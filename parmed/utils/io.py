@@ -16,6 +16,7 @@ except ImportError:
 from io import TextIOWrapper
 from parmed.utils.six import PY2
 
+
 def genopen(name, mode='r', buffering=None):
     """
     Opens a file, automatically detecting compression schemes by filename
@@ -45,28 +46,28 @@ def genopen(name, mode='r', buffering=None):
             raise ImportError('bz2 unavailable; cannot read %s' % name)
         if buffering is not None:
             if PY2:
-                return bz2.BZ2File(name, mode+'b', buffering)
+                return bz2.BZ2File(name, mode + 'b', buffering)
             else:
-                return TextIOWrapper(bz2.BZ2File(name, mode+'b', buffering))
+                return TextIOWrapper(bz2.BZ2File(name, mode + 'b', buffering))
         else:
             if PY2:
-                return bz2.BZ2File(name, mode+'b')
+                return bz2.BZ2File(name, mode + 'b')
             else:
-                return TextIOWrapper(bz2.BZ2File(name, mode+'b'))
+                return TextIOWrapper(bz2.BZ2File(name, mode + 'b'))
     elif name.endswith('.gz'):
         if gzip is None:
             raise ImportError('gzip is unavailable; cannot read %s' % name)
         if buffering is not None:
             if PY2:
-                return gzip.open(name, mode+'b', buffering)
+                return gzip.open(name, mode + 'b', buffering)
             else:
-                return TextIOWrapper(gzip.open(name, mode+'b', buffering))
+                return TextIOWrapper(gzip.open(name, mode + 'b', buffering))
         else:
             if PY2:
-                return gzip.open(name, mode+'b', buffering)
+                return gzip.open(name, mode + 'b', buffering)
             else:
-                return TextIOWrapper(gzip.open(name, mode+'b'))
+                return TextIOWrapper(gzip.open(name, mode + 'b'))
 
     if buffering is not None:
-        return TextIOWrapper(open(name, mode+'b', buffering))
+        return TextIOWrapper(open(name, mode + 'b', buffering))
     return open(name, mode)

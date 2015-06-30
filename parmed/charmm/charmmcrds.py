@@ -21,11 +21,13 @@ from parmed.vec3 import Vec3
 import sys
 
 charmlen = 22
-TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
+TIMESCALE = 4.888821E-14 * 1e12  # AKMA time units to picoseconds
 ONE_TIMESCALE = 1 / TIMESCALE
+
 
 @add_metaclass(FileFormatType)
 class CharmmCrdFile(object):
+
     """
     Reads and parses a CHARMM coordinate file (.crd) into its components,
     namely the coordinates, CHARMM atom types, resid, resname, etc.
@@ -141,12 +143,12 @@ class CharmmCrdFile(object):
                     intitle = False
                 elif line[0] != '*':
                     intitle = False
-                else: 
+                else:
                     intitle = True
 
             while len(line) == 0:      # Skip whitespace
                 line = crdfile.readline().strip()
-            
+
             try:
                 self.natom = int(line.split()[0])
                 for row in range(self.natom):
@@ -162,18 +164,20 @@ class CharmmCrdFile(object):
                     self.resid.append(int(line[8]))
                     self.weighting.append(float(line[9]))
 
-                if 3*self.natom != len(self.coords):
+                if 3 * self.natom != len(self.coords):
                     raise CharmmError("Error parsing CHARMM .crd file: %d "
-                                          "atoms requires %d coords (not %d)" %
-                                          (self.natom, 3*self.natom,
-                                           len(self.coords))
-                    )
+                                      "atoms requires %d coords (not %d)" %
+                                      (self.natom, 3 * self.natom,
+                                       len(self.coords))
+                                      )
             except (ValueError, IndexError):
                 raise CharmmError('Error parsing CHARMM coordinate file')
             self.coords = np.array(self.coords).reshape((-1, self.natom, 3))
 
+
 @add_metaclass(FileFormatType)
 class CharmmRstFile(object):
+
     """
     Reads and parses data, velocities and coordinates from a CHARMM restart
     file (.rst) of file name 'fname' into class attributes
@@ -228,7 +232,7 @@ class CharmmRstFile(object):
         self.coordsold = []
         self.coords = []
         self.vels = []
-        
+
         self.ff_version = 0
         self.natom = 0
         self.npriv = 0
@@ -269,14 +273,14 @@ class CharmmRstFile(object):
     def _parse(self, fname):
 
         with closing(io.genopen(fname, 'r')) as crdfile:
-            readingHeader = True 
+            readingHeader = True
             while readingHeader:
                 line = crdfile.readline()
                 if not len(line):
                     raise CharmmError('Premature end of file')
                 line = line.strip()
                 words = line.split()
-                if len(line) != 0:  
+                if len(line) != 0:
                     if words[0] == 'ENERGIES' or words[0] == '!ENERGIES':
                         readingHeader = False
                     else:
@@ -289,11 +293,12 @@ class CharmmRstFile(object):
                     line = self.header[row].strip().split()
                     if line[0][0:5] == 'NATOM' or line[0][0:6] == '!NATOM':
                         try:
-                            line = self.header[row+1].strip().split()
-                            self.natom = int(line[0])     
+                            line = self.header[row + 1].strip().split()
+                            self.natom = int(line[0])
                             self.npriv = int(line[1])     # num. previous steps
-                            self.nstep = int(line[2])     # num. steps in file  
-                            self.nsavc = int(line[3])     # coord save frequency 
+                            self.nstep = int(line[2])     # num. steps in file
+                            # coord save frequency
+                            self.nsavc = int(line[3])
                             self.nsavv = int(line[4])     # velocities "
                             self.jhstrt = int(line[5])    # Num total steps?
                             break
@@ -302,7 +307,8 @@ class CharmmRstFile(object):
 
             self.scan(crdfile, '!XOLD')
             self._get_formatted_crds(crdfile, self.coordsold)
-            self.coordsold = np.array(self.coordsold).reshape((-1,self.natom,3))
+            self.coordsold = np.array(
+                self.coordsold).reshape((-1, self.natom, 3))
 
             self.scan(crdfile, '!VX')
             self._get_formatted_crds(crdfile, self.vels)
@@ -314,10 +320,11 @@ class CharmmRstFile(object):
             self._get_formatted_crds(crdfile, self.coords)
             self.coords = np.array(self.coords).reshape((-1, self.natom, 3))
 
-    def scan(self, handle, str, r=0): # read lines in file till 'str' is found
+    def scan(self, handle, str, r=0):  # read lines in file till 'str' is found
         scanning = True
 
-        if(r): handle.seek(0)
+        if(r):
+            handle.seek(0)
 
         while scanning:
             line = handle.readline()
@@ -335,17 +342,18 @@ class CharmmRstFile(object):
             if not line:
                 raise CharmmError('Premature end of file')
 
-            if len(line) < 3*charmlen:
+            if len(line) < 3 * charmlen:
                 raise CharmmError("Less than 3 coordinates present in "
-                                      "coordinate row or coords may be "
-                                      "truncated.") 
+                                  "coordinate row or coords may be "
+                                  "truncated.")
 
-            line = line.replace('D','E')     # CHARMM uses 'D' for exponentials
+            # CHARMM uses 'D' for exponentials
+            line = line.replace('D', 'E')
 
             # CHARMM uses fixed format (len = charmlen = 22) for crds in .rst's
-            crds.append(float(line[0:charmlen]))  
-            crds.append(float(line[charmlen:2*charmlen]))
-            crds.append(float(line[2*charmlen:3*charmlen]))
+            crds.append(float(line[0:charmlen]))
+            crds.append(float(line[charmlen:2 * charmlen]))
+            crds.append(float(line[2 * charmlen:3 * charmlen]))
 
 if __name__ == '__main__':
     import doctest

@@ -10,8 +10,10 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
 
+
 @add_metaclass(FileFormatType)
 class PSFFile(object):
+
     """
     CHARMM- or XPLOR-style PSF file parser and writer. This class is
     specifically a holder for the writing functionality and a vessel for
@@ -96,20 +98,21 @@ class PSFFile(object):
 
         # Assign the formats we need to write with
         if ext:
-            atmfmt1 = ('%10d %-8s %-8i %-8s %-8s %4d %10.6f %13.4f' + 11*' ')
-            atmfmt2 = ('%10d %-8s %-8i %-8s %-8s %-4s %10.6f %13.4f' + 11*' ')
-            intfmt = '%10d' # For pointers
+            atmfmt1 = ('%10d %-8s %-8i %-8s %-8s %4d %10.6f %13.4f' + 11 * ' ')
+            atmfmt2 = (
+                '%10d %-8s %-8i %-8s %-8s %-4s %10.6f %13.4f' + 11 * ' ')
+            intfmt = '%10d'  # For pointers
         else:
-            atmfmt1 = ('%8d %-4s %-4i %-4s %-4s %4d %10.6f %13.4f' + 11*' ')
-            atmfmt2 = ('%8d %-4s %-4i %-4s %-4s %-4s %10.6f %13.4f' + 11*' ')
-            intfmt = '%8d' # For pointers
+            atmfmt1 = ('%8d %-4s %-4i %-4s %-4s %4d %10.6f %13.4f' + 11 * ' ')
+            atmfmt2 = ('%8d %-4s %-4i %-4s %-4s %-4s %10.6f %13.4f' + 11 * ' ')
+            intfmt = '%8d'  # For pointers
 
         # Now print the header then the title
         dest.write('PSF ')
         if hasattr(struct, 'flags'):
             dest.write(' '.join(struct.flags))
         else:
-            dest.write('EXT') # EXT is always active
+            dest.write('EXT')  # EXT is always active
         dest.write('\n\n')
         dest.write(intfmt % len(struct.title) + ' !NTITLE\n')
         dest.write('\n'.join(struct.title) + '\n\n')
@@ -121,14 +124,15 @@ class PSFFile(object):
             typ = atom.type
             if isinstance(atom.type, str):
                 fmt = atmfmt2
-                if not atom.type: typ = atom.name
+                if not atom.type:
+                    typ = atom.name
             else:
                 fmt = atmfmt1
             if hasattr(atom, 'segid'):
                 segid = atom.segid
             else:
                 segid = 'SYS'
-            atmstr = fmt % (i+1, segid, atom.residue.number,
+            atmstr = fmt % (i + 1, segid, atom.residue.number,
                             atom.residue.name, atom.name, typ,
                             atom.charge, atom.mass)
             if hasattr(atom, 'props'):
@@ -139,8 +143,8 @@ class PSFFile(object):
         # Bonds
         dest.write(intfmt % len(struct.bonds) + ' !NBOND: bonds\n')
         for i, bond in enumerate(struct.bonds):
-            dest.write((intfmt*2) % (bond.atom1.idx+1, bond.atom2.idx+1))
-            if i % 4 == 3: # Write 4 bonds per line
+            dest.write((intfmt * 2) % (bond.atom1.idx + 1, bond.atom2.idx + 1))
+            if i % 4 == 3:  # Write 4 bonds per line
                 dest.write('\n')
         # See if we need to terminate
         if len(struct.bonds) % 4 != 0 or len(struct.bonds) == 0:
@@ -149,10 +153,10 @@ class PSFFile(object):
         # Angles
         dest.write(intfmt % len(struct.angles) + ' !NTHETA: angles\n')
         for i, angle in enumerate(struct.angles):
-            dest.write((intfmt*3) % (angle.atom1.idx+1, angle.atom2.idx+1,
-                                     angle.atom3.idx+1)
-            )
-            if i % 3 == 2: # Write 3 angles per line
+            dest.write((intfmt * 3) % (angle.atom1.idx + 1, angle.atom2.idx + 1,
+                                       angle.atom3.idx + 1)
+                       )
+            if i % 3 == 2:  # Write 3 angles per line
                 dest.write('\n')
         # See if we need to terminate
         if len(struct.angles) % 3 != 0 or len(struct.angles) == 0:
@@ -161,10 +165,10 @@ class PSFFile(object):
         # Dihedrals
         dest.write(intfmt % len(struct.dihedrals) + ' !NPHI: dihedrals\n')
         for i, dih in enumerate(struct.dihedrals):
-            dest.write((intfmt*4) % (dih.atom1.idx+1, dih.atom2.idx+1,
-                                     dih.atom3.idx+1, dih.atom4.idx+1)
-            )
-            if i % 2 == 1: # Write 2 dihedrals per line
+            dest.write((intfmt * 4) % (dih.atom1.idx + 1, dih.atom2.idx + 1,
+                                       dih.atom3.idx + 1, dih.atom4.idx + 1)
+                       )
+            if i % 2 == 1:  # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
         if len(struct.dihedrals) % 2 != 0 or len(struct.dihedrals) == 0:
@@ -173,10 +177,10 @@ class PSFFile(object):
         # Impropers
         dest.write(intfmt % len(struct.impropers) + ' !NIMPHI: impropers\n')
         for i, imp in enumerate(struct.impropers):
-            dest.write((intfmt*4) % (imp.atom1.idx+1, imp.atom2.idx+1,
-                                     imp.atom3.idx+1, imp.atom4.idx+1)
-            )
-            if i % 2 == 1: # Write 2 dihedrals per line
+            dest.write((intfmt * 4) % (imp.atom1.idx + 1, imp.atom2.idx + 1,
+                                       imp.atom3.idx + 1, imp.atom4.idx + 1)
+                       )
+            if i % 2 == 1:  # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
         if len(struct.impropers) % 2 != 0 or len(struct.impropers) == 0:
@@ -185,8 +189,8 @@ class PSFFile(object):
         # Donor section
         dest.write(intfmt % len(struct.donors) + ' !NDON: donors\n')
         for i, don in enumerate(struct.donors):
-            dest.write((intfmt*2) % (don.atom1.idx+1, don.atom2.idx+1))
-            if i % 4 == 3: # 4 donors per line
+            dest.write((intfmt * 2) % (don.atom1.idx + 1, don.atom2.idx + 1))
+            if i % 4 == 3:  # 4 donors per line
                 dest.write('\n')
         if len(struct.donors) % 4 != 0 or len(struct.donors) == 0:
             dest.write('\n')
@@ -194,8 +198,8 @@ class PSFFile(object):
         # Acceptor section
         dest.write(intfmt % len(struct.acceptors) + ' !NACC: acceptors\n')
         for i, acc in enumerate(struct.acceptors):
-            dest.write((intfmt*2) % (acc.atom1.idx+1, acc.atom2.idx+1))
-            if i % 4 == 3: # 4 donors per line
+            dest.write((intfmt * 2) % (acc.atom1.idx + 1, acc.atom2.idx + 1))
+            if i % 4 == 3:  # 4 donors per line
                 dest.write('\n')
         if len(struct.acceptors) % 4 != 0 or len(struct.acceptors) == 0:
             dest.write('\n')
@@ -204,16 +208,18 @@ class PSFFile(object):
         dest.write(intfmt % 0 + ' !NNB\n\n')
         for i in range(len(struct.atoms)):
             dest.write(intfmt % 0)
-            if i % 8 == 7: # Write 8 0's per line
+            if i % 8 == 7:  # Write 8 0's per line
                 dest.write('\n')
-        if len(struct.atoms) % 8 != 0: dest.write('\n')
+        if len(struct.atoms) % 8 != 0:
+            dest.write('\n')
         dest.write('\n')
         # Group section
-        dest.write((intfmt*2) % (len(struct.groups), struct.groups.nst2))
+        dest.write((intfmt * 2) % (len(struct.groups), struct.groups.nst2))
         dest.write(' !NGRP NST2\n')
         for i, gp in enumerate(struct.groups):
-            dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
-            if i % 3 == 2: dest.write('\n')
+            dest.write((intfmt * 3) % (gp.bs, gp.type, gp.move))
+            if i % 3 == 2:
+                dest.write('\n')
         if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
             dest.write('\n')
         dest.write('\n')
@@ -225,20 +231,22 @@ class PSFFile(object):
             dest.write(intfmt % max(mollist) + ' !MOLNT\n')
             for i, atom in enumerate(struct.atoms):
                 dest.write(intfmt % atom.marked)
-                if i % 8 == 7: dest.write('\n')
-            if len(struct.atoms) % 8 != 0: dest.write('\n')
+                if i % 8 == 7:
+                    dest.write('\n')
+            if len(struct.atoms) % 8 != 0:
+                dest.write('\n')
             dest.write('\n')
             # NUMLP/NUMLPH section
-            dest.write((intfmt*2) % (0, 0) + ' !NUMLP NUMLPH\n')
+            dest.write((intfmt * 2) % (0, 0) + ' !NUMLP NUMLPH\n')
             dest.write('\n')
         # CMAP section
         dest.write(intfmt % len(struct.cmaps) + ' !NCRTERM: cross-terms\n')
         for i, cmap in enumerate(struct.cmaps):
-            dest.write((intfmt*8) % (cmap.atom1.idx+1, cmap.atom2.idx+1,
-                                     cmap.atom3.idx+1, cmap.atom4.idx+1,
-                                     cmap.atom2.idx+1, cmap.atom3.idx+1,
-                                     cmap.atom4.idx+1, cmap.atom5.idx+1)
-            )
+            dest.write((intfmt * 8) % (cmap.atom1.idx + 1, cmap.atom2.idx + 1,
+                                       cmap.atom3.idx + 1, cmap.atom4.idx + 1,
+                                       cmap.atom2.idx + 1, cmap.atom3.idx + 1,
+                                       cmap.atom4.idx + 1, cmap.atom5.idx + 1)
+                       )
             dest.write('\n')
         # Done!
         # If we opened our own handle, close it

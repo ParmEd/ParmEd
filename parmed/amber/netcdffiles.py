@@ -37,6 +37,7 @@ try:
     nc4get_int_dimension = lambda obj, name: len(obj.dimensions[name])
     # Support 1-dimension arrays as scalars (since that's how Python-NetCDF
     # bindings write out scalars in Amber files)
+
     def nc4get_float(obj, name):
         try:
             val = obj.variables[name].getValue()
@@ -73,6 +74,7 @@ except ImportError:
 
 HAS_NETCDF = (_HAS_NC4 or _HAS_SCIENTIFIC_PYTHON or _HAS_SCIPY_NETCDF)
 
+
 def _coerce_to_string(string, encoding='ascii'):
     """
     Decodes input to a string with the specified encoding if it is a bytes
@@ -83,6 +85,7 @@ def _coerce_to_string(string, encoding='ascii'):
     except AttributeError:
         # Assume string
         return string
+
 
 def use(package=None):
     """
@@ -154,14 +157,15 @@ def use(package=None):
         get_float = spget_float
     else:
         raise ImportError('%s not a valid NetCDF package. Available options '
-                          'are %s' % (package, 
+                          'are %s' % (package,
                                       ', '.join(ALLOWED_NETCDF_PACKAGES))
-        )
-    
-    NETCDF_INITIALIZED = True # We have now selected a NetCDF implementation
+                          )
+
+    NETCDF_INITIALIZED = True  # We have now selected a NetCDF implementation
 
 import numpy as np
 from parmed import __version__
+
 
 def needs_netcdf(fcn):
     """
@@ -173,12 +177,14 @@ def needs_netcdf(fcn):
         if not HAS_NETCDF:
             raise ImportError('No NetCDF packages are available!')
         if not NETCDF_INITIALIZED:
-            use() # Set up a default NetCDF implementation
+            use()  # Set up a default NetCDF implementation
         return fcn(*args, **kwargs)
     return new_fcn
 
+
 @add_metaclass(FileFormatType)
 class NetCDFRestart(object):
+
     """ Class to read or write NetCDF restart files """
 
     @staticmethod
@@ -196,12 +202,12 @@ class NetCDFRestart(object):
             True if it is an Amber NetCDF restart file. False otherwise
         """
         if not HAS_NETCDF:
-            return False # Can't determine...
+            return False  # Can't determine...
         if not NETCDF_INITIALIZED:
             use()
         try:
             f = open_netcdf(filename, 'r')
-        except: # Bare except... each package raises different exceptions
+        except:  # Bare except... each package raises different exceptions
             return False
         try:
             try:
@@ -224,7 +230,7 @@ class NetCDFRestart(object):
         """
         self.closed = False
         self._ncfile = open_netcdf(fname, mode)
-   
+
     @classmethod
     @needs_netcdf
     def open_new(cls, fname, natom, box, vels, title='',
@@ -265,8 +271,8 @@ class NetCDFRestart(object):
                                      'T-REMD restarts.')
             elif remd[0] in 'mM':
                 remd_type = 'MULTI'
-                if (remd_indices is None or remd_groups is None or 
-                    len(remd_indices) != len(remd_groups)):
+                if (remd_indices is None or remd_groups is None or
+                        len(remd_indices) != len(remd_groups)):
                     raise ValueError('remd_indices and remd_groups must be '
                                      'given for multi-D REMD, and must have '
                                      'the same length.')
@@ -310,25 +316,25 @@ class NetCDFRestart(object):
         v[:] = np.asarray(list('xyz'))
         if inst.hasbox:
             v = ncfile.createVariable('cell_angular', 'c',
-                                            ('cell_angular', 'label'))
+                                      ('cell_angular', 'label'))
             v[0] = np.asarray(list('alpha'))
             v[1] = np.asarray(list('beta '))
             v[2] = np.asarray(list('gamma'))
             v = ncfile.createVariable('cell_spatial', 'c',
-                                            ('cell_spatial',))
+                                      ('cell_spatial',))
             v[0], v[1], v[2] = 'a', 'b', 'c'
             v = ncfile.createVariable('cell_lengths', 'd',
-                                            ('cell_spatial',))
+                                      ('cell_spatial',))
             v.units = 'angstrom'
             v = ncfile.createVariable('cell_angles', 'd',
-                                            ('cell_angular',))
+                                      ('cell_angular',))
             v.units = 'degree'
         v = ncfile.createVariable('coordinates', 'd',
-                                        ('atom', 'spatial'))
+                                  ('atom', 'spatial'))
         v.units = 'angstrom'
         if inst.hasvels:
             v = ncfile.createVariable('velocities', 'd',
-                                            ('atom', 'spatial'))
+                                      ('atom', 'spatial'))
             try:
                 # Prevent NetCDF4 from trying to autoscale the values. Ugh.
                 v.set_auto_maskandscale(False)
@@ -344,11 +350,11 @@ class NetCDFRestart(object):
             v.units = 'kelvin'
         elif remd_type == 'MULTI':
             ncfile.createVariable('remd_indices', 'i',
-                                        ('remd_dimension',))
+                                  ('remd_dimension',))
             ncfile.createVariable('remd_groups', 'i',
-                                        ('remd_dimension',))
+                                  ('remd_dimension',))
             ncfile.createVariable('remd_dimtype', 'i',
-                                        ('remd_dimension',))
+                                  ('remd_dimension',))
 
         return inst
 
@@ -374,7 +380,8 @@ class NetCDFRestart(object):
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
-            if dim == 'time': continue
+            if dim == 'time':
+                continue
             setattr(inst, dim, get_int_dimension(ncfile, dim))
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
@@ -411,13 +418,13 @@ class NetCDFRestart(object):
     @velocities.setter
     def velocities(self, stuff):
         self._ncfile.variables['velocities'][:] = \
-                    np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
+            np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
         self.flush()
 
     @property
     def cell_lengths(self):
         return self._ncfile.variables['cell_lengths'][:]
-   
+
     @cell_lengths.setter
     def cell_lengths(self, stuff):
         self._ncfile.variables['cell_lengths'][:] = np.asarray(stuff)
@@ -426,7 +433,7 @@ class NetCDFRestart(object):
     @property
     def cell_angles(self):
         return self._ncfile.variables['cell_angles'][:]
-   
+
     @cell_angles.setter
     def cell_angles(self, stuff):
         self._ncfile.variables['cell_angles'][:] = np.asarray(stuff)
@@ -459,14 +466,15 @@ class NetCDFRestart(object):
     def temp0(self, stuff):
         self._ncfile.variables['temp0'][0] = float(stuff)
         self.flush()
-   
+
     @property
     def remd_indices(self):
         return self._ncfile.variables['remd_indices'][:]
 
     @remd_indices.setter
     def remd_indices(self, stuff):
-        self._ncfile.variables['remd_indices'][:] = np.asarray(stuff, dtype='i')
+        self._ncfile.variables['remd_indices'][
+            :] = np.asarray(stuff, dtype='i')
         self.flush()
 
     @property
@@ -484,7 +492,8 @@ class NetCDFRestart(object):
 
     @remd_dimtype.setter
     def remd_dimtype(self, stuff):
-        self._ncfile.variables['remd_dimtype'][:] = np.asarray(stuff, dtype='i')
+        self._ncfile.variables['remd_dimtype'][
+            :] = np.asarray(stuff, dtype='i')
         self.flush()
 
     def close(self):
@@ -500,8 +509,10 @@ class NetCDFRestart(object):
         except AttributeError:
             pass
 
+
 @add_metaclass(FileFormatType)
 class NetCDFTraj(object):
+
     """ Class to read or write NetCDF restart files
 
     Parameters
@@ -534,12 +545,12 @@ class NetCDFTraj(object):
             True if it is an Amber NetCDF trajectory file. False otherwise
         """
         if not HAS_NETCDF:
-            return False # Can't determine...
+            return False  # Can't determine...
         if not NETCDF_INITIALIZED:
             use()
         try:
             f = open_netcdf(filename, 'r')
-        except: # Bare except... each package raises different exceptions
+        except:  # Bare except... each package raises different exceptions
             return False
         try:
             try:
@@ -557,7 +568,7 @@ class NetCDFTraj(object):
         """ Opens a NetCDF File """
         self.closed = False
         self._ncfile = open_netcdf(fname, mode)
-   
+
     @classmethod
     @needs_netcdf
     def open_new(cls, fname, natom, box, crds=True, vels=False, frcs=False,
@@ -637,21 +648,21 @@ class NetCDFTraj(object):
         v[:] = np.asarray(list('xyz'))
         if inst.hasbox:
             v = ncfile.createVariable('cell_spatial', 'c',
-                                            ('cell_spatial',))
+                                      ('cell_spatial',))
             v[:] = np.asarray(list('abc'))
             v = ncfile.createVariable('cell_angular', 'c',
-                                            ('cell_angular', 'label',))
+                                      ('cell_angular', 'label',))
             v[:] = np.asarray([list('alpha'), list('beta '), list('gamma')])
         v = ncfile.createVariable('time', 'f', ('frame',))
         v.units = 'picosecond'
         if inst.hascrds:
             v = ncfile.createVariable('coordinates', 'f',
-                                            ('frame', 'atom', 'spatial'))
+                                      ('frame', 'atom', 'spatial'))
             v.units = 'angstrom'
             inst._last_crd_frame = 0
         if inst.hasvels:
             v = ncfile.createVariable('velocities', 'f',
-                                            ('frame', 'atom', 'spatial'))
+                                      ('frame', 'atom', 'spatial'))
             v.units = 'angstrom/picosecond'
             inst.velocity_scale = v.scale_factor = 20.455
             inst._last_vel_frame = 0
@@ -663,15 +674,15 @@ class NetCDFTraj(object):
                 pass
         if inst.hasfrcs:
             v = ncfile.createVariable('forces', 'f',
-                                            ('frame', 'atom', 'spatial'))
+                                      ('frame', 'atom', 'spatial'))
             v.units = 'kilocalorie/mole/angstrom'
             inst._last_frc_frame = 0
         if inst.hasbox:
             v = ncfile.createVariable('cell_lengths', 'd',
-                                            ('frame', 'cell_spatial'))
+                                      ('frame', 'cell_spatial'))
             v.units = 'angstrom'
             v = ncfile.createVariable('cell_angles', 'd',
-                                            ('frame', 'cell_angular'))
+                                      ('frame', 'cell_angular'))
             v.units = 'degree'
             inst._last_box_frame = 0
         if inst.remd == 'TEMPERATURE':
@@ -680,11 +691,11 @@ class NetCDFTraj(object):
             inst._last_remd_frame = 0
         elif inst.remd == 'MULTI':
             ncfile.createVariable('remd_indices', 'i',
-                                        ('frame', 'remd_dimension'))
+                                  ('frame', 'remd_dimension'))
             ncfile.createVariable('remd_dimtype', 'i',
-                                        ('remd_dimension',))
+                                  ('remd_dimension',))
             inst._last_remd_frame = 0
-    
+
         inst._last_time_frame = 0
 
         return inst
@@ -729,7 +740,8 @@ class NetCDFTraj(object):
             except AttributeError:
                 # Other packages do not have this variable.
                 pass
-            inst._velocities = np.array(ncfile.variables['velocities'][:])*scale
+            inst._velocities = np.array(
+                ncfile.variables['velocities'][:]) * scale
             inst.velocity_scale = scale
         if inst.hasfrcs:
             inst._forces = np.array(ncfile.variables['forces'][:])
@@ -766,7 +778,7 @@ class NetCDFTraj(object):
             stuff = stuff.value_in_unit(u.angstroms)
         stuff = np.asarray(stuff)
         self._ncfile.variables['coordinates'][self._last_crd_frame] = \
-                np.reshape(stuff, (self.atom, 3))
+            np.reshape(stuff, (self.atom, 3))
         self._last_crd_frame += 1
         self.flush()
 
@@ -789,10 +801,10 @@ class NetCDFTraj(object):
             [x1, y1, z1, x2, y2, z2, ... ].
         """
         if u.is_quantity(stuff):
-            stuff = stuff.value_in_unit(u.angstrom/u.picosecond)
+            stuff = stuff.value_in_unit(u.angstrom / u.picosecond)
         stuff = np.asarray(stuff)
         self._ncfile.variables['velocities'][self._last_vel_frame] = \
-                np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
+            np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
         self._last_vel_frame += 1
         self.flush()
 
@@ -815,9 +827,9 @@ class NetCDFTraj(object):
             [x1, y1, z1, x2, y2, z2, ... ].
         """
         if u.is_quantity(stuff):
-            stuff.value_in_unit(u.kilocalories_per_mole/u.angstroms)
+            stuff.value_in_unit(u.kilocalories_per_mole / u.angstroms)
         self._ncfile.variables['forces'][self._last_frc_frame] = \
-                np.reshape(stuff, (self.atom, 3))
+            np.reshape(stuff, (self.atom, 3))
         self._last_frc_frame += 1
         self.flush()
 
@@ -846,7 +858,8 @@ class NetCDFTraj(object):
             includes angles as well.
         """
         def strip_units(x, desired_units):
-            if u.is_quantity(x): return x.value_in_unit(desired_units)
+            if u.is_quantity(x):
+                return x.value_in_unit(desired_units)
             return x
         if len(lengths) == 3 and angles is None:
             raise ValueError('Both lengths and angles are required.')
@@ -858,9 +871,9 @@ class NetCDFTraj(object):
             angles = [strip_units(x, u.degrees) for x in lengths[3:]]
         lengths = [strip_units(x, u.angstroms) for x in lengths[:3]]
         self._ncfile.variables['cell_lengths'][self._last_box_frame] = \
-                np.asarray(lengths)
+            np.asarray(lengths)
         self._ncfile.variables['cell_angles'][self._last_box_frame] = \
-                np.asarray(angles)
+            np.asarray(angles)
         self._last_box_frame += 1
         self.flush()
 
@@ -878,7 +891,8 @@ class NetCDFTraj(object):
         stuff : float or time-dimension Quantity
             The time to add to the current frame
         """
-        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.picoseconds)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.picoseconds)
         self._ncfile.variables['time'][self._last_time_frame] = float(stuff)
         self._last_time_frame += 1
         self.flush()
@@ -896,7 +910,7 @@ class NetCDFTraj(object):
             The indices in each REMD dimension
         """
         self._ncfile.variables['remd_indices'][self._last_remd_frame] = \
-                np.asarray(stuff, dtype='i')
+            np.asarray(stuff, dtype='i')
         self._last_remd_frame += 1
         self.flush()
 
@@ -912,7 +926,8 @@ class NetCDFTraj(object):
         stuff : float or temperature Quantity
             The temperature to add to the current NetCDF file
         """
-        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.kelvin)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.kelvin)
         self._ncfile.variables['temp0'][self._last_remd_frame] = float(stuff)
         self._last_remd_frame += 1
         self.flush()
@@ -923,7 +938,8 @@ class NetCDFTraj(object):
 
     @remd_dimtype.setter
     def remd_dimtype(self, stuff):
-        self._ncfile.variables['remd_dimtype'][:] = np.asarray(stuff, dtype='i')
+        self._ncfile.variables['remd_dimtype'][
+            :] = np.asarray(stuff, dtype='i')
         self.flush()
 
     def close(self):

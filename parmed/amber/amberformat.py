@@ -5,8 +5,8 @@ Amber-style files with %FLAG/%FORMAT tags
 from __future__ import division, print_function
 
 from parmed.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
-            NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
-            NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
+                              NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
+                              NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
 from parmed.exceptions import AmberError
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
@@ -22,6 +22,7 @@ from warnings import warn, filterwarnings
 
 filterwarnings('always', message='.', category=DeprecationWarning)
 
+
 def _deprecated(oldname, newname):
     def wrapper(func):
         @wraps(func)
@@ -34,7 +35,9 @@ def _deprecated(oldname, newname):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class FortranFormat(object):
+
     """
     Processes Fortran format strings according to the Fortran specification for
     such formats. This object handles reading and writing data with any valid
@@ -75,7 +78,7 @@ class FortranFormat(object):
         strings using this format
         """
         self.format = format_string
-        self.strip_strings = strip_strings # for ease of copying
+        self.strip_strings = strip_strings  # for ease of copying
 
         # Define a function that processes all arguments prior to adding them to
         # the returned list. By default, do nothing, but this allows us to
@@ -84,7 +87,8 @@ class FortranFormat(object):
 
         if FortranFormat.strre.match(format_string):
             rematch = FortranFormat.strre.match(format_string)
-            # replace our write() method with write_string to force left-justify
+            # replace our write() method with write_string to force
+            # left-justify
             self.type, self.write = str, self._write_string
             nitems, itemlen = rematch.groups()
             if nitems is None:
@@ -94,7 +98,8 @@ class FortranFormat(object):
             self.itemlen = int(itemlen)
             self.fmt = '%s'
             # See if we want to strip the strings
-            if strip_strings: self.process_method = lambda x: x.strip()
+            if strip_strings:
+                self.process_method = lambda x: x.strip()
 
         elif FortranFormat.intre.match(format_string):
             self.type = int
@@ -250,8 +255,10 @@ class FortranFormat(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 @add_metaclass(FileFormatType)
 class AmberFormat(object):
+
     """ 
     A class that can parse and print files stored in the Amber topology or MDL
     format. In particular, these files have the general form:
@@ -412,7 +419,7 @@ class AmberFormat(object):
     def rdparm(self, fname, slow=False):
         """ Parses the Amber format file """
         self.name = fname
-        self.version = None # reset all top info each time rdparm is called
+        self.version = None  # reset all top info each time rdparm is called
         self.formats = {}
         self.parm_data = {}
         self.parm_comments = {}
@@ -437,7 +444,8 @@ class AmberFormat(object):
         else:
             # Unpack returned contents
             parm_data, parm_comments, formats, unkflg, flag_list, version = ret
-            # Now assign them to instance attributes and process where necessary
+            # Now assign them to instance attributes and process where
+            # necessary
             self.parm_data = parm_data
             self.parm_comments = parm_comments
             for key in formats:
@@ -487,7 +495,8 @@ class AmberFormat(object):
                         self.flag_list.append(current_flag)
                         continue
                     elif line[0:8] == '%COMMENT':
-                        self.parm_comments[current_flag].append(line[9:].strip())
+                        self.parm_comments[current_flag].append(
+                            line[9:].strip())
                         continue
                     elif line[0:7] == '%FORMAT':
                         fmt = FortranFormat(fmtre.match(line).groups()[0])
@@ -536,16 +545,17 @@ class AmberFormat(object):
                 if idx == 0:
                     line_idx += 1
                 try:
-                    tmp_data.append(int(lines[line_idx][idx*6:idx*6+6]))
+                    tmp_data.append(int(lines[line_idx][idx * 6:idx * 6 + 6]))
                 except ValueError:
                     raise ValueError(
-                            'Error parsing line %d, token %d [%s]: Problem '
-                            'during integer read.' % (line_idx, idx,
-                            lines[line_idx][idx*6:idx*6+6])
+                        'Error parsing line %d, token %d [%s]: Problem '
+                        'during integer read.' % (line_idx, idx,
+                                                  lines[line_idx][idx * 6:idx * 6 + 6])
                     )
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         def read_string(line_idx, lines, num_items):
@@ -556,10 +566,11 @@ class AmberFormat(object):
                 idx = i % 20
                 if idx == 0:
                     line_idx += 1
-                tmp_data.append(lines[line_idx][idx*4:idx*4+4])
+                tmp_data.append(lines[line_idx][idx * 4:idx * 4 + 4])
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         def read_float(line_idx, lines, num_items):
@@ -571,16 +582,18 @@ class AmberFormat(object):
                 if idx == 0:
                     line_idx += 1
                 try:
-                    tmp_data.append(float(lines[line_idx][idx*16:idx*16+16]))
+                    tmp_data.append(
+                        float(lines[line_idx][idx * 16:idx * 16 + 16]))
                 except ValueError:
                     raise ValueError(
-                            'Error parsing line %d, token %d [%s]: Problem '
-                            'during floating point  read.' % (line_idx, idx,
-                            lines[line_idx][idx*16:idx*16+16])
+                        'Error parsing line %d, token %d [%s]: Problem '
+                        'during floating point  read.' % (line_idx, idx,
+                                                          lines[line_idx][idx * 16:idx * 16 + 16])
                     )
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         # First add a title
@@ -636,7 +649,7 @@ class AmberFormat(object):
         # Next read number excluded atoms
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
         self.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', data=tmp_data)
-      
+
         # Next read nonbonded parm index
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntypes**2)
         self.add_flag('NONBONDED_PARM_INDEX', '10I8', data=tmp_data)
@@ -648,7 +661,7 @@ class AmberFormat(object):
         # Next read residue pointer
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nres)
         self.add_flag('RESIDUE_POINTER', '10I8', data=tmp_data)
-   
+
         # Next read bond force constant
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numbnd)
         self.add_flag('BOND_FORCE_CONSTANT', '5E16.8', data=tmp_data)
@@ -689,27 +702,27 @@ class AmberFormat(object):
         self.add_flag('LENNARD_JONES_BCOEF', '5E16.8', data=tmp_data)
 
         # Next read bonds including hydrogen
-        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nbonh*3)
+        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nbonh * 3)
         self.add_flag('BONDS_INC_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read bonds without hydrogen
-        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nbona*3)
+        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nbona * 3)
         self.add_flag('BONDS_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read angles including hydrogen
-        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntheth*4)
+        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntheth * 4)
         self.add_flag('ANGLES_INC_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read angles without hydrogen
-        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntheta*4)
+        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntheta * 4)
         self.add_flag('ANGLES_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read dihdrals including hydrogen
-        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nphih*5)
+        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nphih * 5)
         self.add_flag('DIHEDRALS_INC_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read dihedrals without hydrogen
-        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nphia*5)
+        tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nphia * 5)
         self.add_flag('DIHEDRALS_WITHOUT_HYDROGEN', '10I8', data=tmp_data)
 
         # Next read the excluded atoms list
@@ -770,9 +783,9 @@ class AmberFormat(object):
         """ Sets the version string """
         now = datetime.datetime.now()
         self.version = (
-                '%%VERSION  VERSION_STAMP = V0001.000  DATE = %02d/%02d/%02d  '
-                '%02d:%02d:%02d' % (now.month, now.day, now.year % 100,
-                                    now.hour, now.minute, now.second)
+            '%%VERSION  VERSION_STAMP = V0001.000  DATE = %02d/%02d/%02d  '
+            '%02d:%02d:%02d' % (now.month, now.day, now.year % 100,
+                                now.hour, now.minute, now.second)
         )
 
     #===================================================
@@ -803,19 +816,20 @@ class AmberFormat(object):
             # write version to top of prmtop file
             new_prm.write('%s\n' % self.version)
 
-            # write data to prmtop file, inserting blank line if it's an empty field
+            # write data to prmtop file, inserting blank line if it's an empty
+            # field
             for flag in self.flag_list:
                 new_prm.write('%%FLAG %s\n' % flag)
                 # Insert any comments before the %FORMAT specifier
                 for comment in self.parm_comments[flag]:
                     new_prm.write('%%COMMENT %s\n' % comment)
                 new_prm.write('%%FORMAT(%s)\n' % self.formats[flag])
-                if len(self.parm_data[flag]) == 0: # empty field...
+                if len(self.parm_data[flag]) == 0:  # empty field...
                     new_prm.write('\n')
                     continue
                 self.formats[flag].write(self.parm_data[flag], new_prm)
 
-        new_prm.close() # close new prmtop
+        new_prm.close()  # close new prmtop
 
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
@@ -888,7 +902,7 @@ class AmberFormat(object):
         """ Removes a flag from the topology file """
         flag_name = flag_name.upper()
         if not flag_name in self.flag_list:
-            return # already gone
+            return  # already gone
         del self.flag_list[self.flag_list.index(flag_name)]
         del self.parm_comments[flag_name]
         del self.formats[flag_name]

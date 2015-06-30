@@ -22,8 +22,10 @@ try:
 except ImportError:
     np = None
 
+
 @add_metaclass(FileFormatType)
 class GromacsGroFile(object):
+
     """ Parses and writes Gromacs GRO files """
     #===================================================
 
@@ -43,30 +45,32 @@ class GromacsGroFile(object):
             otherwise
         """
         with closing(genopen(filename)) as f:
-            f.readline() # Title line
+            f.readline()  # Title line
             try:
-                int(f.readline().strip()) # number of atoms
+                int(f.readline().strip())  # number of atoms
             except ValueError:
                 return False
             line = f.readline()
             try:
                 int(line[:5])
-                if not line[5:10].strip(): return False
-                if not line[10:15].strip(): return False
+                if not line[5:10].strip():
+                    return False
+                if not line[10:15].strip():
+                    return False
                 int(line[15:20])
                 pdeci = [i for i, x in enumerate(line) if x == '.']
                 ndeci = pdeci[1] - pdeci[0] - 5
                 for i in range(1, 4):
-                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    wbeg = (pdeci[0] - 4) + (5 + ndeci) * (i - 1)
+                    wend = (pdeci[0] - 4) + (5 + ndeci) * i
                     float(line[wbeg:wend])
                 i = 4
-                wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                wend = (pdeci[0]-4)+(5+ndeci)*i
+                wbeg = (pdeci[0] - 4) + (5 + ndeci) * (i - 1)
+                wend = (pdeci[0] - 4) + (5 + ndeci) * i
                 if line[wbeg:wend].strip():
                     for i in range(4, 7):
-                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                        wend = (pdeci[0]-4)+(5+ndeci)*i
+                        wbeg = (pdeci[0] - 4) + (5 + ndeci) * (i - 1)
+                        wend = (pdeci[0] - 4) + (5 + ndeci) * i
                         float(line[wbeg:wend])
             except ValueError:
                 return False
@@ -105,7 +109,8 @@ class GromacsGroFile(object):
                 raise GromacsError('Could not parse %s as GRO file' % filename)
             digits = None
             for i, line in enumerate(fileobj):
-                if i == natom: break
+                if i == natom:
+                    break
                 try:
                     resnum = int(line[:5])
                     resname = line[5:10].strip()
@@ -121,20 +126,20 @@ class GromacsGroFile(object):
                                     number=atnum, mass=mass)
                     if digits is None:
                         pdeci = line.index('.', 20)
-                        ndeci = line.index('.', pdeci+1)
+                        ndeci = line.index('.', pdeci + 1)
                         digits = ndeci - pdeci
                     atom.xx, atom.xy, atom.xz = (
-                            float(line[20+i*digits:20+(i+1)*digits])*10
-                                for i in range(3)
+                        float(line[20 + i * digits:20 + (i + 1) * digits]) * 10
+                        for i in range(3)
                     )
                     i = 4
-                    wbeg = (pdeci-4)+(5+ndeci)*(i-1)
-                    wend = (pdeci-4)+(5+ndeci)*i
+                    wbeg = (pdeci - 4) + (5 + ndeci) * (i - 1)
+                    wend = (pdeci - 4) + (5 + ndeci) * i
                     if line[wbeg:wend].strip():
                         atom.vx, atom.vy, atom.vz = (
-                                float(line[(pdeci-3)+(6+ndeci)*i:
-                                           (pdeci-3)+(6+ndeci)*(i+1)])*10
-                                for i in range(3, 6)
+                            float(line[(pdeci - 3) + (6 + ndeci) * i:
+                                       (pdeci - 3) + (6 + ndeci) * (i + 1)]) * 10
+                            for i in range(3, 6)
                         )
                 except (ValueError, IndexError):
                     raise GromacsError('Could not parse the atom record of '
@@ -148,14 +153,14 @@ class GromacsGroFile(object):
                     raise GromacsError('Could not understand box line of GRO '
                                        'file %s' % filename)
                 if len(box) == 3:
-                    struct.box = [box[0]*10, box[1]*10, box[2]*10,
+                    struct.box = [box[0] * 10, box[1] * 10, box[2] * 10,
                                   90.0, 90.0, 90.0]
                 elif len(box) == 9:
                     # Assume we have vectors
                     leng, ang = box_vectors_to_lengths_and_angles(
-                                [box[0], box[3], box[4]]*u.nanometers,
-                                [box[5], box[1], box[6]]*u.nanometers,
-                                [box[7], box[8], box[2]]*u.nanometers)
+                        [box[0], box[3], box[4]] * u.nanometers,
+                        [box[5], box[1], box[6]] * u.nanometers,
+                        [box[7], box[8], box[2]] * u.nanometers)
                     a, b, c = leng.value_in_unit(u.angstroms)
                     alpha, beta, gamma = ang.value_in_unit(u.degrees)
                     struct.box = [a, b, c, alpha, beta, gamma]
@@ -198,36 +203,36 @@ class GromacsGroFile(object):
         has_vels = all(hasattr(a, 'vx') for a in struct.atoms)
         varwidth = 5 + precision
         crdfmt = '%%%d.%df' % (varwidth, precision)
-        velfmt = '%%%d.%df' % (varwidth, precision+1)
+        velfmt = '%%%d.%df' % (varwidth, precision + 1)
         for atom in struct.atoms:
             resid = (atom.residue.idx + 1) % 100000
             atid = (atom.idx + 1) % 100000
             dest.write('%5d%-5s%5s%5d' % (resid, atom.residue.name[:5],
                                           atom.name[:5], atid))
-            dest.write((crdfmt % (atom.xx/10))[:varwidth])
-            dest.write((crdfmt % (atom.xy/10))[:varwidth])
-            dest.write((crdfmt % (atom.xz/10))[:varwidth])
+            dest.write((crdfmt % (atom.xx / 10))[:varwidth])
+            dest.write((crdfmt % (atom.xy / 10))[:varwidth])
+            dest.write((crdfmt % (atom.xz / 10))[:varwidth])
             if has_vels:
-                dest.write((velfmt % (atom.vx/10))[:varwidth])
-                dest.write((velfmt % (atom.vy/10))[:varwidth])
-                dest.write((velfmt % (atom.vz/10))[:varwidth])
+                dest.write((velfmt % (atom.vx / 10))[:varwidth])
+                dest.write((velfmt % (atom.vy / 10))[:varwidth])
+                dest.write((velfmt % (atom.vz / 10))[:varwidth])
             dest.write('\n')
         # Box, in the weird format...
         if struct.box is not None:
             a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
-                            *struct.box))
-            if all([abs(x-90) < TINY for x in struct.box[3:]]):
-                dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
+                *struct.box))
+            if all([abs(x - 90) < TINY for x in struct.box[3:]]):
+                dest.write('%10.5f' * 3 % (a[0] / 10, b[1] / 10, c[2] / 10))
             else:
-                dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
-                           a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
+                dest.write('%10.5f' * 9 % (a[0] / 10, b[1] / 10, c[2] / 10, a[1] / 10,
+                                           a[2] / 10, b[0] / 10, b[2] / 10, c[0] / 10, c[1] / 10))
             dest.write('\n')
         elif not nobox and struct.atoms:
             # Find the extent of the molecule in all dimensions, and buffer it
             # by 5 A
             crds = struct.coordinates
             diff = (crds.max(axis=1) - crds.min(axis=1)) / 10 + 0.5
-            dest.write('%10.5f'*3 % (diff[0], diff[1], diff[2]))
+            dest.write('%10.5f' * 3 % (diff[0], diff[1], diff[2]))
             dest.write('\n')
         if own_handle:
             dest.close()

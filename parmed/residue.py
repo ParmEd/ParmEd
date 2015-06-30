@@ -10,7 +10,9 @@ __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class BiomolecularResidue(object):
+
     """ Base class for different classes of biopolymer residues """
     _all_residues_by_name = dict()
     _all_residues_by_abbr = dict()
@@ -54,7 +56,9 @@ class BiomolecularResidue(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class AminoAcidResidue(BiomolecularResidue):
+
     """
     An individual amino acid residue.
 
@@ -96,7 +100,7 @@ class AminoAcidResidue(BiomolecularResidue):
 
     def __repr__(self):
         return '<Amino Acid Residue %s: %s [%s]>' % (self.name, self.abbr,
-                self.symbol)
+                                                     self.symbol)
 
     @classmethod
     def get(cls, key):
@@ -130,7 +134,7 @@ class AminoAcidResidue(BiomolecularResidue):
 ALA = AminoAcidResidue('Alanine', 'ALA', 'A')
 ARG = AminoAcidResidue('Arginine', 'ARG', 'R')
 ASN = AminoAcidResidue('Asparagine', 'ASN', 'N')
-ASP = AminoAcidResidue('Aspartate' ,'ASP', 'D', ['ASH', 'AS4'])
+ASP = AminoAcidResidue('Aspartate', 'ASP', 'D', ['ASH', 'AS4'])
 CYS = AminoAcidResidue('Cysteine', 'CYS', 'C', ['CYM', 'CYX'])
 GLU = AminoAcidResidue('Glutamate', 'GLU', 'E', ['GLH', 'GL4'])
 GLN = AminoAcidResidue('Glutamine', 'GLN', 'Q')
@@ -150,7 +154,9 @@ VAL = AminoAcidResidue('Valine', 'VAL', 'V')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class DNAResidue(BiomolecularResidue):
+
     """ An individual DNA residue
 
     Parameters
@@ -210,7 +216,9 @@ class DNAResidue(BiomolecularResidue):
         except KeyError:
             return cls._all_residues_by_name[key.upper()]
 
+
 class RNAResidue(DNAResidue):
+
     """ An individual RNA residue
 
     Parameters

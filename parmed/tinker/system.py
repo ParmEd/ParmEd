@@ -9,38 +9,40 @@ from __future__ import print_function, absolute_import, division
 from parmed.utils.six.moves import range
 from parmed.exceptions import TinkerError
 from parmed.tinker.topologyobjects import (AtomList, BondList, AngleList,
-      StretchBendList, UreyBradleyList, OutOfPlaneBendList, OutOfPlaneDistList,
-      TorsionAngleList, PiTorsionList, TorsionTorsionList, AtomicMultipoleList,
-      DipolePolarizabilityList, TorsionTorsionGrid)
+                                           StretchBendList, UreyBradleyList, OutOfPlaneBendList, OutOfPlaneDistList,
+                                           TorsionAngleList, PiTorsionList, TorsionTorsionList, AtomicMultipoleList,
+                                           DipolePolarizabilityList, TorsionTorsionGrid)
+
 
 class TinkerAnalout(object):
+
     """ Reads the output of "analyze" to determine system parameters """
 
     # Flags paired with the attributes in the pointers
-    atom_inter_flags = {'Atoms in System' : 'natom', 
-                        'Pisystem Atoms' : 'norbit',
-                        'Bond Stretches' : 'nbond',
-                        'Conjugated Pi-Bonds' : 'nbpi',
-                        'Angle Bends' : 'nangle',
-                        'Stretch-Bends' : 'nstrbnd',
-                        'Urey-Bradley' : 'nurey',
-                        'Angle-Angles' : 'nangang',
-                        'Out-of-Plane Bends' : 'nopbend',
-                        'Out-of-Plane Distances' : 'nopdist',
-                        'Improper Dihedrals' : 'niprop',
-                        'Improper Torsions' : 'nitors',
-                        'Torsional Angles' : 'ntors',
-                        'Pi-Orbital Torsions' : 'npitors',
-                        'Stretch-Torsions' : 'nstrtor',
-                        'Torsion-Torsions' : 'ntortor',
-                        'Atomic Partial Charges' : 'nion',
-                        'Bond Dipole Moments' : 'ndipole',
-                        'Polarizable Multipoles' : 'npole',
-                        'Number of 1-2 Pairs' : 'pair12',
-                        'Number of 1-3 Pairs' : 'pair13',
-                        'Number of 1-4 Pairs' : 'pair14',
-                        'Number of 1-5 Pairs' : 'pair15',
-    }
+    atom_inter_flags = {'Atoms in System': 'natom',
+                        'Pisystem Atoms': 'norbit',
+                        'Bond Stretches': 'nbond',
+                        'Conjugated Pi-Bonds': 'nbpi',
+                        'Angle Bends': 'nangle',
+                        'Stretch-Bends': 'nstrbnd',
+                        'Urey-Bradley': 'nurey',
+                        'Angle-Angles': 'nangang',
+                        'Out-of-Plane Bends': 'nopbend',
+                        'Out-of-Plane Distances': 'nopdist',
+                        'Improper Dihedrals': 'niprop',
+                        'Improper Torsions': 'nitors',
+                        'Torsional Angles': 'ntors',
+                        'Pi-Orbital Torsions': 'npitors',
+                        'Stretch-Torsions': 'nstrtor',
+                        'Torsion-Torsions': 'ntortor',
+                        'Atomic Partial Charges': 'nion',
+                        'Bond Dipole Moments': 'ndipole',
+                        'Polarizable Multipoles': 'npole',
+                        'Number of 1-2 Pairs': 'pair12',
+                        'Number of 1-3 Pairs': 'pair13',
+                        'Number of 1-4 Pairs': 'pair14',
+                        'Number of 1-5 Pairs': 'pair15',
+                        }
 
     def __init__(self, fname=None):
         if fname is not None:
@@ -49,9 +51,9 @@ class TinkerAnalout(object):
     def read(self, fname):
         """ Reads the analout file """
         self.pointers = dict(natom=0, norbit=0, nbond=0, nbpi=0, nangle=0,
-                nstrbnd=0, nurey=0, nangang=0, nopbend=0, nopdist=0, niprop=0,
-                nitors=0, ntors=0, npitors=0, nstrtor=0, ntortor=0, nion=0,
-                ndipole=0, npole=0, pair12=0, pair13=0, pair14=0, pair15=0)
+                             nstrbnd=0, nurey=0, nangang=0, nopbend=0, nopdist=0, niprop=0,
+                             nitors=0, ntors=0, npitors=0, nstrtor=0, ntortor=0, nion=0,
+                             ndipole=0, npole=0, pair12=0, pair13=0, pair14=0, pair15=0)
         self.fname = fname
         f = open(self.fname, 'r')
         try:
@@ -66,7 +68,7 @@ class TinkerAnalout(object):
                 line = f.readline()
             # Get the numbers of all parameters
             while not line.lstrip().startswith(
-                        'Total Numbers of Atoms and Interactions'):
+                    'Total Numbers of Atoms and Interactions'):
                 if not line:
                     raise TinkerError('Could not find the atom/ixn count')
                 line = f.readline()
@@ -111,7 +113,7 @@ class TinkerAnalout(object):
         finally:
             f.close()
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     # These are functions that take an open file and load a section of the file
     # into the data structures
@@ -120,7 +122,9 @@ class TinkerAnalout(object):
         # Make an atom list
         self.atom_list = AtomList()
         # Eat 3 lines, then begin
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['natom']):
             try:
@@ -143,7 +147,9 @@ class TinkerAnalout(object):
             raise AttributeError('Atom definitions must be loaded '
                                  'prior to vdW!')
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['natom']):
             try:
@@ -164,7 +170,9 @@ class TinkerAnalout(object):
         """ Reads the bond stretching terms """
         self.bond_list = BondList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['nbond']):
             try:
@@ -172,7 +180,7 @@ class TinkerAnalout(object):
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 self.bond_list.add(self.atom_list[at1], self.atom_list[at2],
-                    line[40:50], line[50:60])
+                                   line[40:50], line[50:60])
             except ValueError:
                 raise TinkerError('Error parsing bonded term')
             line = f.readline()
@@ -181,7 +189,9 @@ class TinkerAnalout(object):
         """ Reads the angle stretching terms """
         self.angle_list = AngleList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['nangle']):
             try:
@@ -190,8 +200,9 @@ class TinkerAnalout(object):
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
                 self.angle_list.add(self.atom_list[at1], self.atom_list[at2],
-                    self.atom_list[at3], line[40:50], line[50:60], line[60:67],
-                    line[69:])
+                                    self.atom_list[at3], line[
+                                        40:50], line[50:60], line[60:67],
+                                    line[69:])
             except ValueError:
                 raise TinkerError('Error parsing angle term')
             line = f.readline()
@@ -200,7 +211,9 @@ class TinkerAnalout(object):
         """ Reads the stretch-bend terms """
         self.stretchbend_list = StretchBendList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['nstrbnd']):
             try:
@@ -209,9 +222,9 @@ class TinkerAnalout(object):
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
                 self.stretchbend_list.add(
-                        self.atom_list[at1], self.atom_list[at2],
-                        self.atom_list[at3], line[27:40], line[40:50],
-                        line[50:60], line[60:70]
+                    self.atom_list[at1], self.atom_list[at2],
+                    self.atom_list[at3], line[27:40], line[40:50],
+                    line[50:60], line[60:70]
                 )
             except ValueError:
                 raise TinkerError('Error parsing stretch-bend term')
@@ -221,7 +234,9 @@ class TinkerAnalout(object):
         """ Reads the urey-bradley terms """
         self.ureybrad_list = UreyBradleyList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['nurey']):
             try:
@@ -237,7 +252,7 @@ class TinkerAnalout(object):
                 except ValueError:
                     at3 = at2
                 self.ureybrad_list.add(self.atom_list[at1], self.atom_list[at3],
-                        line[34:50], line[50:60])
+                                       line[34:50], line[50:60])
             except ValueError:
                 raise TinkerError('Error parsing Urey-Bradley term')
             line = f.readline()
@@ -246,7 +261,9 @@ class TinkerAnalout(object):
         """ Reads the out-of-plane bending terms """
         self.oopbend_list = OutOfPlaneBendList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['nopbend']):
             try:
@@ -266,7 +283,9 @@ class TinkerAnalout(object):
         """ Read the out-of-plane distance parameters """
         self.oopdist_list = OutOfPlaneDistList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['nopdist']):
             try:
@@ -286,7 +305,9 @@ class TinkerAnalout(object):
         """ Read the torsion-angle parameters """
         self.torangle_list = TorsionAngleList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['ntors']):
             try:
@@ -299,7 +320,8 @@ class TinkerAnalout(object):
                 # simple string split on whitespace)
                 terms = line[33:].replace('/', ' ').split()
                 self.torangle_list.add(self.atom_list[at1], self.atom_list[at2],
-                                       self.atom_list[at3], self.atom_list[at4],
+                                       self.atom_list[
+                                           at3], self.atom_list[at4],
                                        terms)
             except ValueError:
                 raise TinkerError('Error parsing torsion angle term')
@@ -309,7 +331,9 @@ class TinkerAnalout(object):
         """ Read the Pi-Orbital Torsion parameters """
         self.pitors_list = PiTorsionList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['npitors']):
             try:
@@ -326,7 +350,9 @@ class TinkerAnalout(object):
         """ Read the Torsion-Torsion parameters """
         self.tortor_list = TorsionTorsionList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['ntortor']):
             try:
@@ -349,7 +375,7 @@ class TinkerAnalout(object):
             # need to eat the next dim1*dim2 lines
             if len(line.split()) == 3:
                 gridvals = []
-                for j in range(dim1*dim2):
+                for j in range(dim1 * dim2):
                     gridvals.append(tuple([float(x) for x in line.split()]))
                     line = f.readline()
                 self.tortor_list[-1].type = TorsionTorsionGrid.new(gridvals)
@@ -358,7 +384,9 @@ class TinkerAnalout(object):
         """ Read the atomic multipoles """
         self.multipole_list = AtomicMultipoleList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['npole']):
             try:
@@ -387,14 +415,16 @@ class TinkerAnalout(object):
         """ Read atomic dipole polarizabilities """
         self.dipole_list = DipolePolarizabilityList()
         # Eat the next 3 lines
-        f.readline(); f.readline(); f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         for i in range(self.pointers['npole']):
             try:
                 int(line[0:6])
                 at = int(line[9:15]) - 1
                 self.dipole_list.add(self.atom_list[at], line[25:35],
-                    line[40:].split())
+                                     line[40:].split())
             except ValueError:
                 raise TinkerError('Error parsing dipole polarizabilities')
             line = f.readline()
@@ -420,7 +450,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['pair12']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
-            self.pair12_list.add( (self.atom_list[at1], self.atom_list[at2]) )
+            self.pair12_list.add((self.atom_list[at1], self.atom_list[at2]))
             line = f.readline()
 
     def _read_13pairs(self, f):
@@ -430,7 +460,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['pair13']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
-            self.pair13_list.add( (self.atom_list[at1], self.atom_list[at2]) )
+            self.pair13_list.add((self.atom_list[at1], self.atom_list[at2]))
             line = f.readline()
 
     def _read_14pairs(self, f):
@@ -440,7 +470,7 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['pair14']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
-            self.pair14_list.add( (self.atom_list[at1], self.atom_list[at2]) )
+            self.pair14_list.add((self.atom_list[at1], self.atom_list[at2]))
             line = f.readline()
 
     def _read_15pairs(self, f):
@@ -450,10 +480,10 @@ class TinkerAnalout(object):
         line = f.readline()
         for i in range(self.pointers['pair15']):
             at1, at2 = int(line[0:8]) - 1, int(line[8:16]) - 1
-            self.pair15_list.add( (self.atom_list[at1], self.atom_list[at2]) )
+            self.pair15_list.add((self.atom_list[at1], self.atom_list[at2]))
             line = f.readline()
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     def __str__(self):
         return self.fname
@@ -470,22 +500,22 @@ class TinkerAnalout(object):
 # key of the pointers flag (see self.pointers below) that declares how
 # many numbers must be parsed from that section
 TinkerAnalout._functionmap = {
-    'Van der Waals Parameters :' : TinkerAnalout._read_vdw,
-    'Bond Stretching Parameters :' : TinkerAnalout._read_bonds,
-    'Angle Bending Parameters :' : TinkerAnalout._read_angs,
-    'Stretch-Bend Parameters :' : TinkerAnalout._read_strbnd,
-    'Urey-Bradley Parameters :' : TinkerAnalout._read_ureybrad,
-    'Out-of-Plane Bending Parameters :' : TinkerAnalout._read_opbend,
-    'Out-of-Plane Distance Parameters :' : TinkerAnalout._read_opdist,
-    'Torsional Angle Parameters :' : TinkerAnalout._read_torang,
-    'Pi-Orbital Torsion Parameters :' : TinkerAnalout._read_pitors,
-    'Torsion-Torsion Parameters :' : TinkerAnalout._read_tortors,
-    'Atomic Multipole Parameters :' : TinkerAnalout._read_multipoles,
-    'Dipole Polarizability Parameters :' : TinkerAnalout._read_dipoles,
-    'List of 1-2 Connected Atomic Interactions :' : TinkerAnalout._read_12pairs,
-    'List of 1-3 Connected Atomic Interactions :' : TinkerAnalout._read_13pairs,
-    'List of 1-4 Connected Atomic Interactions :' : TinkerAnalout._read_14pairs,
-    'List of 1-5 Connected Atomic Interactions :' : TinkerAnalout._read_15pairs,
-    'Total Number of Pairwise Atomic Interactions :' :
-            TinkerAnalout._read_interactions,
+    'Van der Waals Parameters :': TinkerAnalout._read_vdw,
+    'Bond Stretching Parameters :': TinkerAnalout._read_bonds,
+    'Angle Bending Parameters :': TinkerAnalout._read_angs,
+    'Stretch-Bend Parameters :': TinkerAnalout._read_strbnd,
+    'Urey-Bradley Parameters :': TinkerAnalout._read_ureybrad,
+    'Out-of-Plane Bending Parameters :': TinkerAnalout._read_opbend,
+    'Out-of-Plane Distance Parameters :': TinkerAnalout._read_opdist,
+    'Torsional Angle Parameters :': TinkerAnalout._read_torang,
+    'Pi-Orbital Torsion Parameters :': TinkerAnalout._read_pitors,
+    'Torsion-Torsion Parameters :': TinkerAnalout._read_tortors,
+    'Atomic Multipole Parameters :': TinkerAnalout._read_multipoles,
+    'Dipole Polarizability Parameters :': TinkerAnalout._read_dipoles,
+    'List of 1-2 Connected Atomic Interactions :': TinkerAnalout._read_12pairs,
+    'List of 1-3 Connected Atomic Interactions :': TinkerAnalout._read_13pairs,
+    'List of 1-4 Connected Atomic Interactions :': TinkerAnalout._read_14pairs,
+    'List of 1-5 Connected Atomic Interactions :': TinkerAnalout._read_15pairs,
+    'Total Number of Pairwise Atomic Interactions :':
+    TinkerAnalout._read_interactions,
 }

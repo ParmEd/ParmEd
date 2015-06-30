@@ -3,6 +3,7 @@ Some support classes for easy array manipulation
 """
 from parmed.utils.six.moves import zip, range
 
+
 def _same_len(operation):
     """ Make sure all arrays are the same length """
     def decorator(func):
@@ -15,8 +16,9 @@ def _same_len(operation):
 
     return decorator
 
+
 class NumberArray(list):
-   
+
     def __init__(self, stuff=None):
         if stuff is None:
             list.__init__(self)
@@ -24,28 +26,31 @@ class NumberArray(list):
             list.__init__(self, stuff)
 
     def __mul__(self, scalar):
-        return NumberArray([i*scalar for i in self])
+        return NumberArray([i * scalar for i in self])
 
     __rmul__ = __mul__
 
     def __imul__(self, scalar):
-        for i in range(len(self)): self[i] *= scalar
+        for i in range(len(self)):
+            self[i] *= scalar
         return self
-   
+
     @_same_len('addition')
     def __add__(self, other):
-        return NumberArray([i+j for i,j in zip(self, other)])
-   
+        return NumberArray([i + j for i, j in zip(self, other)])
+
     @_same_len('addition')
     def __iadd__(self, other):
-        for i, val in enumerate(other): self[i] += val
+        for i, val in enumerate(other):
+            self[i] += val
         return self
-   
+
     @_same_len('subtraction')
     def __sub__(self, other):
-        return NumberArray([i-j for i,j in zip(self, other)])
+        return NumberArray([i - j for i, j in zip(self, other)])
 
     @_same_len('subtraction')
     def __isub__(self, other):
-        for i, val in enumerate(other): self[i] -= val
+        for i, val in enumerate(other):
+            self[i] -= val
         return self

@@ -39,6 +39,7 @@ __version__ = "0.6"
 
 
 class BaseDimension(object):
+
     '''
     A physical dimension such as length, mass, or temperature.
 
@@ -66,7 +67,8 @@ class BaseDimension(object):
         """
         self.name = name
         if not self.name in BaseDimension._index_by_name.keys():
-            BaseDimension._index_by_name[name] = BaseDimension._next_unused_index
+            BaseDimension._index_by_name[
+                name] = BaseDimension._next_unused_index
             BaseDimension._next_unused_index += 1
         self._index = BaseDimension._index_by_name[name]
 
@@ -88,12 +90,12 @@ class BaseDimension(object):
 
     def __repr__(self):
         return 'BaseDimension("%s")' % self.name
-    
+
     def __eq__(self, other):
         if isinstance(other, BaseDimension):
             return self._index == other._index
         return False
-    
+
     def __ne__(self, other):
         if isinstance(other, BaseDimension):
             return self._index != other._index
@@ -101,8 +103,8 @@ class BaseDimension(object):
 
 
 # run module directly for testing
-if __name__=='__main__':
+if __name__ == '__main__':
     # Test the examples in the docstrings
-    import doctest, sys
+    import doctest
+    import sys
     doctest.testmod(sys.modules[__name__])
-

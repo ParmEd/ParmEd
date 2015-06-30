@@ -13,8 +13,9 @@ import warnings
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class BondParam(object):
-   
+
     def __init__(self, atype1, atype2, rk=None, req=None, bondtype=None):
         """ Initializes a Bond parameter based on two atom types """
         self.atype1, self.atype2 = atype1, atype2
@@ -27,11 +28,12 @@ class BondParam(object):
 
     def __str__(self):
         return '%s-%s   %8.3f  %6.3f' % (self.atype1.ljust(2),
-                self.atype2.ljust(2), self.type.k, self.type.req)
+                                         self.atype2.ljust(2), self.type.k, self.type.req)
 
     def __eq__(self, other):
         """ Two bonds are equal if their atom types and bond type is equal """
-        if self.type != other.type: return False
+        if self.type != other.type:
+            return False
         return (
             (self.atype1 == other.atype1 and self.atype2 == other.atype2) or
             (self.atype2 == other.atype1 and self.atype1 == other.atype2)
@@ -39,8 +41,9 @@ class BondParam(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class AngleParam(object):
-   
+
     def __init__(self, atype1, atype2, atype3, thetk=None, theteq=None,
                  angletype=None):
         self.atype1, self.atype2, self.atype3 = atype1, atype2, atype3
@@ -53,8 +56,9 @@ class AngleParam(object):
 
     def __str__(self):
         return '%s-%s-%s   %8.3f  %6.3f' % (self.atype1.ljust(2),
-                self.atype2.ljust(2), self.atype3.ljust(2), self.type.k,
-                self.type.theteq)
+                                            self.atype2.ljust(2), self.atype3.ljust(
+                                                2), self.type.k,
+                                            self.type.theteq)
 
     def __eq__(self, other):
         """ Two angles are equal if their atom types and bond type is equal """
@@ -67,8 +71,11 @@ class AngleParam(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class _DihedralTerm(object):
+
     """ A single term in a (potentially multiterm) dihedral """
+
     def __init__(self, idivf=1, pk=None, phase=None, periodicity=None,
                  dihedraltype=None, scee=1.2, scnb=2.0, dihtype='normal'):
         self.idivf = int(idivf)
@@ -90,17 +97,19 @@ class _DihedralTerm(object):
             return str(self)
         else:
             return '%4i %8.3f %8.3f %5.1f    SCEE=%s SCNB=%s' % (self.idivf,
-                self.type.phi_k * self.idivf, self.type.phase,
-                -self.type.per, self.type.scee, self.type.scnb)
-         
+                                                                 self.type.phi_k *
+                                                                 self.idivf, self.type.phase,
+                                                                 -self.type.per, self.type.scee, self.type.scnb)
+
     def __str__(self):
         if self.dihtype == 'improper':
             return '%8.3f %8.3f %5.1f' % (self.type.phi_k, self.type.phase,
                                           self.type.per)
         else:
             return '%4i %8.3f %8.3f %5.1f    SCEE=%s SCNB=%s' % (self.idivf,
-                    self.type.phi_k * self.idivf, self.type.phase,
-                    self.type.per, self.type.scee, self.type.scnb)
+                                                                 self.type.phi_k *
+                                                                 self.idivf, self.type.phase,
+                                                                 self.type.per, self.type.scee, self.type.scnb)
 
     def __eq__(self, other):
         if self.dihtype != other.dihtype and 'improper' in (self.dihtype,
@@ -112,13 +121,14 @@ class _DihedralTerm(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class DihedralParam(list):
-   
+
     def __init__(self, atype1, atype2, atype3, atype4):
         list.__init__(self)
         self.atype1, self.atype2 = atype1, atype2
         self.atype3, self.atype4 = atype3, atype4
-   
+
     def add_term_from_args(self, *args, **kwargs):
         """ Convert the args to a _DihedralTerm first """
         term = _DihedralTerm(*args, **kwargs)
@@ -137,24 +147,28 @@ class DihedralParam(list):
             raise ValueError('Improper dihedrals cannot have multiple terms')
         # Add dihedrals in terms of decreasing periodicity
         for i, oterm in enumerate(self):
-            if oterm.type.per > term.type.per: continue
+            if oterm.type.per > term.type.per:
+                continue
             return list.insert(self, i, term)
         return list.append(self, term)
 
     def __str__(self):
         if len(self) == 1:
             return '%s-%s-%s-%s %s' % (self.atype1.ljust(2),
-                    self.atype2.ljust(2), self.atype3.ljust(2),
-                    self.atype4.ljust(2), self[0].parmline())
+                                       self.atype2.ljust(
+                                           2), self.atype3.ljust(2),
+                                       self.atype4.ljust(2), self[0].parmline())
         retstr = ''
-        for i in range(len(self)-1):
+        for i in range(len(self) - 1):
             retstr += '%s-%s-%s-%s %s\n' % (self.atype1.ljust(2),
-                    self.atype2.ljust(2), self.atype3.ljust(2),
-                    self.atype4.ljust(2), self[i].parmline(multiterm=True))
+                                            self.atype2.ljust(
+                                                2), self.atype3.ljust(2),
+                                            self.atype4.ljust(2), self[i].parmline(multiterm=True))
         i = len(self) - 1
         retstr += '%s-%s-%s-%s %s' % (self.atype1.ljust(2),
-                    self.atype2.ljust(2), self.atype3.ljust(2),
-                    self.atype4.ljust(2), self[i].parmline(multiterm=False))
+                                      self.atype2.ljust(
+                                          2), self.atype3.ljust(2),
+                                      self.atype4.ljust(2), self[i].parmline(multiterm=False))
         return retstr
 
     def __eq__(self, other):
@@ -194,24 +208,27 @@ class DihedralParam(list):
         if self[0].dihtype == 'improper':
             # For impropers, the third atom is the central atom and the other 3
             # can be in any order
-            if self.atype3 != atomlist[2]: return False, False
+            if self.atype3 != atomlist[2]:
+                return False, False
             if (self.atype1 == atomlist[0] and self.atype2 == atomlist[1] and
-                self.atype4 == atomlist[3]):
+                    self.atype4 == atomlist[3]):
                 return True, True
             # Make sure every atom type is unique so every atom type is added to
             # the set (but we know it is NOT the same order now)
-            set1, set2 = set() , set()
+            set1, set2 = set(), set()
             for x, y in zip([atomlist[0], atomlist[1], atomlist[3]],
                             [self.atype1, self.atype2, self.atype4]):
                 if x in set1:
                     i = 0
-                    while '%s%d%d' % (x, i, i) in set1: i += 1
+                    while '%s%d%d' % (x, i, i) in set1:
+                        i += 1
                     set1.add('%s%d%d' % (x, i, i))
                 else:
                     set1.add(x)
                 if y in set2:
                     i = 0
-                    while '%s%d%d' % (y, i, i) in set2: i += 1
+                    while '%s%d%d' % (y, i, i) in set2:
+                        i += 1
                     set2.add('%s%d%d' % (y, i, i))
                 else:
                     set2.add(y)
@@ -226,13 +243,14 @@ class DihedralParam(list):
                 return eq, False
             return same, same
         if self.atype3 == atomlist[1] and self.atype2 == atomlist[2]:
-            return self.atype1==atomlist[3] and self.atype4==atomlist[0], False
+            return self.atype1 == atomlist[3] and self.atype4 == atomlist[0], False
         return False, False
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class AtomType(object):
-   
+
     def __init__(self, atype, mass, rmin, epsilon):
         self.type = atype
         self.mass = float(mass)
@@ -251,8 +269,9 @@ class AtomType(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class ParamList(list):
-   
+
     type = None
 
     def __init__(self, unique_only=True):
@@ -273,11 +292,13 @@ class ParamList(list):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class BondParamList(ParamList):
-   
+
     type = BondParam
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 class AngleParamList(ParamList):
 
@@ -285,8 +306,9 @@ class AngleParamList(ParamList):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class DihedralParamList(ParamList):
-   
+
     type = _DihedralTerm
 
     def __init__(self, unique_only=True):
@@ -329,14 +351,16 @@ class DihedralParamList(ParamList):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class AtomTypeList(ParamList):
-   
+
     type = AtomType
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class ParameterSet(object):
-   
+
     def __init__(self):
         self.atoms = AtomTypeList(unique_only=True)
         self.bonds = BondParamList(unique_only=True)
@@ -361,12 +385,12 @@ class ParameterSet(object):
             raise TypeError('ParameterSet.load_from_parm() expects AmberParm')
         # Loop through all atoms, adding it to the list of atoms
         for atom in parm.atoms:
-            rmin = parm.LJ_radius[atom.nb_idx-1]
-            eps = parm.LJ_depth[atom.nb_idx-1]
+            rmin = parm.LJ_radius[atom.nb_idx - 1]
+            eps = parm.LJ_depth[atom.nb_idx - 1]
             self._add_atom(atom.type, atom.mass, rmin, eps)
         # Loop through all bonds
         for bond in parm.bonds_without_h:
-            self._add_bond(bond.atom1.type, bond.atom2.type, 
+            self._add_bond(bond.atom1.type, bond.atom2.type,
                            bondtype=bond.type)
         for bond in parm.bonds_inc_h:
             self._add_bond(bond.atom1.type, bond.atom2.type,
@@ -426,13 +450,15 @@ class ParameterSet(object):
         # Write the dihedrals
         outfile.write('DIHE\n')
         for dihedral in self.dihedrals:
-            if dihedral[0].dihtype == 'improper': continue
+            if dihedral[0].dihtype == 'improper':
+                continue
             outfile.write('%s\n' % dihedral)
         outfile.write('\n')
         # Write the impropers
         outfile.write('IMPROPER\n')
         for dihedral in self.dihedrals:
-            if dihedral[0].dihtype != 'improper': continue
+            if dihedral[0].dihtype != 'improper':
+                continue
             outfile.write('%s\n' % dihedral)
         outfile.write('\n')
         # Write the LJ terms

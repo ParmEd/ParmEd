@@ -32,6 +32,7 @@ import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     """
     Compares two atom instances, along with the residue name, number, and chain
@@ -55,16 +56,22 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     -------
     True if they are the same atom, False otherwise
     """
-    if old_atom.name != new_atom.name: return False
-    if old_atom.residue.name != resname: return False
-    if old_atom.residue.number != resid: return False
-    if old_atom.residue.chain != chain.strip(): return False
+    if old_atom.name != new_atom.name:
+        return False
+    if old_atom.residue.name != resname:
+        return False
+    if old_atom.residue.number != resid:
+        return False
+    if old_atom.residue.chain != chain.strip():
+        return False
     return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 @add_metaclass(FileFormatType)
 class PDBFile(object):
+
     """ Standard PDB file format parser and writer """
     #===================================================
 
@@ -87,13 +94,13 @@ class PDBFile(object):
 
         for line in lines:
             if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
-                    'MASTER', 'ORIGXn', 'SCALEn', 'AUTHOR', 'CAVEAT', 'COMPND',
-                    'EXPDTA', 'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
-                    'SPRSDE', 'TITLE ', 'ANISOU', 'ATOM  ', 'CISPEP', 'CONECT',
-                    'DBREF ', 'HELIX ', 'HET   ', 'HETATM', 'LINK  ', 'MODRES',
-                    'MTRIXn', 'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL',
-                    'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL', 'MODEL ',
-                    'TER   ', 'TER', 'JRNL  ', 'REMARK'):
+                            'MASTER', 'ORIGXn', 'SCALEn', 'AUTHOR', 'CAVEAT', 'COMPND',
+                            'EXPDTA', 'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
+                            'SPRSDE', 'TITLE ', 'ANISOU', 'ATOM  ', 'CISPEP', 'CONECT',
+                            'DBREF ', 'HELIX ', 'HET   ', 'HETATM', 'LINK  ', 'MODRES',
+                            'MTRIXn', 'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL',
+                            'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL', 'MODEL ',
+                            'TER   ', 'TER', 'JRNL  ', 'REMARK'):
                 continue
             return False
         return True
@@ -157,7 +164,8 @@ class PDBFile(object):
         # Rewind, wrap it in a GzipFile and send it to parse
         fileobj.seek(0)
         if PY3:
-            fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
+            fileobj = io.TextIOWrapper(
+                gzip.GzipFile(fileobj=fileobj, mode='r'))
         else:
             fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
         if saveto is not None:
@@ -186,7 +194,7 @@ class PDBFile(object):
         --------
         The PDB parser also adds metadata to the returned Structure object that
         may be present in the PDB file
-    
+
         experimental : ``str``
             EXPDTA record
         journal : ``str``
@@ -211,11 +219,11 @@ class PDBFile(object):
             Year that the article was published, from the JRNL record
         related_entries : ``list of (str, str)``
             List of entries in other databases
-    
+
         Returns
         -------
         structure
-        
+
         structure : :class:`Structure`
             The Structure object initialized with all of the information from
             the PDB file.  No bonds or other topological features are added by
@@ -235,7 +243,7 @@ class PDBFile(object):
         struct.title = ''
         struct.year = None
         struct.related_entries = []
-        modelno = 1 # For PDB files with multiple MODELs
+        modelno = 1  # For PDB files with multiple MODELs
         atomno = 0
         coordinates = []
         all_coordinates = []
@@ -261,15 +269,16 @@ class PDBFile(object):
                     x, y, z = line[30:38], line[38:46], line[47:54]
                     occupancy, bfactor = line[54:60], line[60:66]
                     elem, chg = line[76:78], line[78:80]
-                    segid = line[72:76].strip() # CHARMM-specific
+                    segid = line[72:76].strip()  # CHARMM-specific
                     atname = atname.strip()
                     altloc = altloc.strip()
                     resname = resname.strip()
                     chain = chain.strip()
                     inscode = inscode.strip()
 
-                    elem = '%-2s' % elem # Make sure we have at least 2 chars
-                    if elem[0] == ' ': elem = elem[1] + ' '
+                    elem = '%-2s' % elem  # Make sure we have at least 2 chars
+                    if elem[0] == ' ':
+                        elem = elem[1] + ' '
                     try:
                         atsym = (elem[0] + elem[1].lower()).strip()
                         atomic_number = AtomicNum[atsym]
@@ -302,7 +311,7 @@ class PDBFile(object):
                                 resid = int(resid, 16)
                             except ValueError:
                                 if resid == '****':
-                                    resid = None # Figure out by unique atoms
+                                    resid = None  # Figure out by unique atoms
                                 else:
                                     raise
                         elif resid == '1000' and line[26] == '0':
@@ -363,17 +372,18 @@ class PDBFile(object):
                         chg = float(chg)
                     except ValueError:
                         chg = 0.0
-                    if atname in ('EP', 'LP'): # lone pair
+                    if atname in ('EP', 'LP'):  # lone pair
                         atom = ExtraPoint(atomic_number=atomic_number,
-                                name=atname, charge=chg, mass=mass,
-                                occupancy=occupancy, bfactor=bfactor,
-                                altloc=altloc, number=atnum)
+                                          name=atname, charge=chg, mass=mass,
+                                          occupancy=occupancy, bfactor=bfactor,
+                                          altloc=altloc, number=atnum)
                     else:
                         atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=chg, mass=mass, occupancy=occupancy,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
+                                    charge=chg, mass=mass, occupancy=occupancy,
+                                    bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
-                    if segid: atom.segid = segid
+                    if segid:
+                        atom.segid = segid
                     if _compare_atoms(last_atom, atom, resname, resid, chain):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
@@ -384,18 +394,18 @@ class PDBFile(object):
                         struct.add_atom(atom, resname, resid, chain, inscode)
                     else:
                         try:
-                            orig_atom = struct.atoms[atomno-1]
+                            orig_atom = struct.atoms[atomno - 1]
                         except IndexError:
                             raise PDBError('Atom %d differs in MODEL %d [%s %s '
                                            'vs. %s %s]' % (atomno, modelno,
-                                           atom.residue.name, atom.name,
-                                           resname, atname))
+                                                           atom.residue.name, atom.name,
+                                                           resname, atname))
                         if (orig_atom.residue.name != resname.strip()
                                 or orig_atom.name != atname.strip()):
                             raise PDBError('Atom %d differs in MODEL %d [%s %s '
                                            'vs. %s %s]' % (atomno, modelno,
-                                           orig_atom.residue.name,
-                                           orig_atom.name, resname, atname))
+                                                           orig_atom.residue.name,
+                                                           orig_atom.name, resname, atname))
                     coordinates.extend([atom.xx, atom.xy, atom.xz])
                 elif rec == 'ANISOU':
                     try:
@@ -403,7 +413,7 @@ class PDBFile(object):
                     except ValueError:
                         warnings.warn('Problem parsing atom number from ANISOU '
                                       'record', PDBWarning)
-                        continue # Skip the rest of this record
+                        continue  # Skip the rest of this record
                     aname = line[12:16].strip()
                     altloc = line[16].strip()
                     rname = line[17:21].strip()
@@ -413,7 +423,7 @@ class PDBFile(object):
                     except ValueError:
                         warnings.warn('Problem parsing residue number from '
                                       'ANISOU record', PDBWarning)
-                        continue # Skip the rest of this record
+                        continue  # Skip the rest of this record
                     icode = line[27].strip()
                     try:
                         u11 = int(line[28:35])
@@ -438,27 +448,29 @@ class PDBFile(object):
                         warnings.warn('ANISOU record does not match previous '
                                       'atom', PDBWarning)
                         continue
-                    la.anisou = create_array([u11/1e4, u22/1e4, u33/1e4,
-                                              u12/1e4, u13/1e4, u23/1e4])
+                    la.anisou = create_array([u11 / 1e4, u22 / 1e4, u33 / 1e4,
+                                              u12 / 1e4, u13 / 1e4, u23 / 1e4])
                 elif rec.strip() == 'TER':
-                    if modelno == 1: last_atom.residue.ter = True
+                    if modelno == 1:
+                        last_atom.residue.ter = True
                 elif rec == 'ENDMDL':
                     # End the current model
                     if len(struct.atoms) == 0:
                         raise PDBError('MODEL ended before any atoms read in')
                     modelno += 1
-                    if len(struct.atoms)*3 != len(coordinates):
+                    if len(struct.atoms) * 3 != len(coordinates):
                         raise ValueError(
-                                'Inconsistent atom numbers in some PDB models')
+                            'Inconsistent atom numbers in some PDB models')
                     all_coordinates.append(coordinates)
                     atomno = 0
                     coordinates = []
                     resend = 26
                     atom_overflow = False
                 elif rec == 'MODEL ':
-                    if modelno == 1 and len(struct.atoms) == 0: continue
+                    if modelno == 1 and len(struct.atoms) == 0:
+                        continue
                     if len(coordinates) > 0:
-                        if len(struct.atoms)*3 != len(coordinates):
+                        if len(struct.atoms) * 3 != len(coordinates):
                             raise ValueError('Inconsistent atom numbers in '
                                              'some PDB models')
                         warnings.warn('MODEL not explicitly ended', PDBWarning)
@@ -513,21 +525,22 @@ class PDBFile(object):
                         struct.related_entries.append(rematch.groups())
         finally:
             # Make sure our file is closed if we opened it
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         # Post-process some of the metadata to make it more reader-friendly
         struct.keywords = [s.strip() for s in struct.keywords.split(',')
-                                            if s.strip()]
+                           if s.strip()]
         struct.journal = struct.journal.strip()
         struct.title = struct.title.strip()
 
         struct.unchange()
         if coordinates:
-            if len(coordinates) != 3*len(struct.atoms):
+            if len(coordinates) != 3 * len(struct.atoms):
                 raise ValueError('bad number of atoms in some PDB models')
             all_coordinates.append(coordinates)
         struct._coordinates = np.array(all_coordinates).reshape(
-                        (-1, len(struct.atoms), 3))
+            (-1, len(struct.atoms), 3))
         return struct
 
     #===================================================
@@ -606,8 +619,8 @@ class PDBFile(object):
             reslen = 3
         if struct.box is not None:
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
-                    struct.box[0], struct.box[1], struct.box[2], struct.box[3],
-                    struct.box[4], struct.box[5], struct.space_group, ''))
+                struct.box[0], struct.box[1], struct.box[2], struct.box[3],
+                struct.box[4], struct.box[5], struct.space_group, ''))
         if coordinates is not None:
             try:
                 crdsize = len(coordinates)
@@ -620,7 +633,8 @@ class PDBFile(object):
                     try:
                         coords = list(itertools.chain(*coordinates))
                     except TypeError:
-                        raise TypeError("Unsupported coordinate dimensionality")
+                        raise TypeError(
+                            "Unsupported coordinate dimensionality")
                 if len(coords) != len(struct.atoms) * 3:
                     raise TypeError("Unsupported coordinate shape")
             elif crdsize == len(struct.atoms) * 3:
@@ -635,11 +649,11 @@ class PDBFile(object):
         if altlocs == 'all':
             def print_atoms(atom, coords):
                 i3 = atom.idx * 3
-                return atom, atom.other_locations, coords[i3:i3+3]
+                return atom, atom.other_locations, coords[i3:i3 + 3]
         elif altlocs == 'first':
             def print_atoms(atom, coords):
                 i3 = atom.idx * 3
-                return atom, dict(), coords[i3:i3+3]
+                return atom, dict(), coords[i3:i3 + 3]
         elif altlocs == 'occupancy':
             def print_atoms(atom, coords):
                 occ = atom.occupancy
@@ -651,7 +665,7 @@ class PDBFile(object):
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             raise Exception("Should not be here!")
-        nmore = 0 # how many *extra* atoms have been added?
+        nmore = 0  # how many *extra* atoms have been added?
         last_number = 0
         last_rnumber = 0
         for res in struct.residues:
@@ -681,18 +695,22 @@ class PDBFile(object):
                     segid = pa.segid[:4]
                 else:
                     segid = ''
-                dest.write(atomrec % (anum , aname, pa.altloc,
-                           res.name[:reslen], res.chain[:1], rnum,
-                           res.insertion_code[:1], x, y, z, pa.occupancy,
-                           pa.bfactor, segid,
-                           Element[pa.atomic_number].upper(), ''))
+                dest.write(atomrec % (anum, aname, pa.altloc,
+                                      res.name[:reslen], res.chain[:1], rnum,
+                                      res.insertion_code[
+                                          :1], x, y, z, pa.occupancy,
+                                      pa.bfactor, segid,
+                                      Element[pa.atomic_number].upper(), ''))
                 if write_anisou and pa.anisou is not None:
-                    anisou = [int(ani*1e4) for ani in pa.anisou]
+                    anisou = [int(ani * 1e4) for ani in pa.anisou]
                     dest.write(anisourec % (anum, aname, pa.altloc,
-                               res.name[:reslen], res.chain[:1], rnum,
-                               res.insertion_code[:1], anisou[0], anisou[1],
-                               anisou[2], anisou[3], anisou[4], anisou[5],
-                               Element[pa.atomic_number].upper(), ''))
+                                            res.name[:reslen], res.chain[
+                                                :1], rnum,
+                                            res.insertion_code[
+                                                :1], anisou[0], anisou[1],
+                                            anisou[2], anisou[
+                                                3], anisou[4], anisou[5],
+                                            Element[pa.atomic_number].upper(), ''))
                 for key in sorted(others.keys()):
                     oatom = others[key]
                     x, y, z = oatom.xx, oatom.xy, oatom.xz
@@ -713,18 +731,22 @@ class PDBFile(object):
                     else:
                         segid = ''
                     dest.write(atomrec % (anum, aname, key, res.name[:reslen],
-                               res.chain[:1], rnum, res.insertion_code[:1],
-                               x, y, z, oatom.occupancy, oatom.bfactor, segid,
-                               Element[oatom.atomic_number].upper(), ''))
+                                          res.chain[
+                                              :1], rnum, res.insertion_code[:1],
+                                          x, y, z, oatom.occupancy, oatom.bfactor, segid,
+                                          Element[oatom.atomic_number].upper(), ''))
                     if write_anisou and oatom.anisou is not None:
-                        anisou = [int(ani*1e4) for ani in oatom.anisou]
+                        anisou = [int(ani * 1e4) for ani in oatom.anisou]
                         dest.write(anisourec % (anum, aname,
-                            oatom.altloc[:1], res.name[:reslen], res.chain[:1],
-                            rnum, res.insertion_code[:1], anisou[0], anisou[1],
-                            anisou[2], anisou[3], anisou[4], anisou[5],
-                            Element[oatom.atomic_number].upper(), ''))
+                                                oatom.altloc[:1], res.name[
+                                                    :reslen], res.chain[:1],
+                                                rnum, res.insertion_code[
+                                                    :1], anisou[0], anisou[1],
+                                                anisou[2], anisou[
+                                                    3], anisou[4], anisou[5],
+                                                Element[oatom.atomic_number].upper(), ''))
             if res.ter:
-                dest.write(terrec % (anum+1, res.name[:reslen],
+                dest.write(terrec % (anum + 1, res.name[:reslen],
                                      res.chain, rnum))
                 if renumber:
                     nmore += 1
@@ -737,8 +759,10 @@ class PDBFile(object):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 @add_metaclass(FileFormatType)
 class CIFFile(object):
+
     """ Standard PDBx/mmCIF file format parser and writer """
     #===================================================
 
@@ -759,7 +783,8 @@ class CIFFile(object):
         f = genopen(filename)
         try:
             for line in f:
-                if line.startswith('#'): continue
+                if line.startswith('#'):
+                    continue
                 if line[:5] == 'data_' and len(line.split()) == 1:
                     return True
                 else:
@@ -825,7 +850,8 @@ class CIFFile(object):
             ftp.close()
         fileobj.seek(0)
         if PY3:
-            fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
+            fileobj = io.TextIOWrapper(
+                gzip.GzipFile(fileobj=fileobj, mode='r'))
         else:
             fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
         if saveto is not None:
@@ -901,7 +927,8 @@ class CIFFile(object):
             data = []
             cifobj.read(data)
         finally:
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         structures = []
         for cont in data:
@@ -917,7 +944,7 @@ class CIFFile(object):
                 nameidx = auth.getAttributeIndex('name')
                 if nameidx != -1:
                     struct.authors = ', '.join([t[nameidx] for t in
-                                               auth.getRowList()])
+                                                auth.getRowList()])
             cite = cont.getObj('citation_author')
             if cite is not None:
                 nameidx = cite.getAttributeIndex('name')
@@ -940,10 +967,10 @@ class CIFFile(object):
                 rows = cite.getRowList()
                 if doiid != -1:
                     struct.doi = ', '.join([row[doiid] for row in rows
-                                                if row[doiid] != '?'])
+                                            if row[doiid] != '?'])
                 if pmiid != -1:
                     struct.pmid = ', '.join([row[pmiid] for row in rows
-                                                if row[pmiid] != '?'])
+                                             if row[pmiid] != '?'])
                 if titlid != -1:
                     struct.title = '; '.join([row[titlid] for row in rows])
                 if yearid != -1:
@@ -961,14 +988,15 @@ class CIFFile(object):
                     rows = keywds.getRowList()
                     struct.keywords = ', '.join([row[textid] for row in rows])
                     struct.keywords = [key.strip() for key in
-                            struct.keywords.split(',') if key.strip()]
+                                       struct.keywords.split(',') if key.strip()]
             dbase = cont.getObj('pdbx_database_related')
             if dbase is not None:
                 dbid = dbase.getAttributeIndex('db_id')
                 nameid = dbase.getAttributeIndex('db_name')
                 if dbid != -1 and nameid != -1:
                     rows = dbase.getRowList()
-                    struct.related_entries = [(r[dbid],r[nameid]) for r in rows]
+                    struct.related_entries = [
+                        (r[dbid], r[nameid]) for r in rows]
             # Now go through all of the atoms. Any items that do *not* exist are
             # given an index of -1. So we append an empty string on the end of
             # each row so that the default value for any un-specified value is
@@ -1002,12 +1030,14 @@ class CIFFile(object):
                 elem = row[elemid]
                 atname = row[atnameid]
                 altloc = row[altlocid]
-                if altloc == '.': altloc = ''
+                if altloc == '.':
+                    altloc = ''
                 resname = row[resnameid]
                 chain = row[chainid]
                 resnum = int(row[resnumid])
                 inscode = row[inscodeid]
-                if inscode in '?.': inscode = ''
+                if inscode in '?.':
+                    inscode = ''
                 try:
                     model = int(row[modelid])
                 except ValueError:
@@ -1032,8 +1062,9 @@ class CIFFile(object):
                     except TypeError:
                         charge = 0.0
                 # Try to figure out the element
-                elem = '%-2s' % elem # Make sure we have at least 2 characters
-                if elem[0] == ' ': elem = elem[1] + ' '
+                elem = '%-2s' % elem  # Make sure we have at least 2 characters
+                if elem[0] == ' ':
+                    elem = elem[1] + ' '
                 try:
                     atsym = (elem[0] + elem[1].lower()).strip()
                     atomic_number = AtomicNum[atsym]
@@ -1051,12 +1082,12 @@ class CIFFile(object):
                             atomic_number = AtomicNum[sym]
                             mass = Mass[sym]
                         except KeyError:
-                            atomic_number = 0 # give up
+                            atomic_number = 0  # give up
                             mass = 0.0
                 if atname.startswith('EP') or atname.startswith('LP'):
                     atom = ExtraPoint(atomic_number=atomic_number, name=atname,
-                                charge=charge, mass=mass, occupancy=occup,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
+                                      charge=charge, mass=mass, occupancy=occup,
+                                      bfactor=bfactor, altloc=altloc, number=atnum)
                 else:
                     atom = Atom(atomic_number=atomic_number, name=atname,
                                 charge=charge, mass=mass, occupancy=occup,
@@ -1081,7 +1112,8 @@ class CIFFile(object):
                 # Keep a mapping in case we need to go back and add attributes,
                 # like anisotropic b-factors
                 if model == origmodel:
-                    key = (resnum,resname,inscode,chain,atnum,altloc,atname)
+                    key = (
+                        resnum, resname, inscode, chain, atnum, altloc, atname)
                     atommap[key] = atom
             # Check for unit cell parameters
             cell = cont.getObj('cell')
@@ -1095,9 +1127,9 @@ class CIFFile(object):
                 spaceid = cell.getAttributeIndex('space_group_name_H-M')
                 row = cell.getRow(0)
                 struct.box = create_array(
-                        [float(row[aid]), float(row[bid]), float(row[cid]),
-                         float(row[alphaid]), float(row[betaid]),
-                         float(row[gammaid])]
+                    [float(row[aid]), float(row[bid]), float(row[cid]),
+                     float(row[alphaid]), float(row[betaid]),
+                     float(row[gammaid])]
                 )
                 if spaceid != -1:
                     struct.space_group = row[spaceid]
@@ -1138,12 +1170,14 @@ class CIFFile(object):
                             u12 = float(row[u12id])
                             u13 = float(row[u13id])
                             u23 = float(row[u23id])
-                            if altloc == '.': altloc = ''
-                            if inscode in '?.': inscode = ''
+                            if altloc == '.':
+                                altloc = ''
+                            if inscode in '?.':
+                                inscode = ''
                             key = (resnum, resname, inscode, chain, atnum,
                                    altloc, atname)
                             atommap[key].anisou = create_array(
-                                    [u11, u22, u33, u12, u13, u23]
+                                [u11, u22, u33, u12, u13, u23]
                             )
                     except (ValueError, KeyError):
                         # If at least one went wrong, set them all to None
@@ -1158,7 +1192,7 @@ class CIFFile(object):
                 all_coords.append(xyz)
             if all_coords:
                 struct._coordinates = np.array(all_coords).reshape(
-                            (-1, len(struct.atoms), 3))
+                    (-1, len(struct.atoms), 3))
 
         # Build the return value
         if len(structures) == 1:
@@ -1247,7 +1281,8 @@ class CIFFile(object):
                     try:
                         coords = list(itertools.chain(*coordinates))
                     except TypeError:
-                        raise TypeError("Unsupported coordinate dimensionality")
+                        raise TypeError(
+                            "Unsupported coordinate dimensionality")
                 if len(coords) != len(struct.atoms) * 3:
                     raise TypeError("Unsupported coordinate shape")
             elif crdsize == len(struct.atoms) * 3:
@@ -1262,11 +1297,11 @@ class CIFFile(object):
         if altlocs == 'all':
             def print_atoms(atom, coords):
                 i3 = atom.idx * 3
-                return atom, atom.other_locations, coords[i3:i3+3]
+                return atom, atom.other_locations, coords[i3:i3 + 3]
         elif altlocs == 'first':
             def print_atoms(atom, coords):
                 i3 = atom.idx * 3
-                return atom, dict(), coords[i3:i3+3]
+                return atom, dict(), coords[i3:i3 + 3]
         elif altlocs == 'occupancy':
             def print_atoms(atom, coords):
                 occ = atom.occupancy
@@ -1284,14 +1319,14 @@ class CIFFile(object):
         cifatoms = containers.DataCategory('atom_site')
         cont.append(cifatoms)
         cifatoms.setAttributeNameList(
-                ['group_PDB', 'id', 'type_symbol', 'label_atom_id',
-                 'label_alt_id', 'label_comp_id', 'label_asym_id',
-                 'label_entity_id', 'label_seq_id', 'pdbx_PDB_ins_code',
-                 'Cartn_x', 'Cartn_y', 'Cartn_z', 'occupancy', 'B_iso_or_equiv',
-                 'Cartn_x_esd', 'Cartn_y_esd', 'Cartn_z_esd', 'occupancy_esd',
-                 'B_iso_or_equiv_esd', 'pdbx_formal_charge', 'auth_seq_id',
-                 'auth_comp_id', 'auth_asym_id', 'auth_atom_id',
-                 'pdbx_PDB_model_num']
+            ['group_PDB', 'id', 'type_symbol', 'label_atom_id',
+             'label_alt_id', 'label_comp_id', 'label_asym_id',
+             'label_entity_id', 'label_seq_id', 'pdbx_PDB_ins_code',
+             'Cartn_x', 'Cartn_y', 'Cartn_z', 'occupancy', 'B_iso_or_equiv',
+             'Cartn_x_esd', 'Cartn_y_esd', 'Cartn_z_esd', 'occupancy_esd',
+             'B_iso_or_equiv_esd', 'pdbx_formal_charge', 'auth_seq_id',
+             'auth_comp_id', 'auth_asym_id', 'auth_atom_id',
+             'pdbx_PDB_model_num']
         )
         write_anisou = write_anisou and any(atom.anisou is not None
                                             for atom in struct.atoms)
@@ -1299,16 +1334,16 @@ class CIFFile(object):
             cifanisou = containers.DataCategory('atom_site_anisotrop')
             cont.append(cifanisou)
             cifanisou.setAttributeNameList(
-                    ['id', 'type_symbol', 'pdbx_label_atom_id',
-                    'pdbx_label_alt_id', 'pdbx_label_comp_id',
-                    'pdbx_label_asym_id', 'pdbx_label_seq_id', 'U[1][1]',
-                    'U[2][2]', 'U[3][3]', 'U[1][2]', 'U[1][3]', 'U[2][3]',
-                    'U[1][1]_esd', 'U[2][2]_esd', 'U[3][3]_esd', 'U[1][2]_esd',
-                    'U[1][3]_esd', 'U[2][3]_esd', 'pdbx_auth_seq_id',
-                    'pdbx_auth_comp_id', 'pdbx_auth_asym_id',
-                    'pdbx_auth_atom_id']
+                ['id', 'type_symbol', 'pdbx_label_atom_id',
+                 'pdbx_label_alt_id', 'pdbx_label_comp_id',
+                 'pdbx_label_asym_id', 'pdbx_label_seq_id', 'U[1][1]',
+                 'U[2][2]', 'U[3][3]', 'U[1][2]', 'U[1][3]', 'U[2][3]',
+                 'U[1][1]_esd', 'U[2][2]_esd', 'U[3][3]_esd', 'U[1][2]_esd',
+                 'U[1][3]_esd', 'U[2][3]_esd', 'pdbx_auth_seq_id',
+                 'pdbx_auth_comp_id', 'pdbx_auth_asym_id',
+                 'pdbx_auth_atom_id']
             )
-        nmore = 0 # how many *extra* atoms have been added?
+        nmore = 0  # how many *extra* atoms have been added?
         last_number = 0
         last_rnumber = 0
         for res in struct.residues:
@@ -1328,19 +1363,20 @@ class CIFFile(object):
                 last_number = anum
                 last_rnumber = rnum
                 cifatoms.append(
-                        ['ATOM', anum, Element[pa.atomic_number].upper(),
-                         pa.name, pa.altloc, res.name, res.chain, '?', rnum,
-                         res.insertion_code, x, y, z, pa.occupancy, pa.bfactor,
-                         '?', '?', '?', '?', '?', '', rnum, res.name, res.chain,
-                         pa.name, '1']
+                    ['ATOM', anum, Element[pa.atomic_number].upper(),
+                     pa.name, pa.altloc, res.name, res.chain, '?', rnum,
+                     res.insertion_code, x, y, z, pa.occupancy, pa.bfactor,
+                     '?', '?', '?', '?', '?', '', rnum, res.name, res.chain,
+                     pa.name, '1']
                 )
                 if write_anisou and pa.anisou is not None:
                     cifanisou.append(
-                            [anum, Element[pa.atomic_number].upper(), pa.name,
-                             pa.altloc, res.name, res.chain, rnum, pa.anisou[0],
-                             pa.anisou[1], pa.anisou[2], pa.anisou[3],
-                             pa.anisou[4], pa.anisou[5], '?', '?', '?', '?',
-                             '?', '?', rnum, res.name, res.chain, pa.name]
+                        [anum, Element[pa.atomic_number].upper(), pa.name,
+                         pa.altloc, res.name, res.chain, rnum, pa.anisou[
+                            0],
+                         pa.anisou[1], pa.anisou[2], pa.anisou[3],
+                         pa.anisou[4], pa.anisou[5], '?', '?', '?', '?',
+                         '?', '?', rnum, res.name, res.chain, pa.name]
                     )
                 for key in sorted(others.keys()):
                     oatom = others[key]
@@ -1352,21 +1388,21 @@ class CIFFile(object):
                         anum = oatom.number or last_number + 1
                     last_number = anum
                     cifatoms.append(
-                            ['ATOM', anum, Element[oatom.atomic_number].upper(),
-                             oatom.name, oatom.altloc, res.name, res.chain, '?',
-                             rnum, res.insertion_code, x, y, z, oatom.occupancy,
-                             oatom.bfactor, '?', '?', '?', '?', '?', '',
-                             rnum, res.name, res.chain, oatom.name, '1']
+                        ['ATOM', anum, Element[oatom.atomic_number].upper(),
+                         oatom.name, oatom.altloc, res.name, res.chain, '?',
+                         rnum, res.insertion_code, x, y, z, oatom.occupancy,
+                         oatom.bfactor, '?', '?', '?', '?', '?', '',
+                         rnum, res.name, res.chain, oatom.name, '1']
                     )
                     if write_anisou and oatom.anisou is not None:
                         cifanisou.append(
-                                [anum, Element[oatom.atomic_number].upper(),
-                                 oatom.name, oatom.altloc, res.name, res.chain,
-                                 rnum, oatom.anisou[0], oatom.anisou[1],
-                                 oatom.anisou[2], oatom.anisou[3],
-                                 oatom.anisou[4], oatom.anisou[5], '?', '?',
-                                 '?', '?', '?', '?', rnum, res.name, res.chain,
-                                 oatom.name]
+                            [anum, Element[oatom.atomic_number].upper(),
+                             oatom.name, oatom.altloc, res.name, res.chain,
+                             rnum, oatom.anisou[0], oatom.anisou[1],
+                             oatom.anisou[2], oatom.anisou[3],
+                             oatom.anisou[4], oatom.anisou[5], '?', '?',
+                             '?', '?', '?', '?', rnum, res.name, res.chain,
+                             oatom.name]
                         )
         # Now write the PDBx file
         writer = PdbxWriter(dest)

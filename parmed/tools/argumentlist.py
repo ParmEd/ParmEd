@@ -4,8 +4,11 @@ This stores a list of arguments, tokenizing a string into a list of arguments.
 import warnings
 from parmed.tools.exceptions import NoArgument, InputError
 
+
 class Argument(object):
+
     """ Is an argument """
+
     def __init__(self, string):
         """ Input string for the argument """
         self.string = string.strip()
@@ -56,10 +59,10 @@ class Argument(object):
             return self.string
 
         # Strip leading and trailing quotes (only if they both exist)
-        if self.string[0] == "'" and self.string[len(self.string)-1] == "'":
-            return self.string[1:len(self.string)-1]
-        elif self.string[0] == '"' and self.string[len(self.string)-1] == '"':
-            return self.string[1:len(self.string)-1]
+        if self.string[0] == "'" and self.string[len(self.string) - 1] == "'":
+            return self.string[1:len(self.string) - 1]
+        elif self.string[0] == '"' and self.string[len(self.string) - 1] == '"':
+            return self.string[1:len(self.string) - 1]
 
         return self.string
 
@@ -77,7 +80,9 @@ class Argument(object):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
 class ArgumentList(object):
+
     """ 
     List of arguments.  
     The arguments should be parsed in the following order to ensure it's done
@@ -88,6 +93,7 @@ class ArgumentList(object):
         get_next_mask
         get_next_string
     """
+
     def __init__(self, inp):
         """ Defines the string """
         if isinstance(inp, tuple) or isinstance(inp, list):
@@ -118,7 +124,7 @@ class ArgumentList(object):
         tokenlist = tokenre.findall(instring)
         # Make sure every non-whitespace character is consumed
         if len(tokenre.sub('', instring).strip()) > 0:
-            warnings.warn("Not all of argument string were handled: [%s]" % 
+            warnings.warn("Not all of argument string were handled: [%s]" %
                           tokenre.sub('', instring).strip())
         # Strip out whitespace in all arguments
         self.tokenlist = [Argument(token.strip()) for token in tokenlist]
@@ -132,7 +138,8 @@ class ArgumentList(object):
         for token in self.tokenlist:
             if token.isint() and not token.marked:
                 return int(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing integer argument!")
 
     def get_next_float(self, optional=False, default=None):
@@ -140,16 +147,19 @@ class ArgumentList(object):
         for token in self.tokenlist:
             if token.isfloat() and not token.marked:
                 return float(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing floating point argument!")
 
     def get_next_mask(self, optional=False, default=None):
         """ Returns the next string as long as it matches a mask """
         for token in self.tokenlist:
-            if token.marked: continue
+            if token.marked:
+                continue
             if token.ismask():
                 return str(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing Amber mask!")
 
     def get_next_string(self, optional=False, keep_quotes=False, default=None):
@@ -158,7 +168,8 @@ class ArgumentList(object):
             if not token.marked:
                 token.keep_quotes = keep_quotes
                 return str(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing string!")
 
     def unmarked(self):
@@ -175,15 +186,16 @@ class ArgumentList(object):
             # Skip all marked tokens. This allows us to allow users to specify
             # a token numerous times (useful if you want to enable an
             # arbitrary-length list of arguments
-            if token.marked: continue
+            if token.marked:
+                continue
             if token == key:
-                if self.tokenlist[i+1].marked:
+                if self.tokenlist[i + 1].marked:
                     raise RuntimeError("Expected token already marked! Should "
                                        "not happen. This means a buggy "
                                        "action...")
                 token.marked = True
                 try:
-                    return argtype(self.tokenlist[i+1])
+                    return argtype(self.tokenlist[i + 1])
                 except ValueError as err:
                     raise InputError(str(err))
 
@@ -207,10 +219,10 @@ class ArgumentList(object):
         """ Get a mask that follows a keyword """
         for i, token in enumerate(self.tokenlist):
             if token == key:
-                if not self.tokenlist[i+1].ismask():
+                if not self.tokenlist[i + 1].ismask():
                     raise InputError("Expected mask to follow %s. Got %s "
                                      "instead" %
-                                     (key, self.tokenlist[i+1].string))
+                                     (key, self.tokenlist[i + 1].string))
         try:
             return self._get_key_arg(key, str)
         except NoArgument:
@@ -227,6 +239,7 @@ class ArgumentList(object):
         """ See if a particular keyword is present (optionally mark it) """
         for token in self.tokenlist:
             if not token.marked and token == key:
-                if mark: token.mark()
+                if mark:
+                    token.mark()
                 return True
         return False

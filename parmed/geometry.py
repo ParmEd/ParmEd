@@ -30,6 +30,7 @@ from math import pi, cos, sin, sqrt, acos
 import numpy as np
 import warnings
 
+
 def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
     """
     This function takes the lengths of the unit cell vectors and the angles
@@ -60,14 +61,20 @@ def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
     The unit cell lengths are assumed to be Angstroms if no explicit unit is
     given. The angles are assumed to be degrees
     """
-    if u.is_quantity(a): a = a.value_in_unit(u.angstroms)
-    if u.is_quantity(b): b = b.value_in_unit(u.angstroms)
-    if u.is_quantity(c): c = c.value_in_unit(u.angstroms)
-    if u.is_quantity(alpha): alpha = alpha.value_in_unit(u.degrees)
-    if u.is_quantity(beta): beta = beta.value_in_unit(u.degrees)
-    if u.is_quantity(gamma): gamma = gamma.value_in_unit(u.degrees)
+    if u.is_quantity(a):
+        a = a.value_in_unit(u.angstroms)
+    if u.is_quantity(b):
+        b = b.value_in_unit(u.angstroms)
+    if u.is_quantity(c):
+        c = c.value_in_unit(u.angstroms)
+    if u.is_quantity(alpha):
+        alpha = alpha.value_in_unit(u.degrees)
+    if u.is_quantity(beta):
+        beta = beta.value_in_unit(u.degrees)
+    if u.is_quantity(gamma):
+        gamma = gamma.value_in_unit(u.degrees)
 
-    if alpha <= 2*pi and beta <= 2*pi and gamma <= 2*pi:
+    if alpha <= 2 * pi and beta <= 2 * pi and gamma <= 2 * pi:
         warnings.warn('Strange unit cell vector angles detected. They '
                       'appear to be in radians...')
 
@@ -80,18 +87,24 @@ def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
     by = b * sin(gamma)
     bv = [bx, by, 0.0]
     cx = c * cos(beta)
-    cy = c * (cos(alpha) - cos(beta)*cos(gamma)) / sin(gamma)
-    cz = sqrt(c*c - cx*cx - cy*cy)
+    cy = c * (cos(alpha) - cos(beta) * cos(gamma)) / sin(gamma)
+    cz = sqrt(c * c - cx * cx - cy * cy)
     cv = [cx, cy, cz]
 
     # Make sure that any tiny components are exactly 0
-    if abs(bx) < TINY: bv[0] = 0
-    if abs(by) < TINY: bv[1] = 0
-    if abs(cx) < TINY: cv[0] = 0
-    if abs(cy) < TINY: cv[1] = 0
-    if abs(cz) < TINY: cv[2] = 0
+    if abs(bx) < TINY:
+        bv[0] = 0
+    if abs(by) < TINY:
+        bv[1] = 0
+    if abs(cx) < TINY:
+        cv[0] = 0
+    if abs(cy) < TINY:
+        cv[1] = 0
+    if abs(cz) < TINY:
+        cv[2] = 0
 
     return (av, bv, cv) * u.angstroms
+
 
 def box_vectors_to_lengths_and_angles(a, b, c):
     """
@@ -119,23 +132,27 @@ def box_vectors_to_lengths_and_angles(a, b, c):
     The unit cell lengths are assumed to be Angstroms if no explicit unit is
     given.
     """
-    if u.is_quantity(a): a = a.value_in_unit(u.angstroms)
-    if u.is_quantity(b): b = b.value_in_unit(u.angstroms)
-    if u.is_quantity(c): c = c.value_in_unit(u.angstroms)
+    if u.is_quantity(a):
+        a = a.value_in_unit(u.angstroms)
+    if u.is_quantity(b):
+        b = b.value_in_unit(u.angstroms)
+    if u.is_quantity(c):
+        c = c.value_in_unit(u.angstroms)
     # Get the lengths
-    la = sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
-    lb = sqrt(b[0]*b[0] + b[1]*b[1] + b[2]*b[2])
-    lc = sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2])
+    la = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
+    lb = sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2])
+    lc = sqrt(c[0] * c[0] + c[1] * c[1] + c[2] * c[2])
     # Angles
-    alpha = acos((b[0]*c[0] + b[1]*c[1] + b[2]*c[2]) / (lb*lc))
-    beta = acos((a[0]*c[0] + a[1]*c[1] + a[2]*c[2]) / (la*lc))
-    gamma = acos((b[0]*a[0] + b[1]*a[1] + b[2]*a[2]) / (lb*la))
+    alpha = acos((b[0] * c[0] + b[1] * c[1] + b[2] * c[2]) / (lb * lc))
+    beta = acos((a[0] * c[0] + a[1] * c[1] + a[2] * c[2]) / (la * lc))
+    gamma = acos((b[0] * a[0] + b[1] * a[1] + b[2] * a[2]) / (lb * la))
     # Convert to degrees
     alpha *= RAD_TO_DEG
     beta *= RAD_TO_DEG
     gamma *= RAD_TO_DEG
 
     return (la, lb, lc) * u.angstroms, (alpha, beta, gamma) * u.degrees
+
 
 def reduce_box_vectors(a, b, c):
     """
@@ -173,9 +190,9 @@ def reduce_box_vectors(a, b, c):
     b = Vec3(*b)
     c = Vec3(*c)
 
-    c = c - b*round(c[1]/b[1])
-    c = c - a*round(c[0]/a[0])
-    b = b - a*round(b[0]/a[0])
+    c = c - b * round(c[1] / b[1])
+    c = c - a * round(c[0] / a[0])
+    b = b - a * round(b[0] / a[0])
 
     return a, b, c
 

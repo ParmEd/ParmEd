@@ -32,6 +32,8 @@ from warnings import warn as _warn
 __all__ = ['AmberFormat', 'AmberParm', 'ChamberParm', 'LoadParm', 'Rst7']
 
 # Supply a function to load a topology file in the 'correct' format
+
+
 def LoadParm(parmname, rst7name=None):
     """
     Loads a topology file using the correct class.

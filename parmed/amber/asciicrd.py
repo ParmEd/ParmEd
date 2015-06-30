@@ -21,11 +21,15 @@ import warnings as _warnings
 VELSCALE = 20.455
 ONEVELSCALE = 1 / VELSCALE
 
+
 class _FileEOF(Exception):
+
     """ For control flow """
+
 
 @add_metaclass(FileFormatType)
 class _AmberAsciiCoordinateFile(object):
+
     """
     Abstract base class for interacting with ASCII coordinate files.
     Opens a new ASCII coordinate file and either parses it (loading
@@ -58,7 +62,8 @@ class _AmberAsciiCoordinateFile(object):
             # be written as coordinates first, then box.
             self._writebox = False
         else:
-            raise ValueError("%s mode must be 'r' or 'w'" % type(self).__name__)
+            raise ValueError("%s mode must be 'r' or 'w'" %
+                             type(self).__name__)
         self._file = genopen(fname, mode)
 
         self.natom = natom
@@ -97,9 +102,11 @@ class _AmberAsciiCoordinateFile(object):
         except AttributeError:
             pass
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 class AmberAsciiRestart(_AmberAsciiCoordinateFile):
+
     """
     Parser for the Amber ASCII inpcrd/restart file format
 
@@ -146,9 +153,10 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                 i += 2
                 for j in range(6):
                     j12 = j * 12
-                    if lines[i][j12+4] != '.': return False
-                    float(lines[i][j12:j12+12])
-                    if lines[i][j12+11] not in '0123456789':
+                    if lines[i][j12 + 4] != '.':
+                        return False
+                    float(lines[i][j12:j12 + 12])
+                    if lines[i][j12 + 11] not in '0123456789':
                         return False
         except (IndexError, ValueError):
             return False
@@ -221,7 +229,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         idx = 0
         for i in range(startline, endline):
             line = lines[i]
-            x1 = float(line[ 0:12])
+            x1 = float(line[0:12])
             y1 = float(line[12:24])
             z1 = float(line[24:36])
             self._coordinates[idx] = [x1, y1, z1]
@@ -243,7 +251,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             idx = 0
             for i in range(startline, endline):
                 line = lines[i]
-                x1 = float(line[ 0:12]) * VELSCALE
+                x1 = float(line[0:12]) * VELSCALE
                 y1 = float(line[12:24]) * VELSCALE
                 z1 = float(line[24:36]) * VELSCALE
                 self._velocities[idx] = [x1, y1, z1]
@@ -255,7 +263,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                 except ValueError:
                     pass
                 else:
-                    self._velocities[idx] = [x2,y2,z2]
+                    self._velocities[idx] = [x2, y2, z2]
                     idx += 1
             startline = endline
             self._velocities = self._velocities.reshape((1, self.natom, 3))
@@ -294,10 +302,12 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         fmt = '%12.7f%12.7f%12.7f'
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3], stuff[i3+1], stuff[i3+2]))
+            self._file.write(fmt % (stuff[i3], stuff[i3 + 1], stuff[i3 + 2]))
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0:
+                self._file.write('\n')
+        if self.natom % 2 == 1:
+            self._file.write('\n')
         self._coords_written = True
 
     @property
@@ -316,7 +326,8 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if not self._coords_written:
             raise RuntimeError('Coordinates must be set before velocities')
         if self._cell_lengths_written or self._cell_angles_written:
-            raise RuntimeError('Velocities must be written before the box info')
+            raise RuntimeError(
+                'Velocities must be written before the box info')
         if self._vels_written:
             raise RuntimeError('Can only write velocities once')
         if len(stuff) != 3 * self.natom:
@@ -327,13 +338,15 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         numwrit = 0
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3  ]*ONEVELSCALE,
-                                    stuff[i3+1]*ONEVELSCALE,
-                                    stuff[i3+2]*ONEVELSCALE)
-            )
+            self._file.write(fmt % (stuff[i3] * ONEVELSCALE,
+                                    stuff[i3 + 1] * ONEVELSCALE,
+                                    stuff[i3 + 2] * ONEVELSCALE)
+                             )
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0:
+                self._file.write('\n')
+        if self.natom % 2 == 1:
+            self._file.write('\n')
         self._vels_written = True
 
     @property
@@ -356,7 +369,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     def box(self):
         """ Combined cell lengths and cell angles """
         if self._status == 'new' and not (hasattr(self, '_cell_lengths') and
-                hasattr(self, '_cell_angles')):
+                                          hasattr(self, '_cell_angles')):
             raise RuntimeError('Cell parameters not yet set')
         if not self.hasbox:
             raise NameError('%s has no periodic box information' % self.fname)
@@ -393,7 +406,8 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell lengths')
         self._cell_angles = np.array(stuff, copy=False)
-        self._file.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
+        self._file.write('%12.7f%12.7f%12.7f\n' %
+                         (stuff[0], stuff[1], stuff[2]))
         self._cell_angles_written = True
 
     @box.setter
@@ -402,9 +416,11 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self.cell_lengths = stuff[:3]
         self.cell_angles = stuff[3:]
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 class AmberMdcrd(_AmberAsciiCoordinateFile):
+
     """
     A class to parse Amber ASCII trajectory files. This is *much* slower than
     parsing NetCDF files (or the equivalent parsing done in a compiled language
@@ -438,9 +454,10 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 i += 1
                 for j in range(10):
                     j8 = j * 8
-                    if lines[i][j8+4] != '.': return False
-                    float(lines[i][j8:j8+8])
-                    if lines[i][j8+7] not in '0123456789':
+                    if lines[i][j8 + 4] != '.':
+                        return False
+                    float(lines[i][j8:j8 + 8])
+                    if lines[i][j8 + 7] not in '0123456789':
                         return False
         except (IndexError, ValueError):
             return False
@@ -460,29 +477,34 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         self.title = line.strip()
         self._coordinates = np.ndarray(0)
         self.cell_lengths = np.ndarray(0)
-        mainiter = range(0, 8*self.CRDS_PER_LINE, 8)
-        extraiter = range(0, 8*self._nextras, 8)
+        mainiter = range(0, 8 * self.CRDS_PER_LINE, 8)
+        extraiter = range(0, 8 * self._nextras, 8)
         try:
             while line:
-                frame = np.zeros(self.natom*3)
-                if not line: raise _FileEOF()
+                frame = np.zeros(self.natom * 3)
+                if not line:
+                    raise _FileEOF()
                 cell = np.zeros(3)
                 idx = 0
                 line = self._file.readline()
-                if not line: raise StopIteration()
+                if not line:
+                    raise StopIteration()
                 for i in range(self._full_lines_per_frame):
-                    if not line: raise _FileEOF()
-                    frame[idx:idx+10] = [float(line[j:j+8]) for j in mainiter]
+                    if not line:
+                        raise _FileEOF()
+                    frame[
+                        idx:idx + 10] = [float(line[j:j + 8]) for j in mainiter]
                     idx += 10
                     line = self._file.readline()
 
                 if self._nextras:
-                    frame[idx:idx+self._nextras] = \
-                            [float(line[j:j+8]) for j in extraiter]
+                    frame[idx:idx + self._nextras] = \
+                        [float(line[j:j + 8]) for j in extraiter]
 
                 if self.hasbox:
                     line = self._file.readline()
-                    if not line: raise _FileEOF()
+                    if not line:
+                        raise _FileEOF()
                     cell[0] = float(line[:8])
                     cell[1] = float(line[8:16])
                     cell[2] = float(line[16:24])
@@ -544,7 +566,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             pass
         if self._writebox:
             raise RuntimeError('Box information not written for last frame')
-        if len(stuff) != 3*self.natom:
+        if len(stuff) != 3 * self.natom:
             raise ValueError('add_coordinates requires an array of length '
                              'natom*3')
 
@@ -554,11 +576,11 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         for i in range(self._full_lines_per_frame):
             i10 = i * 10
             for j in range(10):
-                self._file.write('%8.3f' % stuff[i10+j])
+                self._file.write('%8.3f' % stuff[i10 + j])
             self._file.write('\n')
         if self._nextras:
-            extra = i*10+j + 1
-            while extra < self.natom*3:
+            extra = i * 10 + j + 1
+            while extra < self.natom * 3:
                 self._file.write('%8.3f' % stuff[extra])
                 extra += 1
             self._file.write('\n')
@@ -595,4 +617,4 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         self._writebox = False
         self._file.flush()
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

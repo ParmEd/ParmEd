@@ -38,15 +38,14 @@ _time_scale = (daltons * angstroms**2 /
                kilocalories_per_mole).conversion_factor_to(picoseconds**2)
 akma_time_base_unit = BaseUnit(time_dimension, "akma_time_unit", "akma-s")
 akma_time_base_unit.define_conversion_factor_to(picosecond_base_unit,
-            1 / sqrt(_time_scale))
+                                                1 / sqrt(_time_scale))
 del _time_scale
 
 akma_unit_system = UnitSystem([
-        angstrom_base_unit,
-        dalton_base_unit,
-        akma_time_base_unit,
-        elementary_charge_base_unit,
-        kelvin_base_unit,
-        mole_base_unit,
-        radian_base_unit])
-
+    angstrom_base_unit,
+    dalton_base_unit,
+    akma_time_base_unit,
+    elementary_charge_base_unit,
+    kelvin_base_unit,
+    mole_base_unit,
+    radian_base_unit])
