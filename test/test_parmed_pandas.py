@@ -16,8 +16,10 @@ try:
 except ImportError:
     pd = np = None
 
+
 @unittest.skipIf(pd is None or np is None, "Cannot test without pandas")
 class TestStructureDataFrame(unittest.TestCase):
+
     """ Tests the conversion of parmed.Structure to a pd.DataFrame """
 
     def testPDBPandas(self):
@@ -66,7 +68,8 @@ class TestStructureDataFrame(unittest.TestCase):
                 self.assertEqual(r1.U12, r2.U12)
                 self.assertEqual(r1.U13, r2.U13)
                 self.assertEqual(r1.U23, r2.U23)
-                self.assertTrue(np.all(np.abs(r1[anisou] - pdb.atoms[i].anisou) < 1e-4))
+                self.assertTrue(
+                    np.all(np.abs(r1[anisou] - pdb.atoms[i].anisou) < 1e-4))
             self.assertEqual(r1.charge, 0)
             self.assertEqual(r1.charge, pdb.atoms[i].charge)
             self.assertEqual(r1['name'], pdb.atoms[i].name)
@@ -172,7 +175,7 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertEqual(r1.type_idx, parm.atoms[i].type_idx)
             self.assertEqual(r1.class_idx, parm.atoms[i].class_idx)
             self.assertTrue(np.all(r1[multipoles] ==
-                np.array(parm.atoms[i].multipoles)))
+                                   np.array(parm.atoms[i].multipoles)))
             self.assertEqual(r1.polarizability, parm.atoms[i].polarizability)
             self.assertEqual(r1.vdw_parent, parm.atoms[i].vdw_parent.idx)
 

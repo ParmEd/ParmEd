@@ -13,9 +13,11 @@ import unittest
 
 get_fn = utils.get_fn
 
+
 class TestCharmmCoords(unittest.TestCase):
+
     """ Test CHARMM coordinate file parsers """
-    
+
     def testCharmmCrd(self):
         """ Test CHARMM coordinate file parser """
         crd = charmmcrds.CharmmCrdFile(get_fn('1tnm.crd'))
@@ -48,9 +50,11 @@ class TestCharmmCoords(unittest.TestCase):
         self.assertEqual(crd.enrgstat, [])
         self.assertEqual(crd.nsavv, 10)
 
+
 class TestCharmmPsf(unittest.TestCase):
+
     """ Test CHARMM PSF file capabilities """
-    
+
     def testCharmmPsf(self):
         """ Test CHARMM PSF file parsing """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
@@ -58,7 +62,7 @@ class TestCharmmPsf(unittest.TestCase):
         for i, atom in enumerate(cpsf.atoms):
             self.assertEqual(atom.idx, i)
             self.assertEqual(atom.residue.name, 'ALA')
-            self.assertTrue(atom in atom.residue) # tests __contains__
+            self.assertTrue(atom in atom.residue)  # tests __contains__
         # Check the bond, angle, and torsion partners of the first N atom
         a = cpsf.atoms[0]
         for atom in a.bond_partners:
@@ -135,7 +139,7 @@ class TestCharmmPsf(unittest.TestCase):
         for i, atom in enumerate(cpsf.atoms):
             self.assertEqual(atom.idx, i)
             self.assertEqual(atom.residue.name, 'ALA')
-            self.assertTrue(atom in atom.residue) # tests __contains__
+            self.assertTrue(atom in atom.residue)  # tests __contains__
         # Check the bond, angle, and torsion partners of the first N atom
         a = cpsf.atoms[0]
         for atom in a.bond_partners:
@@ -219,7 +223,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.impropers), 295)
         self.assertEqual(len(cpsf.residues), 109)
         self.assertEqual(len(cpsf.title), 3)
-    
+
     def testVmdPsf(self):
         """ Test parsing of CHARMM PSF from VMD """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala_autopsf.psf'))
@@ -228,7 +232,7 @@ class TestCharmmPsf(unittest.TestCase):
         for i, atom in enumerate(cpsf.atoms):
             self.assertEqual(atom.idx, i)
             self.assertEqual(atom.residue.name, 'ALA')
-            self.assertTrue(atom in atom.residue) # tests __contains__
+            self.assertTrue(atom in atom.residue)  # tests __contains__
         # Check the bond, angle, and torsion partners of the first N atom
         a = cpsf.atoms[0]
         for atom in a.bond_partners:
@@ -309,16 +313,18 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.cmaps), 447)
         self.assertEqual(cpsf.residues[281].insertion_code, 'A')
 
+
 class TestCharmmParameters(unittest.TestCase):
+
     """ Test CHARMM Parameter file parsing """
-    
+
     def testSingleParameterset(self):
         """ Test reading a single parameter set """
         self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
-                                                get_fn('par_all22_prot.inp')))
+            get_fn('par_all22_prot.inp')))
         params = parameters.CharmmParameterSet(
-                                get_fn('top_all22_prot.inp'),
-                                get_fn('par_all22_prot.inp'),
+            get_fn('top_all22_prot.inp'),
+            get_fn('par_all22_prot.inp'),
         )
         for i, tup in enumerate(params.atom_types_tuple):
             name, num = tup
@@ -326,7 +332,7 @@ class TestCharmmParameters(unittest.TestCase):
                             params.atom_types_str[name])
             self.assertTrue(params.atom_types_tuple[tup] is
                             params.atom_types_int[num])
-        self.assertEqual(i, 94) # 95 types, but i starts from 0
+        self.assertEqual(i, 94)  # 95 types, but i starts from 0
         self.assertEqual(len(params.angle_types), 685)
         self.assertEqual(len(params.atom_types_int), 95)
         self.assertEqual(len(params.atom_types_str), 95)
@@ -341,15 +347,15 @@ class TestCharmmParameters(unittest.TestCase):
         # Look at the parsed residue templates and make sure they line up
         self.assertEqual(len(params.residues), 32)
         self.assertEqual(set(params.residues.keys()),
-                set(['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY',
-                     'HSD', 'HSE', 'HSP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE',
-                     'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ALAD', 'TIP3',
-                     'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
-        )
+                         set(['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY',
+                              'HSD', 'HSE', 'HSP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE',
+                              'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ALAD', 'TIP3',
+                              'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
+                         )
         self.assertEqual(len(params.patches), 22)
         for resname, res in iteritems(params.residues):
             if resname in ('TIP3', 'TP3M', 'SOD', 'MG', 'CLA', 'POT', 'CES',
-                    'CAL', 'ZN2', 'ALAD'):
+                           'CAL', 'ZN2', 'ALAD'):
                 self.assertIs(res.first_patch, None)
                 self.assertIs(res.last_patch, None)
                 continue
@@ -361,9 +367,11 @@ class TestCharmmParameters(unittest.TestCase):
             else:
                 self.assertIs(res.first_patch, params.patches['NTER'])
         # Look at the number of unique terms
+
         def uniques(stuff):
             myset = set()
-            for key in stuff: myset.add(id(stuff[key]))
+            for key in stuff:
+                myset.add(id(stuff[key]))
             return len(myset)
         self.assertEqual(uniques(params.angle_types), 356)
         self.assertEqual(uniques(params.atom_types_int), 95)
@@ -394,16 +402,18 @@ class TestCharmmParameters(unittest.TestCase):
     def testCollection(self):
         """ Test reading a large number of parameter files """
         p = parameters.CharmmParameterSet(
-                    get_fn('top_all36_prot.rtf'), 
-                    get_fn('top_all36_carb.rtf'),
-                    get_fn('par_all36_prot.prm'),
-                    get_fn('par_all36_carb.prm'),
-                    get_fn('toppar_water_ions.str'),
+            get_fn('top_all36_prot.rtf'),
+            get_fn('top_all36_carb.rtf'),
+            get_fn('par_all36_prot.prm'),
+            get_fn('par_all36_carb.prm'),
+            get_fn('toppar_water_ions.str'),
         ).condense()
         # Look at the number of unique terms
+
         def uniques(stuff):
             myset = set()
-            for key in stuff: myset.add(id(stuff[key]))
+            for key in stuff:
+                myset.add(id(stuff[key]))
             return len(myset)
         self.assertEqual(uniques(p.angle_types), 206)
         self.assertEqual(uniques(p.atom_types_int), 123)
@@ -418,7 +428,8 @@ class TestCharmmParameters(unittest.TestCase):
 
     def testCGenFF(self):
         """ Test parsing stream files generated by CGenFF """
-        p = parameters.CharmmParameterSet(get_fn('toppar_spin_label_dummy.str'))
+        p = parameters.CharmmParameterSet(
+            get_fn('toppar_spin_label_dummy.str'))
         p = p.condense()
         self.assertEqual(len(p.atom_types_str), 4)
         self.assertEqual(p.atom_types_str['CBD'].epsilon, 0)
@@ -435,47 +446,86 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(p.bond_types[('CG251O', 'NG3C51')].penalty, 64)
         self.assertEqual(p.bond_types[('CG321', 'NG3C51')].penalty, 20)
         # Check angle types
-        self.assertEqual(p.angle_types[('CG2D2','CG251O','CG3C52')].penalty, 268)
-        self.assertEqual(p.angle_types[('CG2D2','CG251O','NG3C51')].penalty, 264.5)
-        self.assertEqual(p.angle_types[('CG3C52','CG251O','NG3C51')].penalty, 328)
-        self.assertEqual(p.angle_types[('CG251O','CG2D2','HGA5')].penalty, 23)
-        self.assertEqual(p.angle_types[('CG321','CG321','NG3C51')].penalty, 3.9)
-        self.assertEqual(p.angle_types[('NG3C51','CG321','HGA2')].penalty, 3)
-        self.assertEqual(p.angle_types[('CG251O','CG3C52','CG2R51')].penalty, 4)
-        self.assertEqual(p.angle_types[('CG251O','CG3C52','HGA2')].penalty, 3.5)
-        self.assertEqual(p.angle_types[('CG251O','NG3C51','CG2R51')].penalty, 75)
-        self.assertEqual(p.angle_types[('CG251O','NG3C51','CG321')].penalty, 123.5)
-        self.assertEqual(p.angle_types[('CG2R51','NG3C51','CG321')].penalty, 122.5)
+        self.assertEqual(
+            p.angle_types[('CG2D2', 'CG251O', 'CG3C52')].penalty, 268)
+        self.assertEqual(
+            p.angle_types[('CG2D2', 'CG251O', 'NG3C51')].penalty, 264.5)
+        self.assertEqual(
+            p.angle_types[('CG3C52', 'CG251O', 'NG3C51')].penalty, 328)
+        self.assertEqual(
+            p.angle_types[('CG251O', 'CG2D2', 'HGA5')].penalty, 23)
+        self.assertEqual(
+            p.angle_types[('CG321', 'CG321', 'NG3C51')].penalty, 3.9)
+        self.assertEqual(p.angle_types[('NG3C51', 'CG321', 'HGA2')].penalty, 3)
+        self.assertEqual(
+            p.angle_types[('CG251O', 'CG3C52', 'CG2R51')].penalty, 4)
+        self.assertEqual(
+            p.angle_types[('CG251O', 'CG3C52', 'HGA2')].penalty, 3.5)
+        self.assertEqual(
+            p.angle_types[('CG251O', 'NG3C51', 'CG2R51')].penalty, 75)
+        self.assertEqual(
+            p.angle_types[('CG251O', 'NG3C51', 'CG321')].penalty, 123.5)
+        self.assertEqual(
+            p.angle_types[('CG2R51', 'NG3C51', 'CG321')].penalty, 122.5)
         # Check dihedral types
-        self.assertEqual(p.dihedral_types[('CG3C52','CG251O','CG2D2','HGA5')].penalty, 295)
-        self.assertEqual(p.dihedral_types[('NG3C51','CG251O','CG2D2','HGA5')].penalty, 294)
-        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','CG3C52','CG2R51')].penalty, 136.5)
-        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','CG3C52','HGA2')].penalty, 136.5)
-        self.assertEqual(p.dihedral_types[('NG3C51','CG251O','CG3C52','CG2R51')].penalty, 165.5)
-        self.assertEqual(p.dihedral_types[('NG3C51','CG251O','CG3C52','HGA2')].penalty, 148)
-        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','NG3C51','CG2R51')].penalty, 210.5)
-        self.assertEqual(p.dihedral_types[('CG2D2','CG251O','NG3C51','CG321')].penalty, 167.5)
-        self.assertEqual(p.dihedral_types[('CG3C52','CG251O','NG3C51','CG2R51')].penalty, 232.5)
-        self.assertEqual(p.dihedral_types[('CG3C52','CG251O','NG3C51','CG321')].penalty, 189.5)
-        self.assertEqual(p.dihedral_types[('CG2R51','CG2R51','CG3C52','CG251O')].penalty, 4)
-        self.assertEqual(p.dihedral_types[('HGR51','CG2R51','CG3C52','CG251O')].penalty, 4)
-        self.assertEqual(p.dihedral_types[('CG2R51','CG2R51','NG3C51','CG251O')].penalty, 75)
-        self.assertEqual(p.dihedral_types[('CG2R51','CG2R51','NG3C51','CG321')].penalty, 31)
-        self.assertEqual(p.dihedral_types[('HGR52','CG2R51','NG3C51','CG251O')].penalty, 75)
-        self.assertEqual(p.dihedral_types[('HGR52','CG2R51','NG3C51','CG321')].penalty, 31)
-        self.assertEqual(p.dihedral_types[('CG331','CG321','CG321','NG3C51')].penalty, 33)
-        self.assertEqual(p.dihedral_types[('CG331','CG321','CG321','NG3C51')].penalty, 33)
-        self.assertEqual(p.dihedral_types[('NG3C51','CG321','CG321','HGA2')].penalty, 9)
-        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG251O')].penalty, 89)
-        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG251O')].penalty, 89)
-        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG251O')].penalty, 89)
-        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
-        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
-        self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
-        self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
-        self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
+        self.assertEqual(
+            p.dihedral_types[('CG3C52', 'CG251O', 'CG2D2', 'HGA5')].penalty, 295)
+        self.assertEqual(
+            p.dihedral_types[('NG3C51', 'CG251O', 'CG2D2', 'HGA5')].penalty, 294)
+        self.assertEqual(
+            p.dihedral_types[('CG2D2', 'CG251O', 'CG3C52', 'CG2R51')].penalty, 136.5)
+        self.assertEqual(
+            p.dihedral_types[('CG2D2', 'CG251O', 'CG3C52', 'HGA2')].penalty, 136.5)
+        self.assertEqual(
+            p.dihedral_types[('NG3C51', 'CG251O', 'CG3C52', 'CG2R51')].penalty, 165.5)
+        self.assertEqual(
+            p.dihedral_types[('NG3C51', 'CG251O', 'CG3C52', 'HGA2')].penalty, 148)
+        self.assertEqual(
+            p.dihedral_types[('CG2D2', 'CG251O', 'NG3C51', 'CG2R51')].penalty, 210.5)
+        self.assertEqual(
+            p.dihedral_types[('CG2D2', 'CG251O', 'NG3C51', 'CG321')].penalty, 167.5)
+        self.assertEqual(
+            p.dihedral_types[('CG3C52', 'CG251O', 'NG3C51', 'CG2R51')].penalty, 232.5)
+        self.assertEqual(
+            p.dihedral_types[('CG3C52', 'CG251O', 'NG3C51', 'CG321')].penalty, 189.5)
+        self.assertEqual(
+            p.dihedral_types[('CG2R51', 'CG2R51', 'CG3C52', 'CG251O')].penalty, 4)
+        self.assertEqual(
+            p.dihedral_types[('HGR51', 'CG2R51', 'CG3C52', 'CG251O')].penalty, 4)
+        self.assertEqual(
+            p.dihedral_types[('CG2R51', 'CG2R51', 'NG3C51', 'CG251O')].penalty, 75)
+        self.assertEqual(
+            p.dihedral_types[('CG2R51', 'CG2R51', 'NG3C51', 'CG321')].penalty, 31)
+        self.assertEqual(
+            p.dihedral_types[('HGR52', 'CG2R51', 'NG3C51', 'CG251O')].penalty, 75)
+        self.assertEqual(
+            p.dihedral_types[('HGR52', 'CG2R51', 'NG3C51', 'CG321')].penalty, 31)
+        self.assertEqual(
+            p.dihedral_types[('CG331', 'CG321', 'CG321', 'NG3C51')].penalty, 33)
+        self.assertEqual(
+            p.dihedral_types[('CG331', 'CG321', 'CG321', 'NG3C51')].penalty, 33)
+        self.assertEqual(
+            p.dihedral_types[('NG3C51', 'CG321', 'CG321', 'HGA2')].penalty, 9)
+        self.assertEqual(
+            p.dihedral_types[('CG321', 'CG321', 'NG3C51', 'CG251O')].penalty, 89)
+        self.assertEqual(
+            p.dihedral_types[('CG321', 'CG321', 'NG3C51', 'CG251O')].penalty, 89)
+        self.assertEqual(
+            p.dihedral_types[('CG321', 'CG321', 'NG3C51', 'CG251O')].penalty, 89)
+        self.assertEqual(
+            p.dihedral_types[('CG321', 'CG321', 'NG3C51', 'CG2R51')].penalty, 88)
+        self.assertEqual(
+            p.dihedral_types[('CG321', 'CG321', 'NG3C51', 'CG2R51')].penalty, 88)
+        self.assertEqual(
+            p.dihedral_types[('CG321', 'CG321', 'NG3C51', 'CG2R51')].penalty, 88)
+        self.assertEqual(
+            p.dihedral_types[('HGA2', 'CG321', 'NG3C51', 'CG251O')].penalty, 49.5)
+        self.assertEqual(
+            p.dihedral_types[('HGA2', 'CG321', 'NG3C51', 'CG2R51')].penalty, 48.5)
+
 
 class TestFileWriting(unittest.TestCase):
+
     """ Tests the various file writing capabilities """
 
     def setUp(self):
@@ -499,12 +549,14 @@ class TestFileWriting(unittest.TestCase):
         cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True))
         cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
-            if attr.startswith('_'): continue
+            if attr.startswith('_'):
+                continue
             # Skip descriptors
             if attr in ('topology', 'positions', 'box_vectors',
                         'velocities', 'name'):
                 continue
-            if callable(getattr(cpsf, attr)): continue
+            if callable(getattr(cpsf, attr)):
+                continue
             if hasattr(getattr(cpsf, attr), '__len__'):
                 self.assertEqual(len(getattr(cpsf, attr)),
                                  len(getattr(cpsf2, attr)))
@@ -528,11 +580,13 @@ class TestFileWriting(unittest.TestCase):
         cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True), vmd=True)
         cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
-            if attr.startswith('_'): continue
+            if attr.startswith('_'):
+                continue
             if attr in ('topology', 'positions', 'box_vectors',
                         'velocities', 'name'):
                 continue
-            if callable(getattr(cpsf, attr)): continue
+            if callable(getattr(cpsf, attr)):
+                continue
             if hasattr(getattr(cpsf, attr), '__len__'):
                 self.assertEqual(len(getattr(cpsf, attr)),
                                  len(getattr(cpsf2, attr)))

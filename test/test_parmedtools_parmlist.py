@@ -7,6 +7,7 @@ from parmed.charmm import CharmmPsfFile
 from parmed.tools import ParmList
 import unittest
 
+
 class TestParmList(unittest.TestCase):
 
     def testAddAmberParm(self):
@@ -95,7 +96,6 @@ class TestParmList(unittest.TestCase):
         self.assertIs(parms.parm, ala3)
         parms.set_new_active(get_fn('ala_ala_ala.psf'))
         self.assertIs(parms.parm, aaa)
-
 
     def testAddCharmmPsfNames(self):
         """ Test adding CHARMM PSF file names to ParmList """

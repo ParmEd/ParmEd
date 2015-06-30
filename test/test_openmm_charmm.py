@@ -39,7 +39,7 @@ from copy import copy
 from math import sqrt
 import unittest
 import warnings
-    
+
 get_fn = utils.get_fn
 
 # Suppress warning output from bad psf file... sigh.
@@ -62,26 +62,29 @@ if has_openmm:
 
     CPU = mm.Platform.getPlatformByName('CPU')
 
+
 def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     """ Gets a decomposed energy for a given system """
     energies = {}
     # Get energy components
-    s = context.getState(getEnergy=True, groups=1<<parm.BOND_FORCE_GROUP)
+    s = context.getState(getEnergy=True, groups=1 << parm.BOND_FORCE_GROUP)
     energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True, groups=1<<parm.ANGLE_FORCE_GROUP)
+    s = context.getState(getEnergy=True, groups=1 << parm.ANGLE_FORCE_GROUP)
     energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True, groups=1<<parm.DIHEDRAL_FORCE_GROUP)
+    s = context.getState(getEnergy=True, groups=1 << parm.DIHEDRAL_FORCE_GROUP)
     energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True, groups=1<<parm.NONBONDED_FORCE_GROUP)
+    s = context.getState(
+        getEnergy=True, groups=1 << parm.NONBONDED_FORCE_GROUP)
     energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     s = context.getState(getEnergy=True,
-                         groups=1<<parm.UREY_BRADLEY_FORCE_GROUP)
+                         groups=1 << parm.UREY_BRADLEY_FORCE_GROUP)
     energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True, groups=1<<parm.IMPROPER_FORCE_GROUP)
+    s = context.getState(getEnergy=True, groups=1 << parm.IMPROPER_FORCE_GROUP)
     energies['improper'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True, groups=1<<parm.CMAP_FORCE_GROUP)
+    s = context.getState(getEnergy=True, groups=1 << parm.CMAP_FORCE_GROUP)
     energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
+
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestCharmmFiles(utils.TestCaseRelative):
@@ -96,7 +99,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM gas phase energies """
         parm = charmm_gas
         system = parm.createSystem(param22)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -127,11 +130,11 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], energies2['cmap'])
         self.assertRelativeEqual(energies['nonbond'], energies2['nonbond'])
 
-    def testGB1Energy(self): # HCT (uses mbondi radii internally)
+    def testGB1Energy(self):  # HCT (uses mbondi radii internally)
         """ Compare OpenMM and CHARMM GB (igb=1) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.HCT)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -143,8 +146,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -102.1598379, places=5)
         system = parm.createSystem(param22, implicitSolvent=app.HCT,
-                                   implicitSolventSaltConc=1.0*u.molar)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   implicitSolventSaltConc=1.0 * u.molar)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -156,11 +159,11 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -102.5012873, places=5)
 
-    def testGB2Energy(self): # OBC1 (uses mbondi2 radii internally)
+    def testGB2Energy(self):  # OBC1 (uses mbondi2 radii internally)
         """ Compare OpenMM and CHARMM GB (igb=2) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC1)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -172,8 +175,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -107.8675, places=4)
         system = parm.createSystem(param22, implicitSolvent=app.OBC1,
-                                   implicitSolventSaltConc=1.0*u.molar)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   implicitSolventSaltConc=1.0 * u.molar)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -185,11 +188,11 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -108.2129, places=4)
 
-    def testGB5Energy(self): # OBC2 (uses mbondi2 radii internally)
+    def testGB5Energy(self):  # OBC2 (uses mbondi2 radii internally)
         """ Compare OpenMM and CHARMM GB (igb=5) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC2)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -201,8 +204,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -103.6186, places=4)
         system = parm.createSystem(param22, implicitSolvent=app.OBC2,
-                                   implicitSolventSaltConc=1.0*u.molar)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   implicitSolventSaltConc=1.0 * u.molar)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -214,11 +217,11 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -103.9603, places=4)
 
-    def testGB7Energy(self): # GBn (uses bondi radii internally)
+    def testGB7Energy(self):  # GBn (uses bondi radii internally)
         """ Compare OpenMM and CHARMM GB (igb=7) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -230,8 +233,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -109.4987850, places=5)
         system = parm.createSystem(param22, implicitSolvent=app.GBn,
-                                   implicitSolventSaltConc=1.0*u.molar)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   implicitSolventSaltConc=1.0 * u.molar)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -243,11 +246,11 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -109.8465917, places=5)
 
-    def testGB8Energy(self): # GBn2 (uses mbondi3 radii internally)
+    def testGB8Energy(self):  # GBn2 (uses mbondi3 radii internally)
         """ Compare OpenMM and CHARMM GB (igb=8) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn2)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -259,8 +262,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbond'], -108.1396, places=4)
         system = parm.createSystem(param22, implicitSolvent=app.GBn2,
-                                   implicitSolventSaltConc=1.0*u.molar)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   implicitSolventSaltConc=1.0 * u.molar)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -276,8 +279,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM PME energies """
         parm = charmm_solv
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
-                                   nonbondedCutoff=8*u.angstrom)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   nonbondedCutoff=8 * u.angstrom)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -293,11 +296,11 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM PME energies w/out vdW correction """
         parm = charmm_solv
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
-                                   nonbondedCutoff=8*u.angstroms,)
+                                   nonbondedCutoff=8 * u.angstroms,)
         for force in system.getForces():
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
@@ -313,8 +316,8 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Test energies of systems with NBFIX modifications """
         parm = charmm_nbfix
         system = parm.createSystem(param36, nonbondedMethod=app.PME,
-                                   nonbondedCutoff=8*u.angstroms)
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+                                   nonbondedCutoff=8 * u.angstroms)
+        integrator = mm.VerletIntegrator(1.0 * u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = decomposed_energy(sim.context, parm)

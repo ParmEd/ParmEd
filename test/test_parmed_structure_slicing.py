@@ -11,7 +11,9 @@ parm = chem.load_file(utils.get_fn('trx.prmtop'))
 pdb1 = chem.load_file(utils.get_fn('4lzt.pdb'))
 pdb2 = chem.load_file(utils.get_fn('1kip.cif'))
 
+
 class TestStructureSlicing(unittest.TestCase):
+
     """ Tests the fancy slicing/indexing of Structure """
 
     def testIntIndex(self):
@@ -31,7 +33,7 @@ class TestStructureSlicing(unittest.TestCase):
         sl12 = parm[10:20]
         sl22 = pdb1[10:20]
         sl32 = pdb2[10:20]
-        sl13 = parm[5:100:5] # 19 selections -- 100 not inclusive
+        sl13 = parm[5:100:5]  # 19 selections -- 100 not inclusive
         sl23 = pdb1[5:100:5]
         sl33 = pdb2[5:100:5]
         # Check that the slices are all the correct # of atoms
@@ -68,14 +70,14 @@ class TestStructureSlicing(unittest.TestCase):
             self.assertEqual(patom.sigma, atom.sigma)
 
         for atom in sl22.atoms:
-            patom = pdb1.atoms[atom.idx+10]
+            patom = pdb1.atoms[atom.idx + 10]
             self.assertEqual(patom.name, atom.name)
             self.assertEqual(patom.xx, atom.xx)
             self.assertEqual(patom.xy, atom.xy)
             self.assertEqual(patom.xz, atom.xz)
 
         for atom in sl33.atoms:
-            patom = pdb2.atoms[atom.idx*5+5]
+            patom = pdb2.atoms[atom.idx * 5 + 5]
             self.assertEqual(patom.name, atom.name)
             self.assertEqual(patom.xx, atom.xx)
             self.assertEqual(patom.xy, atom.xy)
@@ -91,7 +93,7 @@ class TestStructureSlicing(unittest.TestCase):
 
     def testSelectionArray(self):
         """ Tests Structure selection using indices array """
-        indices = [random.randint(0, len(pdb1.atoms)-1) for i in range(100)]
+        indices = [random.randint(0, len(pdb1.atoms) - 1) for i in range(100)]
         sel = pdb1[indices]
         self.assertEqual(len(sel.atoms), len(set(indices)))
         self.assertGreater(len(sel.atoms), 0)
@@ -103,8 +105,8 @@ class TestStructureSlicing(unittest.TestCase):
 
     def testResidueAtomSelection(self):
         """ Tests combined residue,atom slicing/selections """
-        sel = pdb1[10:20,:5] # First five atoms of residues 10-19
-        self.assertEqual(len(sel.atoms), 49) # 1 residue has only 4 atoms
+        sel = pdb1[10:20, :5]  # First five atoms of residues 10-19
+        self.assertEqual(len(sel.atoms), 49)  # 1 residue has only 4 atoms
         c = 0
         for res in pdb1.residues[10:20]:
             for i in range(min(len(res), 5)):
@@ -114,7 +116,8 @@ class TestStructureSlicing(unittest.TestCase):
                 self.assertEqual(sel.atoms[c].xz, res[i].xz)
                 c += 1
 
-        sel = pdb1[[0,2,3,5], :2] # First 2 atoms of residues 0, 2, 3, and 5
+        # First 2 atoms of residues 0, 2, 3, and 5
+        sel = pdb1[[0, 2, 3, 5], :2]
         self.assertEqual(len(sel.atoms), 8)
         c = 0
         for i, res in enumerate([0, 2, 3, 5]):
@@ -130,7 +133,7 @@ class TestStructureSlicing(unittest.TestCase):
             self.assertEqual(sel.atoms[c].xz, res[1].xz)
             c += 1
 
-        sel = pdb1[8,:]
+        sel = pdb1[8, :]
         self.assertEqual(len(sel.atoms), len(pdb1.residues[8]))
         for a1, a2 in zip(sel.atoms, pdb1.residues[8]):
             self.assertEqual(a1.name, a2.name)
@@ -138,7 +141,7 @@ class TestStructureSlicing(unittest.TestCase):
             self.assertEqual(a1.xy, a2.xy)
             self.assertEqual(a1.xz, a2.xz)
 
-        self.assertIs(pdb1[8,4], pdb1.residues[8][4])
+        self.assertIs(pdb1[8, 4], pdb1.residues[8][4])
 
         sel = pdb1[['ALA', 'GLY'], :]
         for atom in sel.atoms:
@@ -151,15 +154,15 @@ class TestStructureSlicing(unittest.TestCase):
 
     def testChainResidueAtomSelection(self):
         """ Tests combined chain,residue,atom slicing/selections """
-        sel = pdb2['A',:,:] # All of chain A
+        sel = pdb2['A', :, :]  # All of chain A
         for a in sel.atoms:
             self.assertEqual(a.residue.chain, 'A')
         # Get all chains
-        chainA = pdb2['A',:,:]
-        chainB = pdb2['B',:,:]
-        chainC = pdb2['C',:,:]
+        chainA = pdb2['A', :, :]
+        chainB = pdb2['B', :, :]
+        chainC = pdb2['C', :, :]
         # Now try some different kinds of indexing
-        sel = pdb2['B',0,0]
+        sel = pdb2['B', 0, 0]
         self.assertIs(sel, pdb2.atoms[826])
-        sel = pdb2[['A','B'], :10:2, 0]
-        self.assertEqual(len(sel.atoms), 2*5*1)
+        sel = pdb2[['A', 'B'], :10:2, 0]
+        self.assertEqual(len(sel.atoms), 2 * 5 * 1)

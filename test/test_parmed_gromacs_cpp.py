@@ -10,7 +10,9 @@ import os
 import unittest
 import warnings
 
+
 class TestGromacsCpp(unittest.TestCase):
+
     """ Tests the C-preprocessor written for the Gromacs classes """
 
     def setUp(self):
@@ -20,7 +22,7 @@ class TestGromacsCpp(unittest.TestCase):
         """ Tests CPreProcessor #ifdef/#else/#endif preprocessing """
         f = StringIO('#ifdef MY_DEFINE\nPPVAR is set to MY_DEFINE\n'
                      '#else\nMY_DEFINE is not set\n#endif\n')
-        pp = CPreProcessor(f) # no defines
+        pp = CPreProcessor(f)  # no defines
         self.assertEqual(pp.read().strip(), 'MY_DEFINE is not set')
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_DEFINE='SUCCESS'))
@@ -30,12 +32,11 @@ class TestGromacsCpp(unittest.TestCase):
         """ Tests CPreProcessor #ifndef/#else#endif preprocessing """
         f = StringIO('#ifndef MY_DEFINE\nMY_DEFINE is not set\n'
                      '#else\nPPVAR is set to MY_DEFINE\n#endif\n')
-        pp = CPreProcessor(f) # no defines
+        pp = CPreProcessor(f)  # no defines
         self.assertEqual(pp.read().strip(), 'MY_DEFINE is not set')
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_DEFINE='SUCCESS'))
         self.assertEqual(pp.read().strip(), 'PPVAR is set to SUCCESS')
-
 
     def test_define(self):
         """ Tests CPreProcessor #define preprocessing """
@@ -89,14 +90,14 @@ class TestGromacsCpp(unittest.TestCase):
         """ Tests CPreProcessor use of #if 1 and #if 0 to serve as comments """
         f = StringIO('#if 1\n#ifdef MY_DEFINE\nPPVAR is set to MY_DEFINE\n'
                      '#else\nMY_DEFINE is not set\n#endif\n#endif\n')
-        pp = CPreProcessor(f) # no defines
+        pp = CPreProcessor(f)  # no defines
         self.assertEqual(pp.read().strip(), 'MY_DEFINE is not set')
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_DEFINE='SUCCESS'))
         self.assertEqual(pp.read().strip(), 'PPVAR is set to SUCCESS')
         f = StringIO('#if 0\n#ifdef MY_DEFINE\nPPVAR is set to MY_DEFINE\n'
                      '#else\nMY_DEFINE is not set\n#endif\n#endif\n')
-        pp = CPreProcessor(f) # no defines
+        pp = CPreProcessor(f)  # no defines
         self.assertFalse(pp.read().strip())
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_DEFINE='SUCCESS'))
@@ -166,10 +167,12 @@ pptest1 line 3""")
         # Check that it does not replace tokens inside quotes
         f = StringIO("'MY_VAR' is MY_VAR\n\"MY_VAR\" is MY_VAR still\n")
         pp = CPreProcessor(f, defines=dict(MY_VAR='set'))
-        self.assertEqual(pp.read().strip(), "'MY_VAR' is set\n\"MY_VAR\" is set still")
+        self.assertEqual(
+            pp.read().strip(), "'MY_VAR' is set\n\"MY_VAR\" is set still")
         f = StringIO("This is NOT_MY_VAR, but 'MY_VAR' is MY_VAR\n")
         pp = CPreProcessor(f, defines=dict(MY_VAR='taken'))
-        self.assertEqual(pp.read().strip(), "This is NOT_MY_VAR, but 'MY_VAR' is taken")
+        self.assertEqual(
+            pp.read().strip(), "This is NOT_MY_VAR, but 'MY_VAR' is taken")
 
     def test_nested_defines(self):
         """ Tests CPreProcessor nested #define token replacement """

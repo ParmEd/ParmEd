@@ -12,9 +12,11 @@ import os
 import random
 import unittest
 
+
 class TestReadParm(unittest.TestCase):
+
     """ Tests the various Parm file classes """
-    
+
     def testOptimizedReader(self):
         """ Check that the optimized reader imports correctly """
         from parmed.amber import _rdparm
@@ -38,7 +40,7 @@ class TestReadParm(unittest.TestCase):
                          [a.xy for a in parm.atoms])
         self.assertEqual([a.xz for a in gasparm.atoms],
                          [a.xz for a in parm.atoms])
-        
+
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
@@ -52,8 +54,9 @@ class TestReadParm(unittest.TestCase):
         coords = rst.coordinates
         vels = rst.vels
         for i, atom in enumerate(gasparm.atoms):
-            np.testing.assert_allclose(coords[0,i], [atom.xx, atom.xy, atom.xz])
-            np.testing.assert_allclose(vels[0,i], [atom.vx, atom.vy, atom.vz])
+            np.testing.assert_allclose(
+                coords[0, i], [atom.xx, atom.xy, atom.xz])
+            np.testing.assert_allclose(vels[0, i], [atom.vx, atom.vy, atom.vz])
 
     def testRemakeParm(self):
         """ Tests the rebuilding of the AmberParm raw data structures """
@@ -132,8 +135,9 @@ class TestReadParm(unittest.TestCase):
         """ Test the AmoebaParm class w/ small system (not all terms) """
         parm = readparm.AmoebaParm(get_fn('nma.parm7'))
         rst7 = readparm.BeemanRestart(get_fn('nma.rst'))
-        self.assertEqual(3*rst7.natom, len(rst7.coordinates))
-        self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
+        self.assertEqual(3 * rst7.natom, len(rst7.coordinates))
+        self.assertEqual(
+            rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
         self.assertEqual(rst7.natom, parm.ptr('natom'))
         self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
@@ -152,7 +156,8 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('ntheth'), len(list(parm.angles_inc_h)))
         self.assertEqual(parm.ptr('ntheta'), len(list(parm.angles_without_h)))
         self.assertEqual(parm.ptr('nphih'), len(list(parm.dihedrals_inc_h)))
-        self.assertEqual(parm.ptr('nphia'), len(list(parm.dihedrals_without_h)))
+        self.assertEqual(
+            parm.ptr('nphia'), len(list(parm.dihedrals_without_h)))
         self.assertEqual([a.name for a in parm.atoms],
                          parm.parm_data['ATOM_NAME'])
         self.assertEqual([a.type for a in parm.atoms],
@@ -185,7 +190,8 @@ class TestReadParm(unittest.TestCase):
             self.assertTrue(all([a in residue for a in residue.atoms]))
             self.assertEqual(sum([a in residue for a in atoms]),
                              len(residue))
-        if not parm.chamber: return
+        if not parm.chamber:
+            return
         # Chamber tests now
         for ub in parm.urey_bradleys:
             self.assertEqual(sum([a in ub for a in atoms]), 2)
@@ -198,9 +204,11 @@ class TestReadParm(unittest.TestCase):
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
+
 class TestCoordinateFiles(unittest.TestCase):
+
     """ Tests the various coordinate file classes """
-    
+
     def testMdcrd(self):
         """ Test the ASCII trajectory file parsing """
         mdcrd = asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'),
@@ -224,9 +232,11 @@ class TestCoordinateFiles(unittest.TestCase):
         crdsum = restart.coordinates.sum()
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
 
+
 class TestAmberMask(unittest.TestCase):
+
     """ Test the Amber mask parser """
-    
+
     def testMask(self):
         """ Test the Amber mask parser """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
@@ -257,7 +267,7 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
-        
+
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
@@ -336,7 +346,7 @@ class TestAmberMask(unittest.TestCase):
                 dx = atom.xx - a2.xx
                 dy = atom.xy - a2.xy
                 dz = atom.xz - a2.xz
-                if dx*dx + dy*dy + dz*dz < 25:
+                if dx * dx + dy * dy + dz * dz < 25:
                     self.assertTrue(sel[i])
                     break
             else:
@@ -357,7 +367,7 @@ class TestAmberMask(unittest.TestCase):
                 dx = atom2.xx - atom.xx
                 dy = atom2.xy - atom.xy
                 dz = atom2.xz - atom.xz
-                if (dx*dx + dy*dy + dz*dz) < 25:
+                if (dx * dx + dy * dy + dz * dz) < 25:
                     within = 1
                     break
             self.assertEqual(sel[i], within)
@@ -371,15 +381,17 @@ class TestAmberMask(unittest.TestCase):
                     dx = atom2.xx - atom.xx
                     dy = atom2.xy - atom.xy
                     dz = atom2.xz - atom.xz
-                    if (dx*dx + dy*dy + dz*dz) > 100:
+                    if (dx * dx + dy * dy + dz * dz) > 100:
                         within = 1
                         break
-                if within: break
+                if within:
+                    break
             for atom in res.atoms:
                 self.assertEqual(sel[atom.idx], within)
 
+
 class TestWriteFiles(unittest.TestCase):
-    
+
     def setUp(self):
         try:
             os.makedirs(get_fn('writes'))
@@ -437,19 +449,19 @@ class TestWriteFiles(unittest.TestCase):
         Restart = asciicrd.AmberAsciiRestart
         box = np.asarray([10, 10, 10, 90, 90, 90])
         rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9)
-        rst.coordinates = np.arange(27).reshape((9,3))
+        rst.coordinates = np.arange(27).reshape((9, 3))
         rst.close()
         rst = Restart(get_fn('testcv.rst7', written=True), 'w', natom=20)
-        rst.coordinates = np.arange(60).reshape((20,3))
-        rst.velocities = np.asarray(list(reversed(range(60)))).reshape((20,3))
+        rst.coordinates = np.arange(60).reshape((20, 3))
+        rst.velocities = np.asarray(list(reversed(range(60)))).reshape((20, 3))
         rst.close()
         rst = Restart(get_fn('testcb.rst7', written=True), 'w', natom=7)
-        rst.coordinates = np.arange(21).reshape((7,3))
+        rst.coordinates = np.arange(21).reshape((7, 3))
         rst.box = box
         rst.close()
         rst = Restart(get_fn('testcvb.rst7', written=True), 'w', natom=15)
-        rst.coordinates = np.arange(45).reshape((15,3))
-        rst.velocities = np.asarray(list(reversed(range(45)))).reshape((15,3))
+        rst.coordinates = np.arange(45).reshape((15, 3))
+        rst.velocities = np.asarray(list(reversed(range(45)))).reshape((15, 3))
         rst.box = box
         rst.close()
         self._check_written_restarts(box)
@@ -461,22 +473,22 @@ class TestWriteFiles(unittest.TestCase):
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=False,
                     mode='w', title='Test file')
         crd.add_coordinates(list(range(45)))
-        crd.add_coordinates([x+1 for x in range(45)])
-        crd.add_coordinates([x+2 for x in range(45)])
-        crd.add_coordinates([x+3 for x in range(45)])
-        crd.add_coordinates([x+4 for x in range(45)])
+        crd.add_coordinates([x + 1 for x in range(45)])
+        crd.add_coordinates([x + 2 for x in range(45)])
+        crd.add_coordinates([x + 3 for x in range(45)])
+        crd.add_coordinates([x + 4 for x in range(45)])
         crd.close()
         crd = Mdcrd(get_fn('testcb.mdcrd', written=True), natom=18, hasbox=True,
                     mode='w', title='Test file')
         crd.add_coordinates(list(range(54)))
         crd.add_box(box)
-        crd.add_coordinates([x+1 for x in range(54)])
-        crd.add_box(box)                          
-        crd.add_coordinates([x+2 for x in range(54)])
-        crd.add_box(box)                          
-        crd.add_coordinates([x+3 for x in range(54)])
-        crd.add_box(box)                          
-        crd.add_coordinates([x+4 for x in range(54)])
+        crd.add_coordinates([x + 1 for x in range(54)])
+        crd.add_box(box)
+        crd.add_coordinates([x + 2 for x in range(54)])
+        crd.add_box(box)
+        crd.add_coordinates([x + 3 for x in range(54)])
+        crd.add_box(box)
+        crd.add_coordinates([x + 4 for x in range(54)])
         crd.add_box(box)
         crd.close()
         self._check_written_mdcrds(box)
@@ -487,25 +499,25 @@ class TestWriteFiles(unittest.TestCase):
         Mdcrd = asciicrd.AmberMdcrd
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=False,
                     mode='w', title='Test file')
-        coorddata = np.arange(45).reshape((15,3))
+        coorddata = np.arange(45).reshape((15, 3))
         crd.add_coordinates(coorddata)
-        crd.add_coordinates(coorddata+1)
-        crd.add_coordinates(coorddata+2)
-        crd.add_coordinates(coorddata+3)
-        crd.add_coordinates(coorddata+4)
+        crd.add_coordinates(coorddata + 1)
+        crd.add_coordinates(coorddata + 2)
+        crd.add_coordinates(coorddata + 3)
+        crd.add_coordinates(coorddata + 4)
         crd.close()
         crd = Mdcrd(get_fn('testcb.mdcrd', written=True), natom=18, hasbox=True,
                     mode='w', title='Test file')
-        coorddata = np.arange(54).reshape((18,3))
+        coorddata = np.arange(54).reshape((18, 3))
         crd.add_coordinates(coorddata)
         crd.add_box(box)
-        crd.add_coordinates(coorddata+1)
+        crd.add_coordinates(coorddata + 1)
         crd.add_box(box)
-        crd.add_coordinates(coorddata+2)
+        crd.add_coordinates(coorddata + 2)
         crd.add_box(box)
-        crd.add_coordinates(coorddata+3)
+        crd.add_coordinates(coorddata + 3)
         crd.add_box(box)
-        crd.add_coordinates(coorddata+4)
+        crd.add_coordinates(coorddata + 4)
         crd.add_box(box)
         crd.close()
         self._check_written_mdcrds(box)
@@ -517,6 +529,7 @@ class TestWriteFiles(unittest.TestCase):
         box = [10, 10, 10, 90, 90, 90]
         rst = Restart(get_fn('testc.rst7', written=True), 'w', natom=9,
                       hasbox=True)
+
         def assign(obj, stmnt):
             rst = crd = obj
             exec(stmnt)
@@ -538,10 +551,10 @@ class TestWriteFiles(unittest.TestCase):
         try:
             crd.add_coordinates(eval(s))
             self.assertRaises(RuntimeError,
-                              lambda: assign(crd, 'crd.add_coordinates(%s)'%s))
+                              lambda: assign(crd, 'crd.add_coordinates(%s)' % s))
             crd.add_box([10, 10, 10])
             self.assertRaises(ValueError,
-                              lambda: assign(crd, 'crd.add_coordinates(%s)'%s2))
+                              lambda: assign(crd, 'crd.add_coordinates(%s)' % s2))
         finally:
             crd.close()
 
@@ -562,16 +575,16 @@ class TestWriteFiles(unittest.TestCase):
         self.assertTrue(rst.hasvels)
         self.assertFalse(rst.hasbox)
         np.testing.assert_equal(rst.coordinates,
-                np.arange(60).reshape(rst.coordinates.shape))
+                                np.arange(60).reshape(rst.coordinates.shape))
         np.testing.assert_allclose(rst.velocities,
-                np.array(list(reversed(range(60)))).reshape(rst.velocities.shape))
+                                   np.array(list(reversed(range(60)))).reshape(rst.velocities.shape))
         rst = readparm.Rst7.open(get_fn('testcvb.rst7', written=True))
         self.assertTrue(rst.hasvels)
         self.assertTrue(rst.hasbox)
         np.testing.assert_equal(rst.coordinates,
-                np.arange(45).reshape(rst.coordinates.shape))
+                                np.arange(45).reshape(rst.coordinates.shape))
         np.testing.assert_allclose(rst.velocities,
-                np.array(list(reversed(range(45)))).reshape(rst.velocities.shape))
+                                   np.array(list(reversed(range(45)))).reshape(rst.velocities.shape))
         np.testing.assert_equal(rst.box, box)
 
     def _check_written_mdcrds(self, box):
@@ -598,10 +611,13 @@ class TestWriteFiles(unittest.TestCase):
             np.testing.assert_equal(crd.coordinates[i], refcrd)
             np.testing.assert_equal(crd.box[i], box)
         for i, (coords, mybox) in enumerate(zip(crd.coordinates, crd.box)):
-            np.testing.assert_equal(coords, (np.arange(54)+i).reshape(coords.shape))
+            np.testing.assert_equal(
+                coords, (np.arange(54) + i).reshape(coords.shape))
             np.testing.assert_equal(mybox, box)
 
+
 class TestObjectAPIs(unittest.TestCase):
+
     """ Tests various object APIs """
 
     def testTrackedList(self):
@@ -618,7 +634,7 @@ class TestObjectAPIs(unittest.TestCase):
         self.assertFalse(mylist2.changed)
         for i in range(20):
             self.assertEqual(i, mylist[i])
-            self.assertEqual(i, mylist[39-i])
+            self.assertEqual(i, mylist[39 - i])
         mylist.changed = False
         mylist.append(10)
         self.assertTrue(mylist.changed)
@@ -642,7 +658,9 @@ class TestObjectAPIs(unittest.TestCase):
         mylist *= 2
         self.assertTrue(mylist.changed)
 
+
 class TestAmberParmSlice(unittest.TestCase):
+
     """ Tests fancy slicing """
 
     def testSplit(self):
@@ -650,9 +668,9 @@ class TestAmberParmSlice(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('solv.prmtop'))
         parts = parm.split()
         # Make sure the sum of the parts is equal to the whole
-        natom = sum(len(part[0].atoms)*part[1] for part in parts)
+        natom = sum(len(part[0].atoms) * part[1] for part in parts)
         self.assertEqual(len(parm.atoms), natom)
-        self.assertEqual(len(parts), 4) # 4 types of molecules
+        self.assertEqual(len(parts), 4)  # 4 types of molecules
         self.assertEqual(parts[0][1], 1)
         self.assertEqual(parts[1][1], 1)
         self.assertEqual(parts[2][1], 8)
@@ -689,7 +707,8 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
             self.assertEqual(a1.radii, a2.radii)
-        self.assertEqual(len(comb.residues), len(parm1.residues) + len(parm2.residues))
+        self.assertEqual(
+            len(comb.residues), len(parm1.residues) + len(parm2.residues))
         for r1, r2 in zip(comb.residues, parm1.residues + parm2.residues):
             self.assertEqual(len(r1), len(r2))
             self.assertEqual(r1.name, r2.name)
@@ -712,16 +731,16 @@ class TestAmberParmSlice(unittest.TestCase):
         """ Tests replicating AmberParm instances """
         parm = readparm.AmberParm(get_fn('phenol.prmtop'))
         mult = parm * 5
-        self.assertEqual(len(mult.atoms), 5*len(parm.atoms))
-        self.assertEqual(len(mult.residues), 5*len(parm.residues))
+        self.assertEqual(len(mult.atoms), 5 * len(parm.atoms))
+        self.assertEqual(len(mult.residues), 5 * len(parm.residues))
         for i, a1 in enumerate(mult.atoms):
-            a2 = parm[i%len(parm.atoms)]
+            a2 = parm[i % len(parm.atoms)]
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
             self.assertEqual(a1.radii, a2.radii)
         for i, r1 in enumerate(mult.residues):
-            r2 = parm.residues[i%len(parm.residues)]
+            r2 = parm.residues[i % len(parm.residues)]
             self.assertEqual(len(r1), len(r2))
             self.assertEqual(r1.name, r2.name)
             self.assertEqual(r1.chain, r2.chain)
@@ -751,6 +770,7 @@ class TestAmberParmSlice(unittest.TestCase):
         self.assertEqual(len(parm2.atoms), len(selection.atoms))
         self.assertEqual(len(parm2.residues), len(selection.residues))
         self.assertLess(len(parm2.atoms), len(parm1.atoms))
+
         def cmp_atoms(a1, a2):
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.type, a2.type)

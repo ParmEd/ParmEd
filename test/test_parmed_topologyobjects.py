@@ -16,7 +16,9 @@ from copy import copy
 import unittest
 import random
 
+
 class TestTopologyObjects(unittest.TestCase):
+
     """
     This test set is responsible for testing the classes in
     parmed.topologyobjects
@@ -80,7 +82,7 @@ class TestTopologyObjects(unittest.TestCase):
         # "del" instead of "pop" and make sure it still works
         for i in choices:
             my_container.append(objects[i])
-        objects = [obj for obj in my_container] # Re-sync ordering
+        objects = [obj for obj in my_container]  # Re-sync ordering
         for i in choices:
             del my_container[i]
         for i in choices:
@@ -95,7 +97,7 @@ class TestTopologyObjects(unittest.TestCase):
             if i % 2 == 0:
                 self.assertEqual(objects[i].idx, -1)
             else:
-                self.assertEqual(objects[i].idx, i//2)
+                self.assertEqual(objects[i].idx, i // 2)
         for i, obj in enumerate(my_container):
             self.assertEqual(obj.idx, i)
 
@@ -246,7 +248,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(copy1.epsilon_14, atom.epsilon_14)
         self.assertRaises(AttributeError, lambda: copy1.xx)
         self.assertRaises(AttributeError, lambda: copy1.vx)
-        self.assertIs(copy1.atom_type, atom.atom_type) # shallow copy
+        self.assertIs(copy1.atom_type, atom.atom_type)  # shallow copy
         self.assertIsNot(copy1, atom)
         # Check copy 2
         self.assertEqual(copy2.name, atom.name)
@@ -278,11 +280,11 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(atype.rmin, 1.2)
         self.assertEqual(atype.epsilon_14, 1.0)
         self.assertEqual(atype.rmin_14, 1.2)
-        self.assertEqual(atype.sigma, 1.2*2**(-1/6)*2)
+        self.assertEqual(atype.sigma, 1.2 * 2**(-1 / 6) * 2)
         self.assertEqual(atype.sigma_14, atype.sigma)
         # Now try setting sigma and make sure it also changes rmin
         atype.sigma = 1.2
-        self.assertEqual(atype.rmin, 1.2*2**(1/6)/2)
+        self.assertEqual(atype.rmin, 1.2 * 2**(1 / 6) / 2)
         atom.atom_type = atype
         self.assertEqual(atom.epsilon, atype.epsilon)
         self.assertEqual(atom.sigma, atype.sigma)
@@ -311,9 +313,9 @@ class TestTopologyObjects(unittest.TestCase):
         bond1 = Bond(a1, a2)
         bond2 = Bond(a2, a3)
         bond3 = Bond(a3, a4)
-        bond4 = Bond(a1, a2) # Duplicate
+        bond4 = Bond(a1, a2)  # Duplicate
         bond1.delete()
-        self.assertIn(a1, a2.bond_partners) # Duplicated bond
+        self.assertIn(a1, a2.bond_partners)  # Duplicated bond
         bond4.delete()
         self.assertNotIn(a1, a2.bond_partners)
         # Now test the bond types
@@ -406,10 +408,10 @@ class TestTopologyObjects(unittest.TestCase):
         atoms.extend([Atom(list=atoms) for i in range(10)])
         bonds = []
         # Sequential bonds
-        for i in range(len(atoms)-2):
-            bonds.append(Bond(atoms[i], atoms[i+1]))
-        bonds.append(Bond(atoms[-1], atoms[1])) # to make an improper
-        bonds.append(Bond(atoms[0], atoms[-1])) # stupid bond
+        for i in range(len(atoms) - 2):
+            bonds.append(Bond(atoms[i], atoms[i + 1]))
+        bonds.append(Bond(atoms[-1], atoms[1]))  # to make an improper
+        bonds.append(Bond(atoms[0], atoms[-1]))  # stupid bond
         dihed_types = TrackedList()
         dihed_types.append(DihedralType(5.0, 2, 0.0, 1.2, 2.0, dihed_types))
         dihed_types.append(DihedralType(1.0, 3, 180.0, 1.2, 2.0, dihed_types))
@@ -534,12 +536,12 @@ class TestTopologyObjects(unittest.TestCase):
         rb_types.claim()
         for i, rb_typ in enumerate(rb_types):
             self.assertEqual(i, rb_typ.idx)
-            self.assertEqual(rb_typ.c0, 10+i)
-            self.assertEqual(rb_typ.c1, 20+i)
-            self.assertEqual(rb_typ.c2, 30+i)
-            self.assertEqual(rb_typ.c3, 40+i)
-            self.assertEqual(rb_typ.c4, 50+i)
-            self.assertEqual(rb_typ.c5, 60+i)
+            self.assertEqual(rb_typ.c0, 10 + i)
+            self.assertEqual(rb_typ.c1, 20 + i)
+            self.assertEqual(rb_typ.c2, 30 + i)
+            self.assertEqual(rb_typ.c3, 40 + i)
+            self.assertEqual(rb_typ.c4, 50 + i)
+            self.assertEqual(rb_typ.c5, 60 + i)
         # Test RBTorsion.__copy__
         cp = copy(rb_types[0])
         self.assertIsNot(cp, rb_types[0])
@@ -578,7 +580,8 @@ class TestTopologyObjects(unittest.TestCase):
     def test_improper(self):
         """ Tests the CHARMM improper torsion term and type """
         atoms = TrackedList([Atom(), Atom(), Atom(), Atom()])
-        for atom in atoms: atom.list = atoms
+        for atom in atoms:
+            atom.list = atoms
         b1 = Bond(atoms[0], atoms[1])
         b2 = Bond(atoms[0], atoms[2])
         b3 = Bond(atoms[0], atoms[3])
@@ -611,7 +614,7 @@ class TestTopologyObjects(unittest.TestCase):
         """ Tests the coupled-torsion CMAP terms used by CHARMM """
         atoms = TrackedList()
         atoms.extend([Atom(list=atoms) for i in range(10)])
-        bonds = [Bond(atoms[i], atoms[i+1]) for i in range(9)]
+        bonds = [Bond(atoms[i], atoms[i + 1]) for i in range(9)]
         cg1 = list(range(36))
         cg2 = list(reversed(range(36)))
         cmap_types = TrackedList()
@@ -654,7 +657,7 @@ class TestTopologyObjects(unittest.TestCase):
             self.assertEqual(cmap_types[0].grid[i], val)
             i1 = i // 6
             i2 = i % 6
-            self.assertEqual(cmap_types[0].grid[i1,i2], val)
+            self.assertEqual(cmap_types[0].grid[i1, i2], val)
         transpose = cmap_types[0].grid.T
         for i, val in enumerate(cg1):
             i1 = i // 6
@@ -666,7 +669,8 @@ class TestTopologyObjects(unittest.TestCase):
         sg = cmap_types[0].grid.switch_range()
         for i in range(6):
             for j in range(6):
-                self.assertEqual(sg[i,j], cmap_types[0].grid[(i+3)%6,(j+3)%6])
+                self.assertEqual(
+                    sg[i, j], cmap_types[0].grid[(i + 3) % 6, (j + 3) % 6])
         # Check the CmapType.__copy__ functionality
         cp = copy(cmap_types[0])
         self.assertIsNot(cp, cmap_types[0])
@@ -787,23 +791,27 @@ class TestTopologyObjects(unittest.TestCase):
         pre = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_'
         atoms = TrackedList()
         atoms.extend([Atom(list=atoms) for i in range(15)])
-        bonds = [Bond(atoms[i], atoms[i+1]) for i in range(14)]
+        bonds = [Bond(atoms[i], atoms[i + 1]) for i in range(14)]
         tortor_types = TrackedList()
         tortor_types.extend([
-                TorsionTorsionType((25, 25), data[pre+'01_ANGLE1'],
-                    data[pre+'01_ANGLE2'],
-                    data[pre+'01_FUNC'],
-                    list=tortor_types),
-                TorsionTorsionType((25, 25),
-                    data[pre+'01_ANGLE1'], data[pre+'01_ANGLE2'],
-                    data[pre+'01_FUNC'], data[pre+'01_DFUNC_DANGLE1'],
-                    data[pre+'01_DFUNC_DANGLE2'],
-                    data[pre+'01_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
-                TorsionTorsionType((25, 25),
-                    data[pre+'03_ANGLE1'], data[pre+'03_ANGLE2'],
-                    data[pre+'03_FUNC'], data[pre+'03_DFUNC_DANGLE1'],
-                    data[pre+'03_DFUNC_DANGLE2'],
-                    data[pre+'03_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
+            TorsionTorsionType((25, 25), data[pre + '01_ANGLE1'],
+                               data[pre + '01_ANGLE2'],
+                               data[pre + '01_FUNC'],
+                               list=tortor_types),
+            TorsionTorsionType((25, 25),
+                               data[
+                                   pre + '01_ANGLE1'], data[pre + '01_ANGLE2'],
+                               data[
+                                   pre + '01_FUNC'], data[pre + '01_DFUNC_DANGLE1'],
+                               data[pre + '01_DFUNC_DANGLE2'],
+                               data[pre + '01_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
+            TorsionTorsionType((25, 25),
+                               data[
+                                   pre + '03_ANGLE1'], data[pre + '03_ANGLE2'],
+                               data[
+                                   pre + '03_FUNC'], data[pre + '03_DFUNC_DANGLE1'],
+                               data[pre + '03_DFUNC_DANGLE2'],
+                               data[pre + '03_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
         ])
         tortor1 = TorsionTorsion(atoms[0], atoms[1], atoms[2], atoms[3],
                                  atoms[4], type=tortor_types[0])
@@ -909,7 +917,7 @@ class TestTopologyObjects(unittest.TestCase):
             atom = random.choice(atoms)
             is_inside = atom in res
             res.delete_atom(atom)
-            self.assertEqual(lenres-len(res), is_inside)
+            self.assertEqual(lenres - len(res), is_inside)
             self.assertIs(atom.residue, None)
         self.assertEqual(len(res), 0)
         for atom in atoms:
@@ -996,7 +1004,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(len(reslist), 4)
         self.assertTrue(reslist[0].is_empty())
         reslist.prune()
-        self.assertEqual(len(reslist), 3) # Got rid of empty residue.
+        self.assertEqual(len(reslist), 3)  # Got rid of empty residue.
         self.assertEqual(len(atoms), sum([len(r) for r in reslist]))
 
     #=============================================

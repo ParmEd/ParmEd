@@ -20,13 +20,16 @@ import os
 import unittest
 from utils import get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests
 
+
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
     io.seek(0)
     io.truncate()
     return io
 
+
 class TestFileLoader(unittest.TestCase):
+
     """ Tests the automatic file loader """
 
     def testLoadOFF(self):
@@ -68,7 +71,7 @@ class TestFileLoader(unittest.TestCase):
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberMdcrd)
         self.assertRaises(TypeError, lambda:
-                formats.load_file(get_fn('tz2.truncoct.crd')))
+                          formats.load_file(get_fn('tz2.truncoct.crd')))
 
     def testLoadCharmmPsfFile(self):
         """ Tests automatic loading of CHARMM PSF file """
@@ -92,7 +95,7 @@ class TestFileLoader(unittest.TestCase):
             self.assertIsInstance(crd, amber.NetCDFRestart)
         else:
             self.assertRaises(exceptions.FormatNotFound, lambda:
-                    formats.load_file(get_fn('ncinpcrd.rst7')))
+                              formats.load_file(get_fn('ncinpcrd.rst7')))
 
     def testLoadNetCDFTraj(self):
         """ Tests automatic loading of Amber NetCDF trajectory file """
@@ -101,7 +104,7 @@ class TestFileLoader(unittest.TestCase):
             self.assertIsInstance(crd, amber.NetCDFTraj)
         else:
             self.assertRaises(exceptions.FormatNotFound, lambda:
-                    formats.load_file(get_fn('ncinpcrd.rst7')))
+                              formats.load_file(get_fn('ncinpcrd.rst7')))
 
     def testLoadPDB(self):
         """ Tests automatic loading of PDB files """
@@ -135,11 +138,12 @@ class TestFileLoader(unittest.TestCase):
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
         self.assertRaises(exceptions.FormatNotFound, lambda:
-                formats.load_file(get_fn('../test_parmed_formats.py')))
+                          formats.load_file(get_fn('../test_parmed_formats.py')))
         self.assertRaises(IOError, lambda: formats.load_file('no_file'))
 
+
 class TestChemistryPDBStructure(unittest.TestCase):
-    
+
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
         self.pdbgz = get_fn('4lzt.pdb.gz')
@@ -188,7 +192,8 @@ class TestChemistryPDBStructure(unittest.TestCase):
         from parmed import Vec3
         pdbfile = read_PDB(open(self.models))
         self.assertIsInstance(pdbfile.positions[0], u.Quantity)
-        self.assertIsInstance(pdbfile.positions[0].value_in_unit(u.angstroms), Vec3)
+        self.assertIsInstance(
+            pdbfile.positions[0].value_in_unit(u.angstroms), Vec3)
 
     def testGzip(self):
         """ Test Gzipped-PDB file parsing """
@@ -213,7 +218,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self.assertEqual(len(pdbfile.atoms), 114277)
         self.assertEqual(len(pdbfile.residues), 25042)
         for i, atom in enumerate(pdbfile.atoms):
-            self.assertEqual(atom.number, i+1)
+            self.assertEqual(atom.number, i + 1)
             self.assertEqual(atom.idx, i)
 
     def testPdbWriteSimple(self):
@@ -291,7 +296,8 @@ class TestChemistryPDBStructure(unittest.TestCase):
         output.seek(0)
         pdbfile4 = read_PDB(output)
         self._check4lzt(pdbfile4, check_meta=False, has_altloc=False)
-        self._compareInputOutputPDBs(pdbfile, pdbfile4, altloc_option='occupancy')
+        self._compareInputOutputPDBs(
+            pdbfile, pdbfile4, altloc_option='occupancy')
         # Double-check 'first' vs. 'occupancy'. Residue 85 (SER) has a conformer
         # A that has an occupancy of 0.37 and conformer B with occupancy 0.63
         self.assertEqual(pdbfile3.residues[84][4].xx, -4.162)
@@ -300,18 +306,18 @@ class TestChemistryPDBStructure(unittest.TestCase):
     def testAnisouRead(self):
         """ Tests that read_PDB properly reads ANISOU records """
         pdbfile = read_PDB(self.pdb)
-        aniso1 = [2066, 1204, 1269, 44, 126, 191] # first atom's ANISOU record
+        aniso1 = [2066, 1204, 1269, 44, 126, 191]  # first atom's ANISOU record
         aniso2 = [2090, 1182, 921, 46, 64, 60]    # second atom's ANISOU record
-        aniso3 = [3057, 3932, 5304, 126, -937, -661] # last atom's ANISOU
+        aniso3 = [3057, 3932, 5304, 126, -937, -661]  # last atom's ANISOU
         self.assertEqual(len(aniso1), len(pdbfile.atoms[0].anisou))
         for x, y in zip(aniso1, pdbfile.atoms[0].anisou):
-            self.assertEqual(x/10000, y)
+            self.assertEqual(x / 10000, y)
         self.assertEqual(len(aniso2), len(pdbfile.atoms[1].anisou))
         for x, y in zip(aniso2, pdbfile.atoms[1].anisou):
-            self.assertEqual(x/10000, y)
+            self.assertEqual(x / 10000, y)
         self.assertEqual(len(aniso3), len(pdbfile.atoms[-1].anisou))
         for x, y in zip(aniso3, pdbfile.atoms[-1].anisou):
-            self.assertEqual(x/10000, y)
+            self.assertEqual(x / 10000, y)
 
     def testAnisouWrite(self):
         """ Tests that write_PDB properly writes ANISOU records """
@@ -321,13 +327,13 @@ class TestChemistryPDBStructure(unittest.TestCase):
             aniso3 = [3057, 3932, 5304, 126, -937, -661]
             self.assertEqual(len(aniso1), len(pdbfile.atoms[0].anisou))
             for x, y in zip(aniso1, pdbfile.atoms[0].anisou):
-                self.assertEqual(x/10000, y)
+                self.assertEqual(x / 10000, y)
             self.assertEqual(len(aniso2), len(pdbfile.atoms[1].anisou))
             for x, y in zip(aniso2, pdbfile.atoms[1].anisou):
-                self.assertEqual(x/10000, y)
+                self.assertEqual(x / 10000, y)
             self.assertEqual(len(aniso3), len(pdbfile.atoms[-1].anisou))
             for x, y in zip(aniso3, pdbfile.atoms[-1].anisou):
-                self.assertEqual(x/10000, y)
+                self.assertEqual(x / 10000, y)
         pdbfile = read_PDB(self.pdb)
         check_aniso(pdbfile)
         output = StringIO.StringIO()
@@ -409,7 +415,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                         occ = oa.occupancy
                         a = oa
                 a1idx = a1.idx
-                a1 = a # This is the atom we want to compare with
+                a1 = a  # This is the atom we want to compare with
             self.assertEqual(a1.atomic_number, a2.atomic_number)
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.type, a2.type)
@@ -425,7 +431,8 @@ class TestChemistryPDBStructure(unittest.TestCase):
             self.assertEqual(a1.xy, a2.xy)
             self.assertEqual(a1.xz, a2.xz)
             if altloc_option != 'all':
-                # There should be no alternate locations unless we keep them all
+                # There should be no alternate locations unless we keep them
+                # all
                 self.assertEqual(len(a2.other_locations), 0)
             if not reordered:
                 self.assertEqual(a1.number, a2.number)
@@ -460,7 +467,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
     def _check4lzt(self, obj, check_meta=True, has_altloc=True):
         self.assertEqual(obj.get_coordinates('all').shape[0], 1)
         np.testing.assert_allclose(obj.box,
-                         [27.24, 31.87, 34.23, 88.52, 108.53, 111.89])
+                                   [27.24, 31.87, 34.23, 88.52, 108.53, 111.89])
         self.assertEqual(obj.space_group, 'P 1')
         self.assertEqual(len(obj.atoms), 1164)
         self.assertEqual(len(obj.residues[0]), 9)
@@ -483,7 +490,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
             self.assertEqual(total_natoms, 1183)
             self.assertEqual(len(obj.atoms), 1164)
         else:
-            self.assertEqual(total_natoms, 1164) # 19 atoms have altlocs
+            self.assertEqual(total_natoms, 1164)  # 19 atoms have altlocs
         # Check the metadata
         if check_meta:
             self.assertEqual(obj.experimental, 'X-RAY DIFFRACTION')
@@ -494,7 +501,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
             self.assertEqual(obj.journal, 'ACTA CRYSTALLOGR.,SECT.D')
             self.assertEqual(obj.year, 1998)
             self.assertEqual(obj.keywords, ['HYDROLASE', 'O-GLYCOSYL',
-                             'GLYCOSIDASE'])
+                                            'GLYCOSIDASE'])
             self.assertEqual(obj.title, 'REFINEMENT OF TRICLINIC HEN EGG-WHITE '
                              'LYSOZYME AT ATOMIC RESOLUTION.')
             self.assertEqual(obj.doi, '10.1107/S0907444997013656')
@@ -507,6 +514,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
             else:
                 self.assertFalse(residue.ter)
 
+
 class TestChemistryCIFStructure(unittest.TestCase):
 
     def setUp(self):
@@ -516,7 +524,7 @@ class TestChemistryCIFStructure(unittest.TestCase):
         try:
             os.makedirs(get_fn('writes'))
         except OSError:
-            pass # Already exists
+            pass  # Already exists
 
     def tearDown(self):
         try:
@@ -639,20 +647,20 @@ class TestChemistryCIFStructure(unittest.TestCase):
         # Check the metadata now
         self.assertEqual(cif.experimental, 'X-RAY DIFFRACTION')
         self.assertEqual(cif.authors,
-                'Walsh, M.A., Schneider, T., Sieker, L.C., Dauter, Z., '
-                'Lamzin, V., Wilson, K.S.')
+                         'Walsh, M.A., Schneider, T., Sieker, L.C., Dauter, Z., '
+                         'Lamzin, V., Wilson, K.S.')
         self.assertEqual(cif.title,
-                'Refinement of triclinic hen egg-white lysozyme at atomic '
-                'resolution.; Refinement of Triclinic Lysozyme: I. Fourier '
-                'and Least-Squares Methods; Refinement of Triclinic Lysozyme: '
-                'II. The Method of Stereochemically Restrained Least Squares')
+                         'Refinement of triclinic hen egg-white lysozyme at atomic '
+                         'resolution.; Refinement of Triclinic Lysozyme: I. Fourier '
+                         'and Least-Squares Methods; Refinement of Triclinic Lysozyme: '
+                         'II. The Method of Stereochemically Restrained Least Squares')
         self.assertEqual(cif.journal,
-                'Acta Crystallogr.,Sect.D; Acta Crystallogr.,Sect.B; '
-                'Acta Crystallogr.,Sect.B')
+                         'Acta Crystallogr.,Sect.D; Acta Crystallogr.,Sect.B; '
+                         'Acta Crystallogr.,Sect.B')
         self.assertEqual(cif.journal_authors,
-                'Walsh, M.A., Schneider, T.R., Sieker, L.C., Dauter, Z., '
-                'Lamzin, V.S., Wilson, K.S., Hodsdon, J.M., Brown, G.M., '
-                'Jensen, L.H., Ramanadham, M.')
+                         'Walsh, M.A., Schneider, T.R., Sieker, L.C., Dauter, Z., '
+                         'Lamzin, V.S., Wilson, K.S., Hodsdon, J.M., Brown, G.M., '
+                         'Jensen, L.H., Ramanadham, M.')
         self.assertEqual(cif.year, '1998, 1990, 1990')
         self.assertEqual(cif.page, '522, 54, 63')
         self.assertEqual(cif.keywords, ['HYDROLASE', 'O-GLYCOSYL',
@@ -661,7 +669,9 @@ class TestChemistryCIFStructure(unittest.TestCase):
         self.assertEqual(cif.doi, '10.1107/S0907444997013656')
         self.assertEqual(cif.pmid, '9761848')
 
+
 class TestMol2File(unittest.TestCase):
+
     """ Tests the correct parsing and processing of mol2 files """
 
     def setUp(self):
@@ -779,8 +789,10 @@ class TestMol2File(unittest.TestCase):
 
     def testMol2MultiWriteFromStructure(self):
         """ Tests writing mol2 file of multi residues from Structure """
-        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
-        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol2', written=True))
+        mol2 = formats.Mol2File.parse(
+            get_fn('test_multi.mol2'), structure=True)
+        formats.Mol2File.write(
+            mol2, get_fn('test_multistruct.mol2', written=True))
         self.assertTrue(diff_files(get_fn('test_multistruct.mol2', written=True),
                                    get_saved_fn('test_multistruct.mol2')))
 
@@ -796,7 +808,8 @@ class TestMol2File(unittest.TestCase):
 
     def testMol3MultiWriteFromStructure(self):
         """ Tests writing mol3 file of multi residues from Structure """
-        mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
+        mol2 = formats.Mol2File.parse(
+            get_fn('test_multi.mol2'), structure=True)
         formats.Mol2File.write(mol2, get_fn('test_multistruct.mol3', written=True),
                                mol3=True)
         self.assertTrue(diff_files(get_fn('test_multistruct.mol3', written=True),
@@ -812,7 +825,8 @@ class TestMol2File(unittest.TestCase):
     def testMol2SingleWriteStruct(self):
         """ Tests writing mol2 file of single-residue Structure """
         mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
-        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol2', written=True))
+        formats.Mol2File.write(
+            mol2, get_fn('tripos9struct.mol2', written=True))
         self.assertTrue(diff_files(get_fn('tripos9struct.mol2', written=True),
                                    get_saved_fn('tripos9struct.mol2')))
 

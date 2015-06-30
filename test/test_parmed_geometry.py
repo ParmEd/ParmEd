@@ -11,7 +11,9 @@ import math
 import unittest
 import numpy as np
 
+
 class TestChemistryGeometry(unittest.TestCase):
+
     """ Tests the various routines in the geometry package """
 
     def assertEqualVectors(self, a, b):
@@ -30,7 +32,8 @@ class TestChemistryGeometry(unittest.TestCase):
 
         ang = 109.475
         rad = ang * math.pi / 180
-        a,b,c = geo.box_lengths_and_angles_to_vectors(50, 50, 50, ang, ang, ang)
+        a, b, c = geo.box_lengths_and_angles_to_vectors(
+            50, 50, 50, ang, ang, ang)
         leng, ang = geo.box_vectors_to_lengths_and_angles(a, b, c)
         self.assertEqualVectors(leng, (50, 50, 50))
         self.assertEqualVectors(ang, (rad, rad, rad))
@@ -44,7 +47,9 @@ class TestChemistryGeometry(unittest.TestCase):
         self.assertTrue(np.all(geo.center_of_mass(array, masses) == 0))
         # Change masses
         masses = np.asarray([2, 1])
-        almost_equal(geo.center_of_mass(array, masses), np.array([1/3, 0, 0]))
+        almost_equal(
+            geo.center_of_mass(array, masses), np.array([1 / 3, 0, 0]))
+
 
 def strip_units(x):
     if u.is_quantity(x):

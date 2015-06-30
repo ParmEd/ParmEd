@@ -21,13 +21,14 @@ def _unpackLen(obj):
 
 @unittest.skipIf(not init, "Cannot test load_rosetta module without PyRosetta.")
 class TestRosetta(unittest.TestCase):
+
     """ Tests loading of a Rosetta pose object """
 
     def testLoadedPositions(self):
         """ Test that positions were properly loaded"""
 
         init()
-        seq = 3*'A'
+        seq = 3 * 'A'
         pose = pose_from_sequence(seq)
 
         struct = load_rosetta(pose)
@@ -35,7 +36,7 @@ class TestRosetta(unittest.TestCase):
         posexyz = list(
             chain(*[[tuple(atom.xyz()) for atom in res.atoms()]
                     for res in [pose.residue(idx)
-                                for idx in range(1, len(seq)+1)]]))
+                                for idx in range(1, len(seq) + 1)]]))
 
         structxyz = [(atom.xx, atom.xy, atom.xz) for atom in struct.atoms]
 
@@ -45,7 +46,7 @@ class TestRosetta(unittest.TestCase):
         """ Test load_rosetta against read_PDB"""
 
         init()
-        pose = pose_from_sequence(3*'A')
+        pose = pose_from_sequence(3 * 'A')
 
         struct = load_rosetta(pose)
         pdb = read_PDB(get_fn('ala_ala_ala.pdb'))
@@ -58,7 +59,7 @@ class TestRosetta(unittest.TestCase):
         """ Test load_rosetta against OpenMM topology"""
 
         init()
-        pose = pose_from_sequence(3*'A')
+        pose = pose_from_sequence(3 * 'A')
 
         struct = load_rosetta(pose)
         pdb = PDBFile(get_fn('ala_ala_ala.pdb'))

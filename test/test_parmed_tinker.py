@@ -9,8 +9,9 @@ from parmed.utils.six.moves import zip
 
 get_fn = utils.get_fn
 
+
 class TestTinkerFiles(unittest.TestCase):
-    
+
     def testParameterFile(self):
         """ Tests parsing TINKER parameter files """
         param = parameterfile.AmoebaParameterSet(get_fn('amoeba09.prm'))
@@ -54,7 +55,7 @@ class TestTinkerFiles(unittest.TestCase):
 
         self.assertEqual(len(param.opbends), 35)
         self.assertAlmostEqual(param.opbends['60-62-0-0'].k, 107.9)
-        
+
         self.assertEqual(len(param.torsion_torsions), 0)
 
         self.assertEqual(len(param.urey_bradleys), 1)
@@ -92,10 +93,10 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(analout.multipole_list[5].moment,
                          [0.2124, 0.0, 0.0, -0.1249, 0.03622, 0.0, -0.01437,
                           0.0, 0.0, -0.02185])
-        
+
         self.assertEqual(analout.pitors_list[5].atom1.type, 9)
         self.assertEqual(len(analout.pair12_list), 16569)
-    
+
     def testXyz(self):
         """ Tests parsing Tinker XYZ files """
         xyz = tinkerfiles.XyzFile(get_fn('nma.xyz'))
@@ -117,7 +118,7 @@ class TestTinkerFiles(unittest.TestCase):
             self.assertTrue(hasattr(dyn, attr))
 
         for x, y in zip(dyn.positions[10],
-                [-0.1099425448789507, -1.83499212341286, 6.089155631551154]):
+                        [-0.1099425448789507, -1.83499212341286, 6.089155631551154]):
             self.assertAlmostEqual(x, y)
 
 if __name__ == '__main__':
