@@ -6,7 +6,6 @@ by the element's symbol. For consistency with AMBER, a fictitious element
 or any other meaningful attribute. It's just a container to put an extra 
 charge 
 """
-
 # Data descriptions:
 #
 #  KNOWN_ELEMENTS: number of known elements
@@ -225,6 +224,8 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
 
+_sorted_masses = sorted(Mass.items(), key=lambda x: x[1])
+
 def element_by_mass(mass):
     """
     Determine the element that has a mass closest to the input mass
@@ -246,13 +247,16 @@ def element_by_mass(mass):
     masses have changed -- particularly in the case of Hydrogen mass
     repartitioning.
     """
-    diff = mass
+    diff = mass + 1
     best_guess = 'EP'
 
-    for element in Element:
-        if abs(Mass[element] - mass) < diff:
+    for element, element_mass in _sorted_masses:
+        d = abs(element_mass - mass)
+        if d < diff:
             best_guess = element
-            diff = abs(Mass[element] - mass)
+            diff = d
+        else:
+            break
 
     return best_guess
 
