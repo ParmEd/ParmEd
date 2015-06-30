@@ -6,6 +6,8 @@ by the element's symbol. For consistency with AMBER, a fictitious element
 or any other meaningful attribute. It's just a container to put an extra 
 charge 
 """
+from collections import OrderedDict
+from parmed.utils.six import iteritems
 
 # Data descriptions:
 #
@@ -225,6 +227,13 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
 
+# Have a set of sorted masses so we can optimize element_by_mass
+tmp = sorted(list(Mass.items()), key=lambda x: x[1])
+_sorted_masses = OrderedDict()
+for _, __ in tmp:
+    _sorted_masses[_] = __
+del _, __, tmp
+
 def element_by_mass(mass):
     """
     Determine the element that has a mass closest to the input mass
@@ -249,10 +258,13 @@ def element_by_mass(mass):
     diff = mass
     best_guess = 'EP'
 
-    for element in Element:
-        if abs(Mass[element] - mass) < diff:
+    for element, element_mass in iteritems(_sorted_masses):
+        d = abs(element_mass - mass)
+        if d < diff:
             best_guess = element
-            diff = abs(Mass[element] - mass)
+            diff = d
+        else:
+            break
 
     return best_guess
 
