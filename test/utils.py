@@ -21,13 +21,16 @@ try:
 except ImportError:
     from string import ascii_uppercase as uppercase
 
+
 def skip_big_tests():
     return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+
 
 class TestCaseRelative(unittest.TestCase):
 
     def assertRelativeEqual(self, val1, val2, places=7, delta=None):
-        if val1 == val2: return
+        if val1 == val2:
+            return
         try:
             ratio = val1 / val2
         except ZeroDivisionError:
@@ -37,15 +40,15 @@ class TestCaseRelative(unittest.TestCase):
                 if abs(round(ratio - 1, places)) == 0:
                     return
                 raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, 10**-places, ratio)
+                    '%s != %s with relative tolerance %g (%f)' %
+                    (val1, val2, 10**-places, ratio)
                 )
             else:
                 if abs(ratio - 1) < delta:
                     return
                 raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, delta, ratio))
+                    '%s != %s with relative tolerance %g (%f)' %
+                    (val1, val2, delta, ratio))
 
 
 def get_fn(filename, written=False):
@@ -70,6 +73,7 @@ def get_fn(filename, written=False):
     else:
         return join(split(abspath(__file__))[0], 'files', filename)
 
+
 def get_saved_fn(filename):
     """
     Gets the full path of a file name of a saved test case that is used for
@@ -79,13 +83,14 @@ def get_saved_fn(filename):
     ----------
     filename : str
         Name of the file to get
-    
+
     Returns
     -------
     str
         Name of the test file with the full path location
     """
     return join(split(abspath(__file__))[0], 'files', 'saved', filename)
+
 
 def has_scipy():
     try:
@@ -94,12 +99,14 @@ def has_scipy():
     except ImportError:
         return False
 
+
 def has_netcdf4():
     try:
         import netCDF4
         return True
     except ImportError:
         return False
+
 
 def has_scientific():
     try:
@@ -108,6 +115,7 @@ def has_scientific():
     except ImportError:
         return False
 
+
 def has_pynetcdf():
     try:
         import pynetcdf
@@ -115,8 +123,10 @@ def has_pynetcdf():
     except ImportError:
         return False
 
+
 def has_numpy():
     return True
+
 
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,
@@ -145,7 +155,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
     -------
     bool
         True if files match. False if they do not or one file does not exist
-    
+
     Notes
     -----
     This routine is not protected against bad types of input. AttributeError may
@@ -153,8 +163,10 @@ def diff_files(file1, file2, ignore_whitespace=True,
     """
     if absolute_error is not None and relative_error is not None:
         raise ValueError('Cannot specify absolute_error AND relative_error')
-    if absolute_error is not None: absolute_error = float(absolute_error)
-    if relative_error is not None: relative_error = float(relative_error)
+    if absolute_error is not None:
+        absolute_error = float(absolute_error)
+    if relative_error is not None:
+        relative_error = float(relative_error)
     if isinstance(file1, string_types):
         try:
             f1 = open(file1, 'r')
@@ -189,7 +201,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1,l2,absolute_error,relative_error):
+                    if not detailed_diff(l1, l2, absolute_error, relative_error):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -206,7 +218,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1,l2,absolute_error,relative_error):
+                    if not detailed_diff(l1, l2, absolute_error, relative_error):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -218,6 +230,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
 
     return same
 
+
 def record_diffs(i, f1, f2, l1, l2):
     if not os.path.isdir(get_fn('diffs')):
         os.makedirs(get_fn('diffs'))
@@ -225,6 +238,7 @@ def record_diffs(i, f1, f2, l1, l2):
     f.write('# diff %s %s [line %d]\n' % (f1, f2, i))
     f.write('< %s> %s' % (l1, l2))
     f.close()
+
 
 def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
     """
@@ -235,27 +249,29 @@ def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
     fdir = os.path.split(get_fn('writes'))[0]
     w1 = l1.split()
     w2 = l2.split()
-    if len(w1) != len(w2): return False
+    if len(w1) != len(w2):
+        return False
     for wx, wy in zip(w1, w2):
         try:
             wx = float(wx)
             wy = float(wy)
         except ValueError:
             if isinstance(wx, float) or (wx != wy and not
-                    (wx.startswith(fdir) or wy.startswith(fdir))):
+                                         (wx.startswith(fdir) or wy.startswith(fdir))):
                 return False
         else:
             if wx != wy:
-                if absolute_error is not None and abs(wx-wy) > absolute_error:
+                if absolute_error is not None and abs(wx - wy) > absolute_error:
                     return False
                 elif relative_error is not None:
-                    if wx == 0 or wy == 0 and abs(wx-wy) > relative_error:
+                    if wx == 0 or wy == 0 and abs(wx - wy) > relative_error:
                         return False
                     if abs((wx / wy) - 1) > relative_error:
                         return False
                 elif absolute_error is None and relative_error is None:
                     return False
     return True
+
 
 def which(prog):
     """ Like the Unix program ``which``
@@ -288,6 +304,7 @@ def which(prog):
             return trial
     return None
 
+
 def create_random_structure(parametrized, novalence=False):
     """ Create a random Structure with random attributes
 
@@ -302,43 +319,44 @@ def create_random_structure(parametrized, novalence=False):
         set to False if parametrized is True
     """
     from parmed.topologyobjects import (Atom, Bond, AtomType, BondType,
-            AngleType, DihedralType, ImproperType, CmapType, OutOfPlaneBendType,
-            StretchBendType, TorsionTorsionType, AmoebaNonbondedExceptionType,
-            Angle, UreyBradley, Dihedral, Improper, Cmap, TrigonalAngle,
-            OutOfPlaneBend, StretchBend, PiTorsion, TorsionTorsion,
-            AcceptorDonor, Group, ChiralFrame, MultipoleFrame,
-            NonbondedException, RBTorsionType)
+                                        AngleType, DihedralType, ImproperType, CmapType, OutOfPlaneBendType,
+                                        StretchBendType, TorsionTorsionType, AmoebaNonbondedExceptionType,
+                                        Angle, UreyBradley, Dihedral, Improper, Cmap, TrigonalAngle,
+                                        OutOfPlaneBend, StretchBend, PiTorsion, TorsionTorsion,
+                                        AcceptorDonor, Group, ChiralFrame, MultipoleFrame,
+                                        NonbondedException, RBTorsionType)
     from parmed import structure
     from copy import copy
-    if parametrized: novalence = False
+    if parametrized:
+        novalence = False
     # Generate random atom and parameter types
     atom_types = [AtomType(''.join(random.sample(uppercase, 3)),
-                           i, random.random()*16+1, random.randint(1, 8))
+                           i, random.random() * 16 + 1, random.randint(1, 8))
                   for i in range(random.randint(8, 20))]
-    bond_types = [BondType(random.random()*2, random.random()*100)
+    bond_types = [BondType(random.random() * 2, random.random() * 100)
                   for i in range(random.randint(10, 20))]
-    angle_types = [AngleType(random.random()*50, random.random()*120)
+    angle_types = [AngleType(random.random() * 50, random.random() * 120)
                    for i in range(random.randint(10, 20))]
-    dihed_types = [DihedralType(random.random()*10, random.randint(1, 6),
+    dihed_types = [DihedralType(random.random() * 10, random.randint(1, 6),
                                 random.choice([0, 180]))
                    for i in range(random.randint(10, 20))]
-    rb_types = [RBTorsionType(*[random.random()*10 for i in range(6)])]
-    imp_types = [ImproperType(random.random()*100, random.choice([0, 180]))
+    rb_types = [RBTorsionType(*[random.random() * 10 for i in range(6)])]
+    imp_types = [ImproperType(random.random() * 100, random.choice([0, 180]))
                  for i in range(random.randint(10, 20))]
-    cmap_types = [CmapType(24, [random.random()*5 for i in range(24*24)])
+    cmap_types = [CmapType(24, [random.random() * 5 for i in range(24 * 24)])
                   for i in range(random.randint(5, 10))]
-    oop_types = [OutOfPlaneBendType(random.random()*100)
+    oop_types = [OutOfPlaneBendType(random.random() * 100)
                  for i in range(random.randint(10, 20))]
-    strbnd_types = [StretchBendType(random.random()*10, random.random()*10,
-                                    random.random()*2, random.random()*2,
-                                    random.random()*120)
+    strbnd_types = [StretchBendType(random.random() * 10, random.random() * 10,
+                                    random.random() * 2, random.random() * 2,
+                                    random.random() * 120)
                     for i in range(random.randint(10, 20))]
-    ang1, ang2 = list(range(-180,180,36)), list(range(-180,180,18))
+    ang1, ang2 = list(range(-180, 180, 36)), list(range(-180, 180, 18))
     tortor_types = [TorsionTorsionType((10, 20), ang1[:], ang2[:],
-                            [random.random()*10 for j in range(200)])
+                                       [random.random() * 10 for j in range(200)])
                     for i in range(random.randint(5, 10))]
     for typ in atom_types:
-        typ.set_lj_params(random.random()*2, random.random()*2)
+        typ.set_lj_params(random.random() * 2, random.random() * 2)
 
     struct = structure.Structure()
     # Add atoms in residues
@@ -396,7 +414,7 @@ def create_random_structure(parametrized, novalence=False):
         struct.adjust_types.extend([AmoebaNonbondedExceptionType(0.5, 0.5, 0.6, 0.6, 0.7)
                                     for i in range(random.randint(10, 20))])
         struct.adjust_types.claim()
-    # Add valence terms with optional 
+    # Add valence terms with optional
     for i in range(random.randint(40, 50)):
         struct.bonds.append(Bond(*random.sample(struct.atoms, 2)))
         if parametrized:
@@ -406,9 +424,11 @@ def create_random_structure(parametrized, novalence=False):
         if parametrized:
             struct.angles[-1].type = random.choice(struct.angle_types)
     for i in range(random.randint(35, 45)):
-        struct.urey_bradleys.append(UreyBradley(*random.sample(struct.atoms, 2)))
+        struct.urey_bradleys.append(
+            UreyBradley(*random.sample(struct.atoms, 2)))
         if parametrized:
-            struct.urey_bradleys[-1].type = random.choice(struct.urey_bradley_types)
+            struct.urey_bradleys[-
+                                 1].type = random.choice(struct.urey_bradley_types)
     for i in range(random.randint(30, 40)):
         struct.dihedrals.append(Dihedral(*random.sample(struct.atoms, 4),
                                          improper=random.choice([True, False])))
@@ -417,7 +437,8 @@ def create_random_structure(parametrized, novalence=False):
     for i in range(random.randint(30, 40)):
         struct.rb_torsions.append(Dihedral(*random.sample(struct.atoms, 4)))
         if parametrized:
-            struct.rb_torsions[-1].type = random.choice(struct.rb_torsion_types)
+            struct.rb_torsions[-
+                               1].type = random.choice(struct.rb_torsion_types)
     for i in range(random.randint(10, 20)):
         struct.impropers.append(Improper(*random.sample(struct.atoms, 4)))
         if parametrized:
@@ -427,25 +448,34 @@ def create_random_structure(parametrized, novalence=False):
         if parametrized:
             struct.cmaps[-1].type = random.choice(struct.cmap_types)
     for i in range(random.randint(30, 40)):
-        struct.trigonal_angles.append(TrigonalAngle(*random.sample(struct.atoms, 4)))
+        struct.trigonal_angles.append(
+            TrigonalAngle(*random.sample(struct.atoms, 4)))
         if parametrized:
-            struct.trigonal_angles[-1].type = random.choice(struct.trigonal_angle_types)
+            struct.trigonal_angles[-
+                                   1].type = random.choice(struct.trigonal_angle_types)
     for i in range(random.randint(30, 40)):
-        struct.out_of_plane_bends.append(OutOfPlaneBend(*random.sample(struct.atoms, 4)))
+        struct.out_of_plane_bends.append(
+            OutOfPlaneBend(*random.sample(struct.atoms, 4)))
         if parametrized:
-            struct.out_of_plane_bends[-1].type = random.choice(struct.out_of_plane_bend_types)
+            struct.out_of_plane_bends[-
+                                      1].type = random.choice(struct.out_of_plane_bend_types)
     for i in range(random.randint(30, 40)):
-        struct.stretch_bends.append(StretchBend(*random.sample(struct.atoms, 3)))
+        struct.stretch_bends.append(
+            StretchBend(*random.sample(struct.atoms, 3)))
         if parametrized:
-            struct.stretch_bends[-1].type = random.choice(struct.stretch_bend_types)
+            struct.stretch_bends[-
+                                 1].type = random.choice(struct.stretch_bend_types)
     for i in range(random.randint(20, 30)):
         struct.pi_torsions.append(PiTorsion(*random.sample(struct.atoms, 6)))
         if parametrized:
-            struct.pi_torsions[-1].type = random.choice(struct.pi_torsion_types)
+            struct.pi_torsions[-
+                               1].type = random.choice(struct.pi_torsion_types)
     for i in range(random.randint(10, 20)):
-        struct.torsion_torsions.append(TorsionTorsion(*random.sample(struct.atoms, 5)))
+        struct.torsion_torsions.append(
+            TorsionTorsion(*random.sample(struct.atoms, 5)))
         if parametrized:
-            struct.torsion_torsions[-1].type = random.choice(struct.torsion_torsion_types)
+            struct.torsion_torsions[-
+                                    1].type = random.choice(struct.torsion_torsion_types)
     # Now use some lesser-used features
     for i in range(random.randint(5, 10)):
         struct.acceptors.append(AcceptorDonor(*random.sample(struct.atoms, 2)))
@@ -456,7 +486,8 @@ def create_random_structure(parametrized, novalence=False):
         struct.multipole_frames.append(MultipoleFrame(random.choice(struct.atoms),
                                                       0, 1, 2, 3))
     for i in range(random.randint(20, 30)):
-        struct.adjusts.append(NonbondedException(*random.sample(struct.atoms, 2)))
+        struct.adjusts.append(
+            NonbondedException(*random.sample(struct.atoms, 2)))
         if parametrized:
             struct.adjusts[-1].type = random.choice(struct.adjust_types)
     struct.prune_empty_terms()

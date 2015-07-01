@@ -14,8 +14,10 @@ from parmed.topologyobjects import Atom, Bond
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 
+
 @add_metaclass(FileFormatType)
 class Mol2File(object):
+
     """ Class to read and write TRIPOS Mol2 files """
 
     #===================================================
@@ -37,8 +39,10 @@ class Mol2File(object):
         f = genopen(filename, 'r')
         try:
             for line in f:
-                if line.startswith('#'): continue
-                if not line.strip(): continue
+                if line.startswith('#'):
+                    continue
+                if not line.strip():
+                    continue
                 return line.startswith('@<TRIPOS>')
             return False
         finally:
@@ -83,8 +87,10 @@ class Mol2File(object):
             last_residue = None
             headtail = 'head'
             for line in f:
-                if line.startswith('#'): continue
-                if not line.strip() and section is None: continue
+                if line.startswith('#'):
+                    continue
+                if not line.strip() and section is None:
+                    continue
                 if line.startswith('@<TRIPOS>'):
                     section = line[9:].strip()
                     continue
@@ -162,7 +168,8 @@ class Mol2File(object):
                     #   bond_type -- string describing bond type (ignored)
                     #   status_bits -- ignored
                     words = line.split()
-                    int(words[0]) # Bond serial number... redundant and ignored
+                    # Bond serial number... redundant and ignored
+                    int(words[0])
                     a1 = int(words[1])
                     a2 = int(words[2])
                     atom1 = struct.atoms.find_original_index(a1)
@@ -199,7 +206,7 @@ class Mol2File(object):
                             res = restemp
                         else:
                             res = rescont[atom1.residue.idx]
-                        res.add_bond(atom1.idx-offset, atom2.idx-offset)
+                        res.add_bond(atom1.idx - offset, atom2.idx - offset)
                     continue
                 if section == 'CRYSIN':
                     # Section formatted as follows:
@@ -250,7 +257,7 @@ class Mol2File(object):
                     if residx - 1 == len(rescont):
                         res = restemp
                     elif residx - 1 < len(rescont):
-                        res = rescont[residx-1]
+                        res = rescont[residx - 1]
                     else:
                         raise Mol2Error('Residue out of range in head/tail')
                     for atom in res:
@@ -274,12 +281,13 @@ class Mol2File(object):
                     if residx - 1 == len(rescont):
                         res = restemp
                     elif residx - 1 < len(rescont):
-                        res = rescont[residx-1]
+                        res = rescont[residx - 1]
                     else:
                         raise Mol2Error('Residue out of range in '
                                         'residueconnect')
                     for a in words[3:]:
-                        if a == '0': continue
+                        if a == '0':
+                            continue
                         for atom in res:
                             if atom.name == a:
                                 atom.connections.append(atom)
@@ -331,15 +339,15 @@ class Mol2File(object):
                 bases = [1 for res in struct]
                 for i, res in enumerate(struct):
                     if i < len(struct) - 1:
-                        bases[i+1] = bases[i] + len(res)
+                        bases[i + 1] = bases[i] + len(res)
                 for i, res in enumerate(struct):
                     for bond in res.bonds:
-                        bonds.append((bond.atom1.idx+bases[i],
-                                      bond.atom2.idx+bases[i]))
-                    if i < len(struct)-1 and (res.tail is not None and
-                            struct[i+1].head is not None):
-                        bonds.append((res.tail.idx+bases[i],
-                                      struct[i+1].head.idx+bases[i+1]))
+                        bonds.append((bond.atom1.idx + bases[i],
+                                      bond.atom2.idx + bases[i]))
+                    if i < len(struct) - 1 and (res.tail is not None and
+                                                struct[i + 1].head is not None):
+                        bonds.append((res.tail.idx + bases[i],
+                                      struct[i + 1].head.idx + bases[i + 1]))
                     charges.extend([a.charge for a in res])
                 residues = struct
                 if not struct.name:
@@ -348,7 +356,8 @@ class Mol2File(object):
                     name = struct.name
             else:
                 natom = len(struct.atoms)
-                bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
+                bonds = [(b.atom1.idx + 1, b.atom2.idx + 1)
+                         for b in struct.bonds]
                 if isinstance(struct, ResidueTemplate):
                     residues = [struct]
                     name = struct.name
@@ -397,7 +406,7 @@ class Mol2File(object):
                     except AttributeError:
                         z = 0
                     dest.write('%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s' % (
-                               j, atom.name, x, y, z, atom.type, i+1, res.name))
+                               j, atom.name, x, y, z, atom.type, i + 1, res.name))
                     if printchg:
                         dest.write(' %10.6f\n' % atom.charge)
                     else:
@@ -405,7 +414,7 @@ class Mol2File(object):
                     j += 1
             dest.write('@<TRIPOS>BOND\n')
             for i, bond in enumerate(bonds):
-                dest.write('%8d %8d %8d 1\n' % (i+1, bond[0], bond[1]))
+                dest.write('%8d %8d %8d 1\n' % (i + 1, bond[0], bond[1]))
             dest.write('@<TRIPOS>SUBSTRUCTURE\n')
             first_atom = 0
             for i, res in enumerate(residues):
@@ -415,30 +424,30 @@ class Mol2File(object):
                     chain = res.chain
                 intresbonds = 0
                 if isinstance(res, ResidueTemplate):
-                    if i != len(residues)-1 and (res.tail is not None and
-                            residues[i+1].head is not None):
+                    if i != len(residues) - 1 and (res.tail is not None and
+                                                   residues[i + 1].head is not None):
                         intresbonds += 1
-                    if i != 0 and (res.head is not None and residues[i-1].tail
-                            is not None):
+                    if i != 0 and (res.head is not None and residues[i - 1].tail
+                                   is not None):
                         intresbonds += 1
                 else:
                     for atom in res:
                         for a2 in atom.bond_partners:
                             if a2.residue is not res:
                                 intresbonds += 1
-                dest.write('%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n' % (i+1,
-                           res.name, first_atom+1, 0, chain[:4], intresbonds))
+                dest.write('%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n' % (i + 1,
+                                                                         res.name, first_atom + 1, 0, chain[:4], intresbonds))
                 first_atom += len(res)
             if mol3:
                 dest.write('@<TRIPOS>HEADTAIL\n')
                 for i, res in enumerate(residues):
                     if isinstance(res, ResidueTemplate):
                         if res.head is not None:
-                            dest.write('%s %d\n' % (res.head.name, i+1))
+                            dest.write('%s %d\n' % (res.head.name, i + 1))
                         else:
                             dest.write('0 0\n')
                         if res.tail is not None:
-                            dest.write('%s %d\n' % (res.tail.name, i+1))
+                            dest.write('%s %d\n' % (res.tail.name, i + 1))
                         else:
                             dest.write('0 0\n')
                     else:
@@ -450,11 +459,11 @@ class Mol2File(object):
                                 if a2.residue.idx == res.idx + 1:
                                     tail = atom
                         if head is not None:
-                            dest.write('%s %d\n' % (head.name, i+1))
+                            dest.write('%s %d\n' % (head.name, i + 1))
                         else:
                             dest.write('0 0\n')
                         if tail is not None:
-                            dest.write('%s %d\n' % (tail.name, i+1))
+                            dest.write('%s %d\n' % (tail.name, i + 1))
                         else:
                             dest.write('0 0\n')
                 dest.write('@<TRIPOS>RESIDUECONNECT\n')
@@ -462,7 +471,7 @@ class Mol2File(object):
                     if isinstance(res, ResidueTemplate):
                         con = [res.head, res.tail, None, None, None, None]
                         for i, a in enumerate(res.connections):
-                            con[i+2] = a
+                            con[i + 2] = a
                     else:
                         con = [None, None, None, None, None, None]
                         ncon = 2
@@ -475,7 +484,7 @@ class Mol2File(object):
                                 elif a2.residue.idx != res.idx:
                                     con[ncon] = atom
                                     ncon += 1
-                    dest.write('%d' % (i+1))
+                    dest.write('%d' % (i + 1))
                     for a in con:
                         if a is not None:
                             dest.write(' %s' % a.name)
@@ -483,4 +492,5 @@ class Mol2File(object):
                             dest.write(' 0')
                     dest.write('\n')
         finally:
-            if own_handle: dest.close()
+            if own_handle:
+                dest.close()

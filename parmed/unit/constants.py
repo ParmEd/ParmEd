@@ -50,7 +50,8 @@ SPEED_OF_LIGHT_C = 2.99792458e8 * meter / second
 GRAVITATIONAL_CONSTANT_G = 6.6742e-11 * newton * meter**2 / kilogram**2
 
 # run module directly for testing
-if __name__=='__main__':
+if __name__ == '__main__':
     # Test the examples in the docstrings
-    import doctest, sys
+    import doctest
+    import sys
     doctest.testmod(sys.modules[__name__])

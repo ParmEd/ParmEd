@@ -16,8 +16,10 @@ try:
 except ImportError:
     HAS_OPENMM = False
 
+
 def needs_openmm(fcn):
     global HAS_OPENMM
+
     @wraps(fcn)
     def new_fcn(*args, **kwargs):
         if not HAS_OPENMM:
@@ -27,4 +29,3 @@ def needs_openmm(fcn):
         return fcn(*args, **kwargs)
 
     return new_fcn
-

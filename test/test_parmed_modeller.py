@@ -23,7 +23,9 @@ import unittest
 import warnings
 get_fn = utils.get_fn
 
+
 class TestResidueTemplate(unittest.TestCase):
+
     """ Tests the ResidueTemplate class """
 
     def setUp(self):
@@ -147,7 +149,7 @@ class TestResidueTemplate(unittest.TestCase):
                     elif oatom.residue.idx == res.idx + 1:
                         self.assertIs(templ.tail, templ[idx])
                     elif oatom.residue.idx == res.idx:
-                        self.assertTrue(False) # Should never hit
+                        self.assertTrue(False)  # Should never hit
                     else:
                         # Should only happen with CYX for amber prmtop...
                         self.assertEqual(res.name, 'CYX')
@@ -161,7 +163,9 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIsInstance(templ.coordinates, np.ndarray)
         self.assertEqual(templ.coordinates.shape, (len(templ), 3))
 
+
 class TestResidueTemplateContainer(unittest.TestCase):
+
     """ Tests the ResidueTemplateContainer class """
 
     def testFromStructure(self):
@@ -182,7 +186,7 @@ class TestResidueTemplateContainer(unittest.TestCase):
     def testToLibrary(self):
         """ Tests converting a ResidueTemplateContainer to a library/dict """
         lib = ResidueTemplateContainer.from_structure(
-                AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+            AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         ).to_library()
         self.assertIsInstance(lib, dict)
         self.assertEqual(len(lib.keys()), 23)
@@ -191,7 +195,9 @@ class TestResidueTemplateContainer(unittest.TestCase):
                       "PRO", "MET", "TYR", "GLN", "ASN", "ARG", "CALA"])
         self.assertEqual(set(lib.keys()), refset)
 
+
 class TestAmberOFFLibrary(unittest.TestCase):
+
     """ Tests the AmberOFFLibrary class """
 
     def testReadInternal(self):
@@ -451,7 +457,9 @@ class TestAmberOFFLibrary(unittest.TestCase):
                 self.assertEqual(b1.atom1.name, b2.atom1.name)
                 self.assertEqual(b1.atom2.name, b2.atom2.name)
 
+
 class TestAmberOFFLeapCompatibility(unittest.TestCase):
+
     """ Tests the AmberOFFLibrary classes written in LEaP """
 
     def setUp(self):

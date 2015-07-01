@@ -26,16 +26,16 @@ from parmed.amber.amberformat import AmberFormat, _deprecated
 from parmed.amber.asciicrd import AmberAsciiRestart
 from parmed.amber.netcdffiles import NetCDFRestart
 from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
-            MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
-            NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
-            NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL)
+                              MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
+                              NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
+                              NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
+                              NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL)
 from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
 from parmed.geometry import box_lengths_and_angles_to_vectors
 from parmed.periodic_table import AtomicNum, element_by_mass
 from parmed.structure import Structure, needs_openmm
 from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
-                       BondType, AngleType, DihedralType, AtomType, ExtraPoint)
+                                    BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from parmed import unit as u
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import zip, range
@@ -53,7 +53,9 @@ from warnings import warn
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class AmberParm(AmberFormat, Structure):
+
     """
     Amber Topology (parm7 format) class. Gives low, and some high, level access
     to topology data. You can interact with the raw data in the topology file
@@ -307,7 +309,8 @@ class AmberParm(AmberFormat, Structure):
         nbfixes = inst.atoms.assign_nbidx_from_types()
         # Give virtual sites a name that Amber understands
         for atom in inst.atoms:
-            if isinstance(atom, ExtraPoint): atom.type = 'EP'
+            if isinstance(atom, ExtraPoint):
+                atom.type = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
@@ -316,8 +319,8 @@ class AmberParm(AmberFormat, Structure):
         inst.LJ_radius = [0 for i in range(ntyp)]
         inst.LJ_depth = [0 for i in range(ntyp)]
         for atom in inst.atoms:
-            inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+            inst.LJ_radius[atom.nb_idx - 1] = atom.atom_type.rmin
+            inst.LJ_depth[atom.nb_idx - 1] = atom.atom_type.epsilon
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
@@ -371,7 +374,7 @@ class AmberParm(AmberFormat, Structure):
         return other
 
     #===================================================
-   
+
     def __getitem__(self, selection):
         other = super(AmberParm, self).__getitem__(selection)
         if other is None:
@@ -383,8 +386,8 @@ class AmberParm(AmberFormat, Structure):
         other.LJ_radius = copy.copy(self.LJ_radius)
         other.LJ_depth = copy.copy(self.LJ_depth)
         for atom in other.atoms:
-            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+            other.LJ_radius[atom.nb_idx - 1] = atom.atom_type.rmin
+            other.LJ_depth[atom.nb_idx - 1] = atom.atom_type.epsilon
         other._add_standard_flags()
         return other
 
@@ -418,7 +421,8 @@ class AmberParm(AmberFormat, Structure):
         self.pointers["NHPARM"] = self.parm_data["POINTERS"][NHPARM]
         self.pointers["NPARM"] = self.parm_data["POINTERS"][NPARM]
         self.pointers["NEXT"] = self.parm_data["POINTERS"][NEXT]
-        self.pointers["NNB"] = self.parm_data["POINTERS"][NNB] # alias for above
+        self.pointers["NNB"] = self.parm_data[
+            "POINTERS"][NNB]  # alias for above
         self.pointers["NRES"] = self.parm_data["POINTERS"][NRES]
         self.pointers["NBONA"] = self.parm_data["POINTERS"][NBONA]
         self.pointers["NTHETA"] = self.parm_data["POINTERS"][NTHETA]
@@ -526,11 +530,11 @@ class AmberParm(AmberFormat, Structure):
             atom.occupancy = occu[i]
             atom.bfactor = bfac[i]
             atom.number = anum[i]
-            depth = self.LJ_depth[atom.nb_idx-1]
-            radius = self.LJ_radius[atom.nb_idx-1]
+            depth = self.LJ_depth[atom.nb_idx - 1]
+            radius = self.LJ_radius[atom.nb_idx - 1]
             try:
-                depth14 = self.LJ_14_depth[atom.nb_idx-1]
-                radius14 = self.LJ_14_radius[atom.nb_idx-1]
+                depth14 = self.LJ_14_depth[atom.nb_idx - 1]
+                radius14 = self.LJ_14_radius[atom.nb_idx - 1]
             except AttributeError:
                 depth14 = radius14 = None
             atom.atom_type.set_lj_params(depth, radius, depth14, radius14)
@@ -583,19 +587,19 @@ class AmberParm(AmberFormat, Structure):
         rst7 = Rst7(natom=len(self.atoms))
 
         # Now fill in the rst7 coordinates
-        rst7.coordinates = [0.0 for i in range(len(self.atoms)*3)]
+        rst7.coordinates = [0.0 for i in range(len(self.atoms) * 3)]
         if self.velocities is not None:
-            rst7.vels = [0.0 for i in range(len(self.atoms)*3)]
+            rst7.vels = [0.0 for i in range(len(self.atoms) * 3)]
 
         for i, at in enumerate(self.atoms):
             i3 = i * 3
-            rst7.coordinates[i3  ] = at.xx
-            rst7.coordinates[i3+1] = at.xy
-            rst7.coordinates[i3+2] = at.xz
+            rst7.coordinates[i3] = at.xx
+            rst7.coordinates[i3 + 1] = at.xy
+            rst7.coordinates[i3 + 2] = at.xz
             if rst7.hasvels:
-                rst7.vels[i3  ] = at.vx
-                rst7.vels[i3+1] = at.vy
-                rst7.vels[i3+2] = at.vz
+                rst7.vels[i3] = at.vx
+                rst7.vels[i3 + 1] = at.vy
+                rst7.vels[i3 + 2] = at.vz
 
         rst7.box = copy.copy(self.box)
         # Now write the restart file
@@ -630,7 +634,7 @@ class AmberParm(AmberFormat, Structure):
         self.residues.prune()
         self.rediscover_molecules()
 
-        # Transfer information from the topology lists 
+        # Transfer information from the topology lists
         self._xfer_atom_info()
         self._xfer_residue_info()
         self._xfer_bond_info()
@@ -642,7 +646,7 @@ class AmberParm(AmberFormat, Structure):
         super(AmberParm, self).unchange()
 
     #===================================================
-   
+
     def is_changed(self):
         """ 
         Determines if any of the topological arrays have changed since the
@@ -681,11 +685,12 @@ class AmberParm(AmberFormat, Structure):
         the tleap bug. Returns None otherwise.
         """
         # Bail out of we are not doing a solvated prmtop
-        if not self.parm_data['POINTERS'][IFBOX]: return None
+        if not self.parm_data['POINTERS'][IFBOX]:
+            return None
 
         owner = set_molecules(self)
-        ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
-                'CIO','MG2', 'SOD', 'CLA', 'POT', 'CAL']
+        ions = ['Br-', 'Cl-', 'Cs+', 'F-', 'I-', 'K+', 'Li+', 'Mg+', 'Na+', 'Rb+', 'IB',
+                'CIO', 'MG2', 'SOD', 'CLA', 'POT', 'CAL']
         indices = []
         for res in self.residues:
             if res.name in type(self).solvent_residues:
@@ -701,9 +706,12 @@ class AmberParm(AmberFormat, Structure):
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
             self.pointers['IFBOX'] = 0
-            if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
-            if 'NSPM' in self.pointers: del self.pointers['NSPM']
-            if 'NSPSOL' in self.pointers: del self.pointers['NSPSOL']
+            if 'IPTRES' in self.pointers:
+                del self.pointers['IPTRES']
+            if 'NSPM' in self.pointers:
+                del self.pointers['NSPM']
+            if 'NSPSOL' in self.pointers:
+                del self.pointers['NSPSOL']
             self.delete_flag('SOLVENT_POINTERS')
             self.delete_flag('ATOMS_PER_MOLECULE')
             self.delete_flag('BOX_DIMENSIONS')
@@ -715,10 +723,10 @@ class AmberParm(AmberFormat, Structure):
         first_solvent = self.residues[min(indices)].atoms[0].idx
         # Find the first solvent molecule
         for i, mol in enumerate(owner):
-            if first_solvent in mol: # mol is a set, so it is efficient
+            if first_solvent in mol:  # mol is a set, so it is efficient
                 self.parm_data['SOLVENT_POINTERS'][2] = i + 1
                 break
-        else: # this else belongs to 'for', not 'if'
+        else:  # this else belongs to 'for', not 'if'
             warn('Could not find first solvent atom. Set to 0', AmberWarning)
             self.parm_data['SOLVENT_POINTERS'][2] = 0
 
@@ -731,7 +739,7 @@ class AmberParm(AmberFormat, Structure):
             for mol in owner:
                 sortedmol = sorted(list(mol))
                 for i in range(1, len(sortedmol)):
-                    if sortedmol[i] != sortedmol[i-1] + 1:
+                    if sortedmol[i] != sortedmol[i - 1] + 1:
                         raise StopIteration()
         except StopIteration:
             if not fix_broken:
@@ -783,11 +791,11 @@ class AmberParm(AmberFormat, Structure):
         bcoef = pd['LENNARD_JONES_BCOEF']
         natom = self.pointers['NATOM']
         ntypes = self.pointers['NTYPES']
-        for i in range(natom): # fill the LJ_types array
+        for i in range(natom):  # fill the LJ_types array
             self.LJ_types[pd["AMBER_ATOM_TYPE"][i]] = pd["ATOM_TYPE_INDEX"][i]
-         
+
         for i in range(ntypes):
-            lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
+            lj_index = pd["NONBONDED_PARM_INDEX"][ntypes * i + i] - 1
             if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
                 self.LJ_radius.append(0)
                 self.LJ_depth.append(0)
@@ -814,7 +822,7 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.pointers['NTYPES']
         for i in range(ntypes):
             for j in range(i, ntypes):
-                index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                index = pd['NONBONDED_PARM_INDEX'][ntypes * i + j] - 1
                 if index < 0:
                     pd['LENNARD_JONES_ACOEF'][-index] = 0.0
                     pd['LENNARD_JONES_BCOEF'][-index] = 0.0
@@ -842,8 +850,9 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.parm_data['POINTERS'][NTYPES]
         for i in range(ntypes):
             for j in range(ntypes):
-                idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                if idx < 0: continue
+                idx = pd['NONBONDED_PARM_INDEX'][ntypes * i + j] - 1
+                if idx < 0:
+                    continue
                 rij = self.LJ_radius[i] + self.LJ_radius[j]
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 a = pd['LENNARD_JONES_ACOEF'][idx]
@@ -872,19 +881,24 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.parm_data['POINTERS'][NTYPES]
         for i in range(ntypes):
             for j in range(ntypes):
-                idx = self.parm_data['NONBONDED_PARM_INDEX'][i*ntypes+j] - 1
-                if idx >= 0: continue
+                idx = self.parm_data['NONBONDED_PARM_INDEX'][
+                    i * ntypes + j] - 1
+                if idx >= 0:
+                    continue
                 # It was negative, so we should have ADDED 1 to adjust for
                 # indexing from 0
                 idx = -idx - 2
                 a = self.parm_data['HBOND_ACOEF'][idx]
                 b = self.parm_data['HBOND_BCOEF'][idx]
-                if a == 0 and b == 0: continue
+                if a == 0 and b == 0:
+                    continue
                 indices_with_1012.append((i, j))
-        if not indices_with_1012: return False
+        if not indices_with_1012:
+            return False
         # Now make sure that some of the atoms *have* those indices
         active_indices = set()
-        for atom in self.atoms: active_indices.add(atom.nb_idx-1)
+        for atom in self.atoms:
+            active_indices.add(atom.nb_idx - 1)
         for i, j in indices_with_1012:
             if i in active_indices and j in active_indices:
                 return True
@@ -957,14 +971,17 @@ class AmberParm(AmberFormat, Structure):
     def coords(self):
         warn('Use coordinates attribute instead of coords', DeprecationWarning)
         return self.coordinates
+
     @coords.setter
     def coords(self, value):
         warn('Use coordinates attribute instead of coords', DeprecationWarning)
         self.coordinates = value
+
     @property
     def vels(self):
         warn('Use velocities attribute instead of vels', DeprecationWarning)
         return self.velocities
+
     @vels.setter
     def vels(self, value):
         warn('Use velocities attribute instead of vels', DeprecationWarning)
@@ -974,8 +991,8 @@ class AmberParm(AmberFormat, Structure):
 
     @needs_openmm
     def omm_nonbonded_force(self, nonbondedMethod=None,
-                            nonbondedCutoff=8*u.angstroms,
-                            switchDistance=0*u.angstroms,
+                            nonbondedCutoff=8 * u.angstroms,
+                            switchDistance=0 * u.angstroms,
                             ewaldErrorTolerance=0.0005,
                             reactionFieldDielectric=78.5):
         """
@@ -1016,10 +1033,11 @@ class AmberParm(AmberFormat, Structure):
             2-element tuple of NonbondedForce, CustomNonbondedForce. If only a
             NonbondedForce is necessary, that is the return value
         """
-        if not self.atoms: return None
+        if not self.atoms:
+            return None
         nonbfrc = super(AmberParm, self).omm_nonbonded_force(
-                nonbondedMethod, nonbondedCutoff, switchDistance,
-                ewaldErrorTolerance, reactionFieldDielectric
+            nonbondedMethod, nonbondedCutoff, switchDistance,
+            ewaldErrorTolerance, reactionFieldDielectric
         )
         hasnbfix = self.has_NBFIX()
         has1012 = self.has_1012()
@@ -1028,19 +1046,21 @@ class AmberParm(AmberFormat, Structure):
             return nonbfrc
 
         # If we have NBFIX, omm_nonbonded_force returned a tuple
-        if hasnbfix: nonbfrc = nonbfrc[0]
+        if hasnbfix:
+            nonbfrc = nonbfrc[0]
 
-        # We need a CustomNonbondedForce... determine what it needs to calculate
+        # We need a CustomNonbondedForce... determine what it needs to
+        # calculate
         if hasnbfix and has1264:
             if has1012:
                 force = mm.CustomNonbondedForce(
-                        '(a/r6)^2-b/r6-c/r4+ah/(r6*r6)-bh/(r6*r4); r6=r4*r2;'
-                                                'r4=r2^2; r2=r^2;'
-                                                'a=acoef(type1, type2);'
-                                                'b=bcoef(type1, type2);'
-                                                'c=ccoef(type1, type2);'
-                                                'ah=ahcoef(type1, type2);'
-                                                'bh=bhcoef(type1, type2);'
+                    '(a/r6)^2-b/r6-c/r4+ah/(r6*r6)-bh/(r6*r4); r6=r4*r2;'
+                    'r4=r2^2; r2=r^2;'
+                    'a=acoef(type1, type2);'
+                    'b=bcoef(type1, type2);'
+                    'c=ccoef(type1, type2);'
+                    'ah=ahcoef(type1, type2);'
+                    'bh=bhcoef(type1, type2);'
                 )
             else:
                 force = mm.CustomNonbondedForce('(a/r6)^2-b/r6-c/r4; r6=r4*r2;'
@@ -1051,12 +1071,12 @@ class AmberParm(AmberFormat, Structure):
         elif hasnbfix:
             if has1012:
                 force = mm.CustomNonbondedForce(
-                        '(a/r6)^2-b/r6+ah/(r6*r6)-bh/(r6*r4);'
-                        'r6=r2*r2*r2;r2=r^2;'
-                        'a=acoef(type1, type2);'
-                        'b=bcoef(type1, type2);'
-                        'ah=ahcoef(type1, type2);'
-                        'bh=bhcoef(type1, type2);'
+                    '(a/r6)^2-b/r6+ah/(r6*r6)-bh/(r6*r4);'
+                    'r6=r2*r2*r2;r2=r^2;'
+                    'a=acoef(type1, type2);'
+                    'b=bcoef(type1, type2);'
+                    'ah=ahcoef(type1, type2);'
+                    'bh=bhcoef(type1, type2);'
                 )
             else:
                 force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2;'
@@ -1069,7 +1089,8 @@ class AmberParm(AmberFormat, Structure):
                                                 'ah=ahcoef(type1, type2);'
                                                 'bh=bhcoef(type1, type2);')
             else:
-                force = mm.CustomNonbondedForce('-c/r^4;c=ccoef(type1, type2);')
+                force = mm.CustomNonbondedForce(
+                    '-c/r^4;c=ccoef(type1, type2);')
         elif has1012:
             force = mm.CustomNonbondedForce('a/r^12-b/r^10;'
                                             'a=ahcoef(type1, type2);'
@@ -1078,14 +1099,15 @@ class AmberParm(AmberFormat, Structure):
         # Set up the force with all of the particles
         force.addPerParticleParameter('type')
         force.setForceGroup(self.NONBONDED_FORCE_GROUP)
-        for atom in self.atoms: force.addParticle([atom.nb_idx-1])
+        for atom in self.atoms:
+            force.addParticle([atom.nb_idx - 1])
 
         # Now construct the lookup tables
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         ntypes = self.parm_data['POINTERS'][NTYPES]
         if hasnbfix:
-            acoef = [0 for i in range(ntypes*ntypes)]
+            acoef = [0 for i in range(ntypes * ntypes)]
             parm_acoef = self.parm_data['LENNARD_JONES_ACOEF']
             bcoef = acoef[:]
             parm_bcoef = self.parm_data['LENNARD_JONES_BCOEF']
@@ -1105,10 +1127,11 @@ class AmberParm(AmberFormat, Structure):
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             for i in range(ntypes):
                 for j in range(ntypes):
-                    idx = nbidx[ntypes*i+j] - 1
+                    idx = nbidx[ntypes * i + j] - 1
                     ii = i + ntypes * j
                     if idx < 0 and has1012:
-                        idx = -idx - 2 # Fix adjust for 0 since it was negative
+                        # Fix adjust for 0 since it was negative
+                        idx = -idx - 2
                         ahcoef[ii] = parm_ahcoef[idx] * ahfac
                         bhcoef[ii] = parm_bhcoef[idx] * bhfac
                         if has1264:
@@ -1119,15 +1142,16 @@ class AmberParm(AmberFormat, Structure):
                         if has1264:
                             ccoef[ii] = parm_ccoef[idx] * cfac
             force.addTabulatedFunction('acoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, acoef))
+                                       mm.Discrete2DFunction(ntypes, ntypes, acoef))
             force.addTabulatedFunction('bcoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, bcoef))
+                                       mm.Discrete2DFunction(ntypes, ntypes, bcoef))
             if has1264:
                 force.addTabulatedFunction('ccoef',
-                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+                                           mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Our CustomNonbondedForce is taking care of the LJ part of our
             # potential, so we need to go through nonbfrc and zero-out the
-            # Lennard-Jones parameters, but keep the charge parameters in place.
+            # Lennard-Jones parameters, but keep the charge parameters in
+            # place.
             for i in range(nonbfrc.getNumParticles()):
                 chg, sig, eps = nonbfrc.getParticleParameters(i)
                 nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
@@ -1140,10 +1164,10 @@ class AmberParm(AmberFormat, Structure):
             # Here we have JUST the r^-4 or r^-10/r^-12 parts, since the
             # hasnbfix block above handled the "hasnbfix and has1264" case
             if has1264:
-                ccoef = [0 for i in range(ntypes*ntypes)]
+                ccoef = [0 for i in range(ntypes * ntypes)]
                 parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
             if has1012:
-                ahcoef = [0 for i in range(ntypes*ntypes)]
+                ahcoef = [0 for i in range(ntypes * ntypes)]
                 bhcoef = ahcoef[:]
                 parm_ahcoef = self.parm_data['HBOND_ACOEF']
                 parm_bhcoef = self.parm_data['HBOND_BCOEF']
@@ -1153,28 +1177,29 @@ class AmberParm(AmberFormat, Structure):
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             for i in range(ntypes):
                 for j in range(ntypes):
-                    idx = nbidx[ntypes*i+j] - 1
+                    idx = nbidx[ntypes * i + j] - 1
                     if idx < 0 and has1012:
-                        idx = -idx - 2 # Fix adjust for 0 since it was negative
-                        ahcoef[i+ntypes*j] = parm_ahcoef[idx] * ahfac
-                        bhcoef[i+ntypes*j] = parm_bhcoef[idx] * bhfac
+                        # Fix adjust for 0 since it was negative
+                        idx = -idx - 2
+                        ahcoef[i + ntypes * j] = parm_ahcoef[idx] * ahfac
+                        bhcoef[i + ntypes * j] = parm_bhcoef[idx] * bhfac
                         if has1264:
-                            ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+                            ccoef[i + ntypes * j] = parm_ccoef[idx] * cfac
                     elif idx > 0:
                         if has1264:
-                            ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+                            ccoef[i + ntypes * j] = parm_ccoef[idx] * cfac
             if has1264:
                 force.addTabulatedFunction('ccoef',
-                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+                                           mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Copy the exclusions
             for ii in range(nonbfrc.getNumExceptions()):
                 i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
                 force.addExclusion(i, j)
         if has1012:
             force.addTabulatedFunction('ahcoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, ahcoef))
+                                       mm.Discrete2DFunction(ntypes, ntypes, ahcoef))
             force.addTabulatedFunction('bhcoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, bhcoef))
+                                       mm.Discrete2DFunction(ntypes, ntypes, bhcoef))
         # Copy the switching function information to the CustomNonbondedForce
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -1289,10 +1314,11 @@ class AmberParm(AmberFormat, Structure):
         AmberError if any of the lengths are incorrect
         """
         def check_length(key, length, required=True):
-            if not required and key not in self.parm_data: return
+            if not required and key not in self.parm_data:
+                return
             if len(self.parm_data[key]) != length:
                 raise AmberError('FLAG %s has %d elements; expected %d' %
-                                     (key, len(self.parm_data[key]), length))
+                                 (key, len(self.parm_data[key]), length))
         natom = self.ptr('NATOM')
         check_length('ATOM_NAME', natom)
         check_length('CHARGE', natom)
@@ -1306,10 +1332,10 @@ class AmberParm(AmberFormat, Structure):
         check_length('ATOMIC_NUMBER', natom, False)
 
         ntypes = self.ptr('NTYPES')
-        check_length('NONBONDED_PARM_INDEX', ntypes*ntypes)
-        check_length('LENNARD_JONES_ACOEF', ntypes*(ntypes+1)//2)
-        check_length('LENNARD_JONES_BCOEF', ntypes*(ntypes+1)//2)
-        check_length('LENNARD_JONES_CCOEF', ntypes*(ntypes+1)//2, False)
+        check_length('NONBONDED_PARM_INDEX', ntypes * ntypes)
+        check_length('LENNARD_JONES_ACOEF', ntypes * (ntypes + 1) // 2)
+        check_length('LENNARD_JONES_BCOEF', ntypes * (ntypes + 1) // 2)
+        check_length('LENNARD_JONES_CCOEF', ntypes * (ntypes + 1) // 2, False)
 
         nres = self.ptr('NRES')
         check_length('RESIDUE_LABEL', nres)
@@ -1328,12 +1354,12 @@ class AmberParm(AmberFormat, Structure):
         check_length('SCEE_SCALE_FACTOR', self.ptr('NPTRA'), False)
         check_length('SCNB_SCALE_FACTOR', self.ptr('NPTRA'), False)
         check_length('SOLTY', self.ptr('NATYP'))
-        check_length('BONDS_INC_HYDROGEN', self.ptr('NBONH')*3)
-        check_length('BONDS_WITHOUT_HYDROGEN', self.ptr('MBONA')*3)
-        check_length('ANGLES_INC_HYDROGEN', self.ptr('NTHETH')*4)
-        check_length('ANGLES_WITHOUT_HYDROGEN', self.ptr('NTHETA')*4)
-        check_length('DIHEDRALS_INC_HYDROGEN', self.ptr('NPHIH')*5)
-        check_length('DIHEDRALS_WITHOUT_HYDROGEN', self.ptr('NPHIA')*5)
+        check_length('BONDS_INC_HYDROGEN', self.ptr('NBONH') * 3)
+        check_length('BONDS_WITHOUT_HYDROGEN', self.ptr('MBONA') * 3)
+        check_length('ANGLES_INC_HYDROGEN', self.ptr('NTHETH') * 4)
+        check_length('ANGLES_WITHOUT_HYDROGEN', self.ptr('NTHETA') * 4)
+        check_length('DIHEDRALS_INC_HYDROGEN', self.ptr('NPHIH') * 5)
+        check_length('DIHEDRALS_WITHOUT_HYDROGEN', self.ptr('NPHIA') * 5)
         check_length('HBOND_ACOEF', self.ptr('NPHB'))
         check_length('HBOND_BCOEF', self.ptr('NPHB'))
         check_length('SOLVENT_POINTERS', 3, False)
@@ -1352,7 +1378,7 @@ class AmberParm(AmberFormat, Structure):
         del self.atoms[:]
         # Figure out on which atoms the residues start and stop
         natom = self.parm_data['POINTERS'][NATOM]
-        res_ptr = self.parm_data['RESIDUE_POINTER'] + [natom+1]
+        res_ptr = self.parm_data['RESIDUE_POINTER'] + [natom + 1]
         try:
             atnums = self.parm_data['ATOMIC_NUMBER']
         except KeyError:
@@ -1367,7 +1393,7 @@ class AmberParm(AmberFormat, Structure):
             res_chn = ['' for i in range(self.parm_data['POINTERS'][NRES])]
         for i, resname in enumerate(self.parm_data['RESIDUE_LABEL']):
             resstart = res_ptr[i] - 1
-            resend = res_ptr[i+1] - 1
+            resend = res_ptr[i + 1] - 1
             for j in range(resstart, resend):
                 if atnums is None:
                     if self.parm_data['AMBER_ATOM_TYPE'][j] in ('EP', 'LP'):
@@ -1404,18 +1430,20 @@ class AmberParm(AmberFormat, Structure):
                             atom._exclusion_partners)
             nexcl = num_excluded[i]
             for j in range(first_excl, nexcl):
-                exclusions.add(self.atoms[excluded_list[j]-1])
+                exclusions.add(self.atoms[excluded_list[j] - 1])
             for eatom in exclusions - bond_excl:
                 atom.exclude(eatom)
             first_excl += nexcl
         # Do the extra points after all of the exclusions have been loaded to
         # make sure the lists are all up-to-date.
         for i, atom in enumerate(self.atoms):
-            if atom.atomic_number > 0: continue
+            if atom.atomic_number > 0:
+                continue
             # This is an extra point -- exclude accordingly
             real_atom = atom.bond_partners[0]
             for atom2 in real_atom.bond_partners:
-                if atom2 is atom: continue
+                if atom2 is atom:
+                    continue
                 atom.bond_to(atom2)
             for atom2 in real_atom.angle_partners:
                 atom.angle_to(atom2)
@@ -1437,14 +1465,14 @@ class AmberParm(AmberFormat, Structure):
         it = iter(self.parm_data['BONDS_WITHOUT_HYDROGEN'])
         for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[i//3], self.atoms[j//3],
-                         self.bond_types[k-1])
+                Bond(self.atoms[i // 3], self.atoms[j // 3],
+                     self.bond_types[k - 1])
             )
         it = iter(self.parm_data['BONDS_INC_HYDROGEN'])
         for i, j, k in zip(it, it, it):
             self.bonds.append(
-                    Bond(self.atoms[i//3], self.atoms[j//3],
-                         self.bond_types[k-1])
+                Bond(self.atoms[i // 3], self.atoms[j // 3],
+                     self.bond_types[k - 1])
             )
 
     #===================================================
@@ -1460,14 +1488,14 @@ class AmberParm(AmberFormat, Structure):
         it = iter(self.parm_data['ANGLES_WITHOUT_HYDROGEN'])
         for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[i//3], self.atoms[j//3], self.atoms[k//3],
-                          self.angle_types[l-1])
+                Angle(self.atoms[i // 3], self.atoms[j // 3], self.atoms[k // 3],
+                      self.angle_types[l - 1])
             )
         it = iter(self.parm_data['ANGLES_INC_HYDROGEN'])
         for i, j, k, l in zip(it, it, it, it):
             self.angles.append(
-                    Angle(self.atoms[i//3], self.atoms[j//3], self.atoms[k//3],
-                          self.angle_types[l-1])
+                Angle(self.atoms[i // 3], self.atoms[j // 3], self.atoms[k // 3],
+                      self.angle_types[l - 1])
             )
 
     #===================================================
@@ -1490,27 +1518,27 @@ class AmberParm(AmberFormat, Structure):
                                     scee, scnb):
             ph *= RAD_TO_DEG
             self.dihedral_types.append(
-                    DihedralType(k, per, ph, e, n, list=self.dihedral_types)
+                DihedralType(k, per, ph, e, n, list=self.dihedral_types)
             )
         it = iter(self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'])
         for i, j, k, l, m in zip(it, it, it, it, it):
             ignore_end = k < 0
             improper = l < 0
             self.dihedrals.append(
-                    Dihedral(self.atoms[i//3], self.atoms[j//3],
-                             self.atoms[abs(k)//3], self.atoms[abs(l)//3],
-                             improper=improper, ignore_end=ignore_end,
-                             type=self.dihedral_types[m-1])
+                Dihedral(self.atoms[i // 3], self.atoms[j // 3],
+                         self.atoms[abs(k) // 3], self.atoms[abs(l) // 3],
+                         improper=improper, ignore_end=ignore_end,
+                         type=self.dihedral_types[m - 1])
             )
         it = iter(self.parm_data['DIHEDRALS_INC_HYDROGEN'])
         for i, j, k, l, m in zip(it, it, it, it, it):
             ignore_end = k < 0
             improper = l < 0
             self.dihedrals.append(
-                    Dihedral(self.atoms[i//3], self.atoms[j//3],
-                             self.atoms[abs(k)//3], self.atoms[abs(l)//3],
-                             improper=improper, ignore_end=ignore_end,
-                             type=self.dihedral_types[m-1])
+                Dihedral(self.atoms[i // 3], self.atoms[j // 3],
+                         self.atoms[abs(k) // 3], self.atoms[abs(l) // 3],
+                         improper=improper, ignore_end=ignore_end,
+                         type=self.dihedral_types[m - 1])
             )
 
     #===================================================
@@ -1530,7 +1558,8 @@ class AmberParm(AmberFormat, Structure):
         data['MASS'] = [atom.mass for atom in self.atoms]
         data['ATOM_TYPE_INDEX'] = [atom.nb_idx for atom in self.atoms]
         data['JOIN_ARRAY'] = [atom.join for atom in self.atoms]
-        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree[:4] for atom in self.atoms]
+        data['TREE_CHAIN_CLASSIFICATION'] = [atom.tree[:4]
+                                             for atom in self.atoms]
         data['IROTAT'] = [atom.irotat for atom in self.atoms]
         data['NUMBER_EXCLUDED_ATOMS'] = [0 for atom in self.atoms]
         if 'RADII' in data:
@@ -1573,7 +1602,8 @@ class AmberParm(AmberFormat, Structure):
         data['POINTERS'][NRES] = nres
         self.pointers['NRES'] = nres
         data['RESIDUE_LABEL'] = [res.name[:4] for res in self.residues]
-        data['RESIDUE_POINTER'] = [res.atoms[0].idx+1 for res in self.residues]
+        data['RESIDUE_POINTER'] = [
+            res.atoms[0].idx + 1 for res in self.residues]
         if 'RESIDUE_NUMBER' in data:
             data['RESIDUE_NUMBER'] = [res.number for res in self.residues]
         if 'RESIDUE_CHAINID' in data:
@@ -1606,15 +1636,15 @@ class AmberParm(AmberFormat, Structure):
         data['BONDS_INC_HYDROGEN'] = bond_array = []
         bond_list = list(self.bonds_inc_h)
         for bond in bond_list:
-            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx * 3, bond.atom2.idx * 3,
+                               bond.type.idx + 1])
         data['POINTERS'][NBONH] = len(bond_list)
         self.pointers['NBONH'] = len(bond_list)
         data['BONDS_WITHOUT_HYDROGEN'] = bond_array = []
         bond_list = list(self.bonds_without_h)
         for bond in bond_list:
-            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx * 3, bond.atom2.idx * 3,
+                               bond.type.idx + 1])
         data['POINTERS'][MBONA] = data['POINTERS'][NBONA] = len(bond_list)
         self.pointers['MBONA'] = self.pointers['NBONA'] = len(bond_list)
 
@@ -1633,23 +1663,23 @@ class AmberParm(AmberFormat, Structure):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
-        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD
-                                        for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq * DEG_TO_RAD
+                                     for type in self.angle_types]
         data['POINTERS'][NUMANG] = len(self.angle_types)
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
         data['ANGLES_INC_HYDROGEN'] = angle_array = []
         angle_list = list(self.angles_inc_h)
         for angle in angle_list:
-            angle_array.extend([angle.atom1.idx*3, angle.atom2.idx*3,
-                                angle.atom3.idx*3, angle.type.idx+1])
+            angle_array.extend([angle.atom1.idx * 3, angle.atom2.idx * 3,
+                                angle.atom3.idx * 3, angle.type.idx + 1])
         data['POINTERS'][NTHETH] = len(angle_list)
         self.pointers['NTHETH'] = len(angle_list)
         data['ANGLES_WITHOUT_HYDROGEN'] = angle_array = []
         angle_list = list(self.angles_without_h)
         for angle in angle_list:
-            angle_array.extend([angle.atom1.idx*3, angle.atom2.idx*3,
-                                angle.atom3.idx*3, angle.type.idx+1])
+            angle_array.extend([angle.atom1.idx * 3, angle.atom2.idx * 3,
+                                angle.atom3.idx * 3, angle.type.idx + 1])
         data['POINTERS'][NTHETA] = data['POINTERS'][MTHETA] = len(angle_list)
         self.pointers['NTHETA'] = self.pointers['MTHETA'] = len(angle_list)
 
@@ -1668,17 +1698,17 @@ class AmberParm(AmberFormat, Structure):
             dihed.type.used = True
         self.dihedral_types.prune_unused()
         data['DIHEDRAL_FORCE_CONSTANT'] = \
-                    [type.phi_k for type in self.dihedral_types]
+            [type.phi_k for type in self.dihedral_types]
         data['DIHEDRAL_PERIODICITY'] = \
-                    [type.per for type in self.dihedral_types]
+            [type.per for type in self.dihedral_types]
         data['DIHEDRAL_PHASE'] = \
-                    [type.phase*DEG_TO_RAD for type in self.dihedral_types]
+            [type.phase * DEG_TO_RAD for type in self.dihedral_types]
         if 'SCEE_SCALE_FACTOR' in data:
             data['SCEE_SCALE_FACTOR'] = \
-                    [type.scee for type in self.dihedral_types]
+                [type.scee for type in self.dihedral_types]
         if 'SCNB_SCALE_FACTOR' in data:
             data['SCNB_SCALE_FACTOR'] = \
-                    [type.scnb for type in self.dihedral_types]
+                [type.scnb for type in self.dihedral_types]
         data['POINTERS'][NPTRA] = len(self.dihedral_types)
         self.pointers['NPTRA'] = len(self.dihedral_types)
         # Now do the dihedral arrays
@@ -1686,30 +1716,30 @@ class AmberParm(AmberFormat, Structure):
         dihed_list = list(self.dihedrals_inc_h)
         for dihed in dihed_list:
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
-                dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*dihed.signs[0],
-                                    dihed.atom1.idx*3*dihed.signs[1],
-                                    dihed.type.idx+1])
+                dihed_array.extend([dihed.atom4.idx * 3, dihed.atom3.idx * 3,
+                                    dihed.atom2.idx * 3 * dihed.signs[0],
+                                    dihed.atom1.idx * 3 * dihed.signs[1],
+                                    dihed.type.idx + 1])
             else:
-                dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*dihed.signs[0],
-                                    dihed.atom4.idx*3*dihed.signs[1],
-                                    dihed.type.idx+1])
+                dihed_array.extend([dihed.atom1.idx * 3, dihed.atom2.idx * 3,
+                                    dihed.atom3.idx * 3 * dihed.signs[0],
+                                    dihed.atom4.idx * 3 * dihed.signs[1],
+                                    dihed.type.idx + 1])
         data['POINTERS'][NPHIH] = len(dihed_list)
         self.pointers['NPHIH'] = len(dihed_list)
         data['DIHEDRALS_WITHOUT_HYDROGEN'] = dihed_array = []
         dihed_list = list(self.dihedrals_without_h)
         for dihed in dihed_list:
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
-                dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*dihed.signs[0],
-                                    dihed.atom1.idx*3*dihed.signs[1],
-                                    dihed.type.idx+1])
+                dihed_array.extend([dihed.atom4.idx * 3, dihed.atom3.idx * 3,
+                                    dihed.atom2.idx * 3 * dihed.signs[0],
+                                    dihed.atom1.idx * 3 * dihed.signs[1],
+                                    dihed.type.idx + 1])
             else:
-                dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*dihed.signs[0],
-                                    dihed.atom4.idx*3*dihed.signs[1],
-                                    dihed.type.idx+1])
+                dihed_array.extend([dihed.atom1.idx * 3, dihed.atom2.idx * 3,
+                                    dihed.atom3.idx * 3 * dihed.signs[0],
+                                    dihed.atom4.idx * 3 * dihed.signs[1],
+                                    dihed.type.idx + 1])
         data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = len(dihed_list)
         self.pointers['NPHIA'] = self.pointers['MPHIA'] = len(dihed_list)
 
@@ -1778,14 +1808,14 @@ class AmberParm(AmberFormat, Structure):
         holder = [0 for i in range(ntypes2)]
         idx = 0
         for i in range(ntypes):
-            for j in range(i+1):
+            for j in range(i + 1):
                 idx += 1
-                holder[ntypes*i+j] = holder[ntypes*j+i] = idx
+                holder[ntypes * i + j] = holder[ntypes * j + i] = idx
         idx = 0
         for i in range(ntypes):
             for j in range(ntypes):
                 self.parm_data['NONBONDED_PARM_INDEX'][idx] = \
-                            holder[ntypes*i+j]
+                    holder[ntypes * i + j]
                 idx += 1
         nttyp = ntypes * (ntypes + 1) // 2
         # Now build the Lennard-Jones arrays
@@ -1797,12 +1827,14 @@ class AmberParm(AmberFormat, Structure):
             for i, fix in enumerate(nbfixes):
                 for terms in fix:
                     j, rmin, eps, rmin14, eps14 = terms
-                    i, j = min(i, j-1), max(i, j-1)
+                    i, j = min(i, j - 1), max(i, j - 1)
                     eps = abs(eps)
                     eps14 = abs(eps14)
-                    idx = self.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    idx = self.parm_data['NONBONDED_PARM_INDEX'][
+                        ntypes * i + j] - 1
                     self.parm_data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
-                    self.parm_data['LENNARD_JONES_BCOEF'][idx] = 2*eps * rmin**6
+                    self.parm_data['LENNARD_JONES_BCOEF'][
+                        idx] = 2 * eps * rmin**6
 
     #===================================================
 
@@ -1826,7 +1858,7 @@ class AmberParm(AmberFormat, Structure):
             bcoef = self.parm_data['LENNARD_JONES_BCOEF']
         nbidx = self.parm_data['NONBONDED_PARM_INDEX']
         ntypes = self.parm_data['POINTERS'][NTYPES]
-        sigma_scale = 2**(-1/6) * length_conv
+        sigma_scale = 2**(-1 / 6) * length_conv
         for ii in range(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
             if qq == 0 and (ss == 0 or ee == 0):
@@ -1838,12 +1870,13 @@ class AmberParm(AmberFormat, Structure):
             unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
                                self.atoms[j].epsilon_14) * ene_conv
             try:
-                one_scnb = ee.value_in_unit(u.kilojoules_per_mole) / unscaled_ee
+                one_scnb = ee.value_in_unit(
+                    u.kilojoules_per_mole) / unscaled_ee
             except ZeroDivisionError:
                 one_scnb = 1
             id1 = atoms[i].nb_idx - 1
             id2 = atoms[j].nb_idx - 1
-            idx = nbidx[ntypes*id1+id2] - 1
+            idx = nbidx[ntypes * id1 + id2] - 1
             if idx >= 0:
                 a = acoef[idx]
                 b = bcoef[idx]
@@ -1854,7 +1887,7 @@ class AmberParm(AmberFormat, Structure):
                 sigma = 0.5
             elif idx >= 0:
                 # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
-                rmin = (a / b * 2)**(1/6)
+                rmin = (a / b * 2)**(1 / 6)
                 epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
@@ -1889,7 +1922,8 @@ class AmberParm(AmberFormat, Structure):
         if not self.adjusts:
             scalings = defaultdict(int)
             for dih in self.dihedrals:
-                if dih.ignore_end or dih.improper: continue
+                if dih.ignore_end or dih.improper:
+                    continue
                 scalings[(dih.type.scee, dih.type.scnb)] += 1
             if len(scalings) > 0:
                 maxkey, maxval = next(iteritems(scalings))
@@ -1910,9 +1944,11 @@ class AmberParm(AmberFormat, Structure):
             # Scan through existing dihedrals to make sure the exceptions match
             # the dihedral list
             for dihedral in self.dihedrals:
-                if dihedral.ignore_end: continue
+                if dihedral.ignore_end:
+                    continue
                 key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
-                eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
+                eref = sqrt(
+                    dihedral.atom1.epsilon_14 * dihedral.atom4.epsilon_14)
                 rref = dihedral.atom1.rmin_14 + dihedral.atom4.rmin_14
                 if key in adjust_dict:
                     pair = adjust_dict[key]
@@ -1946,13 +1982,17 @@ class AmberParm(AmberFormat, Structure):
 
         n13 = n14 = 0
         for atom in self.atoms:
-            if isinstance(atom, ExtraPoint): continue
+            if isinstance(atom, ExtraPoint):
+                continue
             for batom in atom.bond_partners:
-                if isinstance(batom, ExtraPoint): continue
+                if isinstance(batom, ExtraPoint):
+                    continue
                 for aatom in batom.bond_partners:
-                    if isinstance(aatom, ExtraPoint) or aatom is atom: continue
+                    if isinstance(aatom, ExtraPoint) or aatom is atom:
+                        continue
                     for datom in aatom.bond_partners:
-                        if isinstance(datom, ExtraPoint): continue
+                        if isinstance(datom, ExtraPoint):
+                            continue
                         if (datom in atom.angle_partners + atom.bond_partners +
                                 atom.dihedral_partners or datom is atom):
                             continue
@@ -1977,8 +2017,8 @@ class AmberParm(AmberFormat, Structure):
                                     adjust_dict[key].type.chgscale == 0:
                                 if ignored_torsion is None:
                                     ignored_torsion = \
-                                            DihedralType(0, 1, 0, 1e10, 1e10,
-                                                    list=self.dihedral_types)
+                                        DihedralType(0, 1, 0, 1e10, 1e10,
+                                                     list=self.dihedral_types)
                                     self.dihedral_types.append(ignored_torsion)
                                 tortype = ignored_torsion
                             else:
@@ -1987,7 +2027,7 @@ class AmberParm(AmberFormat, Structure):
                                 rmin = pair.type.rmin
                                 # Compare it to the 1-4 parameters that are
                                 # already present
-                                eref = sqrt(pair.atom1.epsilon_14*
+                                eref = sqrt(pair.atom1.epsilon_14 *
                                             pair.atom2.epsilon_14)
                                 if pair.type.epsilon == 0:
                                     scnb = 1e10
@@ -2003,7 +2043,7 @@ class AmberParm(AmberFormat, Structure):
                                         scnb = 1.0
                                     else:
                                         raise TypeError(
-                                                'Cannot translate exceptions'
+                                            'Cannot translate exceptions'
                                         )
                                 tortype = DihedralType(0, 1, 0, scee, scnb,
                                                        list=self.dihedral_types)
@@ -2022,7 +2062,7 @@ class AmberParm(AmberFormat, Structure):
         if n13:
             self.angle_types.append(zero_angle)
             zero_angle.list = self.angle_types
-        if n14: # See if there is some ambiguity here
+        if n14:  # See if there is some ambiguity here
             if not self.adjusts and len(scalings) > 1:
                 warn('Multiple 1-4 scaling factors detected. Using the '
                      'most-used values scee=%f scnb=%f' % (scee, scnb),
@@ -2031,7 +2071,9 @@ class AmberParm(AmberFormat, Structure):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class Rst7(object):
+
     """
     Amber input coordinate (or restart coordinate) file. Front-end for the
     readers and writers, supports both NetCDF and ASCII restarts.
@@ -2071,7 +2113,7 @@ class Rst7(object):
     @classmethod
     def open(cls, filename):
         """ Constructor that opens and parses an input coordinate file
-        
+
         Parameters
         ----------
         filename : str
@@ -2116,7 +2158,7 @@ class Rst7(object):
         warn('coords attribute of Rst7 is deprecated. Use coordinates instead',
              DeprecationWarning)
         return self.coordinates
-   
+
     @classmethod
     def copy_from(cls, thing):
         """
@@ -2127,8 +2169,10 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        if hasattr(thing, 'vels'): inst.vels = copy.deepcopy(thing.vels)
-        if hasattr(thing, 'box'): inst.box = copy.deepcopy(thing.box)
+        if hasattr(thing, 'vels'):
+            inst.vels = copy.deepcopy(thing.vels)
+        if hasattr(thing, 'box'):
+            inst.box = copy.deepcopy(thing.box)
         inst.time = thing.time
 
         return inst
@@ -2166,8 +2210,8 @@ class Rst7(object):
             return [Vec3(*x) for x in coordinates] * u.angstroms
         except AttributeError:
             natom3 = self.natom * 3
-            return ([Vec3(*self.coordinates[i:i+3]) for i in range(0,natom3,3)]
-                        * u.angstroms)
+            return ([Vec3(*self.coordinates[i:i + 3]) for i in range(0, natom3, 3)]
+                    * u.angstroms)
 
     @property
     def velocities(self):
@@ -2177,7 +2221,8 @@ class Rst7(object):
     @property
     def box_vectors(self):
         """ Unit cell vectors with units """
-        if self.box is None: return None
+        if self.box is None:
+            return None
         return box_lengths_and_angles_to_vectors(*self.box)
 
     @property
@@ -2199,6 +2244,7 @@ class Rst7(object):
             return True
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def set_molecules(parm):
     """
@@ -2226,12 +2272,12 @@ def set_molecules(parm):
     owner = []
     # The way I do this is via a recursive algorithm, in which
     # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and 
+    # has, which in turn calls set_owner for each of its partners and
     # so on until everything has been assigned.
-    molecule_number = 1 # which molecule number we are on
+    molecule_number = 1  # which molecule number we are on
     for i, atom in enumerate(parm.atoms):
         # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if 
+        # However, we only increment which molecule number we're on if
         # we actually assigned a new molecule (obviously)
         if not atom.marked:
             tmp = set()
@@ -2244,6 +2290,7 @@ def set_molecules(parm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 def _set_owner(parm, owner_array, atm, mol_id):
     """ Recursively sets ownership of given atom and all bonded partners """
     parm.atoms[atm].marked = mol_id
@@ -2252,10 +2299,11 @@ def _set_owner(parm, owner_array, atm, mol_id):
             owner_array.add(partner.idx)
             _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
+            raise MoleculeError('Atom %d in multiple molecules' %
                                 partner.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def _zeros(length):
     """ Returns an array of zeros of the given length """

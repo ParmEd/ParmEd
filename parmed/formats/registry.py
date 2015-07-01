@@ -24,7 +24,9 @@ import os
 PARSER_REGISTRY = dict()
 PARSER_ARGUMENTS = dict()
 
+
 class FileFormatType(type):
+
     """
     Metaclass for registering parsers for different formats of different types
     of files.
@@ -51,6 +53,7 @@ class FileFormatType(type):
             else:
                 PARSER_ARGUMENTS[name] = ()
         super(FileFormatType, cls).__init__(name, bases, dct)
+
 
 def load_file(filename, *args, **kwargs):
     """

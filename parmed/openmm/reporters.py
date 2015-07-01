@@ -16,7 +16,9 @@ from time import time
 VELUNIT = u.angstrom / u.picosecond
 FRCUNIT = u.kilocalorie_per_mole / u.angstrom
 
+
 class StateDataReporter(object):
+
     """
     This class acts as a state data reporter for OpenMM simulations, but it is a
     little more generalized. Notable differences are:
@@ -29,7 +31,7 @@ class StateDataReporter(object):
 
     Most of this code is copied from the OpenMM StateDataReporter class, with
     the above-mentioned changes made.
-    
+
     Parameters
     ----------
     f : str or file-like
@@ -77,7 +79,7 @@ class StateDataReporter(object):
                  temperature=True, volume=False, density=False, separator=',',
                  systemMass=None, energyUnit=u.kilocalories_per_mole,
                  timeUnit=u.picoseconds, volumeUnit=u.angstroms**3,
-                 densityUnit=u.grams/u.item/u.milliliter):
+                 densityUnit=u.grams / u.item / u.milliliter):
         self._reportInterval = reportInterval
         self._openedFile = not hasattr(f, 'write')
         if self._openedFile:
@@ -139,7 +141,8 @@ class StateDataReporter(object):
         if not self._hasInitialized:
             self._initializeConstants(simulation)
             headers = self._constructHeaders()
-            self._out.write('#"%s"\n' % ('"'+self._separator+'"').join(headers))
+            self._out.write('#"%s"\n' %
+                            ('"' + self._separator + '"').join(headers))
             self._hasInitialized = True
 
         # Check for errors.
@@ -211,7 +214,7 @@ class StateDataReporter(object):
             # Compute the number of degrees of freedom.
             dof = 0
             for i in range(system.getNumParticles()):
-                if system.getParticleMass(i) > 0*u.dalton:
+                if system.getParticleMass(i) > 0 * u.dalton:
                     dof += 3
             dof -= system.getNumConstraints()
             if any(isinstance(frc, mm.CMMotionRemover) for frc in frclist):
@@ -220,11 +223,11 @@ class StateDataReporter(object):
         if self._density:
             if self._totalMass is None:
                 # Compute the total system mass.
-                self._totalMass = 0*u.dalton
+                self._totalMass = 0 * u.dalton
                 for i in range(system.getNumParticles()):
                     self._totalMass += system.getParticleMass(i)
             elif not u.is_quantity(self._totalMass):
-                self._totalMass = self._totalMass*u.dalton
+                self._totalMass = self._totalMass * u.dalton
 
     def _constructHeaders(self):
         """Construct the headers for the CSV output
@@ -280,7 +283,9 @@ class StateDataReporter(object):
         except NameError:
             pass
 
+
 class NetCDFReporter(object):
+
     """ NetCDFReporter prints a trajectory in NetCDF format """
 
     @needs_openmm
@@ -310,7 +315,7 @@ class NetCDFReporter(object):
             raise ValueError('Cannot write a trajectory without coordinates, '
                              'velocities, or forces! Pick at least one.')
         self._reportInterval = reportInterval
-        self._out = None # not written yet
+        self._out = None  # not written yet
         self.fname = file
 
     def describeNextReport(self, simulation):
@@ -332,7 +337,6 @@ class NetCDFReporter(object):
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
         return (steps, self.crds, self.vels, self.frcs, False)
-
 
     def report(self, simulation, state):
         """Generate a report.
@@ -359,10 +363,11 @@ class NetCDFReporter(object):
                 atom = len(vels)
             elif self.frcs:
                 atom = len(frcs)
-            self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
+            self.uses_pbc = simulation.topology.getUnitCellDimensions(
+            ) is not None
             self._out = NetCDFTraj.open_new(
-                    self.fname, atom, self.uses_pbc, self.crds, self.vels,
-                    self.frcs, title="ParmEd-created trajectory using OpenMM"
+                self.fname, atom, self.uses_pbc, self.crds, self.vels,
+                self.frcs, title="ParmEd-created trajectory using OpenMM"
             )
         if self.uses_pbc:
             vecs = state.getPeriodicBoxVectors()
@@ -396,7 +401,9 @@ class NetCDFReporter(object):
         except NameError:
             pass
 
+
 class MdcrdReporter(object):
+
     """
     MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will
     be significantly slower than binary file reporters (like DCDReporter or
@@ -425,16 +432,19 @@ class MdcrdReporter(object):
     def __init__(self, file, reportInterval, crds=True, vels=False, frcs=False):
         # ASCII mdcrds can have either coordinates, forces, or velocities
         ntrue = 0
-        if crds: ntrue += 1
-        if vels: ntrue += 1
-        if frcs: ntrue += 1
+        if crds:
+            ntrue += 1
+        if vels:
+            ntrue += 1
+        if frcs:
+            ntrue += 1
         if ntrue != 1:
             raise ValueError('MdcrdReporter must print exactly one of either '
                              'coordinates, velocities, or forces.')
         # Control flags
         self.crds, self.vels, self.frcs = crds, vels, frcs
         self._reportInterval = reportInterval
-        self._out = None # not written yet
+        self._out = None  # not written yet
         self.fname = file
 
     def describeNextReport(self, simulation):
@@ -469,7 +479,7 @@ class MdcrdReporter(object):
         global VELUNIT, FRCUNIT
         if self.crds:
             crds = state.getPositions().value_in_unit(u.angstrom)
-        elif self.vels: # crds/vels/frcs are exclusive, elif works
+        elif self.vels:  # crds/vels/frcs are exclusive, elif works
             vels = state.getVelocities().value_in_unit(VELUNIT)
         elif self.frcs:
             frcs = state.getForces().value_in_unit(FRCUNIT)
@@ -481,32 +491,33 @@ class MdcrdReporter(object):
                 self.atom = len(vels)
             elif self.frcs:
                 self.atom = len(frcs)
-            self.uses_pbc = simulation.topology.getUnitCellDimensions() is not None
+            self.uses_pbc = simulation.topology.getUnitCellDimensions(
+            ) is not None
             self._out = AmberMdcrd(self.fname, self.atom, self.uses_pbc,
-                    title="ParmEd-created trajectory using OpenMM", mode='w')
+                                   title="ParmEd-created trajectory using OpenMM", mode='w')
 
         # Add the coordinates, velocities, and/or forces as needed
         if self.crds:
-            flatcrd = [0 for i in range(self.atom*3)]
+            flatcrd = [0 for i in range(self.atom * 3)]
             for i in range(self.atom):
-                i3 = i*3
-                flatcrd[i3], flatcrd[i3+1], flatcrd[i3+2] = crds[i]
+                i3 = i * 3
+                flatcrd[i3], flatcrd[i3 + 1], flatcrd[i3 + 2] = crds[i]
             self._out.add_coordinates(flatcrd)
         if self.vels:
             # Divide by the scaling factor (works if vels is a list of Vec3's)
             # This is necessary since AmberMdcrd does not scale before writing
             # (since it expects coordinates)
             vels = [v / VELSCALE for v in vels]
-            flatvel = [0 for i in range(self.atom*3)]
+            flatvel = [0 for i in range(self.atom * 3)]
             for i in range(self.atom):
-                i3 = i*3
-                flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
+                i3 = i * 3
+                flatvel[i3], flatvel[i3 + 1], flatvel[i3 + 2] = vels[i]
             self._out.add_coordinates(flatvel)
         if self.frcs:
-            flatfrc = [0 for i in range(self.atom*3)]
+            flatfrc = [0 for i in range(self.atom * 3)]
             for i in range(self.atom):
-                i3 = i*3
-                flatfrc[i3], flatfrc[i3+1], flatfrc[i3+2] = frcs[i]
+                i3 = i * 3
+                flatfrc[i3], flatfrc[i3 + 1], flatfrc[i3 + 2] = frcs[i]
             self._out.add_coordinates(flatfrc)
         # Now it's time to add the box lengths
         if self.uses_pbc:
@@ -529,7 +540,9 @@ class MdcrdReporter(object):
         except NameError:
             pass
 
+
 class RestartReporter(object):
+
     """
     Use a reporter to handle writing restarts at specified intervals.
 
@@ -549,7 +562,7 @@ class RestartReporter(object):
         Write velocities to the restart file. You can turn this off for passing
         in, for instance, a minimized structure.
     """
-   
+
     @needs_openmm
     def __init__(self, file, reportInterval, write_multiple=False, netcdf=False,
                  write_velocities=True):
@@ -599,18 +612,18 @@ class RestartReporter(object):
             self.rst7 = Rst7(natom=self.atom,
                              title='Restart file written by ParmEd with OpenMM')
         self.rst7.time = state.getTime().value_in_unit(u.picosecond)
-        flatcrd = [0.0 for i in range(self.atom*3)]
+        flatcrd = [0.0 for i in range(self.atom * 3)]
         for i in range(self.atom):
-            i3 = i*3
-            flatcrd[i3], flatcrd[i3+1], flatcrd[i3+2] = crds[i]
+            i3 = i * 3
+            flatcrd[i3], flatcrd[i3 + 1], flatcrd[i3 + 2] = crds[i]
         self.rst7.coordinates = flatcrd
 
         if self.write_velocities:
             vels = state.getVelocities().value_in_unit(VELUNIT)
-            flatvel = [0.0 for i in range(self.atom*3)]
+            flatvel = [0.0 for i in range(self.atom * 3)]
             for i in range(self.atom):
-                i3 = i*3
-                flatvel[i3], flatvel[i3+1], flatvel[i3+2] = vels[i]
+                i3 = i * 3
+                flatvel[i3], flatvel[i3 + 1], flatvel[i3 + 2] = vels[i]
             self.rst7.vels = flatvel
 
         if self.uses_pbc:
@@ -632,7 +645,9 @@ class RestartReporter(object):
         """ No-op here """
         pass
 
+
 class ProgressReporter(StateDataReporter):
+
     """
     A class that prints out a progress report of how much MD (or minimization)
     has been done, how fast the simulation is running, and how much time is left
@@ -678,10 +693,10 @@ class ProgressReporter(StateDataReporter):
         # a bad thing, but also prepares it for reports
         kwargs['time'] = kwargs['step'] = True
         super(ProgressReporter, self).__init__(
-                f, reportInterval, potentialEnergy=potentialEnergy,
-                kineticEnergy=kineticEnergy, totalEnergy=totalEnergy,
-                temperature=temperature, volume=volume, density=density,
-                systemMass=systemMass, **kwargs
+            f, reportInterval, potentialEnergy=potentialEnergy,
+            kineticEnergy=kineticEnergy, totalEnergy=totalEnergy,
+            temperature=temperature, volume=volume, density=density,
+            systemMass=systemMass, **kwargs
         )
         if not self._openedFile:
             raise ValueError('ProgressReporter requires a file name '
@@ -723,7 +738,7 @@ class ProgressReporter(StateDataReporter):
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
         return (steps, False, False, False, self._needEnergy)
-   
+
     def report(self, simulation, state):
         """
         Generate a report and predict the time to completion (and
@@ -746,8 +761,9 @@ class ProgressReporter(StateDataReporter):
         self._lastReportTime = now
 
         total_nsperday = ((values['step'] - self._firstStep) * self._timeStep /
-                           total_time)
-        partial_nsperday = (self._reportInterval*self._timeStep) / partial_time
+                          total_time)
+        partial_nsperday = (
+            self._reportInterval * self._timeStep) / partial_time
 
         # Get total and partial ns/day (currently ns/second)
         total_nsperday *= 3600 * 24
@@ -774,7 +790,8 @@ class ProgressReporter(StateDataReporter):
                                               self._totalSteps))
             f.write('\n')
             if self._totalEnergy:
-                f.write('  Total Energy     = %12.4f\n' % values['totalEnergy'])
+                f.write('  Total Energy     = %12.4f\n' %
+                        values['totalEnergy'])
             if self._potentialEnergy:
                 f.write('  Potential Energy = %12.4f\n' %
                         values['potentialEnergy'])
@@ -786,19 +803,23 @@ class ProgressReporter(StateDataReporter):
             if self._density:
                 f.write('  Density          = %12.4f\n' % values['density'])
             if self._temperature:
-                f.write('  Temperature      = %12.4f\n' % values['temperature'])
+                f.write('  Temperature      = %12.4f\n' %
+                        values['temperature'])
             f.write('\n')
             f.write(' Time for last %8d steps: %10.4f s. (%.3f ns/day)\n' %
                     (self._reportInterval, partial_time, partial_nsperday))
             f.write(' Time for all %9d steps: %10.4f s. (%.3f ns/day)\n' %
-                    (values['step']-self._firstStep, total_time, total_nsperday)
-            )
+                    (values['step'] - self._firstStep,
+                     total_time, total_nsperday)
+                    )
             f.write('\n')
-            f.write(' Estimated time to completion: %.3f %s\n' % (etc, unitstr))
+            f.write(' Estimated time to completion: %.3f %s\n' %
+                    (etc, unitstr))
             f.write('\n')
             f.write('-+' * 39 + '\n')
 
-        if remaining_steps == 0: self._startTime = None
+        if remaining_steps == 0:
+            self._startTime = None
 
     def _constructReportValues(self, simulation, state):
         """
@@ -839,11 +860,13 @@ class ProgressReporter(StateDataReporter):
             values['density'] = dens.value_in_unit(self._densityUnit)
 
         return values
-   
+
     def __del__(self):
         """ We already closed the file. """
 
+
 class EnergyMinimizerReporter(StateDataReporter):
+
     """
     This class acts as a simple energy reporter class for minimizations. This
     is not meant to be used as a reporter for OpenMM's molecular dynamics
@@ -876,11 +899,12 @@ class EnergyMinimizerReporter(StateDataReporter):
             self._out.write('Frame: %10d\n' % frame)
         e = state.getPotentialEnergy().value_in_unit(self._energyUnit)
         self._out.write('   Potential Energy = %12.4f %s\n' % (e,
-                self._energyUnit))
+                                                               self._energyUnit))
         if has_pbc and (self._volume or self._density):
             vol = state.getPeriodicBoxVolume().value_in_unit(self._volumeUnit)
         if has_pbc and self._volume:
-            self._out.write('   Volume = %12.4f %s\n' % (vol, self._volumeUnit))
+            self._out.write('   Volume = %12.4f %s\n' %
+                            (vol, self._volumeUnit))
         self._out.write('\n')
 
     def finalize(self):

@@ -8,9 +8,11 @@ import unittest
 
 get_fn = utils.get_fn
 
+
 class TestNetCDF(unittest.TestCase):
+
     """ Test NetCDF Functionality """
-    
+
     def testScipy(self):
         """ Test scipy NetCDF parsing """
         import parmed.amber as amber
@@ -82,9 +84,9 @@ class TestNetCDF(unittest.TestCase):
         self.assertAlmostEqual(rst.cell_angles[0], 109.471219)
         self.assertAlmostEqual(rst.cell_angles[1], 109.471219)
         self.assertAlmostEqual(rst.cell_angles[2], 109.471219)
-        self.assertTrue(all([round(x-y, 7) == 0 
+        self.assertTrue(all([round(x - y, 7) == 0
                              for x, y in zip(rst.cell_lengths, rst.box[:3])]))
-        self.assertTrue(all([round(x-y, 7) == 0 
+        self.assertTrue(all([round(x - y, 7) == 0
                              for x, y in zip(rst.cell_angles, rst.box[3:])]))
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ This package contains some useful functionality for common tasks in OpenMM
 from parmed import unit as u
 from parmed.utils.six import iteritems
 
+
 def energy_decomposition(structure, context, nrg=None):
     """
     This computes the energy of every force group in the given structure and
@@ -43,7 +44,7 @@ def energy_decomposition(structure, context, nrg=None):
         force_group_names[gp] = all_names[gp]
 
     for grp, name in iteritems(force_group_names):
-        state = context.getState(getEnergy=True, groups=1<<grp)
+        state = context.getState(getEnergy=True, groups=1 << grp)
         energy_components[name] = state.getPotentialEnergy().value_in_unit(nrg)
 
     e = context.getState(getEnergy=True).getPotentialEnergy()

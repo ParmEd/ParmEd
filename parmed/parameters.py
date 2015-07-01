@@ -8,14 +8,16 @@ Author: Jason M. Swails
 from __future__ import print_function, division
 
 from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
-                AtomType)
+                                    AtomType)
 from parmed.utils.six.moves import range
 from parmed.utils.six import iteritems
 from collections import OrderedDict
 from copy import copy
 import warnings
 
+
 class ParameterSet(object):
+
     """
     Stores a parameter set defining a force field
 
@@ -88,45 +90,54 @@ class ParameterSet(object):
         for key, item in iteritems(self.atom_types_tuple):
             other.atom_types_tuple[key] = copy(item)
         for key, item in iteritems(self.bond_types):
-            if key in other.bond_types: continue
+            if key in other.bond_types:
+                continue
             typ = copy(item)
             other.bond_types[key] = typ
             other.bond_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.pair_types):
-            if key in other.pair_types: continue
+            if key in other.pair_types:
+                continue
             typ = copy(item)
             other.pair_types[key] = typ
             other.pair_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.angle_types):
-            if key in other.angle_types: continue
+            if key in other.angle_types:
+                continue
             typ = copy(item)
             other.angle_types[key] = typ
             other.angle_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.dihedral_types):
-            if key in other.dihedral_types: continue
+            if key in other.dihedral_types:
+                continue
             typ = copy(item)
             other.dihedral_types[key] = typ
             other.dihedral_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.rb_torsion_types):
-            if key in other.rb_torsion_types: continue
+            if key in other.rb_torsion_types:
+                continue
             typ = copy(item)
             other.rb_torsion_types[key] = typ
             other.rb_torsion_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.improper_types):
-            if key in other.improper_types: continue
+            if key in other.improper_types:
+                continue
             other.improper_types[key] = copy(item)
         for key, item in iteritems(self.improper_periodic_types):
-            if key in other.improper_periodic_types: continue
+            if key in other.improper_periodic_types:
+                continue
             typ = copy(item)
             other.improper_periodic_types[key] = typ
             other.improper_periodic_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.urey_bradley_types):
-            if key in other.urey_bradley_types: continue
+            if key in other.urey_bradley_types:
+                continue
             typ = copy(item)
             other.urey_bradley_types[key] = typ
             other.urey_bradley_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.cmap_types):
-            if key in other.cmap_types: continue
+            if key in other.cmap_types:
+                continue
             typ = copy(item)
             other.cmap_types[key] = typ
             other.cmap_types[tuple(reversed(key))] = typ
@@ -180,9 +191,10 @@ class ParameterSet(object):
                 if atom_type.number is not None:
                     params.atom_types_int[int(atom_type)] = atom_type
                     params.atom_types_tuple[(int(atom_type), str(atom_type))] =\
-                            atom_type
+                        atom_type
         for bond in struct.bonds:
-            if bond.type is None: continue
+            if bond.type is None:
+                continue
             if (bond.atom1.type, bond.atom2.type) in params.bond_types:
                 continue
             typ = copy(bond.type)
@@ -190,7 +202,8 @@ class ParameterSet(object):
             params.bond_types[key] = typ
             params.bond_types[tuple(reversed(key))] = typ
         for angle in struct.angles:
-            if angle.type is None: continue
+            if angle.type is None:
+                continue
             if ((angle.atom1.type, angle.atom2.type, angle.atom3.type) in
                     params.angle_types):
                 continue
@@ -203,11 +216,13 @@ class ParameterSet(object):
                 params.urey_bradley_types[key] = NoUreyBradley
                 params.urey_bradley_types[tuple(reversed(key))] = NoUreyBradley
         for dihedral in struct.dihedrals:
-            if dihedral.type is None: continue
+            if dihedral.type is None:
+                continue
             key = (dihedral.atom1.type, dihedral.atom2.type,
                    dihedral.atom3.type, dihedral.atom4.type)
             if dihedral.improper:
-                if key in params.improper_periodic_types: continue
+                if key in params.improper_periodic_types:
+                    continue
                 typ = copy(dihedral.type)
                 params.improper_periodic_types[key] = typ
                 params.improper_periodic_types[tuple(reversed(key))] = typ
@@ -256,21 +271,26 @@ class ParameterSet(object):
                         params.dihedral_types[key] = typ
                         params.dihedral_types[tuple(reversed(key))] = typ
         for improper in struct.impropers:
-            if improper.type is None: continue
+            if improper.type is None:
+                continue
             key = (improper.atom1.type, improper.atom2.type,
-                    improper.atom3.type, improper.atom4.type)
-            if key in params.improper_types: continue
+                   improper.atom3.type, improper.atom4.type)
+            if key in params.improper_types:
+                continue
             params.improper_types[key] = copy(improper.type)
         for cmap in struct.cmaps:
-            if cmap.type is None: continue
+            if cmap.type is None:
+                continue
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
-                    cmap.atom4.type, cmap.atom5.type)
-            if key in params.cmap_types: continue
+                   cmap.atom4.type, cmap.atom5.type)
+            if key in params.cmap_types:
+                continue
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
             params.cmap_types[tuple(reversed(key))] = typ
         for urey in struct.urey_bradleys:
-            if urey.type is None or urey.type is NoUreyBradley: continue
+            if urey.type is None or urey.type is NoUreyBradley:
+                continue
             key = (urey.atom1.type, urey.atom2.type)
             if key not in params.urey_bradley_types:
                 warnings.warn('Angle corresponding to Urey-Bradley type not '
@@ -342,7 +362,7 @@ class ParameterSet(object):
         keylist = list(typedict.keys())
         for i in range(len(keylist) - 1):
             key1 = keylist[i]
-            for j in range(i+1, len(keylist)):
+            for j in range(i + 1, len(keylist)):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]

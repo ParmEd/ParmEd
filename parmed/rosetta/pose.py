@@ -16,11 +16,13 @@ try:
 except ImportError:
     Pose = AtomID = None
 
+
 def _n_prior(pose, nbr):
     prior = -1
     for i in range(1, nbr.rsd()):
         prior += pose.residue(i).natoms()
     return prior + nbr.atomno()
+
 
 class RosettaPose(object):
 
@@ -44,10 +46,10 @@ class RosettaPose(object):
 
         atnum = 1
         conf = pose.conformation()
-        for resid in range(1, pose.total_residue()+1):
+        for resid in range(1, pose.total_residue() + 1):
             res = pose.residue(resid)
             resname = res.name3().strip()
-            chain = chr(res.chain()+ord('A')-1)
+            chain = chr(res.chain() + ord('A') - 1)
             for atno, at in enumerate(res.atoms(), start=1):
                 try:
                     atinfo = res.atom_type(atno)

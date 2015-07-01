@@ -3,6 +3,7 @@ from parmed.exceptions import MoleculeError as _MoleculeError
 
 __all__ = ['six', 'io', 'timer', 'which', 'tag_molecules']
 
+
 def which(prog):
     """ Returns the full path of a program if it exists in PATH
 
@@ -17,8 +18,10 @@ def which(prog):
         The full path of the program. If it cannot be found, None
     """
     import os
+
     def is_exe(fpath):
-        if os.path.isdir(fpath): return False
+        if os.path.isdir(fpath):
+            return False
         return os.path.exists(fpath) and os.access(fpath, os.X_OK)
     fpath, fprog = os.path.split(prog)
     if fpath:
@@ -30,6 +33,7 @@ def which(prog):
         if is_exe(trial):
             return trial
     return None
+
 
 def tag_molecules(struct):
     """
@@ -53,10 +57,12 @@ def tag_molecules(struct):
     struct.atoms.unmark()
     mol_id = 1
     for atom in struct.atoms:
-        if atom.marked: continue
+        if atom.marked:
+            continue
         atom.marked = mol_id
         _set_owner(atom, mol_id)
         mol_id += 1
+
 
 def _set_owner(atm, mol_id):
     """ Recursively sets ownership of given atom and all bonded partners """

@@ -9,7 +9,9 @@ from collections import OrderedDict
 import re
 import warnings
 
+
 class BookmarkedFile(object):
+
     """ Allows setting a bookmark and rewinding to that bookmark """
 
     def __init__(self, *args, **kwargs):
@@ -30,12 +32,14 @@ class BookmarkedFile(object):
         except:
             pass
 
+
 def _IS_INT(thing):
     try:
         int(thing)
         return True
     except ValueError:
         return False
+
 
 def _IS_FLOAT(thing):
     try:
@@ -46,7 +50,9 @@ def _IS_FLOAT(thing):
 
 #==============================================================================
 
+
 class _ParamType(object):
+
     " All parameter types. This caches the list of parameters for easy access "
     TypeList = dict()
     _param_type = ''
@@ -80,16 +86,21 @@ class _ParamType(object):
             raise TypeError('cannot compare type %s to type %s' %
                             (type(self), type(other)))
         for prop in dir(cls):
-            if prop.startswith('_') or prop == 'TypeList': continue
+            if prop.startswith('_') or prop == 'TypeList':
+                continue
             # Skip all callable attributes
-            if hasattr(getattr(self, prop), '__call__'): continue
-            if getattr(self, prop) != getattr(other, prop): return False
+            if hasattr(getattr(self, prop), '__call__'):
+                continue
+            if getattr(self, prop) != getattr(other, prop):
+                return False
 
         return True
 
 #==============================================================================
 
+
 class _BondType(_ParamType):
+
     """ Bond parameter type """
 
     TypeList = dict()
@@ -106,11 +117,13 @@ class _BondType(_ParamType):
 
 #==============================================================================
 
+
 def get_angle_type(typecode, *args, **kwargs):
     """ Factory that returns the appropriate angle type """
     if typecode in 'fF':
         return _FourierAngleType(*args, **kwargs)
     return _AngleType(*args, **kwargs)
+
 
 class _AngleType(_ParamType):
 
@@ -141,6 +154,7 @@ class _AngleType(_ParamType):
             retval += '; theteq3=%s' % self.theteq3
         return retval + '>'
 
+
 class _FourierAngleType(_AngleType):
 
     def __init__(self, idx1, idx2, idx3, k, theteq, periodicity):
@@ -153,10 +167,11 @@ class _FourierAngleType(_AngleType):
 
     def __repr__(self):
         return '<_FourierAngleType: k=%s; theteq=%s; periodicity=%s>' % (
-                    self.k, self.theteq, self.periodicity)
+            self.k, self.theteq, self.periodicity)
+
 
 class _StretchBendType(_AngleType):
-   
+
     TypeList = dict()
     _param_type = 'stretch-bend'
 
@@ -169,8 +184,9 @@ class _StretchBendType(_AngleType):
     def __repr__(self):
         return '<_StretchBendType: k1=%s; k2=%s>' % (self.k1, self.k2)
 
+
 class _UreyBradleyType(_AngleType):
-   
+
     TypeList = dict()
     _param_type = 'urey-bradley'
 
@@ -184,6 +200,7 @@ class _UreyBradleyType(_AngleType):
         return '<_UreyBradleyType: k=%s; req=%s>' % (self.k, self.req)
 
 #==============================================================================
+
 
 class _OPBendType(_ParamType):
 
@@ -201,6 +218,7 @@ class _OPBendType(_ParamType):
 
 #==============================================================================
 
+
 class _DihedralType(_ParamType):
 
     TypeList = dict()
@@ -213,15 +231,16 @@ class _DihedralType(_ParamType):
         elif idx2 > idx3 or (idx2 == idx3 and idx1 > idx4):
             key = '%d-%d-%d-%d' % (idx4, idx3, idx2, idx1)
         self.k, self.phase, self.periodicity = [], [], []
-        for i in range(len(args)//3):
-            self.k.append(float(args[i*3]))
-            self.phase.append(float(args[i*3+1]))
-            self.periodicity.append(float(args[i*3+2]))
+        for i in range(len(args) // 3):
+            self.k.append(float(args[i * 3]))
+            self.phase.append(float(args[i * 3 + 1]))
+            self.periodicity.append(float(args[i * 3 + 2]))
         self.register(self, key)
 
     def __repr__(self):
         return '<_DihedralType: k=%r; phase=%r; per=%r>' % (self.k, self.phase,
-                self.periodicity)
+                                                            self.periodicity)
+
 
 class _PiTorsionType(_ParamType):
 
@@ -236,6 +255,7 @@ class _PiTorsionType(_ParamType):
 
     def __repr__(self):
         return '<_PiTorsionType: k=%s>' % self.k
+
 
 class _TorsionTorsionType(_ParamType):
 
@@ -257,6 +277,7 @@ class _TorsionTorsionType(_ParamType):
 
 #==============================================================================
 
+
 class _MultipoleType(_ParamType):
 
     TypeList = dict()
@@ -277,6 +298,7 @@ class _MultipoleType(_ParamType):
 
 #==============================================================================
 
+
 def get_atom_type(index, atomic_number, mass, valence):
     """
     Factory for getting an _AtomType, but making sure that only one instance of
@@ -288,16 +310,18 @@ def get_atom_type(index, atomic_number, mass, valence):
     except KeyError:
         return _AtomType(index, atomic_number, mass, valence)
 
+
 class _AtomType(object):
+
     """ An atom type """
-    TypeList = dict() # All cached types -- ensures atom types are unique
+    TypeList = dict()  # All cached types -- ensures atom types are unique
 
     def __init__(self, index, atomic_number, mass, valence):
         self.index = int(index)
         self.atomic_number = int(atomic_number)
         self.mass = float(mass)
         self.valence = int(valence)
-        _AtomType.TypeList[index] = self # cache this type
+        _AtomType.TypeList[index] = self  # cache this type
 
     @staticmethod
     def set_vdw_params(index, size, epsilon, reduction=None):
@@ -311,17 +335,19 @@ class _AtomType(object):
 
     def __repr__(self):
         retval = '<_AtomType: idx=%d; elem=%d; mass=%s; val=%d' % (
-                       self.index, self.atomic_number, self.mass, self.valence)
+            self.index, self.atomic_number, self.mass, self.valence)
         if hasattr(self, 'size'):
             retval += '; size=%s; eps=%s; red=%s' % (self.size, self.epsilon,
-                self.reduction)
+                                                     self.reduction)
         return retval + '>'
 
     @classmethod
     def reset(cls):
         cls.TypeList = dict()
 
+
 class _Atom(object):
+
     """ An atom in a parameter set """
 
     def __init__(self, typeindex, name, descrip, atomic_number, mass, val):
@@ -331,12 +357,19 @@ class _Atom(object):
 
     # Allow _Atom instances to access (but not modify) type properties
     def _typeindex(self): return self.type.index
+
     def _atomic_number(self): return self.type.atomic_number
+
     def _element(self): return self.type.atomic_number
+
     def _valence(self): return self.type.valence
+
     def _size(self): return self.type.size
+
     def _epsilon(self): return self.type.epsilon
+
     def _reduction(self): return self.type.reduction
+
     def _blocked(self): raise NotImplementedError('Cannot set this attribute')
     # Now set the above as properties
     typeindex = property(fget=_typeindex, fset=_blocked)
@@ -354,16 +387,17 @@ class _Atom(object):
 
     def __repr__(self):
         retstr = '<_Atom "%s": name=%s; type=%d' % (
-                            self.description, self.name, self.typeindex)
+            self.description, self.name, self.typeindex)
         if hasattr(self, 'polarizability'):
             retstr += '; dipole pol=%s; thole=%s; connected atoms=%r' % (
-                        self.polarizability, self.thole, self.connected_types)
+                self.polarizability, self.thole, self.connected_types)
 
     @classmethod
     def reset(cls):
         cls.TypeList = dict()
 
 #==============================================================================
+
 
 def reset():
     """
@@ -384,7 +418,9 @@ def reset():
 
 #==============================================================================
 
+
 class AmoebaParameterSet(object):
+
     """
     Contains all of the parameters found in an Amoeba parameter file from TINKER
     """
@@ -394,9 +430,9 @@ class AmoebaParameterSet(object):
 
     def __init__(self, fname=None):
         self.atoms = dict()
-        self.atom_types = _AtomType.TypeList # For easy access
+        self.atom_types = _AtomType.TypeList  # For easy access
         self.bonds = _BondType.TypeList
-        self.angles = _AngleType.TypeList # includes FourierAngleTypes
+        self.angles = _AngleType.TypeList  # includes FourierAngleTypes
         self.stretch_bends = _StretchBendType.TypeList
         self.urey_bradleys = _UreyBradleyType.TypeList
         self.opbends = _OPBendType.TypeList
@@ -427,7 +463,8 @@ class AmoebaParameterSet(object):
                 line = f.readline().replace('\t', ' ')
                 continue
             words = line.split()
-            if len(words) != 2: continue
+            if len(words) != 2:
+                continue
             # Now extract the property
             if _IS_INT(words[1]):
                 self.attributes[words[0].lower()] = int(words[1])
@@ -446,7 +483,7 @@ class AmoebaParameterSet(object):
             rematch = self.atomre.match(line)
             num, typenum, name, descrip, anum, mass, val = rematch.groups()
             self.atoms[int(num)] = _Atom(typenum, name, descrip,
-                                                 anum, mass, val)
+                                         anum, mass, val)
             line = f.readline().replace('\t', ' ')
         # Now parse out the van der waals terms
         while line.lstrip()[:4].lower() != 'vdw ':
@@ -490,7 +527,8 @@ class AmoebaParameterSet(object):
             _UreyBradleyType(*line.split()[1:])
             line = f.readline().replace('\t', ' ')
         # Get the out-of-plane bending
-        f.rewind(); line = f.readline().replace('\t', ' ')
+        f.rewind()
+        line = f.readline().replace('\t', ' ')
         while line.lstrip()[:7].lower() != 'opbend ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:7].lower() == 'opbend ' and line:
@@ -498,7 +536,8 @@ class AmoebaParameterSet(object):
             _OPBendType(*line.split()[1:])
             line = f.readline().replace('\t', ' ')
         # Get the torsion parameters
-        f.rewind(); line = f.readline().replace('\t', ' ')
+        f.rewind()
+        line = f.readline().replace('\t', ' ')
         while line.lstrip()[:8].lower() != 'torsion ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:8].lower() == 'torsion ' and line:
@@ -506,7 +545,8 @@ class AmoebaParameterSet(object):
             _DihedralType(*line.split()[1:])
             line = f.readline().replace('\t', ' ')
         # Get the pitorsions
-        f.rewind(); line = f.readline().replace('\t', ' ')
+        f.rewind()
+        line = f.readline().replace('\t', ' ')
         while line.lstrip()[:7] != 'pitors ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:7] == 'pitors ' and line:
@@ -514,7 +554,8 @@ class AmoebaParameterSet(object):
             _PiTorsionType(*line.split()[1:])
             line = f.readline().replace('\t', ' ')
         # Get the coupled torsions
-        f.rewind(); line = f.readline().replace('\t', ' ')
+        f.rewind()
+        line = f.readline().replace('\t', ' ')
         while line.lstrip()[:8] != 'tortors ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:8] == 'tortors ' and line:
@@ -527,7 +568,8 @@ class AmoebaParameterSet(object):
             line = f.readline().replace('\t', ' ')
             f.mark()
         # Get the multipole terms
-        f.rewind(); line = f.readline().replace('\t', ' ')
+        f.rewind()
+        line = f.readline().replace('\t', ' ')
         while line.lstrip()[:10].lower() != 'multipole ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:10].lower() == 'multipole ' and line:
@@ -540,7 +582,8 @@ class AmoebaParameterSet(object):
             line = f.readline().replace('\t', ' ')
             f.mark()
         # Get the dipole polarizabilities
-        f.rewind(); line = f.readline().replace('\t', ' ')
+        f.rewind()
+        line = f.readline().replace('\t', ' ')
         while line.lstrip()[:9] != 'polarize ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:9] == 'polarize ' and line:
@@ -548,7 +591,7 @@ class AmoebaParameterSet(object):
             index = int(words[1])
             try:
                 self.atoms[index].set_polarizability(
-                            words[2], words[3], words[4:]
+                    words[2], words[3], words[4:]
                 )
             except IndexError:
                 self.atoms[index].set_polarizability(words[2], words[3], [])

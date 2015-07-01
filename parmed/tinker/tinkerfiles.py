@@ -4,22 +4,25 @@ This module contains classes for reading various TINKER-style files
 from parmed.exceptions import TinkerError
 from parmed.utils.six.moves import range
 
+
 class KeywordControlFile(object):
+
     """ Reads and processes a keyword control file for TINKER simulations """
-    _datatypes = {'PARAMETERS' : str, 'A-AXIS' : float, 'B-AXIS' : float,
-                  'C-AXIS' : float, 'ALPHA' : float, 'BETA' : float,
-                  'GAMMA' : float}
+    _datatypes = {'PARAMETERS': str, 'A-AXIS': float, 'B-AXIS': float,
+                  'C-AXIS': float, 'ALPHA': float, 'BETA': float,
+                  'GAMMA': float}
 
     def __init__(self, fname):
         # The currently recognized/parsed keywords (these are the only ones
         # necessary for running Amoeba in Amber)
-        self.keywords = {'PARAMETERS' : None, 'A-AXIS' : None, 'B-AXIS' : None,
-                         'C-AXIS' : None, 'ALPHA' : None, 'BETA' : None,
-                         'GAMMA' : None}
+        self.keywords = {'PARAMETERS': None, 'A-AXIS': None, 'B-AXIS': None,
+                         'C-AXIS': None, 'ALPHA': None, 'BETA': None,
+                         'GAMMA': None}
         # Parse the file
         for line in open(fname, 'r'):
             # Skip over any blank lines
-            if not line.strip(): continue
+            if not line.strip():
+                continue
             words = line.split()
             key = words[0].upper()
             # Get rid of the keyword and all whitespace
@@ -27,18 +30,22 @@ class KeywordControlFile(object):
             try:
                 self.keywords[key] = self._datatypes[key](result)
             except KeyError:
-                pass # All non-keyword lines are ignored comments
+                pass  # All non-keyword lines are ignored comments
             except ValueError:
                 raise TinkerError('Malformed keyword control file! Could not '
                                   'convert the value of %s into type %s' %
                                   (key, self._datatypes[key]))
 
+
 class XyzFile(object):
+
     """ Reads and processes a Tinker XYZ file """
     class _Atom(object):
+
         """
         An atom object that stores the atomic information stored in the XyzFile
         """
+
         def __init__(self, name, x, y, z, type, bonded_partners):
             self.name = str(name)
             self.position = [float(x), float(y), float(z)]
@@ -47,7 +54,9 @@ class XyzFile(object):
             self.bonded_partners = [int(i) for i in bonded_partners]
 
     class _AtomList(list):
+
         " A list of _Atom objects "
+
         def __init__(self):
             super(XyzFile._AtomList, self).__init__()
 
@@ -60,7 +69,8 @@ class XyzFile(object):
             super(XyzFile._AtomList, self).append(thing)
 
         def extend(self, things):
-            for thing in things: self.append(thing)
+            for thing in things:
+                self.append(thing)
 
     def __init__(self, fname):
         self.natom = 0
@@ -83,8 +93,11 @@ class XyzFile(object):
                                words[4], words[5], words[6:])
         f.close()
 
+
 class DynFile(object):
+
     """ Reads and processes a Tinker DYN file """
+
     def __init__(self, fname=None):
         if fname is not None:
             self.read(fname)
@@ -117,14 +130,14 @@ class DynFile(object):
             if line == 'Current Translational Velocities :':
                 self.rigidbody = True
                 self.translational_velocities = [[0.0, 0.0, 0.0] for i in
-                            range(self.natom)]
+                                                 range(self.natom)]
                 DynFile._read_section(f, self.translational_velocities,
                                       self.natom)
                 if f.readline().strip() != 'Current Angular Velocities :':
                     raise TinkerError('Could not find Angular velocity '
                                       'section in .dyn file')
                 self.angular_velocities = [[0.0, 0.0, 0.0]
-                                            for i in range(self.natom)]
+                                           for i in range(self.natom)]
                 DynFile._read_section(f, self.angular_velocities, self.natom)
                 if f.readline().strip() != 'Current Angular Momenta :':
                     raise TinkerError('Could not find angular momenta section '
@@ -137,7 +150,7 @@ class DynFile(object):
                 self.velocities = [[0.0, 0.0, 0.0] for i in range(self.natom)]
                 DynFile._read_section(f, self.velocities, self.natom)
                 if f.readline().strip() != 'Current Atomic Accelerations :':
-                    raise TinkerError('Could not find accelerations in %s ' % 
+                    raise TinkerError('Could not find accelerations in %s ' %
                                       fname)
                 self.accelerations = [[0.0, 0.0, 0.0]
                                       for i in range(self.natom)]
@@ -145,7 +158,7 @@ class DynFile(object):
                 if f.readline().strip() != 'Alternate Atomic Accelerations :':
                     raise TinkerError('Could not find old accelerations in %s' %
                                       fname)
-                self.old_accelerations = [[0.0, 0.0, 0.0] 
+                self.old_accelerations = [[0.0, 0.0, 0.0]
                                           for i in range(self.natom)]
                 DynFile._read_section(f, self.old_accelerations, self.natom)
             else:
@@ -167,6 +180,7 @@ class DynFile(object):
                 container[i][2] = float(words[2].replace('D', 'E'))
             except (IndexError, ValueError):
                 raise TinkerError('Could not parse values from dyn file')
+
 
 def is_float(thing):
     try:

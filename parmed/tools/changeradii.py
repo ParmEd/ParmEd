@@ -2,6 +2,7 @@ from parmed.tools.exceptions import ChangeRadiiError
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 def bondi(parm):
     """ Sets the bondi radii """
     for i, atom in enumerate(parm.atoms):
@@ -16,15 +17,24 @@ def bondi(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 1: atom.radii = 1.2
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 1:
+            atom.radii = 1.2
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'Bondi radii (bondi)'
@@ -34,17 +44,18 @@ def bondi(parm):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 def amber6(parm):
     """ Sets the amber6 radii """
     for i, atom in enumerate(parm.atoms):
         # Radius of H atom depends on element it is bonded to
         bondeds = list(atom.bond_partners)
         if atom.atomic_number == 1:
-            if bondeds[0].atomic_number == 6: # carbon
+            if bondeds[0].atomic_number == 6:  # carbon
                 atom.radii = 1.3
-            elif bondeds[0].atomic_number in (8, 16): # oxygen or sulfur
+            elif bondeds[0].atomic_number in (8, 16):  # oxygen or sulfur
                 atom.radii = 0.8
-            else: # anything else
+            else:  # anything else
                 atom.radii = 1.2
         # Radius of C atom depends on what type it is
         elif atom.atomic_number == 6:
@@ -57,22 +68,32 @@ def amber6(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
-        parm.parm_data['RADIUS_SET'][0] = 'amber6 modified Bondi radii (amber6)'
+        parm.parm_data['RADIUS_SET'][
+            0] = 'amber6 modified Bondi radii (amber6)'
     except AttributeError:
         pass
     _screen1(parm)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def mbondi(parm):
     """ Sets the mbondi radii """
@@ -80,9 +101,9 @@ def mbondi(parm):
         # Radius of H atom depends on element it is bonded to
         if atom.atomic_number == 1:
             bondeds = list(atom.bond_partners)
-            if bondeds[0].atomic_number in (6, 7): # C or N
+            if bondeds[0].atomic_number in (6, 7):  # C or N
                 atom.radii = 1.3
-            elif bondeds[0].atomic_number in (8, 16): # O or S
+            elif bondeds[0].atomic_number in (8, 16):  # O or S
                 atom.radii = 0.8
             else:
                 atom.radii = 1.2
@@ -97,14 +118,22 @@ def mbondi(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8:  atom.radii = 1.5
-        elif atom.atomic_number == 9:  atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'modified Bondi radii (mbondi)'
@@ -113,6 +142,7 @@ def mbondi(parm):
     _screen1(parm)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def mbondi2(parm):
     """ Sets the mbondi2 radii """
@@ -134,14 +164,22 @@ def mbondi2(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'H(N)-modified Bondi radii (mbondi2)'
@@ -151,9 +189,10 @@ def mbondi2(parm):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 def mbondi3(parm):
     """ Sets mbondi3 radii """
-    mbondi2(parm) # start from mbondi2 radii
+    mbondi2(parm)  # start from mbondi2 radii
     for i, atom in enumerate(parm.atoms):
         # Adjust OE (GLU), OD (ASP), and HH/HE (ARG)
         if atom.residue.name in ('GLU', 'ASP', 'GL4', 'AS4'):
@@ -167,16 +206,17 @@ def mbondi3(parm):
         # (i.e., 2-chain dimers)
         if atom.name == 'OXT':
             atom.radii = 1.4
-            parm.atoms[i-1].radii = 1.4
+            parm.atoms[i - 1].radii = 1.4
 
     try:
         parm.parm_data['RADIUS_SET'][0] = \
-                'ArgH and AspGluO modified Bondi2 radii (mbondi3)'
+            'ArgH and AspGluO modified Bondi2 radii (mbondi3)'
     except AttributeError:
         pass
     _screen1(parm)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def _screen1(parm):
     """ Applies the first set of screening parameters found in tleap source """
@@ -199,6 +239,7 @@ def _screen1(parm):
             atom.screen = 0.8
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def _screen2(parm):
     """
@@ -226,6 +267,7 @@ def _screen2(parm):
             atom.screen = 0.8
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def _screen3(parm):
     """
@@ -256,6 +298,7 @@ def _screen3(parm):
 
 _call_method = dict(bondi=bondi, mbondi=mbondi, mbondi2=mbondi2,
                     mbondi3=mbondi3, amber6=amber6)
+
 
 def ChRad(parm, radii_set):
     global _call_method

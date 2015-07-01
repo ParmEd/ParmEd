@@ -6,12 +6,14 @@ ignored.
 from parmed.utils.io import genopen
 from parmed.exceptions import CharmmError
 
+
 class CharmmFile(object):
+
     """
     A CHARMM file that recognizes the "!" character as a 'comment' token. It
     can be iterated over and generally treated like a file object, but only
     spits out strings that have been truncated at its first comment character.
-    
+
     There is currently no way to recognize a ! as a _non_ comment character,
     since allowing an escape character does not seem to be common practice and
     would likely introduce negative performance implications.
@@ -99,7 +101,9 @@ class CharmmFile(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class CharmmStreamFile(object):
+
     """
     The stream file is broken down into sections of commands delimited by the
     strings:
@@ -111,6 +115,7 @@ class CharmmStreamFile(object):
     dealing with the text.
 
     """
+
     def __init__(self, fname):
         self.lines = []
         self.comments = []
@@ -162,6 +167,5 @@ class CharmmStreamFile(object):
         # No sections left
         return None, None, None
 
-
-    def __del__(self): 
+    def __del__(self):
         pass

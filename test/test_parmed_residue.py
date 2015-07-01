@@ -6,6 +6,7 @@ import utils
 from parmed import residue
 import unittest
 
+
 class TestChemistryResidue(unittest.TestCase):
 
     def testResidueMembers(self):
@@ -56,12 +57,12 @@ class TestChemistryResidue(unittest.TestCase):
         """ Test the %r representation of the Amino Acids """
         for res in residue.AminoAcidResidue.all_residues:
             self.assertEqual('<Amino Acid Residue %s: %s [%s]>' % (res.name,
-                res.abbr, res.symbol), repr(res))
+                                                                   res.abbr, res.symbol), repr(res))
 
     def testBadLookup(self):
         """ Test that lookups of non-existent residues fails """
         self.assertRaises(KeyError,
-                lambda: residue.AminoAcidResidue.get('NoResidue'))
+                          lambda: residue.AminoAcidResidue.get('NoResidue'))
 
     def testHas(self):
         """ Tests the `has` method of BiomolecularResidue """
@@ -89,7 +90,8 @@ class TestChemistryResidue(unittest.TestCase):
         self.assertIs(residue.AminoAcidResidue.get('NHIS'), residue.HIS)
         self.assertIs(residue.AminoAcidResidue.get('NASH'), residue.ASP)
         self.assertRaises(KeyError,
-                lambda: residue.AminoAcidResidue.get('XASH'))
+                          lambda: residue.AminoAcidResidue.get('XASH'))
+
 
 class TestNucleicAcidResidues(unittest.TestCase):
 
@@ -115,8 +117,10 @@ class TestNucleicAcidResidues(unittest.TestCase):
 
     def testBadLookup(self):
         """ Test that lookups of non-existent nucleic acid residues fails """
-        self.assertRaises(KeyError, lambda: residue.RNAResidue.get('NoResidue'))
-        self.assertRaises(KeyError, lambda: residue.DNAResidue.get('NoResidue'))
+        self.assertRaises(
+            KeyError, lambda: residue.RNAResidue.get('NoResidue'))
+        self.assertRaises(
+            KeyError, lambda: residue.DNAResidue.get('NoResidue'))
 
     def testTermini(self):
         """ Tests that decorated DNA/RNA termini are properly recognized """

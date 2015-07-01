@@ -24,8 +24,11 @@ import warnings
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
 class Angle(object):
+
     """ Angle between 3 bonded atoms """
+
     def __init__(self, atom1, atom2, atom3, acoef, bcoef, ccoef, dcoef):
         self.atom1 = atom1.strip()
         self.atom2 = atom2.strip()
@@ -43,7 +46,8 @@ class Angle(object):
         """
         # First see if we are looking to match the angles in forward or reverse
         reversed_angles = False
-        if self.atom2 != other.atom2: return False
+        if self.atom2 != other.atom2:
+            return False
         if self.atom1 != other.atom1:
             if self.atom1 != other.atom3:
                 if self.atom1 != 'X' and other.atom1 != 'X':
@@ -57,20 +61,23 @@ class Angle(object):
         # Now check the rest (non-reversed case first)
         if not reversed_angles:
             if (self.atom3 != other.atom3 and self.atom3 != 'X' and
-                other.atom3 != 'X'):
+                    other.atom3 != 'X'):
                 return False
-        else: # reversed angles
+        else:  # reversed angles
             if (self.atom3 != other.atom1 and self.atom3 != 'X' and
-                other.atom1 != 'X'):
+                    other.atom1 != 'X'):
                 return False
         # If we passed all these tests so far, then we must be the same!
         return True
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
 class Dihedral(object):
+
     """ Dihedral between 4 bonded atoms """
-    def __init__(self, atom1, atom2, atom3, atom4, 
+
+    def __init__(self, atom1, atom2, atom3, atom4,
                  ampl1, ampl2, ampl3, ampl4,
                  phase1, phase2, phase3, phase4):
         self.atom1, self.atom2 = atom1, atom2
@@ -110,6 +117,7 @@ class Dihedral(object):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
 def addCoarseGrain(parm, param_file):
     from parmed.tools.exceptions import CoarseGrainError
     from sys import stderr
@@ -130,7 +138,7 @@ def addCoarseGrain(parm, param_file):
             file_line = file_line[:file_line.index('#')]
         # Filter out blank lines
         file_line = file_line.strip()
-        if len(file_line) == 0: 
+        if len(file_line) == 0:
             file_line = params.readline()
             continue
         # See if we start reading ANGLEs yet:
@@ -145,7 +153,8 @@ def addCoarseGrain(parm, param_file):
             reading_angles = False
             file_line = params.readline()
             continue
-        # Pass over any INDEX header lines -- they're just there for readability
+        # Pass over any INDEX header lines -- they're just there for
+        # readability
         if (reading_dihedrals or reading_angles) and file_line[:5] == 'INDEX':
             file_line = params.readline()
             continue
@@ -163,14 +172,14 @@ def addCoarseGrain(parm, param_file):
                                           dcoef)
             except ValueError as err:
                 raise CoarseGrainError(
-                        'Unexpected format in Coarse Grain angles. Expected '
-                        'different data type: %s. See format specification'
-                        % err)
+                    'Unexpected format in Coarse Grain angles. Expected '
+                    'different data type: %s. See format specification'
+                    % err)
             except IndexError:
                 raise CoarseGrainError(
-                        'Unexpected format in Coarse Grain parameter file. '
-                        'Expected more data fields on the line. See format '
-                        'specification')
+                    'Unexpected format in Coarse Grain parameter file. '
+                    'Expected more data fields on the line. See format '
+                    'specification')
             file_line = params.readline()
             continue
         if reading_dihedrals:
@@ -194,14 +203,14 @@ def addCoarseGrain(parm, param_file):
                                                 phase1, phase2, phase3, phase4)
             except ValueError as err:
                 raise CoarseGrainError(
-                        'Unexpected format in Coarse Grain dihedrals. Expected '
-                        'different data type: %s. See format specification'
-                        % err)
+                    'Unexpected format in Coarse Grain dihedrals. Expected '
+                    'different data type: %s. See format specification'
+                    % err)
             except IndexError:
                 raise CoarseGrainError(
-                        'Unexpected format in Coarse Grain parameter file. '
-                        'Expected more data fields on the line. See format '
-                        'specification')
+                    'Unexpected format in Coarse Grain parameter file. '
+                    'Expected more data fields on the line. See format '
+                    'specification')
             file_line = params.readline()
             continue
         warnings.warn('Line (%s) ignored in Coarse Grain parameter file' %
@@ -211,51 +220,51 @@ def addCoarseGrain(parm, param_file):
 
     # Now let's add comments to our topology file!
     parm.parm_comments['ANGLE_FORCE_CONSTANT'].append(
-                'This section is only an index and is not used for Coarse '
-                'grained topologies')
+        'This section is only an index and is not used for Coarse '
+        'grained topologies')
     parm.parm_comments['DIHEDRAL_FORCE_CONSTANT'].append(
-                'This section is only an index and is not used for Coarse '
-                'grained topologies')
+        'This section is only an index and is not used for Coarse '
+        'grained topologies')
     parm.parm_comments['DIHEDRAL_PERIODICITY'].append(
-                'This section is not used for Coarse grained topologies')
+        'This section is not used for Coarse grained topologies')
     parm.parm_comments['DIHEDRAL_PHASE'].append(
-                'This section is not used for Coarse grained topologies')
-   
+        'This section is not used for Coarse grained topologies')
+
     # Now let's add our new sections
-    parm.add_flag('ANGLE_COEF_A','5E16.8',parm.ptr('numang'),
-                 comments='A Coefficient for Coarse grained force field')
-    parm.add_flag('ANGLE_COEF_B','5E16.8',parm.ptr('numang'),
-                 comments='B Coefficient for Coarse grained force field')
-    parm.add_flag('ANGLE_COEF_C','5E16.8',parm.ptr('numang'),
-                 comments='C Coefficient for Coarse grained force field')
-    parm.add_flag('ANGLE_COEF_D','5E16.8',parm.ptr('numang'),
-                 comments='D Coefficient for Coarse grained force field')
-    parm.add_flag('DIHEDRAL_AMPLITUDE_1','5E16.8',parm.ptr('nptra'),
-                 comments='1st Dihedral Amplitude for coarse grained force '
-                          'field')
-    parm.add_flag('DIHEDRAL_AMPLITUDE_2','5E16.8',parm.ptr('nptra'),
-                 comments='2nd Dihedral Amplitude for coarse grained force '
-                          'field'
-    )
-    parm.add_flag('DIHEDRAL_AMPLITUDE_3','5E16.8',parm.ptr('nptra'),
-                 comments='3rd Dihedral Amplitude for coarse grained force '
-                          'field'
-    )
-    parm.add_flag('DIHEDRAL_AMPLITUDE_4','5E16.8',parm.ptr('nptra'),
-                 comments='4th Dihedral Amplitude for coarse grained force '
-                          'field'
-    )
-    parm.add_flag('DIHEDRAL_PHASE_1','5E16.8',parm.ptr('nptra'),
-                 comments='1st Dihedral Phase for coarse grained force field')
-    parm.add_flag('DIHEDRAL_PHASE_2','5E16.8',parm.ptr('nptra'),
-                 comments='2nd Dihedral Phase for coarse grained force field')
-    parm.add_flag('DIHEDRAL_PHASE_3','5E16.8',parm.ptr('nptra'),
-                 comments='3rd Dihedral Phase for coarse grained force field')
-    parm.add_flag('DIHEDRAL_PHASE_4','5E16.8',parm.ptr('nptra'),
-                 comments='4th Dihedral Phase for coarse grained force field')
+    parm.add_flag('ANGLE_COEF_A', '5E16.8', parm.ptr('numang'),
+                  comments='A Coefficient for Coarse grained force field')
+    parm.add_flag('ANGLE_COEF_B', '5E16.8', parm.ptr('numang'),
+                  comments='B Coefficient for Coarse grained force field')
+    parm.add_flag('ANGLE_COEF_C', '5E16.8', parm.ptr('numang'),
+                  comments='C Coefficient for Coarse grained force field')
+    parm.add_flag('ANGLE_COEF_D', '5E16.8', parm.ptr('numang'),
+                  comments='D Coefficient for Coarse grained force field')
+    parm.add_flag('DIHEDRAL_AMPLITUDE_1', '5E16.8', parm.ptr('nptra'),
+                  comments='1st Dihedral Amplitude for coarse grained force '
+                  'field')
+    parm.add_flag('DIHEDRAL_AMPLITUDE_2', '5E16.8', parm.ptr('nptra'),
+                  comments='2nd Dihedral Amplitude for coarse grained force '
+                  'field'
+                  )
+    parm.add_flag('DIHEDRAL_AMPLITUDE_3', '5E16.8', parm.ptr('nptra'),
+                  comments='3rd Dihedral Amplitude for coarse grained force '
+                  'field'
+                  )
+    parm.add_flag('DIHEDRAL_AMPLITUDE_4', '5E16.8', parm.ptr('nptra'),
+                  comments='4th Dihedral Amplitude for coarse grained force '
+                  'field'
+                  )
+    parm.add_flag('DIHEDRAL_PHASE_1', '5E16.8', parm.ptr('nptra'),
+                  comments='1st Dihedral Phase for coarse grained force field')
+    parm.add_flag('DIHEDRAL_PHASE_2', '5E16.8', parm.ptr('nptra'),
+                  comments='2nd Dihedral Phase for coarse grained force field')
+    parm.add_flag('DIHEDRAL_PHASE_3', '5E16.8', parm.ptr('nptra'),
+                  comments='3rd Dihedral Phase for coarse grained force field')
+    parm.add_flag('DIHEDRAL_PHASE_4', '5E16.8', parm.ptr('nptra'),
+                  comments='4th Dihedral Phase for coarse grained force field')
 
     for i in range(len(parm.parm_data['ANGLE_FORCE_CONSTANT'])):
-        try: 
+        try:
             index = int(parm.parm_data['ANGLE_FORCE_CONSTANT'][i])
             angl = angle_params[index]
         except KeyError:
@@ -265,7 +274,7 @@ def addCoarseGrain(parm, param_file):
         parm.parm_data['ANGLE_COEF_B'][i] = angl.bcoef
         parm.parm_data['ANGLE_COEF_C'][i] = angl.ccoef
         parm.parm_data['ANGLE_COEF_D'][i] = angl.dcoef
-   
+
     for i in range(len(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])):
         try:
             index = int(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'][i])

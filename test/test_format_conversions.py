@@ -17,7 +17,9 @@ except ImportError:
 import unittest
 import warnings
 
+
 class TestCase(TestCaseRelative):
+
     def setUp(self):
         warnings.filterwarnings('default', category=GromacsWarning)
         try:
@@ -33,13 +35,15 @@ class TestCase(TestCaseRelative):
         except OSError:
             pass
 
+
 class TestAmberToGromacs(TestCase):
+
     """ Tests converting Amber prmtop files to Gromacs topologies """
 
     def testBenzeneCyclohexane(self):
         """ Test converting binary liquid from Amber prmtop to Gromacs top """
         parm = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'),
-                              get_fn('benzene_cyclohexane_10_500.inpcrd'))
+                         get_fn('benzene_cyclohexane_10_500.inpcrd'))
         top = gromacs.GromacsTopologyFile.from_structure(parm)
         groname = get_fn('benzene_cyclohexane_10_500.gro', written=True)
         gromacs.GromacsGroFile.write(parm, groname, precision=8)
@@ -54,10 +58,13 @@ class TestAmberToGromacs(TestCase):
             self.assertAlmostEqual(a1.xz, a2.xz)
         top.write(get_fn('benzene_cyclohexane_10_500.top', written=True))
         saved = GromacsFile(get_saved_fn('benzene_cyclohexane_10_500.top'))
-        written = GromacsFile(get_fn('benzene_cyclohexane_10_500.top', written=True))
+        written = GromacsFile(
+            get_fn('benzene_cyclohexane_10_500.top', written=True))
         self.assertTrue(diff_files(saved, written))
 
+
 class TestGromacsToAmber(TestCase):
+
     """ Tests converting Gromacs top/gro files to Amber """
 
     def testSimple(self):
@@ -96,7 +103,7 @@ class TestGromacsToAmber(TestCase):
         self.assertTrue(diff_files(get_fn('1aki.charmm27_fromgmx.parm7',
                                           written=True),
                                    get_saved_fn('1aki.charmm27_fromgmx.parm7'))
-        )
+                        )
 
     @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
     def testEnergySimple(self):
@@ -138,7 +145,6 @@ class TestGromacsToAmber(TestCase):
 
         self._check_energies(top, cong, parm, cona)
 
-
     def _check_energies(self, parm1, con1, parm2, con2):
         ene1 = openmm.utils.energy_decomposition(parm1, con1)
         ene2 = openmm.utils.energy_decomposition(parm2, con2)
@@ -153,8 +159,10 @@ class TestGromacsToAmber(TestCase):
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
+
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestOpenMMToAmber(TestCase):
+
     """
     Tests that OpenMM system/topology combo can be translated to other formats
     """
@@ -164,7 +172,7 @@ class TestOpenMMToAmber(TestCase):
         parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem()
         amber.AmberParm.from_structure(
-                openmm.load_topology(parm.topology, system)
+            openmm.load_topology(parm.topology, system)
         ).write_parm(get_fn('ash_from_omm.parm7', written=True))
         parm2 = load_file(get_fn('ash_from_omm.parm7', written=True))
         system2 = parm2.createSystem()
@@ -189,8 +197,10 @@ class TestOpenMMToAmber(TestCase):
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
+
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestOpenMMToGromacs(TestCase):
+
     """
     Tests that OpenMM system/topology combo can be translated to other formats
     """
@@ -200,9 +210,10 @@ class TestOpenMMToGromacs(TestCase):
         parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         system = parm.createSystem()
         gromacs.GromacsTopologyFile.from_structure(
-                openmm.load_topology(parm.topology, system)
+            openmm.load_topology(parm.topology, system)
         ).write(get_fn('ash_from_omm.top', written=True))
-        parm2 = gromacs.GromacsTopologyFile(get_fn('ash_from_omm.top', written=True))
+        parm2 = gromacs.GromacsTopologyFile(
+            get_fn('ash_from_omm.top', written=True))
         system2 = parm2.createSystem()
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
@@ -224,4 +235,3 @@ class TestOpenMMToGromacs(TestCase):
                 self.assertAlmostEqual(ene1[term], 0)
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
-

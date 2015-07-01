@@ -21,8 +21,11 @@ __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class _ResidueType(object):
+
     """ Singleton for various types of residues """
+
     def __init__(self, name):
         self.name = name
 
@@ -39,7 +42,9 @@ UNKNOWN = _ResidueType('UNKNOWN')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class ResidueTemplate(object):
+
     """
     This is a residue template, which contains a listing of the atoms in the
     residue template as well as a mapping of which atoms are bonded to other
@@ -99,8 +104,8 @@ class ResidueTemplate(object):
         else:
             tail = 'None'
         return '<%s %s: %d atoms; %d bonds; head=%s; tail=%s>' % (
-                    type(self).__name__, self.name, len(self.atoms),
-                    len(self.bonds), head, tail)
+            type(self).__name__, self.name, len(self.atoms),
+            len(self.bonds), head, tail)
 
     def add_atom(self, atom):
         """ Adds an atom to this residue template
@@ -311,8 +316,8 @@ class ResidueTemplate(object):
         # Coordinates
         try:
             coords = pd.DataFrame(
-                    [[atom.xx, atom.xy, atom.xz] for atom in self.atoms],
-                    columns=['xx', 'xy', 'xz']
+                [[atom.xx, atom.xy, atom.xz] for atom in self.atoms],
+                columns=['xx', 'xy', 'xz']
             )
         except AttributeError:
             pass
@@ -321,8 +326,8 @@ class ResidueTemplate(object):
         # Velocities
         try:
             vels = pd.DataFrame(
-                    [[atom.vx, atom.vy, atom.vz] for atom in self.atoms],
-                    columns=['vx', 'vy', 'vz']
+                [[atom.vx, atom.vy, atom.vz] for atom in self.atoms],
+                columns=['vx', 'vy', 'vz']
             )
         except AttributeError:
             pass
@@ -332,7 +337,9 @@ class ResidueTemplate(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class PatchTemplate(ResidueTemplate):
+
     """
     A residue patch (typically used for CHARMM) that is used to modify existing
     residues in some way (e.g., terminal patches, disulfide bridges, etc.)
@@ -357,13 +364,16 @@ class PatchTemplate(ResidueTemplate):
     be deleted when applying this patch -- something that does not apply to
     standard Residues
     """
+
     def __init__(self, name=''):
         super(PatchTemplate, self).__init__(name)
         self.delete = []
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 class ResidueTemplateContainer(list):
+
     """
     A container of ResidueTemplate objects representing a unit with multiple
     residues
@@ -373,6 +383,7 @@ class ResidueTemplateContainer(list):
     name : str, optional
         The name of the residue container
     """
+
     def __init__(self, name=''):
         self.box = None
         self.name = name
@@ -421,7 +432,8 @@ class ResidueTemplateContainer(list):
         if isinstance(value, str):
             # Behave like a dict here... albeit a slow one
             for res in self:
-                if res.name == value: return res
+                if res.name == value:
+                    return res
         return list.__getitem__(self, value)
 
     def to_library(self):
@@ -437,6 +449,7 @@ class ResidueTemplateContainer(list):
         """
         ret = dict()
         for res in self:
-            if res.name in ret: continue
+            if res.name in ret:
+                continue
             ret[res.name] = res
         return ret

@@ -23,8 +23,10 @@ except ImportError:
 import re
 import warnings
 
+
 @add_metaclass(FileFormatType)
 class AmberOFFLibrary(object):
+
     """
     Class containing static methods responsible for parsing and writing OFF
     libraries
@@ -143,7 +145,8 @@ class AmberOFFLibrary(object):
             residues[name] = AmberOFFLibrary._parse_residue(fileobj, name)
             line = fileobj.readline()
 
-        if own_handle: fileobj.close()
+        if own_handle:
+            fileobj.close()
 
         return residues
 
@@ -235,7 +238,7 @@ class AmberOFFLibrary(object):
         n = int(fileobj.readline().strip())
         if nres + 1 != n:
             warnings.warn('Unexpected childsequence (%d); expected %d for '
-                          'residue %s' % (n, nres+1, name), AmberWarning)
+                          'residue %s' % (n, nres + 1, name), AmberWarning)
         elif not isinstance(templ, ResidueTemplate) and n != len(templ) + 1:
             raise RuntimeError('child sequence must be 1 greater than the '
                                'number of residues in the unit')
@@ -253,12 +256,12 @@ class AmberOFFLibrary(object):
         except ValueError:
             raise RuntimeError('Error processing connect table entries')
         if head > 0 and nres == 1:
-            templ.head = templ[head-1]
+            templ.head = templ[head - 1]
         elif head > 0 and nres > 1:
             if head < sum([len(r) for r in container]):
                 raise RuntimeError('HEAD on multi-residue unit not supported')
         if tail > 0 and nres == 1:
-            templ.tail = templ[tail-1]
+            templ.tail = templ[tail - 1]
         elif tail > 0 and nres > 1:
             if tail < sum([len(r) for r in container]):
                 warnings.warn('TAIL on multi-residue unit not supported (%s). '
@@ -284,9 +287,9 @@ class AmberOFFLibrary(object):
                         ii -= 1
                         break
                 start_idx = start_atoms[ii]
-                container[ii].add_bond(i-start_idx, j-start_idx)
+                container[ii].add_bond(i - start_idx, j - start_idx)
             else:
-                templ.add_bond(int(i)-1, int(j)-1)
+                templ.add_bond(int(i) - 1, int(j) - 1)
         # Get the hierarchy table
         rematch = AmberOFFLibrary._sec7re.match(line)
         if not rematch:
@@ -306,7 +309,7 @@ class AmberOFFLibrary(object):
         elif rematch.groups()[0] != name:
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
-        fileobj.readline() # Skip this... not used
+        fileobj.readline()  # Skip this... not used
         line = fileobj.readline()
         # Get the atomic positions
         rematch = AmberOFFLibrary._sec9re.match(line)
@@ -328,14 +331,16 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
         for i in range(nres):
-            c1,c2,c3,c4,c5,c6 = [int(x) for x in fileobj.readline().split()]
-            if templ.head is not None and templ.head is not templ[c1-1]:
+            c1, c2, c3, c4, c5, c6 = [int(x)
+                                      for x in fileobj.readline().split()]
+            if templ.head is not None and templ.head is not templ[c1 - 1]:
                 warnings.warn('HEAD atom is not connect0')
-            if templ.tail is not None and templ.tail is not templ[c2-1]:
+            if templ.tail is not None and templ.tail is not templ[c2 - 1]:
                 warnings.warn('TAIL atom is not connect1')
             for i in (c3, c4, c5, c6):
-                if i == 0: continue
-                templ.connections.append(templ[i-1])
+                if i == 0:
+                    continue
+                templ.connections.append(templ[i - 1])
         # Get the residues table
         line = fileobj.readline()
         rematch = AmberOFFLibrary._sec11re.match(line)
@@ -354,8 +359,8 @@ class AmberOFFLibrary(object):
             img = int(img)
             if next - start != len(container[i]):
                 warnings.warn('residue table predicted %d, not %d atoms for '
-                              'residue %s' % (next-start, len(container[i]),
-                              name), AmberWarning)
+                              'residue %s' % (next - start, len(container[i]),
+                                              name), AmberWarning)
             if typ == 'p':
                 container[i].type = PROTEIN
             elif typ == 'n':
@@ -376,7 +381,7 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
         for i in range(nres):
-            #TODO sanity check
+            # TODO sanity check
             fileobj.readline()
         line = fileobj.readline()
         # Get the solventcap array
@@ -435,7 +440,8 @@ class AmberOFFLibrary(object):
         for name in names:
             AmberOFFLibrary._write_residue(dest, lib[name])
 
-        if own_handle: dest.close()
+        if own_handle:
+            dest.close()
 
     #===================================================
 
@@ -461,8 +467,9 @@ class AmberOFFLibrary(object):
         for i, r in enumerate(res):
             for atom in r:
                 dest.write(' "%s" "%s" 0 %d 131072 %d %d %.6f\n' % (atom.name,
-                           atom.type, i+1, atom.idx+1, atom.atomic_number,
-                           atom.charge))
+                                                                    atom.type, i + 1, atom.idx +
+                                                                    1, atom.atomic_number,
+                                                                    atom.charge))
         dest.write('!entry.%s.unit.atomspertinfo table  str pname  str ptype  '
                    'int ptypex  int pelmnt  dbl pchg\n' % res.name)
         for r in res:
@@ -481,7 +488,7 @@ class AmberOFFLibrary(object):
             dest.write(' %f\n' % res.box[1])
             dest.write(' %f\n' % res.box[2])
         dest.write('!entry.%s.unit.childsequence single int\n %d\n' %
-                   (res.name, len(res)+1))
+                   (res.name, len(res) + 1))
         dest.write('!entry.%s.unit.connect array int\n' % res.name)
         if len(res) > 1:
             dest.write(' 0\n 0\n')
@@ -498,14 +505,15 @@ class AmberOFFLibrary(object):
                    'int flags\n' % res.name)
         for r in res:
             for bond in r.bonds:
-                dest.write(' %d %d 1\n' % (bond.atom1.idx+1, bond.atom2.idx+1))
+                dest.write(' %d %d 1\n' %
+                           (bond.atom1.idx + 1, bond.atom2.idx + 1))
         dest.write('!entry.%s.unit.hierarchy table  str abovetype  int '
                    'abovex  str belowtype  int belowx\n' % res.name)
         c = 1
         for i, r in enumerate(res):
-            dest.write(' "U" 0 "R" %d\n' % (i+1))
+            dest.write(' "U" 0 "R" %d\n' % (i + 1))
             for atom in r:
-                dest.write(' "R" %d "A" %d\n' % (i+1, c))
+                dest.write(' "R" %d "A" %d\n' % (i + 1, c))
                 c += 1
         dest.write('!entry.%s.unit.name single str\n' % res.name)
         dest.write(' "%s"\n' % res.name)
@@ -520,10 +528,12 @@ class AmberOFFLibrary(object):
             # Make the CONECT1 and 0 default to 1 so that the TREE gets set
             # correctly by tleap. Not used for anything else...
             conn = [1, 1, 0, 0, 0, 0]
-            if r.head is not None: conn[0] = r.head.idx + 1
-            if r.tail is not None: conn[1] = r.tail.idx + 1
+            if r.head is not None:
+                conn[0] = r.head.idx + 1
+            if r.tail is not None:
+                conn[1] = r.tail.idx + 1
             for i, at in enumerate(r.connections):
-                conn[i+2] = at.idx + 1
+                conn[i + 2] = at.idx + 1
             dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
         dest.write('!entry.%s.unit.residues table  str name  int seq  int '
                    'childseq  int startatomx  str restype  int imagingx\n' %
@@ -535,15 +545,15 @@ class AmberOFFLibrary(object):
             elif r.type is NUCLEIC:
                 typ = 'n'
             elif r.type is SOLVENT:
-                typ='w'
+                typ = 'w'
             elif r.type is UNKNOWN:
-                typ='?'
+                typ = '?'
             else:
                 warnings.warn('Unrecognized residue type %r' % r.type,
                               AmberWarning)
                 typ = '?'
-            dest.write(' "%s" %d %d %d "%s" %d\n' % (r.name, i+1, 1+len(r), c,
-                       typ, _imaging_atom(r)))
+            dest.write(' "%s" %d %d %d "%s" %d\n' % (r.name, i + 1, 1 + len(r), c,
+                                                     typ, _imaging_atom(r)))
             c += len(r)
         dest.write('!entry.%s.unit.residuesPdbSequenceNumber array int\n' %
                    res.name)
@@ -551,7 +561,7 @@ class AmberOFFLibrary(object):
             if len(res) == 1:
                 dest.write(' 0\n')
             else:
-                dest.write(' %d\n' % (i+1))
+                dest.write(' %d\n' % (i + 1))
         dest.write('!entry.%s.unit.solventcap array dbl\n' % res.name)
         dest.write(' -1.000000\n' + ' 0.0\n' * 4)
         dest.write('!entry.%s.unit.velocities table  dbl x  dbl y  dbl z\n' %
@@ -568,11 +578,14 @@ class AmberOFFLibrary(object):
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Helper routines
+
+
 def _strip_enveloping_quotes(inp):
     """ Strips the quotation marks enveloping a string """
     if inp[0] == inp[-1] == '"' or inp[0] == inp[-1] == "'":
         return inp[1:-1]
     return inp
+
 
 def _imaging_atom(res):
     """
@@ -581,18 +594,19 @@ def _imaging_atom(res):
     COM of the residue
     """
     from parmed.geometry import center_of_mass
-    #TODO implement the docstring
+    # TODO implement the docstring
     found_heavy = False
     heavy_idx = -1
     for i, atom in enumerate(res):
         if atom.atomic_number > 1:
             heavy_idx = i
-            if found_heavy: break
+            if found_heavy:
+                break
             found_heavy = True
     else:
         if heavy_idx != -1:
             return heavy_idx
-        return 0 # No heavy atoms?? No imaging atom, then.
+        return 0  # No heavy atoms?? No imaging atom, then.
     # Now pick the atom closest to COM (if numpy is available)
     if np is None:
         warnings.warn('numpy not available. imaging atom set to 0')

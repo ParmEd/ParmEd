@@ -4,6 +4,7 @@ from math import sqrt
 from parmed.constants import NTYPES
 from parmed.utils.six.moves import range
 
+
 def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     """ Adds a new Lennard Jones type to a topology file """
     # Set the new atom type
@@ -17,7 +18,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     # Now increment NTYPES
     parm.parm_data['POINTERS'][NTYPES] += 1
     parm.pointers['NTYPES'] += 1
-   
+
     # Now create a whole new array for NONBONDED_PARM_INDEX
     start_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1
     current_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1
@@ -25,7 +26,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     for i in range(old_ntypes):
         # Copy over the first ntypes terms
         parm.parm_data['NONBONDED_PARM_INDEX'].insert(
-                                    parm.ptr('ntypes')*(i+1)-1, current_idx)
+            parm.ptr('ntypes') * (i + 1) - 1, current_idx)
         current_idx += 1
 
     # Now add the interaction of the last type with every other
@@ -49,7 +50,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
             depth = sqrt(parm.LJ_14_depth[i] * epsilon14)
             parm.parm_data['LENNARD_JONES_14_ACOEF'].append(depth * rad**12)
             parm.parm_data['LENNARD_JONES_14_BCOEF'].append(2 * depth * rad**6)
-   
+
     # Now add the last type interacting with itself, and add it to the
     # LJ_radius/depth arrays
     depth = epsilon
@@ -74,11 +75,11 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     if 'LENNARD_JONES_CCOEF' in parm.parm_data:
         ccoeffs = parm.parm_data['LENNARD_JONES_CCOEF']
         for i in range(old_ntypes):
-            nbi = parm.ptr('ntypes')*(old_type-1) + i
+            nbi = parm.ptr('ntypes') * (old_type - 1) + i
             idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
             ccoeffs.append(ccoeffs[idx])
 
         # Now the last type interacting with itself
-        nbi = parm.ptr('ntypes')*(old_type-1) + old_type - 1
+        nbi = parm.ptr('ntypes') * (old_type - 1) + old_type - 1
         idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
         ccoeffs.append(ccoeffs[idx])

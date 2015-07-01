@@ -9,7 +9,7 @@ Date: Apr. 13, 2015
 """
 from __future__ import division
 from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
-                       DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
+                    DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
@@ -23,15 +23,21 @@ import warnings
 
 _penaltyre = re.compile(r'penalty\s*=\s*([\d\.]+)')
 
+
 class _EmptyStringIterator(object):
+
     """ Always yields an empty string """
+
     def __iter__(self):
         while True:
             yield ''
+
     def __getitem__(self, idx):
         return ''
 
+
 class CharmmParameterSet(ParameterSet):
+
     """
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
     the information found in the MASS section of the CHARMM topology file
@@ -129,9 +135,12 @@ class CharmmParameterSet(ParameterSet):
                     raise ValueError('Unrecognized file type: %s' % arg)
             else:
                 raise ValueError('Unrecognized file type: %s' % arg)
-        for top in tops: self.read_topology_file(top)
-        for par in pars: self.read_parameter_file(par)
-        for strf in strs: self.read_stream_file(strf)
+        for top in tops:
+            self.read_topology_file(top)
+        for par in pars:
+            self.read_parameter_file(par)
+        for strf in strs:
+            self.read_stream_file(strf)
 
     @classmethod
     def load_set(cls, tfile=None, pfile=None, sfiles=None):
@@ -152,7 +161,7 @@ class CharmmParameterSet(ParameterSet):
         -------
         New CharmmParameterSet populated with parameters found in the provided
         files
-            
+
         Notes
         -----
         The RTF file is read first (if provided), followed by the PAR file,
@@ -212,7 +221,7 @@ class CharmmParameterSet(ParameterSet):
         current_cmap2 = None
         current_cmap_data = []
         current_cmap_res = 0
-        nonbonded_types = dict() # Holder
+        nonbonded_types = dict()  # Holder
         parameterset = None
         read_first_nonbonded = False
         for i, line in enumerate(f):
@@ -257,11 +266,12 @@ class CharmmParameterSet(ParameterSet):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
-            if line.startswith('END'): # should this be case-insensitive?
+            if line.startswith('END'):  # should this be case-insensitive?
                 section = None
                 continue
             # If we have no section, skip
-            if section is None: continue
+            if section is None:
+                continue
             # See if our comments define a penalty for this line
             pens = _penaltyre.findall(comment)
             if len(pens) == 1:
@@ -270,7 +280,8 @@ class CharmmParameterSet(ParameterSet):
                 penalty = None
             # Now handle each section specifically
             if section == 'ATOMS':
-                if not line.startswith('MASS'): continue # Should this happen?
+                if not line.startswith('MASS'):
+                    continue  # Should this happen?
                 words = line.split()
                 try:
                     idx = conv(words[1], int, 'atom type')
@@ -358,7 +369,7 @@ class CharmmParameterSet(ParameterSet):
                         if dtype.per == dihedral.per:
                             # Replace. Warn if they are different
                             if dtype != dihedral:
-                                warnings.warn('Replacing dihedral %r with %r' % 
+                                warnings.warn('Replacing dihedral %r with %r' %
                                               (dtype, dihedral))
                             self.dihedral_types[key][i] = dihedral
                             replaced = True
@@ -375,11 +386,11 @@ class CharmmParameterSet(ParameterSet):
                             break
                     if not replaced:
                         self.dihedral_types[key].append(dihedral)
-                else: # key not present
+                else:  # key not present
                     dtl = DihedralTypeList()
                     dtl.append(dihedral)
-                    self.dihedral_types[(type1,type2,type3,type4)] = dtl
-                    self.dihedral_types[(type4,type3,type2,type1)] = dtl
+                    self.dihedral_types[(type1, type2, type3, type4)] = dtl
+                    self.dihedral_types[(type4, type3, type2, type1)] = dtl
                 continue
             if section == 'IMPROPER':
                 words = line.split()
@@ -398,10 +409,11 @@ class CharmmParameterSet(ParameterSet):
                     tmp = conv(words[6], float, 'improper equil. value')
                     theteq = tmp
                 except IndexError:
-                    pass # Do nothing
+                    pass  # Do nothing
                 # Improper types seem not to have the central atom defined in
                 # the first place, so just have the key a fully sorted list. We
-                # still depend on the PSF having properly ordered improper atoms
+                # still depend on the PSF having properly ordered improper
+                # atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
                 improp = ImproperType(k, theteq)
                 self.improper_types[key] = improp
@@ -435,8 +447,10 @@ class CharmmParameterSet(ParameterSet):
                     except IndexError:
                         raise CharmmError('Could not parse CMAP data.')
                     # order the torsions independently
-                    k1 = [type1,type2,type3,type4,type5,type6,type7,type8]
-                    k2 = [type8,type7,type6,type5,type4,type3,type2,type1]
+                    k1 = [
+                        type1, type2, type3, type4, type5, type6, type7, type8]
+                    k2 = [
+                        type8, type7, type6, type5, type4, type3, type2, type1]
                     current_cmap = tuple(min(k1, k2))
                     current_cmap2 = tuple(max(k1, k2))
                     current_cmap_res = res
@@ -454,10 +468,12 @@ class CharmmParameterSet(ParameterSet):
                     # If we haven't read our first nonbonded term yet, we may
                     # just be parsing the settings that should be used. So
                     # soldier on
-                    if not read_first_nonbonded: continue
+                    if not read_first_nonbonded:
+                        continue
                     raise CharmmError('Could not parse nonbonded terms.')
                 except CharmmError:
-                    if not read_first_nonbonded: continue
+                    if not read_first_nonbonded:
+                        continue
                     raise
                 else:
                     # OK, we've read our first nonbonded section for sure now
@@ -515,8 +531,10 @@ class CharmmParameterSet(ParameterSet):
         except KeyError:
             raise RuntimeError('Atom type %s not present in AtomType list' %
                                key)
-        if parameterset is not None: self.parametersets.append(parameterset)
-        if own_handle: f.close()
+        if parameterset is not None:
+            self.parametersets.append(parameterset)
+        if own_handle:
+            f.close()
 
     def read_topology_file(self, tfile):
         """
@@ -535,7 +553,7 @@ class CharmmParameterSet(ParameterSet):
         else:
             own_handle = False
             f = tfile
-        hpatch = tpatch = None # default Head and Tail patches
+        hpatch = tpatch = None  # default Head and Tail patches
         residues = dict()
         patches = dict()
         hpatches = dict()
@@ -553,7 +571,8 @@ class CharmmParameterSet(ParameterSet):
                     except IndexError:
                         raise CharmmError('Could not parse MASS section of %s' %
                                           tfile)
-                    # The parameter file might or might not have an element name
+                    # The parameter file might or might not have an element
+                    # name
                     try:
                         elem = words[4]
                         if len(elem) == 2:
@@ -568,7 +587,7 @@ class CharmmParameterSet(ParameterSet):
                     self.atom_types_int[atype.number] = atype
                     self.atom_types_tuple[(atype.name, atype.number)] = atype
                 elif line[:4] == 'DECL':
-                    pass # Not really sure what this means
+                    pass  # Not really sure what this means
                 elif line[:4] == 'DEFA':
                     words = line.split()
                     if len(words) < 5:
@@ -656,7 +675,8 @@ class CharmmParameterSet(ParameterSet):
                         elif line[:5].upper() == 'PATCH':
                             it = iter(line.split()[1:])
                             for tok, val in zip(it, it):
-                                if val.upper() == 'NONE': val = None
+                                if val.upper() == 'NONE':
+                                    val = None
                                 if tok.upper().startswith('FIRS'):
                                     hpatches[resname] = val
                                 elif tok.upper().startswith('LAST'):
@@ -672,7 +692,8 @@ class CharmmParameterSet(ParameterSet):
                             # Back up a line and bail
                             break
                         line = next(f)
-                    if group: res.groups.append(group)
+                    if group:
+                        res.groups.append(group)
                     _fit_IC_table(res, ictable)
                     if restype == 'RESI':
                         residues[resname] = res
@@ -704,7 +725,8 @@ class CharmmParameterSet(ParameterSet):
         self.residues.update(residues)
         self.patches.update(patches)
 
-        if own_handle: f.close()
+        if own_handle:
+            f.close()
 
     def read_stream_file(self, sfile):
         """
@@ -733,6 +755,7 @@ class CharmmParameterSet(ParameterSet):
             title, section, comments = f.next_section()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 def _fit_IC_table(res, ictable):
     """

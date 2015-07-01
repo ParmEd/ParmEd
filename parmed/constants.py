@@ -54,13 +54,38 @@ NCOPY  : Number of copies for advanded simulations
 # These global variables provide a more natural way of accessing
 # the various pointers.  Most useful if they're loaded into the
 # top-level namespace.
-NATOM  = 0; NTYPES = 1; NBONH  = 2; MBONA  = 3; NTHETH = 4
-MTHETA = 5; NPHIH  = 6; MPHIA  = 7; NHPARM = 8; NPARM  = 9
-NEXT   = 10; NRES   = 11; NBONA  = 12; NTHETA = 13; NPHIA  = 14
-NUMBND = 15; NUMANG = 16; NPTRA  = 17; NATYP  = 18; NPHB   = 19
-IFPERT = 20; NBPER  = 21; NGPER  = 22; NDPER  = 23; MBPER  = 24
-MGPER  = 25; MDPER  = 26; IFBOX  = 27; NMXRS  = 28; IFCAP  = 29
-NUMEXTRA= 30; NCOPY  = 31
+NATOM = 0
+NTYPES = 1
+NBONH = 2
+MBONA = 3
+NTHETH = 4
+MTHETA = 5
+NPHIH = 6
+MPHIA = 7
+NHPARM = 8
+NPARM = 9
+NEXT = 10
+NRES = 11
+NBONA = 12
+NTHETA = 13
+NPHIA = 14
+NUMBND = 15
+NUMANG = 16
+NPTRA = 17
+NATYP = 18
+NPHB = 19
+IFPERT = 20
+NBPER = 21
+NGPER = 22
+NDPER = 23
+MBPER = 24
+MGPER = 25
+MDPER = 26
+IFBOX = 27
+NMXRS = 28
+IFCAP = 29
+NUMEXTRA = 30
+NCOPY = 31
 
 # An alias
 NNB = NEXT

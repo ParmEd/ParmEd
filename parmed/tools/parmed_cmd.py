@@ -20,9 +20,11 @@ except ImportError:
 
 _COMMANDLOGS = []
 
+
 def log_commands(func):
     """ Decorator to write the line to a file """
     global _COMMANDLOGS
+
     def new_func(self, line, *args, **kwargs):
         if self._logfile is not None and line != 'EOF':
             self._logfile.write('%s\n' % line)
@@ -36,7 +38,9 @@ def log_commands(func):
 
     return new_func
 
+
 class ParmedCmd(cmd.Cmd):
+
     """
     ParmEd command interpreter. The docstrings for each do_* command are simply
     copied from the docstring for that Action's docstring
@@ -52,7 +56,8 @@ class ParmedCmd(cmd.Cmd):
         self.continued = ''
         self._logfile = None
         self._exit_on_fatal = True
-        if not self._populated: self.populate_actions()
+        if not self._populated:
+            self.populate_actions()
 
     def setlog(self, f):
         """
@@ -125,7 +130,7 @@ class ParmedCmd(cmd.Cmd):
                 return None, None, line
         i, n = 0, len(line)
         while i < n and line[i] in self.identchars:
-            i = i+1
+            i = i + 1
         cmd, arg = line[:i], ArgumentList(line[i:].strip())
         if len(line) == 4 and line == 'help':
             arg = ''
@@ -142,7 +147,7 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
                 raise err
-   
+
     def _normaldo(self, ActionClass, line):
         """ The standard action command does this stuff """
         actionname = ActionClass.__name__
@@ -193,7 +198,7 @@ class ParmedCmd(cmd.Cmd):
                 _cmd.cmdloop()
             except ParmedError:
                 pass
-      
+
     def do_go(self, line):
         """
         Stops reading commands and executes any 'parmout' command that had
@@ -230,7 +235,7 @@ class ParmedCmd(cmd.Cmd):
                 self.stdout.write('%s\n' % line)
         else:
             for i in range(readline.get_current_history_length()):
-                self.stdout.write('%s\n' % readline.get_history_item(i+1))
+                self.stdout.write('%s\n' % readline.get_history_item(i + 1))
 
     def default(self, line):
         words = line.split()
@@ -269,14 +274,15 @@ class ParmedCmd(cmd.Cmd):
         python_interpreter = PythonCmd(stdin=self.stdin, stdout=self.stdout)
         python_interpreter.use_rawinput = self.use_rawinput
         python_interpreter.setlog(self._logfile)
-        if not self.prompt: python_interpreter.prompt = ''
+        if not self.prompt:
+            python_interpreter.prompt = ''
         python_interpreter.cmdloop()
         try:
             amber_prmtop = self.parm
             exec(python_interpreter.command_string)
         except Exception as err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
-      
+
     def do_help(self, arg):
         " Modify the original do_help to pull docstrings from actions "
         if arg:
@@ -285,7 +291,7 @@ class ParmedCmd(cmd.Cmd):
                 func = getattr(self, 'help_' + arg)
             except (AttributeError, TypeError):
                 try:
-                    doc=getattr(self, 'do_' + arg).__doc__
+                    doc = getattr(self, 'do_' + arg).__doc__
                     if doc:
                         self.stdout.write("%s\n" % str(doc))
                         return
@@ -300,7 +306,7 @@ class ParmedCmd(cmd.Cmd):
                     doc = doc % (_fmt_usage(Usages[arg.lower()]),
                                  _action.__doc__)
                     if doc:
-                        self.stdout.write("%s\n"%str(doc))
+                        self.stdout.write("%s\n" % str(doc))
                         return
                 except (AttributeError, KeyError):
                     pass
@@ -314,7 +320,7 @@ class ParmedCmd(cmd.Cmd):
             help = {}
             for name in names:
                 if name[:5] == 'help_':
-                    help[name[5:]]=1
+                    help[name[5:]] = 1
             names.sort()
             # There can be duplicates if routines overridden
             prevname = ''
@@ -323,7 +329,7 @@ class ParmedCmd(cmd.Cmd):
                     if name == prevname:
                         continue
                     prevname = name
-                    cmd=name[3:]
+                    cmd = name[3:]
                     if cmd in help:
                         cmds_doc.append(cmd)
                         del help[cmd]
@@ -333,12 +339,14 @@ class ParmedCmd(cmd.Cmd):
                         cmds_doc.append(cmd)
                     else:
                         cmds_undoc.append(cmd)
-            self.stdout.write("%s\n"%str(self.doc_leader))
-            self.print_topics(self.doc_header,   cmds_doc,   15,80)
-            self.print_topics(self.misc_header,  help.keys(),15,80)
-            self.print_topics(self.undoc_header, cmds_undoc, 15,80)
+            self.stdout.write("%s\n" % str(self.doc_leader))
+            self.print_topics(self.doc_header,   cmds_doc,   15, 80)
+            self.print_topics(self.misc_header,  help.keys(), 15, 80)
+            self.print_topics(self.undoc_header, cmds_undoc, 15, 80)
+
 
 class PythonCmd(cmd.Cmd):
+
     """ Command interpreter for limited Python interpreter """
     prompt = "py >>> "
 
@@ -349,7 +357,8 @@ class PythonCmd(cmd.Cmd):
 
     def setlog(self, f):
         """ Open up a log file to start logging the commands """
-        if f is None: return
+        if f is None:
+            return
         if hasattr(f, 'write'):
             self._logfile = f
         else:
@@ -377,11 +386,14 @@ class PythonCmd(cmd.Cmd):
 
     def default(self, line):
         """ Add this onto the command string """
-        if line.strip() == '!!': return True
+        if line.strip() == '!!':
+            return True
         self.command_string += line + '\n'
 
 # To pretty-print usage statements. Some are getting long, so they need to be
 # shortened and printed in a helpfully formatted way
+
+
 def _fmt_usage(usage):
     MAX_LINE_LEN = 79
 
@@ -430,7 +442,8 @@ def _fmt_usage(usage):
             word += char
             i += 1
         # Now add the final word to the list of words if it's not blank
-        if word: words.append(word)
+        if word:
+            words.append(word)
         return words
 
     uwords = split_options(usage)
@@ -445,5 +458,6 @@ def _fmt_usage(usage):
         else:
             lines.append(line)
             line = ' ' * indent_size + uword
-    if line: lines.append(line)
+    if line:
+        lines.append(line)
     return '\n'.join(lines)

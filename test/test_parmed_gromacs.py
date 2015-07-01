@@ -12,8 +12,10 @@ import unittest
 from utils import get_fn, diff_files, get_saved_fn
 import warnings
 
+
 @unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(unittest.TestCase):
+
     """ Tests the Gromacs topology file parser """
 
     def setUp(self):
@@ -138,7 +140,7 @@ class TestGromacsTop(unittest.TestCase):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
         top = load_file(get_fn('1aki.charmm27.top'))
         GromacsTopologyFile.write(top,
-                get_fn('1aki.charmm27.top', written=True))
+                                  get_fn('1aki.charmm27.top', written=True))
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
         self._charmm27_checks(top)
 
@@ -178,6 +180,7 @@ class TestGromacsTop(unittest.TestCase):
                                                getattr(v2.type, attr), places=5)
                 else:
                     self.assertEqual(v1.type, v2.type)
+
         def cmp_dihedrals(dih1, dih2):
             self.assertEqual(len(dih1), len(dih2))
             for v1, v2 in zip(dih1, dih2):
@@ -192,9 +195,12 @@ class TestGromacsTop(unittest.TestCase):
                 if isinstance(v1, DihedralTypeList):
                     self.assertEqual(len(v1.type), len(v2.type))
                     for vt1, vt2 in zip(v1.type, v2.type):
-                        self.assertAlmostEqual(v1.type.phi_k, v2.type.phi_k, places=5)
-                        self.assertAlmostEqual(v1.type.per, v2.type.per, places=5)
-                        self.assertAlmostEqual(v1.type.phase, v2.type.phase, places=5)
+                        self.assertAlmostEqual(
+                            v1.type.phi_k, v2.type.phi_k, places=5)
+                        self.assertAlmostEqual(
+                            v1.type.per, v2.type.per, places=5)
+                        self.assertAlmostEqual(
+                            v1.type.phase, v2.type.phase, places=5)
 
         self.assertEqual(len(top1.atoms), len(top2.atoms))
         for a1, a2 in zip(top1.atoms, top2.atoms):
@@ -212,8 +218,8 @@ class TestGromacsTop(unittest.TestCase):
         """ Tests writing a Gromacs topology with multiple molecules """
         top = load_file(get_fn('1aki.ff99sbildn.top'))
         GromacsTopologyFile.write(top,
-                get_fn('1aki.ff99sbildn.top', written=True),
-                combine=None)
+                                  get_fn('1aki.ff99sbildn.top', written=True),
+                                  combine=None)
         top2 = load_file(get_fn('1aki.ff99sbildn.top', written=True))
         self._check_ff99sbildn(top2)
         self._check_equal_structures(top, top2)
@@ -227,7 +233,9 @@ class TestGromacsTop(unittest.TestCase):
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
         self.assertEqual(len(top.residues), 40)
 
+
 class TestGromacsGro(unittest.TestCase):
+
     """ Tests the Gromacs GRO file parser """
 
     def setUp(self):
@@ -297,7 +305,7 @@ class TestGromacsGro(unittest.TestCase):
                                    get_fn('1aki.ff99sbildn_highprec.gro',
                                           written=True)
                                    )
-        )
+                        )
         gro2 = GromacsGroFile.parse(get_fn('1aki.ff99sbildn_highprec.gro',
                                            written=True))
         gro3 = load_file(get_fn('1aki.ff99sbildn_highprec.gro', written=True))

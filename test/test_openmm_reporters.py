@@ -14,10 +14,10 @@ import numpy as np
 import os
 from parmed import unit as u
 from parmed.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
-                AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
+                          AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
 from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
-                ProgressReporter, RestartReporter, StateDataReporter,
-                EnergyMinimizerReporter)
+                                     ProgressReporter, RestartReporter, StateDataReporter,
+                                     EnergyMinimizerReporter)
 from parmed.utils.six.moves import range, zip
 import unittest
 
@@ -25,6 +25,7 @@ get_fn = utils.get_fn
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestStateDataReporter(unittest.TestCase):
@@ -43,9 +44,10 @@ class TestStateDataReporter(unittest.TestCase):
     def testStateDataReporter(self):
         """ Test StateDataReporter with various options """
         system = amber_gas.createSystem()
-        integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
-                                           1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
+        integrator = mm.LangevinIntegrator(300 * u.kelvin, 5.0 / u.picoseconds,
+                                           1.0 * u.femtoseconds)
+        sim = app.Simulation(
+            amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         f = open(get_fn('akma5.dat', written=True), 'w')
         sim.reporters.extend([
@@ -84,14 +86,15 @@ class TestStateDataReporter(unittest.TestCase):
             self.assertTrue(label in header[i])
         for i, line in enumerate(akma1):
             words = line.replace('\n', '').split(',')
-            self.assertEqual(i*10+10, int(words[0])) # step
+            self.assertEqual(i * 10 + 10, int(words[0]))  # step
         akma1.close()
         # AKMA 2
         header = akma2.readline().strip()[1:].split(',')
         self.assertEqual(len(header), 1)
         self.assertTrue('Step' in header[0])
         for i, line in enumerate(akma2):
-            self.assertEqual(int(line.replace('\n', '').split(',')[0]), 10*i+10)
+            self.assertEqual(
+                int(line.replace('\n', '').split(',')[0]), 10 * i + 10)
         akma2.close()
         # AKMA 3 -- save energies so we can compare to the file with different
         # units
@@ -117,7 +120,7 @@ class TestStateDataReporter(unittest.TestCase):
             self.assertTrue(label in header[i])
         for i, line in enumerate(akma4):
             words = line.replace('\n', '').split('\t')
-            self.assertEqual(i*10+10, int(words[0])) # step
+            self.assertEqual(i * 10 + 10, int(words[0]))  # step
         akma4.close()
         # AKMA 5 -- write to open file handle
         header = akma5.readline().strip()[1:].split(',')
@@ -128,7 +131,7 @@ class TestStateDataReporter(unittest.TestCase):
             self.assertTrue(label in header[i])
         for i, line in enumerate(akma5):
             words = line.replace('\n', '').split(',')
-            self.assertEqual(i*10+10, int(words[0])) # step
+            self.assertEqual(i * 10 + 10, int(words[0]))  # step
         akma5.close()
         # UNITS -- compare other units
         ene = u.kilojoule_per_mole.conversion_factor_to(u.kilocalorie_per_mole)
@@ -140,7 +143,7 @@ class TestStateDataReporter(unittest.TestCase):
             words = line.replace('\n', '').split(',')
             self.assertEqual(int(words[0]), akma_energies[i][0])
             for j in range(1, 8):
-                self.assertAlmostEqual(float(words[j])*conversions[j],
+                self.assertAlmostEqual(float(words[j]) * conversions[j],
                                        akma_energies[i][j],
                                        places=5)
         units.close()
@@ -148,9 +151,10 @@ class TestStateDataReporter(unittest.TestCase):
     def testProgressReporter(self):
         """ Test ProgressReporter with various options """
         system = amber_gas.createSystem()
-        integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
-                                           1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
+        integrator = mm.LangevinIntegrator(300 * u.kelvin, 5.0 / u.picoseconds,
+                                           1.0 * u.femtoseconds)
+        sim = app.Simulation(
+            amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.append(
             ProgressReporter(get_fn('progress_reporter.dat', written=True), 10,
@@ -168,6 +172,7 @@ class TestStateDataReporter(unittest.TestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
+
 @unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
 class TestTrajRestartReporter(unittest.TestCase):
 
@@ -182,33 +187,35 @@ class TestTrajRestartReporter(unittest.TestCase):
     def testReporters(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (no PBC) """
         system = amber_gas.createSystem()
-        integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
-                                           1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
+        integrator = mm.LangevinIntegrator(300 * u.kelvin, 5.0 / u.picoseconds,
+                                           1.0 * u.femtoseconds)
+        sim = app.Simulation(
+            amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.extend([
-                NetCDFReporter(get_fn('traj1.nc', written=True), 10),
-                NetCDFReporter(get_fn('traj2.nc', written=True), 10, vels=True),
-                NetCDFReporter(get_fn('traj3.nc', written=True), 10, frcs=True),
-                NetCDFReporter(get_fn('traj4.nc', written=True), 10, vels=True,
-                               frcs=True),
-                NetCDFReporter(get_fn('traj5.nc', written=True), 10, crds=False,
-                               vels=True),
-                NetCDFReporter(get_fn('traj6.nc', written=True), 10, crds=False,
-                               frcs=True),
-                NetCDFReporter(get_fn('traj7.nc', written=True), 10, crds=False,
-                               vels=True, frcs=True),
-                MdcrdReporter(get_fn('traj1.mdcrd', written=True), 10),
-                MdcrdReporter(get_fn('traj2.mdcrd', written=True), 10,
-                              crds=False, vels=True),
-                MdcrdReporter(get_fn('traj3.mdcrd', written=True), 10,
-                              crds=False, frcs=True),
-                RestartReporter(get_fn('restart.ncrst', written=True), 10,
-                                write_multiple=True, netcdf=True),
-                RestartReporter(get_fn('restart.rst7', written=True), 10)
+            NetCDFReporter(get_fn('traj1.nc', written=True), 10),
+            NetCDFReporter(get_fn('traj2.nc', written=True), 10, vels=True),
+            NetCDFReporter(get_fn('traj3.nc', written=True), 10, frcs=True),
+            NetCDFReporter(get_fn('traj4.nc', written=True), 10, vels=True,
+                           frcs=True),
+            NetCDFReporter(get_fn('traj5.nc', written=True), 10, crds=False,
+                           vels=True),
+            NetCDFReporter(get_fn('traj6.nc', written=True), 10, crds=False,
+                           frcs=True),
+            NetCDFReporter(get_fn('traj7.nc', written=True), 10, crds=False,
+                           vels=True, frcs=True),
+            MdcrdReporter(get_fn('traj1.mdcrd', written=True), 10),
+            MdcrdReporter(get_fn('traj2.mdcrd', written=True), 10,
+                          crds=False, vels=True),
+            MdcrdReporter(get_fn('traj3.mdcrd', written=True), 10,
+                          crds=False, frcs=True),
+            RestartReporter(get_fn('restart.ncrst', written=True), 10,
+                            write_multiple=True, netcdf=True),
+            RestartReporter(get_fn('restart.rst7', written=True), 10)
         ])
         sim.step(500)
-        for reporter in sim.reporters: reporter.finalize()
+        for reporter in sim.reporters:
+            reporter.finalize()
 
         self.assertEqual(len(os.listdir(get_fn('writes'))), 61)
         ntraj = [NetCDFTraj.open_old(get_fn('traj1.nc', written=True)),
@@ -252,8 +259,10 @@ class TestTrajRestartReporter(unittest.TestCase):
         self.assertFalse(ntraj[6].hascrds)
         self.assertTrue(ntraj[6].hasvels)
         self.assertTrue(ntraj[6].hasfrcs)
-        for i in (0, 2, 3, 4, 5, 6): ntraj[i].close() # still need the 2nd
-        for traj in atraj: traj.close()
+        for i in (0, 2, 3, 4, 5, 6):
+            ntraj[i].close()  # still need the 2nd
+        for traj in atraj:
+            traj.close()
         # Now test the NetCDF restart files
         fn = get_fn('restart.ncrst.%d', written=True)
         for i, j in enumerate(range(10, 501, 10)):
@@ -273,21 +282,22 @@ class TestTrajRestartReporter(unittest.TestCase):
     def testReportersPBC(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (w/ PBC) """
         system = amber_solv.createSystem(nonbondedMethod=app.PME,
-                                         nonbondedCutoff=8*u.angstroms)
-        integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
-                                           1.0*u.femtoseconds)
+                                         nonbondedCutoff=8 * u.angstroms)
+        integrator = mm.LangevinIntegrator(300 * u.kelvin, 5.0 / u.picoseconds,
+                                           1.0 * u.femtoseconds)
         sim = app.Simulation(amber_solv.topology, system, integrator)
         sim.context.setPositions(amber_solv.positions)
         sim.reporters.extend([
-                NetCDFReporter(get_fn('traj.nc', written=True), 1,
-                               vels=True, frcs=True),
-                MdcrdReporter(get_fn('traj.mdcrd', written=True), 1),
-                RestartReporter(get_fn('restart.ncrst', written=True), 1,
-                                netcdf=True),
-                RestartReporter(get_fn('restart.rst7', written=True), 1)
+            NetCDFReporter(get_fn('traj.nc', written=True), 1,
+                           vels=True, frcs=True),
+            MdcrdReporter(get_fn('traj.mdcrd', written=True), 1),
+            RestartReporter(get_fn('restart.ncrst', written=True), 1,
+                            netcdf=True),
+            RestartReporter(get_fn('restart.rst7', written=True), 1)
         ])
         sim.step(5)
-        for reporter in sim.reporters: reporter.finalize()
+        for reporter in sim.reporters:
+            reporter.finalize()
         ntraj = NetCDFTraj.open_old(get_fn('traj.nc', written=True))
         atraj = AmberMdcrd(get_fn('traj.mdcrd', written=True),
                            amber_solv.ptr('natom'), True, mode='r')

@@ -17,6 +17,7 @@ ppcomments = re.compile(r'(?://.+|/\*(?:.*)\*/)')
 includere = re.compile(r'[<"](.+)[>"]')
 novarcharre = re.compile(r'\W')
 
+
 def _strip_pp_comments(func):
     """
     Decorator to apply to functions that will strip out C-style comments before
@@ -29,22 +30,26 @@ def _strip_pp_comments(func):
         return func(self, args)
     return wrapper
 
+
 def _find_all_instances_in_string(string, substr):
     """ Find indices of all instances of substr in string """
     indices = []
     idx = string.find(substr, 0)
     while idx > -1:
         indices.append(idx)
-        idx = string.find(substr, idx+1)
+        idx = string.find(substr, idx + 1)
     return indices
+
 
 def _replace_defines(line, defines):
     """ Replaces defined tokens in a given line """
-    if not defines: return line
+    if not defines:
+        return line
     for define in reversed(defines):
         value = defines[define]
         indices = _find_all_instances_in_string(line, define)
-        if not indices: continue
+        if not indices:
+            continue
         # Check to see if it's inside of quotes
         inside = ''
         idx = 0
@@ -65,7 +70,7 @@ def _replace_defines(line, defines):
                     new_line.append(char)
                     idx += 1
                     continue
-                if i == 0 or novarcharre.match(line[i-1]):
+                if i == 0 or novarcharre.match(line[i - 1]):
                     endidx = indices[idx] + len(define)
                     if endidx >= len(line) or novarcharre.match(line[endidx]):
                         new_line.extend(list(value))
@@ -75,7 +80,7 @@ def _replace_defines(line, defines):
                 idx += 1
             new_line.append(char)
         line = ''.join(new_line)
-                        
+
     return line
 
 # To track where in the "if-elif-else" block each conditional is
@@ -83,7 +88,9 @@ _IN_IF = 'in if'
 _IN_ELIF = 'in elif'
 _IN_ELSE = 'in else'
 
+
 class CPreProcessor(object):
+
     """
     Steps through a file line-by-line, yielding only the preprocessed contents
 
@@ -237,7 +244,8 @@ class CPreProcessor(object):
 
     @_strip_pp_comments
     def _pp_elif(self, args):
-        raise NotImplementedError('#elif conditionals are not yet implemented.')
+        raise NotImplementedError(
+            '#elif conditionals are not yet implemented.')
 
     @_strip_pp_comments
     def _pp_else(self, args):
@@ -327,10 +335,10 @@ class CPreProcessor(object):
         elif len(words) == 0:
             raise PreProcessorError('Nothing defined in #undef')
 
-    _ppcmdmap = {'if' : _pp_if, 'elif' : _pp_elif, 'ifdef' : _pp_ifdef,
-                 'else' : _pp_else, 'define' : _pp_define, 'undef' : _pp_undef,
-                 'include' : _pp_include, 'endif' : _pp_endif,
-                 'ifndef' : _pp_ifndef}
+    _ppcmdmap = {'if': _pp_if, 'elif': _pp_elif, 'ifdef': _pp_ifdef,
+                 'else': _pp_else, 'define': _pp_define, 'undef': _pp_undef,
+                 'include': _pp_include, 'endif': _pp_endif,
+                 'ifndef': _pp_ifndef}
 
 if __name__ == '__main__':
     # Act as a stand-alone preprocessor
@@ -338,16 +346,16 @@ if __name__ == '__main__':
     import sys
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input-file', dest='input', metavar='FILE',
-                required=True, help='''Input file to pre-process. Either a file
+                        required=True, help='''Input file to pre-process. Either a file
                 name or, if '--' is given, from standard input.''')
     parser.add_argument('-o', '--output-file', dest='output', metavar='FILE',
-                default=None, help='''Output file with preprocessed results.
+                        default=None, help='''Output file with preprocessed results.
                 Default is standard output''')
     parser.add_argument('-D', dest='defines', metavar='VAR[=VAL]',
-                action='append', help='''List of predefined variables to pass to
+                        action='append', help='''List of predefined variables to pass to
                 the preprocessor. Default VAL is 1 when missing.''', default=[])
     parser.add_argument('-I', dest='includes', metavar='DIRECTORY',
-                action='append', help='''List of include directories to search
+                        action='append', help='''List of include directories to search
                 for included files''', default=[])
 
     opt = parser.parse_args()
