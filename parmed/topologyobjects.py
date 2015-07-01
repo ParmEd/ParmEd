@@ -269,11 +269,10 @@ class Atom(_ListItem):
         In some cases, "type" is an ambiguous choice of an integer serial number
         or a string descriptor. In this case, atom_type is an AtomType instance
         that disambiguates this discrepancy.
-    anisou : ``numpy.ndarray(float64) (or list of floats)``
+    anisou : numpy.ndarray(float64) (or list of floats)
         Anisotropic temperature scaling factors. This is a 6-element numpy array
-        (if numpy is not available, it is a 6-element list) of floating point
-        numbers. They are the 3x3 symmetric matrix elements U(1,1), U(2,2),
-        U(3,3), U(1,2), U(1,3), U(2,3). If no factors available, it is None.
+        They are the 3x3 symmetric matrix elements U(1,1), U(2,2), U(3,3),
+        U(1,2), U(1,3), U(2,3). If no factors available, it is None.
     idx : ``int``
         The index of this atom in the list. Set to -1 if this atom is not part
         of a list or the index cannot otherwise be determined (i.e., if the
@@ -2537,7 +2536,7 @@ class Improper(_FourAtomTerm):
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 4:
-            raise DihedralError('Impropers have 4 atoms, not %s' % len(thing))
+            raise MoleculeError('Impropers have 4 atoms, not %s' % len(thing))
         if self.atom1.idx != thing[0]:
             return False
         selfset = set([self.atom2.idx, self.atom3.idx, self.atom4.idx])
@@ -2762,8 +2761,8 @@ class Cmap(object):
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 5:
-            raise DihedralError('CMAP can compare to 5 elements, not %d'
-                                % (type(thing).__name__, len(thing)))
+            raise MoleculeError('CMAP can compare to 5 elements, not %d' %
+                                (type(thing).__name__, len(thing)))
         return ((self.atom1.idx == thing[0] and self.atom2.idx == thing[1] and
                  self.atom3.idx == thing[2] and self.atom4.idx == thing[3] and
                  self.atom5.idx == thing[4]) or
@@ -2915,10 +2914,8 @@ class _CmapGrid(object):
     @property
     def transpose(self):
         """ The transpose of the potential grid """
-        try:
+        if hasattr(self, '_transpose'):
             return self._transpose
-        except AttributeError:
-            pass
         _transpose = []
         size = len(self._data)
         for i in range(self.resolution):
@@ -3907,10 +3904,10 @@ class TrackedList(list):
     >>> tl.needs_indexing, tl.changed
     (False, False)
     """
-    def __init__(self, arg=[]):
+    def __init__(self, *args):
         self.changed = False
         self.needs_indexing = False
-        return list.__init__(self, arg)
+        return list.__init__(self, *args)
 
     @_changes
     def __delitem__(self, item):
@@ -3924,10 +3921,12 @@ class TrackedList(list):
             try:
                 self[index]._idx = -1
             except AttributeError:
+                # If we can't set _idx attribute on this object, don't fret
                 pass
             try:
                 self[index].list = None
             except AttributeError:
+                # If we can't set list attribute on this object, don't fret
                 pass
 
         return list.__delitem__(self, item)
@@ -3941,10 +3940,12 @@ class TrackedList(list):
             try:
                 self[index]._idx = -1
             except AttributeError:
+                # If we can't set _idx attribute on this object, don't fret
                 pass
             try:
                 self[index].list = None
             except AttributeError:
+                # If we can't set list attribute on this object, don't fret
                 pass
         return list.__delslice__(self, start, stop)
 
@@ -3978,10 +3979,9 @@ class TrackedList(list):
         return TrackedList(list.__mul__(self, fac))
 
     def __getitem__(self, thing):
-        retval = list.__getitem__(self, thing)
-        if hasattr(thing, 'indices'):
-            return TrackedList(retval)
-        return retval
+        if isinstance(thing, slice):
+            return TrackedList(list.__getitem__(self, thing))
+        return list.__getitem__(self, thing)
 
     def __getslice__(self, start, end):
         return TrackedList(list.__getslice__(self, start, end))

@@ -83,8 +83,7 @@ class _DihedralTerm(object):
             self.type = dihedraltype
         else:
             self.type = DihedralType(pk / self.idivf, float(periodicity),
-                                    float(phase), float(scee), float(scnb),
-                                    improper=improper)
+                                     float(phase), float(scee), float(scnb))
 
     def parmline(self, multiterm=False):
         if self.dihtype == 'improper' or not multiterm:

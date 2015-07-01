@@ -66,6 +66,9 @@ class PdbxSyntaxError(PdbxError):
     def __str__(self):
         return "%%ERROR - [at line: %d] %s" % (self.lineNumber, self.text)
 
+class InputError(ParmedError):
+    """ When there is an error with input """
+
 # Warnings
 
 class ParmedWarning(Warning):

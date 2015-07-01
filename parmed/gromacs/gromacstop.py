@@ -153,6 +153,23 @@ class GromacsTopologyFile(Structure):
         parametertypes sections. If False, only parameter types defined in the
         parameter sections themselves are loaded (i.e., on the same line as the
         parameter was defined). Default is True
+    xyz : str or array, optional
+        The source of atomic coordinates. It can be a string containing the name
+        of a coordinate file from which to fill the coordinates (and optionally
+        the unit cell information), or it can be an array with the coordinates.
+        Default is None
+    box : array, optional
+        If provided, the unit cell information will be set from this variable.
+        If provided, it must be a collection of 6 floats representing the unit
+        cell dimensions a, b, c, alpha, beta, and gamma, respectively. Default
+        is None.
+
+    Notes
+    -----
+    If the ``xyz`` argument is a file name that contains the unit cell
+    information, this unit cell information is set. However, the ``box``
+    argument takes precedence and will override values given in the coordinate
+    file unless it has its default value of ``None``.
     """
 
     #===================================================
@@ -192,17 +209,37 @@ class GromacsTopologyFile(Structure):
                                'system', 'bondtypes', 'angletypes', 'cmaptypes',
                                'dihedraltypes', 'bonds', 'angles', 'dihedrals',
                                'cmaps', 'molecules', 'exclusions',
-                               'nonbond_params')
+                               'nonbond_params', 'position_restraints')
             return False
 
     #===================================================
 
-    def __init__(self, fname=None, defines=None, parametrize=True):
+    def __init__(self, fname=None, defines=None, parametrize=True,
+                 xyz=None, box=None):
+        from parmed import load_file
         super(GromacsTopologyFile, self).__init__()
         self.parameterset = None
         self.defaults = _Defaults()
         if fname is not None:
             self.read(fname, defines, parametrize)
+            # Fill in coordinates and unit cell information if appropriate
+            if xyz is not None:
+                if isinstance(xyz, string_types):
+                    f = load_file(xyz)
+                    if (not hasattr(f, 'coordinates') or
+                            f.coordinates is None):
+                        raise TypeError('File %s does not have coordinates' %
+                                        xyz)
+                    self.coordinates = f.coordinates
+                    if box is None and hasattr(f, 'box'):
+                        self.box = f.box
+                else:
+                    self.coordinates = xyz
+            if box is not None:
+                self.box = box
+            self.unchange()
+        elif xyz is not None or box is not None:
+            raise ValueError('Cannot provide coordinates/box and NOT a top')
 
     #===================================================
 

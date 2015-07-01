@@ -5,10 +5,12 @@ _charmmfile.py for reading files
 
 Author: Jason Deckman
 Contributors: Jason Swails
-Date: Feb. 24, 2015
+Date: June 19, 2015
 """
 from __future__ import print_function, division
 
+from contextlib import closing
+import numpy as np
 from parmed.utils import io
 from parmed.formats.registry import FileFormatType
 from parmed.exceptions import CharmmError
@@ -16,7 +18,6 @@ from parmed import unit as u
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
 from parmed.vec3 import Vec3
-from contextlib import closing
 import sys
 
 charmlen = 22
@@ -40,16 +41,11 @@ class CharmmCrdFile(object):
         Number of atoms in the system
     resname : list of str
         List of all residue names in the system
-    coords : list of float
-        List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
+    coordinates : np.ndarray with shape (1, natom, 3)
+        Atomic coordinates in a numpy array
     positions : natom x 3 distance Quantity
         2-D list of all coordinates with the appropriate distance unit attached.
         Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
-
-    Example:
-    >>> chm = CharmmCrdFile('testfiles/1tnm.crd')
-    >>> print('%d atoms; %d coords' % (chm.natom, len(chm.coords)))
-    1414 atoms; 4242 coords
     """
 
     @staticmethod
@@ -66,30 +62,28 @@ class CharmmCrdFile(object):
         is_fmt : bool
             True if it is a CHARMM coordinate file
         """
-        with io.genopen(filename) as f:
+        with closing(io.genopen(filename)) as f:
             line = f.readline()
             while len(line.strip()) == 0:   # Skip whitespace, as a precaution
                 line = f.readline()
 
             intitle = True
-
             while intitle:
-                line = f.readline()
-                if len(line.strip()) == 0:
+                line = f.readline().strip()
+                if len(line) == 0:
                     intitle = False
-                elif line.strip()[0] != '*':
+                elif line[0] != '*':
                     intitle = False
                 else:
                     intitle = True
 
-            while len(line.strip()) == 0:      # Skip whitespace
-                line = f.readline()
+            while len(line) == 0:      # Skip whitespace
+                line = f.readline().strip()
 
             try:
-                natom = int(line.strip().split()[0])
-
+                natom = int(line.split()[0])
                 for row in range(min(natom, 3)):
-                    line = f.readline().strip().split()
+                    line = f.readline().split()
                     int(line[0])
                     int(line[1])
                     float(line[4])
@@ -121,41 +115,42 @@ class CharmmCrdFile(object):
         """
         Atomic coordinates with units attached to them with the shape (natom, 3)
         """
-        return ([Vec3(*self.coords[i:i+3]) for i in range(0, self.natom*3, 3)] *
-                        u.angstroms)
+        return [Vec3(*xyz) for xyz in self.coordinates[0]] * u.angstroms
 
     @property
     def coordinates(self):
         return self.coords
 
+    @property
+    def box(self):
+        return None
+
     def _parse(self, fname):
 
         with closing(io.genopen(fname, 'r')) as crdfile:
-            line = crdfile.readline()
+            line = crdfile.readline().strip()
 
-            while len(line.strip()) == 0:   # Skip whitespace, as a precaution
-                line = crdfile.readline()
+            while len(line) == 0:   # Skip whitespace, as a precaution
+                line = crdfile.readline().strip()
 
             intitle = True
-
             while intitle:
-                self.title.append(line.strip())
-                line = crdfile.readline()
-                if len(line.strip()) == 0:
+                self.title.append(line)
+                line = crdfile.readline().strip()
+                if len(line) == 0:
                     intitle = False
-                elif line.strip()[0] != '*':
+                elif line[0] != '*':
                     intitle = False
                 else: 
                     intitle = True
 
-            while len(line.strip()) == 0:      # Skip whitespace
-                line = crdfile.readline()
+            while len(line) == 0:      # Skip whitespace
+                line = crdfile.readline().strip()
             
             try:
-                self.natom = int(line.strip().split()[0])
-                
+                self.natom = int(line.split()[0])
                 for row in range(self.natom):
-                    line = crdfile.readline().strip().split()
+                    line = crdfile.readline().split()
                     self.atomno.append(int(line[0]))
                     self.resno.append(int(line[1]))
                     self.resname.append(line[2])
@@ -173,9 +168,9 @@ class CharmmCrdFile(object):
                                           (self.natom, 3*self.natom,
                                            len(self.coords))
                     )
-
             except (ValueError, IndexError):
                 raise CharmmError('Error parsing CHARMM coordinate file')
+            self.coords = np.array(self.coords).reshape((-1, self.natom, 3))
 
 @add_metaclass(FileFormatType)
 class CharmmRstFile(object):
@@ -194,11 +189,11 @@ class CharmmRstFile(object):
         Number of atoms in the system
     resname : list of str
         Names of all residues in the system
-    coords : list of float
+    coordinates : np.ndarray shape(1, natom, 3)
         List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
-    coordsold : list of float
+    coordinatesold : np.ndarray shape(1, natom, 3)
         List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]
-    vels : list of float
+    velocities : np.ndarray shape(1, natom, 3)
         List of all velocities in the format [x1, y1, z1, x2, y2, z2, ...]
     positions : natom x 3 distance Quantity
         2-D list of all coordinates with the appropriate distance unit attached.
@@ -206,18 +201,6 @@ class CharmmRstFile(object):
     positionsold : natom x 3 distance Quantity
         2-D list of all old coordinates with the appropriate distance unit
         attached.  Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
-    velocities : natom x 3 distance/time Quantity
-        2-D list of all old coordinates with the appropriate distance unit
-        attached. Has the format [ [x1, y1, z1], [x2, y2, z2], ... ]
-
-    Example:
-    >>> chm = CharmmRstFile('testfiles/sample-charmm.rst')
-    >>> print(chm.header[0])
-    REST    37     1
-    >>> natom, nc, nco = chm.natom, len(chm.coords), len(chm.coordsold)
-    >>> nv = len(chm.vels)
-    >>> print('%d atoms; %d crds; %d old crds; %d vels' % (natom, nc, nco, nv))
-    256 atoms; 768 crds; 768 old crds; 768 vels
     """
 
     @staticmethod
@@ -234,9 +217,8 @@ class CharmmRstFile(object):
         is_fmt : bool
             True if it is a CHARMM restart file
         """
-        f = io.genopen(filename)
-        line = f.readline()
-        f.close()
+        with closing(io.genopen(filename)) as f:
+            line = f.readline()
         return line.startswith('REST')
 
     def __init__(self, fname):
@@ -262,28 +244,32 @@ class CharmmRstFile(object):
         return self.coords
 
     @property
+    def coordinatesold(self):
+        return self.coordsold
+
+    @property
     def positions(self):
         """ Atomic positions with units """
-        return ([Vec3(*self.coords[i:i+3]) for i in range(0, self.natom*3, 3)] *
-                        u.angstroms)
+        return [Vec3(*xyz) for xyz in self.coords] * u.angstroms
 
     @property
     def positionsold(self):
         """ Old atomic positions with units """
-        return ([Vec3(*self.coordsold[i:i+3]) for i in range(0,self.natom*3,3)]
-                        * u.angstroms)
+        return [Vec3(*xyz) for xyz in self.coordsold] * u.angstroms
 
     @property
     def velocities(self):
-        """ Atomic velocities with units """
-        return ([self.vels[i:i+3] for i in range(0, self.natom*3, 3)] *
-                        u.angstroms / u.picoseconds)
+        """ Atomic velocities in Angstroms/picoseconds """
+        return self.vels
+
+    @property
+    def box(self):
+        return None
 
     def _parse(self, fname):
 
         with closing(io.genopen(fname, 'r')) as crdfile:
             readingHeader = True 
-
             while readingHeader:
                 line = crdfile.readline()
                 if not len(line):
@@ -311,21 +297,22 @@ class CharmmRstFile(object):
                             self.nsavv = int(line[4])     # velocities "
                             self.jhstrt = int(line[5])    # Num total steps?
                             break
-                       
                         except (ValueError, IndexError):
                             raise CharmmError('Problem parsing CHARMM restart')
 
             self.scan(crdfile, '!XOLD')
             self._get_formatted_crds(crdfile, self.coordsold)
+            self.coordsold = np.array(self.coordsold).reshape((-1,self.natom,3))
 
             self.scan(crdfile, '!VX')
             self._get_formatted_crds(crdfile, self.vels)
+            self.vels = np.array(self.vels).reshape((-1, self.natom, 3))
+            # Convert velocities to angstroms/ps
+            self.vels *= ONE_TIMESCALE
 
             self.scan(crdfile, '!X')
             self._get_formatted_crds(crdfile, self.coords)
-
-            # Convert velocities to angstroms/ps
-            self.vels = [v * ONE_TIMESCALE for v in self.vels]
+            self.coords = np.array(self.coords).reshape((-1, self.natom, 3))
 
     def scan(self, handle, str, r=0): # read lines in file till 'str' is found
         scanning = True
@@ -359,12 +346,6 @@ class CharmmRstFile(object):
             crds.append(float(line[0:charmlen]))  
             crds.append(float(line[charmlen:2*charmlen]))
             crds.append(float(line[2*charmlen:3*charmlen]))
-
-    def printcoords(self, crds):
-        for crd in range(len(crds)):
-            sys.stdout.write(crds[crd])
-            if not (crd+1) % 3:
-                sys.stdout.write('\n')
 
 if __name__ == '__main__':
     import doctest

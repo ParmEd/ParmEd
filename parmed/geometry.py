@@ -27,10 +27,7 @@ from parmed import unit as u
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from parmed.vec3 import Vec3
 from math import pi, cos, sin, sqrt, acos
-try:
-    import numpy as np
-except ImportError:
-    np = None
+import numpy as np
 import warnings
 
 def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):

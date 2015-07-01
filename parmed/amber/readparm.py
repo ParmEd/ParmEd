@@ -31,15 +31,6 @@ from warnings import warn as _warn
 # Define importables via *
 __all__ = ['AmberFormat', 'AmberParm', 'ChamberParm', 'LoadParm', 'Rst7']
 
-# For backwards compatibility, but this will be eliminated
-class rst7(Rst7):
-    """ Amber input coordinate (or restart coordinate) file format """
-
-    def __init__(self, filename=None):
-        _warn('rst7 is deprecated. Use Rst7 instead.', DeprecationWarning)
-        super(rst7, self).__init__(filename=filename)
-   
-
 # Supply a function to load a topology file in the 'correct' format
 def LoadParm(parmname, rst7name=None):
     """

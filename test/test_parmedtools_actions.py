@@ -2224,7 +2224,7 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
         for attribute in dir(parm):
             # skip descriptors
             if attribute in ('topology', 'positions', 'box_vectors',
-                             'velocities'):
+                             'velocities', 'coordinates', 'coords', 'vels'):
                 continue
             attr = getattr(parm, attribute)
             if not isinstance(attr, TrackedList): continue

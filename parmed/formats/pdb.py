@@ -4,6 +4,7 @@ PDBx/mmCIF files.
 """
 from __future__ import division, print_function, absolute_import
 
+from contextlib import closing
 import io
 import itertools
 import ftplib
@@ -19,7 +20,7 @@ except ImportError:
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
-from parmed.periodic_table import AtomicNum, Mass, Element
+from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
 from parmed.utils.io import genopen
@@ -81,9 +82,8 @@ class PDBFile(object):
         is_fmt : bool
             True if it is a PDB file
         """
-        f = genopen(filename, 'r')
-        lines = [f.readline() for i in range(3)]
-        f.close()
+        with closing(genopen(filename, 'r')) as f:
+            lines = [f.readline() for i in range(3)]
 
         for line in lines:
             if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
@@ -101,7 +101,7 @@ class PDBFile(object):
     #===================================================
 
     @staticmethod
-    def download(pdb_id, timeout=10):
+    def download(pdb_id, timeout=10, saveto=None):
         """
         Goes to the wwPDB website and downloads the requested PDB, loading it
         as a :class:`Structure` instance
@@ -113,6 +113,12 @@ class PDBFile(object):
         timeout : float, optional
             The number of seconds to wait before raising a timeout error.
             Default is 10 seconds
+        saveto : str, optional
+            If provided, this will be treated as a file name to which the PDB
+            file will be saved. If None (default), no PDB file will be written.
+            This will be a verbatim copy of the downloaded PDB file, unlike the
+            somewhat-stripped version you would get by using
+            :meth:`Structure.write_pdb <parmed.structure.Structure.write_pdb>`
 
         Returns
         -------
@@ -124,7 +130,8 @@ class PDBFile(object):
         socket.timeout if the connection times out while trying to contact the
         FTP server
 
-        IOError if there is a problem retrieving the requested PDB
+        IOError if there is a problem retrieving the requested PDB or writing a
+        requested ``saveto`` file
 
         ImportError if the gzip module is not available
 
@@ -145,12 +152,18 @@ class PDBFile(object):
                            fileobj.write)
         except ftplib.all_errors as err:
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+        finally:
+            ftp.close()
         # Rewind, wrap it in a GzipFile and send it to parse
         fileobj.seek(0)
         if PY3:
             fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
         else:
             fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
+        if saveto is not None:
+            with closing(genopen(saveto, 'w')) as f:
+                f.write(fileobj.read())
+            fileobj.seek(0)
         return PDBFile.parse(fileobj)
 
     #===================================================
@@ -207,12 +220,6 @@ class PDBFile(object):
             The Structure object initialized with all of the information from
             the PDB file.  No bonds or other topological features are added by
             default.
-    
-        Notes
-        -----
-        The returned structure has an extra attribute, pdbxyz, that contains all
-        of the coordinates for all of the frames in the PDB file as a list of
-        NATOM*3 lists.
         """
         if isinstance(filename, string_types):
             own_handle = True
@@ -270,18 +277,9 @@ class PDBFile(object):
                     except KeyError:
                         # Now try based on the atom name... but don't try too
                         # hard (e.g., don't try to differentiate b/w Ca and C)
-                        try:
-                            atomic_number = AtomicNum[atname.strip()[0].upper()]
-                            mass = Mass[atname.strip()[0].upper()]
-                        except KeyError:
-                            try:
-                                sym = atname.strip()[:2]
-                                sym = '%s%s' % (sym[0].upper(), sym[0].lower())
-                                atomic_number = AtomicNum[sym]
-                                mass = Mass[sym]
-                            except KeyError:
-                                atomic_number = 0 # give up
-                                mass = 0.0
+                        elem = element_by_name(atname)
+                        atomic_number = AtomicNum[elem]
+                        mass = Mass[elem]
                     try:
                         bfactor = float(bfactor)
                     except ValueError:
@@ -481,10 +479,7 @@ class PDBFile(object):
                     except (IndexError, ValueError):
                         A = B = C = 90.0
                     struct.box = [a, b, c, A, B, C]
-                    try:
-                        struct.space_group = line[55:66].strip()
-                    except IndexError:
-                        pass
+                    struct.space_group = line[55:66].strip()
                 elif rec == 'EXPDTA':
                     struct.experimental = line[6:].strip()
                 elif rec == 'AUTHOR':
@@ -503,6 +498,7 @@ class PDBFile(object):
                             try:
                                 struct.year = int(line[62:66])
                             except ValueError:
+                                # Shouldn't happen, but don't throw a fit
                                 pass
                     elif part == 'PMID':
                         struct.pmid = line[19:].strip()
@@ -530,7 +526,8 @@ class PDBFile(object):
             if len(coordinates) != 3*len(struct.atoms):
                 raise ValueError('bad number of atoms in some PDB models')
             all_coordinates.append(coordinates)
-        struct.pdbxyz = all_coordinates
+        struct._coordinates = np.array(all_coordinates).reshape(
+                        (-1, len(struct.atoms), 3))
         return struct
 
     #===================================================
@@ -774,7 +771,7 @@ class CIFFile(object):
     #===================================================
 
     @staticmethod
-    def download(pdb_id, timeout=10):
+    def download(pdb_id, timeout=10, saveto=None):
         """
         Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
         loading it as a :class:`Structure` instance
@@ -786,11 +783,17 @@ class CIFFile(object):
         timeout : float, optional
             The number of seconds to wait before raising a timeout error.
             Default is 10 seconds
+        saveto : str, optional
+            If provided, this will be treated as a file name to which the PDB
+            file will be saved. If None (default), no CIF file will be written.
+            This will be a verbatim copy of the downloaded CIF file, unlike the
+            somewhat-stripped version you would get by using
+            :meth:`Structure.write_cif <parmed.structure.Structure.write_cif>`
 
         Returns
         -------
         struct : :class:`Structure <parmed.structure.Structure>`
-            Structure instance populated by the requested PDB
+            Structure instance populated by the requested PDBx/mmCIF
 
         Raises
         ------
@@ -818,11 +821,17 @@ class CIFFile(object):
                            fileobj.write)
         except ftplib.all_errors as err:
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+        finally:
+            ftp.close()
         fileobj.seek(0)
         if PY3:
             fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
         else:
             fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
+        if saveto is not None:
+            with closing(genopen(saveto, 'w')) as f:
+                f.write(fileobj.read())
+            fileobj.seek(0)
         return CIFFile.parse(fileobj)
 
     #===================================================
@@ -879,12 +888,6 @@ class CIFFile(object):
             the PDBx/mmCIF file.  No bonds or other topological features are
             added by default. If multiple structures are defined in the CIF
             file, multiple Structure instances will be returned as a tuple.
-
-        Notes
-        -----
-        The returned structure has an extra attribute, pdbxyz, that contains all
-        of the coordinates for all of the frames in the PDB file as a list of
-        NATOM*3 lists.
         """
         if isinstance(filename, string_types):
             own_handle = True
@@ -989,6 +992,7 @@ class CIFFile(object):
             modelid = atoms.getAttributeIndex('pdbx_PDB_model_num')
             origmodel = None
             lastmodel = None
+            all_coords = []
             xyz = []
             atommap = dict()
             last_atom = Atom()
@@ -1069,10 +1073,10 @@ class CIFFile(object):
                     if model == lastmodel:
                         xyz.extend([x, y, z])
                     else:
-                        if lastmodel == origmodel:
-                            struct.pdbxyz = [xyz]
-                        else:
-                            struct.pdbxyz.append(xyz)
+                        if all_coords and len(xyz) != len(all_coords[-1]):
+                            raise ValueError('All frames must have same number '
+                                             'of atoms')
+                        all_coords.append(xyz)
                         xyz = []
                 # Keep a mapping in case we need to go back and add attributes,
                 # like anisotropic b-factors
@@ -1151,11 +1155,10 @@ class CIFFile(object):
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
                                      'same atoms')
-                try:
-                    struct.pdbxyz.append(xyz)
-                except AttributeError:
-                    # Hasn't been assigned yet
-                    struct.pdbxyz = xyz
+                all_coords.append(xyz)
+            if all_coords:
+                struct._coordinates = np.array(all_coords).reshape(
+                            (-1, len(struct.atoms), 3))
 
         # Build the return value
         if len(structures) == 1:
@@ -1274,7 +1277,7 @@ class CIFFile(object):
                         a = item
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
-            raise Exception("Should not be here!")
+            assert False, 'Should not be here'
         # Now add the atom section. Include all names that the CIF standard
         # usually includes, but put '?' in sections that contain data we don't
         # store in the Structure, Residue, or Atom classes
@@ -1290,9 +1293,6 @@ class CIFFile(object):
                  'auth_comp_id', 'auth_asym_id', 'auth_atom_id',
                  'pdbx_PDB_model_num']
         )
-        # Generator expression here instead of list comp, since the generator
-        # need only execute until the first True (no point in wasting the time
-        # or space creating the entire list just to see if one is True...)
         write_anisou = write_anisou and any(atom.anisou is not None
                                             for atom in struct.atoms)
         if write_anisou:

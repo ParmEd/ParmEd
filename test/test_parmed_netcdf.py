@@ -57,19 +57,16 @@ class TestNetCDF(unittest.TestCase):
         self.assertEqual(traj.program, 'sander')
         self.assertEqual(traj.programVersion, '9.0')
         self.assertEqual(traj.ConventionVersion, '1.0')
-        runsum = 0
-        for frame in range(traj.frame):
-            for coord in traj.coordinates(frame):
-                runsum += coord
-        self.assertAlmostEqual(runsum, 7049.7614416316874, places=4)
+        runsum = traj.coordinates.sum()
+        self.assertAlmostEqual(runsum, 7049.7598, places=4)
 
         for frame in range(traj.frame):
-            leng, ang = traj.cell_lengths_angles(frame)
-            self.assertAlmostEqual(ang[0], 109.471219, places=6)
-            self.assertAlmostEqual(ang[1], 109.471219, places=6)
-            self.assertAlmostEqual(ang[2], 109.471219, places=6)
-            self.assertAlmostEqual(leng[0], leng[1])
-            self.assertAlmostEqual(leng[0], leng[2])
+            box = traj.box[frame]
+            self.assertAlmostEqual(box[0], box[1])
+            self.assertAlmostEqual(box[0], box[2])
+            self.assertAlmostEqual(box[3], 109.471219, places=6)
+            self.assertAlmostEqual(box[4], 109.471219, places=6)
+            self.assertAlmostEqual(box[5], 109.471219, places=6)
 
     def _check_rst(self, rst):
         """ Checks various restart properties """

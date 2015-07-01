@@ -7,6 +7,8 @@ if sys.version_info < (2, 7):
                      'correctly.\n')
     sys.exit(0)
 
+is_pypy = '__pypy__' in sys.builtin_module_names
+
 # parmed package and all its subpackages
 packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
@@ -16,11 +18,20 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm
-extensions = [Extension('parmed.amber._rdparm',
-                        sources=['src/_rdparm.cpp', 'src/readparm.cpp'],
-                        include_dirs=[os.path.join(os.path.abspath('.'),'src')],
-                        depends=['src/CompatibilityMacros.h', 'src/readparm.h']
-)]
+if is_pypy:
+    sources = depends = include_dirs = extensions = []
+else:
+    sources = [os.path.join('src', '_rdparm.cpp'),
+               os.path.join('src', 'readparm.cpp')]
+    depends = [os.path.join('src', 'CompatabilityMacros.h'),
+               os.path.join('src', 'readparm.h')]
+    include_dirs = [os.path.join(os.path.abspath('.'), 'src')]
+
+    extensions = [Extension('parmed.amber._rdparm',
+                            sources=sources,
+                            include_dirs=include_dirs,
+                            depends=depends)
+    ]
 
 if __name__ == '__main__':
 
@@ -32,39 +43,58 @@ if __name__ == '__main__':
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
     from distutils import sysconfig
-    if not os.path.exists(os.path.join(sysconfig.get_config_vars()['INCLUDEPY'],
-                                       'Python.h')):
+    if is_pypy or not os.path.exists(
+            os.path.join(sysconfig.get_config_vars()['INCLUDEPY'], 'Python.h')):
         extensions = []
 
-    # Since we changed package names from "chemistry" to "parmed", make sure we
-    # delete all of the old versions
+    # Delete old versions with old names of scripts and packages (chemistry and
+    # ParmedTools for packages, parmed.py and xparmed.py for scripts)
+    def deldir(folder):
+        try:
+            shutil.rmtree(folder)
+        except OSError:
+            sys.stderr.write(
+                    'Could not remove old package %s; you should make sure\n'
+                      'this is completely removed in order to make sure you\n'
+                      'do not accidentally use the old version of ParmEd\n' %
+                      folder
+            )
+    def delfile(file):
+        try:
+            os.unlink(file)
+        except OSError:
+            sys.stderr.write(
+                    'Could not remove old script %s; you should make sure\n'
+                      'this is completely removed in order to make sure you\n'
+                      'do not accidentally use the old version of ParmEd\n' %
+                      file
+            )
+
     for folder in sys.path:
         folder = os.path.realpath(os.path.abspath(folder))
         if folder == os.path.realpath(os.path.abspath('.')): continue
         chem = os.path.join(folder, 'chemistry')
         pmdtools = os.path.join(folder, 'ParmedTools')
-        if os.path.isdir(chem):
-            try:
-                shutil.rmtree(chem)
-                sys.stderr.write('Removing %s\n' % chem)
-            except OSError:
-                sys.stderr.write(
-                      'Could not remove old chemistry package %s; you should\n'
-                      'make sure this is completely removed in order to make\n'
-                      'sure you do not accidentally use the old version of '
-                      'ParmEd\n' % chem
-                )
-        if os.path.isdir(pmdtools):
-            try:
-                shutil.rmtree(pmdtools)
-                sys.stderr.write('Removing %s\n' % pmdtools)
-            except OSError:
-                sys.stderr.write(
-                      'Could not remove old ParmedTools package %s; you should\n'
-                      'make sure this is completely removed in order to make\n'
-                      'sure you do not accidentally use the old version of '
-                      'ParmEd\n' % pmdtools
-                )
+        pmd = os.path.join(folder, 'parmed.py')
+        xpmd = os.path.join(folder, 'xparmed.py')
+        pmdc = os.path.join(folder, 'parmed.pyc')
+        xpmdc = os.path.join(folder, 'xparmed.pyc')
+        if os.path.isdir(chem): deldir(chem)
+        if os.path.isdir(pmdtools): deldir(pmdtools)
+        if os.path.exists(pmd): delfile(pmd)
+        if os.path.exists(xpmd): delfile(xpmd)
+        if os.path.exists(pmdc): delfile(pmdc)
+        if os.path.exists(xpmdc): delfile(xpmdc)
+
+    for folder in os.getenv('PATH').split(os.pathsep):
+        pmd = os.path.join(folder, 'parmed.py')
+        xpmd = os.path.join(folder, 'xparmed.py')
+        pmdc = os.path.join(folder, 'parmed.pyc')
+        xpmdc = os.path.join(folder, 'xparmed.pyc')
+        if os.path.exists(pmd): delfile(pmd)
+        if os.path.exists(xpmd): delfile(xpmd)
+        if os.path.exists(pmdc): delfile(pmdc)
+        if os.path.exists(xpmdc): delfile(xpmdc)
 
     scripts = [os.path.join('scripts', 'parmed'),
                os.path.join('scripts', 'xparmed')]

@@ -6,7 +6,6 @@ by the element's symbol. For consistency with AMBER, a fictitious element
 or any other meaningful attribute. It's just a container to put an extra 
 charge 
 """
-
 # Data descriptions:
 #
 #  KNOWN_ELEMENTS: number of known elements
@@ -225,6 +224,8 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
 
+_sorted_masses = sorted(Mass.items(), key=lambda x: x[1])
+
 def element_by_mass(mass):
     """
     Determine the element that has a mass closest to the input mass
@@ -239,13 +240,59 @@ def element_by_mass(mass):
     element: str
         The returned string is the name of the element whose atomic mass is
         closest to the input mass
+
+    Notes
+    -----
+    This actually fails (i.e., produces poor predictions) for some cases when
+    masses have changed -- particularly in the case of Hydrogen mass
+    repartitioning.
     """
-    diff = mass
+    diff = mass + 1
     best_guess = 'EP'
 
-    for element in Element:
-        if abs(Mass[element] - mass) < diff:
+    for element, element_mass in _sorted_masses:
+        d = abs(element_mass - mass)
+        if d < diff:
             best_guess = element
-            diff = abs(Mass[element] - mass)
+            diff = d
+        else:
+            break
 
     return best_guess
+
+def element_by_name(name):
+    """
+    Determine the element based on the name of an atom. This is very naive. It
+    first tries to match the first letter of the element. If that doesn't work,
+    it tries to match the first *two* atoms. If that still doesn't work, it
+    defaults to an extra point
+
+    Parameters
+    ----------
+    name : str
+        Name of the atom to determine an element for
+
+    Returns
+    -------
+    element : str
+        The name of the best-matching element
+
+    Notes
+    -----
+    This should be a last-case scenario for guessing element information. For
+    instance, Ca will never be matched, since calcium atoms will be tagged as
+    carbon before the second letter is tried. This is usually OK for
+    biomolecules, but you are better off using the mass or, even better, an
+    appropriate representation of the atomic number to begin with
+    """
+    try:
+        atomic_number = AtomicNum[name.strip()[0].upper()]
+    except KeyError:
+        sym = name.strip()[:2]
+        try:
+            sym = '%s%s' % (sym[0].upper(), sym[1].lower())
+            atomic_number = AtomicNum[sym]
+        except (KeyError, IndexError):
+            atomic_number = 0 # give up
+
+    return Element[atomic_number]

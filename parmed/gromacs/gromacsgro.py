@@ -8,10 +8,11 @@ from parmed.constants import TINY
 from parmed.exceptions import GromacsError
 from parmed.formats.registry import FileFormatType
 from parmed.geometry import (box_vectors_to_lengths_and_angles,
-                                box_lengths_and_angles_to_vectors,
-                                reduce_box_vectors)
+                             box_lengths_and_angles_to_vectors,
+                             reduce_box_vectors)
+from parmed.periodic_table import AtomicNum, element_by_name, Mass
 from parmed.structure import Structure
-from parmed.topologyobjects import Atom
+from parmed.topologyobjects import Atom, ExtraPoint
 from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
@@ -102,32 +103,39 @@ class GromacsGroFile(object):
                 natom = int(fileobj.readline().strip())
             except ValueError:
                 raise GromacsError('Could not parse %s as GRO file' % filename)
+            digits = None
             for i, line in enumerate(fileobj):
                 if i == natom: break
                 try:
                     resnum = int(line[:5])
                     resname = line[5:10].strip()
                     atomname = line[10:15].strip()
+                    elem = element_by_name(atomname)
+                    atomic_number = AtomicNum[elem]
+                    mass = Mass[elem]
                     atnum = int(line[15:20])
-                    atom = Atom(name=atomname, number=atnum)
-                    pdeci = [i for i, x in enumerate(line) if x == '.']
-                    ndeci = pdeci[1] - pdeci[0] - 5
-                    for i in range(1, 4):
-                        wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                        wend = (pdeci[0]-4)+(5+ndeci)*i
-                        if i == 1: atom.xx = float(line[wbeg:wend]) * 10
-                        elif i == 2: atom.xy = float(line[wbeg:wend]) * 10
-                        elif i == 3: atom.xz = float(line[wbeg:wend]) * 10
+                    if atomic_number == 0:
+                        atom = ExtraPoint(name=atomname, number=atnum)
+                    else:
+                        atom = Atom(atomic_number=atomic_number, name=atomname,
+                                    number=atnum, mass=mass)
+                    if digits is None:
+                        pdeci = line.index('.', 20)
+                        ndeci = line.index('.', pdeci+1)
+                        digits = ndeci - pdeci
+                    atom.xx, atom.xy, atom.xz = (
+                            float(line[20+i*digits:20+(i+1)*digits])*10
+                                for i in range(3)
+                    )
                     i = 4
-                    wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                    wend = (pdeci[0]-4)+(5+ndeci)*i
+                    wbeg = (pdeci-4)+(5+ndeci)*(i-1)
+                    wend = (pdeci-4)+(5+ndeci)*i
                     if line[wbeg:wend].strip():
-                        for i in range(4, 7):
-                            wbeg = (pdeci[0]-4)+(5+ndeci)*(i-1)
-                            wend = (pdeci[0]-4)+(5+ndeci)*i
-                            if i == 4: atom.vx = float(line[wbeg:wend]) * 10
-                            elif i == 5: atom.vy = float(line[wbeg:wend]) * 10
-                            elif i == 5: atom.vz = float(line[wbeg:wend]) * 10
+                        atom.vx, atom.vy, atom.vz = (
+                                float(line[(pdeci-3)+(6+ndeci)*i:
+                                           (pdeci-3)+(6+ndeci)*(i+1)])*10
+                                for i in range(3, 6)
+                        )
                 except (ValueError, IndexError):
                     raise GromacsError('Could not parse the atom record of '
                                        'GRO file %s' % filename)
@@ -192,8 +200,10 @@ class GromacsGroFile(object):
         crdfmt = '%%%d.%df' % (varwidth, precision)
         velfmt = '%%%d.%df' % (varwidth, precision+1)
         for atom in struct.atoms:
-            dest.write('%5d%-5s%5s%5d' % (atom.residue.idx+1, atom.residue.name,
-                                          atom.name, atom.idx+1))
+            resid = (atom.residue.idx + 1) % 100000
+            atid = (atom.idx + 1) % 100000
+            dest.write('%5d%-5s%5s%5d' % (resid, atom.residue.name[:5],
+                                          atom.name[:5], atid))
             dest.write((crdfmt % (atom.xx/10))[:varwidth])
             dest.write((crdfmt % (atom.xy/10))[:varwidth])
             dest.write((crdfmt % (atom.xz/10))[:varwidth])
@@ -213,20 +223,11 @@ class GromacsGroFile(object):
                            a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
             dest.write('\n')
         elif not nobox and struct.atoms:
-            # Find the extent of the molecule in all dimensions
-            xdim = [struct.atoms[0].xx, struct.atoms[1].xx]
-            ydim = [struct.atoms[0].xy, struct.atoms[1].xy]
-            zdim = [struct.atoms[0].xz, struct.atoms[1].xz]
-            for atom in struct.atoms:
-                xdim[0] = min(xdim[0], atom.xx)
-                xdim[1] = max(xdim[1], atom.xx)
-                ydim[0] = min(ydim[0], atom.xy)
-                ydim[1] = max(ydim[1], atom.xy)
-                zdim[0] = min(zdim[0], atom.xz)
-                zdim[1] = max(zdim[1], atom.xz)
-            dest.write('%10.5f'*3 % ((xdim[1]-xdim[0]+5)/10,
-                                     (ydim[1]-ydim[0]+5)/10,
-                                     (zdim[1]-zdim[0]+5)/10))
+            # Find the extent of the molecule in all dimensions, and buffer it
+            # by 5 A
+            crds = struct.coordinates
+            diff = (crds.max(axis=1) - crds.min(axis=1)) / 10 + 0.5
+            dest.write('%10.5f'*3 % (diff[0], diff[1], diff[2]))
             dest.write('\n')
         if own_handle:
             dest.close()

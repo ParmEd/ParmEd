@@ -4,6 +4,7 @@ Tests parmed.formats package
 from __future__ import division
 import utils
 
+import numpy as np
 from parmed import amber, charmm, exceptions, formats, gromacs
 from parmed import (Structure, read_PDB, write_PDB, read_CIF,
                     download_PDB, download_CIF)
@@ -166,13 +167,20 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self._check4lzt(read_PDB(self.pdb))
         # The PDB file with multiple models
         pdbfile = read_PDB(open(self.models))
-        self.assertEqual(len(pdbfile.pdbxyz), 20)
-        self.assertEqual(pdbfile.pdbxyz[0][:3], [-8.886, -5.163, 9.647])
-        self.assertEqual(pdbfile.pdbxyz[19][-3:], [-12.051, 5.205, -2.146])
+        all_crds = pdbfile.get_coordinates('all')
+        self.assertEqual(all_crds.shape[0], 20)
+        np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
+        np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
 
     def testDownload(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
+
+    def testDownloadSave(self):
+        """ Tests downloading PDB files and saving a copy """
+        fname = get_fn('downloaded.pdb', written=True)
+        self._check4lzt(download_PDB('4lzt', saveto=fname))
+        self._check4lzt(read_PDB(fname))
 
     def testPositions(self):
         """ Tests that positions are Vec3's with units """
@@ -196,7 +204,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile = read_PDB(self.overflow)
         self.assertEqual(len(pdbfile.atoms), 110237)
         self.assertEqual(len(pdbfile.residues), 35697)
-        self.assertEqual(pdbfile.box, [0, 0, 0, 90, 90, 90])
+        np.testing.assert_allclose(pdbfile.box, [0, 0, 0, 90, 90, 90])
 
     @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
     def testRegularOverflow(self):
@@ -224,7 +232,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
     def testPdbWriteModels(self):
         """ Test PDB file writing from NMR structure with models """
         pdbfile = read_PDB(self.models)
-        self.assertEqual(len(pdbfile.pdbxyz), 20)
+        self.assertEqual(pdbfile.get_coordinates('all').shape[0], 20)
         self.assertEqual(len(pdbfile.atoms), 451)
         output = StringIO.StringIO()
         write_PDB(pdbfile, output)
@@ -450,8 +458,8 @@ class TestChemistryPDBStructure(unittest.TestCase):
 
     # Private helper test functions
     def _check4lzt(self, obj, check_meta=True, has_altloc=True):
-        self.assertEqual(len(obj.pdbxyz), 1)
-        self.assertEqual(obj.box,
+        self.assertEqual(obj.get_coordinates('all').shape[0], 1)
+        np.testing.assert_allclose(obj.box,
                          [27.24, 31.87, 34.23, 88.52, 108.53, 111.89])
         self.assertEqual(obj.space_group, 'P 1')
         self.assertEqual(len(obj.atoms), 1164)

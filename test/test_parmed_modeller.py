@@ -2,6 +2,12 @@
 Tests the functionality in parmed.modeller
 """
 import utils
+import numpy as np
+import os
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from parmed import Atom, read_PDB
 from parmed.exceptions import AmberWarning
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
@@ -10,7 +16,6 @@ from parmed.amber import AmberParm
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
-import os
 from parmed.tools import changeRadii
 import random
 import sys
@@ -153,9 +158,8 @@ class TestResidueTemplate(unittest.TestCase):
                     self.assertIn(templ[id1], templ[id2].bond_partners)
                     self.assertIn(templ[id2], templ[id1].bond_partners)
         # Make sure that our coordinates come as a numpy array
-        if utils.has_numpy():
-            self.assertIsInstance(templ.coordinates, utils.numpy.ndarray)
-            self.assertEqual(templ.coordinates.shape, (len(templ)*3,))
+        self.assertIsInstance(templ.coordinates, np.ndarray)
+        self.assertEqual(templ.coordinates.shape, (len(templ), 3))
 
 class TestResidueTemplateContainer(unittest.TestCase):
     """ Tests the ResidueTemplateContainer class """
@@ -395,6 +399,15 @@ class TestAmberOFFLibrary(unittest.TestCase):
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
+
+    @unittest.skipIf(pd is None, "Cannot test without pandas")
+    def testDataFrame(self):
+        """ Test converting ResidueTemplate to a DataFrame """
+        offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
+        df = offlib['ALA'].to_dataframe()
+        self.assertEqual(df.shape, (10, 26))
+        self.assertAlmostEqual(df.charge.sum(), 0)
+        self.assertEqual(df.atomic_number.sum(), 38)
 
     def _check_read_written_libs(self, offlib, offlib2):
         # Check that offlib and offlib2 are equivalent

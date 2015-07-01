@@ -8,17 +8,14 @@ instances where the prequisites may not be installed.
 """
 from __future__ import division, print_function, absolute_import
 
+from math import ceil
+import numpy as np
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
-from math import ceil
-try:
-    import numpy as np
-except ImportError:
-    np = None
-    from array import array
-
+import parmed.unit as u
+from parmed.vec3 import Vec3
 import warnings as _warnings
 
 VELSCALE = 20.455
@@ -83,6 +80,10 @@ class _AmberAsciiCoordinateFile(object):
     def _parse(self):
         """ Handles actual file parsing """
         raise NotImplementedError('virtual method not overwritten')
+
+    @property
+    def positions(self):
+        return [Vec3(*xyz) for xyz in self._coordinates[0]] * u.angstroms
 
     def close(self):
         """ Close the open file handler """
@@ -176,8 +177,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     def _parse(self):
         """
         This method parses the data out of the ASCII restart file and creates
-        self._coordinates and self._velocities as np.ndarray(natom*3) arrays if
-        numpy is available or array.array instances if numpy is not available
+        self._coordinates and self._velocities as np.ndarray(natom*3) arrays
 
         This method is called automatically for 'old' restart files and should
         not be called by external callers
@@ -209,22 +209,12 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         else:
             raise RuntimeError('Badly formatted restart file. Has %d lines '
                                'for %d atoms.' % (len(self.lines), self.natom))
-        if np is not None:
-            converter = lambda x: x
-            self._coordinates = np.zeros(self.natom * 3)
-            if self.hasvels:
-                self._velocities = np.zeros(self.natom * 3)
-            if self.hasbox:
-                self._cell_lengths = np.zeros(3)
-                self._cell_angles = np.zeros(3)
-        else:
-            converter = lambda x: array('f', x)
-            self._coordinates = array('f', [0 for i in range(self.natom * 3)])
-            if self.hasvels:
-                self._velocities = self._coordinates[:] # copy for efficiency
-            if self.hasbox:
-                self._cell_lengths = array('f', [0.0, 0.0, 0.0])
-                self._cell_angles = array('f', [0.0, 0.0, 0.0])
+        self._coordinates = np.zeros((self.natom, 3))
+        if self.hasvels:
+            self._velocities = np.zeros((self.natom, 3))
+        if self.hasbox:
+            self._cell_lengths = np.zeros(3)
+            self._cell_angles = np.zeros(3)
         # Now it's time to parse. Coordinates first
         startline = 2
         endline = startline + int(ceil(self.natom / 2.0))
@@ -234,15 +224,18 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             x1 = float(line[ 0:12])
             y1 = float(line[12:24])
             z1 = float(line[24:36])
+            self._coordinates[idx] = [x1, y1, z1]
+            idx += 1
             try:
                 x2 = float(line[36:48])
                 y2 = float(line[48:60])
                 z2 = float(line[60:72])
             except ValueError:
-                self._coordinates[idx:idx+3] = converter([x1,y1,z1])
+                pass
             else:
-                self._coordinates[idx:idx+6] = converter([x1,y1,z1,x2,y2,z2])
-            idx += 6
+                self._coordinates[idx] = [x2, y2, z2]
+                idx += 1
+        self._coordinates = self._coordinates.reshape((1, self.natom, 3))
         startline = endline
         # Now it's time to parse the velocities if we have them
         if self.hasvels:
@@ -253,25 +246,28 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                 x1 = float(line[ 0:12]) * VELSCALE
                 y1 = float(line[12:24]) * VELSCALE
                 z1 = float(line[24:36]) * VELSCALE
+                self._velocities[idx] = [x1, y1, z1]
+                idx += 1
                 try:
                     x2 = float(line[36:48]) * VELSCALE
                     y2 = float(line[48:60]) * VELSCALE
                     z2 = float(line[60:72]) * VELSCALE
                 except ValueError:
-                    self._velocities[idx:idx+3] = converter([x1, y1, z1])
+                    pass
                 else:
-                    self._velocities[idx:idx+6] = converter([x1,y1,z1,x2,y2,z2])
-                idx += 6
+                    self._velocities[idx] = [x2,y2,z2]
+                    idx += 1
             startline = endline
+            self._velocities = self._velocities.reshape((1, self.natom, 3))
         # Now it's time to parse the box info if we have it
         if self.hasbox:
             line = lines[startline]
-            self._cell_lengths[0:3] = converter([float(line[0:12]),
-                                                 float(line[12:24]),
-                                                 float(line[24:36])])
-            self._cell_angles[0:3] = converter([float(line[36:48]),
-                                                float(line[48:60]),
-                                                float(line[60:72])])
+            self._cell_lengths[0:3] = [float(line[0:12]),
+                                       float(line[12:24]),
+                                       float(line[24:36])]
+            self._cell_angles[0:3] = [float(line[36:48]),
+                                      float(line[48:60]),
+                                      float(line[60:72])]
 
     @property
     def coordinates(self):
@@ -283,30 +279,22 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     def coordinates(self, stuff):
         if self._status == 'old':
             raise RuntimeError('Cannot set coordinates on an old restart')
-        # Try to flatten the array if we got a 3-D numpy array. Don't worry if
-        # it doesn't work, just go on
-        try:
-            stuff = stuff.flatten()
-        except AttributeError:
-            pass
+        stuff = np.array(stuff, copy=False).ravel()
         if self.natom > 0 and len(stuff) != 3 * self.natom:
             raise ValueError('Only got %d coordinates for %d atoms' %
                              (len(stuff), self.natom))
-        if len(stuff) % 3 != 0:
-            raise ValueError('Number of coordinates (%d) is not a '
-                             'multiple of 3' % len(stuff))
         if self._coords_written:
             raise RuntimeError('Coordinates have already been written.')
         # Error checking done. If we didn't already set our number of atoms,
         # set that now
         self.natom = len(stuff) // 3
-        self._coordinates = stuff
+        self._coordinates = stuff.reshape((-1, self.natom, 3))
         self._file.write('%5d%15.7e\n' % (self.natom, self.time))
         numwrit = 0
         fmt = '%12.7f%12.7f%12.7f'
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3], stuff[i3 + 1], stuff[i3 + 2]))
+            self._file.write(fmt % (stuff[i3], stuff[i3+1], stuff[i3+2]))
             numwrit += 1
             if numwrit % 2 == 0: self._file.write('\n')
         if self.natom % 2 == 1: self._file.write('\n')
@@ -324,11 +312,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     def velocities(self, stuff):
         if self._status == 'old':
             raise RuntimeError('Cannot set velocities on an old restart')
-        # Try to flatten the array if we got a 3-D numpy array
-        try:
-            stuff = stuff.flatten()
-        except AttributeError:
-            pass
+        stuff = np.array(stuff, copy=False).ravel()
         if not self._coords_written:
             raise RuntimeError('Coordinates must be set before velocities')
         if self._cell_lengths_written or self._cell_angles_written:
@@ -338,14 +322,14 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if len(stuff) != 3 * self.natom:
             raise ValueError('Got %d velocities for %d atoms.' %
                              (len(stuff), self.natom))
-        self._velocities = stuff
+        self._velocities = stuff.reshape((-1, self.natom, 3))
         fmt = '%12.7f%12.7f%12.7f'
         numwrit = 0
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3  ] * ONEVELSCALE,
-                                    stuff[i3+1] * ONEVELSCALE,
-                                    stuff[i3+2] * ONEVELSCALE)
+            self._file.write(fmt % (stuff[i3  ]*ONEVELSCALE,
+                                    stuff[i3+1]*ONEVELSCALE,
+                                    stuff[i3+2]*ONEVELSCALE)
             )
             numwrit += 1
             if numwrit % 2 == 0: self._file.write('\n')
@@ -376,13 +360,10 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Cell parameters not yet set')
         if not self.hasbox:
             raise NameError('%s has no periodic box information' % self.fname)
-        if np is not None:
-            box = np.zeros(6)
-        else:
-            box = array('f', [0, 0, 0, 0, 0, 0])
+        box = np.zeros(6)
         lengths, angles = self.cell_lengths, self.cell_angles
-        box[0], box[1], box[2] = lengths[0], lengths[1], lengths[2]
-        box[3], box[4], box[5] = angles[0], angles[1], angles[2]
+        box[0:3] = [lengths[0], lengths[1], lengths[2]]
+        box[3:6] = [angles[0], angles[1], angles[2]]
         return box
 
     @cell_lengths.setter
@@ -395,7 +376,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Can only write cell lengths once')
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell lengths')
-        self._cell_lengths = stuff
+        self._cell_lengths = np.array(stuff, copy=False)
         self._file.write('%12.7f%12.7f%12.7f' % (stuff[0], stuff[1], stuff[2]))
         self._cell_lengths_written = True
 
@@ -411,7 +392,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Can only write cell angles once')
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell lengths')
-        self._cell_angles = stuff
+        self._cell_angles = np.array(stuff, copy=False)
         self._file.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
         self._cell_angles_written = True
 
@@ -469,59 +450,45 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
     def _parse(self):
         """
-        This method parses the data out of the mdcrd file and creates self.data
-        as a list of np.ndarray(natom*3) (or list of array.array(natom*3) if
-        numpy is not available) and self.cell_lengths as a list of np.ndarray(3)
-        (or list of array.array(3) if numpy is not available) for each frame in
-        the trajectory. This method is called automatically for 'old' trajectory
+        This method parses the data out of the mdcrd file and creates
+        self._coordinates as a list of np.ndarray(1, natom, 3) and
+        self.cell_lengths as a list of np.ndarray(3) for each frame in the
+        trajectory. This method is called automatically for 'old' trajectory
         files and should not be called by external callers.
         """
-        self.frame = 0
-        rawline = self._file.readline()
-        self.title = rawline.strip()
-        self.data = list()
-        self.cell_lengths = list()
-        mainiter = range(0, 8 * self.CRDS_PER_LINE, 8)
-        extraiter = range(0, 8 * self._nextras, 8)
-        if np is not None:
-            converter = lambda x: x
-        else:
-            natom3iter = range(self.natom * 3)
-            converter = lambda x: array('f', x)
+        line = self._file.readline()
+        self.title = line.strip()
+        self._coordinates = np.ndarray(0)
+        self.cell_lengths = np.ndarray(0)
+        mainiter = range(0, 8*self.CRDS_PER_LINE, 8)
+        extraiter = range(0, 8*self._nextras, 8)
         try:
-            while rawline:
-                if np is not None:
-                    frame = np.zeros(self.natom*3)
-                    if not rawline: raise _FileEOF()
-                    cell = np.zeros(3)
-                else:
-                    frame = array('f', [0 for i in natom3iter])
-                    cell = array('f', [0, 0, 0])
+            while line:
+                frame = np.zeros(self.natom*3)
+                if not line: raise _FileEOF()
+                cell = np.zeros(3)
                 idx = 0
-                rawline = self._file.readline()
-                if not rawline: raise StopIteration()
+                line = self._file.readline()
+                if not line: raise StopIteration()
                 for i in range(self._full_lines_per_frame):
-                    if not rawline: raise _FileEOF()
-                    frame[idx:idx+10] = converter([float(rawline[j:j+8]) 
-                                                   for j in mainiter])
+                    if not line: raise _FileEOF()
+                    frame[idx:idx+10] = [float(line[j:j+8]) for j in mainiter]
                     idx += 10
-                    rawline = self._file.readline()
+                    line = self._file.readline()
 
                 if self._nextras:
-                    frame[idx:idx+self._nextras] = converter(
-                            [float(rawline[j:j+8]) for j in extraiter]
-                    )
+                    frame[idx:idx+self._nextras] = \
+                            [float(line[j:j+8]) for j in extraiter]
 
                 if self.hasbox:
-                    rawline = self._file.readline()
-                    if not rawline: raise _FileEOF()
-                    cell[0] = float(rawline[:8])
-                    cell[1] = float(rawline[8:16])
-                    cell[2] = float(rawline[16:24])
+                    line = self._file.readline()
+                    if not line: raise _FileEOF()
+                    cell[0] = float(line[:8])
+                    cell[1] = float(line[8:16])
+                    cell[2] = float(line[16:24])
 
-                self.data.append(frame)
-                self.cell_lengths.append(cell)
-                self.frame += 1
+                self._coordinates = np.concatenate((self._coordinates, frame))
+                self.cell_lengths = np.concatenate((self.cell_lengths, cell))
 
         except _FileEOF:
             _warnings.warn('Unexpected EOF in parsing mdcrd. natom and/or '
@@ -529,54 +496,22 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         except StopIteration:
             pass
 
+        self._coordinates = self._coordinates.reshape((-1, self.natom, 3))
+        self.cell_lengths = self.cell_lengths.reshape((-1, 3))
         self._file.close()
 
-    def coordinates(self, frame=None):
-        """
-        Returns the requested coordinates
+    @property
+    def coordinates(self):
+        return self._coordinates
 
-        Parameters
-        ----------
-        frame : int, optional
-            If provided, this is the frame number whose coordinates will be
-            returned. If not provided, all of the coordinates are returned as a
-            list in which each entry is a 3*natom-length array of coordinates
+    @property
+    def frame(self):
+        return self._coordinates.shape[0]
 
-        Returns
-        -------
-        coordinates : array or list of array
-            If ``frame`` is None, the coordinates will be a list of length the
-            number of frames in the trajectory with each item being an array
-            (numpy if available) of 3*natom length of coordinates.
-        """
-        if not self._status == 'old':
-            raise RuntimeError('Cannot access coordinates of a new mdcrd')
-        if frame is not None:
-            return self.data[frame]
-        return self.data
-   
-    def box(self, frame=None):
-        """
-        Returns the frame'th frame of the box lengths as a length-3 array
-
-        Parameters
-        ----------
-        frame : int, optional
-            If provided, this is the frame number whose box dimensions will be
-            returned. If not provided, all of the box dimensions are returned as
-            a list in which each entry is a length-3 array of box lengths
-
-        Returns
-        -------
-        box_lengths : array or list of array
-            If ``frame`` is None, the box lengths will be a list of length the
-            number of frames in the trajectory with each item being an array
-            (numpy if available) of box lengths.
-        """
+    @property
+    def box(self):
         if not self._status == 'old':
             raise RuntimeError('Cannot access box of a new mdcrd')
-        if frame is not None:
-            return self.cell_lengths[frame]
         return self.cell_lengths
 
     def add_coordinates(self, stuff):

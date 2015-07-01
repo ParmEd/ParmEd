@@ -10,6 +10,8 @@ try:
     has_openmm = True
 except ImportError:
     has_openmm = False
+import numpy as np
+import os
 from parmed import unit as u
 from parmed.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
                 AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
@@ -17,7 +19,6 @@ from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 ProgressReporter, RestartReporter, StateDataReporter,
                 EnergyMinimizerReporter)
 from parmed.utils.six.moves import range, zip
-import os
 import unittest
 
 get_fn = utils.get_fn
@@ -257,24 +258,17 @@ class TestTrajRestartReporter(unittest.TestCase):
         fn = get_fn('restart.ncrst.%d', written=True)
         for i, j in enumerate(range(10, 501, 10)):
             ncrst = NetCDFRestart.open_old(fn % j)
-            self.assertEqual(ncrst.coordinates.shape, (75,))
-            self.assertEqual(ncrst.velocities.shape, (75,))
-            flatcrdr = ncrst.coordinates
-            flatvelr = ncrst.velocities
-            flatcrdt = ntraj[1].coordinates(i)
-            flatvelt = ntraj[1].velocities(i)
-            for x1, x2 in zip(flatcrdr, flatcrdt):
-                self.assertAlmostEqual(x1, x2, places=6)
-            for v1, v2 in zip(flatvelr, flatvelt):
-                # Lose a place of precision due to scaling/rescaling
-                self.assertAlmostEqual(v1, v2, places=5)
+            self.assertEqual(ncrst.coordinates.shape, (1, 25, 3))
+            self.assertEqual(ncrst.velocities.shape, (1, 25, 3))
+            np.testing.assert_allclose(ncrst.coordinates[0],
+                                       ntraj[1].coordinates[i])
+            np.testing.assert_allclose(ncrst.velocities[0],
+                                       ntraj[1].velocities[i], rtol=1e-6)
         # Now test the ASCII restart file
         f = AmberAsciiRestart(get_fn('restart.rst7', written=True), 'r')
         # Compare to ncrst and make sure it's the same data
-        for x1, x2 in zip(flatcrdr, f.coordinates):
-            self.assertAlmostEqual(x1, x2, places=4) # limited ASCII precision
-        for v1, v2 in zip(flatvelr, f.velocities):
-            self.assertAlmostEqual(v1, v2, places=4) # limited ASCII precision
+        np.testing.assert_allclose(ncrst.coordinates, f.coordinates, rtol=1e-4)
+        np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-4)
 
     def testReportersPBC(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (w/ PBC) """
@@ -304,8 +298,7 @@ class TestTrajRestartReporter(unittest.TestCase):
         self.assertTrue(ntraj.hasvels)
         self.assertTrue(ntraj.hasfrcs)
         for i in range(ntraj.frame):
-            self.assertAlmostEqual
-            for x1, x2 in zip(ntraj.box(i), atraj.box(i)):
+            for x1, x2 in zip(ntraj.box[i], atraj.box[i]):
                 self.assertAlmostEqual(x1, x2, places=3)
         self.assertEqual(len(nrst.box), 6)
         self.assertEqual(len(arst.box), 6)

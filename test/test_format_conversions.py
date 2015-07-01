@@ -87,6 +87,17 @@ class TestGromacsToAmber(TestCase):
             self.assertEqual(set([a.idx for a in a1.dihedral_partners]),
                              set([a.idx for a in a2.dihedral_partners]))
 
+    def testChamber(self):
+        """ Tests converting standard Gromacs system into Chamber prmtop """
+        top = load_file(get_fn('1aki.charmm27.solv.top'),
+                        xyz=get_fn('1aki.charmm27.solv.gro'))
+        parm = amber.ChamberParm.from_structure(top)
+        parm.write_parm(get_fn('1aki.charmm27_fromgmx.parm7', written=True))
+        self.assertTrue(diff_files(get_fn('1aki.charmm27_fromgmx.parm7',
+                                          written=True),
+                                   get_saved_fn('1aki.charmm27_fromgmx.parm7'))
+        )
+
     @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
     def testEnergySimple(self):
         """ Check equal energies for Gromacs -> Amber conversion of Amber FF """

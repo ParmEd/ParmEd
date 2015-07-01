@@ -37,15 +37,12 @@ from parmed.structure import Structure, needs_openmm
 from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
 from parmed import unit as u
-from parmed.utils.six import iteritems
+from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
 from collections import defaultdict
 import copy
-try:
-    import numpy as np
-except ImportError:
-    np = None
+import numpy as np
 from math import sqrt
 try:
     from simtk import openmm as mm
@@ -65,12 +62,16 @@ class AmberParm(AmberFormat, Structure):
 
     Parameters
     ----------
-    prm_name : str=None
+    prm_name : str, optional
         If provided, this file is parsed and the data structures will be loaded
         from the data in this file
-    rst7_name : str=None
+    xyz : str or array, optional
         If provided, the coordinates and unit cell dimensions from the provided
-        Amber inpcrd/restart file will be loaded into the molecule
+        Amber inpcrd/restart file will be loaded into the molecule, or the
+        coordinates will be loaded from the coordinate array
+    box : array, optional
+        If provided, the unit cell information will be set from the provided
+        unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)
 
     Attributes
     ----------
@@ -156,7 +157,7 @@ class AmberParm(AmberFormat, Structure):
 
     solvent_residues = ('WAT', 'HOH', 'SOL')
 
-    def __init__(self, prm_name=None, rst7_name=None):
+    def __init__(self, prm_name=None, xyz=None, box=None, rst7_name=None):
         """
         Instantiates an AmberParm object from data in prm_name and establishes
         validity based on presence of POINTERS and CHARGE sections. In general,
@@ -167,19 +168,25 @@ class AmberParm(AmberFormat, Structure):
         Structure.__init__(self)
         self.hasvels = False
         self.hasbox = False
-        self.coords = None
-        self.vels = None
         self.box = None
+        if xyz is None and rst7_name is not None:
+            warn('rst7_name keyword is deprecated. Use xyz instead',
+                 DeprecationWarning)
+            xyz = rst7_name
+        elif xyz is not None and rst7_name is not None:
+            warn('rst7_name keyword is deprecated and ignored in favor of xyz',
+                 DeprecationWarning)
         if prm_name is not None:
-            self.initialize_topology(rst7_name)
+            self.initialize_topology(xyz, box)
 
     #===================================================
 
-    def initialize_topology(self, rst7_name=None):
+    def initialize_topology(self, xyz=None, box=None):
         """
         Initializes topology data structures, like the list of atoms, bonds,
         etc., after the topology file has been read.
         """
+        from parmed import load_file
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
         if 'RESIDUE_ICODE' in self.flag_list:
@@ -195,22 +202,24 @@ class AmberParm(AmberFormat, Structure):
         # Instantiate the Structure data structures
         self.load_structure()
 
-        if rst7_name is not None:
-            self.load_rst7(rst7_name)
-        elif self.parm_data['POINTERS'][IFBOX] > 0:
-            self.hasbox = True
-            box = self.parm_data['BOX_DIMENSIONS']
-            self.box = box[1:] + [box[0], box[0], box[0]]
+        if isinstance(xyz, string_types):
+            f = load_file(xyz)
+            if not hasattr(f, 'coordinates') or f.coordinates is None:
+                raise TypeError('%s does not have coordinates' % xyz)
+            self.coordinates = f.coordinates
+            if hasattr(f, 'box') and f.box is not None and box is None:
+                self.box = f.box
+        else:
+            self.coordinates = xyz
+        if box is not None:
+            self.box = box
 
-        # If we have coordinates or velocities, load them into the atom list
-        if self.coords is not None:
-            for i, atom in enumerate(self.atoms):
-                i3 = i * 3
-                atom.xx, atom.xy, atom.xz = self.coords[i3:i3+3]
-        if self.vels is not None:
-            for i, atom in enumerate(self.atoms):
-                i3 = i * 3
-                atom.vx, atom.vy, atom.vz = self.vels[i3:i3+3]
+        # If all else fails, set the box from the prmtop file
+        if self.parm_data['POINTERS'][IFBOX] > 0 and self.box is None:
+            box = self.parm_data['BOX_DIMENSIONS']
+            self.box = list(box[1:]) + [box[0], box[0], box[0]]
+
+        self.hasbox = self.box is not None
 
     #===================================================
 
@@ -240,16 +249,14 @@ class AmberParm(AmberFormat, Structure):
         inst.initialize_topology()
         # See if the rawdata has any kind of structural attributes, like
         # coordinates and an atom list with positions and/or velocities
-        if hasattr(rawdata, 'coords') and rawdata.coords is not None:
-            inst.load_coordinates(copy.copy(rawdata.coords))
-        if hasattr(rawdata, 'vels') and rawdata.vels is not None:
-            inst.load_velocities(copy.copy(rawdata.vels))
+        if hasattr(rawdata, 'coordinates'):
+            inst.coordinates = copy.copy(rawdata.coordinates)
+        if hasattr(rawdata, 'velocities'):
+            inst.velocities = copy.copy(rawdata.velocities)
         if hasattr(rawdata, 'box'):
             inst.box = copy.copy(rawdata.box)
-        if hasattr(rawdata, 'hasbox'):
-            inst.hasbox = rawdata.hasbox or inst.box is not None
-        if hasattr(rawdata, 'hasvels'):
-            inst.hasvels = rawdata.hasvels or inst.vels is not None
+        inst.hasbox = inst.box is not None
+        inst.hasvels = inst.velocities is not None
         return inst
 
     @classmethod
@@ -322,19 +329,12 @@ class AmberParm(AmberFormat, Structure):
                 or abs(struct.box[5] - 90) > TINY):
             inst.parm_data['POINTERS'][IFBOX] = 2
             inst.pointers['IFBOX'] = 2
-            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + struct.box[:3]
+            inst.parm_data['BOX_DIMENSIONS'] = ([struct.box[3]] +
+                                                list(struct.box[:3]))
         else:
             inst.parm_data['POINTERS'][IFBOX] = 1
             inst.pointers['IFBOX'] = 1
-            inst.parm_data['BOX_DIMENSIONS'] = [90] + struct.box[:3]
-        try:
-            coords = []
-            for atom in struct.atoms:
-                coords.extend([atom.xx, atom.xy, atom.xz])
-        except AttributeError:
-            pass
-        else:
-            inst.load_coordinates(coords)
+            inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
         # pmemd likes to skip torsions with periodicities of 0, which may be
         # present as a way to hack entries into the 1-4 pairlist. See
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
@@ -367,14 +367,6 @@ class AmberParm(AmberFormat, Structure):
         """ Needs to copy a few additional data structures """
         other = super(AmberParm, self).__copy__()
         other.initialize_topology()
-        other.coords = copy.copy(self.coords)
-        other.vels = copy.copy(other.vels)
-        other.box = copy.copy(self.box)
-        # Fill in the coordinates if applicable
-        if other.coords is not None:
-            for i, atom in enumerate(other.atoms):
-                i3 = i * 3
-                atom.xx, atom.xy, atom.xz = other.coords[i3:i3+3]
         # Now we should have a full copy
         return other
 
@@ -401,27 +393,11 @@ class AmberParm(AmberFormat, Structure):
     def __imul__(self, ncopies, other=None):
         super(AmberParm, self).__imul__(ncopies, other)
         self.remake_parm()
-        if all(hasattr(atom, 'xx') for atom in self.atoms):
-            self.coords = []
-            for atom in self.atoms:
-                self.coords.extend([atom.xx, atom.xy, atom.xz])
-        if all(hasattr(atom, 'vx') for atom in self.atoms):
-            self.vels = []
-            for atom in self.atoms:
-                self.vels.extend([atom.xx, atom.xy, atom.xz])
         return self
 
     def __iadd__(self, other):
         super(AmberParm, self).__iadd__(other)
         self.remake_parm()
-        if all(hasattr(atom, 'xx') for atom in self.atoms):
-            self.coords = []
-            for atom in self.atoms:
-                self.coords.extend([atom.xx, atom.xy, atom.xz])
-        if all(hasattr(atom, 'vx') for atom in self.atoms):
-            self.vels = []
-            for atom in self.atoms:
-                self.vels.extend([atom.xx, atom.xy, atom.xz])
         return self
 
     #===================================================
@@ -608,7 +584,7 @@ class AmberParm(AmberFormat, Structure):
 
         # Now fill in the rst7 coordinates
         rst7.coordinates = [0.0 for i in range(len(self.atoms)*3)]
-        if self.vels is not None:
+        if self.velocities is not None:
             rst7.vels = [0.0 for i in range(len(self.atoms)*3)]
 
         for i, at in enumerate(self.atoms):
@@ -694,19 +670,6 @@ class AmberParm(AmberFormat, Structure):
         """
         super(AmberParm, self).strip(selection)
         self.remake_parm()
-        if self.coords is not None:
-            self.coords = []
-            for atom in self.atoms:
-                self.coords.extend([atom.xx, atom.xy, atom.xz])
-            if np is not None:
-                # Convert to numpy array
-                self.coords = np.asarray(self.coords)
-            if self.hasvels:
-                self.vels = []
-                for atom in self.atoms:
-                    self.vels.extend([atom.vx, atom.vy, atom.vz])
-                if np is not None:
-                    self.vels = np.asarray(self.vels)
 
     #===================================================
 
@@ -940,12 +903,12 @@ class AmberParm(AmberFormat, Structure):
         """
         if not hasattr(rst7, 'coordinates'):
             rst7 = Rst7.open(rst7)
-        self.load_coordinates(rst7.coordinates)
+        self.coordinates = rst7.coordinates
         self.hasvels = rst7.hasvels
         self.box = copy.copy(rst7.box)
         self.hasbox = self.box is not None
         if self.hasvels:
-            self.load_velocities(rst7.vels)
+            self.velocities = rst7.vels
 
     #===================================================
 
@@ -957,13 +920,15 @@ class AmberParm(AmberFormat, Structure):
         coords : list of floats
             A 1-dimensional iterable of coordinates of shape (natom*3,) from
             which all atomic coordinates are assigned. In Angstroms
+
+        Notes
+        -----
+        This function is deprecated and will be removed in future versions. Just
+        set the 'coordinates' attribute instead
         """
-        self.coords = coords
-        for i, atom in enumerate(self.atoms):
-            i3 = 3 * i
-            atom.xx = coords[i3  ]
-            atom.xy = coords[i3+1]
-            atom.xz = coords[i3+2]
+        warn('load_coordinates is deprecated. Just set coordinates attribute '
+             'instead.', DeprecationWarning)
+        self.coordinates = coords
 
     #===================================================
 
@@ -975,14 +940,35 @@ class AmberParm(AmberFormat, Structure):
         vels : list of floats
             A 1-dimensional iterable of velocities of shape (natom*3,) from
             which all atomic velocities are assigned. In Angstroms/picosecond
+
+        Notes
+        -----
+        This function is deprecated and will be removed in future versions. Just
+        set the 'velocities' attribute instead
         """
+        warn('load_velocities is deprecated. Just set velocities attribute '
+             'instead.', DeprecationWarning)
         self.hasvels = True
-        self.vels = vels
-        for i, atom in enumerate(self.atoms):
-            i3 = 3 * i
-            atom.vx = vels[i3  ]
-            atom.vy = vels[i3+1]
-            atom.vz = vels[i3+2]
+        self.velocities = vels
+
+    #===================================================
+
+    @property
+    def coords(self):
+        warn('Use coordinates attribute instead of coords', DeprecationWarning)
+        return self.coordinates
+    @coords.setter
+    def coords(self, value):
+        warn('Use coordinates attribute instead of coords', DeprecationWarning)
+        self.coordinates = value
+    @property
+    def vels(self):
+        warn('Use velocities attribute instead of vels', DeprecationWarning)
+        return self.velocities
+    @vels.setter
+    def vels(self, value):
+        warn('Use velocities attribute instead of vels', DeprecationWarning)
+        self.velocities = value
 
     #===================================================
 
@@ -1876,13 +1862,21 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _add_missing_13_14(self):
+    def _add_missing_13_14(self, ignore_inconsistent_vdw=False):
         """
         Uses the bond graph to fill in zero-parameter angles and dihedrals. The
         reason this is necessary is that Amber assumes that the list of angles
         and dihedrals encompasses *all* 1-3 and 1-4 pairs as determined by the
         bond graph, respectively. As a result, Amber programs use the angle and
         dihedral lists to set nonbonded exclusions and exceptions.
+
+        Parameters
+        ----------
+        ignore_inconsistent_vdw : bool, optional
+            If True, do not make inconsistent 1-4 vdW parameters fatal. For
+            ChamberParm, the 1-4 specific vdW parameters can compensate. For
+            AmberParm, the 1-4 scaling factor cannot represent arbitrary
+            exceptions. Default is False (should only be True for ChamberParm)
 
         Returns
         -------
@@ -1932,7 +1926,10 @@ class AmberParm(AmberFormat, Structure):
                         scee = 1 / pair.type.chgscale
                     if (abs(rref - pair.type.rmin) > SMALL and
                             pair.type.epsilon != 0):
-                        raise TypeError('Cannot translate exceptions')
+                        if ignore_inconsistent_vdw:
+                            scnb = 1.0
+                        else:
+                            raise TypeError('Cannot translate exceptions')
                     if (abs(scnb - dihedral.type.scnb) < SMALL and
                             abs(scee - dihedral.type.scee) < SMALL):
                         continue
@@ -1992,9 +1989,6 @@ class AmberParm(AmberFormat, Structure):
                                 # already present
                                 eref = sqrt(pair.atom1.epsilon_14*
                                             pair.atom2.epsilon_14)
-                                rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
-                                if abs(rmin - rref) > SMALL:
-                                    raise TypeError('Cannot translate exceptions')
                                 if pair.type.epsilon == 0:
                                     scnb = 1e10
                                 else:
@@ -2003,6 +1997,14 @@ class AmberParm(AmberFormat, Structure):
                                     scee = 1e10
                                 else:
                                     scee = 1 / pair.type.chgscale
+                                rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
+                                if abs(rmin - rref) > SMALL:
+                                    if ignore_inconsistent_vdw:
+                                        scnb = 1.0
+                                    else:
+                                        raise TypeError(
+                                                'Cannot translate exceptions'
+                                        )
                                 tortype = DihedralType(0, 1, 0, scee, scnb,
                                                        list=self.dihedral_types)
                                 self.dihedral_types.append(tortype)
@@ -2169,14 +2171,8 @@ class Rst7(object):
 
     @property
     def velocities(self):
-        """ Atomic velocities with units """
-        try:
-            return u.Quantity(self.vels.reshape(self.natom, 3),
-                              u.angstroms/u.picoseconds)
-        except AttributeError:
-            natom3 = self.natom * 3
-            return ([self.vels[i:i+3] for i in range(0, natom3, 3)] *
-                        u.angstroms/u.picoseconds)
+        """ Atomic velocities in units of angstroms/picoseconds """
+        return np.array(self.vels, copy=False).reshape(self.natom, 3)
 
     @property
     def box_vectors(self):

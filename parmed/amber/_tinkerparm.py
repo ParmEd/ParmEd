@@ -32,6 +32,7 @@ from parmed import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 TorsionTorsionType)
 from parmed import AmoebaNonbondedExceptionType as NonbondedExceptionType
 from parmed.exceptions import AmberError
+from parmed.utils.six import string_types
 from parmed.utils.six.moves import range, zip
 
 class AmoebaParm(AmberParm):
@@ -153,7 +154,7 @@ class AmoebaParm(AmberParm):
 
     #=============================================
 
-    def initialize_topology(self, rst7_name=None):
+    def initialize_topology(self, xyz=None, box=None):
         """
         Initializes topology data structures, like the list of atoms, bonds,
         etc., after the topology file has been read.
@@ -183,13 +184,25 @@ class AmoebaParm(AmberParm):
 
         # Load the structure arrays
         self.load_structure()
-      
-        if rst7_name is not None:
-            self.load_rst7(rst7_name)
-        elif self.parm_data['POINTERS'][IFBOX] > 0:
-            self.hasbox = True
+
+        if isinstance(xyz, string_types):
+            f = load_file(xyz)
+            if not hasattr(f, 'coordinates') or f.coordinates is None:
+                raise TypeError('%s does not have coordinates' % xyz)
+            self.coordinates = f.coordinates
+            if hasattr(f, 'box') and f.box is not None and box is None:
+                self.box = f.box
+        else:
+            self.coordinates = xyz
+        if box is not None:
+            self.box = box
+
+        # If all else fails, set the box from the prmtop file
+        if self.parm_data['POINTERS'][IFBOX] > 0 and self.box is None:
             box = self.parm_data['BOX_DIMENSIONS']
-            self.box = box[1:] + [box[0], box[0], box[0]]
+            self.box = list(box[1:]) + [box[0], box[0], box[0]]
+
+        self.hasbox = self.box is not None
 
     #=============================================
 
@@ -620,23 +633,19 @@ class AmoebaParm(AmberParm):
         """ Loads the AMOEBA chiral and multipole frames """
         data = self.parm_data
         del self.chiral_frames[:]
-        try:
+        if 'AMOEBA_CHIRAL_FRAME_LIST' in data:
             it = iter(data['AMOEBA_CHIRAL_FRAME_LIST'])
             for i, j, k in zip(it, it, it):
                 self.chiral_frames.append(
                         ChiralFrame(self.atoms[i-1], self.atoms[j-1], k)
                 )
-        except KeyError:
-            pass
         del self.multipole_frames[:]
-        try:
+        if 'AMOEBA_FRAME_DEF_LIST' in data:
             it = iter(data['AMOEBA_FRAME_DEF_LIST'])
             for i, j, k, l, m in zip(it, it, it, it, it):
                 self.multipole_frames.append(
                         MultipoleFrame(self.atoms[i-1], j, k, l, m)
                 )
-        except KeyError:
-            pass
 
     #=============================================
 
@@ -645,23 +654,21 @@ class AmoebaParm(AmberParm):
         del self.adjust_types[:]
         del self.adjusts[:]
         data = self.parm_data
-        try:
-            for a,b,c,d,e in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
-                                 data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
-                self.adjust_types.append(
-                        NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
-                )
-            it = iter(data['AMOEBA_ADJUST_LIST'])
-            for i, j, k in zip(it, it, it):
-                self.adjusts.append(
-                        NonbondedException(self.atoms[i-1], self.atoms[j-1],
-                                           self.adjust_types[k-1])
-                )
-        except KeyError:
-            pass
+        # This section should always be present
+        for a,b,c,d,e in zip(data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
+                             data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
+            self.adjust_types.append(
+                    NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
+            )
+        it = iter(data['AMOEBA_ADJUST_LIST'])
+        for i, j, k in zip(it, it, it):
+            self.adjusts.append(
+                    NonbondedException(self.atoms[i-1], self.atoms[j-1],
+                                        self.adjust_types[k-1])
+            )
 
     #=============================================
 
