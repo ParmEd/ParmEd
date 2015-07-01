@@ -3979,10 +3979,9 @@ class TrackedList(list):
         return TrackedList(list.__mul__(self, fac))
 
     def __getitem__(self, thing):
-        retval = list.__getitem__(self, thing)
-        if hasattr(thing, 'indices'):
-            return TrackedList(retval)
-        return retval
+        if isinstance(thing, slice):
+            return TrackedList(list.__getitem__(self, thing))
+        return list.__getitem__(self, thing)
 
     def __getslice__(self, start, end):
         return TrackedList(list.__getslice__(self, start, end))
