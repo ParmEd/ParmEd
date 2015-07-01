@@ -86,8 +86,8 @@ class ChamberParm(AmberParm):
 
     See Also
     --------
-    :class:`AmberParm <parmed.amber._amberparm.AmberParm>` for list of other
-    attributes present in ChamberParm instances
+    See :class:`AmberParm` for list of other attributes present in ChamberParm
+    instances
     """
 
     solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC',
