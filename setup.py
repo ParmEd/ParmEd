@@ -7,6 +7,8 @@ if sys.version_info < (2, 7):
                      'correctly.\n')
     sys.exit(0)
 
+is_pypy = '__pypy__' in sys.builtin_module_names
+
 # parmed package and all its subpackages
 packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
@@ -16,17 +18,20 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm
-sources = [os.path.join('src', '_rdparm.cpp'),
-           os.path.join('src', 'readparm.cpp')]
-depends = [os.path.join('src', 'CompatabilityMacros.h'),
-           os.path.join('src', 'readparm.h')]
-include_dirs = [os.path.join(os.path.abspath('.'), 'src')]
+if is_pypy:
+    sources = depends = include_dirs = extensions = []
+else:
+    sources = [os.path.join('src', '_rdparm.cpp'),
+               os.path.join('src', 'readparm.cpp')]
+    depends = [os.path.join('src', 'CompatabilityMacros.h'),
+               os.path.join('src', 'readparm.h')]
+    include_dirs = [os.path.join(os.path.abspath('.'), 'src')]
 
-extensions = [Extension('parmed.amber._rdparm',
-                        sources=sources,
-                        include_dirs=include_dirs,
-                        depends=depends)
-]
+    extensions = [Extension('parmed.amber._rdparm',
+                            sources=sources,
+                            include_dirs=include_dirs,
+                            depends=depends)
+    ]
 
 if __name__ == '__main__':
 
@@ -38,8 +43,8 @@ if __name__ == '__main__':
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
     from distutils import sysconfig
-    if not os.path.exists(os.path.join(sysconfig.get_config_vars()['INCLUDEPY'],
-                                       'Python.h')):
+    if is_pypy or not os.path.exists(
+            os.path.join(sysconfig.get_config_vars()['INCLUDEPY'], 'Python.h')):
         extensions = []
 
     # Delete old versions with old names of scripts and packages (chemistry and
