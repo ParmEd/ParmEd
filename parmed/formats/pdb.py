@@ -374,7 +374,8 @@ class PDBFile(object):
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                     if segid: atom.segid = segid
-                    if _compare_atoms(last_atom, atom, resname, resid, chain):
+                    if (_compare_atoms(last_atom, atom, resname, resid, chain)
+                            and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
                         last_atom_added = atom
@@ -1062,7 +1063,8 @@ class CIFFile(object):
                                 charge=charge, mass=mass, occupancy=occup,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
-                if _compare_atoms(last_atom, atom, resname, resnum, chain):
+                if (_compare_atoms(last_atom, atom, resname, resnum, chain)
+                        and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
                 else:
