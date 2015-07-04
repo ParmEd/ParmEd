@@ -1394,25 +1394,11 @@ class Structure(object):
 
     @property
     def coordinates(self):
-        if self._coordinates is None:
-            try:
-                coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
-            except AttributeError:
-                return None
-            else:
-                return np.array(coords)
-        elif self.is_changed():
-            # Make sure our first frame matches our atomic coordinates. If not,
-            # delete those coordinates
-            coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-            if np.abs(self._coordinates[0] - coords).max() > SMALL:
-                self._coordinates = None
-                return coords
-        assert len(self._coordinates.shape) == 3, \
-                'Internal coordinate shape wrong'
-        assert self._coordinates.shape[1] == len(self.atoms), \
-                'Coordinate shape different from number of atoms'
-        return self._coordinates[0]
+        try:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+        except AttributeError:
+            return None
+        return np.array(coords)
 
     @coordinates.setter
     def coordinates(self, value):
@@ -1458,29 +1444,32 @@ class Structure(object):
         ------
         IndexError if there are fewer than ``frame`` coordinates
         """
-        if self.is_changed() and self._coordinates is not None:
-            try:
-                coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-            except AttributeError:
+        try:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+        except AttributeError:
+            coords = None
+        else:
+            coords = np.array(coords)
+        # Wipe out our existing coordinates if we think anything might have
+        # changed
+        if self._coordinates is not None:
+            if coords is None:
                 self._coordinates = None
-            else:
-                if np.abs(self._coordinates[0] - coords).max() > SMALL:
-                    self._coordinates = None
+            elif coords.shape != self._coordinates.shape[1:]:
+                self._coordinates = None
+            elif np.abs(coords - self._coordinates[0]).max() > SMALL:
+                self._coordinates = None
+
         if frame == 'all':
             if self._coordinates is not None:
                 return self._coordinates
-            try:
-                return np.array([[a.xx, a.xy, a.xz]
-                    for a in self.atoms]).reshape((1, len(self.atoms), 3))
-            except AttributeError:
-                return None
+            elif coords is not None:
+                return coords.reshape((1, len(self.atoms), 3))
+            return None
         elif self._coordinates is None:
-            if frame == 0:
-                try:
-                    return np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-                except AttributeError:
-                    raise IndexError('No coordinate frames present')
-            # We requested *not* the first frame
+            if frame == 0 and coords is not None:
+                return coords
+            # Requested NOT the first frame
             raise IndexError('No coordinate frames present')
         return self._coordinates[frame]
 
