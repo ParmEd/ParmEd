@@ -3910,7 +3910,7 @@ class TrackedList(list):
         return list.__init__(self, *args)
 
     def __repr__(self):
-        return 'TrackedList(%s)' % list.__repr__(self)
+        return '%s(%s)' % (type(self).__name__, list.__repr__(self))
 
     @_changes
     def __delitem__(self, item):
