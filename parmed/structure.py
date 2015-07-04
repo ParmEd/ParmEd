@@ -1457,7 +1457,7 @@ class Structure(object):
                 self._coordinates = None
             elif coords.shape != self._coordinates.shape[1:]:
                 self._coordinates = None
-            elif np.abs(coords[0] - self._coordinates[0]).max() > SMALL:
+            elif np.abs(coords - self._coordinates[0]).max() > SMALL:
                 self._coordinates = None
 
         if frame == 'all':
