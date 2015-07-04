@@ -1455,7 +1455,7 @@ class Structure(object):
         if self._coordinates is not None:
             if coords is None:
                 self._coordinates = None
-            elif coords.shape[1:] != self._coordinates.shape[1:]:
+            elif coords.shape != self._coordinates.shape[1:]:
                 self._coordinates = None
             elif np.abs(coords[0] - self._coordinates[0]).max() > SMALL:
                 self._coordinates = None
