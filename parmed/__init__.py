@@ -6,10 +6,9 @@ between standard and amber file formats, manipulate structures, etc.
 __version__ = '2.0beta3'
 __author__ = 'Jason Swails'
 
-from parmed import exceptions, periodic_table
+from parmed import exceptions, periodic_table, residue
 from parmed import unit, utils
 from parmed.topologyobjects import *
-from parmed.residue import *
 from parmed.structure import Structure
 from parmed import amber, charmm, gromacs, tinker, openmm, rosetta
 from parmed import formats
