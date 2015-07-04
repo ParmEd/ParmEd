@@ -3909,6 +3909,9 @@ class TrackedList(list):
         self.needs_indexing = False
         return list.__init__(self, *args)
 
+    def __repr__(self):
+        return 'TrackedList(%s)' % list.__repr__(self)
+
     @_changes
     def __delitem__(self, item):
         """ Deletes items and slices. Make sure all items """
@@ -3977,14 +3980,6 @@ class TrackedList(list):
 
     def __mul__(self, fac):
         return TrackedList(list.__mul__(self, fac))
-
-    def __getitem__(self, thing):
-        if isinstance(thing, slice):
-            return TrackedList(list.__getitem__(self, thing))
-        return list.__getitem__(self, thing)
-
-    def __getslice__(self, start, end):
-        return TrackedList(list.__getslice__(self, start, end))
 
     def index_members(self):
         """

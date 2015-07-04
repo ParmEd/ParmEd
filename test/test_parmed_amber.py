@@ -610,7 +610,7 @@ class TestObjectAPIs(unittest.TestCase):
         mylist2 = topologyobjects.TrackedList(reversed(range(20)))
         self.assertFalse(mylist.changed)
         self.assertIsInstance(mylist[0], int)
-        self.assertIsInstance(mylist[0:5], topologyobjects.TrackedList)
+        self.assertIsInstance(mylist[0:5], list)
         self.assertIsInstance(mylist + mylist2, topologyobjects.TrackedList)
         self.assertIsInstance(mylist * 2, topologyobjects.TrackedList)
         mylist += mylist2
