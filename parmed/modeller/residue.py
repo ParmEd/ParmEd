@@ -10,10 +10,7 @@ except ImportError:
     pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
-try:
-    import numpy as np
-except ImportError:
-    np = None
+import numpy as np
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
@@ -432,7 +429,7 @@ class ResidueTemplateContainer(list):
 
         Returns
         -------
-        residues : dict {str : :class:`ResidueTemplate}
+        residues : dict {str : :class:`ResidueTemplate`}
             The residue library with all residues from this residue collection
         """
         ret = dict()
