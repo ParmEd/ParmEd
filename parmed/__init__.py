@@ -23,3 +23,7 @@ load_rosetta = rosetta.RosettaPose.load
 
 download_PDB = formats.PDBFile.download
 download_CIF = formats.CIFFile.download
+
+# The tools package depends on *everything*, so import this at the end to avoid
+# circular imports.
+from parmed import tools
