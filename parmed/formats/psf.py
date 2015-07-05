@@ -209,7 +209,11 @@ class PSFFile(object):
         if len(struct.atoms) % 8 != 0: dest.write('\n')
         dest.write('\n')
         # Group section
-        dest.write((intfmt*2) % (len(struct.groups), struct.groups.nst2))
+        try:
+            nst2 = struct.groups.nst2
+        except AttributeError:
+            nst2 = 0
+        dest.write((intfmt*2) % (len(struct.groups), nst2))
         dest.write(' !NGRP NST2\n')
         for i, gp in enumerate(struct.groups):
             dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
