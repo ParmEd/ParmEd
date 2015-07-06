@@ -1343,7 +1343,7 @@ class Structure(object):
         if kind is not None:
             kind = kind.upper()
         else:
-            _, ext = os.path.splitext(fname)[1]
+            _, ext = os.path.splitext(fname)
             if ext in ('.bz2', '.gz'):
                 ext = os.path.splitext(ext)[1]
             try:
