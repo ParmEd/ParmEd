@@ -4,7 +4,7 @@ This sets up the command interpreter for textual ParmEd (parmed).
 
 # Load some system modules that may be useful for various users in shell mode
 from parmed.amber.readparm import AmberParm
-from parmed.exceptions import ParmedError
+from parmed.exceptions import ParmedError, ParmedWarning
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range
 import cmd
@@ -51,19 +51,16 @@ class ParmedCmd(cmd.Cmd):
         cmd.Cmd.__init__(self, stdin=stdin, stdout=stdout)
         self.continued = ''
         self._logfile = None
-        self._exit_on_fatal = True
+        try:
+            self._exit_on_fatal = not os.isatty(self.stdin.fileno())
+        except AttributeError:
+            self._exit_on_fatal = False
         if not self._populated: self.populate_actions()
 
     def setlog(self, f):
-        """
-        Open up a log file to start logging the commands. If we log these
-        commands, then we want to catch any fatal error for an action and avoid
-        bailing out of the interpreter (so do NOT exit on fatal).
-        """
+        """ Open up a log file to start logging the commands. """
         if f is None:
-            self._exit_on_fatal = True
             return
-        self._exit_on_fatal = False
         if hasattr(f, 'write'):
             self._logfile = f
         else:
@@ -137,11 +134,11 @@ class ParmedCmd(cmd.Cmd):
         # Store this action for later use. This action is unique
         try:
             self.parmout = COMMANDMAP['parmout'](self.parm, line)
-        except ParmedError as err:
+        except (ParmedError, ParmedWarning) as err:
             self.stdout.write('Action parmout failed.\n\t')
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
-                raise err
+                raise
    
     def _normaldo(self, ActionClass, line):
         """ The standard action command does this stuff """
@@ -151,7 +148,7 @@ class ParmedCmd(cmd.Cmd):
             if action.valid:
                 self.stdout.write('%s\n' % action)
                 action.execute()
-        except ParmedError as err:
+        except (ParmedError, ParmedWarning) as err:
             self.stdout.write('Action %s failed\n\t' % actionname)
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
@@ -206,7 +203,7 @@ class ParmedCmd(cmd.Cmd):
             except ParmedError as err:
                 self.stdout.write('%s: %s\n' % (type(err).__name__, err))
                 if self._exit_on_fatal:
-                    raise err
+                    raise
 
         return True
 

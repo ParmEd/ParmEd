@@ -175,6 +175,7 @@ def clapp():
                     for line in f:
                         if line.startswith('# Log started on'): continue
                         readline.add_history(line.rstrip())
+                    f.close()
             try:
                 logfile = open(opt.logfile, 'a')
             except IOError:
