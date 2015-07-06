@@ -1292,16 +1292,16 @@ class Structure(object):
 
     #===================================================
 
-    def save(self, fname, kind=None, **kwargs):
+    def save(self, fname, format=None, **kwargs):
         """
         Saves the current Structure in the requested file format. Supported
         formats can be specified explicitly or determined by file-name
         extension. The following formats are supported, with the recognized
-        suffix and ``kind`` keyword shown in parentheses:
+        suffix and ``format`` keyword shown in parentheses:
 
             - PDB (.pdb, pdb)
             - PDBx/mmCIF (.cif, cif)
-            - Amber topology file (.prmtop/.parm, amber)
+            - Amber topology file (.prmtop/.parm7, amber)
             - CHARMM PSF file (.psf, charmm)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)
@@ -1311,10 +1311,10 @@ class Structure(object):
         Parameters
         ----------
         fname : str
-            Name of the file to save. If ``kind`` is ``None`` (see below), the
+            Name of the file to save. If ``format`` is ``None`` (see below), the
             file type will be determined based on the filename extension. If the
             type cannot be determined, a ValueError is raised.
-        kind : str, optional
+        format : str, optional
             The case-insensitive keyword specifying what type of file ``fname``
             should be saved as. If ``None`` (default), the file type will be
             determined from filename extension of ``fname``
@@ -1324,7 +1324,7 @@ class Structure(object):
 
         Raises
         ------
-        ValueError if either filename extension or ``kind`` are not recognized
+        ValueError if either filename extension or ``format`` are not recognized
         TypeError if the structure cannot be converted to the desired format for
         whatever reason
         """
@@ -1340,33 +1340,33 @@ class Structure(object):
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
         }
-        if kind is not None:
-            kind = kind.upper()
+        if format is not None:
+            format = format.upper()
         else:
             _, ext = os.path.splitext(fname)
             if ext in ('.bz2', '.gz'):
                 ext = os.path.splitext(ext)[1]
             try:
-                kind = extmap[ext]
+                format = extmap[ext]
             except KeyError:
                 raise ValueError('Could not determine file type of %s' % fname)
         # Dispatch
-        if kind == 'PDB':
+        if format == 'PDB':
             self.write_pdb(fname, **kwargs)
-        elif kind == 'CIF':
+        elif format == 'CIF':
             self.write_cif(fname, **kwargs)
-        elif kind == 'PSF':
+        elif format == 'PSF':
             self.write_psf(fname, **kwargs)
-        elif kind == 'GRO':
+        elif format == 'GRO':
             gromacs.GromacsGroFile.write(self, fname, **kwargs)
-        elif kind == 'MOL2':
+        elif format == 'MOL2':
             formats.Mol2File.write(self, fname, **kwargs)
-        elif kind == 'MOL3':
+        elif format == 'MOL3':
             formats.Mol2File.write(self, fname, mol3=True, **kwargs)
-        elif kind == 'GROMACS':
+        elif format == 'GROMACS':
             s = gromacs.GromacsTopologyFile.from_structure(self)
             s.write(fname, **kwargs)
-        elif kind == 'AMBER':
+        elif format == 'AMBER':
             if (self.trigonal_angles or self.out_of_plane_bends or
                     self.torsion_torsions or self.pi_torsions or
                     self.stretch_bends or self.chiral_frames or
@@ -1386,7 +1386,7 @@ class Structure(object):
                         raise
                 s.write_parm(fname, **kwargs)
         else:
-            raise ValueError('No file type matching %s' % kind)
+            raise ValueError('No file type matching %s' % format)
 
     #===================================================
 
