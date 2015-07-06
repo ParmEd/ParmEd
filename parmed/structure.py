@@ -1340,53 +1340,66 @@ class Structure(object):
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
         }
-        if format is not None:
-            format = format.upper()
-        else:
-            _, ext = os.path.splitext(fname)
-            if ext in ('.bz2', '.gz'):
-                ext = os.path.splitext(ext)[1]
-            try:
-                format = extmap[ext]
-            except KeyError:
-                raise ValueError('Could not determine file type of %s' % fname)
-        # Dispatch
-        if format == 'PDB':
-            self.write_pdb(fname, **kwargs)
-        elif format == 'CIF':
-            self.write_cif(fname, **kwargs)
-        elif format == 'PSF':
-            self.write_psf(fname, **kwargs)
-        elif format == 'GRO':
-            gromacs.GromacsGroFile.write(self, fname, **kwargs)
-        elif format == 'MOL2':
-            formats.Mol2File.write(self, fname, **kwargs)
-        elif format == 'MOL3':
-            formats.Mol2File.write(self, fname, mol3=True, **kwargs)
-        elif format == 'GROMACS':
-            s = gromacs.GromacsTopologyFile.from_structure(self)
-            s.write(fname, **kwargs)
-        elif format == 'AMBER':
-            if (self.trigonal_angles or self.out_of_plane_bends or
-                    self.torsion_torsions or self.pi_torsions or
-                    self.stretch_bends or self.chiral_frames or
-                    self.multipole_frames):
-                s = amber.AmoebaParm.from_structure(self)
-                s.write_parm(fname, **kwargs)
-            elif self.urey_bradleys or self.impropers or self.cmaps:
-                s = amber.ChamberParm.from_structure(self)
-                s.write_parm(fname, **kwargs)
+        # Basically everybody uses atom type names instead of type indexes. So
+        # convert to atom type names and switch back if need be
+        all_ints = True
+        for atom in self.atoms:
+            if isinstance(atom.type, integer_types):
+                atom.type = str(atom.atom_type)
             else:
+                all_ints = False
+        try:
+            if format is not None:
+                format = format.upper()
+            else:
+                _, ext = os.path.splitext(fname)
+                if ext in ('.bz2', '.gz'):
+                    ext = os.path.splitext(ext)[1]
                 try:
-                    s = amber.AmberParm.from_structure(self)
-                except TypeError as e:
-                    if 'Cannot translate exceptions' in str(e):
-                        s = amber.ChamberParm.from_structure(self)
-                    else:
-                        raise
-                s.write_parm(fname, **kwargs)
-        else:
-            raise ValueError('No file type matching %s' % format)
+                    format = extmap[ext]
+                except KeyError:
+                    raise ValueError('Could not determine file type of %s' % fname)
+            # Dispatch
+            if format == 'PDB':
+                self.write_pdb(fname, **kwargs)
+            elif format == 'CIF':
+                self.write_cif(fname, **kwargs)
+            elif format == 'PSF':
+                self.write_psf(fname, **kwargs)
+            elif format == 'GRO':
+                gromacs.GromacsGroFile.write(self, fname, **kwargs)
+            elif format == 'MOL2':
+                formats.Mol2File.write(self, fname, **kwargs)
+            elif format == 'MOL3':
+                formats.Mol2File.write(self, fname, mol3=True, **kwargs)
+            elif format == 'GROMACS':
+                s = gromacs.GromacsTopologyFile.from_structure(self)
+                s.write(fname, **kwargs)
+            elif format == 'AMBER':
+                if (self.trigonal_angles or self.out_of_plane_bends or
+                        self.torsion_torsions or self.pi_torsions or
+                        self.stretch_bends or self.chiral_frames or
+                        self.multipole_frames):
+                    s = amber.AmoebaParm.from_structure(self)
+                    s.write_parm(fname, **kwargs)
+                elif self.urey_bradleys or self.impropers or self.cmaps:
+                    s = amber.ChamberParm.from_structure(self)
+                    s.write_parm(fname, **kwargs)
+                else:
+                    try:
+                        s = amber.AmberParm.from_structure(self)
+                    except TypeError as e:
+                        if 'Cannot translate exceptions' in str(e):
+                            s = amber.ChamberParm.from_structure(self)
+                        else:
+                            raise
+                    s.write_parm(fname, **kwargs)
+            else:
+                raise ValueError('No file type matching %s' % format)
+        finally:
+            if all_ints:
+                for atom in self.atoms:
+                    atom.type = int(atom.atom_type)
 
     #===================================================
 

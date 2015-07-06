@@ -4,6 +4,8 @@ Tests the parmed/structure module
 from __future__ import division
 
 import numpy as np
+import parmed as pmd
+from parmed.exceptions import CharmmWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
@@ -12,9 +14,10 @@ from parmed.utils.six.moves import range, zip
 from copy import copy
 import random
 import string
-import unittest
 import os
-from utils import create_random_structure
+import unittest
+from utils import create_random_structure, get_fn
+import warnings
 
 class TestStructureAPI(unittest.TestCase):
     """ Tests the underlying Structure API """
@@ -609,6 +612,160 @@ class TestStructureAdd(unittest.TestCase):
             self.assertEqual(r1.name, r2.name)
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
+
+class TestStructureSave(unittest.TestCase):
+    """ Tests the universal "save" function in Structure """
+
+    def setUp(self):
+        warnings.filterwarnings('ignore', category=CharmmWarning)
+        self.sys1 = pmd.load_file(get_fn('ala3_solv.psf'))
+        self.sys1.coordinates = pmd.load_file(get_fn('ala3_solv.crd')).coordinates
+        self.sys1.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
+        self.sys1.load_parameters(
+                pmd.charmm.CharmmParameterSet(
+                        get_fn('par_all36_prot.prm'),
+                        get_fn('toppar_water_ions.str')
+                )
+        )
+        self.sys2 = pmd.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        self.sys3 = pmd.load_file(get_fn(os.path.join('01.1water', 'topol.top')),
+                                  xyz=get_fn(os.path.join('01.1water', 'conf.gro')))
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        warnings.filterwarnings('default', category=CharmmWarning)
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def savePDB(self):
+        """ Test saving various Structure instances as a PDB """
+        self.sys1.save(get_fn('test.pdb', written=True))
+        self.sys2.save(get_fn('test2.pdb', written=True))
+        self.sys3.save(get_fn('test3.pdb', written=True))
+        x1 = pmd.formats.PDBFile.parse(get_fn('test.pdb', written=True))
+        x2 = pmd.formats.PDBFile.parse(get_fn('test2.pdb', written=True))
+        x3 = pmd.formats.PDBFile.parse(get_fn('test3.pdb', written=True))
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+
+    def saveCIF(self):
+        """ Test saving various Structure instances as a PDBx/mmCIF """
+        self.sys1.save(get_fn('test.cif', written=True))
+        self.sys2.save(get_fn('test2.cif', written=True))
+        self.sys3.save(get_fn('test3.cif', written=True))
+        x1 = pmd.formats.CIFFile.parse(get_fn('test.cif', written=True))
+        x2 = pmd.formats.CIFFile.parse(get_fn('test2.cif', written=True))
+        x3 = pmd.formats.CIFFile.parse(get_fn('test3.cif', written=True))
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+
+    def saveMol2(self):
+        """ Test saving various Structure instances as Mol2 files """
+        self.sys1.save(get_fn('test.mol2', written=True))
+        self.sys2.save(get_fn('test2.mol2', written=True))
+        self.sys3.save(get_fn('test3.mol2', written=True))
+        x1 = pmd.formats.Mol2File.parse(get_fn('test.mol2', written=True), structure=True)
+        x2 = pmd.formats.Mol2File.parse(get_fn('test2.mol2', written=True), structure=True)
+        x3 = pmd.formats.Mol2File.parse(get_fn('test3.mol2', written=True), structure=True)
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
+        self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
+        self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
+
+    def saveMol3(self):
+        """ Test saving various Structure instances as Mol3 files """
+        self.sys1.save(get_fn('test.mol3', written=True))
+        x1 = pmd.formats.Mol2File.parse(get_fn('test.mol3', written=True), structure=True)
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
+        with open(get_fn('test.mol3', written=True), 'r') as f:
+            for line in f:
+                if line.startswith('@<TRIPOS>HEADTAIL'):
+                    break
+            else:
+                self.assertFalse(True)
+
+    def saveAmberParm(self):
+        """ Test saving various Structure instances as Amber prmtop files """
+        self.sys1.save(get_fn('test.parm7', written=True))
+        self.sys2.save(get_fn('test2.parm7', written=True))
+        self.sys3.save(get_fn('test3.parm7', written=True))
+        x1 = pmd.amber.LoadParm(get_fn('test.parm7', written=True))
+        x2 = pmd.amber.LoadParm(get_fn('test2.parm7', written=True))
+        x3 = pmd.amber.LoadParm(get_fn('test3.parm7', written=True))
+        self.assertIsInstance(x1, pmd.amber.ChamberParm)
+        self.assertIsInstance(x2, pmd.amber.AmberParm)
+        self.assertIsInstance(x3, pmd.amber.AmberParm)
+        # Check equivalence of topologies
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
+        self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
+        self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
+        self.assertEqual(len(self.sys1.angles), len(x1.angles))
+        self.assertEqual(len(self.sys2.angles), len(x2.angles))
+        self.assertEqual(len(self.sys3.angles), len(x3.angles))
+        self.assertEqual(sum([len(d.type) for d in self.sys1.dihedrals]), len(x1.dihedrals))
+        self.assertEqual(len(self.sys2.dihedrals), len(x2.dihedrals))
+        self.assertEqual(sum([len(d.type) for d in self.sys3.dihedrals]), len(x3.dihedrals))
+        self.assertEqual(len(self.sys1.impropers), len(x1.impropers))
+        self.assertEqual(len(self.sys2.impropers), len(x2.impropers))
+        self.assertEqual(len(self.sys3.impropers), len(x3.impropers))
+        self.assertEqual(len(self.sys1.cmaps), len(x1.cmaps))
+        self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
+        self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
+        for a1, a2 in zip(self.sys1.atoms, x1.atoms):
+            self.assertAlmostEqual(a1.rmin, a2.rmin)
+            self.assertAlmostEqual(abs(a1.epsilon), abs(a2.epsilon))
+        for a1, a2 in zip(self.sys2.atoms, x2.atoms):
+            self.assertAlmostEqual(a1.rmin, a2.rmin)
+            self.assertAlmostEqual(abs(a1.epsilon), abs(a2.epsilon))
+        for a1, a2 in zip(self.sys3.atoms, x3.atoms):
+            self.assertAlmostEqual(a1.rmin, a2.rmin)
+            self.assertAlmostEqual(abs(a1.epsilon), abs(a2.epsilon))
+
+    def savePSF(self):
+        """ Test saving various Structure instances as CHARMM PSF files """
+        self.sys1.save(get_fn('test.psf', written=True))
+        self.sys2.save(get_fn('test2.psf', written=True))
+        self.sys3.save(get_fn('test3.psf', written=True))
+        x1 = pmd.charmm.CharmmPsfFile(get_fn('test.psf', written=True))
+        x2 = pmd.charmm.CharmmPsfFile(get_fn('test2.psf', written=True))
+        x3 = pmd.charmm.CharmmPsfFile(get_fn('test3.psf', written=True))
+        self.assertIsInstance(x1, pmd.charmm.CharmmPsfFile)
+        self.assertIsInstance(x2, pmd.charmm.CharmmPsfFile)
+        self.assertIsInstance(x3, pmd.charmm.CharmmPsfFile)
+        # Check equivalence of topologies
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
+        self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
+        self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
+        self.assertEqual(len(self.sys1.angles), len(x1.angles))
+        self.assertEqual(len(self.sys2.angles), len(x2.angles))
+        self.assertEqual(len(self.sys3.angles), len(x3.angles))
+        self.assertEqual(len(self.sys1.dihedrals), len(x1.dihedrals))
+        self.assertEqual(len(self.sys2.dihedrals), len(x2.dihedrals))
+        self.assertEqual(len(self.sys3.dihedrals), len(x3.dihedrals))
+        self.assertEqual(len(self.sys1.impropers), len(x1.impropers))
+        self.assertEqual(len(self.sys2.impropers), len(x2.impropers))
+        self.assertEqual(len(self.sys3.impropers), len(x3.impropers))
+        self.assertEqual(len(self.sys1.cmaps), len(x1.cmaps))
+        self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
+        self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
 if __name__ == '__main__':
     unittest.main()

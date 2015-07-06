@@ -1098,6 +1098,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.improper_types = struct.improper_types
         gmxtop.cmap_types = struct.cmap_types
         gmxtop.rb_torsion_types = struct.rb_torsion_types
+        gmxtop.urey_bradley_types = struct.urey_bradley_types
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
