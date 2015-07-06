@@ -115,6 +115,8 @@ class ParmedCmd(cmd.Cmd):
             return None, None, line
         elif line[0] == '?':
             line = 'help ' + line[1:]
+        elif line[-1] == '?' and len(line.split()) == 1:
+            line = 'help ' + line[:-1]
         elif line[0] == '!':
             if hasattr(self, 'do_shell'):
                 line = 'shell ' + line[1:]
