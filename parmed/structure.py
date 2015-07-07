@@ -406,15 +406,16 @@ class Structure(object):
 
     #===================================================
 
-    def copy(self, cls, split_dihedrals=False):
+    def copy(self, cls=None, split_dihedrals=False):
         """
         Makes a copy of the current structure as an instance of a specified
         subclass
 
         Parameters
         ----------
-        cls : Structure subclass
+        cls : Structure subclass, optional
             The returned object is a copy of this structure as a `cls` instance
+            If not provided, it is the class definition of this instance
         split_dihedrals : ``bool``
             If True, then the Dihedral entries will be split up so that each one
             is paired with a single DihedralType (rather than a
@@ -426,6 +427,8 @@ class Structure(object):
             The instance of the Structure subclass `cls` with a copy of the
             current Structure's topology information
         """
+        if cls is not None:
+            cls = type(self)
         c = cls()
         for atom in self.atoms:
             res = atom.residue
