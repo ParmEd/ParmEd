@@ -744,9 +744,6 @@ class TestStructureSave(unittest.TestCase):
         x1 = pmd.charmm.CharmmPsfFile(get_fn('test.psf', written=True))
         x2 = pmd.charmm.CharmmPsfFile(get_fn('test2.psf', written=True))
         x3 = pmd.charmm.CharmmPsfFile(get_fn('test3.psf', written=True))
-        self.assertIsInstance(x1, pmd.charmm.CharmmPsfFile)
-        self.assertIsInstance(x2, pmd.charmm.CharmmPsfFile)
-        self.assertIsInstance(x3, pmd.charmm.CharmmPsfFile)
         # Check equivalence of topologies
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
@@ -766,6 +763,46 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual(len(self.sys1.cmaps), len(x1.cmaps))
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
+
+    def saveGromacs(self):
+        """ Test saving various Structure instances as GROMACS top files """
+        self.sys1.save(get_fn('test.top', written=True))
+        self.sys2.save(get_fn('test2.top', written=True))
+        self.sys3.save(get_fn('test3.top', written=True))
+        x1 = pmd.gromacs.GromacsTopologyFile(get_fn('test.top', written=True))
+        x2 = pmd.gromacs.GromacsTopologyFile(get_fn('test2.top', written=True))
+        x3 = pmd.gromacs.GromacsTopologyFile(get_fn('test3.top', written=True))
+        # Check equivalence of topologies
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
+        self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
+        self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
+        self.assertEqual(len(self.sys1.angles), len(x1.angles))
+        self.assertEqual(len(self.sys2.angles), len(x2.angles))
+        self.assertEqual(len(self.sys3.angles), len(x3.angles))
+        self.assertEqual(len(self.sys1.dihedrals), len(x1.dihedrals))
+        self.assertEqual(len(self.sys2.dihedrals), len(x2.dihedrals))
+        self.assertEqual(len(self.sys3.dihedrals), len(x3.dihedrals))
+        self.assertEqual(len(self.sys1.impropers), len(x1.impropers))
+        self.assertEqual(len(self.sys2.impropers), len(x2.impropers))
+        self.assertEqual(len(self.sys3.impropers), len(x3.impropers))
+        self.assertEqual(len(self.sys1.cmaps), len(x1.cmaps))
+        self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
+        self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
+
+    def saveGRO(self):
+        """ Test saving various Structure instances as a PDB """
+        self.sys1.save(get_fn('test.gro', written=True))
+        self.sys2.save(get_fn('test2.gro', written=True))
+        self.sys3.save(get_fn('test3.gro', written=True))
+        x1 = pmd.gromacs.GromacsGroFile.parse(get_fn('test.gro', written=True))
+        x2 = pmd.gromacs.GromacsGroFile.parse(get_fn('test2.gro', written=True))
+        x3 = pmd.gromacs.GromacsGroFile.parse(get_fn('test3.gro', written=True))
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
 if __name__ == '__main__':
     unittest.main()

@@ -40,7 +40,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame,
+        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules
@@ -538,6 +538,7 @@ class Structure(object):
                 )
                 c.dihedrals[-1]._funct = d._funct
         for ub in self.urey_bradleys:
+            if ub.type is NoUreyBradley: continue
             c.urey_bradleys.append(
                     UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
                                 ub.type and c.urey_bradley_types[ub.type.idx])
