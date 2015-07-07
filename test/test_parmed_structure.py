@@ -644,7 +644,7 @@ class TestStructureSave(unittest.TestCase):
         except OSError:
             pass
 
-    def savePDB(self):
+    def testSavePDB(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.pdb', written=True))
         self.sys2.save(get_fn('test2.pdb', written=True))
@@ -656,7 +656,7 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
-    def saveCIF(self):
+    def testSaveCIF(self):
         """ Test saving various Structure instances as a PDBx/mmCIF """
         self.sys1.save(get_fn('test.cif', written=True))
         self.sys2.save(get_fn('test2.cif', written=True))
@@ -668,7 +668,7 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
-    def saveMol2(self):
+    def testSaveMol2(self):
         """ Test saving various Structure instances as Mol2 files """
         self.sys1.save(get_fn('test.mol2', written=True))
         self.sys2.save(get_fn('test2.mol2', written=True))
@@ -683,7 +683,7 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
 
-    def saveMol3(self):
+    def testSaveMol3(self):
         """ Test saving various Structure instances as Mol3 files """
         self.sys1.save(get_fn('test.mol3', written=True))
         x1 = pmd.formats.Mol2File.parse(get_fn('test.mol3', written=True), structure=True)
@@ -696,7 +696,7 @@ class TestStructureSave(unittest.TestCase):
             else:
                 self.assertFalse(True)
 
-    def saveAmberParm(self):
+    def testSaveAmberParm(self):
         """ Test saving various Structure instances as Amber prmtop files """
         self.sys1.save(get_fn('test.parm7', written=True))
         self.sys2.save(get_fn('test2.parm7', written=True))
@@ -736,7 +736,7 @@ class TestStructureSave(unittest.TestCase):
             self.assertAlmostEqual(a1.rmin, a2.rmin)
             self.assertAlmostEqual(abs(a1.epsilon), abs(a2.epsilon))
 
-    def savePSF(self):
+    def testSavePSF(self):
         """ Test saving various Structure instances as CHARMM PSF files """
         self.sys1.save(get_fn('test.psf', written=True))
         self.sys2.save(get_fn('test2.psf', written=True))
@@ -764,7 +764,7 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
-    def saveGromacs(self):
+    def testSaveGromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
         self.sys1.save(get_fn('test.top', written=True))
         self.sys2.save(get_fn('test2.top', written=True))
@@ -792,7 +792,7 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
-    def saveGRO(self):
+    def testSaveGRO(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.gro', written=True))
         self.sys2.save(get_fn('test2.gro', written=True))
