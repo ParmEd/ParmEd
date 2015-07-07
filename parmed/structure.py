@@ -23,6 +23,14 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division, print_function
 
+from copy import copy
+import math
+import numpy as np
+import os
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
@@ -32,7 +40,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame,
+        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules
@@ -40,16 +48,7 @@ from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
-from copy import copy
-import math
 import re
-import numpy as np
-
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
@@ -539,6 +538,7 @@ class Structure(object):
                 )
                 c.dihedrals[-1]._funct = d._funct
         for ub in self.urey_bradleys:
+            if ub.type is NoUreyBradley: continue
             c.urey_bradleys.append(
                     UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
                                 ub.type and c.urey_bradley_types[ub.type.idx])
@@ -1290,6 +1290,117 @@ class Structure(object):
                 structs.append(mol)
                 counts.append(1)
         return list(zip(structs, counts))
+
+    #===================================================
+
+    def save(self, fname, format=None, **kwargs):
+        """
+        Saves the current Structure in the requested file format. Supported
+        formats can be specified explicitly or determined by file-name
+        extension. The following formats are supported, with the recognized
+        suffix and ``format`` keyword shown in parentheses:
+
+            - PDB (.pdb, pdb)
+            - PDBx/mmCIF (.cif, cif)
+            - Amber topology file (.prmtop/.parm7, amber)
+            - CHARMM PSF file (.psf, charmm)
+            - Gromacs topology file (.top, gromacs)
+            - Gromacs GRO file (.gro, gro)
+            - Mol2 file (.mol2, mol2)
+            - Mol3 file (.mol3, mol3)
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to save. If ``format`` is ``None`` (see below), the
+            file type will be determined based on the filename extension. If the
+            type cannot be determined, a ValueError is raised.
+        format : str, optional
+            The case-insensitive keyword specifying what type of file ``fname``
+            should be saved as. If ``None`` (default), the file type will be
+            determined from filename extension of ``fname``
+        kwargs : keyword-arguments
+            Remaining arguments are passed on to the file writing routines that
+            are called by this function
+
+        Raises
+        ------
+        ValueError if either filename extension or ``format`` are not recognized
+        TypeError if the structure cannot be converted to the desired format for
+        whatever reason
+        """
+        from parmed import amber, formats, gromacs
+        extmap = {
+                '.pdb' : 'PDB',
+                '.cif' : 'CIF',
+                '.parm7' : 'AMBER',
+                '.prmtop' : 'AMBER',
+                '.psf' : 'PSF',
+                '.top' : 'GROMACS',
+                '.gro' : 'GRO',
+                '.mol2' : 'MOL2',
+                '.mol3' : 'MOL3',
+        }
+        # Basically everybody uses atom type names instead of type indexes. So
+        # convert to atom type names and switch back if need be
+        all_ints = True
+        for atom in self.atoms:
+            if isinstance(atom.type, integer_types):
+                atom.type = str(atom.atom_type)
+            else:
+                all_ints = False
+        try:
+            if format is not None:
+                format = format.upper()
+            else:
+                _, ext = os.path.splitext(fname)
+                if ext in ('.bz2', '.gz'):
+                    ext = os.path.splitext(ext)[1]
+                try:
+                    format = extmap[ext]
+                except KeyError:
+                    raise ValueError('Could not determine file type of %s' % fname)
+            # Dispatch
+            if format == 'PDB':
+                self.write_pdb(fname, **kwargs)
+            elif format == 'CIF':
+                self.write_cif(fname, **kwargs)
+            elif format == 'PSF':
+                self.write_psf(fname, **kwargs)
+            elif format == 'GRO':
+                gromacs.GromacsGroFile.write(self, fname, **kwargs)
+            elif format == 'MOL2':
+                formats.Mol2File.write(self, fname, **kwargs)
+            elif format == 'MOL3':
+                formats.Mol2File.write(self, fname, mol3=True, **kwargs)
+            elif format == 'GROMACS':
+                s = gromacs.GromacsTopologyFile.from_structure(self)
+                s.write(fname, **kwargs)
+            elif format == 'AMBER':
+                if (self.trigonal_angles or self.out_of_plane_bends or
+                        self.torsion_torsions or self.pi_torsions or
+                        self.stretch_bends or self.chiral_frames or
+                        self.multipole_frames):
+                    s = amber.AmoebaParm.from_structure(self)
+                    s.write_parm(fname, **kwargs)
+                elif self.urey_bradleys or self.impropers or self.cmaps:
+                    s = amber.ChamberParm.from_structure(self)
+                    s.write_parm(fname, **kwargs)
+                else:
+                    try:
+                        s = amber.AmberParm.from_structure(self)
+                    except TypeError as e:
+                        if 'Cannot translate exceptions' in str(e):
+                            s = amber.ChamberParm.from_structure(self)
+                        else:
+                            raise
+                    s.write_parm(fname, **kwargs)
+            else:
+                raise ValueError('No file type matching %s' % format)
+        finally:
+            if all_ints:
+                for atom in self.atoms:
+                    atom.type = int(atom.atom_type)
 
     #===================================================
 
