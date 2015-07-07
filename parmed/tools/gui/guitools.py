@@ -1,5 +1,5 @@
 """
-The GUI components of xparmed.py
+The GUI components of xparmed
 """
 from __future__ import division
 from parmed.utils.six import iteritems

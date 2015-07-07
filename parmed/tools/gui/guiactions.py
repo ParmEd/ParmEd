@@ -18,7 +18,7 @@ def gui_action_dispatcher(root, amber_prmtop, action_name, messages):
 
     if not hasattr(_guiactions, action_name.lower()):
         showerror('Not Implemented.', action_name + 
-                  ' is not implemented in xParmEd! Use parmed.py instead.')
+                  ' is not implemented in xParmEd! Use parmed instead.')
         return None
 
     # Call the function to establish our action
