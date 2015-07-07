@@ -1,4 +1,4 @@
-""" Exceptions used in parmed.py """
+""" Exceptions used in parmed script """
 from sys import stderr
 from parmed.exceptions import ParmedError, ParmedWarning, InputError
 

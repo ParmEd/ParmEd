@@ -211,7 +211,7 @@ def guiapp():
     from optparse import OptionParser
     from os.path import exists, split
     from parmed.tools.exceptions import ParmError
-    from parmed.tools import __version__
+    from parmed import __version__
     from parmed.tools.gui.guitools import ParmedApp
     from parmed.tools.gui.guifiletools import file_chooser
     from parmed.tools.logos import Logo
