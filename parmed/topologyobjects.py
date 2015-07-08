@@ -25,7 +25,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group', 'AtomType',
            'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
-           'RBTorsionType', 'lorentz_berthelot', 'geometric']
+           'RBTorsionType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
