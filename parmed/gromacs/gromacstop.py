@@ -15,7 +15,7 @@ from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
-            NonbondedExceptionType, lorentz_berthelot, geometric)
+            NonbondedExceptionType)
 from parmed.periodic_table import element_by_mass, AtomicNum
 from parmed import unit as u
 from parmed.utils.io import genopen
@@ -528,10 +528,8 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('Unsupported nonbonded type; unknown '
                                       'functional', GromacsWarning)
                         self.unknown_functional = True
-                    if words[1] != '2':
-                        warnings.warn('Unsupported combining rule',
-                                      GromacsWarning)
-                        self.unknown_functional = True
+                    if words[1] == '1':
+                        self.combining_rule = 'geometric'
                     self.defaults = _Defaults(*words)
                 elif current_section == 'molecules':
                     name, num = line.split()
@@ -888,15 +886,11 @@ class GromacsTopologyFile(Structure):
                 pair.type.used = True
             elif self.defaults.gen_pairs:
                 if self.defaults.comb_rule in (1, 3):
-                    eps, sig = geometric(
-                                    pair.atom1.epsilon, pair.atom2.epsilon,
-                                    pair.atom1.sigma, pair.atom2.sigma
-                    )
+                    eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
+                    sig = 0.5 * math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
                 elif self.defaults.comb_rule == 2:
-                    eps, sig = lorentz_berthelot(
-                                    pair.atom1.epsilon, pair.atom2.epsilon,
-                                    pair.atom1.sigma, pair.atom2.sigma
-                    )
+                    eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
+                    sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
                 eps *= self.defaults.fudgeLJ
                 pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
                             self.defaults.fudgeQQ, list=self.adjust_types)

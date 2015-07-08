@@ -810,6 +810,11 @@ class AmberParm(AmberFormat, Structure):
         This will undo any off-diagonal L-J modifications you may have made, so
         call this function with care.
         """
+        if self.combining_rule == 'lorentz':
+            combine_rmin = lambda r1, r2: 0.5 * (r1 + r2)
+        elif self.combining_rule == 'geometric':
+            fac = 2**(-1/6)
+            combine_rmin = lambda r1, r2: sqrt(r1 * r2) * fac
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
         for i in range(ntypes):
@@ -819,7 +824,7 @@ class AmberParm(AmberFormat, Structure):
                     pd['LENNARD_JONES_ACOEF'][-index] = 0.0
                     pd['LENNARD_JONES_BCOEF'][-index] = 0.0
                     continue
-                rij = self.LJ_radius[i] + self.LJ_radius[j]
+                rij = combine_rmin(self.LJ_radius[i], self.LJ_radius[j])
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 pd["LENNARD_JONES_ACOEF"][index] = wdij * rij**12
                 pd["LENNARD_JONES_BCOEF"][index] = 2 * wdij * rij**6
@@ -838,13 +843,18 @@ class AmberParm(AmberFormat, Structure):
             If True, off-diagonal elements in the combined Lennard-Jones matrix
             exist. If False, they do not.
         """
+        if self.combining_rule == 'lorentz':
+            combine_rmin = lambda r1, r2: 0.5 * (r1 + r2)
+        elif self.combining_rule == 'geometric':
+            fac = 2**(-1/6)
+            combine_rmin = lambda r1, r2: sqrt(r1 * r2) * fac
         pd = self.parm_data
         ntypes = self.parm_data['POINTERS'][NTYPES]
         for i in range(ntypes):
             for j in range(ntypes):
                 idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 if idx < 0: continue
-                rij = self.LJ_radius[i] + self.LJ_radius[j]
+                rij = combine_rmin(self.LJ_radius[i], self.LJ_radius[j])
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 a = pd['LENNARD_JONES_ACOEF'][idx]
                 b = pd['LENNARD_JONES_BCOEF'][idx]
