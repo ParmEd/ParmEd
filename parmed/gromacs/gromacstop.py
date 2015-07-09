@@ -501,6 +501,8 @@ class GromacsTopologyFile(Structure):
                             dt = dihedral_types[(c0, c1, c2, c3, c4, c5)]
                         else:
                             dt = RBTorsionType(c0, c1, c2, c3, c4, c5,
+                                               scee=1/self.defaults.fudgeQQ,
+                                               scnb=1/self.defaults.fudgeLJ,
                                                list=molecule.rb_torsion_types)
                             molecule.rb_torsion_types.append(dt)
                             dihedral_types[(c0, c1, c2, c3, c4, c5)] = dt
@@ -528,7 +530,7 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('Unsupported nonbonded type; unknown '
                                       'functional', GromacsWarning)
                         self.unknown_functional = True
-                    if words[1] == '1':
+                    if words[1] in ('1', '3'):
                         self.combining_rule = 'geometric'
                     self.defaults = _Defaults(*words)
                 elif current_section == 'molecules':
@@ -804,7 +806,9 @@ class GromacsTopologyFile(Structure):
                         a1, a2, a3, a4 = words[:4]
                         c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
                                                     for x in words[si+1:si+7]]
-                        ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
+                        ptype = RBTorsionType(c0, c1, c2, c3, c4, c5,
+                                              scee=1/self.defaults.fudgeQQ,
+                                              scnb=1/self.defaults.fudgeLJ)
                         params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
                         params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
                 elif current_section == 'cmaptypes':
@@ -896,12 +900,14 @@ class GromacsTopologyFile(Structure):
                 pair.type = params.pair_types[key]
                 pair.type.used = True
             elif self.defaults.gen_pairs:
-                if self.defaults.comb_rule in (1, 3):
+                if self.combining_rule == 'geometric':
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
-                    sig = 0.5 * math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
-                elif self.defaults.comb_rule == 2:
+                    sig = math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
+                elif self.combining_rule == 'lorentz':
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
                     sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
+                else:
+                    assert False, 'Unrecognized combining rule'
                 eps *= self.defaults.fudgeLJ
                 pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
                             self.defaults.fudgeQQ, list=self.adjust_types)

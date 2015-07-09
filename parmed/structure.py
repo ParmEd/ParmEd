@@ -2328,7 +2328,7 @@ class Structure(object):
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
         for atom in self.atoms:
-            force.addParticle(atom.charge, atom.rmin*sigma_scale,
+            force.addParticle(atom.charge, atom.sigma*length_conv,
                               abs(atom.epsilon*ene_conv))
         # Add exclusions from the bond graph out to nrexcl-1 bonds away (atoms
         # nrexcl bonds away will be exceptions defined later)
@@ -2353,19 +2353,16 @@ class Structure(object):
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue # Handled separately
             exclude_to(atom, atom, 0, self.nrexcl)
-        # Pointer to combining rules
-        if self.combining_rule == 'lorentz':
-            combine_sig = lambda sig1, sig2: sig1 + sig2
-        elif self.combining_rule == 'geometric':
-            combine_sig = lambda sig1, sig2: math.sqrt(sig1 * sig2)
-        else:
-            assert False, "Unrecognized combining rule. Should not be here"
         # Add the exceptions from the dihedral list IFF no explicit exceptions
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
         # 1-4 with the appropriate scaling factor is used as the exception.
         sigma_scale = 2**(-1/6) * length_conv
+        if self.combining_rule == 'lorentz':
+            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
+        elif self.combining_rule == 'geometric':
+            comb_sig = lambda sig1, sig2: math.sqrt(sig1 * sig2)
         if not self.adjusts:
-            for dih in self.dihedrals:
+            for dih in self.dihedrals + self.rb_torsions:
                 if dih.ignore_end: continue
                 if isinstance(dih.type, DihedralTypeList):
                     scee = scnb = 0
@@ -2386,7 +2383,7 @@ class Structure(object):
                 except KeyError:
                     epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = combine_sig(dih.atom1.sigma_14,dih.atom4.sigma_14)
+                    sigprod = comb_sig(dih.atom1.sigma_14, dih.atom4.sigma_14)
                     sigprod *= length_conv
                 else:
                     epsprod = wdij14 * ene_conv / scnb
@@ -2397,7 +2394,7 @@ class Structure(object):
                 for child in dih.atom1.children:
                     epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = combine_sig(child.sigma_14, dih.atom4.sigma_14)
+                    sigprod = comb_sig(child.sigma_14, dih.atom4.sigma_14)
                     sigprod *= length_conv
                     chgprod = (child.charge * dih.atom4.charge) / scee
                     force.addException(child.idx, dih.atom4.idx, chgprod,
@@ -2405,7 +2402,7 @@ class Structure(object):
                 for child in dih.atom4.children:
                     epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = combine_sig(child.sigma_14, dih.atom1.sigma_14)
+                    sigprod = comb_sig(child.sigma_14, dih.atom1.sigma_14)
                     sigprod *= length_conv
                     chgprod = child.charge * dih.atom1.charge / scee
                     force.addException(child.idx, dih.atom1.idx, chgprod,
@@ -2414,7 +2411,7 @@ class Structure(object):
                     for c2 in dih.atom2.children:
                         epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
                         epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                        sigprod = combine_sig(c1.sigma_14, c2.sigma_14)
+                        sigprod = comb_sig(c1.sigma_14, c2.sigma_14)
                         sigprod *= length_conv
                         chgprod = c1.charge * c2.charge / scee
                         force.addException(c1.idx, c2.idx, chgprod, sigprod,
@@ -2424,7 +2421,7 @@ class Structure(object):
         for pair in self.adjusts:
             chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
             force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
-                               pair.type.rmin*sigma_scale,
+                               pair.type.sigma*length_conv,
                                pair.type.epsilon*ene_conv, True)
 
         # Any exclusion partners we already added will zero-out existing
@@ -2448,11 +2445,15 @@ class Structure(object):
 
         # Now see if we have any NBFIXes that we need to implement via a
         # CustomNonbondedForce
+        if self.combining_rule == 'geometric':
+            if self.has_NBFIX():
+                return (force, self._omm_nbfixed_force(force, nonbondedMethod),
+                        self._omm_geometric_force(force, nonbondedMethod))
+            else:
+                return force, self._omm_geometric_force(force, nonbondedMethod)
+
         if self.has_NBFIX():
             return force, self._omm_nbfixed_force(force, nonbondedMethod)
-
-        elif self.combining_rule == 'geometric':
-            return force, self._omm_geometric_force(force, nonbondedMethod)
 
         return force
 
@@ -2481,7 +2482,7 @@ class Structure(object):
         # We need a CustomNonbondedForce to implement the NBFIX functionality.
         # First derive the type lookup tables
         lj_idx_list = [0 for atom in self.atoms]
-        lj_sigma, lj_depths = [], []
+        lj_radii, lj_depths = [], []
         num_lj_types = 0
         lj_type_list = []
         for i, atom in enumerate(self.atoms):
@@ -2491,7 +2492,7 @@ class Structure(object):
             lj_idx_list[i] = num_lj_types
             ljtype = (atype.rmin, abs(atype.epsilon))
             lj_type_list.append(atype)
-            lj_sigma.append(atype.sigma)
+            lj_radii.append(atype.rmin)
             lj_depths.append(abs(atype.epsilon))
             for j in range(i+1, len(self.atoms)):
                 atype2 = self.atoms[j].atom_type
@@ -2506,18 +2507,13 @@ class Structure(object):
         # Now everything is assigned. Create the A- and B-coefficient arrays
         acoef = [0 for i in range(num_lj_types*num_lj_types)]
         bcoef = acoef[:]
-        if self.combining_rule == 'lorentz':
-            combine_sig = lambda sig1, sig2: sig1 + sig2
-        else:
-            combine_sig = lambda sig1, sig2: math.sqrt(sig1 * sig2)
         for i in range(num_lj_types):
             for j in range(num_lj_types):
                 namej = lj_type_list[j].name
                 try:
                     rij, wdij, rij14, wdij14 = lj_type_list[i].nbfix[namej]
                 except KeyError:
-                    rij = combine_sig(lj_sigma[i], lj_sigma[j])
-                    rij *= length_conv * 2**(1/6)
+                    rij = (lj_radii[i] + lj_radii[j]) * length_conv
                     wdij = math.sqrt(lj_depths[i] * lj_depths[j]) * ene_conv
                 else:
                     rij *= length_conv
@@ -2597,9 +2593,9 @@ class Structure(object):
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         # We need a CustomNonbondedForce to implement the geometric combining
         # rules
-        force = mm.CustomNonbondedForce('eps1*eps2*(sigr6**2-sigr6);'
-                                        'sigr6=sigr2*sigr2*sigr2;'
-                                        'sigr2=(sigc/r)**2; sigc=sig1*sig2;')
+        force = mm.CustomNonbondedForce('eps1*eps2*(sigr6^2-sigr6); '
+                                        'sigr6=sigr2*sigr2*sigr2; '
+                                        'sigr2=(sigc/r)^2; sigc=sig1*sig2')
         force.addPerParticleParameter('eps')
         force.addPerParticleParameter('sig')
         force.setForceGroup(self.NONBONDED_FORCE_GROUP)
@@ -2615,7 +2611,7 @@ class Structure(object):
                              nonbondedMethod)
         # Add the particles
         for atom in self.atoms:
-            eps = math.sqrt(atom.epsilon*ene_conv)
+            eps = math.sqrt(atom.epsilon*ene_conv) * 2
             sig = math.sqrt(atom.sigma*length_conv)
             force.addParticle((eps, sig))
         # Now wipe out the L-J parameters in the nonbonded force

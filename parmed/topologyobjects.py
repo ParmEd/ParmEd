@@ -2198,6 +2198,10 @@ class RBTorsionType(_ListItem, _ParameterType):
         The coefficient of the quartic term in kcal/mol
     c5 : float
         The coefficient of the quintic term in kcal/mol
+    scee : float, optional
+        1-4 electrostatic scaling factor. Default is 1.0
+    scnb : float, optional
+        1-4 van der Waals scaling factor. Default is 1.0
     list : TrackedList=None
         A list of `RBTorsionType`s in which this is a member
 
@@ -2236,7 +2240,7 @@ class RBTorsionType(_ListItem, _ParameterType):
 
     #===================================================
    
-    def __init__(self, c0, c1, c2, c3, c4, c5, list=None):
+    def __init__(self, c0, c1, c2, c3, c4, c5, scee=1.0, scnb=1.0, list=None):
         _ParameterType.__init__(self)
         self.c0 = _strip_units(c0, u.kilocalories_per_mole)
         self.c1 = _strip_units(c1, u.kilocalories_per_mole)
@@ -2244,6 +2248,8 @@ class RBTorsionType(_ListItem, _ParameterType):
         self.c3 = _strip_units(c3, u.kilocalories_per_mole)
         self.c4 = _strip_units(c4, u.kilocalories_per_mole)
         self.c5 = _strip_units(c5, u.kilocalories_per_mole)
+        self.scee = scee
+        self.scnb = scnb
         self.list = list
         self._idx = -1
 
@@ -2255,13 +2261,14 @@ class RBTorsionType(_ListItem, _ParameterType):
                 self.c4 == other.c4 and self.c5 == other.c5)
 
     def __copy__(self):
-        return RBTorsionType(self.c0, self.c1, self.c2,
-                             self.c3, self.c4, self.c5)
+        return RBTorsionType(self.c0, self.c1, self.c2, self.c3, self.c4,
+                             self.c5, self.scee, self.scnb)
 
     def __repr__(self):
         return ('<RBTorsionType; c0=%.3f; c1=%.3f; c2=%.3f; c3=%.3f; c4=%.3f; '
-                'c5=%.3f>' % (self.c0, self.c1, self.c2, self.c3, self.c4,
-                              self.c5))
+                'c5=%.3f; scee=%s; scnb=%s>' %
+                (self.c0, self.c1, self.c2, self.c3, self.c4, self.c5,
+                 self.scee, self.scnb))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

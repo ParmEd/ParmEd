@@ -9,8 +9,9 @@ Date: Apr. 13, 2015
 """
 from __future__ import division
 from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
-                       DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
+                    DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
+from parmed.constants import TINY
 from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
@@ -220,7 +221,6 @@ class CharmmParameterSet(ParameterSet):
         current_cmap_res = 0
         nonbonded_types = dict() # Holder
         parameterset = None
-        read_first_nonbonded = False
         for i, line in enumerate(f):
             line = line.strip()
             try:
@@ -498,14 +498,16 @@ class CharmmParameterSet(ParameterSet):
                             if self._declared_nbrules:
                                 # We already specified it -- make sure it's the
                                 # same as the one we specified before
-                                diff = abs(self.dihedral_types[0][0].scee-scee)
+                                _, dt0 = next(iteritems(self.dihedral_types))
+                                diff = abs(dt0[0].scee - scee)
                                 if diff > TINY:
                                     raise CharmmError('Inconsistent 1-4 '
                                                       'scalings')
-                            scee = 1 / scee
-                            for key, dtl in iteritems(self.dihedral_types):
-                                for dt in dtl:
-                                    dt.scee = scee
+                            else:
+                                scee = 1 / scee
+                                for key, dtl in iteritems(self.dihedral_types):
+                                    for dt in dtl:
+                                        dt.scee = scee
                         elif word.upper().startswith('GEOM'):
                             if (self._declared_nbrules and
                                     self.combining_rule != 'geometric'):
@@ -514,6 +516,7 @@ class CharmmParameterSet(ParameterSet):
                                         'different combining rules'
                                 )
                             self.combining_rule = 'geometric'
+                    continue
                 else:
                     # OK, we've read our first nonbonded section for sure now
                     read_first_nonbonded = True
