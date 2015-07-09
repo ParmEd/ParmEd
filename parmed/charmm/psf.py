@@ -392,7 +392,7 @@ class CharmmPsfFile(Structure):
         ParameterError if any parameters cannot be found
         """
         parmset = copy(parmset)
-        self.combining_rules = parmset.combining_rules
+        self.combining_rule = parmset.combining_rule
         # First load the atom types
         types_are_int = False
         for atom in self.atoms:

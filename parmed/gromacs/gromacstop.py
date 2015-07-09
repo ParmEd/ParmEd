@@ -742,19 +742,30 @@ class GromacsTopologyFile(Structure):
                     words = line.split()
                     replace = False
                     dtype = 'normal'
-                    a1, a2, a3, a4 = words[:4]
+                    # Ugh. Gromacs allows only two atom types (the middle atom
+                    # types) to be specified. We have to figure out if that's
+                    # the case here.
+                    middle_only = words[2] in ('1', '2', '3', '4', '5', '8',
+                                               '9', '10', '11')
+                    if middle_only:
+                        a1 = a4 = 'X'
+                        a2, a3 = words[:2]
+                        si = 2
+                    else:
+                        a1, a2, a3, a4 = words[:4]
+                        si = 4
                     improper_periodic = False
-                    if words[4] == '1':
+                    if words[si] == '1':
                         pass
-                    elif words[4] == '4':
+                    elif words[si] == '4':
                         replace = True
                         improper_periodic = True
-                    elif words[4] == '9':
+                    elif words[si] == '9':
                         pass
-                    elif words[4] == '2':
+                    elif words[si] == '2':
                         replace = True
                         dtype = 'improper'
-                    elif words[4] == '3':
+                    elif words[si] == '3':
                         dtype = 'rbtorsion'
                     else:
                         warnings.warn('dihedraltypes funct not supported',
@@ -762,14 +773,14 @@ class GromacsTopologyFile(Structure):
                         self.unknown_functional = True
                     # Do the proper types
                     if dtype == 'normal':
-                        phase = float(words[5]) * u.degrees
-                        phi_k = float(words[6]) * u.kilojoules_per_mole
-                        per = int(words[7])
+                        phase = float(words[si+1]) * u.degrees
+                        phi_k = float(words[si+2]) * u.kilojoules_per_mole
+                        per = int(words[si+3])
                         dt = DihedralType(phi_k, per, phase,
                                           scee=1/self.defaults.fudgeQQ,
                                           scnb=1/self.defaults.fudgeLJ)
-                        key = (words[0], words[1], words[2], words[3])
-                        rkey = (words[3], words[2], words[1], words[0])
+                        key = (a1, a2, a3, a4)
+                        rkey = (a4, a3, a2, a1)
                         if improper_periodic:
                             # Impropers only ever have 1 term, and therefore
                             # always replace.
@@ -784,15 +795,15 @@ class GromacsTopologyFile(Structure):
                             else:
                                 params.dihedral_types[key].append(dt)
                     elif dtype == 'improper':
-                        theta = float(words[5])*u.degrees
-                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2/2
-                        a1, a2, a3, a4 = sorted(words[:4])
+                        theta = float(words[si+1])*u.degrees
+                        k = float(words[si+2])*u.kilojoules_per_mole/u.radians**2/2
+                        a1, a2, a3, a4 = sorted([a1, a2, a3, a4])
                         ptype = ImproperType(k, theta)
                         params.improper_types[(a1, a2, a3, a4)] = ptype
                     elif dtype == 'rbtorsion':
                         a1, a2, a3, a4 = words[:4]
                         c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
-                                                    for x in words[5:11]]
+                                                    for x in words[si+1:si+7]]
                         ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
                         params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
                         params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
@@ -976,8 +987,18 @@ class GromacsTopologyFile(Structure):
                    _gettype(t.atom4))
             if not t.improper:
                 wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
+                wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
+                          _gettype(t.atom3), 'X')
+                wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
+                          _gettype(t.atom4))
                 if key in params.dihedral_types:
                     t.type = params.dihedral_types[key]
+                    t.type.used = True
+                elif wckey1 in params.dihedral_types:
+                    t.type = params.dihedral_types[wckey1]
+                    t.type.used = True
+                elif wckey2 in params.dihedral_types:
+                    t.type = params.dihedral_types[wckey2]
                     t.type.used = True
                 elif wckey in params.dihedral_types:
                     t.type = params.dihedral_types[wckey]
@@ -1008,8 +1029,18 @@ class GromacsTopologyFile(Structure):
             key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
                    _gettype(t.atom4))
             wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
+            wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
+                      _gettype(t.atom3), 'X')
+            wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
+                      _gettype(t.atom4))
             if key in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[key]
+                t.type.used = True
+            elif wckey1 in params.rb_torsion_types:
+                t.type = params.rb_torsion_types[wckey1]
+                t.type.used = True
+            elif wckey2 in params.rb_torsion_types:
+                t.type = params.rb_torsion_types[wckey2]
                 t.type.used = True
             elif wckey in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[wckey]

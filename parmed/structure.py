@@ -622,8 +622,8 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(g.bs, g.type, g.move))
-        c.box = self.box.copy()
-        c._coordinates = self._coordinates.copy()
+        c.box = copy(self.box)
+        c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
         return c
 
@@ -2354,9 +2354,9 @@ class Structure(object):
             if isinstance(atom, ExtraPoint): continue # Handled separately
             exclude_to(atom, atom, 0, self.nrexcl)
         # Pointer to combining rules
-        if self.combining_rules == 'lorentz':
+        if self.combining_rule == 'lorentz':
             combine_sig = lambda sig1, sig2: sig1 + sig2
-        elif self.combining_rules == 'geometric':
+        elif self.combining_rule == 'geometric':
             combine_sig = lambda sig1, sig2: math.sqrt(sig1 * sig2)
         else:
             assert False, "Unrecognized combining rule. Should not be here"

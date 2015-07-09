@@ -1,4 +1,4 @@
-"""
+"""]
 This module contains an amber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
@@ -203,7 +203,7 @@ class AmberParm(AmberFormat, Structure):
         # Lorentz-Berthelot is to try and change the combining rules to
         # geometric *if we detect NBFIXes* and see if we still have NBFIXes. If
         # not, then our combining rules are clearly geometric.
-        if self.has_NBFIX():
+        if not self.has_1012() and self.has_NBFIX():
             self.combining_rule = 'geometric'
             if self.has_NBFIX():
                 self.combining_rule = 'lorentz'

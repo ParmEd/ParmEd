@@ -131,7 +131,7 @@ class ParameterSet(object):
             typ = copy(item)
             other.cmap_types[key] = typ
             other.cmap_types[tuple(reversed(key))] = typ
-        other.combining_rules = self.combining_rules
+        other.combining_rule = self.combining_rule
 
         return other
 
