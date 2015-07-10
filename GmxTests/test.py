@@ -27,8 +27,8 @@ from nifty import printcool, printcool_dictionary, _exec, which, wopen, isint, i
 # from molecule import Molecule
 
 # ParmEd import
-from chemistry import gromacs, amber
-from chemistry.amber.mdin import Mdin
+from parmed import gromacs, amber
+from parmed.amber.mdin import Mdin
 
 # OpenMM import
 import simtk.unit as u

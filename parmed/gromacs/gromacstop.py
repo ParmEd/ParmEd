@@ -15,7 +15,7 @@ from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
-            NonbondedExceptionType, lorentz_berthelot, geometric)
+            NonbondedExceptionType)
 from parmed.periodic_table import element_by_mass, AtomicNum
 from parmed import unit as u
 from parmed.utils.io import genopen
@@ -495,12 +495,15 @@ class GromacsTopologyFile(Structure):
                             dihedral_types[(psieq, k)] = dt
                         molecule.impropers[-1].type = dt
                     elif funct == 3 and len(words) >= 11:
-                        c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoule_per_mole
-                                                  for x in words[5:11])
+                        c0, c1, c2, c3, c4, c5 = (float(x) for x in words[5:11])
                         if (c0, c1, c2, c3, c4, c5) in dihedral_types:
                             dt = dihedral_types[(c0, c1, c2, c3, c4, c5)]
                         else:
-                            dt = RBTorsionType(c0, c1, c2, c3, c4, c5,
+                            kjpm = u.kilojoules_per_mole
+                            dt = RBTorsionType(c0*kjpm, c1*kjpm, c2*kjpm,
+                                               c3*kjpm, c4*kjpm, c5*kjpm,
+                                               scee=1/self.defaults.fudgeQQ,
+                                               scnb=1/self.defaults.fudgeLJ,
                                                list=molecule.rb_torsion_types)
                             molecule.rb_torsion_types.append(dt)
                             dihedral_types[(c0, c1, c2, c3, c4, c5)] = dt
@@ -528,10 +531,8 @@ class GromacsTopologyFile(Structure):
                         warnings.warn('Unsupported nonbonded type; unknown '
                                       'functional', GromacsWarning)
                         self.unknown_functional = True
-                    if words[1] != '2':
-                        warnings.warn('Unsupported combining rule',
-                                      GromacsWarning)
-                        self.unknown_functional = True
+                    if words[1] in ('1', '3'):
+                        self.combining_rule = 'geometric'
                     self.defaults = _Defaults(*words)
                 elif current_section == 'molecules':
                     name, num = line.split()
@@ -744,19 +745,30 @@ class GromacsTopologyFile(Structure):
                     words = line.split()
                     replace = False
                     dtype = 'normal'
-                    a1, a2, a3, a4 = words[:4]
+                    # Ugh. Gromacs allows only two atom types (the middle atom
+                    # types) to be specified. We have to figure out if that's
+                    # the case here.
+                    middle_only = words[2] in ('1', '2', '3', '4', '5', '8',
+                                               '9', '10', '11')
+                    if middle_only:
+                        a1 = a4 = 'X'
+                        a2, a3 = words[:2]
+                        si = 2
+                    else:
+                        a1, a2, a3, a4 = words[:4]
+                        si = 4
                     improper_periodic = False
-                    if words[4] == '1':
+                    if words[si] == '1':
                         pass
-                    elif words[4] == '4':
+                    elif words[si] == '4':
                         replace = True
                         improper_periodic = True
-                    elif words[4] == '9':
+                    elif words[si] == '9':
                         pass
-                    elif words[4] == '2':
+                    elif words[si] == '2':
                         replace = True
                         dtype = 'improper'
-                    elif words[4] == '3':
+                    elif words[si] == '3':
                         dtype = 'rbtorsion'
                     else:
                         warnings.warn('dihedraltypes funct not supported',
@@ -764,14 +776,14 @@ class GromacsTopologyFile(Structure):
                         self.unknown_functional = True
                     # Do the proper types
                     if dtype == 'normal':
-                        phase = float(words[5]) * u.degrees
-                        phi_k = float(words[6]) * u.kilojoules_per_mole
-                        per = int(words[7])
+                        phase = float(words[si+1]) * u.degrees
+                        phi_k = float(words[si+2]) * u.kilojoules_per_mole
+                        per = int(words[si+3])
                         dt = DihedralType(phi_k, per, phase,
                                           scee=1/self.defaults.fudgeQQ,
                                           scnb=1/self.defaults.fudgeLJ)
-                        key = (words[0], words[1], words[2], words[3])
-                        rkey = (words[3], words[2], words[1], words[0])
+                        key = (a1, a2, a3, a4)
+                        rkey = (a4, a3, a2, a1)
                         if improper_periodic:
                             # Impropers only ever have 1 term, and therefore
                             # always replace.
@@ -786,16 +798,18 @@ class GromacsTopologyFile(Structure):
                             else:
                                 params.dihedral_types[key].append(dt)
                     elif dtype == 'improper':
-                        theta = float(words[5])*u.degrees
-                        k = float(words[6])*u.kilojoules_per_mole/u.radians**2/2
-                        a1, a2, a3, a4 = sorted(words[:4])
+                        theta = float(words[si+1])*u.degrees
+                        k = float(words[si+2])*u.kilojoules_per_mole/u.radians**2/2
+                        a1, a2, a3, a4 = sorted([a1, a2, a3, a4])
                         ptype = ImproperType(k, theta)
                         params.improper_types[(a1, a2, a3, a4)] = ptype
                     elif dtype == 'rbtorsion':
                         a1, a2, a3, a4 = words[:4]
                         c0, c1, c2, c3, c4, c5 = [float(x)*u.kilojoules_per_mole
-                                                    for x in words[5:11]]
-                        ptype = RBTorsionType(c0, c1, c2, c3, c4, c5)
+                                                    for x in words[si+1:si+7]]
+                        ptype = RBTorsionType(c0, c1, c2, c3, c4, c5,
+                                              scee=1/self.defaults.fudgeQQ,
+                                              scnb=1/self.defaults.fudgeLJ)
                         params.rb_torsion_types[(a1, a2, a3, a4)] = ptype
                         params.rb_torsion_types[(a4, a3, a2, a1)] = ptype
                 elif current_section == 'cmaptypes':
@@ -887,16 +901,14 @@ class GromacsTopologyFile(Structure):
                 pair.type = params.pair_types[key]
                 pair.type.used = True
             elif self.defaults.gen_pairs:
-                if self.defaults.comb_rule in (1, 3):
-                    eps, sig = geometric(
-                                    pair.atom1.epsilon, pair.atom2.epsilon,
-                                    pair.atom1.sigma, pair.atom2.sigma
-                    )
-                elif self.defaults.comb_rule == 2:
-                    eps, sig = lorentz_berthelot(
-                                    pair.atom1.epsilon, pair.atom2.epsilon,
-                                    pair.atom1.sigma, pair.atom2.sigma
-                    )
+                if self.combining_rule == 'geometric':
+                    eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
+                    sig = math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
+                elif self.combining_rule == 'lorentz':
+                    eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
+                    sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
+                else:
+                    assert False, 'Unrecognized combining rule'
                 eps *= self.defaults.fudgeLJ
                 pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
                             self.defaults.fudgeQQ, list=self.adjust_types)
@@ -982,8 +994,18 @@ class GromacsTopologyFile(Structure):
                    _gettype(t.atom4))
             if not t.improper:
                 wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
+                wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
+                          _gettype(t.atom3), 'X')
+                wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
+                          _gettype(t.atom4))
                 if key in params.dihedral_types:
                     t.type = params.dihedral_types[key]
+                    t.type.used = True
+                elif wckey1 in params.dihedral_types:
+                    t.type = params.dihedral_types[wckey1]
+                    t.type.used = True
+                elif wckey2 in params.dihedral_types:
+                    t.type = params.dihedral_types[wckey2]
                     t.type.used = True
                 elif wckey in params.dihedral_types:
                     t.type = params.dihedral_types[wckey]
@@ -1014,8 +1036,18 @@ class GromacsTopologyFile(Structure):
             key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
                    _gettype(t.atom4))
             wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
+            wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
+                      _gettype(t.atom3), 'X')
+            wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
+                      _gettype(t.atom4))
             if key in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[key]
+                t.type.used = True
+            elif wckey1 in params.rb_torsion_types:
+                t.type = params.rb_torsion_types[wckey1]
+                t.type.used = True
+            elif wckey2 in params.rb_torsion_types:
+                t.type = params.rb_torsion_types[wckey2]
                 t.type.used = True
             elif wckey in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[wckey]
@@ -1099,6 +1131,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.cmap_types = struct.cmap_types
         gmxtop.rb_torsion_types = struct.rb_torsion_types
         gmxtop.urey_bradley_types = struct.urey_bradley_types
+        gmxtop.combining_rule = struct.combining_rule
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
@@ -1112,8 +1145,6 @@ class GromacsTopologyFile(Structure):
         if hasattr(struct, 'defaults') and isinstance(struct.defaults,
                                                       _Defaults):
             gmxtop.defaults = struct.defaults
-        elif isinstance(struct, CharmmPsfFile):
-            gmxtop.defaults.fudgeLJ = gmxtop.defaults.fudgeQQ = 1.0
         else:
             scee_values = set()
             scnb_values = set()
@@ -1143,6 +1174,8 @@ class GromacsTopologyFile(Structure):
                 gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
             else:
                 gmxtop.defaults.fudgeLJ = 1.0
+        if gmxtop.combining_rule == 'geometric':
+            gmxtop.defaults.comb_rule = 3
 
         return gmxtop
 

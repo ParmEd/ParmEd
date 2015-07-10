@@ -78,6 +78,7 @@ class ParameterSet(object):
         self.nbfix_types = OrderedDict()
         self.pair_types = OrderedDict()
         self.parametersets = []
+        self._combining_rule = 'lorentz'
 
     def __copy__(self):
         other = type(self)()
@@ -130,6 +131,7 @@ class ParameterSet(object):
             typ = copy(item)
             other.cmap_types[key] = typ
             other.cmap_types[tuple(reversed(key))] = typ
+        other.combining_rule = self.combining_rule
 
         return other
 
@@ -346,3 +348,13 @@ class ParameterSet(object):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]
+
+    @property
+    def combining_rule(self):
+        return self._combining_rule
+
+    @combining_rule.setter
+    def combining_rule(self, value):
+        if value not in ('lorentz', 'geometric'):
+            raise ValueError('combining_rule must be "lorentz" or "geometric"')
+        self._combining_rule = value

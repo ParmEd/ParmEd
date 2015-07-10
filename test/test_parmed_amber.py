@@ -31,6 +31,7 @@ class TestReadParm(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         gasparm = readparm.AmberParm(get_fn('trx.prmtop'))
         gasparm.load_rst7(get_fn('trx.inpcrd'))
+        self.assertEqual(gasparm.combining_rule, 'lorentz')
 
         self.assertEqual([a.xx for a in gasparm.atoms],
                          [a.xx for a in parm.atoms])
@@ -67,6 +68,8 @@ class TestReadParm(unittest.TestCase):
                     self.assertEqual(x1, x2)
                 else:
                     self.assertAlmostEqual(x1, x2)
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        self.assertEqual(parm2.combining_rule, 'lorentz')
 
     def testRemakeChamberParm(self):
         """ Tests the rebuilding of the ChamberParm raw data structures """
@@ -80,11 +83,14 @@ class TestReadParm(unittest.TestCase):
                     self.assertEqual(x1, x2)
                 else:
                     self.assertAlmostEqual(x1, x2)
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        self.assertEqual(parm2.combining_rule, 'lorentz')
 
     def testAmberSolvParm(self):
         """ Test the AmberParm class with a periodic prmtop """
         parm = readparm.AmberParm(get_fn('solv.prmtop'),
                                   get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._solv_pointer_tests(parm)
         self.assertFalse(parm.chamber)
@@ -94,6 +100,7 @@ class TestReadParm(unittest.TestCase):
     def testChamberGasParm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
         parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
         self.assertTrue(parm.chamber)
@@ -103,6 +110,7 @@ class TestReadParm(unittest.TestCase):
     def testChamberSolvParm(self):
         """ Test the ChamberParm class with a periodic prmtop """
         parm = readparm.ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._solv_pointer_tests(parm)
         self.assertTrue(parm.chamber)
@@ -141,6 +149,7 @@ class TestReadParm(unittest.TestCase):
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """
         parm = readparm.AmberParm(get_fn('ff91.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm, has1012=True)
 
     # Tests for individual prmtops

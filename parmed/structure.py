@@ -309,6 +309,7 @@ class Structure(object):
         self.unknown_functional = False
         self.nrexcl = 3
         self.title = ''
+        self._combining_rule = 'lorentz'
 
     #===================================================
 
@@ -623,6 +624,7 @@ class Structure(object):
             c.groups.append(Group(g.bs, g.type, g.move))
         c.box = copy(self.box)
         c._coordinates = copy(self._coordinates)
+        c.combining_rule = self.combining_rule
         return c
 
     #===================================================
@@ -1401,6 +1403,18 @@ class Structure(object):
             if all_ints:
                 for atom in self.atoms:
                     atom.type = int(atom.atom_type)
+
+    #===================================================
+
+    @property
+    def combining_rule(self):
+        return self._combining_rule
+
+    @combining_rule.setter
+    def combining_rule(self, thing):
+        if thing not in ('lorentz', 'geometric'):
+            raise ValueError("combining_rule must be 'lorentz' or 'geometric'")
+        self._combining_rule = thing
 
     #===================================================
 
@@ -2314,7 +2328,7 @@ class Structure(object):
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
         for atom in self.atoms:
-            force.addParticle(atom.charge, atom.rmin*sigma_scale,
+            force.addParticle(atom.charge, atom.sigma*length_conv,
                               abs(atom.epsilon*ene_conv))
         # Add exclusions from the bond graph out to nrexcl-1 bonds away (atoms
         # nrexcl bonds away will be exceptions defined later)
@@ -2343,8 +2357,12 @@ class Structure(object):
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
         # 1-4 with the appropriate scaling factor is used as the exception.
         sigma_scale = 2**(-1/6) * length_conv
+        if self.combining_rule == 'lorentz':
+            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
+        elif self.combining_rule == 'geometric':
+            comb_sig = lambda sig1, sig2: math.sqrt(sig1 * sig2)
         if not self.adjusts:
-            for dih in self.dihedrals:
+            for dih in self.dihedrals + self.rb_torsions:
                 if dih.ignore_end: continue
                 if isinstance(dih.type, DihedralTypeList):
                     scee = scnb = 0
@@ -2365,24 +2383,27 @@ class Structure(object):
                 except KeyError:
                     epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (dih.atom1.rmin_14+dih.atom4.rmin_14)*sigma_scale
+                    sigprod = comb_sig(dih.atom1.sigma_14, dih.atom4.sigma_14)
+                    sigprod *= length_conv
                 else:
                     epsprod = wdij14 * ene_conv / scnb
-                    sigprod = rij * length_conv * sigma_scale
+                    sigprod = rij14 * length_conv * sigma_scale
                 chgprod = dih.atom1.charge * dih.atom4.charge / scee
                 force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                    sigprod, epsprod, True)
                 for child in dih.atom1.children:
                     epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+                    sigprod = comb_sig(child.sigma_14, dih.atom4.sigma_14)
+                    sigprod *= length_conv
                     chgprod = (child.charge * dih.atom4.charge) / scee
                     force.addException(child.idx, dih.atom4.idx, chgprod,
                                        sigprod, epsprod, True)
                 for child in dih.atom4.children:
                     epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
+                    sigprod = comb_sig(child.sigma_14, dih.atom1.sigma_14)
+                    sigprod *= length_conv
                     chgprod = child.charge * dih.atom1.charge / scee
                     force.addException(child.idx, dih.atom1.idx, chgprod,
                                        sigprod, epsprod, True)
@@ -2390,7 +2411,8 @@ class Structure(object):
                     for c2 in dih.atom2.children:
                         epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
                         epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                        sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
+                        sigprod = comb_sig(c1.sigma_14, c2.sigma_14)
+                        sigprod *= length_conv
                         chgprod = c1.charge * c2.charge / scee
                         force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                            epsprod, True)
@@ -2399,7 +2421,7 @@ class Structure(object):
         for pair in self.adjusts:
             chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
             force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
-                               pair.type.rmin*sigma_scale,
+                               pair.type.sigma*length_conv,
                                pair.type.epsilon*ene_conv, True)
 
         # Any exclusion partners we already added will zero-out existing
@@ -2423,6 +2445,13 @@ class Structure(object):
 
         # Now see if we have any NBFIXes that we need to implement via a
         # CustomNonbondedForce
+        if self.combining_rule == 'geometric':
+            if self.has_NBFIX():
+                return (force, self._omm_nbfixed_force(force, nonbondedMethod),
+                        self._omm_geometric_force(force, nonbondedMethod))
+            else:
+                return force, self._omm_geometric_force(force, nonbondedMethod)
+
         if self.has_NBFIX():
             return force, self._omm_nbfixed_force(force, nonbondedMethod)
 
@@ -2514,6 +2543,77 @@ class Structure(object):
         # Add the particles
         for i in lj_idx_list:
             force.addParticle((i-1,))
+        # Now wipe out the L-J parameters in the nonbonded force
+        for i in range(nonbfrc.getNumParticles()):
+            chg, sig, eps = nonbfrc.getParticleParameters(i)
+            nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
+        # Now transfer the exclusions
+        for ii in range(nonbfrc.getNumExceptions()):
+            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            force.addExclusion(i, j)
+        # Now transfer the other properties (cutoff, switching function, etc.)
+        force.setUseLongRangeCorrection(True)
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        else:
+            raise ValueError('Unsupported nonbonded method %s' %
+                             nonbondedMethod)
+        force.setCutoffDistance(nonbfrc.getCutoffDistance())
+        if nonbfrc.getUseSwitchingFunction():
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
+
+        return force
+
+    #===================================================
+
+    def _omm_geometric_force(self, nonbfrc, nonbondedMethod):
+        """ Private method for creating a CustomNonbondedForce with a lookup
+        table. This should not be called by users -- you have been warned.
+
+        Parameters
+        ----------
+        nonbfrc : NonbondedForce
+            NonbondedForce for the "standard" nonbonded interactions. This will
+            be modified (specifically, L-J ixns will be zeroed)
+        nonbondedMethod : Nonbonded Method (e.g., NoCutoff, PME, etc.)
+            The nonbonded method to apply here. Ewald and PME will be
+            interpreted as CutoffPeriodic for the CustomNonbondedForce.
+
+        Returns
+        -------
+        force : CustomNonbondedForce
+            The L-J force with NBFIX implemented as a lookup table
+        """
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        # We need a CustomNonbondedForce to implement the geometric combining
+        # rules
+        force = mm.CustomNonbondedForce('eps1*eps2*(sigr6^2-sigr6); '
+                                        'sigr6=sigr2*sigr2*sigr2; '
+                                        'sigr2=(sigc/r)^2; sigc=sig1*sig2')
+        force.addPerParticleParameter('eps')
+        force.addPerParticleParameter('sig')
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
+        if (nonbondedMethod is app.PME or nonbondedMethod is app.Ewald or
+                nonbondedMethod is app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        elif nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        else:
+            raise ValueError('Unrecognized nonbonded method [%s]' %
+                             nonbondedMethod)
+        # Add the particles
+        for atom in self.atoms:
+            eps = math.sqrt(atom.epsilon*ene_conv) * 2
+            sig = math.sqrt(atom.sigma*length_conv)
+            force.addParticle((eps, sig))
         # Now wipe out the L-J parameters in the nonbonded force
         for i in range(nonbfrc.getNumParticles()):
             chg, sig, eps = nonbfrc.getParticleParameters(i)

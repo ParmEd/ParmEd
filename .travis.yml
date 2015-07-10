@@ -4,10 +4,9 @@ sudo: false
 
 env:
     matrix:
-        - PYTHON_VERSION=2.7 
-        - PYTHON_VERSION=2.7 MINIMAL_PACKAGES=yes
-        - PYTHON_VERSION=3.3 
-        - PYTHON_VERSION=3.4 
+        - PYTHON_VERSION=2.7
+        - PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes
+        - PYTHON_VERSION=3.4
 
 install:
     - source devtools/travis-ci/install.sh

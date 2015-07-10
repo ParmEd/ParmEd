@@ -96,6 +96,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM gas phase energies """
         parm = charmm_gas
         system = parm.createSystem(param22)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
@@ -112,6 +113,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Test ParmEd -> OpenMM round trip with CHARMM gas phase """
         parm = charmm_gas
         system = parm.createSystem(param22)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system2 = openmm.load_topology(parm.topology, system).createSystem()
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
@@ -131,6 +133,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM GB (igb=1) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.HCT)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
@@ -160,6 +163,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM GB (igb=2) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC1)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
@@ -189,6 +193,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM GB (igb=5) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC2)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
@@ -218,6 +223,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM GB (igb=7) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
@@ -247,6 +253,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         """ Compare OpenMM and CHARMM GB (igb=8) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn2)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_gas_crds.positions)
@@ -277,6 +284,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_solv
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstrom)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_solv_crds.positions)
@@ -294,6 +302,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_solv
         system = parm.createSystem(param22, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         for force in system.getForces():
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
@@ -314,6 +323,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
         parm = charmm_nbfix
         system = parm.createSystem(param36, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
+        self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_nbfix_crds.positions)
