@@ -1130,6 +1130,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.cmap_types = struct.cmap_types
         gmxtop.rb_torsion_types = struct.rb_torsion_types
         gmxtop.urey_bradley_types = struct.urey_bradley_types
+        gmxtop.combining_rule = struct.combining_rule
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
@@ -1143,8 +1144,6 @@ class GromacsTopologyFile(Structure):
         if hasattr(struct, 'defaults') and isinstance(struct.defaults,
                                                       _Defaults):
             gmxtop.defaults = struct.defaults
-        elif isinstance(struct, CharmmPsfFile):
-            gmxtop.defaults.fudgeLJ = gmxtop.defaults.fudgeQQ = 1.0
         else:
             scee_values = set()
             scnb_values = set()
@@ -1174,6 +1173,8 @@ class GromacsTopologyFile(Structure):
                 gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
             else:
                 gmxtop.defaults.fudgeLJ = 1.0
+        if gmxtop.combining_rule == 'geometric':
+            gmxtop.defaults.comb_rule = 3
 
         return gmxtop
 

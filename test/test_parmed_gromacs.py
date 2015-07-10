@@ -129,6 +129,7 @@ class TestGromacsTop(unittest.TestCase):
     def testCharmm27Top(self):
         """ Tests parsing a Gromacs topology with CHARMM 27 FF """
         top = GromacsTopologyFile(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         self.assertEqual(top.itps, ['charmm27.ff/forcefield.itp',
                                     'charmm27.ff/tip3p.itp',
                                     'charmm27.ff/ions.itp'])
@@ -137,6 +138,7 @@ class TestGromacsTop(unittest.TestCase):
     def testWriteCharmm27Top(self):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
         top = load_file(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         GromacsTopologyFile.write(top,
                 get_fn('1aki.charmm27.top', written=True))
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
@@ -206,11 +208,13 @@ class TestGromacsTop(unittest.TestCase):
     def testReadAmber99SBILDN(self):
         """ Tests parsing a Gromacs topology with Amber99SBILDN and water """
         top = load_file(get_fn('1aki.ff99sbildn.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         self._check_ff99sbildn(top)
 
     def testWriteAmber99SBILDN(self):
         """ Tests writing a Gromacs topology with multiple molecules """
         top = load_file(get_fn('1aki.ff99sbildn.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         GromacsTopologyFile.write(top,
                 get_fn('1aki.ff99sbildn.top', written=True),
                 combine=None)
@@ -223,9 +227,17 @@ class TestGromacsTop(unittest.TestCase):
         parm = load_file(get_fn('phenol.prmtop'))
         parm = parm * 20 + load_file(get_fn('biphenyl.prmtop')) * 20
         top = GromacsTopologyFile.from_structure(parm)
+        self.assertEqual(top.combining_rule, 'lorentz')
         top.write(get_fn('phenol_biphenyl.top', written=True))
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
         self.assertEqual(len(top.residues), 40)
+
+    def testOPLS(self):
+        """ Tests the geometric combining rules in Gromacs with OPLS/AA """
+        parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
+        self.assertEqual(parm.combining_rule, 'geometric')
+        self.assertEqual(parm.defaults.comb_rule, 3)
 
 class TestGromacsGro(unittest.TestCase):
     """ Tests the Gromacs GRO file parser """
