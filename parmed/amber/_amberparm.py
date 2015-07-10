@@ -1,4 +1,4 @@
-"""]
+"""
 This module contains an amber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
@@ -207,7 +207,6 @@ class AmberParm(AmberFormat, Structure):
             self.combining_rule = 'geometric'
             if self.has_NBFIX():
                 self.combining_rule = 'lorentz'
-
         # Instantiate the Structure data structures
         self.load_structure()
 
@@ -820,12 +819,16 @@ class AmberParm(AmberFormat, Structure):
         call this function with care.
         """
         if self.combining_rule == 'lorentz':
-            combine_rmin = lambda r1, r2: 0.5 * (r1 + r2)
+            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
-            fac = 2**(-1/6)
-            combine_rmin = lambda r1, r2: sqrt(r1 * r2) * fac
+            comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
+        else:
+            assert False, "Unrecognized combining rule"
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
+        fac = 2**(-1/6) * 2
+        LJ_sigma = [x*fac for x in self.LJ_radius]
+        fac = 2**(1/6)
         for i in range(ntypes):
             for j in range(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
@@ -833,7 +836,7 @@ class AmberParm(AmberFormat, Structure):
                     pd['LENNARD_JONES_ACOEF'][-index] = 0.0
                     pd['LENNARD_JONES_BCOEF'][-index] = 0.0
                     continue
-                rij = combine_rmin(self.LJ_radius[i], self.LJ_radius[j])
+                rij = comb_sig(LJ_sigma[i], LJ_sigma[j]) * fac
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 pd["LENNARD_JONES_ACOEF"][index] = wdij * rij**12
                 pd["LENNARD_JONES_BCOEF"][index] = 2 * wdij * rij**6
@@ -853,17 +856,21 @@ class AmberParm(AmberFormat, Structure):
             exist. If False, they do not.
         """
         if self.combining_rule == 'lorentz':
-            combine_rmin = lambda r1, r2: 0.5 * (r1 + r2)
+            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
-            fac = 2**(-1/6)
-            combine_rmin = lambda r1, r2: sqrt(r1 * r2) * fac
+            comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
+        else:
+            assert False, "Unrecognized combining rule"
+        fac = 2**(-1/6) * 2
+        LJ_sigma = [x*fac for x in self.LJ_radius]
         pd = self.parm_data
         ntypes = self.parm_data['POINTERS'][NTYPES]
+        fac = 2**(1/6)
         for i in range(ntypes):
             for j in range(ntypes):
                 idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 if idx < 0: continue
-                rij = combine_rmin(self.LJ_radius[i], self.LJ_radius[j])
+                rij = comb_sig(LJ_sigma[i], LJ_sigma[j]) * fac
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 a = pd['LENNARD_JONES_ACOEF'][idx]
                 b = pd['LENNARD_JONES_BCOEF'][idx]
@@ -1928,11 +1935,19 @@ class AmberParm(AmberFormat, Structure):
             zero_torsion = None
             # Scan through existing dihedrals to make sure the exceptions match
             # the dihedral list
+            if self.combining_rule == 'lorentz':
+                comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
+            elif self.combining_rule == 'geometric':
+                comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
+            else:
+                assert False, "Unrecognized combining rule"
+            fac = 2**(1/6)
             for dihedral in self.dihedrals:
                 if dihedral.ignore_end: continue
                 key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
                 eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
-                rref = dihedral.atom1.rmin_14 + dihedral.atom4.rmin_14
+                rref = comb_sig(dihedral.atom1.sigma_14,
+                                dihedral.atom4.sigma_14) * fac
                 if key in adjust_dict:
                     pair = adjust_dict[key]
                     if pair.type.epsilon == 0:
@@ -1964,6 +1979,13 @@ class AmberParm(AmberFormat, Structure):
         zero_angle = AngleType(0, 0)
 
         n13 = n14 = 0
+        if self.combining_rule == 'lorentz':
+            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
+        elif self.combining_rule == 'geometric':
+            comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
+        else:
+            assert False, 'Unrecognized combining rule. Should not be here'
+        fac = 2**(1/6)
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue
             for batom in atom.bond_partners:
@@ -2016,7 +2038,8 @@ class AmberParm(AmberFormat, Structure):
                                     scee = 1e10
                                 else:
                                     scee = 1 / pair.type.chgscale
-                                rref = pair.atom1.rmin_14 + pair.atom2.rmin_14
+                                rref = comb_sig(pair.atom1.sigma_14,
+                                                pair.atom2.sigma_14) * fac
                                 if abs(rmin - rref) > SMALL:
                                     if ignore_inconsistent_vdw:
                                         scnb = 1.0
