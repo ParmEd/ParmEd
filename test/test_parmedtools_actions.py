@@ -4,7 +4,7 @@ Tests for the various actions in ParmEd
 from __future__ import division, print_function
 
 import utils
-from parmed import periodic_table
+from parmed import periodic_table, gromacs
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
@@ -28,6 +28,8 @@ solvparm = AmberParm(get_fn('solv.prmtop'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
+
+gromacs.GROMACS_TOPDIR = get_fn('top')
 
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
