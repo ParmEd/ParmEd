@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 env:
     matrix:
         - PYTHON_VERSION=2.7 

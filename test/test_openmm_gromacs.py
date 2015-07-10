@@ -13,7 +13,7 @@ except ImportError:
     from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from parmed import load_file, ExtraPoint, openmm
+from parmed import load_file, ExtraPoint, openmm, gromacs
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.openmm.utils import energy_decomposition
 from parmed.exceptions import GromacsWarning, ParmedError, OpenMMWarning
@@ -33,6 +33,8 @@ get_fn = utils.get_fn
 #   2 - CutoffPeriodic
 #   3 - Ewald
 #   4 - PME
+
+gromacs.GROMACS_TOPDIR = get_fn('top')
 
 def get_forces_from_xvg(frcfile):
     with open(frcfile, 'r') as f:
