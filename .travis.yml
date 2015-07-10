@@ -2,11 +2,6 @@ language: python
 
 sudo: false
 
-addons:
-    apt:
-        packages:
-            - g++
-            - gromacs
 env:
     matrix:
         - PYTHON_VERSION=2.7 
