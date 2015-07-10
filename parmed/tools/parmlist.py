@@ -34,7 +34,7 @@ class ParmList(object):
             if parm in self._parm_names:
                 raise DuplicateParm('%s already in ParmList' % parm)
             try:
-                parm = load_file(parm)
+                parm = load_file(parm, structure=True)
             except FormatNotFound:
                 raise ParmError('Could not determine file type of %s' % parm)
             if not isinstance(parm, Structure):
