@@ -26,6 +26,7 @@ from parmed.amber.amberformat import AmberFormat
 from parmed.amber._amberparm import AmberParm, Rst7
 from parmed.amber._chamberparm import ChamberParm, ConvertFromPSF
 from parmed.amber._tinkerparm import AmoebaParm, BeemanRestart
+from parmed.utils.six import string_types
 from warnings import warn as _warn
 
 # Define importables via *
@@ -56,6 +57,8 @@ def LoadParm(parmname, xyz=None, box=None, rst7_name=None):
         (i.e., CHARMM force field), or Amoeba-style (i.e., Amoeba force field),
         and then returns an instance of the appropriate type.
     """
+    from parmed import load_file
+    from parmed.constants import IFBOX
     parm = AmberFormat(parmname)
     if 'CTITLE' in parm.flag_list:
         parm = parm.view(ChamberParm)
@@ -66,30 +69,30 @@ def LoadParm(parmname, xyz=None, box=None, rst7_name=None):
 
     # Now read the coordinate file if applicable
     if xyz is None and rst7_name is not None:
-        warn('rst7_name keyword is deprecated. Use xyz instead',
-             DeprecationWarning)
+        _warn('rst7_name keyword is deprecated. Use xyz instead',
+              DeprecationWarning)
         xyz = rst7_name
     elif xyz is not None and rst7_name is not None:
-        warn('rst7_name keyword is deprecated and ignored in favor of xyz',
-             DeprecationWarning)
+        _warn('rst7_name keyword is deprecated and ignored in favor of xyz',
+              DeprecationWarning)
 
     if isinstance(xyz, string_types):
         f = load_file(xyz)
         if not hasattr(f, 'coordinates') or f.coordinates is None:
             raise TypeError('%s does not have coordinates' % xyz)
-        self.coordinates = f.coordinates
+        parm.coordinates = f.coordinates
         if hasattr(f, 'box') and f.box is not None and box is None:
-            self.box = f.box
+            parm.box = f.box
     else:
-        self.coordinates = xyz
+        parm.coordinates = xyz
     if box is not None:
-        self.box = box
+        parm.box = box
 
     # If all else fails, set the box from the prmtop file
-    if self.parm_data['POINTERS'][IFBOX] > 0 and self.box is None:
-        box = self.parm_data['BOX_DIMENSIONS']
-        self.box = list(box[1:]) + [box[0], box[0], box[0]]
+    if parm.parm_data['POINTERS'][IFBOX] > 0 and parm.box is None:
+        box = parm.parm_data['BOX_DIMENSIONS']
+        parm.box = list(box[1:]) + [box[0], box[0], box[0]]
 
-    self.hasbox = self.box is not None
+    parm.hasbox = parm.box is not None
 
     return parm
