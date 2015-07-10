@@ -495,12 +495,13 @@ class GromacsTopologyFile(Structure):
                             dihedral_types[(psieq, k)] = dt
                         molecule.impropers[-1].type = dt
                     elif funct == 3 and len(words) >= 11:
-                        c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoule_per_mole
-                                                  for x in words[5:11])
+                        c0, c1, c2, c3, c4, c5 = (float(x) for x in words[5:11])
                         if (c0, c1, c2, c3, c4, c5) in dihedral_types:
                             dt = dihedral_types[(c0, c1, c2, c3, c4, c5)]
                         else:
-                            dt = RBTorsionType(c0, c1, c2, c3, c4, c5,
+                            kjpm = u.kilojoules_per_mole
+                            dt = RBTorsionType(c0*kjpm, c1*kjpm, c2*kjpm,
+                                               c3*kjpm, c4*kjpm, c5*kjpm,
                                                scee=1/self.defaults.fudgeQQ,
                                                scnb=1/self.defaults.fudgeLJ,
                                                list=molecule.rb_torsion_types)
