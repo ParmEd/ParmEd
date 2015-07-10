@@ -99,7 +99,8 @@ class TestGromacsToAmber(TestCase):
         parm.write_parm(get_fn('1aki.charmm27_fromgmx.parm7', written=True))
         self.assertTrue(diff_files(get_fn('1aki.charmm27_fromgmx.parm7',
                                           written=True),
-                                   get_saved_fn('1aki.charmm27_fromgmx.parm7'))
+                                   get_saved_fn('1aki.charmm27_fromgmx.parm7'),
+                                   relative_error=1e-8)
         )
 
     def testGeometricCombiningRule(self):
