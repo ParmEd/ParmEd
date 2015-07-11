@@ -1586,17 +1586,17 @@ class printAngles(Action):
                     found = True
                 if not found: continue
                 if angle.type is not None:
-                    retstr.apend('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
-                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
-                           atom3.name, atom3.type, angle.type.k,
+                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name,
+                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
+                           atom3.idx+1, atom3.name, atom3.type, angle.type.k,
                            angle.type.theteq)
                     )
                 else:
                     retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%-10s %-10s\n' % (atom1.idx+1, atom1.name, atom1.type,
-                           atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
-                           atom3.name, atom3.type, 'N/A', 'N/A')
+                           '%-10s %-10s\n' % (atom1.idx+1, atom1.name,
+                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
+                           atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
                     )
         return ''.join(retstr)
 
