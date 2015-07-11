@@ -3917,7 +3917,15 @@ class TrackedList(list):
         return list.__init__(self, *args)
 
     def __repr__(self):
-        return '%s(%s)' % (type(self).__name__, list.__repr__(self))
+        retstr = ['%s([\n' % (type(self).__name__)]
+        if len(self) > 30:
+            retstr.extend('\t%r\n' % self[i] for i in range(24))
+            retstr.append('\t...\n')
+            retstr.extend('\t%r\n' % self[i] for i in range(-5, 0))
+        else:
+            retstr.extend('\t%r\n' % i for i in self)
+        retstr.append('])')
+        return ''.join(retstr)
 
     @_changes
     def __delitem__(self, item):
