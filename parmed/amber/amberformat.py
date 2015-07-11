@@ -154,6 +154,9 @@ class FortranFormat(object):
     def __str__(self):
         return self.format
 
+    def __repr__(self):
+        return "<%s: %s>" % (type(self).__name__, self.format)
+
     #===================================================
 
     def write(self, items, dest):
