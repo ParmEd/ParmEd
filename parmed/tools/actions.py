@@ -817,14 +817,17 @@ class printInfo(Action):
 
             self.found = True
 
-    def __str__(self):
-        ret_str = ''
+    def __repr__(self):
+        ret_str = []
         for i, item in enumerate(self.parm.parm_data[self.flag]):
-            ret_str += self.format % item
+            ret_str.append(self.format % item)
             if i % 5 == 4:
-                ret_str += '\n'
+                ret_str.append('\n')
 
-        return ret_str
+        return ''.join(ret_str)
+
+    def __str__(self):
+        return self.__repr__()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -912,8 +915,8 @@ class printLJTypes(Action):
                 self.mask = AmberMask(self.parm, ':*')
 
         if self.mask is None:
-            self.type_list = []
             type_fields = self.type_list.strip().split(',')
+            self.type_list = []
             for field in type_fields:
                 if len(field.strip()) == 0: continue
                 if '-' in field:
@@ -926,6 +929,9 @@ class printLJTypes(Action):
                     self.type_list.append(int(field))
 
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         # Construct the atom selections and related atom types lists
         if self.mask:
             selection = self.mask.Selection()
@@ -1085,34 +1091,37 @@ class printDetails(Action):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
 
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         selection = self.mask.Selection()
-        retstr = "\nThe mask %s matches %d atoms:\n\n" % (
-                        self.mask, sum(selection))
+        retstr = ["\nThe mask %s matches %d atoms:\n\n" % (
+                        self.mask, sum(selection))]
         # Separate printout for Amoeba-style prmtop files
         if isinstance(self.parm, AmoebaParm):
-            retstr += '%7s%7s%9s%6s%6s%10s\n' % ('ATOM', 'RES', 'RESNAME',
-                                                 'NAME', 'TYPE', 'Mass')
+            retstr.append('%7s%7s%9s%6s%6s%10s\n' % ('ATOM', 'RES', 'RESNAME',
+                                                     'NAME', 'TYPE', 'Mass'))
             for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
-                retstr += (
+                retstr.append(
                         '%7d%7d%9s%6s%6s%10.4f\n' %
                             (i+1, atm.residue.idx+1, atm.residue.name,
                              atm.name, atm.type, atm.mass)
                 )
         else:
-            retstr += ("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
+            retstr.append("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
                        ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'LJ Radius',
                         'LJ Depth', 'Mass', 'Charge','GB Radius','GB Screen')
             )
             for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
-                retstr += (
+                retstr.append(
                         "%7d%7d%9s%6s%6s%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n"
                         % (i+1, atm.residue.idx+1, atm.residue.name, atm.name,
                            atm.type, atm.rmin, atm.epsilon, atm.mass,
                            atm.charge, atm.radii, atm.screen)
                 )
-        return retstr
+        return ''.join(retstr)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1125,10 +1134,12 @@ class printFlags(Action):
         pass
 
     def __str__(self):
-        string = '\n'
-        for flag in self.parm.flag_list:
-            string += '%%FLAG %s\n' % flag
-        return string
+        return self.__repr__()
+
+    def __repr__(self):
+        string = ['\n']
+        string.extend('%%FLAG %s\n' % flag for flag in self.parm.flag_list)
+        return ''.join(string)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1141,6 +1152,9 @@ class printPointers(Action):
         pass
 
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         ptrs = self.parm.parm_data['POINTERS']
         ret_str = """\nNATOM (number of atoms in system)................= %d
 NTYPES (number of atom type names)...............= %d
@@ -1470,15 +1484,19 @@ class printBonds(Action):
     mask. If a second mask is given, only bonds in which one atom appears in
     *each* list will be printed.
     """
-    usage = '<mask> [<mask>]'
+    usage = '[<mask> [<mask>] ]'
     def init(self, arg_list):
-        self.mask = AmberMask(self.parm, arg_list.get_next_mask())
-        self.mask2 = AmberMask(self.parm,
-                        arg_list.get_next_mask(optional=True, default='*'))
+        mask = arg_list.get_next_mask(optional=True, default='*')
+        self.mask = AmberMask(self.parm, mask)
+        mask = arg_list.get_next_mask(optional=True, default='*')
+        self.mask2 = AmberMask(self.parm, mask)
 
     def __str__(self):
-        retstr = '%-20s %-20s %-10s %-10s\n' % (
-                                    'Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')
+        return self.__repr__()
+
+    def __repr__(self):
+        retstr = ['%-20s %-20s %-10s %-10s\n' % (
+                                    'Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')]
         # Loop through all of the bonds without and inc hydrogen
         atomsel = set(self.mask.Selected())
         atomsel2 = set(self.mask2.Selected())
@@ -1491,14 +1509,15 @@ class printBonds(Action):
                 found = True
             if not found: continue
             if bond.type is not None:
-                retstr += '%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
+                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
                         atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                         atom2.name, atom2.type, bond.type.req, bond.type.k)
+                )
             else:
-                retstr += '%7d %4s (%4s) %7d %4s (%4s) %-10s %-10s\n' % (
+                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %-10s %-10s\n' % (
                         atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, 'N/A', 'N/A')
-        return retstr
+                        atom2.name, atom2.type, 'N/A', 'N/A'))
+        return ''.join(retstr)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1510,9 +1529,10 @@ class printAngles(Action):
     mask is given, the central atom must be in the second mask and the other two
     atoms must appear in the first *and* third masks (in any order)
     """
-    usage = '<mask> [<mask> [<mask>] ]'
+    usage = '[<mask> [<mask> [<mask>] ] ]'
     def init(self, arg_list):
-        self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        mask = arg_list.get_next_mask(optional=True, default=':*')
+        self.mask = AmberMask(self.parm, mask)
         arg2 = arg_list.get_next_mask(optional=True)
         arg3 = arg_list.get_next_mask(optional=True)
         if arg2 is None:
@@ -1524,8 +1544,11 @@ class printAngles(Action):
             self.mask3 = AmberMask(self.parm, arg3)
 
     def __str__(self):
-        retstr = '%-20s %-20s %-20s %-10s %-10s\n' % (
-                        'Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')
+        return self.__repr__()
+
+    def __repr__(self):
+        retstr = ['%-20s %-20s %-20s %-10s %-10s\n' % (
+                        'Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')]
         if self.one_arg:
             atomsel = self.mask.Selection()
             for angle in self.parm.angles:
@@ -1534,14 +1557,14 @@ class printAngles(Action):
                         atomsel[atom3.idx]):
                     continue
                 if angle.type is not None:
-                    retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
                            '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name,
                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
                            atom3.idx+1, atom3.name, atom3.type, angle.type.k,
                            angle.type.theteq)
                     )
                 else:
-                    retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
                            '%-10s %-10s\n' % (atom1.idx+1, atom1.name,
                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
                            atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
@@ -1563,19 +1586,19 @@ class printAngles(Action):
                     found = True
                 if not found: continue
                 if angle.type is not None:
-                    retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                    retstr.apend('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
                            '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name, atom1.type,
                            atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
                            atom3.name, atom3.type, angle.type.k,
                            angle.type.theteq)
                     )
                 else:
-                    retstr += ('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
                            '%-10s %-10s\n' % (atom1.idx+1, atom1.name, atom1.type,
                            atom2.idx+1, atom2.name, atom2.type, atom3.idx+1,
                            atom3.name, atom3.type, 'N/A', 'N/A')
                     )
-        return retstr
+        return ''.join(retstr)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1587,9 +1610,10 @@ class printDihedrals(Action):
     the first mask, the second atom in the second, etc. The order can be
     precisely reversed, but no other ordering is recognized.
     """
-    usage = '<mask> [<mask> [<mask> [<mask>] ] ]'
+    usage = '[<mask> [<mask> [<mask> [<mask>] ] ] ]'
     def init(self, arg_list):
-        self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        mask = arg_list.get_next_mask(optional=True, default=':*')
+        self.mask = AmberMask(self.parm, mask)
         arg2 = arg_list.get_next_mask(optional=True)
         arg3 = arg_list.get_next_mask(optional=True)
         arg4 = arg_list.get_next_mask(optional=True)
@@ -1604,9 +1628,12 @@ class printDihedrals(Action):
             self.mask4 = AmberMask(self.parm, arg4)
 
     def __str__(self):
-        retstr = '%-20s %-20s %-20s %-20s  %-10s %-10s %-10s %-10s %-10s\n' % (
+        return self.__repr__()
+
+    def __repr__(self):
+        retstr = ['%-20s %-20s %-20s %-20s  %-10s %-10s %-10s %-10s %-10s\n' % (
                 'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
-                'Phase', 'EEL Scale', 'VDW Scale')
+                'Phase', 'EEL Scale', 'VDW Scale')]
         # Loop through all of the bonds without and inc hydrogen
         if self.one_mask:
             atomsel = self.mask.Selection()
@@ -1641,8 +1668,8 @@ class printDihedrals(Action):
                         scnb = '%10.4f' % dihedral.type.scnb
                     else:
                         scee = scnb = 'N/A'
-                retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                           '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
+                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
@@ -1691,24 +1718,24 @@ class printDihedrals(Action):
                     else:
                         scee = scnb = 'N/A'
                 if dihedral.type is not None:
-                    retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                           '%7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
-                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
-                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                            dihedral.type.phi_k, dihedral.type.per,
-                            dihedral.type.phase, scee, scnb)
+                    retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
+                           '(%4s)  %7d %4s (%4s) %10.4f %10.4f %10.4f %10s '
+                           '%10s\n' % (char, atom1.idx+1, atom1.name,
+                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
+                            atom3.idx+1, atom3.name, atom3.type, atom4.idx+1,
+                            atom4.name, atom4.type, dihedral.type.phi_k,
+                            dihedral.type.per, dihedral.type.phase, scee, scnb)
                     )
                 else:
-                    retstr += ('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s)  '
-                           '%7d %4s (%4s) %-10s %-10s %-10s %10s %10s\n' %
+                    retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
+                           '(%4s)  %7d %4s (%4s) %-10s %-10s %-10s %10s %10s\n'%
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
                             'N/A', 'N/A', 'N/A', scee, scnb)
                     )
 
-        return retstr
+        return ''.join(retstr)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2111,10 +2138,13 @@ class printLJMatrix(Action):
         self.mask = None
         if self.idx is None:
             self.mask = AmberMask(self.parm, arg_list.get_next_mask())
-   
+
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         ntypes = self.parm.ptr('NTYPES')
-        ret_str = ''
+        ret_str = []
         if self.idx is not None:
             sel = [0 for i in self.parm.atoms]
             for i, atom in enumerate(self.parm.atoms):
@@ -2139,10 +2169,10 @@ class printLJMatrix(Action):
         for i, names in enumerate(typenames):
             typenames[i] = ','.join(sorted(list(names))) + ' [%d]' % (i+1)
             maxlen = max(maxlen, len(typenames[i]))
-        ret_str = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen) % (
-                    'Atom Type 1', 'Atom Type 2', 'A coefficient',
-                    'B coefficient', 'R i,j', 'Eps i,j')
-        ret_str += '\n' + '-'*len(ret_str) + '\n'
+        fmt = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
+        ret_str.append(fmt % ('Atom Type 1', 'Atom Type 2', 'A coefficient',
+                              'B coefficient', 'R i,j', 'Eps i,j'))
+        ret_str.extend(['\n','-'*len(ret_str[-1]), '\n'])
         for ty in sel_types:
             for ty2 in range(1,ntypes+1):
                 type1, type2 = min(ty, ty2), max(ty, ty2)
@@ -2155,13 +2185,13 @@ class printLJMatrix(Action):
                 else:
                     rij = (2 * acoef / bcoef) ** (1 / 6)
                     eij = (bcoef * bcoef / (4 * acoef))
-                ret_str += ('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
+                ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
                             (maxlen, maxlen) %
                             (typenames[type1-1], typenames[type2-1],
                              acoef, bcoef, rij, eij)
                 )
 
-        return ret_str
+        return ''.join(ret_str)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
