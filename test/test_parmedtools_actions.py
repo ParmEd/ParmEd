@@ -1124,13 +1124,15 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
                                          get_fn('test.rst7', written=True),
                                          absolute_error=0.0001))
@@ -1138,13 +1140,15 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
                                          get_fn('test.rst7', written=True),
                                          absolute_error=0.0001))

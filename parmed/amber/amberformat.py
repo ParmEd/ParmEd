@@ -843,7 +843,7 @@ class AmberFormat(object):
             should be written and read. Do not enclose in ()
         data : list=None
             Sequence with data for the new flag. If None, a list of zeros of
-            length `num_items` (see below) is given as a holder
+            length ``num_items`` (see below) is given as a holder
         num_items : int=-1
             Number of items in the section. This variable is ignored if a set of
             data are given in `data`
