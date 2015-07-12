@@ -621,9 +621,7 @@ class AmberParm(AmberFormat, Structure):
         name : str
             The name of the file to write the prmtop to
         """
-        if self.is_changed():
-            self.remake_parm()
-
+        self.remake_parm()
         AmberFormat.write_parm(self, name)
 
     #===================================================
