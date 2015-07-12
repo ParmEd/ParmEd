@@ -24,7 +24,7 @@ from __future__ import division, print_function, absolute_import
 
 from parmed.amber._amberparm import AmberParm
 from parmed.amber.amberformat import AmberFormat
-from parmed.constants import NATOM, NRES, IFBOX, RAD_TO_DEG
+from parmed.constants import NATOM, NRES, IFBOX, RAD_TO_DEG, DEG_TO_RAD
 from parmed import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
                 DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
                 Dihedral, StretchBend, TorsionTorsion, ChiralFrame,
@@ -903,7 +903,8 @@ class AmoebaParm(AmberParm):
                     [dt.phi_k for dt in self.dihedral_types]
         data['AMOEBA_TORSION_PEROIDICITY'] = \
                     [dt.per for dt in self.dihedral_types]
-        data['AMOEBA_TORSION_PHASE'] = [dt.phase for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_PHASE'] = \
+                    [dt.phase*DEG_TO_RAD for dt in self.dihedral_types]
         data['AMOEBA_TORSION_NUM_LIST'] = [len(self.dihedrals)]
         data['AMOEBA_TORSION_LIST'] = dlist = []
         for dih in self.dihedrals:
@@ -937,7 +938,7 @@ class AmoebaParm(AmberParm):
         data['AMOEBA_PI_TORSION_PEROIDICITY'] = \
                     [dt.per for dt in self.pi_torsion_types]
         data['AMOEBA_PI_TORSION_PHASE'] = \
-                    [dt.phase for dt in self.pi_torsion_types]
+                    [dt.phase*DEG_TO_RAD for dt in self.pi_torsion_types]
         data['AMOEBA_PI_TORSION_NUM_LIST'] = [len(self.pi_torsions)]
         data['AMOEBA_PI_TORSION_LIST'] = dlist = []
         for pit in self.pi_torsions:
@@ -964,7 +965,9 @@ class AmoebaParm(AmberParm):
             return
         # This flag is deprecated... get rid of it and replace it with the 2
         # force constant flags instead
-        self.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
+        # TODO: Deprecate the AMOEBA_STRETCH_BEND_FORCE_CONSTANT flag in
+        # tinker_to_amber and then do it here as well.
+#       self.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
         data = self.parm_data
         for strbnd_type in self.stretch_bend_types:
             strbnd_type.used = False
@@ -972,18 +975,20 @@ class AmoebaParm(AmberParm):
             strbnd.type.used = True
         self.stretch_bend_types.prune_unused()
         data['AMOEBA_STRETCH_BEND_NUM_PARAMS'] = [len(self.stretch_bend_types)]
-        if not 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1' in self.flag_list:
-            self.add_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1', '5E16.8',
-                    data=[strbnd.k1 for strbnd in self.stretch_bend_types])
-        else:
-            data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1'] = \
-                        [strbnd.k1 for strbnd in self.stretch_bend_types]
-        if not 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2' in self.flag_list:
-            self.add_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2', '5E16.8',
-                    data=[strbnd.k2 for strbnd in self.stretch_bend_types])
-        else:
-            data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2'] = \
-                        [strbnd.k2 for strbnd in self.stretch_bend_types]
+#       if not 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1' in self.flag_list:
+#           self.add_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1', '5E16.8',
+#                   data=[strbnd.k1 for strbnd in self.stretch_bend_types])
+#       else:
+#           data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1'] = \
+#                       [strbnd.k1 for strbnd in self.stretch_bend_types]
+#       if not 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2' in self.flag_list:
+#           self.add_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2', '5E16.8',
+#                   data=[strbnd.k2 for strbnd in self.stretch_bend_types])
+#       else:
+#           data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2'] = \
+#                       [strbnd.k2 for strbnd in self.stretch_bend_types]
+        data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'] = \
+                    [strbnd.k1 for strbnd in self.stretch_bend_types]
         data['AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE'] = \
                     [strbnd.req1 for strbnd in self.stretch_bend_types]
         data['AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE'] = \

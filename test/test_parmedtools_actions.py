@@ -1124,13 +1124,15 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
                                          get_fn('test.rst7', written=True),
                                          absolute_error=0.0001))
@@ -1138,13 +1140,15 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
                                          get_fn('test.rst7', written=True),
                                          absolute_error=0.0001))
@@ -2134,23 +2138,21 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
         parm = copy(amoebaparm)
         atoms = [atom for atom in parm.atoms] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        self.assertEqual(parm.ptr('IPTRES'), 0)
+        self.assertEqual(parm.ptr('IPTRES'), 2)
         self.assertEqual(parm.ptr('NSPM'), 819)
-        self.assertEqual(parm.ptr('NSPSOL'), 0)
-        # To keep the output clean
+        self.assertEqual(parm.ptr('NSPSOL'), 2)
         PT.setMolecules(parm).execute()
         self.assertEqual(parm.ptr('IPTRES'), 2)
         self.assertEqual(parm.ptr('NSPM'), 819)
         self.assertEqual(parm.ptr('NSPSOL'), 2)
         self.assertTrue(all([x is y for x,y in zip(parm.atoms, atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
+        # Now check that setMolecules can apply another time
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
         """ Test netCharge for AmoebaParm (charge is the monopole) """
         act = PT.netCharge(amoebaparm)
-        chg = act.execute() # check this part of the API
+        chg = act.execute() # check the netCharge.execute return value
         self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
         self.assertAlmostEqual(chg, 0.0)
         chg = PT.netCharge(amoebaparm, ':WAT').execute()

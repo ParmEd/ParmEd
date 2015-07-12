@@ -4416,7 +4416,7 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
         self.polar_weight = polar_weight
         self.mutual_weight = mutual_weight
         self._idx = -1
-        self.list = None
+        self.list = list
 
     def __eq__(self, other):
         return (self.vdw_weight == other.vdw_weight and
