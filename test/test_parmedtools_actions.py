@@ -2138,23 +2138,21 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
         parm = copy(amoebaparm)
         atoms = [atom for atom in parm.atoms] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        self.assertEqual(parm.ptr('IPTRES'), 0)
+        self.assertEqual(parm.ptr('IPTRES'), 2)
         self.assertEqual(parm.ptr('NSPM'), 819)
-        self.assertEqual(parm.ptr('NSPSOL'), 0)
-        # To keep the output clean
+        self.assertEqual(parm.ptr('NSPSOL'), 2)
         PT.setMolecules(parm).execute()
         self.assertEqual(parm.ptr('IPTRES'), 2)
         self.assertEqual(parm.ptr('NSPM'), 819)
         self.assertEqual(parm.ptr('NSPSOL'), 2)
         self.assertTrue(all([x is y for x,y in zip(parm.atoms, atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
+        # Now check that setMolecules can apply another time
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
         """ Test netCharge for AmoebaParm (charge is the monopole) """
         act = PT.netCharge(amoebaparm)
-        chg = act.execute() # check this part of the API
+        chg = act.execute() # check the netCharge.execute return value
         self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
         self.assertAlmostEqual(chg, 0.0)
         chg = PT.netCharge(amoebaparm, ':WAT').execute()
