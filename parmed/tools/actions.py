@@ -3055,6 +3055,10 @@ class addPDB(Action):
         tempfac = [0.0 for atom in self.parm.atoms]
         occupancies = [0.0 for atom in self.parm.atoms]
         atomnums = [-1 for atom in self.parm.atoms]
+        for res in self.parm.residues:
+            res.number = 0
+            res.chain = '*'
+            res.insertion_code = ''
         for i, res in enumerate(pdb.residues):
             parmres = self.parm.residues[i]
             try:
@@ -3091,9 +3095,9 @@ class addPDB(Action):
                                 warnings.warn('Residue name mismatch [#%d] %s '
                                               'vs. %s' % (i+1, resname, reslab),
                                               AddPDBWarning)
-                resnums[i] = res.number
-                chainids[i] = res.chain
-                icodes[i] = res.insertion_code
+                resnums[i] = parmres.number = res.number
+                chainids[i] = parmres.chain = res.chain
+                icodes[i] = parmres.insertion_code = res.insertion_code
             except IndexError:
                 raise AddPDBError('PDB %s has more residues than prmtop %s' %
                                   (self.pdbfile, self.parm))
@@ -3139,7 +3143,7 @@ class addPDB(Action):
                 comments=['Atom temperature factor from the PDB file'])
         self.parm.add_flag('ATOM_NUMBER', '10I8', data=atomnums,
                 comments=['Atom serial number from the PDB file'])
-        self.parm.load_structure() # Get that information saved
+        self.parm.load_atom_info() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3194,7 +3198,7 @@ class add12_6_4(Action):
     [2] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,
         119, 883-895
     [3] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,
-        Accepted.
+        2015, 11, 1645-1657.
     """
     usage = ('[<divalent ion mask>] [c4file <C4 Param. File> | watermodel '
             '<water model>] [polfile <Pol. Param File> [tunfactor <tunfactor>]')

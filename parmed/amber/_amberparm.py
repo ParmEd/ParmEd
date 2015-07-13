@@ -1403,6 +1403,14 @@ class AmberParm(AmberFormat, Structure):
                 else:
                     atom = Atom()
                 self.add_atom(atom, resname, i, res_chn[i], res_icd[i])
+        # Residue number may not be unique, since zeros may be assigned to all
+        # solvent residues by addPDB. So we can't use the RESIDUE_NUMBER section
+        # to fill in the residue sequence IDs in the add_atom call above. Add it
+        # in as a post-hoc addition now if that information is present
+        if 'RESIDUE_NUMBER' in self.parm_data:
+            for res, num in zip(self.parm_data['RESIDUE_NUMBER'],
+                                self.residues):
+                res.number = num
 
     #===================================================
 

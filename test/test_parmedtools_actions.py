@@ -4,7 +4,7 @@ Tests for the various actions in ParmEd
 from __future__ import division, print_function
 
 import utils
-from parmed import periodic_table, gromacs
+from parmed import periodic_table, gromacs, load_file
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
@@ -1031,6 +1031,16 @@ class TestAmberParmActions(utils.TestCaseRelative):
         self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
         self.assertFalse('ATOM_OCCUPANCY' in parm.flag_list)
         self.assertFalse('ATOM_BFACTOR' in parm.flag_list)
+
+    def testAddPDB2(self):
+        """ Test addPDB with atypical numbering and extra residues """
+        parm = load_file(get_fn('4lzt.parm7'))
+        PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb')).execute()
+        parm.write_parm(get_fn('4lzt_pdb.parm7', written=True))
+        self.assertTrue(utils.diff_files(get_saved_fn('4lzt_pdb.parm7'),
+                                         get_fn('4lzt_pdb.parm7', written=True),
+                                         absolute_error=1e-6)
+        )
 
     def testHMassRepartition(self):
         """ Test HMassRepartition on AmberParm """
