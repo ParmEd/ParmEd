@@ -3,13 +3,13 @@ Tests the functionality in parmed.modeller
 """
 from __future__ import division
 
-import utils
+from copy import copy
 import numpy as np
-import os
 try:
     import pandas as pd
 except ImportError:
     pd = None
+import os
 from parmed import Atom, read_PDB
 from parmed.exceptions import AmberWarning
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
@@ -22,6 +22,7 @@ from parmed.tools import changeRadii
 import random
 import sys
 import unittest
+import utils
 import warnings
 get_fn = utils.get_fn
 
@@ -52,6 +53,10 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
 
+    def testCopy(self):
+        """ Tests ResidueTemplate __copy__ functionality """
+        templcopy = copy(self.templ)
+
     def testFixCharge(self):
         """ Tests charge fixing for ResidueTemplate """
         charges = [random.random()*2 - 2 for a in self.templ]
@@ -73,6 +78,9 @@ class TestResidueTemplate(unittest.TestCase):
             self.assertEqual(a.charge, chg)
         # Check that the return value is the residue itself
         self.assertIs(return_value, self.templ)
+
+    def testFixChargeContainer(self):
+        """ Tests charge fixing for ResidueTemplateContainer """
 
     def testAddBondsAtoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
