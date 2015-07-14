@@ -231,6 +231,39 @@ class ResidueTemplate(object):
             raise IndexError('Atom %s not found in %s' % (idx, self.name))
         return self.atoms[idx]
 
+    def fix_charges(self, to=None):
+        """
+        Adjusts the partial charge of all atoms in the residue to match the
+        requested target charge. The default target charge is the closest
+        integer
+
+        Parameters
+        ----------
+        to : float, optional
+            The desired net charge of this residue template. Default is the
+            closest integer charge
+
+        Returns
+        -------
+        self : :class:`ResidueTemplate`
+            The current residue template whose charges are being modified
+
+        Notes
+        -----
+        This method modifies the atomic charges of this residue template
+        in-place.
+        """
+        net_charge = sum(a.charge for a in self.atoms)
+        if to is None:
+            to = round(net_charge)
+        if net_charge == to:
+            return self
+
+        smear = (to - net_charge) / len(self)
+        for atom in self:
+            atom.charge += smear
+        return self
+
     def to_dataframe(self):
         """ Create a pandas dataframe from the atom information
 

@@ -1,6 +1,8 @@
 """
 Tests the functionality in parmed.modeller
 """
+from __future__ import division
+
 import utils
 import numpy as np
 import os
@@ -49,6 +51,28 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.head, None)
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
+
+    def testFixCharge(self):
+        """ Tests charge fixing for ResidueTemplate """
+        charges = [random.random()*2 - 2 for a in self.templ]
+        for a, charge in zip(self.templ, charges):
+            a.charge = charge
+        net_charge = sum(charges)
+        # The odds of 6 random numbers adding to an exact integer is miniscule
+        self.assertNotEqual(net_charge, round(net_charge))
+        self.assertEqual(round(net_charge), int(round(net_charge)))
+        # Find what the new charges *should* be
+        diff = (net_charge - round(net_charge)) / 6
+        fixed_charges = [x - diff for x in charges]
+        self.assertAlmostEqual(sum(fixed_charges), round(net_charge), places=10)
+        # Fix the charges
+        self.assertEqual(sum(a.charge for a in self.templ), net_charge)
+        return_value = self.templ.fix_charges()
+        self.assertEqual(sum(a.charge for a in self.templ), sum(fixed_charges))
+        for a, chg in zip(self.templ, fixed_charges):
+            self.assertEqual(a.charge, chg)
+        # Check that the return value is the residue itself
+        self.assertIs(return_value, self.templ)
 
     def testAddBondsAtoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
