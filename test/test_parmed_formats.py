@@ -722,6 +722,18 @@ class TestMol2File(unittest.TestCase):
         # bond arrays for every residue
         self.assertEqual(sum([len(x.bonds) for x in cont]), 668)
 
+    def testMultiMol2Entries(self):
+        """ Tests a mol2 file with multiple @<MOLECULE> sections """
+        cont = formats.Mol2File.parse(get_fn('multimol.mol2'))
+        self.assertIsInstance(cont, ResidueTemplateContainer)
+        self.assertEqual(len(cont), 200)
+        for i, res in enumerate(cont):
+            self.assertEqual(res.name, 'ZINC00000016_%d' % (i+1))
+            self.assertEqual(len(res.atoms), 37)
+            self.assertEqual(len(res.bonds), 38)
+            self.assertIs(res.head, None)
+            self.assertIs(res.tail, None)
+
     def testMultiMol2Structure(self):
         """ Tests parsing a multi-residue mol2 into a Structure """
         struct = formats.Mol2File.parse(get_fn('test_multi.mol2'),
@@ -774,8 +786,39 @@ class TestMol2File(unittest.TestCase):
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
         formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
-        self.assertTrue(diff_files(get_fn('test_multi.mol2', written=True),
-                                   get_saved_fn('test_multi.mol2')))
+        formats.Mol2File.write(mol2, get_fn('test_multi_sep.mol2', written=True),
+                               split=True)
+        self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
+                                   get_fn('test_multi.mol2', written=True)))
+        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'),
+                                   get_fn('test_multi_sep.mol2', written=True)))
+        mol22 = formats.Mol2File.parse(get_fn('test_multi_sep.mol2', written=True))
+        self.assertEqual(len(mol2), len(mol22))
+        self.assertEqual([r.name for r in mol2], [r.name for r in mol22])
+        for r1, r2 in zip(mol2, mol22):
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            self.assertEqual(len(r1.atoms), len(r2.atoms))
+            self.assertFalse(r1.head is None and r1.tail is None)
+            self.assertTrue(r2.head is None and r2.tail is None)
+        f = StringIO.StringIO()
+        formats.Mol2File.write(mol2, f, mol3=True, split=True)
+        f.seek(0)
+        mol3 = formats.Mol2File.parse(f)
+        self.assertEqual(len(mol2), len(mol3))
+        self.assertEqual([r.name for r in mol2], [r.name for r in mol3])
+        for r1, r2 in zip(mol2, mol3):
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            self.assertEqual(len(r1.atoms), len(r2.atoms))
+            self.assertFalse(r1.head is None and r1.tail is None)
+            self.assertFalse(r2.head is None and r2.tail is None)
+            if r1.head is None:
+                self.assertIs(r2.head, None)
+            else:
+                self.assertEqual(r1.head.name, r2.head.name)
+            if r1.tail is None:
+                self.assertIs(r2.tail, None)
+            else:
+                self.assertEqual(r1.tail.name, r2.tail.name)
 
     def testMol2MultiWriteFromStructure(self):
         """ Tests writing mol2 file of multi residues from Structure """
