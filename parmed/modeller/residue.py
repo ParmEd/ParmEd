@@ -480,6 +480,32 @@ class ResidueTemplateContainer(list):
                 if res.name == value: return res
         return list.__getitem__(self, value)
 
+    def fix_charges(self):
+        """
+        Adjusts the net charge of all residues in this ResidueContainer to match
+        the closest integer charge
+
+        Returns
+        -------
+        self : :class:`ResidueTemplateContainer`
+            The current residue template container whose ResidueTemplates are
+            being modified
+
+        Notes
+        -----
+        This method modifies everything in-place.
+
+        Raises
+        ------
+        ValueError
+            If you try to call fix_charges on a container with no templates
+        """
+        if len(self) == 0:
+            raise ValueError('Cannot fix charges on an empty container')
+        for res in self:
+            res.fix_charges()
+        return self
+
     def to_library(self):
         """
         Converts the ResidueTemplateContainer instance to a library of unique

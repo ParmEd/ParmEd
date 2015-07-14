@@ -133,8 +133,54 @@ class TestResidueTemplate(unittest.TestCase):
         # Check that the return value is the residue itself
         self.assertIs(return_value, self.templ)
 
+    def testFixCharge2(self):
+        """ Tests charge fixing to a specific value for ResidueTemplate """
+        desired_charge = random.choice(range(-10, 11))
+        charges = [random.random()*2 - 2 for a in self.templ]
+        for a, charge in zip(self.templ, charges):
+            a.charge = charge
+        net_charge = sum(charges)
+        # The odds of 6 random numbers adding to my exact integer are negligible
+        self.assertNotEqual(net_charge, desired_charge)
+        # Find what the new charges *should* be
+        diff = (net_charge - desired_charge) / 6
+        fixed_charges = [x - diff for x in charges]
+        self.assertAlmostEqual(sum(fixed_charges), desired_charge, places=10)
+        # Fix the charges
+        self.assertEqual(sum(a.charge for a in self.templ), net_charge)
+        return_value = self.templ.fix_charges(desired_charge)
+        self.assertEqual(sum(a.charge for a in self.templ), sum(fixed_charges))
+        for a, chg in zip(self.templ, fixed_charges):
+            self.assertEqual(a.charge, chg)
+        # Check that the return value is the residue itself
+        self.assertIs(return_value, self.templ)
+
+
     def testFixChargeContainer(self):
         """ Tests charge fixing for ResidueTemplateContainer """
+        rescont = ResidueTemplateContainer()
+        for i in range(10):
+            templcopy = copy(self.templ)
+            templcopy.name = '%s%d' % (templcopy.name, i)
+            sumchg = 0
+            for a in templcopy.atoms:
+                a.charge = random.random()*2 - 2
+                sumchg += a.charge
+            self.assertNotEqual(sumchg, round(sumchg))
+            rescont.append(templcopy)
+        self.assertEqual(len(rescont), 10)
+        orig_charges = [sum(a.charge for a in r) for r in rescont]
+        new_charges = [round(x) for x in orig_charges]
+        for res, oc, nc in zip(rescont, orig_charges, new_charges):
+            self.assertNotEqual(oc, nc)
+            self.assertEqual(round(oc), nc)
+            self.assertEqual(sum(a.charge for a in res), oc)
+        retval = rescont.fix_charges()
+        self.assertIs(retval, rescont)
+        for res, oc, nc in zip(rescont, orig_charges, new_charges):
+            self.assertNotEqual(oc, nc)
+            self.assertEqual(round(oc), nc)
+            self.assertAlmostEqual(sum(a.charge for a in res), nc, places=10)
 
     def testAddBondsAtoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
