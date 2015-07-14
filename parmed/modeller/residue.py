@@ -84,7 +84,6 @@ class ResidueTemplate(object):
         self.first_patch = None
         self.last_patch = None
         self.groups = []
-        self.cmaps = []
 
     def __repr__(self):
         if self.head is not None:
@@ -223,6 +222,26 @@ class ResidueTemplate(object):
                     return True
         return False
 
+    def __copy__(self):
+        other = type(self)(name=self.name)
+
+        for atom in self.atoms:
+            other.add_atom(copy.copy(atom))
+        for bond in self.bonds:
+            other.add_bond(bond.atom1.idx, bond.atom2.idx)
+        other.type = self.type
+
+        if self.head is not None:
+            other.head = other.atoms[self.head.idx]
+        if self.tail is not None:
+            other.tail = other.atoms[self.tail.idx]
+        for connection in self.connections:
+            other.connections.append(other.atoms[connection.idx])
+        other.first_patch = self.first_patch
+        other.last_patch = self.last_patch
+
+        return other
+
     def __getitem__(self, idx):
         if isinstance(idx, str):
             for atom in self.atoms:
@@ -252,7 +271,14 @@ class ResidueTemplate(object):
         -----
         This method modifies the atomic charges of this residue template
         in-place.
+
+        Raises
+        ------
+        ValueError
+            If you try to call fix_charges on a residue template with no atoms
         """
+        if not self.atoms:
+            raise ValueError('Cannot fix charges on an empty residue')
         net_charge = sum(a.charge for a in self.atoms)
         if to is None:
             to = round(net_charge)

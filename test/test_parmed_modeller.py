@@ -37,6 +37,7 @@ class TestResidueTemplate(unittest.TestCase):
         templ.add_atom(Atom(name='HH33', type='HC'))
         templ.add_atom(Atom(name='C', type='C'))
         templ.add_atom(Atom(name='O', type='O'))
+        templ.type = PROTEIN
         templ.tail = templ.atoms[4]
 
     def testAddAtom(self):
@@ -55,10 +56,63 @@ class TestResidueTemplate(unittest.TestCase):
 
     def testCopy(self):
         """ Tests ResidueTemplate __copy__ functionality """
+        for atom in self.templ:
+            atom.xx = random.random() * 20 - 10
+            atom.xy = random.random() * 20 - 10
+            atom.xz = random.random() * 20 - 10
         templcopy = copy(self.templ)
+        self.assertIsNot(templcopy, self.templ)
+        self.assertEqual(len(templcopy.atoms), len(self.templ.atoms))
+        self.assertEqual(len(templcopy.bonds), len(self.templ.bonds))
+        for a1, a2 in zip(templcopy.atoms, self.templ):
+            self.assertIsNot(a1, a2)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.charge, a2.charge)
+            self.assertEqual(a1.xx, a2.xx)
+            self.assertEqual(a1.xy, a2.xy)
+            self.assertEqual(a1.xz, a2.xz)
+        for b1, b2 in zip(templcopy.bonds, self.templ.bonds):
+            self.assertIsNot(b1, b2)
+            self.assertIsNot(b1.atom1, b2.atom1)
+            self.assertIsNot(b1.atom2, b2.atom2)
+            self.assertEqual(b1.atom1.name, b2.atom1.name)
+            self.assertEqual(b1.atom2.name, b2.atom2.name)
+        self.assertIs(self.templ.head, None)
+        self.assertIs(templcopy.head, None)
+        self.assertIs(self.templ.tail, self.templ[4])
+        self.assertIs(templcopy.tail, templcopy[4])
+        self.assertIs(templcopy.type, self.templ.type)
+        self.assertEqual(templcopy.name, self.templ.name)
+
+        # Give ResidueTemplate a head atom and a connection
+        self.templ.head = self.templ[0]
+        self.templ.connections.append(self.templ[1])
+        templcopy = copy(self.templ)
+        self.assertIs(self.templ.head, self.templ[0])
+        self.assertIs(templcopy.head, templcopy[0])
+        self.assertEqual(len(self.templ.connections), 1)
+        self.assertEqual(len(templcopy.connections), 1)
+        for a1, a2 in zip(self.templ.connections, templcopy.connections):
+            self.assertIsNot(a1, a2)
+            self.assertEqual(a1.name, a2.name) # Enough to verify correctness
+        self.assertIs(self.templ.first_patch, None)
+        self.assertIs(self.templ.last_patch, None)
+        self.assertIs(templcopy.first_patch, None)
+        self.assertIs(templcopy.last_patch, None)
+
+        # Now give ResidueTemplate patches (can be blank, doesn't matter)
+        self.templ.first_patch = ResidueTemplate()
+        self.templ.last_patch = ResidueTemplate()
+        templcopy = copy(self.templ)
+        self.assertIsNot(self.templ.first_patch, None)
+        self.assertIsNot(self.templ.last_patch, None)
+        self.assertIs(self.templ.first_patch, templcopy.first_patch)
+        self.assertIs(self.templ.last_patch, templcopy.last_patch)
 
     def testFixCharge(self):
         """ Tests charge fixing for ResidueTemplate """
+        self.assertRaises(ValueError, lambda:
+                ResidueTemplate().fix_charges())
         charges = [random.random()*2 - 2 for a in self.templ]
         for a, charge in zip(self.templ, charges):
             a.charge = charge
