@@ -250,7 +250,7 @@ class ResidueTemplate(object):
             raise IndexError('Atom %s not found in %s' % (idx, self.name))
         return self.atoms[idx]
 
-    def fix_charges(self, to=None):
+    def fix_charges(self, to=None, precision=4):
         """
         Adjusts the partial charge of all atoms in the residue to match the
         requested target charge. The default target charge is the closest
@@ -261,6 +261,9 @@ class ResidueTemplate(object):
         to : float, optional
             The desired net charge of this residue template. Default is the
             closest integer charge
+        precision : int, optional
+            The number of decimal places that each charge should be rounded to.
+            Default is 4
 
         Returns
         -------
@@ -270,7 +273,12 @@ class ResidueTemplate(object):
         Notes
         -----
         This method modifies the atomic charges of this residue template
-        in-place.
+        in-place. Any residual charge (which is accumulated roundoff beyond the
+        requested precision) is added to the first atom of the residue. This
+        will typically be 10^-precision in magnitude, and should almost never be
+        higher than 2*10^-precision. As long as a reasonable precision is chosen
+        (no fewer than 3 or 4 decimal places), this will have only a negligible
+        impact on a force field.
 
         Raises
         ------
@@ -287,7 +295,11 @@ class ResidueTemplate(object):
 
         smear = (to - net_charge) / len(self)
         for atom in self:
-            atom.charge += smear
+            atom.charge = round(atom.charge + smear, precision)
+
+        # Dump the extra tiny bit (O(10^-precision)) on the first atom
+        self.atoms[0].charge += to - sum(atom.charge for atom in self.atoms)
+
         return self
 
     def to_dataframe(self):
@@ -480,10 +492,16 @@ class ResidueTemplateContainer(list):
                 if res.name == value: return res
         return list.__getitem__(self, value)
 
-    def fix_charges(self):
+    def fix_charges(self, precision=4):
         """
         Adjusts the net charge of all residues in this ResidueContainer to match
         the closest integer charge
+
+        Parameters
+        ----------
+        precision : int, optional
+            The number of decimal places that each charge should be rounded to.
+            Default is 4
 
         Returns
         -------
@@ -503,7 +521,7 @@ class ResidueTemplateContainer(list):
         if len(self) == 0:
             raise ValueError('Cannot fix charges on an empty container')
         for res in self:
-            res.fix_charges()
+            res.fix_charges(precision=precision)
         return self
 
     def to_library(self):

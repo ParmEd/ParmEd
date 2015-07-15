@@ -126,10 +126,12 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertAlmostEqual(sum(fixed_charges), round(net_charge), places=10)
         # Fix the charges
         self.assertEqual(sum(a.charge for a in self.templ), net_charge)
-        return_value = self.templ.fix_charges()
-        self.assertEqual(sum(a.charge for a in self.templ), sum(fixed_charges))
+        precision = random.randint(4, 10)
+        return_value = self.templ.fix_charges(precision=precision)
+        self.assertAlmostEqual(sum(a.charge for a in self.templ),
+                               sum(fixed_charges), places=10)
         for a, chg in zip(self.templ, fixed_charges):
-            self.assertEqual(a.charge, chg)
+            self.assertAlmostEqual(a.charge, chg, delta=2*10**-precision)
         # Check that the return value is the residue itself
         self.assertIs(return_value, self.templ)
 
@@ -147,14 +149,16 @@ class TestResidueTemplate(unittest.TestCase):
         fixed_charges = [x - diff for x in charges]
         self.assertAlmostEqual(sum(fixed_charges), desired_charge, places=10)
         # Fix the charges
-        self.assertEqual(sum(a.charge for a in self.templ), net_charge)
-        return_value = self.templ.fix_charges(desired_charge)
-        self.assertEqual(sum(a.charge for a in self.templ), sum(fixed_charges))
+        self.assertAlmostEqual(sum(a.charge for a in self.templ), net_charge,
+                               places=10)
+        precision = random.randint(4, 10)
+        return_value = self.templ.fix_charges(desired_charge, precision)
+        self.assertAlmostEqual(sum(a.charge for a in self.templ),
+                               sum(fixed_charges), places=10)
         for a, chg in zip(self.templ, fixed_charges):
-            self.assertEqual(a.charge, chg)
+            self.assertAlmostEqual(a.charge, chg, delta=2*10**precision)
         # Check that the return value is the residue itself
         self.assertIs(return_value, self.templ)
-
 
     def testFixChargeContainer(self):
         """ Tests charge fixing for ResidueTemplateContainer """
@@ -175,11 +179,19 @@ class TestResidueTemplate(unittest.TestCase):
             self.assertNotEqual(oc, nc)
             self.assertEqual(round(oc), nc)
             self.assertEqual(sum(a.charge for a in res), oc)
-        retval = rescont.fix_charges()
+        precision = random.randint(4, 10)
+        retval = rescont.fix_charges(precision=precision)
         self.assertIs(retval, rescont)
         for res, oc, nc in zip(rescont, orig_charges, new_charges):
             self.assertNotEqual(oc, nc)
             self.assertEqual(round(oc), nc)
+            strchgs = ['%%.%df' % precision % atom.charge for atom in res.atoms]
+            # If the string charges are equal to the rounded charge to *greater
+            # than the requested precision*, then it is clearly exactly equal.
+            # We go 3 orders of magnitude tighter than the printed precision to
+            # make sure
+            self.assertAlmostEqual(round(oc), sum(float(x) for x in strchgs),
+                                   places=precision+3)
             self.assertAlmostEqual(sum(a.charge for a in res), nc, places=10)
 
     def testAddBondsAtoms(self):
