@@ -338,6 +338,20 @@ class TestResidueTemplateContainer(unittest.TestCase):
 class TestAmberOFFLibrary(unittest.TestCase):
     """ Tests the AmberOFFLibrary class """
 
+    def testFromLibrary(self):
+        """ Tests ResidueTemplateContainer.from_library functionality """
+        offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
+        lib = ResidueTemplateContainer.from_library(offlib)
+        self.assertIsInstance(lib, ResidueTemplateContainer)
+        self.assertEqual(len(lib), len(offlib))
+        for r1, r2 in zip(offlib, lib):
+            r1 = offlib[r1]
+            self.assertIs(r1, r2)
+        lib2 = ResidueTemplateContainer.from_library(offlib, copy=True)
+        for r1, r2 in zip(offlib, lib2):
+            r1 = offlib[r1]
+            self.assertIsNot(r1, r2)
+
     def testReadInternal(self):
         """ Tests reading Amber amino12 OFF library (internal residues) """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))

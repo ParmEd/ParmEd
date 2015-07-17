@@ -3,13 +3,15 @@ This contains the basic residue template and residue building libraries
 typically used in modelling applications
 """
 
-import copy
+from collections import OrderedDict
+import copy as _copy
 try:
     import pandas as pd
 except ImportError:
     pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
+from parmed.utils.six import iteritems
 import numpy as np
 import warnings
 
@@ -168,7 +170,7 @@ class ResidueTemplate(object):
         """
         inst = cls(name=residue.name)
         for atom in residue:
-            inst.add_atom(copy.copy(atom))
+            inst.add_atom(_copy.copy(atom))
         for atom in residue:
             for bond in atom.bonds:
                 try:
@@ -226,7 +228,7 @@ class ResidueTemplate(object):
         other = type(self)(name=self.name)
 
         for atom in self.atoms:
-            other.add_atom(copy.copy(atom))
+            other.add_atom(_copy.copy(atom))
         for bond in self.bonds:
             other.add_bond(bond.atom1.idx, bond.atom2.idx)
         other.type = self.type
@@ -535,8 +537,47 @@ class ResidueTemplateContainer(list):
         residues : dict {str : :class:`ResidueTemplate`}
             The residue library with all residues from this residue collection
         """
-        ret = dict()
+        ret = OrderedDict()
         for res in self:
             if res.name in ret: continue
             ret[res.name] = res
         return ret
+
+    @classmethod
+    def from_library(cls, library, copy=False):
+        """
+        Converts a dictionary of ResidueTemplate items into a
+        ResidueTemplateContainer.
+
+        Parameters
+        ----------
+        library : dict or OrderedDict
+            The library of ResidueTemplate objects to add to this container
+        copy : bool, optional
+            If True, copies of each ResidueTemplate in library is added to the
+            ResidueTemplateContainer. Default is False
+
+        Returns
+        -------
+        cont : ResidueTemplateContainer
+            A ResidueTemplateContainer containing all of the residues defined in
+            ``library``
+
+        Notes
+        -----
+        If the library is ordered, that order is maintained
+
+        Raises
+        ------
+        TypeError if any of the items in the input library is not a
+        ResidueTemplate instance (or an instance of a subclass)
+        """
+        cont = cls()
+        for _, res in iteritems(library):
+            if not isinstance(res, ResidueTemplate):
+                raise ValueError('%r is not a ResidueTemplate instance' % res)
+            if copy:
+                cont.append(_copy.copy(res))
+            else:
+                cont.append(res)
+        return cont
