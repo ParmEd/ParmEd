@@ -283,6 +283,10 @@ class ResidueTemplate(object):
         (no fewer than 3 or 4 decimal places), this will have only a negligible
         impact on a force field.
 
+        If provided, "to" will be rounded to the ``precision``'th decimal place
+        to make sure that the sum of the charges come out as close as possible
+        to the target charge while still obeying the requested precision.
+
         Raises
         ------
         ValueError
@@ -293,6 +297,9 @@ class ResidueTemplate(object):
         net_charge = sum(a.charge for a in self.atoms)
         if to is None:
             to = round(net_charge)
+        else:
+            # We need to make sure
+            to = round(to, precision)
         if net_charge == to:
             return self
 
@@ -454,7 +461,7 @@ class ResidueTemplate(object):
             Mol2File.write(self, fname, mol3=False, **kwargs)
         elif format == 'MOL3':
             Mol2File.write(self, fname, mol3=True, **kwargs)
-        elif format == 'OFFLIB':
+        elif format in ('OFFLIB', 'OFF'):
             AmberOFFLibrary.write({self.name : self}, fname, **kwargs)
         else:
             raise ValueError('Unrecognized format for ResidueTemplate save')
@@ -640,3 +647,68 @@ class ResidueTemplateContainer(list):
             else:
                 cont.append(res)
         return cont
+
+    def save(self, fname, format=None, **kwargs):
+        """
+        Saves the current ResidueTemplateContainer in the requested file format.
+        Supported formats can be specified explicitly or determined by file-name
+        extension. The following formats are supported, with the recognized
+        suffix and ``format`` keyword shown in parentheses:
+
+            - MOL2 (.mol2)
+            - MOL3 (.mol3)
+            - OFF (.lib/.off)
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to save. If ``format`` is ``None`` (see below), the
+            file type will be determined based on the filename extension. If the
+            type cannot be determined, a ValueError is raised.
+        format : str, optional
+            The case-insensitive keyword specifying what type of file ``fname``
+            should be saved as. If ``None`` (default), the file type will be
+            determined from filename extension of ``fname``
+        kwargs : keyword-arguments
+            Remaining arguments are passed on to the file writing routines that
+            are called by this function
+
+        Raises
+        ------
+        ValueError if either filename extension or ``format`` are not recognized
+        TypeError if the structure cannot be converted to the desired format for
+        whatever reason
+
+        Notes
+        -----
+        Mol2 and Mol3 files are saved as concatenated multiple @<MOLECULE>s. By
+        contrast, ``Structure.save`` will save a single @<MOLECULE> mol2 file
+        with multiple residues if the mol2 format is requested.
+        """
+        from parmed.modeller.offlib import AmberOFFLibrary
+        from parmed.formats.mol2 import Mol2File
+        extmap = {
+                '.mol2' : 'MOL2',
+                '.mol3' : 'MOL3',
+                '.off' : 'OFFLIB',
+                '.lib' : 'OFFLIB',
+        }
+        if format is not None:
+            format = format.upper()
+        else:
+            base, ext = os.path.splitext(fname)
+            if ext in ('.bz2', '.gz'):
+                ext = os.path.splitext(base)[1]
+            if ext in extmap:
+                format = extmap[ext]
+            else:
+                raise ValueError('Could not determine file type of %s' % fname)
+        if format == 'MOL2':
+            Mol2File.write(self, fname, mol3=False, split=True, **kwargs)
+        elif format == 'MOL3':
+            Mol2File.write(self, fname, mol3=True, split=True, **kwargs)
+        elif format in ('OFFLIB', 'OFF'):
+            AmberOFFLibrary.write(self.to_library(), fname, **kwargs)
+        else:
+            raise ValueError('Unrecognized format for ResidueTemplate save')
+
