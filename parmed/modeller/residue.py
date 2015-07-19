@@ -3,14 +3,17 @@ This contains the basic residue template and residue building libraries
 typically used in modelling applications
 """
 
-import copy
+from collections import OrderedDict
+import copy as _copy
+import numpy as np
+import os
 try:
     import pandas as pd
 except ImportError:
     pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
-import numpy as np
+from parmed.utils.six import iteritems
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
@@ -84,7 +87,6 @@ class ResidueTemplate(object):
         self.first_patch = None
         self.last_patch = None
         self.groups = []
-        self.cmaps = []
 
     def __repr__(self):
         if self.head is not None:
@@ -169,7 +171,7 @@ class ResidueTemplate(object):
         """
         inst = cls(name=residue.name)
         for atom in residue:
-            inst.add_atom(copy.copy(atom))
+            inst.add_atom(_copy.copy(atom))
         for atom in residue:
             for bond in atom.bonds:
                 try:
@@ -223,6 +225,26 @@ class ResidueTemplate(object):
                     return True
         return False
 
+    def __copy__(self):
+        other = type(self)(name=self.name)
+
+        for atom in self.atoms:
+            other.add_atom(_copy.copy(atom))
+        for bond in self.bonds:
+            other.add_bond(bond.atom1.idx, bond.atom2.idx)
+        other.type = self.type
+
+        if self.head is not None:
+            other.head = other.atoms[self.head.idx]
+        if self.tail is not None:
+            other.tail = other.atoms[self.tail.idx]
+        for connection in self.connections:
+            other.connections.append(other.atoms[connection.idx])
+        other.first_patch = self.first_patch
+        other.last_patch = self.last_patch
+
+        return other
+
     def __getitem__(self, idx):
         if isinstance(idx, str):
             for atom in self.atoms:
@@ -230,6 +252,65 @@ class ResidueTemplate(object):
                     return atom
             raise IndexError('Atom %s not found in %s' % (idx, self.name))
         return self.atoms[idx]
+
+    def fix_charges(self, to=None, precision=4):
+        """
+        Adjusts the partial charge of all atoms in the residue to match the
+        requested target charge. The default target charge is the closest
+        integer
+
+        Parameters
+        ----------
+        to : float, optional
+            The desired net charge of this residue template. Default is the
+            closest integer charge
+        precision : int, optional
+            The number of decimal places that each charge should be rounded to.
+            Default is 4
+
+        Returns
+        -------
+        self : :class:`ResidueTemplate`
+            The current residue template whose charges are being modified
+
+        Notes
+        -----
+        This method modifies the atomic charges of this residue template
+        in-place. Any residual charge (which is accumulated roundoff beyond the
+        requested precision) is added to the first atom of the residue. This
+        will typically be 10^-precision in magnitude, and should almost never be
+        higher than 2*10^-precision. As long as a reasonable precision is chosen
+        (no fewer than 3 or 4 decimal places), this will have only a negligible
+        impact on a force field.
+
+        If provided, "to" will be rounded to the ``precision``'th decimal place
+        to make sure that the sum of the charges come out as close as possible
+        to the target charge while still obeying the requested precision.
+
+        Raises
+        ------
+        ValueError
+            If you try to call fix_charges on a residue template with no atoms
+        """
+        if not self.atoms:
+            raise ValueError('Cannot fix charges on an empty residue')
+        net_charge = sum(a.charge for a in self.atoms)
+        if to is None:
+            to = round(net_charge)
+        else:
+            # We need to make sure
+            to = round(to, precision)
+        if net_charge == to:
+            return self
+
+        smear = (to - net_charge) / len(self)
+        for atom in self:
+            atom.charge = round(atom.charge + smear, precision)
+
+        # Dump the extra tiny bit (O(10^-precision)) on the first atom
+        self.atoms[0].charge += to - sum(atom.charge for atom in self.atoms)
+
+        return self
 
     def to_dataframe(self):
         """ Create a pandas dataframe from the atom information
@@ -327,6 +408,64 @@ class ResidueTemplate(object):
             ret = ret.join(vels)
         return ret
 
+    def save(self, fname, format=None, **kwargs):
+        """
+        Saves the current ResidueTemplate in the requested file format.
+        Supported formats can be specified explicitly or determined by file-name
+        extension. The following formats are supported, with the recognized
+        suffix and ``format`` keyword shown in parentheses:
+
+            - MOL2 (.mol2)
+            - MOL3 (.mol3)
+            - OFF (.lib/.off)
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to save. If ``format`` is ``None`` (see below), the
+            file type will be determined based on the filename extension. If the
+            type cannot be determined, a ValueError is raised.
+        format : str, optional
+            The case-insensitive keyword specifying what type of file ``fname``
+            should be saved as. If ``None`` (default), the file type will be
+            determined from filename extension of ``fname``
+        kwargs : keyword-arguments
+            Remaining arguments are passed on to the file writing routines that
+            are called by this function
+
+        Raises
+        ------
+        ValueError if either filename extension or ``format`` are not recognized
+        TypeError if the structure cannot be converted to the desired format for
+        whatever reason
+        """
+        from parmed.modeller.offlib import AmberOFFLibrary
+        from parmed.formats.mol2 import Mol2File
+        extmap = {
+                '.mol2' : 'MOL2',
+                '.mol3' : 'MOL3',
+                '.off' : 'OFFLIB',
+                '.lib' : 'OFFLIB',
+        }
+        if format is not None:
+            format = format.upper()
+        else:
+            base, ext = os.path.splitext(fname)
+            if ext in ('.bz2', '.gz'):
+                ext = os.path.splitext(base)[1]
+            if ext in extmap:
+                format = extmap[ext]
+            else:
+                raise ValueError('Could not determine file type of %s' % fname)
+        if format == 'MOL2':
+            Mol2File.write(self, fname, mol3=False, **kwargs)
+        elif format == 'MOL3':
+            Mol2File.write(self, fname, mol3=True, **kwargs)
+        elif format in ('OFFLIB', 'OFF'):
+            AmberOFFLibrary.write({self.name : self}, fname, **kwargs)
+        else:
+            raise ValueError('Unrecognized format for ResidueTemplate save')
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PatchTemplate(ResidueTemplate):
@@ -421,6 +560,38 @@ class ResidueTemplateContainer(list):
                 if res.name == value: return res
         return list.__getitem__(self, value)
 
+    def fix_charges(self, precision=4):
+        """
+        Adjusts the net charge of all residues in this ResidueContainer to match
+        the closest integer charge
+
+        Parameters
+        ----------
+        precision : int, optional
+            The number of decimal places that each charge should be rounded to.
+            Default is 4
+
+        Returns
+        -------
+        self : :class:`ResidueTemplateContainer`
+            The current residue template container whose ResidueTemplates are
+            being modified
+
+        Notes
+        -----
+        This method modifies everything in-place.
+
+        Raises
+        ------
+        ValueError
+            If you try to call fix_charges on a container with no templates
+        """
+        if len(self) == 0:
+            raise ValueError('Cannot fix charges on an empty container')
+        for res in self:
+            res.fix_charges(precision=precision)
+        return self
+
     def to_library(self):
         """
         Converts the ResidueTemplateContainer instance to a library of unique
@@ -432,8 +603,112 @@ class ResidueTemplateContainer(list):
         residues : dict {str : :class:`ResidueTemplate`}
             The residue library with all residues from this residue collection
         """
-        ret = dict()
+        ret = OrderedDict()
         for res in self:
             if res.name in ret: continue
             ret[res.name] = res
         return ret
+
+    @classmethod
+    def from_library(cls, library, copy=False):
+        """
+        Converts a dictionary of ResidueTemplate items into a
+        ResidueTemplateContainer.
+
+        Parameters
+        ----------
+        library : dict or OrderedDict
+            The library of ResidueTemplate objects to add to this container
+        copy : bool, optional
+            If True, copies of each ResidueTemplate in library is added to the
+            ResidueTemplateContainer. Default is False
+
+        Returns
+        -------
+        cont : ResidueTemplateContainer
+            A ResidueTemplateContainer containing all of the residues defined in
+            ``library``
+
+        Notes
+        -----
+        If the library is ordered, that order is maintained
+
+        Raises
+        ------
+        TypeError if any of the items in the input library is not a
+        ResidueTemplate instance (or an instance of a subclass)
+        """
+        cont = cls()
+        for _, res in iteritems(library):
+            if not isinstance(res, ResidueTemplate):
+                raise ValueError('%r is not a ResidueTemplate instance' % res)
+            if copy:
+                cont.append(_copy.copy(res))
+            else:
+                cont.append(res)
+        return cont
+
+    def save(self, fname, format=None, **kwargs):
+        """
+        Saves the current ResidueTemplateContainer in the requested file format.
+        Supported formats can be specified explicitly or determined by file-name
+        extension. The following formats are supported, with the recognized
+        suffix and ``format`` keyword shown in parentheses:
+
+            - MOL2 (.mol2)
+            - MOL3 (.mol3)
+            - OFF (.lib/.off)
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to save. If ``format`` is ``None`` (see below), the
+            file type will be determined based on the filename extension. If the
+            type cannot be determined, a ValueError is raised.
+        format : str, optional
+            The case-insensitive keyword specifying what type of file ``fname``
+            should be saved as. If ``None`` (default), the file type will be
+            determined from filename extension of ``fname``
+        kwargs : keyword-arguments
+            Remaining arguments are passed on to the file writing routines that
+            are called by this function
+
+        Raises
+        ------
+        ValueError if either filename extension or ``format`` are not recognized
+        TypeError if the structure cannot be converted to the desired format for
+        whatever reason
+
+        Notes
+        -----
+        Mol2 and Mol3 files are saved as concatenated multiple @<MOLECULE>s. By
+        contrast, ``Structure.save`` will save a single @<MOLECULE> mol2 file
+        with multiple residues if the mol2 format is requested.
+        """
+        from parmed.modeller.offlib import AmberOFFLibrary
+        from parmed.formats.mol2 import Mol2File
+        extmap = {
+                '.mol2' : 'MOL2',
+                '.mol3' : 'MOL3',
+                '.off' : 'OFFLIB',
+                '.lib' : 'OFFLIB',
+        }
+        if format is not None:
+            format = format.upper()
+        else:
+            base, ext = os.path.splitext(fname)
+            if ext in ('.bz2', '.gz'):
+                ext = os.path.splitext(base)[1]
+            if ext in extmap:
+                format = extmap[ext]
+            else:
+                raise ValueError('Could not determine file type of %s' % fname)
+        if format == 'MOL2':
+            Mol2File.write(self, fname, mol3=False, split=True, **kwargs)
+        elif format == 'MOL3':
+            Mol2File.write(self, fname, mol3=True, split=True, **kwargs)
+        elif format in ('OFFLIB', 'OFF'):
+            AmberOFFLibrary.write(self.to_library(), fname, **kwargs)
+        else:
+            raise ValueError('Unrecognized format for ResidueTemplate save')
+

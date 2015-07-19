@@ -10,12 +10,7 @@ from parmed import (Structure, read_PDB, write_PDB, read_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
-try:
-    import cStringIO as StringIO
-    from itertools import izip as zip
-except ImportError:
-    # Must be Python 3
-    import io as StringIO
+from parmed.utils.six.moves import zip, StringIO
 import os
 import unittest
 from utils import get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests
@@ -221,7 +216,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile = read_PDB(self.simple)
         self.assertEqual(len(pdbfile.atoms), 33)
         self.assertEqual(len(pdbfile.residues), 3)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -234,7 +229,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile = read_PDB(self.models)
         self.assertEqual(pdbfile.get_coordinates('all').shape[0], 20)
         self.assertEqual(len(pdbfile.atoms), 451)
-        output = StringIO.StringIO()
+        output = StringIO()
         write_PDB(pdbfile, output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -245,7 +240,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Test PDB file writing from a Xtal structure """
         pdbfile = read_PDB(self.pdb)
         self._check4lzt(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output, renumber=False)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -272,7 +267,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Test PDB file writing with different altloc options """
         pdbfile = read_PDB(self.pdb)
         self._check4lzt(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output, renumber=False, altlocs='all')
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -330,7 +325,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                 self.assertEqual(x/10000, y)
         pdbfile = read_PDB(self.pdb)
         check_aniso(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -566,7 +561,7 @@ class TestChemistryCIFStructure(unittest.TestCase):
 
         # Now check CIF writing without anisotropic B-factors and with
         # renumbering
-        io = StringIO.StringIO()
+        io = StringIO()
         cif.write_cif(io)
         io.seek(0)
         cif3 = read_CIF(io)
@@ -722,6 +717,18 @@ class TestMol2File(unittest.TestCase):
         # bond arrays for every residue
         self.assertEqual(sum([len(x.bonds) for x in cont]), 668)
 
+    def testMultiMol2Entries(self):
+        """ Tests a mol2 file with multiple @<MOLECULE> sections """
+        cont = formats.Mol2File.parse(get_fn('multimol.mol2'))
+        self.assertIsInstance(cont, ResidueTemplateContainer)
+        self.assertEqual(len(cont), 200)
+        for i, res in enumerate(cont):
+            self.assertEqual(res.name, 'ZINC00000016_%d' % (i+1))
+            self.assertEqual(len(res.atoms), 37)
+            self.assertEqual(len(res.bonds), 38)
+            self.assertIs(res.head, None)
+            self.assertIs(res.tail, None)
+
     def testMultiMol2Structure(self):
         """ Tests parsing a multi-residue mol2 into a Structure """
         struct = formats.Mol2File.parse(get_fn('test_multi.mol2'),
@@ -774,8 +781,39 @@ class TestMol2File(unittest.TestCase):
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
         formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
-        self.assertTrue(diff_files(get_fn('test_multi.mol2', written=True),
-                                   get_saved_fn('test_multi.mol2')))
+        formats.Mol2File.write(mol2, get_fn('test_multi_sep.mol2', written=True),
+                               split=True)
+        self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
+                                   get_fn('test_multi.mol2', written=True)))
+        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'),
+                                   get_fn('test_multi_sep.mol2', written=True)))
+        mol22 = formats.Mol2File.parse(get_fn('test_multi_sep.mol2', written=True))
+        self.assertEqual(len(mol2), len(mol22))
+        self.assertEqual([r.name for r in mol2], [r.name for r in mol22])
+        for r1, r2 in zip(mol2, mol22):
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            self.assertEqual(len(r1.atoms), len(r2.atoms))
+            self.assertFalse(r1.head is None and r1.tail is None)
+            self.assertTrue(r2.head is None and r2.tail is None)
+        f = StringIO()
+        formats.Mol2File.write(mol2, f, mol3=True, split=True)
+        f.seek(0)
+        mol3 = formats.Mol2File.parse(f)
+        self.assertEqual(len(mol2), len(mol3))
+        self.assertEqual([r.name for r in mol2], [r.name for r in mol3])
+        for r1, r2 in zip(mol2, mol3):
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            self.assertEqual(len(r1.atoms), len(r2.atoms))
+            self.assertFalse(r1.head is None and r1.tail is None)
+            self.assertFalse(r2.head is None and r2.tail is None)
+            if r1.head is None:
+                self.assertIs(r2.head, None)
+            else:
+                self.assertEqual(r1.head.name, r2.head.name)
+            if r1.tail is None:
+                self.assertIs(r2.tail, None)
+            else:
+                self.assertEqual(r1.tail.name, r2.tail.name)
 
     def testMol2MultiWriteFromStructure(self):
         """ Tests writing mol2 file of multi residues from Structure """
