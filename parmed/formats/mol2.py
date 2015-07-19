@@ -166,6 +166,8 @@ class Mol2File(object):
                             charge = float(words[8])
                         except IndexError:
                             charge = 0
+                    else:
+                        charge = 0
                     if last_residue is None:
                         last_residue = (resid, resname)
                         restemp.name = resname

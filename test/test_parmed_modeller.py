@@ -11,10 +11,11 @@ except ImportError:
     pd = None
 import os
 from parmed import Atom, read_PDB
+from parmed.amber import AmberParm
 from parmed.exceptions import AmberWarning
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
                              PROTEIN, SOLVENT, AmberOFFLibrary)
-from parmed.amber import AmberParm
+from parmed.formats import Mol2File
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
@@ -334,6 +335,218 @@ class TestResidueTemplateContainer(unittest.TestCase):
                       "PHE", "VAL", "ALA", "GLY", "ASH", "TRP", "GLU", "CYX",
                       "PRO", "MET", "TYR", "GLN", "ASN", "ARG", "CALA"])
         self.assertEqual(set(lib.keys()), refset)
+
+class TestResidueTemplateSaver(unittest.TestCase):
+    " Tests the .save method on ResidueTemplate and ResidueTemplateContainer "
+
+    def setUp(self):
+        # Create a ResidueTemplate
+        self.ace = templ = ResidueTemplate('ACE')
+        templ.add_atom(Atom(name='HH31', type='HC'))
+        templ.add_atom(Atom(name='CH3', type='CT'))
+        templ.add_atom(Atom(name='HH32', type='HC'))
+        templ.add_atom(Atom(name='HH33', type='HC'))
+        templ.add_atom(Atom(name='C', type='C'))
+        templ.add_atom(Atom(name='O', type='O'))
+        templ.add_bond(0, 1)
+        templ.add_bond(1, 2)
+        templ.add_bond(1, 3)
+        templ.add_bond(1, 4)
+        templ.add_bond(4, 5)
+        templ.type = PROTEIN
+        templ.tail = templ.atoms[4]
+        for a in templ.atoms:
+            a.xx = random.random() * 10 - 5
+            a.xy = random.random() * 10 - 5
+            a.xz = random.random() * 10 - 5
+
+        self.nme = templ = ResidueTemplate('NME')
+        templ.add_atom(Atom(name='N', type='N'))
+        templ.add_atom(Atom(name='H', type='H'))
+        templ.add_atom(Atom(name='CH3', type='CT'))
+        templ.add_atom(Atom(name='H31', type='H1'))
+        templ.add_atom(Atom(name='H32', type='H1'))
+        templ.add_atom(Atom(name='H33', type='H1'))
+        templ.add_bond(0, 1)
+        templ.add_bond(0, 2)
+        templ.add_bond(2, 3)
+        templ.add_bond(2, 4)
+        templ.add_bond(2, 5)
+        templ.head = templ.atoms[0]
+        for a in templ.atoms:
+            a.xx = random.random() * 10 - 5
+            a.xy = random.random() * 10 - 5
+            a.xz = random.random() * 10 - 5
+
+        self.container = ResidueTemplateContainer()
+        self.container.append(self.ace)
+        self.container.append(self.nme)
+
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
+    def testResidueTemplateMol2Save(self):
+        """ Tests ResidueTemplate.save() method for Mol2 file """
+        # Check saving mol2 files by keyword
+        self.ace.save(get_fn('test', written=True), format='mol2')
+        self.assertTrue(Mol2File.id_format(get_fn('test', written=True)))
+        x = Mol2File.parse(get_fn('test', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=False)
+        self.nme.save(get_fn('test', written=True), format='mol2')
+        self.assertTrue(Mol2File.id_format(get_fn('test', written=True)))
+        x = Mol2File.parse(get_fn('test', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=False)
+        # Check saving mol2 files by filename extension
+        self.ace.save(get_fn('test.mol2', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol2', written=True)))
+        x = Mol2File.parse(get_fn('test.mol2', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=False)
+        self.nme.save(get_fn('test.mol2', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol2', written=True)))
+        x = Mol2File.parse(get_fn('test.mol2', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=False)
+        # Now try zipped
+        self.ace.save(get_fn('test.mol2.gz', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol2.gz', written=True)))
+        x = Mol2File.parse(get_fn('test.mol2.gz', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=False)
+        self.nme.save(get_fn('test.mol2.gz', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol2.gz', written=True)))
+        x = Mol2File.parse(get_fn('test.mol2.gz', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=False)
+        self.ace.save(get_fn('test.mol2.bz2', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol2.bz2', written=True)))
+        x = Mol2File.parse(get_fn('test.mol2.bz2', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=False)
+        self.nme.save(get_fn('test.mol2.bz2', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol2.bz2', written=True)))
+        x = Mol2File.parse(get_fn('test.mol2.bz2', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=False)
+
+    def testResidueTemplateMol3Save(self):
+        """ Tests ResidueTemplate.save() method for Mol3 file """
+        # Check saving mol3 files by keyword
+        self.ace.save(get_fn('test', written=True), format='mol3')
+        self.assertTrue(Mol2File.id_format(get_fn('test', written=True)))
+        x = Mol2File.parse(get_fn('test', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test', written=True), format='mol3')
+        self.assertTrue(Mol2File.id_format(get_fn('test', written=True)))
+        x = Mol2File.parse(get_fn('test', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=True)
+        # Check saving mol3 files by filename extension
+        self.ace.save(get_fn('test.mol3', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol3', written=True)))
+        x = Mol2File.parse(get_fn('test.mol3', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test.mol3', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol3', written=True)))
+        x = Mol2File.parse(get_fn('test.mol3', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=True)
+        # Now try zipped
+        self.ace.save(get_fn('test.mol3.gz', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol3.gz', written=True)))
+        x = Mol2File.parse(get_fn('test.mol3.gz', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test.mol3.gz', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol3.gz', written=True)))
+        x = Mol2File.parse(get_fn('test.mol3.gz', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=True)
+        self.ace.save(get_fn('test.mol3.bz2', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol3.bz2', written=True)))
+        x = Mol2File.parse(get_fn('test.mol3.bz2', written=True))
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test.mol3.bz2', written=True))
+        self.assertTrue(Mol2File.id_format(get_fn('test.mol3.bz2', written=True)))
+        x = Mol2File.parse(get_fn('test.mol3.bz2', written=True))
+        self._check_templates(x, self.nme, preserve_headtail=True)
+
+    def testResidueTemplateOFFSave(self):
+        """ Tests ResidueTemplate.save() method for OFF lib file """
+        # Check saving OFF files by keyword
+        self.ace.save(get_fn('test', written=True), format='offlib')
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test', written=True))['ACE']
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test', written=True), format='offlib')
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test', written=True))['NME']
+        self._check_templates(x, self.nme, preserve_headtail=True)
+        # Check saving OFF files by filename extension
+        self.ace.save(get_fn('test.lib', written=True))
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test.lib', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test.lib', written=True))['ACE']
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test.off', written=True))
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test.off', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test.off', written=True))['NME']
+        self._check_templates(x, self.nme, preserve_headtail=True)
+        # Now try zipped
+        self.ace.save(get_fn('test.lib.gz', written=True))
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test.lib.gz', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test.lib.gz', written=True))['ACE']
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test.off.gz', written=True))
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test.off.gz', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test.off.gz', written=True))['NME']
+        self._check_templates(x, self.nme, preserve_headtail=True)
+        self.ace.save(get_fn('test.lib.bz2', written=True))
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test.lib.bz2', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test.lib.bz2', written=True))['ACE']
+        self._check_templates(x, self.ace, preserve_headtail=True)
+        self.nme.save(get_fn('test.off.bz2', written=True))
+        self.assertTrue(AmberOFFLibrary.id_format(get_fn('test.off.bz2', written=True)))
+        x = AmberOFFLibrary.parse(get_fn('test.off.bz2', written=True))['NME']
+        self._check_templates(x, self.nme, preserve_headtail=True)
+
+    def testResidueTemplateSaveBadFormat(self):
+        """ Tests proper exceptions for bad format types to ResidueTemplate """
+        self.assertRaises(ValueError, lambda:
+                self.ace.save(get_fn('noextension', written=True)))
+        self.assertRaises(ValueError, lambda:
+                self.nme.save(get_fn('bad_extension.txt', written=True)))
+        self.assertRaises(ValueError, lambda:
+                self.nme.save(get_fn('bad_extension.bz2', written=True)))
+        self.assertRaises(ValueError, lambda:
+                self.nme.save(get_fn('test.mol2', written=True), format='SOMETHING'))
+
+    def _check_templates(self, templ1, templ2, preserve_headtail=True):
+        self.assertEqual(len(templ1.atoms), len(templ2.atoms))
+        self.assertEqual(len(templ1.bonds), len(templ2.bonds))
+        if preserve_headtail:
+            if templ1.head is None or templ2.head is None:
+                self.assertIs(templ1.head, None)
+                self.assertIs(templ2.head, None)
+            else:
+                self.assertIsNot(templ1.head, None)
+                self.assertIsNot(templ2.head, None)
+                self.assertEqual(templ1.head.idx, templ2.head.idx)
+            if templ1.tail is None or templ2.tail is None:
+                self.assertIs(templ1.tail, None)
+                self.assertIs(templ2.tail, None)
+            else:
+                self.assertIsNot(templ1.tail, None)
+                self.assertIsNot(templ2.tail, None)
+                self.assertEqual(templ1.tail.idx, templ2.tail.idx)
+        else:
+            self.assertIs(templ1.head, None)
+            self.assertIs(templ1.tail, None)
+        bs1 = set()
+        bs2 = set()
+        for b1, b2 in zip(templ1.bonds, templ2.bonds):
+            bs1.add(tuple(sorted([b1.atom1.idx, b1.atom2.idx])))
+            bs2.add(tuple(sorted([b2.atom1.idx, b2.atom2.idx])))
+        self.assertEqual(bs1, bs2)
 
 class TestAmberOFFLibrary(unittest.TestCase):
     """ Tests the AmberOFFLibrary class """

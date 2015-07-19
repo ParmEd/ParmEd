@@ -5,6 +5,8 @@ typically used in modelling applications
 
 from collections import OrderedDict
 import copy as _copy
+import numpy as np
+import os
 try:
     import pandas as pd
 except ImportError:
@@ -12,7 +14,6 @@ except ImportError:
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 from parmed.utils.six import iteritems
-import numpy as np
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
@@ -399,6 +400,64 @@ class ResidueTemplate(object):
         else:
             ret = ret.join(vels)
         return ret
+
+    def save(self, fname, format=None, **kwargs):
+        """
+        Saves the current ResidueTemplate in the requested file format.
+        Supported formats can be specified explicitly or determined by file-name
+        extension. The following formats are supported, with the recognized
+        suffix and ``format`` keyword shown in parentheses:
+
+            - MOL2 (.mol2)
+            - MOL3 (.mol3)
+            - OFF (.lib/.off)
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to save. If ``format`` is ``None`` (see below), the
+            file type will be determined based on the filename extension. If the
+            type cannot be determined, a ValueError is raised.
+        format : str, optional
+            The case-insensitive keyword specifying what type of file ``fname``
+            should be saved as. If ``None`` (default), the file type will be
+            determined from filename extension of ``fname``
+        kwargs : keyword-arguments
+            Remaining arguments are passed on to the file writing routines that
+            are called by this function
+
+        Raises
+        ------
+        ValueError if either filename extension or ``format`` are not recognized
+        TypeError if the structure cannot be converted to the desired format for
+        whatever reason
+        """
+        from parmed.modeller.offlib import AmberOFFLibrary
+        from parmed.formats.mol2 import Mol2File
+        extmap = {
+                '.mol2' : 'MOL2',
+                '.mol3' : 'MOL3',
+                '.off' : 'OFFLIB',
+                '.lib' : 'OFFLIB',
+        }
+        if format is not None:
+            format = format.upper()
+        else:
+            base, ext = os.path.splitext(fname)
+            if ext in ('.bz2', '.gz'):
+                ext = os.path.splitext(base)[1]
+            if ext in extmap:
+                format = extmap[ext]
+            else:
+                raise ValueError('Could not determine file type of %s' % fname)
+        if format == 'MOL2':
+            Mol2File.write(self, fname, mol3=False, **kwargs)
+        elif format == 'MOL3':
+            Mol2File.write(self, fname, mol3=True, **kwargs)
+        elif format == 'OFFLIB':
+            AmberOFFLibrary.write({self.name : self}, fname, **kwargs)
+        else:
+            raise ValueError('Unrecognized format for ResidueTemplate save')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

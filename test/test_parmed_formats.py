@@ -10,12 +10,7 @@ from parmed import (Structure, read_PDB, write_PDB, read_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
-try:
-    import cStringIO as StringIO
-    from itertools import izip as zip
-except ImportError:
-    # Must be Python 3
-    import io as StringIO
+from parmed.utils.six.moves import zip, StringIO
 import os
 import unittest
 from utils import get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests
@@ -221,7 +216,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile = read_PDB(self.simple)
         self.assertEqual(len(pdbfile.atoms), 33)
         self.assertEqual(len(pdbfile.residues), 3)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -234,7 +229,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile = read_PDB(self.models)
         self.assertEqual(pdbfile.get_coordinates('all').shape[0], 20)
         self.assertEqual(len(pdbfile.atoms), 451)
-        output = StringIO.StringIO()
+        output = StringIO()
         write_PDB(pdbfile, output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -245,7 +240,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Test PDB file writing from a Xtal structure """
         pdbfile = read_PDB(self.pdb)
         self._check4lzt(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output, renumber=False)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -272,7 +267,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Test PDB file writing with different altloc options """
         pdbfile = read_PDB(self.pdb)
         self._check4lzt(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output, renumber=False, altlocs='all')
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -330,7 +325,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                 self.assertEqual(x/10000, y)
         pdbfile = read_PDB(self.pdb)
         check_aniso(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -566,7 +561,7 @@ class TestChemistryCIFStructure(unittest.TestCase):
 
         # Now check CIF writing without anisotropic B-factors and with
         # renumbering
-        io = StringIO.StringIO()
+        io = StringIO()
         cif.write_cif(io)
         io.seek(0)
         cif3 = read_CIF(io)
@@ -800,7 +795,7 @@ class TestMol2File(unittest.TestCase):
             self.assertEqual(len(r1.atoms), len(r2.atoms))
             self.assertFalse(r1.head is None and r1.tail is None)
             self.assertTrue(r2.head is None and r2.tail is None)
-        f = StringIO.StringIO()
+        f = StringIO()
         formats.Mol2File.write(mol2, f, mol3=True, split=True)
         f.seek(0)
         mol3 = formats.Mol2File.parse(f)
