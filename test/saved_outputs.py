@@ -32,7 +32,7 @@ Atom 1               Atom 2               Atom 3               Frc Cnst   Theta 
 """
 
 PRINT_DIHEDRALS = """\
-Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+               Atom 1               Atom 2               Atom 3               Atom 4     Height  Periodic.      Phase  EEL Scale  VDW Scale
         1    N (  N3)        5   CA (  CT)        7   CB (  CT)       10   OG (  OH)     0.1556     3.0000     0.0000     1.2000     2.0000
         1    N (  N3)        5   CA (  CT)       12    C (   C)       13    O (   O)     0.0000     2.0000     0.0000     1.2000     2.0000
         1    N (  N3)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.0000     2.0000     0.0000     1.2000     2.0000
@@ -276,7 +276,7 @@ Atom 1               Atom 2               Atom 3               Frc Cnst   Theta 
 """
 
 PRINT_DIHEDRALSC = """\
-Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+               Atom 1               Atom 2               Atom 3               Atom 4     Height  Periodic.      Phase  EEL Scale  VDW Scale
         1    N ( NH3)        5   CA ( CT1)       11    C (   C)       12    O (   O)     0.0000     1.0000     0.0000     1.0000     1.0000
         1    N ( NH3)        5   CA ( CT1)       11    C (   C)       13    N ( NH1)     0.6000     1.0000     0.0000     1.0000     1.0000
         1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)        8  HB1 (  HA)     0.2000     3.0000     0.0000     1.0000     1.0000
@@ -407,7 +407,7 @@ Atom 1               Atom 2               Atom 3               Frc Cnst   Theta 
 """
 
 PRINT_DIHEDRALSA = """\
-Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+               Atom 1               Atom 2               Atom 3               Atom 4     Height  Periodic.      Phase  EEL Scale  VDW Scale
         4 H31H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
         4 H31H (   H)        1  CH3 (   C)        2    C (   C)        7    N (   N)    -0.0100     3.0000     0.0000        N/A        N/A
         5 H32H (   H)        1  CH3 (   C)        2    C (   C)        3    O (   O)     0.2350     3.0000     0.0000        N/A        N/A
@@ -486,7 +486,7 @@ Atom 1               Atom 2               Atom 3               Frc Cnst   Theta 
 """
 
 PRINT_DIHEDRALS_2MASKS = """\
-Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+               Atom 1               Atom 2               Atom 3               Atom 4     Height  Periodic.      Phase  EEL Scale  VDW Scale
         1    N (  N3)        5   CA (  CT)        7   CB (  CT)       10   OG (  OH)     0.1556     3.0000     0.0000     1.2000     2.0000
         1    N (  N3)        5   CA (  CT)       12    C (   C)       13    O (   O)     0.0000     2.0000     0.0000     1.2000     2.0000
         1    N (  N3)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.0000     2.0000     0.0000     1.2000     2.0000
@@ -495,14 +495,14 @@ Atom 1               Atom 2               Atom 3               Atom 4           
 """
 
 PRINT_DIHEDRALS_3MASKS = """\
-Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+               Atom 1               Atom 2               Atom 3               Atom 4     Height  Periodic.      Phase  EEL Scale  VDW Scale
         4   H3 (   H)        1    N (  N3)        5   CA (  CT)        6   HA (  HP)     0.1556     3.0000     0.0000     1.2000     2.0000
         4   H3 (   H)        1    N (  N3)        5   CA (  CT)        7   CB (  CT)     0.1556     3.0000     0.0000     1.2000     2.0000
         4   H3 (   H)        1    N (  N3)        5   CA (  CT)       12    C (   C)     0.1556     3.0000     0.0000     1.2000     2.0000
 """
 
 PRINT_DIHEDRALS_4MASKS = """\
-Atom 1               Atom 2               Atom 3               Atom 4                Height     Periodic.  Phase      EEL Scale  VDW Scale 
+               Atom 1               Atom 2               Atom 3               Atom 4     Height  Periodic.      Phase  EEL Scale  VDW Scale
         7   CB (  CT)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.0700     2.0000     0.0000     1.2000     2.0000
 M       7   CB (  CT)        5   CA (  CT)       12    C (   C)       14    N (   N)     0.1000     4.0000     0.0000     1.2000     2.0000
 """

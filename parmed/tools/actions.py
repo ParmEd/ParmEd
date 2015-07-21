@@ -1669,7 +1669,7 @@ class printDihedrals(Action):
                     else:
                         scee = scnb = 'N/A'
                 retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %-10s %-10s\n' %
+                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
