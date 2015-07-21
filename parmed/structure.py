@@ -23,6 +23,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division, print_function
 
+from collections import defaultdict
 from copy import copy
 import math
 import numpy as np
@@ -994,12 +995,12 @@ class Structure(object):
         or
 
         atom : :class:`Atom`
-            If only a single atom is selected
-
-        or
-
-        None
-            If no atoms are selected
+            If the selection is a single integer, a tuple of two integers, or a
+            tuple of a string and two integers. This is equivalent to selecting
+            a particular atom, a particular atom from a particular residue, or a
+            particular atom from a particular residue from a particular chain,
+            respectively. All other selections return a Structure instance, even
+            if that selection happens to only select a single atom.
 
         Notes
         -----
@@ -1032,22 +1033,34 @@ class Structure(object):
         elif isinstance(selection, tuple) and len(selection) in (2, 3):
             # This is a selection of chains, and/or residues, and/or atoms
             if len(selection) == 2:
-                # Select just residues and atoms
+                # Select just residues and atoms. Special-case a single-atom
+                # selection for speed -- orders of magnitude improvement in
+                # efficiency
                 ressel, atomsel = selection
+                if (isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    return self.residues[ressel][atomsel]
                 has_chain = False
             elif len(selection) == 3:
                 chainsel, ressel, atomsel = selection
-                chainmap = dict() # First residue in each chain
+                chainmap = defaultdict(TrackedList)
                 for r in self.residues:
-                    if r.chain not in chainmap:
-                        chainmap[r.chain] = r.idx
+                    chainmap[r.chain].append(r)
+                if (isinstance(chainsel, string_types) and
+                        isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    # Special-case single-atom selection for efficiency
+                    try:
+                        return chainmap[chainsel][ressel][atomsel]
+                    except KeyError:
+                        raise IndexError('No chain %s in Structure' % chainsel)
                 if isinstance(chainsel, string_types):
                     if chainsel in chainmap:
                         chainset = set([chainsel])
                     else:
                         # The selected chain is not in the system. Cannot
                         # possibly select *any* atoms. Bail now for speed
-                        return None
+                        return type(self)()
                 elif isinstance(chainsel, slice):
                     # Build an ordered set of chains
                     chains = [self.residues[0].chain]
@@ -1062,7 +1075,7 @@ class Structure(object):
                         break
                 else:
                     # No requested chain is present. Bail now for speed
-                    return None
+                    return type(self)()
                 has_chain = True
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
@@ -1080,13 +1093,26 @@ class Structure(object):
             else:
                 atomset = set(atomsel)
             if has_chain:
-                selection = [
-                        (a.residue.chain in chainset) and
-                        (a.residue.name in resset or
-                         a.residue.idx-chainmap[a.residue.chain] in resset) and
-                        (a.name in atomset or a.idx-a.residue[0].idx in atomset)
+                try:
+                    # To allow us to index the atoms residues from their list of
+                    # chains, temporarily have the chainmap lists claim the
+                    # residues. This must be reversed or the Structure will be
+                    # broken
+                    for chain_name, chain in iteritems(chainmap):
+                        chain.claim()
+                    selection = [
+                            (a.residue.chain in chainset) and
+                            (a.residue.name in resset or
+                                a.residue.idx in resset) and
+                            (a.name in atomset or
+                                a.idx-a.residue[0].idx in atomset)
+
                             for a in self.atoms
-                ]
+                    ]
+                finally:
+                    # Make sure that the residues list *always* reclaims its
+                    # contents
+                    self.residues.claim()
             else:
                 selection = [
                     (a.name in atomset or a.idx-a.residue[0].idx in atomset)
@@ -1116,10 +1142,7 @@ class Structure(object):
         sumsel = sum(selection)
         if sumsel == 0:
             # No atoms selected. Return None
-            return None
-        if sumsel == 1:
-            # 1 atom selected; return that atom
-            return self.atoms[selection.index(1)]
+            return type(self)()
         # The cumulative sum of selection will give our index + 1 of each
         # selected atom into the new structure
         scan = [selection[0]]
@@ -3375,6 +3398,32 @@ class Structure(object):
                     (-1, len(self.atoms), 3))
             self._coordinates = coords
         return self
+
+    #===================================================
+
+    # For the bool-ness of Structure. An empty structure evaluates to
+    # boolean-false, but this means that the structure must have no atoms,
+    # residues, topological features, or parameter types at all.
+
+    def __bool__(self):
+        return bool(self.atoms or self.residues or self.bonds or self.angles or
+                    self.dihedrals or self.impropers or self.rb_torsions or
+                    self.cmaps or self.torsion_torsions or self.stretch_bends or
+                    self.out_of_plane_bends or self.trigonal_angles or
+                    self.torsion_torsions or self.pi_torsions or
+                    self.urey_bradleys or self.chiral_frames or
+                    self.multipole_frames or self.adjusts or self.acceptors or
+                    self.donors or self.groups or self.bond_types or
+                    self.angle_types or self.dihedral_types or
+                    self.urey_bradley_types or self.improper_types or
+                    self.rb_torsion_types or self.cmap_types or
+                    self.trigonal_angle_types or self.out_of_plane_bend_types or
+                    self.pi_torsion_types or self.torsion_torsion_types or
+                    self.adjust_types)
+
+    def __nonzero__(self):
+        # For Python 2
+        return self.__bool__()
 
     #===================================================
 
