@@ -49,6 +49,11 @@ class TestStructureAPI(unittest.TestCase):
             self.assertEqual(residue.atoms[-1].idx - residue.atoms[0].idx + 1,
                              len(residue))
 
+    def testBool(self):
+        """ Tests bool-ness of Structure """
+        self.assertTrue(bool(self.s))
+        self.assertFalse(bool(structure.Structure()))
+
     def testAddAtomToResidue(self):
         """ Tests the Structure.add_atom_to_residue method """
         s = self.s

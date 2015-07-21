@@ -1143,9 +1143,6 @@ class Structure(object):
         if sumsel == 0:
             # No atoms selected. Return None
             return None
-        if sumsel == 1:
-            # 1 atom selected; return that atom
-            return self.atoms[selection.index(1)]
         # The cumulative sum of selection will give our index + 1 of each
         # selected atom into the new structure
         scan = [selection[0]]
@@ -3401,6 +3398,32 @@ class Structure(object):
                     (-1, len(self.atoms), 3))
             self._coordinates = coords
         return self
+
+    #===================================================
+
+    # For the bool-ness of Structure. An empty structure evaluates to
+    # boolean-false, but this means that the structure must have no atoms,
+    # residues, topological features, or parameter types at all.
+
+    def __bool__(self):
+        return bool(self.atoms or self.residues or self.bonds or self.angles or
+                    self.dihedrals or self.impropers or self.rb_torsions or
+                    self.cmaps or self.torsion_torsions or self.stretch_bends or
+                    self.out_of_plane_bends or self.trigonal_angles or
+                    self.torsion_torsions or self.pi_torsions or
+                    self.urey_bradleys or self.chiral_frames or
+                    self.multipole_frames or self.adjusts or self.acceptors or
+                    self.donors or self.groups or self.bond_types or
+                    self.angle_types or self.dihedral_types or
+                    self.urey_bradley_types or self.improper_types or
+                    self.rb_torsion_types or self.cmap_types or
+                    self.trigonal_angle_types or self.out_of_plane_bend_types or
+                    self.pi_torsion_types or self.torsion_torsion_types or
+                    self.adjust_types)
+
+    def __nonzero__(self):
+        # For Python 2
+        return self.__bool__()
 
     #===================================================
 
