@@ -71,3 +71,51 @@ class TestGenopen(FileIOTestCase):
         url = 'https://github.com/ParmEd/ParmEd/raw/master/test/files/4lzt.pdb.gz'
         with closing(genopen(url, 'r')) as f:
             self.assertEqual(f.read(), genopen(get_fn('4lzt.pdb.gz')).read())
+
+    def testAppendNormal(self):
+        """ Tests genopen appending a normal text file """
+        with closing(genopen(get_fn('test.txt', written=True), 'w')) as f:
+            f.write(ALPHABET)
+        with closing(genopen(get_fn('test.txt', written=True), 'a')) as f:
+            f.write(ALPHABET)
+        self.assertEqual(open(get_fn('test.txt', written=True)).read(),
+                         ALPHABET*2)
+
+    def testAppendGzip(self):
+        """ Tests genopen appending a gzipped file """
+        with closing(genopen(get_fn('test.txt.gz', written=True), 'w')) as f:
+            f.write(ALPHABET)
+        with closing(genopen(get_fn('test.txt.gz', written=True), 'a')) as f:
+            f.write(ALPHABET)
+        text = gzip.open(get_fn('test.txt.gz', written=True)).read()
+        self.assertEqual(text.decode('ascii'), ALPHABET*2)
+
+    def testAppendBzip(self):
+        """ Tests genopen appending a bzipped file """
+        with closing(genopen(get_fn('test.txt.bz2', written=True), 'w')) as f:
+            f.write(ALPHABET)
+        with closing(genopen(get_fn('test.txt.bz2', written=True), 'a')) as f:
+            f.write(ALPHABET)
+        text = bz2.BZ2File(get_fn('test.txt.bz2', written=True)).read()
+        self.assertEqual(text.decode('ascii'), ALPHABET*2)
+
+    def testAppendRemoteFile(self):
+        """ Tests that genopen appending a remote file fails """
+        url = 'http://q4md-forcefieldtools.org/REDDB/projects/W-73/tripos1.mol2'
+        self.assertRaises(ValueError, lambda: genopen(url, 'a'))
+        try:
+            genopen(url, 'a')
+            self.assertTrue(False)
+        except ValueError as e:
+            self.assertEqual(str(e), 'Cannot write or append a webpage')
+
+    def testWriteRemoteFile(self):
+        """ Tests that genopen writing a remote file fails """
+        url = 'http://q4md-forcefieldtools.org/REDDB/projects/W-73/tripos1.mol2'
+        self.assertRaises(ValueError, lambda: genopen(url, 'w'))
+        try:
+            genopen(url, 'w')
+            self.assertTrue(False)
+        except ValueError as e:
+            self.assertEqual(str(e), 'Cannot write or append a webpage')
+
