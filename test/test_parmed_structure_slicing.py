@@ -47,6 +47,29 @@ class TestStructureSlicing(unittest.TestCase):
                 for j, atom in enumerate(res):
                     self.assertIs(atom, pdb2[chain_name, i, j])
 
+    def testSingleAtomSlice(self):
+        """ Test that non-trivial, single-atom selections give a Structure """
+        sel1 = parm['@1']
+        sel2 = parm[:1]
+        self.assertIsInstance(sel1, pmd.Structure)
+        self.assertIsInstance(sel2, pmd.Structure)
+        self.assertEqual(len(sel1.atoms), 1)
+        self.assertEqual(len(sel2.atoms), 1)
+
+    def testEmptyStructure(self):
+        sel1 = parm[10000000:]
+        sel2 = pdb1['@NOTHING']
+        sel3 = pdb2['G',:,:]
+        sel4 = parm['NOTHING',:]
+        self.assertFalse(sel1)
+        self.assertFalse(sel2)
+        self.assertFalse(sel3)
+        self.assertFalse(sel4)
+        self.assertIsInstance(sel1, pmd.amber.AmberParm)
+        self.assertIsInstance(sel2, pmd.Structure)
+        self.assertIsInstance(sel3, pmd.Structure)
+        self.assertIsInstance(sel4, pmd.amber.AmberParm)
+
     def testSimpleSlice(self):
         """ Tests simple atom slicing """
         sl11 = parm[:10]

@@ -1060,7 +1060,7 @@ class Structure(object):
                     else:
                         # The selected chain is not in the system. Cannot
                         # possibly select *any* atoms. Bail now for speed
-                        return None
+                        return type(self)()
                 elif isinstance(chainsel, slice):
                     # Build an ordered set of chains
                     chains = [self.residues[0].chain]
@@ -1075,7 +1075,7 @@ class Structure(object):
                         break
                 else:
                     # No requested chain is present. Bail now for speed
-                    return None
+                    return type(self)()
                 has_chain = True
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
@@ -1142,7 +1142,7 @@ class Structure(object):
         sumsel = sum(selection)
         if sumsel == 0:
             # No atoms selected. Return None
-            return None
+            return type(self)()
         # The cumulative sum of selection will give our index + 1 of each
         # selected atom into the new structure
         scan = [selection[0]]
