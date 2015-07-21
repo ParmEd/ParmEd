@@ -1,15 +1,17 @@
 """
 Tests the fancy indexing and slicing capabilities of Structure
 """
-import utils
-import parmed as chem
+from collections import defaultdict
+import parmed as pmd
+from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
+import utils
 
-parm = chem.load_file(utils.get_fn('trx.prmtop'))
-pdb1 = chem.load_file(utils.get_fn('4lzt.pdb'))
-pdb2 = chem.load_file(utils.get_fn('1kip.cif'))
+parm = pmd.load_file(utils.get_fn('trx.prmtop'))
+pdb1 = pmd.load_file(utils.get_fn('4lzt.pdb'))
+pdb2 = pmd.load_file(utils.get_fn('1kip.cif'))
 
 class TestStructureSlicing(unittest.TestCase):
     """ Tests the fancy slicing/indexing of Structure """
@@ -22,6 +24,28 @@ class TestStructureSlicing(unittest.TestCase):
             self.assertIs(atom, pdb1[i])
         for i, atom in enumerate(pdb2.atoms):
             self.assertIs(atom, pdb2[i])
+
+    def testTwoIntIndex(self):
+        """ Tests simple Structure indexing w/ residue and atom (int, int) """
+        for i, res in enumerate(parm.residues):
+            for j, atom in enumerate(res):
+                self.assertIs(res[j], parm[i,j])
+        for i, res in enumerate(pdb1.residues):
+            for j, atom in enumerate(res):
+                self.assertIs(res[j], pdb1[i,j])
+        for i, res in enumerate(pdb2.residues):
+            for j, atom in enumerate(res):
+                self.assertIs(res[j], pdb2[i,j])
+
+    def testThreeSimpleIndex(self):
+        """ Tests simple indexing with chain, residue, and atom ID """
+        chains = defaultdict(pmd.TrackedList)
+        for res in pdb2.residues:
+            chains[res.chain].append(res)
+        for chain_name, chain in iteritems(chains):
+            for i, res in enumerate(chain):
+                for j, atom in enumerate(res):
+                    self.assertIs(atom, pdb2[chain_name, i, j])
 
     def testSimpleSlice(self):
         """ Tests simple atom slicing """
@@ -46,15 +70,15 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertEqual(len(sl33.atoms), 19)
 
         # Check that the resulting types of the slices are correct
-        self.assertIsInstance(sl11, chem.amber.AmberParm)
-        self.assertIsInstance(sl21, chem.Structure)
-        self.assertIsInstance(sl31, chem.Structure)
-        self.assertIsInstance(sl12, chem.amber.AmberParm)
-        self.assertIsInstance(sl22, chem.Structure)
-        self.assertIsInstance(sl32, chem.Structure)
-        self.assertIsInstance(sl13, chem.amber.AmberParm)
-        self.assertIsInstance(sl23, chem.Structure)
-        self.assertIsInstance(sl33, chem.Structure)
+        self.assertIsInstance(sl11, pmd.amber.AmberParm)
+        self.assertIsInstance(sl21, pmd.Structure)
+        self.assertIsInstance(sl31, pmd.Structure)
+        self.assertIsInstance(sl12, pmd.amber.AmberParm)
+        self.assertIsInstance(sl22, pmd.Structure)
+        self.assertIsInstance(sl32, pmd.Structure)
+        self.assertIsInstance(sl13, pmd.amber.AmberParm)
+        self.assertIsInstance(sl23, pmd.Structure)
+        self.assertIsInstance(sl33, pmd.Structure)
 
         # Check that the atoms sliced out are correct
         for atom in sl11.atoms:

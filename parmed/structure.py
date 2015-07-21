@@ -23,6 +23,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division, print_function
 
+from collections import defaultdict
 from copy import copy
 import math
 import numpy as np
@@ -994,12 +995,12 @@ class Structure(object):
         or
 
         atom : :class:`Atom`
-            If only a single atom is selected
-
-        or
-
-        None
-            If no atoms are selected
+            If the selection is a single integer, a tuple of two integers, or a
+            tuple of a string and two integers. This is equivalent to selecting
+            a particular atom, a particular atom from a particular residue, or a
+            particular atom from a particular residue from a particular chain,
+            respectively. All other selections return a Structure instance, even
+            if that selection happens to only select a single atom.
 
         Notes
         -----
@@ -1032,15 +1033,27 @@ class Structure(object):
         elif isinstance(selection, tuple) and len(selection) in (2, 3):
             # This is a selection of chains, and/or residues, and/or atoms
             if len(selection) == 2:
-                # Select just residues and atoms
+                # Select just residues and atoms. Special-case a single-atom
+                # selection for speed -- orders of magnitude improvement in
+                # efficiency
                 ressel, atomsel = selection
+                if (isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    return self.residues[ressel][atomsel]
                 has_chain = False
             elif len(selection) == 3:
                 chainsel, ressel, atomsel = selection
-                chainmap = dict() # First residue in each chain
+                chainmap = defaultdict(TrackedList)
                 for r in self.residues:
-                    if r.chain not in chainmap:
-                        chainmap[r.chain] = r.idx
+                    chainmap[r.chain].append(r)
+                if (isinstance(chainsel, string_types) and
+                        isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    # Special-case single-atom selection for efficiency
+                    try:
+                        return chainmap[chainsel][ressel][atomsel]
+                    except KeyError:
+                        raise IndexError('No chain %s in Structure' % chainsel)
                 if isinstance(chainsel, string_types):
                     if chainsel in chainmap:
                         chainset = set([chainsel])
@@ -1080,13 +1093,26 @@ class Structure(object):
             else:
                 atomset = set(atomsel)
             if has_chain:
-                selection = [
-                        (a.residue.chain in chainset) and
-                        (a.residue.name in resset or
-                         a.residue.idx-chainmap[a.residue.chain] in resset) and
-                        (a.name in atomset or a.idx-a.residue[0].idx in atomset)
+                try:
+                    # To allow us to index the atoms residues from their list of
+                    # chains, temporarily have the chainmap lists claim the
+                    # residues. This must be reversed or the Structure will be
+                    # broken
+                    for chain_name, chain in iteritems(chainmap):
+                        chain.claim()
+                    selection = [
+                            (a.residue.chain in chainset) and
+                            (a.residue.name in resset or
+                                a.residue.idx in resset) and
+                            (a.name in atomset or
+                                a.idx-a.residue[0].idx in atomset)
+
                             for a in self.atoms
-                ]
+                    ]
+                finally:
+                    # Make sure that the residues list *always* reclaims its
+                    # contents
+                    self.residues.claim()
             else:
                 selection = [
                     (a.name in atomset or a.idx-a.residue[0].idx in atomset)
