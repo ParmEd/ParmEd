@@ -2,7 +2,7 @@
 Tests the functionality in the parmed.amber package
 """
 from __future__ import print_function, division
-from utils import get_fn, has_numpy
+from utils import get_fn, has_numpy, FileIOTestCase
 import numpy as np
 from parmed.amber import readparm, asciicrd, mask
 from parmed import topologyobjects, load_file
@@ -387,22 +387,8 @@ class TestAmberMask(unittest.TestCase):
             for atom in res.atoms:
                 self.assertEqual(sel[atom.idx], within)
 
-class TestWriteFiles(unittest.TestCase):
+class TestWriteFiles(FileIOTestCase):
     
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
     def testWriteAmberParm(self):
         """ Test writing an AmberParm file """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))

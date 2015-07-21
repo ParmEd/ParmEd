@@ -336,11 +336,12 @@ class TestResidueTemplateContainer(unittest.TestCase):
                       "PRO", "MET", "TYR", "GLN", "ASN", "ARG", "CALA"])
         self.assertEqual(set(lib.keys()), refset)
 
-class TestResidueTemplateSaver(unittest.TestCase):
+class TestResidueTemplateSaver(utils.FileIOTestCase):
     " Tests the .save method on ResidueTemplate and ResidueTemplateContainer "
 
     def setUp(self):
         # Create a ResidueTemplate
+        utils.FileIOTestCase.setUp(self)
         self.ace = templ = ResidueTemplate('ACE')
         templ.add_atom(Atom(name='HH31', type='HC'))
         templ.add_atom(Atom(name='CH3', type='CT'))
@@ -381,19 +382,6 @@ class TestResidueTemplateSaver(unittest.TestCase):
         self.container = ResidueTemplateContainer()
         self.container.append(self.ace)
         self.container.append(self.nme)
-
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
 
     def testResidueTemplateMol2Save(self):
         """ Tests ResidueTemplate.save() method for Mol2 file """
@@ -916,26 +904,18 @@ class TestAmberOFFLibrary(unittest.TestCase):
                 self.assertEqual(b1.atom1.name, b2.atom1.name)
                 self.assertEqual(b1.atom2.name, b2.atom2.name)
 
-class TestAmberOFFLeapCompatibility(unittest.TestCase):
+class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
     """ Tests the AmberOFFLibrary classes written in LEaP """
 
     def setUp(self):
         self.tleap = utils.which('tleap')
         self.cwd = os.getcwd()
-        try:
-            os.mkdir(get_fn('writes'))
-        except OSError:
-            pass
+        utils.FileIOTestCase.setUp(self)
         os.chdir(get_fn('writes'))
 
     def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
         os.chdir(self.cwd)
+        utils.FileIOTestCase.tearDown()
 
     @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoInternal(self):

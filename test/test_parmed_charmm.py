@@ -475,22 +475,8 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
 
-class TestFileWriting(unittest.TestCase):
+class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
-
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
 
     def testWriteCharmm(self):
         """ Test writing CHARMM-style PSF files """

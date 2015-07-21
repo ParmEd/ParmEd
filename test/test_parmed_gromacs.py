@@ -9,27 +9,16 @@ from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-from utils import get_fn, diff_files, get_saved_fn
+from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
 import warnings
 
 @unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
-class TestGromacsTop(unittest.TestCase):
+class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 
     def setUp(self):
         warnings.filterwarnings('error', category=GromacsWarning)
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        FileIOTestCase.setUp(self)
 
     def _charmm27_checks(self, top):
         # Check that the number of terms are correct
@@ -239,22 +228,8 @@ class TestGromacsTop(unittest.TestCase):
         self.assertEqual(parm.combining_rule, 'geometric')
         self.assertEqual(parm.defaults.comb_rule, 3)
 
-class TestGromacsGro(unittest.TestCase):
+class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
-
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
 
     def testReadGroFile(self):
         """ Tests reading GRO file """
