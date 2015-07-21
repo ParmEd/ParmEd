@@ -59,3 +59,15 @@ class TestGenopen(FileIOTestCase):
         url = 'http://q4md-forcefieldtools.org/REDDB/projects/W-73/tripos1.mol2'
         with closing(genopen(url, 'r')) as f:
             self.assertEqual(f.read(), open(get_fn('tripos1.mol2')).read())
+
+    def testReadBzippedURL(self):
+        """ Tests genopen reading a bzipped remote file """
+        url = 'https://github.com/ParmEd/ParmEd/raw/master/test/files/4lzt.pdb.bz2'
+        with closing(genopen(url, 'r')) as f:
+            self.assertEqual(f.read(), genopen(get_fn('4lzt.pdb.bz2')).read())
+
+    def testReadGzippedURL(self):
+        """ Tests genopen reading a gzipped remote file """
+        url = 'https://github.com/ParmEd/ParmEd/raw/master/test/files/4lzt.pdb.gz'
+        with closing(genopen(url, 'r')) as f:
+            self.assertEqual(f.read(), genopen(get_fn('4lzt.pdb.gz')).read())
