@@ -2,6 +2,7 @@
 This module contains all of the exceptions that are used in the chemistry
 package
 """
+import warnings
 
 # Hard errors
 
@@ -73,6 +74,9 @@ class InputError(ParmedError):
 
 class ParmedWarning(Warning):
     """ Base class for all warnings raised by ParmEd """
+
+# Make sure that all warnings are always printed
+warnings.filterwarnings('always', category=ParmedWarning)
 
 class PDBWarning(ParmedWarning):
     """ A non-fatal error to indicate a problematic PDB file """
