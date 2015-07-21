@@ -1631,7 +1631,7 @@ class printDihedrals(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%-20s %-20s %-20s %-20s  %-10s %-10s %-10s %-10s %-10s\n' % (
+        retstr = ['%21s  %19s  %19s  %19s %10s %10s %10s %10s %10s\n' % (
                 'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
                 'Phase', 'EEL Scale', 'VDW Scale')]
         # Loop through all of the bonds without and inc hydrogen
@@ -1669,7 +1669,7 @@ class printDihedrals(Action):
                     else:
                         scee = scnb = 'N/A'
                 retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %-10s %-10s\n' %
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
