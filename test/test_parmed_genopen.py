@@ -74,7 +74,7 @@ class TestGenopen(FileIOTestCase):
 
     def testAppendNormal(self):
         """ Tests genopen appending a normal text file """
-        with closing(genopen(get_fn('test.txt', written=True), 'w')) as f:
+        with closing(genopen(get_fn('test.txt', written=True), 'a')) as f:
             f.write(ALPHABET)
         with closing(genopen(get_fn('test.txt', written=True), 'a')) as f:
             f.write(ALPHABET)
@@ -83,7 +83,7 @@ class TestGenopen(FileIOTestCase):
 
     def testAppendGzip(self):
         """ Tests genopen appending a gzipped file """
-        with closing(genopen(get_fn('test.txt.gz', written=True), 'w')) as f:
+        with closing(genopen(get_fn('test.txt.gz', written=True), 'a')) as f:
             f.write(ALPHABET)
         with closing(genopen(get_fn('test.txt.gz', written=True), 'a')) as f:
             f.write(ALPHABET)
@@ -92,7 +92,7 @@ class TestGenopen(FileIOTestCase):
 
     def testAppendBzip(self):
         """ Tests genopen appending a bzipped file """
-        with closing(genopen(get_fn('test.txt.bz2', written=True), 'w')) as f:
+        with closing(genopen(get_fn('test.txt.bz2', written=True), 'a')) as f:
             f.write(ALPHABET)
         with closing(genopen(get_fn('test.txt.bz2', written=True), 'a')) as f:
             f.write(ALPHABET)
