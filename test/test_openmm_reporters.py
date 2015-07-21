@@ -27,18 +27,7 @@ amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
-class TestStateDataReporter(unittest.TestCase):
-
-    def setUp(self):
-        if not os.path.isdir(get_fn('writes')):
-            os.makedirs(get_fn('writes'))
-        else:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-
-    def tearDown(self):
-        for f in os.listdir(get_fn('writes')):
-            os.unlink(get_fn(f, written=True))
+class TestStateDataReporter(utils.FileIOTestCase):
 
     def testStateDataReporter(self):
         """ Test StateDataReporter with various options """
@@ -169,15 +158,7 @@ class TestStateDataReporter(unittest.TestCase):
         self.assertTrue('Temperature' in text)
 
 @unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
-class TestTrajRestartReporter(unittest.TestCase):
-
-    def setUp(self):
-        if not os.path.isdir(get_fn('writes')):
-            os.makedirs(get_fn('writes'))
-
-    def tearDown(self):
-        for f in os.listdir(get_fn('writes')):
-            os.unlink(get_fn(f, written=True))
+class TestTrajRestartReporter(utils.FileIOTestCase):
 
     def testReporters(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (no PBC) """

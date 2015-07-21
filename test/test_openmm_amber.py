@@ -73,21 +73,7 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
         energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
 
-class TestAmberParm(utils.TestCaseRelative):
-
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
 
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """

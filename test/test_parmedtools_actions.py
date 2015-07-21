@@ -247,23 +247,9 @@ class TestNonParmActions(unittest.TestCase):
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
-class TestAmberParmActions(utils.TestCaseRelative):
+class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
     
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
     def _empty_writes(self):
         """ Empty the "writes" directory """
         try:

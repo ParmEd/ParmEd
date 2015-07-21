@@ -13,7 +13,8 @@ from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, StringIO
 import os
 import unittest
-from utils import get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests
+from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
+                   FileIOTestCase)
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -133,7 +134,7 @@ class TestFileLoader(unittest.TestCase):
                 formats.load_file(get_fn('../test_parmed_formats.py')))
         self.assertRaises(IOError, lambda: formats.load_file('no_file'))
 
-class TestChemistryPDBStructure(unittest.TestCase):
+class TestChemistryPDBStructure(FileIOTestCase):
     
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
@@ -144,18 +145,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self.simple = get_fn('ala_ala_ala.pdb')
         self.format_test = get_fn('SCM_A.pdb')
         self.overflow2 = get_fn('overflow.pdb')
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        FileIOTestCase.setUp(self)
 
     def testAscii(self):
         """ Test PDB file parsing """
@@ -502,24 +492,13 @@ class TestChemistryPDBStructure(unittest.TestCase):
             else:
                 self.assertFalse(residue.ter)
 
-class TestChemistryCIFStructure(unittest.TestCase):
+class TestChemistryCIFStructure(FileIOTestCase):
 
     def setUp(self):
         self.lztpdb = get_fn('4lzt.pdb')
         self.lzt = get_fn('4LZT.cif')
         self.largecif = get_fn('1ffk.cif')
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass # Already exists
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        FileIOTestCase.setUp(self)
 
     def testWriteCIF(self):
         """ Test CIF writing capabilities """
@@ -656,22 +635,8 @@ class TestChemistryCIFStructure(unittest.TestCase):
         self.assertEqual(cif.doi, '10.1107/S0907444997013656')
         self.assertEqual(cif.pmid, '9761848')
 
-class TestMol2File(unittest.TestCase):
+class TestMol2File(FileIOTestCase):
     """ Tests the correct parsing and processing of mol2 files """
-
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
 
     def testMultiMol2(self):
         """ Tests the parsing of a mol2 file with multiple residues """

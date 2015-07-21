@@ -1495,8 +1495,8 @@ class printBonds(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%-20s %-20s %-10s %-10s\n' % (
-                                    'Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')]
+        retstr = ['%19s %19s %10s %10s\n' %
+                        ('Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')]
         # Loop through all of the bonds without and inc hydrogen
         atomsel = set(self.mask.Selected())
         atomsel2 = set(self.mask2.Selected())
@@ -1547,8 +1547,8 @@ class printAngles(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%-20s %-20s %-20s %-10s %-10s\n' % (
-                        'Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')]
+        retstr = ['%19s  %19s  %19s %10s %10s\n' %
+                        ('Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')]
         if self.one_arg:
             atomsel = self.mask.Selection()
             for angle in self.parm.angles:
@@ -1631,7 +1631,7 @@ class printDihedrals(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%-20s %-20s %-20s %-20s  %-10s %-10s %-10s %-10s %-10s\n' % (
+        retstr = ['%21s  %19s  %19s  %19s %10s %10s %10s %10s %10s\n' % (
                 'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
                 'Phase', 'EEL Scale', 'VDW Scale')]
         # Loop through all of the bonds without and inc hydrogen

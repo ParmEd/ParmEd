@@ -13,7 +13,7 @@ except ImportError:
     from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from parmed import load_file, ExtraPoint, openmm, gromacs
+from parmed import load_file, ExtraPoint, openmm
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.openmm.utils import energy_decomposition
 from parmed.exceptions import GromacsWarning, ParmedError, OpenMMWarning
@@ -33,8 +33,6 @@ get_fn = utils.get_fn
 #   2 - CutoffPeriodic
 #   3 - Ewald
 #   4 - PME
-
-gromacs.GROMACS_TOPDIR = get_fn('top')
 
 def get_forces_from_xvg(frcfile):
     with open(frcfile, 'r') as f:
@@ -69,14 +67,13 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testTiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('01.1water'), 'topol.top'),
-                        xyz=os.path.join(get_fn('01.1water'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('01.1water'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('01.1water'), 'conf.gro'))
 
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem(constraints=app.HBonds, rigidWater=True)
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Make sure they match Lee-Ping's answers (both energies and forces)
@@ -91,15 +88,14 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testVerySmall(self):
         """ Test very small Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('02.6water'), 'topol.top'),
-                        xyz=os.path.join(get_fn('02.6water'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('02.6water'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('02.6water'), 'conf.gro'))
 
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem(constraints=app.HBonds, rigidWater=True,
                                   flexibleConstraints=True)
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
@@ -116,14 +112,12 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testSmallPeptide(self):
         """ Test alanine dipeptide Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('04.Ala'), 'topol.top'),
-                        xyz=os.path.join(get_fn('04.Ala'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
-
+        top = load_file(os.path.join(get_fn('04.Ala'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('04.Ala'), 'conf.gro'))
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem()
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
@@ -142,14 +136,12 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testSmallDoublePeptide(self):
         """ Test interacting peptides Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
-                        xyz=os.path.join(get_fn('03.AlaGlu'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
-
+        top = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('03.AlaGlu'), 'conf.gro'))
         # create the system and context, then calculate the energy decomposition
         system = top.createSystem()
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
@@ -169,14 +161,13 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testJAC(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (no PBC) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'topol.top'),
-                        xyz=os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'conf.gro'))
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem()
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
@@ -197,9 +188,9 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testJACPME(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (PME) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('09.DHFR-PME'), 'topol.top'),
-                        xyz=os.path.join(get_fn('09.DHFR-PME'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('09.DHFR-PME'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('09.DHFR-PME'), 'conf.gro'))
+        top.box = gro.box[:]
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem(nonbondedMethod=app.PME,
@@ -207,7 +198,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
@@ -227,9 +218,9 @@ class TestGromacsTop(utils.TestCaseRelative):
     def testJACPMESwitch(self):
         """ Tests the DHFR Gromacs system nrg and force (PME w/ switch) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('10.DHFR-PME-Switch'), 'topol.top'),
-                        xyz=os.path.join(get_fn('10.DHFR-PME-Switch'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('10.DHFR-PME-Switch'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('10.DHFR-PME-Switch'), 'conf.gro'))
+        top.box = gro.box[:]
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem(nonbondedMethod=app.PME,
@@ -237,7 +228,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
@@ -258,14 +249,16 @@ class TestGromacsTop(utils.TestCaseRelative):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
         # We know what we're doing
         warnings.filterwarnings('ignore', category=GromacsWarning)
-        top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'),
-                        xyz=os.path.join(get_fn('12.DPPC'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('12.DPPC'), 'conf.gro'))
+        top.box = gro.box[:]
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem()
+        with open('system.xml', 'w') as f:
+            f.write(mm.XmlSerializer.serialize(system))
         context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
+        context.setPositions(gro.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers.
@@ -282,41 +275,23 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
 
-    def testOPLS(self):
-        """ Tests geometric combining rules with OPLS/AA in Gromacs topology """
-        top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
-                        xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'geometric')
-
-        # Create the system and context, then calculate the energy decomposition
-        system = top.createSystem()
-        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        context.setPositions(top.positions)
-        energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
-
-        # Compare with Gromacs energies
-        self.assertAlmostEqual(energies['bond'], 332.178260935, places=4)
-        self.assertAlmostEqual(energies['angle'], 29.2231806883, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 0.0057758656, places=4)
-        self.assertAlmostEqual(energies['rb_torsion'], 55.603030624, places=4)
-        self.assertRelativeEqual(energies['nonbonded'], 327.954397827, places=4)
-
     def testRoundTrip(self):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """
         # Use DPPC to get RB-torsions tested. Also check that it initially fails
         # with the CustomNonbondedForce
         warnings.filterwarnings('ignore', category=GromacsWarning)
-        top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'),
-                        xyz=os.path.join(get_fn('12.DPPC'), 'conf.gro'))
-        self.assertEqual(top.combining_rule, 'lorentz')
+        top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'))
+        gro = load_file(os.path.join(get_fn('12.DPPC'), 'conf.gro'))
+        top.box = gro.box[:]
 
         system = top.createSystem()
         def bad_system():
             return openmm.load_topology(top.topology, system).createSystem()
-        warnings.filterwarnings('ignore', category=OpenMMWarning)
-        self.assertTrue(
-                openmm.load_topology(top.topology, system).unknown_functional
+        warnings.filterwarnings('error', category=OpenMMWarning)
+        self.assertRaises(OpenMMWarning, lambda:
+                openmm.load_topology(top.topology, system)
         )
+        warnings.filterwarnings('ignore', category=OpenMMWarning)
         self.assertRaises(ParmedError, bad_system)
         for i in range(len(system.getForces())):
             if isinstance(system.getForce(i), mm.CustomNonbondedForce):
@@ -325,8 +300,8 @@ class TestGromacsTop(utils.TestCaseRelative):
         system2 = openmm.load_topology(top.topology, system).createSystem()
         con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
-        con1.setPositions(top.positions)
-        con2.setPositions(top.positions)
+        con1.setPositions(gro.positions)
+        con2.setPositions(gro.positions)
         ene1 = energy_decomposition(top, con1)
         ene2 = energy_decomposition(top, con2)
         self.assertAlmostEqual(ene1['bond'], ene2['bond'])
