@@ -50,7 +50,7 @@ PRINT_DIHEDRALS = """\
 """
 
 SET_BOND = """\
-Atom 1               Atom 2               R eq       Frc Cnst  
+             Atom 1              Atom 2       R eq   Frc Cnst
     288   CA (  CT)     290   CB (  CT)     1.5000   300.0000
     288   CA (  CT)     294    C (   C)     1.5220   317.0000
     286    N (   N)     288   CA (  CT)     1.4490   337.0000
@@ -102,7 +102,7 @@ Atom 1               Atom 2               R eq       Frc Cnst
 """
 
 SET_ANGLE = """\
-Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+             Atom 1               Atom 2               Atom 3   Frc Cnst   Theta eq
     290   CB (  CT)      288   CA (  CT)      294    C (   C)    63.0000   111.1000
     286    N (   N)      288   CA (  CT)      290   CB (  CT)    80.0000   109.7000
     319   CB (  CT)      317   CA (  CT)      323    C (   C)    63.0000   111.1000
@@ -294,7 +294,7 @@ PRINT_DIHEDRALSC = """\
 """
 
 SET_BONDC = """\
-Atom 1               Atom 2               R eq       Frc Cnst  
+             Atom 1              Atom 2       R eq   Frc Cnst
       7   CB ( CT3)       5   CA ( CT1)     1.5000   300.0000
       1    N ( NH3)       5   CA ( CT1)     1.4800   200.0000
      11    C (   C)       5   CA ( CT1)     1.4900   250.0000
@@ -310,7 +310,7 @@ Atom 1               Atom 2               R eq       Frc Cnst
 """
 
 SET_ANGLEC = """\
-Atom 1               Atom 2               Atom 3               Frc Cnst   Theta eq  
+             Atom 1               Atom 2               Atom 3   Frc Cnst   Theta eq
       1    N ( NH3)        5   CA ( CT1)        7   CB ( CT3)    67.7000   110.0000
       7   CB ( CT3)        5   CA ( CT1)       11    C (   C)    52.0000   108.0000
      13    N ( NH1)       15   CA ( CT1)       17   CB ( CT3)    70.0000   113.5000
