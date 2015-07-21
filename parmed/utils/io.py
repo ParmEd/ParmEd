@@ -14,6 +14,7 @@ try:
 except ImportError:
     gzip = None
 from io import TextIOWrapper, BytesIO
+import os
 from parmed.utils.six import PY2
 from parmed.utils.six.moves.urllib.request import urlopen
 
@@ -87,9 +88,10 @@ def genopen(name, mode='r'):
         # contents back, and return the file that is now open for writing
         if mode == 'a':
             tmp = BytesIO()
-            with bz2.BZ2File(name, 'rb') as f:
-                tmp.write(f.read())
-            tmp.seek(0)
+            if os.path.exists(name):
+                with bz2.BZ2File(name, 'rb') as f:
+                    tmp.write(f.read())
+                tmp.seek(0)
             f = bz2.BZ2File(name, 'wb')
             f.write(tmp.read())
             del tmp
