@@ -313,11 +313,10 @@ class TestGromacsTop(utils.TestCaseRelative):
         system = top.createSystem()
         def bad_system():
             return openmm.load_topology(top.topology, system).createSystem()
-        warnings.filterwarnings('error', category=OpenMMWarning)
-        self.assertRaises(OpenMMWarning, lambda:
-                openmm.load_topology(top.topology, system)
-        )
         warnings.filterwarnings('ignore', category=OpenMMWarning)
+        self.assertTrue(
+                openmm.load_topology(top.topology, system).unknown_functional
+        )
         self.assertRaises(ParmedError, bad_system)
         for i in range(len(system.getForces())):
             if isinstance(system.getForce(i), mm.CustomNonbondedForce):
