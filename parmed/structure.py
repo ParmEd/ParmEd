@@ -3308,8 +3308,6 @@ class Structure(object):
 
     def __mul__(self, ncopies):
         """ Replicates the current Structure `ncopies` times """
-        if not isinstance(ncopies, integer_types):
-            return NotImplemented
         cp = copy(self)
         return cp.__imul__(ncopies, self)
 
