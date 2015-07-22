@@ -174,9 +174,6 @@ class CharmmPsfFile(Structure):
         global _resre
         Structure.__init__(self)
         conv = CharmmPsfFile._convert
-        # Make sure the file exists
-        if not os.path.exists(psf_name):
-            raise IOError('Could not find PSF file %s' % psf_name)
         # Open the PSF and read the first line. It must start with "PSF"
         with closing(genopen(psf_name, 'r')) as psf:
             self.name = psf_name

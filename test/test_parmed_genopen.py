@@ -119,3 +119,7 @@ class TestGenopen(FileIOTestCase):
         except ValueError as e:
             self.assertEqual(str(e), 'Cannot write or append a webpage')
 
+    def testReadBadURL(self):
+        """ Tests proper exception handling of non-existent URL """
+        self.assertRaises(IOError, lambda: genopen('http://asdkfjasdf.lib'))
+

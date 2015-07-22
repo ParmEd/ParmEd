@@ -262,6 +262,7 @@ class Mol2File(object):
                     #   status -- ignored
                     #   comment -- ignored
                     words = line.split()
+                    if not words: continue
                     id = int(words[0])
                     resname = words[1]
                     try:

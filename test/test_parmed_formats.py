@@ -732,6 +732,14 @@ class TestMol2File(FileIOTestCase):
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
 
+    def testMol2FileWithBlankLines(self):
+        """ Tests parsing a Mol2 file with blank lines at the end """
+        mol2 = formats.Mol2File.parse(get_fn('tripos1.mol2'))
+        self.assertIsInstance(mol2, ResidueTemplate)
+        self.assertEqual(mol2.name, 'DAN')
+        self.assertEqual(len(mol2), 31)
+        self.assertEqual(len(mol2.bonds), 33)
+
     def testMol3Structure(self):
         """ Tests parsing a Mol3 file with 1 residue into a Structure """
         mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
@@ -835,5 +843,91 @@ class TestMol2File(FileIOTestCase):
         self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
                                    get_saved_fn('tripos9struct.mol3')))
 
-if __name__ == '__main__':
-    unittest.main()
+class TestFileDownloader(unittest.TestCase):
+    """ Tests load_file with URLs for each format """
+
+    def setUp(self):
+        self.url = 'https://github.com/ParmEd/ParmEd/raw/master/test/files/'
+
+    def testDownloadOFF(self):
+        """ Tests automatic loading of downloaded OFF files """
+        off = formats.load_file(self.url + 'amino12.lib')
+        self.assertIsInstance(off, dict)
+        for key, item in iteritems(off):
+            self.assertIsInstance(item, ResidueTemplate)
+
+    def testDownloadAmberParm(self):
+        """ Tests automatic loading of downloaded AmberParm object """
+        parm = formats.load_file(self.url + 'tip4p.parm7')
+        self.assertIsInstance(parm, amber.AmberParm)
+
+    def testDownloadAmoebaParm(self):
+        """ Tests automatic loading of downloaded AmoebaParm object """
+        parm = formats.load_file(self.url + 'nma.parm7')
+        self.assertIsInstance(parm, amber.AmoebaParm)
+
+    def testDownloadChamberParm(self):
+        """ Tests automatic loading of downloaded ChamberParm object """
+        parm = formats.load_file(self.url + 'ala_ala_ala.parm7')
+        self.assertIsInstance(parm, amber.ChamberParm)
+
+    def testDownloadAmberFormat(self):
+        """ Tests automatic loading of downloaded AmberFormat object """
+        parm = formats.load_file(self.url + 'cSPCE.mdl')
+        self.assertIsInstance(parm, amber.AmberFormat)
+        self.assertNotIsInstance(parm, amber.AmberParm)
+
+    def testDownloadAmberRestart(self):
+        """ Tests automatic loading of downloaded Amber ASCII restart file """
+        parm = formats.load_file(self.url + 'trx.inpcrd')
+        self.assertIsInstance(parm, amber.AmberAsciiRestart)
+
+    def testDownloadAmberMdcrd(self):
+        """ Tests automatic loading of downloaded Amber mdcrd file """
+        crd = formats.load_file(self.url + 'tz2.truncoct.crd', natom=5827,
+                                hasbox=True)
+        self.assertIsInstance(crd, amber.AmberMdcrd)
+
+    def testDownloadCharmmPsfFile(self):
+        """ Tests automatic loading of downloaded CHARMM PSF file """
+        parm = formats.load_file(self.url + 'ala_ala_ala.psf')
+        self.assertIsInstance(parm, charmm.CharmmPsfFile)
+
+    def testDownloadCharmmCrdFile(self):
+        """ Tests automatic loading of downloaded CHARMM crd file """
+        crd = formats.load_file(self.url + 'dhfr_min_charmm.crd')
+        self.assertIsInstance(crd, charmm.CharmmCrdFile)
+
+    def testDownloadCharmmRestart(self):
+        """ Tests automatic loading of downloaded CHARMM restart file """
+        crd = formats.load_file(self.url + 'sample-charmm.rst')
+        self.assertIsInstance(crd, charmm.CharmmRstFile)
+
+    def testDownloadPDB(self):
+        """ Tests automatic loading of downloaded PDB files """
+        pdb = formats.load_file(self.url + '4lzt.pdb')
+        self.assertIsInstance(pdb, Structure)
+        self.assertEqual(len(pdb.atoms), 1164)
+
+    def testDownloadCIF(self):
+        """ Tests automatic loading of downloaded PDBx/mmCIF files """
+        cif = formats.load_file(self.url + '4LZT.cif')
+        self.assertIsInstance(cif, Structure)
+        self.assertEqual(len(cif.atoms), 1164)
+
+    def testDownloadMol2(self):
+        """ Tests automatic loading of downloaded mol2 and mol3 files """
+        mol2 = formats.load_file(self.url + 'test_multi.mol2')
+        self.assertIsInstance(mol2, ResidueTemplateContainer)
+        mol3 = formats.load_file(self.url + 'tripos9.mol2')
+        self.assertIsInstance(mol3, ResidueTemplate)
+
+    def testDownloadGromacsTop(self):
+        """ Tests automatic loading of downloaded Gromacs topology file """
+        top = formats.load_file(self.url + '1aki.charmm27.top')
+        self.assertIsInstance(top, gromacs.GromacsTopologyFile)
+
+    def testDownloadGromacsGro(self):
+        """ Tests automatic loading of downloaded Gromacs GRO file """
+        gro = formats.load_file(self.url + '1aki.ff99sbildn.gro')
+        self.assertIsInstance(gro, Structure)
