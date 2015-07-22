@@ -732,6 +732,14 @@ class TestMol2File(FileIOTestCase):
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
 
+    def testMol2FileWithBlankLines(self):
+        """ Tests parsing a Mol2 file with blank lines at the end """
+        mol2 = formats.Mol2File.parse(get_fn('tripos1.mol2'))
+        self.assertIsInstance(mol2, ResidueTemplate)
+        self.assertEqual(mol2.name, 'DAN')
+        self.assertEqual(len(mol2), 31)
+        self.assertEqual(len(mol2.bonds), 33)
+
     def testMol3Structure(self):
         """ Tests parsing a Mol3 file with 1 residue into a Structure """
         mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
