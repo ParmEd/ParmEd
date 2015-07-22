@@ -427,10 +427,11 @@ class AmberFormat(object):
         except ImportError:
             return self.rdparm_slow(fname)
 
-        if slow:
+        # The optimized parser only works on local files
+        if slow or fname.startswith('http://') or fname.startswith('https://'):
             return self.rdparm_slow(fname)
 
-        # We have the optimized version
+        # We have the optimized version and a local file
         try:
             ret = _rdparm.rdparm(fname)
         except TypeError:

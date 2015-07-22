@@ -5,6 +5,7 @@ directives like #if, #ifdef, and #define.
 Written by Jason Swails
 """
 from parmed.exceptions import PreProcessorError, PreProcessorWarning
+from parmed.utils.io import genopen
 from parmed.utils.six import string_types, iteritems, wraps
 from collections import OrderedDict
 from os import path
@@ -109,7 +110,7 @@ class CPreProcessor(object):
 
     def __init__(self, fname, defines=None, includes=None, notfound_fatal=True):
         if isinstance(fname, string_types):
-            self._fileobj = open(fname, 'r')
+            self._fileobj = genopen(fname, 'r')
             self._ownhandle = True
             curpath = path.abspath(path.split(fname)[0])
             self.filename = fname
@@ -368,7 +369,7 @@ if __name__ == '__main__':
     if opt.output is None:
         output = sys.stdout
     else:
-        output = open(opt.output, 'w')
+        output = genopen(opt.output, 'w')
 
     for line in pp:
         output.write(line)

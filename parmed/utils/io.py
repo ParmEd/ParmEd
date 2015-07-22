@@ -17,6 +17,7 @@ from io import TextIOWrapper, BytesIO
 import os
 from parmed.utils.six import PY2
 from parmed.utils.six.moves.urllib.request import urlopen
+from parmed.utils.six.moves.urllib.error import HTTPError, URLError
 
 def genopen(name, mode='r'):
     """
@@ -70,6 +71,10 @@ def genopen(name, mode='r'):
         is_url = True
         if mode in ['w', 'a']:
             raise ValueError('Cannot write or append a webpage')
+        try:
+            open_url = urlopen(name)
+        except (HTTPError, URLError) as e:
+            raise IOError('Could not open %s: %s' % (name, e))
 
     if name.endswith('.bz2'):
         if bz2 is None:
@@ -80,7 +85,8 @@ def genopen(name, mode='r'):
         # if it is a URL in Python 2
         if PY2 and is_url:
             fileobj = BytesIO()
-            fileobj.write(bz2.decompress(urlopen(name).read()))
+            fileobj.write(bz2.decompress(open_url.read()))
+            open_url.close()
             fileobj.seek(0)
             return TextIOWrapper(fileobj)
         # BZ2File cannot open in append mode, so we have to fake it. Read the
@@ -105,7 +111,7 @@ def genopen(name, mode='r'):
         else:
             # If it is a URL, just pass in the urlopen object as a filename
             if is_url:
-                name = urlopen(name)
+                name = open_url
             return TextIOWrapper(bz2.BZ2File(name, mode+'b'))
     elif name.endswith('.gz'):
         if gzip is None:
@@ -117,23 +123,22 @@ def genopen(name, mode='r'):
                 # BytesIO object... sigh. Yet another reason to migrate to
                 # Python 3
                 fileobj = BytesIO()
-                fileobj.write(urlopen(name).read())
+                fileobj.write(open_url.read())
                 fileobj.seek(0)
+                open_url.close()
                 return gzip.GzipFile(fileobj=fileobj, mode='r')
             else:
                 return gzip.open(name, mode+'b')
         else:
             if is_url:
-                return TextIOWrapper(
-                        gzip.GzipFile(fileobj=urlopen(name), mode='r')
-                )
+                return TextIOWrapper(gzip.GzipFile(fileobj=open_url, mode='r'))
             else:
                 return TextIOWrapper(gzip.open(name, mode+'b'))
 
     if is_url:
         if PY2:
-            return urlopen(name)
+            return open_url
         else:
-            return TextIOWrapper(urlopen(name))
+            return TextIOWrapper(open_url)
     else:
         return open(name, mode)

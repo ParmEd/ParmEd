@@ -17,6 +17,8 @@ simply inherited from a base class (unless that base class is not a metaclass of
 FileFormatType)
 """
 from __future__ import division, print_function, absolute_import
+from contextlib import closing
+from parmed.utils.io import genopen
 from parmed.utils.six import iteritems
 from parmed.exceptions import FormatNotFound
 import os
@@ -60,7 +62,9 @@ def load_file(filename, *args, **kwargs):
     Parameters
     ----------
     filename : str
-        The name of the file to try to parse
+        The name of the file to try to parse. If the filename starts with
+        http:// or https://, it is treated like a URL and the file will be
+        loaded directly from its remote location on the web
     *args : other positional arguments
         Some formats accept positional arguments. These will be passed along
     **kwargs : other options
@@ -75,8 +79,8 @@ def load_file(filename, *args, **kwargs):
 
     Notes
     -----
-    Compressed files are supported and detected by filename extension. The
-    following names are supported:
+    Compressed files are supported and detected by filename extension. This
+    applies both to local and remote files. The following names are supported:
 
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
@@ -96,9 +100,13 @@ def load_file(filename, *args, **kwargs):
     global PARSER_REGISTRY, PARSER_ARGUMENTS
 
     # Check that the file actually exists and that we can read it
-    if not os.path.exists(filename):
+    if filename.startswith('http://') or filename.startswith('https://'):
+        # This raises IOError if it does not exist
+        with closing(genopen(filename)) as f:
+            pass
+    elif not os.path.exists(filename):
         raise IOError('%s does not exist' % filename)
-    if not os.access(filename, os.R_OK):
+    elif not os.access(filename, os.R_OK):
         raise IOError('%s does not have read permissions set' % filename)
 
     for name, cls in iteritems(PARSER_REGISTRY):
