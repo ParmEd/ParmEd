@@ -703,11 +703,6 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         act = PT.printBonds(gasparm, '@3', '@1')
         self.assertEqual(str(act), saved.PRINT_BONDS_2MASKS)
 
-    def testUnhandledArguments(self):
-        """ Test that unhandled arguments raise fatal error by default """
-        self.assertRaises(exc.UnhandledArgumentWarning, lambda:
-                PT.printBonds(gasparm, 1))
-
     def testPrintAngles(self):
         """ Test printAngles on AmberParm """
         act = PT.printAngles(gasparm, '@1')
