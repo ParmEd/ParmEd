@@ -111,8 +111,8 @@ def clapp():
         print(splash)
     
     # Set our warning filter
-    if opt.strict:
-        warnings.filterwarnings('error', category=SeriousParmWarning)
+    if not opt.strict:
+        warnings.filterwarnings('always', category=SeriousParmWarning)
     
     # Set our overwrite preferences
     Action.overwrite = opt.overwrite
