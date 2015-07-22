@@ -26,6 +26,16 @@ class TestReadParm(unittest.TestCase):
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
 
+    def testGzippedParm(self):
+        """ Check that gzipped prmtop files can be parsed correctly """
+        parm = readparm.LoadParm(get_fn('small.parm7.gz'))
+        self.assertEqual(parm.ptr('natom'), 864)
+
+    def testBzippedParm(self):
+        """ Check that bzip2ed prmtop files can be parsed correctly """
+        parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
+        self.assertEqual(parm.ptr('natom'), 864)
+
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
