@@ -3205,7 +3205,7 @@ class Structure(object):
 
     def __iadd__(self, other):
         if not isinstance(other, Structure):
-            raise TypeError('Must concatenate with Structure')
+            return NotImplemented
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3313,7 +3313,7 @@ class Structure(object):
 
     def __imul__(self, ncopies, other=None):
         if not isinstance(ncopies, integer_types):
-            raise TypeError('Can only multiply a structure by an integer')
+            return NotImplemented
         # The basic approach here is similar to what we used in __iadd__, except
         # we don't have to extend the type arrays at all -- we just point to the
         # same one that the first copy pointed to.
