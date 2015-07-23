@@ -655,13 +655,13 @@ class TestAmberParmSlice(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('solv.prmtop'))
         parts = parm.split()
         # Make sure the sum of the parts is equal to the whole
-        natom = sum(len(part[0].atoms)*part[1] for part in parts)
+        natom = sum(len(part[0].atoms)*len(part[1]) for part in parts)
         self.assertEqual(len(parm.atoms), natom)
         self.assertEqual(len(parts), 4) # 4 types of molecules
-        self.assertEqual(parts[0][1], 1)
-        self.assertEqual(parts[1][1], 1)
-        self.assertEqual(parts[2][1], 8)
-        self.assertEqual(parts[3][1], 9086)
+        self.assertEqual(len(parts[0][1]), 1)
+        self.assertEqual(len(parts[1][1]), 1)
+        self.assertEqual(len(parts[2][1]), 8)
+        self.assertEqual(len(parts[3][1]), 9086)
 
     def testSplit2(self):
         """ Tests splitting distinct single-residue molecules with same name """
@@ -680,8 +680,8 @@ class TestAmberParmSlice(unittest.TestCase):
         self.assertEqual(len(parts), 2)
         self.assertEqual(len(parts[0][0].atoms), len(parm.atoms))
         self.assertEqual(len(parts[1][0].atoms), len(parm2.atoms))
-        self.assertEqual(parts[0][1], 20)
-        self.assertEqual(parts[1][1], 30)
+        self.assertEqual(len(parts[0][1]), 20)
+        self.assertEqual(len(parts[1][1]), 30)
 
     def testAdd(self):
         """ Tests combining AmberParm instances """

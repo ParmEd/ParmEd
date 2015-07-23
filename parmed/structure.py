@@ -1254,10 +1254,10 @@ class Structure(object):
 
         Returns
         -------
-        [structs, counts] : list of (:class:`Structure`, int) tuples
+        [structs, counts] : list of (:class:`Structure`, list) tuples
             List of all molecules in the order that they appear first in the
-            parent structure accompanied by the number of times that molecule
-            appears in the Structure
+            parent structure accompanied by the list of the molecule numbers
+            in which that molecule appears in the Structure
         """
         tag_molecules(self)
         mollist = [atom.marked for atom in self.atoms]
@@ -1281,7 +1281,7 @@ class Structure(object):
                 res = sel[0].residue
                 names = tuple(a.name for a in res)
                 if (res.name, len(res), names) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names)]] += 1
+                    counts[res_molecules[(res.name, len(res), names)]].add(i)
                     continue
                 else:
                     res_molecules[(res.name, len(res), names)] = len(structs)
@@ -1301,7 +1301,7 @@ class Structure(object):
                         else:
                             if a1.type != a2.type: break
                     else:
-                        counts[j] += 1
+                        counts[j].add(i)
                         is_duplicate = True
                         break
             if not is_duplicate:
@@ -1313,7 +1313,7 @@ class Structure(object):
                                mol.residue.insertion_code)
                     mol = s
                 structs.append(mol)
-                counts.append(1)
+                counts.append(set([i]))
         return list(zip(structs, counts))
 
     #===================================================
