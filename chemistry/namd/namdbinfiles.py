@@ -67,19 +67,21 @@ class NamdBinFile(object):
         else:
             values = np.zeros(3*natoms)
         hinge = 3*start_index
-        newvalues = np.concatenate((self.values[:hinge],
-                                    values,
-                                    self.values[hinge:]))
+        newvalues = np.concatenate(
+            (self.values[:hinge],values,self.values[hinge:])
+        )
         self.values = newvalues
 
     def copyatoms(self, start_index, natoms):
+        """Convenience function, same as insertatoms() but set 'values' to
+        be the same as the previous natoms' values (i.e. make a copy of them).
+        """
         values = self.values[3*(start_index-natoms):3*start_index]       
         self.insertatoms(start_index,natoms,values)
 
 
 class NamdBinCoor(NamdBinFile):
     """Class to read or write NAMD "bincoordinates" files."""
-
     @property
     def coordinates(self):
         return self.values
@@ -96,4 +98,3 @@ class NamdBinVel(NamdBinFile):
     @property
     def velocities(self):
         return self.values
-
