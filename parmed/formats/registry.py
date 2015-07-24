@@ -127,10 +127,22 @@ def load_file(filename, *args, **kwargs):
         if not arg in kwargs:
             raise TypeError('%s constructor expects %s keyword argument' %
                             name, arg)
+    # Pass on the "structure" keyword IFF the target function accepts a target
+    # keyword. Otherwise, get rid of it.
     if hasattr(cls, 'parse'):
+        _prune_structure(cls.parse, kwargs)
         return cls.parse(filename, *args, **kwargs)
     elif hasattr(cls, 'open_old'):
+        _prune_structure(cls.open_old, kwargs)
         return cls.open_old(filename, *args, **kwargs)
     elif hasattr(cls, 'open'):
+        _prune_structure(cls.open, kwargs)
         return cls.open(filename, *args, **kwargs)
+    _prune_structure(cls.__init__, kwargs)
     return cls(filename, *args, **kwargs)
+
+def _prune_structure(func, kwargs):
+    if 'structure' in kwargs:
+        if ('structure' not in
+                func.func_code.co_varnames[:func.func_code.co_argcount]):
+            kwargs.pop('structure')
