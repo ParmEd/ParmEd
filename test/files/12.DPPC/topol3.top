@@ -1,0 +1,12 @@
+#include "DPPC_2.itp"
+
+; System specifications
+[ system ]
+DPPC Bilayer
+
+[ molecules ]
+; molecule name nr.
+DPPC 4
+SOL	122
+DPPC 4
+SOL 122

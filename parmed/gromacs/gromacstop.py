@@ -1442,8 +1442,20 @@ class GromacsTopologyFile(Structure):
                 dest.write('\n\n')
                 # Molecules
                 dest.write('[ molecules ]\n; Compound       #mols\n')
-                for i, (molecule, num) in enumerate(molecules):
-                    dest.write('%-15s %6d\n' % (names[i], num))
+                total_mols = sum(len(m[1]) for m in molecules)
+                i = 0
+                while i < total_mols:
+                    for j, (molecule, lst) in enumerate(molecules):
+                        if i in lst:
+                            break
+                    else:
+                        raise RuntimeError('Could not find molecule %d in list'
+                                           % i)
+                    ii = i
+                    while ii < total_mols and ii in lst:
+                        ii += 1
+                    dest.write('%-15s %6d\n' % (names[j], ii-i))
+                    i = ii
             elif isinstance(combine, string_types) and combine.lower() == 'all':
                 GromacsTopologyFile._write_molecule(self, dest, 'system',
                                     params, parameters == 'inline')
