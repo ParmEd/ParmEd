@@ -228,6 +228,20 @@ class TestGromacsTop(FileIOTestCase):
         self.assertEqual(parm.combining_rule, 'geometric')
         self.assertEqual(parm.defaults.comb_rule, 3)
 
+    def testMoleculeOrdering(self):
+        """ Tests non-contiguous atoms in Gromacs topology file writes """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
+        parm.write(get_fn('topol3.top', written=True))
+        parm2 = load_file(get_fn('topol3.top', written=True))
+        self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        self.assertEqual(len(parm.residues), len(parm2.residues))
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(r1.name, r2.name)
+            for a1, a2 in zip(r1.atoms, r2.atoms):
+                self.assertEqual(a1.name, a2.name)
+                self.assertEqual(a1.type, a2.type)
+
 class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
 
