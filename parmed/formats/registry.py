@@ -65,6 +65,13 @@ def load_file(filename, *args, **kwargs):
         The name of the file to try to parse. If the filename starts with
         http:// or https://, it is treated like a URL and the file will be
         loaded directly from its remote location on the web
+    structure : object, optional
+        For some classes, such as the Mol2 file class, the default return object
+        is not a Structure, but can be made to return a Structure if the
+        ``structure=True`` keyword argument is passed. To facilitate writing
+        easy code, the ``structure`` keyword is always processed and only passed
+        on to the correct file parser if that parser accepts the structure
+        keyword. There is no default, as each parser has its own default.
     *args : other positional arguments
         Some formats accept positional arguments. These will be passed along
     **kwargs : other options
