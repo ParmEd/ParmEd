@@ -144,5 +144,5 @@ def load_file(filename, *args, **kwargs):
 def _prune_structure(func, kwargs):
     if 'structure' in kwargs:
         if ('structure' not in
-                func.func_code.co_varnames[:func.func_code.co_argcount]):
+                func.__code__.co_varnames[:func.__code__.co_argcount]):
             kwargs.pop('structure')
