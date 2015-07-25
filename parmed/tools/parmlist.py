@@ -7,7 +7,6 @@ from __future__ import print_function, division, absolute_import
 
 from parmed.utils.six import string_types
 from parmed.structure import Structure
-from parmed.formats.mol2 import Mol2File
 from parmed.formats.registry import load_file
 from parmed.exceptions import FormatNotFound
 from parmed.tools.exceptions import DuplicateParm, ParmIndexError, ParmError
@@ -35,19 +34,8 @@ class ParmList(object):
         if isinstance(parm, string_types):
             if parm in self._parm_names:
                 raise DuplicateParm('%s already in ParmList' % parm)
-            # Mol2 file by default parses to a ResidueTemplate. So we need to
-            # special-case this instance
             try:
-                is_mol2 = Mol2File.id_format(parm)
-            except:
-                # Bare except since we don't know what exception could be raised
-                # and it doesn't really matter
-                is_mol2 = False
-            try:
-                if is_mol2:
-                    parm = load_file(parm, structure=True)
-                else:
-                    parm = load_file(parm)
+                parm = load_file(parm, structure=True)
             except FormatNotFound:
                 raise ParmError('Could not determine file type of %s' % parm)
             if not isinstance(parm, Structure):

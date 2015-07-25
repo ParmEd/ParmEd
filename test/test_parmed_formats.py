@@ -134,6 +134,12 @@ class TestFileLoader(unittest.TestCase):
                 formats.load_file(get_fn('../test_parmed_formats.py')))
         self.assertRaises(IOError, lambda: formats.load_file('no_file'))
 
+    def testStructureKeyword(self):
+        """ Tests that the structure argument is special-cased in load_file """
+        mol2 = formats.load_file(get_fn('tripos9.mol2'), structure=True)
+        self.assertIsInstance(mol2, Structure)
+        pdb = formats.load_file(get_fn('4lzt.pdb'), structure=True)
+
 class TestChemistryPDBStructure(FileIOTestCase):
     
     def setUp(self):
