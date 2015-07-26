@@ -6,7 +6,7 @@ import utils
 
 import numpy as np
 from parmed import amber, charmm, exceptions, formats, gromacs
-from parmed import (Structure, read_PDB, write_PDB, read_CIF,
+from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
@@ -223,13 +223,14 @@ class TestChemistryPDBStructure(FileIOTestCase):
     def testPdbWriteModels(self):
         """ Test PDB file writing from NMR structure with models """
         pdbfile = read_PDB(self.models)
-        self.assertEqual(pdbfile.get_coordinates('all').shape[0], 20)
+        self.assertEqual(pdbfile.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(pdbfile.atoms), 451)
         output = StringIO()
         write_PDB(pdbfile, output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
+        self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
     def testPdbWriteXtal(self):
@@ -491,6 +492,7 @@ class TestChemistryPDBStructure(FileIOTestCase):
             self.assertEqual(obj.doi, '10.1107/S0907444997013656')
             self.assertEqual(obj.volume, '54')
             self.assertEqual(obj.page, '522')
+            self.assertEqual(obj.resolution, 0.95)
         # Check the TER card is picked up
         for i, residue in enumerate(obj.residues):
             if i == 128:
@@ -591,6 +593,18 @@ class TestChemistryCIFStructure(FileIOTestCase):
         """ Test CIF downloading on 4LZT """
         self._check4lzt(download_CIF('4lzt'))
 
+    def testCIFModels(self):
+        """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
+        cif = download_CIF('2koc')
+        self.assertEqual(cif.get_coordinates('all').shape, (20, 451, 3))
+        self.assertEqual(len(cif.atoms), 451)
+        output = StringIO()
+        write_CIF(cif, output)
+        output.seek(0)
+        pdbfile2 = read_CIF(output)
+        self.assertEqual(len(pdbfile2.atoms), 451)
+        self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
+
     def _check4lzt(self, cif):
         pdb = read_PDB(self.lztpdb)
         self.assertEqual(len(cif.atoms), len(pdb.atoms))
@@ -640,6 +654,7 @@ class TestChemistryCIFStructure(FileIOTestCase):
         self.assertEqual(cif.volume, '54, 46, 46')
         self.assertEqual(cif.doi, '10.1107/S0907444997013656')
         self.assertEqual(cif.pmid, '9761848')
+        self.assertEqual(cif.resolution, 0.95)
 
 class TestMol2File(FileIOTestCase):
     """ Tests the correct parsing and processing of mol2 files """
