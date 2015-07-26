@@ -6,7 +6,6 @@ from __future__ import division, print_function, absolute_import
 
 from contextlib import closing
 import io
-import itertools
 import ftplib
 try:
     import gzip
