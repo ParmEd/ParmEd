@@ -936,7 +936,13 @@ class CIFFile(object):
                                                auth.getRowList()])
             reflns = cont.getObj('reflns')
             if reflns is not None:
-                struct.resolution = float(reflns.getValue('d_resolution_high'))
+                res = reflns.getValue('d_resolution_high')
+                if res != '?':
+                    try:
+                        struct.resolution = float(res)
+                    except ValueError:
+                        warnings.warn('Could not convert resolution (%s) to '
+                                      'float' % res)
             cite = cont.getObj('citation_author')
             if cite is not None:
                 nameidx = cite.getAttributeIndex('name')
