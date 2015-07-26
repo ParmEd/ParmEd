@@ -491,6 +491,7 @@ class TestChemistryPDBStructure(FileIOTestCase):
             self.assertEqual(obj.doi, '10.1107/S0907444997013656')
             self.assertEqual(obj.volume, '54')
             self.assertEqual(obj.page, '522')
+            self.assertEqual(obj.resolution, 0.95)
         # Check the TER card is picked up
         for i, residue in enumerate(obj.residues):
             if i == 128:
@@ -640,6 +641,7 @@ class TestChemistryCIFStructure(FileIOTestCase):
         self.assertEqual(cif.volume, '54, 46, 46')
         self.assertEqual(cif.doi, '10.1107/S0907444997013656')
         self.assertEqual(cif.pmid, '9761848')
+        self.assertEqual(cif.resolution, 0.95)
 
 class TestMol2File(FileIOTestCase):
     """ Tests the correct parsing and processing of mol2 files """

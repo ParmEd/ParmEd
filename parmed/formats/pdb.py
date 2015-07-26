@@ -209,6 +209,8 @@ class PDBFile(object):
             TITL section of the JRNL record
         year : ``int``
             Year that the article was published, from the JRNL record
+        resolution : ``float``
+            The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
     
@@ -230,10 +232,10 @@ class PDBFile(object):
 
         struct = Structure()
         # Add metadata fields
-        struct.experimental = struct.journal = struct.authors = struct.keywords = ''
-        struct.doi = struct.pmid = struct.journal_authors = struct.volume_page = ''
-        struct.title = ''
-        struct.year = None
+        struct.experimental = struct.journal = struct.authors = ''
+        struct.keywords = struct.doi = struct.pmid = ''
+        struct.journal_authors = struct.volume_page = struct.title = ''
+        struct.year = struct.resolution = None
         struct.related_entries = []
         modelno = 1 # For PDB files with multiple MODELs
         atomno = 0
@@ -507,11 +509,30 @@ class PDBFile(object):
                         struct.doi = line[19:].strip()
                 elif rec == 'KEYWDS':
                     struct.keywords += '%s,' % line[10:]
-                elif rec == 'REMARK' and line[6:10] == ' 900':
-                    # Related entries
-                    rematch = PDBFile._relatere.match(line[11:])
-                    if rematch:
-                        struct.related_entries.append(rematch.groups())
+                elif rec == 'REMARK':
+                    if line[6:10] == ' 900':
+                        # Related entries
+                        rematch = PDBFile._relatere.match(line[11:])
+                        if rematch:
+                            struct.related_entries.append(rematch.groups())
+                    elif line[6:10] == '   2':
+                        # Resolution
+                        if not line[11:22].strip(): continue
+                        if struct.resolution is not None:
+                            # Skip over comments
+                            continue
+                        if line[11:22] !=  'RESOLUTION.':
+                            warnings.warn('Unrecognized RESOLUTION record in '
+                                          'PDB file: %s' % line.strip())
+                            continue
+                        if line[23:38] == 'NOT APPLICABLE.':
+                            # Not a diffraction experiment
+                            continue
+                        try:
+                            struct.resolution = float(line[23:30])
+                        except ValueError:
+                            warnings.warn('Trouble converting resolution (%s) '
+                                          'to float' % line[23:30])
         finally:
             # Make sure our file is closed if we opened it
             if own_handle: fileobj.close()
@@ -877,6 +898,8 @@ class CIFFile(object):
             TITL section of the JRNL record
         year : ``str``
             Year that the article was published, from the JRNL record
+        resolution : ``float``
+            The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
 
@@ -908,6 +931,12 @@ class CIFFile(object):
         for cont in data:
             struct = Structure()
             structures.append(struct)
+            # Add metadata fields
+            struct.experimental = struct.journal = struct.authors = ''
+            struct.keywords = struct.doi = struct.pmid = ''
+            struct.journal_authors = struct.volume_page = struct.title = ''
+            struct.year = struct.resolution = None
+            struct.related_entries = []
 
             # Now we have the data. First get the metadata if it exists
             exptl = cont.getObj('exptl')
@@ -919,6 +948,9 @@ class CIFFile(object):
                 if nameidx != -1:
                     struct.authors = ', '.join([t[nameidx] for t in
                                                auth.getRowList()])
+            reflns = cont.getObj('reflns')
+            if reflns is not None:
+                struct.resolution = float(reflns.getValue('d_resolution_high'))
             cite = cont.getObj('citation_author')
             if cite is not None:
                 nameidx = cite.getAttributeIndex('name')
