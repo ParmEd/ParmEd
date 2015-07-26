@@ -761,6 +761,14 @@ class TestMol2File(FileIOTestCase):
         self.assertEqual(len(mol2), 31)
         self.assertEqual(len(mol2.bonds), 33)
 
+    def testMol2FileWithNoTypeNames(self):
+        """ Tests writing a Mol2 without types uses names instead """
+        struct = read_PDB(get_fn('2koc.pdb'))
+        output = StringIO()
+        formats.Mol2File.write(struct, output)
+        output.seek(0)
+        mol2 = formats.Mol2File.parse(output, structure=True)
+
     def testMol3Structure(self):
         """ Tests parsing a Mol3 file with 1 residue into a Structure """
         mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
