@@ -444,7 +444,8 @@ class Mol2File(object):
                     except AttributeError:
                         z = 0
                     dest.write('%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s' % (
-                               j, atom.name, x, y, z, atom.type, i+1, res.name))
+                               j, atom.name, x, y, z,
+                               atom.type.strip() or atom.name, i+1, res.name))
                     if printchg:
                         dest.write(' %10.6f\n' % atom.charge)
                     else:
