@@ -489,12 +489,30 @@ class TestCharmmParameters(unittest.TestCase):
         self._compare_paramsets(chparams1, params1, copy=False)
         self._compare_paramsets(chparams2, params2, copy=True)
 
-#       self._check_uppercase_types(params1)
-#       self._check_uppercase_types(params2)
+        self._check_uppercase_types(chparams1)
+        self._check_uppercase_types(chparams2)
 
-#   def _check_uppercase_types(self, params):
-#       for aname, atom_type in iteritems(params.atom_types):
-#           self.assertEqual(aname, aname.upper())
+        # GAFF atom types, as in the first parameter set, are all lower-case.
+        # Check that name decoration is the established pattern
+        for name in chparams1.atom_types:
+            self.assertTrue(name.endswith('LTU'))
+
+    def _check_uppercase_types(self, params):
+        for aname, atom_type in iteritems(params.atom_types):
+            self.assertEqual(aname, aname.upper())
+            self.assertEqual(atom_type.name, atom_type.name.upper())
+        for key in params.bond_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+        for key in params.angle_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+        for key in params.dihedral_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+        for key in params.cmap_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
 
     def _compare_paramsets(self, set1, set2, copy):
         def get_typeset(set1, set2):

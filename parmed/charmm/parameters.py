@@ -17,7 +17,7 @@ from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
-from parmed.utils.six import iteritems
+from parmed.utils.six import iteritems, string_types, integer_types
 from parmed.utils.six.moves import zip
 import os
 import re
@@ -168,6 +168,8 @@ class CharmmParameterSet(ParameterSet):
         """
         new_params = cls()
         def typeconv(name):
+            if isinstance(name, integer_types):
+                return name
             if name.upper() == name:
                 return name
             # Lowercase letters present -- decorate the type name with LTU --
@@ -180,6 +182,10 @@ class CharmmParameterSet(ParameterSet):
         # Convert all parameters
         id_typemap = dict()
         def copy_paramtype(key, typ, dict):
+            if isinstance(key, string_types):
+                key = typeconv(key)
+            elif isinstance(key, tuple):
+                key = tuple(typeconv(k) for k in key)
             # NoUreyBradley should never be copied
             if typ is NoUreyBradley:
                 dict[key] = NoUreyBradley
@@ -191,10 +197,13 @@ class CharmmParameterSet(ParameterSet):
                 dict[key] = newtype
 
         for key, atom_type in iteritems(params.atom_types_tuple):
+            atom_type.name = typeconv(atom_type.name)
             copy_paramtype(key, atom_type, new_params.atom_types_tuple)
         for typename, atom_type in iteritems(params.atom_types):
+            atom_type.name = typeconv(atom_type.name)
             copy_paramtype(typename, atom_type, new_params.atom_types)
         for idx, atom_type in iteritems(params.atom_types_int):
+            atom_type.name = typeconv(atom_type.name)
             copy_paramtype(idx, atom_type, new_params.atom_types_int)
 
         for key, typ in iteritems(params.bond_types):
