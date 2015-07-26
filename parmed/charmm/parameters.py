@@ -8,6 +8,7 @@ Contributors:
 Date: Apr. 13, 2015
 """
 from __future__ import division
+from copy import copy as _copy
 from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
                     DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
@@ -139,6 +140,79 @@ class CharmmParameterSet(ParameterSet):
         for top in tops: self.read_topology_file(top)
         for par in pars: self.read_parameter_file(par)
         for strf in strs: self.read_stream_file(strf)
+
+    @classmethod
+    def from_parameterset(cls, params, copy=False):
+        """
+        Instantiates a CharmmParameterSet from another ParameterSet (or
+        subclass). The main thing this feature is responsible for is converting
+        lower-case atom type names into all upper-case and decorating the name
+        to ensure each atom type name is unique.
+
+        Parameters
+        ----------
+        params : :class:`parmed.parameters.ParameterSet`
+            ParameterSet containing the list of parameters to be converted to a
+            CHARMM-compatible set
+        copy : bool, optional
+            If True, the returned parameter set is a deep copy of ``params``. If
+            False, the returned parameter set is a shallow copy, and the
+            original set may be modified if any lower-case atom type names are
+            present. Default is False.
+
+        Returns
+        -------
+        new_params : CharmmParameterSet
+            The parameter set whose atom type names are converted to all
+            upper-case
+        """
+        new_params = cls()
+        def typeconv(name):
+            if name.upper() == name:
+                return name
+            # Lowercase letters present -- decorate the type name with LTU --
+            # Lower To Upper
+            return '%sLTU' % name.upper()
+        if copy:
+            do_copy = lambda x: _copy(x)
+        else:
+            do_copy = lambda x: x
+        # Convert all parameters
+        id_typemap = dict()
+        def copy_paramtype(key, typ, dict):
+            # NoUreyBradley should never be copied
+            if typ is NoUreyBradley:
+                dict[key] = NoUreyBradley
+            elif id(typ) in id_typemap:
+                dict[key] = id_typemap[id(typ)]
+            else:
+                newtype = do_copy(typ)
+                id_typemap[id(typ)] = newtype
+                dict[key] = newtype
+
+        for key, atom_type in iteritems(params.atom_types_tuple):
+            copy_paramtype(key, atom_type, new_params.atom_types_tuple)
+        for typename, atom_type in iteritems(params.atom_types):
+            copy_paramtype(typename, atom_type, new_params.atom_types)
+        for idx, atom_type in iteritems(params.atom_types_int):
+            copy_paramtype(idx, atom_type, new_params.atom_types_int)
+
+        for key, typ in iteritems(params.bond_types):
+            copy_paramtype(key, typ, new_params.bond_types)
+        for key, typ in iteritems(params.angle_types):
+            copy_paramtype(key, typ, new_params.angle_types)
+        for key, typ in iteritems(params.urey_bradley_types):
+            copy_paramtype(key, typ, new_params.urey_bradley_types)
+        for key, typ in iteritems(params.dihedral_types):
+            copy_paramtype(key, typ, new_params.dihedral_types)
+        for key, typ in iteritems(params.improper_types):
+            copy_paramtype(key, typ, new_params.improper_types)
+        for key, typ in iteritems(params.cmap_types):
+            copy_paramtype(key, typ, new_params.cmap_types)
+        for key, typ in iteritems(params.nbfix_types):
+            copy_paramtype(key, typ, new_params.nbfix_types)
+
+        return new_params
 
     @classmethod
     def load_set(cls, tfile=None, pfile=None, sfiles=None):

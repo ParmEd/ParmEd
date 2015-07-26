@@ -6,8 +6,7 @@ from __future__ import division, print_function
 import utils
 from parmed.utils.six import iteritems
 from parmed.charmm import charmmcrds, parameters, psf
-from parmed import topologyobjects as to
-from parmed import exceptions
+from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
 import os
 import unittest
 
@@ -474,6 +473,66 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(p.dihedral_types[('CG321','CG321','NG3C51','CG2R51')].penalty, 88)
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
+
+    def testCharmmParameterSetConversion(self):
+        """ Tests CharmmParameterSet.from_parameterset """
+        params1 = ParameterSet.from_structure(
+                load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
+        )
+        params2 = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top')).parameterset
+        chparams1 = parameters.CharmmParameterSet.from_parameterset(params1)
+        chparams2 = parameters.CharmmParameterSet.from_parameterset(params2, copy=True)
+
+        self.assertIsInstance(chparams1, parameters.CharmmParameterSet)
+        self.assertIsInstance(chparams2, parameters.CharmmParameterSet)
+
+        self._compare_paramsets(chparams1, params1, copy=False)
+        self._compare_paramsets(chparams2, params2, copy=True)
+
+#       self._check_uppercase_types(params1)
+#       self._check_uppercase_types(params2)
+
+#   def _check_uppercase_types(self, params):
+#       for aname, atom_type in iteritems(params.atom_types):
+#           self.assertEqual(aname, aname.upper())
+
+    def _compare_paramsets(self, set1, set2, copy):
+        def get_typeset(set1, set2):
+            ids1 = set()
+            ids2 = set()
+            for _, item in iteritems(set1):
+                ids1.add(id(item))
+            for _, item in iteritems(set2):
+                ids2.add(id(item))
+            return ids1, ids2
+        # Bonds
+        b1, b2 = get_typeset(set1.bond_types, set2.bond_types)
+        self.assertEqual(len(b1), len(b2))
+        if copy:
+            self.assertFalse(b1 & b2)
+        else:
+            self.assertEqual(b1, b2)
+        # Angles
+        a1, a2 = get_typeset(set1.angle_types, set2.angle_types)
+        self.assertEqual(len(a1), len(a2))
+        if copy:
+            self.assertFalse(a1 & a2)
+        else:
+            self.assertEqual(a1, a2)
+        # Dihedrals
+        d1, d2 = get_typeset(set1.dihedral_types, set2.dihedral_types)
+        self.assertEqual(len(d1), len(d2))
+        if copy:
+            self.assertFalse(d1 & d2)
+        else:
+            self.assertEqual(d1, d2)
+        # Atom types
+        a1, a2 = get_typeset(set1.atom_types, set2.atom_types)
+        self.assertEqual(len(a1), len(a2))
+        if copy:
+            self.assertFalse(a1 & a2)
+        else:
+            self.assertEqual(a1, a2)
 
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
