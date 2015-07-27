@@ -370,7 +370,8 @@ class CharmmPsfFile(Structure):
         if (struct.rb_torsions or struct.trigonal_angles or
                 struct.out_of_plane_bends or struct.pi_torsions or
                 struct.stretch_bends or struct.torsion_torsions or
-                struct.chiral_frames or struct.multipole_frames):
+                struct.chiral_frames or struct.multipole_frames or
+                struct.nrexcl != 3):
             raise ValueError('Unsupported functional form for CHARMM PSF')
         if copy:
             struct = _copy(struct)
@@ -405,13 +406,6 @@ class CharmmPsfFile(Structure):
             if atom.atom_type is not None:
                 atom.atom_type.name = typeconv(atom.atom_type.name)
 
-        # In case CHARMM force fields define all of their exclusions from the
-        # bond, angle, and dihedral lists, go ahead and fill in any blank,
-        # zeroed terms that need to exist to fill them out from the bond graph
-        # (the same function is used in the AmberParm class for the same reason)
-#       psf._add_missing_13_14()
-#       del psf.adjusts[:]
-
         # In some cases, 1-4 interactions are defined in the dihedral list. If
         # 1-4 van der Waals scalings exist, these are implemented in CHARMM
         # through scaled 1-4 epsilon parameters. So first we update our dihedral
@@ -435,6 +429,7 @@ class CharmmPsfFile(Structure):
                 if scnb != 1:
                     a1.epsilon_14 = a1.epsilon / scnb
                     a2.epsilon_14 = a2.epsilon / scnb
+
         return psf
 
     #===================================================
@@ -638,178 +633,6 @@ class CharmmPsfFile(Structure):
     def clear_cmap(self):
         " Clear the cmap list to prevent any CMAP parameters from being used "
         del self.cmaps[:]
-
-    #===================================================
-
-    def _add_missing_13_14(self, ignore_inconsistent_vdw=False):
-        """
-        Uses the bond graph to fill in zero-parameter angles and dihedrals. The
-        reason this is necessary is that Amber assumes that the list of angles
-        and dihedrals encompasses *all* 1-3 and 1-4 pairs as determined by the
-        bond graph, respectively. As a result, Amber programs use the angle and
-        dihedral lists to set nonbonded exclusions and exceptions.
-
-        Parameters
-        ----------
-        ignore_inconsistent_vdw : bool, optional
-            If True, do not make inconsistent 1-4 vdW parameters fatal. For
-            ChamberParm, the 1-4 specific vdW parameters can compensate. For
-            AmberParm, the 1-4 scaling factor cannot represent arbitrary
-            exceptions. Default is False (should only be True for ChamberParm)
-        """
-        # We need to figure out what 1-4 scaling term to use if we don't have
-        # explicit exceptions
-        if not self.adjusts:
-            eel_scale = set()
-            for dih in self.dihedrals:
-                if dih.ignore_end or dih.improper: continue
-                if isinstance(dih.type, DihedralType):
-                    eel_scale.add(dih.type.scee)
-                elif isinstance(dih.type, DihedralTypeList):
-                    eel_scale.add(dih.type[0].scee)
-                else:
-                    assert False, 'Should not be here'
-            if len(eel_scale) > 1:
-                raise ValueError('Cannot have mixed 1-4 EEL scaling')
-            elif len(eel_scale) == 1:
-                scee = list(eel_scale)[0]
-            else:
-                scee = 1e10
-            zero_torsion = DihedralType(0, 1, 0, scee, 1.0)
-        else:
-            # Turn list of exceptions into a dict so we can look it up quickly
-            adjust_dict = dict()
-            for pair in self.adjusts:
-                adjust_dict[tuple(sorted([pair.atom1, pair.atom2]))] = pair
-            ignored_torsion = None
-            zero_torsion = None
-            # Scan through existing dihedrals to make sure the exceptions match
-            # the dihedral list
-            if self.combining_rule == 'lorentz':
-                comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
-            elif self.combining_rule == 'geometric':
-                comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-            else:
-                assert False, "Unrecognized combining rule"
-            fac = 2**(1/6)
-            for dihedral in self.dihedrals:
-                if dihedral.ignore_end: continue
-                key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
-                eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
-                rref = comb_sig(dihedral.atom1.sigma_14,
-                                dihedral.atom4.sigma_14) * fac
-                if key in adjust_dict:
-                    pair = adjust_dict[key]
-                    if pair.type.epsilon == 0:
-                        scnb = 1e10
-                    else:
-                        scnb = eref / pair.type.epsilon
-                    if pair.type.chgscale == 0:
-                        scee = 1e10
-                    else:
-                        scee = 1 / pair.type.chgscale
-                    if (abs(rref - pair.type.rmin) > SMALL and
-                            pair.type.epsilon != 0):
-                        if ignore_inconsistent_vdw:
-                            scnb = 1.0
-                        else:
-                            raise TypeError('Cannot translate exceptions')
-                    if (abs(scnb - dihedral.type.scnb) < SMALL and
-                            abs(scee - dihedral.type.scee) < SMALL):
-                        continue
-                else:
-                    scee = scnb = 1e10
-                newtype = _copy(dihedral.type)
-                newtype.scee = scee
-                newtype.scnb = scnb
-                dihedral.type = newtype
-                newtype.list = self.dihedral_types
-                self.dihedral_types.append(newtype)
-
-        zero_angle = AngleType(0, 0)
-
-        n13 = n14 = 0
-        if self.combining_rule == 'lorentz':
-            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
-        elif self.combining_rule == 'geometric':
-            comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, 'Unrecognized combining rule. Should not be here'
-        fac = 2**(1/6)
-        for atom in self.atoms:
-            if isinstance(atom, ExtraPoint): continue
-            for batom in atom.bond_partners:
-                if isinstance(batom, ExtraPoint): continue
-                for aatom in batom.bond_partners:
-                    if isinstance(aatom, ExtraPoint) or aatom is atom: continue
-                    for datom in aatom.bond_partners:
-                        if isinstance(datom, ExtraPoint): continue
-                        if (datom in atom.angle_partners + atom.bond_partners +
-                                atom.dihedral_partners or datom is atom):
-                            continue
-                        # Add the missing dihedral
-                        if not self.adjusts:
-                            tortype = zero_torsion
-                            if n14 == 0:
-                                tortype.list = self.dihedral_types
-                                self.dihedral_types.append(tortype)
-                        else:
-                            # Figure out what the scale factors must be
-                            key = tuple(sorted([atom, datom]))
-                            if key not in adjust_dict:
-                                if ignored_torsion is None:
-                                    ignored_torsion = DihedralType(0, 1, 0,
-                                                                   1e10, 1e10)
-                                    self.dihedral_types.append(ignored_torsion)
-                                    ignored_torsion.list = self.dihedral_types
-                                tortype = ignored_torsion
-                            elif 0 in (adjust_dict[key].type.epsilon,
-                                       adjust_dict[key].type.rmin) and \
-                                    adjust_dict[key].type.chgscale == 0:
-                                if ignored_torsion is None:
-                                    ignored_torsion = \
-                                            DihedralType(0, 1, 0, 1e10, 1e10,
-                                                    list=self.dihedral_types)
-                                    self.dihedral_types.append(ignored_torsion)
-                                tortype = ignored_torsion
-                            else:
-                                pair = adjust_dict[key]
-                                epsilon = pair.type.epsilon
-                                rmin = pair.type.rmin
-                                # Compare it to the 1-4 parameters that are
-                                # already present
-                                eref = sqrt(pair.atom1.epsilon_14*
-                                            pair.atom2.epsilon_14)
-                                if pair.type.epsilon == 0:
-                                    scnb = 1e10
-                                else:
-                                    scnb = eref / epsilon
-                                if pair.type.chgscale == 0:
-                                    scee = 1e10
-                                else:
-                                    scee = 1 / pair.type.chgscale
-                                rref = comb_sig(pair.atom1.sigma_14,
-                                                pair.atom2.sigma_14) * fac
-                                if abs(rmin - rref) > SMALL:
-                                    if ignore_inconsistent_vdw:
-                                        scnb = 1.0
-                                    else:
-                                        raise TypeError(
-                                                'Cannot translate exceptions'
-                                        )
-                                tortype = DihedralType(0, 1, 0, scee, scnb,
-                                                       list=self.dihedral_types)
-                                self.dihedral_types.append(tortype)
-                        dihedral = Dihedral(atom, batom, aatom, datom,
-                                            ignore_end=False, improper=False,
-                                            type=tortype)
-                        self.dihedrals.append(dihedral)
-                        n14 += 1
-                    if aatom in atom.angle_partners + atom.bond_partners:
-                        continue
-                    # Add the missing angle
-                    self.angles.append(Angle(atom, batom, aatom, zero_angle))
-                    n13 += 1
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
