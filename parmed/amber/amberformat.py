@@ -154,6 +154,9 @@ class FortranFormat(object):
     def __str__(self):
         return self.format
 
+    def __repr__(self):
+        return "<%s: %s>" % (type(self).__name__, self.format)
+
     #===================================================
 
     def write(self, items, dest):
@@ -424,10 +427,13 @@ class AmberFormat(object):
         except ImportError:
             return self.rdparm_slow(fname)
 
-        if slow:
+        # The optimized parser only works on local, uncompressed files
+        # TODO: Add gzip and bzip2 support to the optimized reader
+        if (slow or fname.startswith('http://') or fname.startswith('https://')
+                or fname.endswith('.bz2') or fname.endswith('.gz')):
             return self.rdparm_slow(fname)
 
-        # We have the optimized version
+        # We have the optimized version and a local file
         try:
             ret = _rdparm.rdparm(fname)
         except TypeError:
@@ -840,7 +846,7 @@ class AmberFormat(object):
             should be written and read. Do not enclose in ()
         data : list=None
             Sequence with data for the new flag. If None, a list of zeros of
-            length `num_items` (see below) is given as a holder
+            length ``num_items`` (see below) is given as a holder
         num_items : int=-1
             Number of items in the section. This variable is ignored if a set of
             data are given in `data`

@@ -9,27 +9,16 @@ from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-from utils import get_fn, diff_files, get_saved_fn
+from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
 import warnings
 
 @unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
-class TestGromacsTop(unittest.TestCase):
+class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 
     def setUp(self):
         warnings.filterwarnings('error', category=GromacsWarning)
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        FileIOTestCase.setUp(self)
 
     def _charmm27_checks(self, top):
         # Check that the number of terms are correct
@@ -129,6 +118,7 @@ class TestGromacsTop(unittest.TestCase):
     def testCharmm27Top(self):
         """ Tests parsing a Gromacs topology with CHARMM 27 FF """
         top = GromacsTopologyFile(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         self.assertEqual(top.itps, ['charmm27.ff/forcefield.itp',
                                     'charmm27.ff/tip3p.itp',
                                     'charmm27.ff/ions.itp'])
@@ -137,6 +127,7 @@ class TestGromacsTop(unittest.TestCase):
     def testWriteCharmm27Top(self):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
         top = load_file(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         GromacsTopologyFile.write(top,
                 get_fn('1aki.charmm27.top', written=True))
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
@@ -206,11 +197,13 @@ class TestGromacsTop(unittest.TestCase):
     def testReadAmber99SBILDN(self):
         """ Tests parsing a Gromacs topology with Amber99SBILDN and water """
         top = load_file(get_fn('1aki.ff99sbildn.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         self._check_ff99sbildn(top)
 
     def testWriteAmber99SBILDN(self):
         """ Tests writing a Gromacs topology with multiple molecules """
         top = load_file(get_fn('1aki.ff99sbildn.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
         GromacsTopologyFile.write(top,
                 get_fn('1aki.ff99sbildn.top', written=True),
                 combine=None)
@@ -223,26 +216,34 @@ class TestGromacsTop(unittest.TestCase):
         parm = load_file(get_fn('phenol.prmtop'))
         parm = parm * 20 + load_file(get_fn('biphenyl.prmtop')) * 20
         top = GromacsTopologyFile.from_structure(parm)
+        self.assertEqual(top.combining_rule, 'lorentz')
         top.write(get_fn('phenol_biphenyl.top', written=True))
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
         self.assertEqual(len(top.residues), 40)
 
-class TestGromacsGro(unittest.TestCase):
+    def testOPLS(self):
+        """ Tests the geometric combining rules in Gromacs with OPLS/AA """
+        parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
+        self.assertEqual(parm.combining_rule, 'geometric')
+        self.assertEqual(parm.defaults.comb_rule, 3)
+
+    def testMoleculeOrdering(self):
+        """ Tests non-contiguous atoms in Gromacs topology file writes """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
+        parm.write(get_fn('topol3.top', written=True))
+        parm2 = load_file(get_fn('topol3.top', written=True))
+        self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        self.assertEqual(len(parm.residues), len(parm2.residues))
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(r1.name, r2.name)
+            for a1, a2 in zip(r1.atoms, r2.atoms):
+                self.assertEqual(a1.name, a2.name)
+                self.assertEqual(a1.type, a2.type)
+
+class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
-
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
 
     def testReadGroFile(self):
         """ Tests reading GRO file """

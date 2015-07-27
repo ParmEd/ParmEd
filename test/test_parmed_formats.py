@@ -6,19 +6,15 @@ import utils
 
 import numpy as np
 from parmed import amber, charmm, exceptions, formats, gromacs
-from parmed import (Structure, read_PDB, write_PDB, read_CIF,
+from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
-try:
-    import cStringIO as StringIO
-    from itertools import izip as zip
-except ImportError:
-    # Must be Python 3
-    import io as StringIO
+from parmed.utils.six.moves import zip, StringIO
 import os
 import unittest
-from utils import get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests
+from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
+                   FileIOTestCase)
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -138,7 +134,13 @@ class TestFileLoader(unittest.TestCase):
                 formats.load_file(get_fn('../test_parmed_formats.py')))
         self.assertRaises(IOError, lambda: formats.load_file('no_file'))
 
-class TestChemistryPDBStructure(unittest.TestCase):
+    def testStructureKeyword(self):
+        """ Tests that the structure argument is special-cased in load_file """
+        mol2 = formats.load_file(get_fn('tripos9.mol2'), structure=True)
+        self.assertIsInstance(mol2, Structure)
+        pdb = formats.load_file(get_fn('4lzt.pdb'), structure=True)
+
+class TestChemistryPDBStructure(FileIOTestCase):
     
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
@@ -149,18 +151,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         self.simple = get_fn('ala_ala_ala.pdb')
         self.format_test = get_fn('SCM_A.pdb')
         self.overflow2 = get_fn('overflow.pdb')
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        FileIOTestCase.setUp(self)
 
     def testAscii(self):
         """ Test PDB file parsing """
@@ -221,7 +212,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         pdbfile = read_PDB(self.simple)
         self.assertEqual(len(pdbfile.atoms), 33)
         self.assertEqual(len(pdbfile.residues), 3)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -232,20 +223,21 @@ class TestChemistryPDBStructure(unittest.TestCase):
     def testPdbWriteModels(self):
         """ Test PDB file writing from NMR structure with models """
         pdbfile = read_PDB(self.models)
-        self.assertEqual(pdbfile.get_coordinates('all').shape[0], 20)
+        self.assertEqual(pdbfile.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(pdbfile.atoms), 451)
-        output = StringIO.StringIO()
+        output = StringIO()
         write_PDB(pdbfile, output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
+        self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
     def testPdbWriteXtal(self):
         """ Test PDB file writing from a Xtal structure """
         pdbfile = read_PDB(self.pdb)
         self._check4lzt(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output, renumber=False)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -272,7 +264,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
         """ Test PDB file writing with different altloc options """
         pdbfile = read_PDB(self.pdb)
         self._check4lzt(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output, renumber=False, altlocs='all')
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -330,7 +322,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
                 self.assertEqual(x/10000, y)
         pdbfile = read_PDB(self.pdb)
         check_aniso(pdbfile)
-        output = StringIO.StringIO()
+        output = StringIO()
         pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
@@ -500,6 +492,7 @@ class TestChemistryPDBStructure(unittest.TestCase):
             self.assertEqual(obj.doi, '10.1107/S0907444997013656')
             self.assertEqual(obj.volume, '54')
             self.assertEqual(obj.page, '522')
+            self.assertEqual(obj.resolution, 0.95)
         # Check the TER card is picked up
         for i, residue in enumerate(obj.residues):
             if i == 128:
@@ -507,24 +500,13 @@ class TestChemistryPDBStructure(unittest.TestCase):
             else:
                 self.assertFalse(residue.ter)
 
-class TestChemistryCIFStructure(unittest.TestCase):
+class TestChemistryCIFStructure(FileIOTestCase):
 
     def setUp(self):
         self.lztpdb = get_fn('4lzt.pdb')
         self.lzt = get_fn('4LZT.cif')
         self.largecif = get_fn('1ffk.cif')
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass # Already exists
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        FileIOTestCase.setUp(self)
 
     def testWriteCIF(self):
         """ Test CIF writing capabilities """
@@ -566,7 +548,7 @@ class TestChemistryCIFStructure(unittest.TestCase):
 
         # Now check CIF writing without anisotropic B-factors and with
         # renumbering
-        io = StringIO.StringIO()
+        io = StringIO()
         cif.write_cif(io)
         io.seek(0)
         cif3 = read_CIF(io)
@@ -610,6 +592,18 @@ class TestChemistryCIFStructure(unittest.TestCase):
     def testDownload(self):
         """ Test CIF downloading on 4LZT """
         self._check4lzt(download_CIF('4lzt'))
+
+    def testCIFModels(self):
+        """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
+        cif = download_CIF('2koc')
+        self.assertEqual(cif.get_coordinates('all').shape, (20, 451, 3))
+        self.assertEqual(len(cif.atoms), 451)
+        output = StringIO()
+        write_CIF(cif, output)
+        output.seek(0)
+        pdbfile2 = read_CIF(output)
+        self.assertEqual(len(pdbfile2.atoms), 451)
+        self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
 
     def _check4lzt(self, cif):
         pdb = read_PDB(self.lztpdb)
@@ -660,23 +654,10 @@ class TestChemistryCIFStructure(unittest.TestCase):
         self.assertEqual(cif.volume, '54, 46, 46')
         self.assertEqual(cif.doi, '10.1107/S0907444997013656')
         self.assertEqual(cif.pmid, '9761848')
+        self.assertEqual(cif.resolution, 0.95)
 
-class TestMol2File(unittest.TestCase):
+class TestMol2File(FileIOTestCase):
     """ Tests the correct parsing and processing of mol2 files """
-
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
 
     def testMultiMol2(self):
         """ Tests the parsing of a mol2 file with multiple residues """
@@ -722,6 +703,18 @@ class TestMol2File(unittest.TestCase):
         # bond arrays for every residue
         self.assertEqual(sum([len(x.bonds) for x in cont]), 668)
 
+    def testMultiMol2Entries(self):
+        """ Tests a mol2 file with multiple @<MOLECULE> sections """
+        cont = formats.Mol2File.parse(get_fn('multimol.mol2'))
+        self.assertIsInstance(cont, ResidueTemplateContainer)
+        self.assertEqual(len(cont), 200)
+        for i, res in enumerate(cont):
+            self.assertEqual(res.name, 'ZINC00000016_%d' % (i+1))
+            self.assertEqual(len(res.atoms), 37)
+            self.assertEqual(len(res.bonds), 38)
+            self.assertIs(res.head, None)
+            self.assertIs(res.tail, None)
+
     def testMultiMol2Structure(self):
         """ Tests parsing a multi-residue mol2 into a Structure """
         struct = formats.Mol2File.parse(get_fn('test_multi.mol2'),
@@ -760,6 +753,22 @@ class TestMol2File(unittest.TestCase):
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
 
+    def testMol2FileWithBlankLines(self):
+        """ Tests parsing a Mol2 file with blank lines at the end """
+        mol2 = formats.Mol2File.parse(get_fn('tripos1.mol2'))
+        self.assertIsInstance(mol2, ResidueTemplate)
+        self.assertEqual(mol2.name, 'DAN')
+        self.assertEqual(len(mol2), 31)
+        self.assertEqual(len(mol2.bonds), 33)
+
+    def testMol2FileWithNoTypeNames(self):
+        """ Tests writing a Mol2 without types uses names instead """
+        struct = read_PDB(get_fn('2koc.pdb'))
+        output = StringIO()
+        formats.Mol2File.write(struct, output)
+        output.seek(0)
+        mol2 = formats.Mol2File.parse(output, structure=True)
+
     def testMol3Structure(self):
         """ Tests parsing a Mol3 file with 1 residue into a Structure """
         mol3 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
@@ -774,8 +783,39 @@ class TestMol2File(unittest.TestCase):
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
         formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
-        self.assertTrue(diff_files(get_fn('test_multi.mol2', written=True),
-                                   get_saved_fn('test_multi.mol2')))
+        formats.Mol2File.write(mol2, get_fn('test_multi_sep.mol2', written=True),
+                               split=True)
+        self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
+                                   get_fn('test_multi.mol2', written=True)))
+        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'),
+                                   get_fn('test_multi_sep.mol2', written=True)))
+        mol22 = formats.Mol2File.parse(get_fn('test_multi_sep.mol2', written=True))
+        self.assertEqual(len(mol2), len(mol22))
+        self.assertEqual([r.name for r in mol2], [r.name for r in mol22])
+        for r1, r2 in zip(mol2, mol22):
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            self.assertEqual(len(r1.atoms), len(r2.atoms))
+            self.assertFalse(r1.head is None and r1.tail is None)
+            self.assertTrue(r2.head is None and r2.tail is None)
+        f = StringIO()
+        formats.Mol2File.write(mol2, f, mol3=True, split=True)
+        f.seek(0)
+        mol3 = formats.Mol2File.parse(f)
+        self.assertEqual(len(mol2), len(mol3))
+        self.assertEqual([r.name for r in mol2], [r.name for r in mol3])
+        for r1, r2 in zip(mol2, mol3):
+            self.assertEqual(len(r1.bonds), len(r2.bonds))
+            self.assertEqual(len(r1.atoms), len(r2.atoms))
+            self.assertFalse(r1.head is None and r1.tail is None)
+            self.assertFalse(r2.head is None and r2.tail is None)
+            if r1.head is None:
+                self.assertIs(r2.head, None)
+            else:
+                self.assertEqual(r1.head.name, r2.head.name)
+            if r1.tail is None:
+                self.assertIs(r2.tail, None)
+            else:
+                self.assertEqual(r1.tail.name, r2.tail.name)
 
     def testMol2MultiWriteFromStructure(self):
         """ Tests writing mol2 file of multi residues from Structure """
@@ -832,5 +872,91 @@ class TestMol2File(unittest.TestCase):
         self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
                                    get_saved_fn('tripos9struct.mol3')))
 
-if __name__ == '__main__':
-    unittest.main()
+class TestFileDownloader(unittest.TestCase):
+    """ Tests load_file with URLs for each format """
+
+    def setUp(self):
+        self.url = 'https://github.com/ParmEd/ParmEd/raw/master/test/files/'
+
+    def testDownloadOFF(self):
+        """ Tests automatic loading of downloaded OFF files """
+        off = formats.load_file(self.url + 'amino12.lib')
+        self.assertIsInstance(off, dict)
+        for key, item in iteritems(off):
+            self.assertIsInstance(item, ResidueTemplate)
+
+    def testDownloadAmberParm(self):
+        """ Tests automatic loading of downloaded AmberParm object """
+        parm = formats.load_file(self.url + 'tip4p.parm7')
+        self.assertIsInstance(parm, amber.AmberParm)
+
+    def testDownloadAmoebaParm(self):
+        """ Tests automatic loading of downloaded AmoebaParm object """
+        parm = formats.load_file(self.url + 'nma.parm7')
+        self.assertIsInstance(parm, amber.AmoebaParm)
+
+    def testDownloadChamberParm(self):
+        """ Tests automatic loading of downloaded ChamberParm object """
+        parm = formats.load_file(self.url + 'ala_ala_ala.parm7')
+        self.assertIsInstance(parm, amber.ChamberParm)
+
+    def testDownloadAmberFormat(self):
+        """ Tests automatic loading of downloaded AmberFormat object """
+        parm = formats.load_file(self.url + 'cSPCE.mdl')
+        self.assertIsInstance(parm, amber.AmberFormat)
+        self.assertNotIsInstance(parm, amber.AmberParm)
+
+    def testDownloadAmberRestart(self):
+        """ Tests automatic loading of downloaded Amber ASCII restart file """
+        parm = formats.load_file(self.url + 'trx.inpcrd')
+        self.assertIsInstance(parm, amber.AmberAsciiRestart)
+
+    def testDownloadAmberMdcrd(self):
+        """ Tests automatic loading of downloaded Amber mdcrd file """
+        crd = formats.load_file(self.url + 'tz2.truncoct.crd', natom=5827,
+                                hasbox=True)
+        self.assertIsInstance(crd, amber.AmberMdcrd)
+
+    def testDownloadCharmmPsfFile(self):
+        """ Tests automatic loading of downloaded CHARMM PSF file """
+        parm = formats.load_file(self.url + 'ala_ala_ala.psf')
+        self.assertIsInstance(parm, charmm.CharmmPsfFile)
+
+    def testDownloadCharmmCrdFile(self):
+        """ Tests automatic loading of downloaded CHARMM crd file """
+        crd = formats.load_file(self.url + 'dhfr_min_charmm.crd')
+        self.assertIsInstance(crd, charmm.CharmmCrdFile)
+
+    def testDownloadCharmmRestart(self):
+        """ Tests automatic loading of downloaded CHARMM restart file """
+        crd = formats.load_file(self.url + 'sample-charmm.rst')
+        self.assertIsInstance(crd, charmm.CharmmRstFile)
+
+    def testDownloadPDB(self):
+        """ Tests automatic loading of downloaded PDB files """
+        pdb = formats.load_file(self.url + '4lzt.pdb')
+        self.assertIsInstance(pdb, Structure)
+        self.assertEqual(len(pdb.atoms), 1164)
+
+    def testDownloadCIF(self):
+        """ Tests automatic loading of downloaded PDBx/mmCIF files """
+        cif = formats.load_file(self.url + '4LZT.cif')
+        self.assertIsInstance(cif, Structure)
+        self.assertEqual(len(cif.atoms), 1164)
+
+    def testDownloadMol2(self):
+        """ Tests automatic loading of downloaded mol2 and mol3 files """
+        mol2 = formats.load_file(self.url + 'test_multi.mol2')
+        self.assertIsInstance(mol2, ResidueTemplateContainer)
+        mol3 = formats.load_file(self.url + 'tripos9.mol2')
+        self.assertIsInstance(mol3, ResidueTemplate)
+
+    def testDownloadGromacsTop(self):
+        """ Tests automatic loading of downloaded Gromacs topology file """
+        top = formats.load_file(self.url + '1aki.charmm27.top')
+        self.assertIsInstance(top, gromacs.GromacsTopologyFile)
+
+    def testDownloadGromacsGro(self):
+        """ Tests automatic loading of downloaded Gromacs GRO file """
+        gro = formats.load_file(self.url + '1aki.ff99sbildn.gro')
+        self.assertIsInstance(gro, Structure)

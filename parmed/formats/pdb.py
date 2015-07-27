@@ -6,17 +6,12 @@ from __future__ import division, print_function, absolute_import
 
 from contextlib import closing
 import io
-import itertools
 import ftplib
 try:
     import gzip
 except ImportError:
     gzip = None
-try:
-    import numpy as np
-    create_array = lambda x: np.array(x, dtype=np.float64)
-except ImportError:
-    create_array = lambda x: [float(v) for v in x]
+import numpy as np
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
@@ -209,6 +204,8 @@ class PDBFile(object):
             TITL section of the JRNL record
         year : ``int``
             Year that the article was published, from the JRNL record
+        resolution : ``float``
+            The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
     
@@ -230,10 +227,10 @@ class PDBFile(object):
 
         struct = Structure()
         # Add metadata fields
-        struct.experimental = struct.journal = struct.authors = struct.keywords = ''
-        struct.doi = struct.pmid = struct.journal_authors = struct.volume_page = ''
-        struct.title = ''
-        struct.year = None
+        struct.experimental = struct.journal = struct.authors = ''
+        struct.keywords = struct.doi = struct.pmid = ''
+        struct.journal_authors = struct.volume_page = struct.title = ''
+        struct.year = struct.resolution = None
         struct.related_entries = []
         modelno = 1 # For PDB files with multiple MODELs
         atomno = 0
@@ -374,7 +371,8 @@ class PDBFile(object):
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                     if segid: atom.segid = segid
-                    if _compare_atoms(last_atom, atom, resname, resid, chain):
+                    if (_compare_atoms(last_atom, atom, resname, resid, chain)
+                            and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
                         last_atom_added = atom
@@ -438,8 +436,8 @@ class PDBFile(object):
                         warnings.warn('ANISOU record does not match previous '
                                       'atom', PDBWarning)
                         continue
-                    la.anisou = create_array([u11/1e4, u22/1e4, u33/1e4,
-                                              u12/1e4, u13/1e4, u23/1e4])
+                    la.anisou = np.array([u11/1e4, u22/1e4, u33/1e4,
+                                          u12/1e4, u13/1e4, u23/1e4])
                 elif rec.strip() == 'TER':
                     if modelno == 1: last_atom.residue.ter = True
                 elif rec == 'ENDMDL':
@@ -506,11 +504,30 @@ class PDBFile(object):
                         struct.doi = line[19:].strip()
                 elif rec == 'KEYWDS':
                     struct.keywords += '%s,' % line[10:]
-                elif rec == 'REMARK' and line[6:10] == ' 900':
-                    # Related entries
-                    rematch = PDBFile._relatere.match(line[11:])
-                    if rematch:
-                        struct.related_entries.append(rematch.groups())
+                elif rec == 'REMARK':
+                    if line[6:10] == ' 900':
+                        # Related entries
+                        rematch = PDBFile._relatere.match(line[11:])
+                        if rematch:
+                            struct.related_entries.append(rematch.groups())
+                    elif line[6:10] == '   2':
+                        # Resolution
+                        if not line[11:22].strip(): continue
+                        if struct.resolution is not None:
+                            # Skip over comments
+                            continue
+                        if line[11:22] !=  'RESOLUTION.':
+                            warnings.warn('Unrecognized RESOLUTION record in '
+                                          'PDB file: %s' % line.strip())
+                            continue
+                        if line[23:38] == 'NOT APPLICABLE.':
+                            # Not a diffraction experiment
+                            continue
+                        try:
+                            struct.resolution = float(line[23:30])
+                        except ValueError:
+                            warnings.warn('Trouble converting resolution (%s) '
+                                          'to float' % line[23:30])
         finally:
             # Make sure our file is closed if we opened it
             if own_handle: fileobj.close()
@@ -609,37 +626,21 @@ class PDBFile(object):
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
                     struct.box[4], struct.box[5], struct.space_group, ''))
         if coordinates is not None:
+            coords = np.asarray(coordinates, copy=False, subok=True)
             try:
-                crdsize = len(coordinates)
-            except TypeError:
-                raise TypeError("Cannot find length of coordinates")
-            if crdsize == len(struct.atoms):
-                try:
-                    coords = coordinates.flatten()
-                except AttributeError:
-                    try:
-                        coords = list(itertools.chain(*coordinates))
-                    except TypeError:
-                        raise TypeError("Unsupported coordinate dimensionality")
-                if len(coords) != len(struct.atoms) * 3:
-                    raise TypeError("Unsupported coordinate shape")
-            elif crdsize == len(struct.atoms) * 3:
-                coords = coordinates
-            else:
+                coords = coords.reshape((-1, len(struct.atoms), 3))
+            except ValueError:
                 raise TypeError("Coordinates has unexpected shape")
         else:
-            coords = [[a.xx, a.xy, a.xz] for a in struct.atoms]
-            coords = list(itertools.chain(*coords))
+            coords = struct.get_coordinates('all')
         # Create a function to process each atom and return which one we want
         # to print, based on our alternate location choice
         if altlocs == 'all':
             def print_atoms(atom, coords):
-                i3 = atom.idx * 3
-                return atom, atom.other_locations, coords[i3:i3+3]
+                return atom, atom.other_locations, coords[atom.idx]
         elif altlocs == 'first':
             def print_atoms(atom, coords):
-                i3 = atom.idx * 3
-                return atom, dict(), coords[i3:i3+3]
+                return atom, dict(), coords[atom.idx]
         elif altlocs == 'occupancy':
             def print_atoms(atom, coords):
                 occ = atom.occupancy
@@ -654,84 +655,91 @@ class PDBFile(object):
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
         last_rnumber = 0
-        for res in struct.residues:
-            if renumber:
-                atoms = res.atoms
-            else:
-                atoms = sorted(res.atoms, key=lambda atom: atom.number)
-            for atom in atoms:
-                pa, others, (x, y, z) = print_atoms(atom, coords)
-                # Figure out the serial numbers we want to print
+        for model, coord in enumerate(coords):
+            if coords.shape[0] > 1:
+                dest.write('MODEL      %5d\n' % (model+1))
+            for res in struct.residues:
                 if renumber:
-                    anum = (atom.idx + 1 + nmore)
-                    rnum = (res.idx + 1)
+                    atoms = res.atoms
                 else:
-                    anum = (pa.number or last_number + 1)
-                    rnum = (atom.residue.number or last_rnumber + 1)
-                anum = anum - anum // 100000 * 100000
-                rnum = rnum - rnum // 10000 * 10000
-                last_number = anum
-                last_rnumber = rnum
-                # Do any necessary name munging to respect the PDB spec
-                if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
-                    aname = ' %-3s' % pa.name
-                else:
-                    aname = pa.name[:4]
-                if charmm and hasattr(pa, 'segid'):
-                    segid = pa.segid[:4]
-                else:
-                    segid = ''
-                dest.write(atomrec % (anum , aname, pa.altloc,
-                           res.name[:reslen], res.chain[:1], rnum,
-                           res.insertion_code[:1], x, y, z, pa.occupancy,
-                           pa.bfactor, segid,
-                           Element[pa.atomic_number].upper(), ''))
-                if write_anisou and pa.anisou is not None:
-                    anisou = [int(ani*1e4) for ani in pa.anisou]
-                    dest.write(anisourec % (anum, aname, pa.altloc,
-                               res.name[:reslen], res.chain[:1], rnum,
-                               res.insertion_code[:1], anisou[0], anisou[1],
-                               anisou[2], anisou[3], anisou[4], anisou[5],
-                               Element[pa.atomic_number].upper(), ''))
-                for key in sorted(others.keys()):
-                    oatom = others[key]
-                    x, y, z = oatom.xx, oatom.xy, oatom.xz
+                    atoms = sorted(res.atoms, key=lambda atom: atom.number)
+                for atom in atoms:
+                    pa, others, (x, y, z) = print_atoms(atom, coords[0])
+                    # Figure out the serial numbers we want to print
                     if renumber:
-                        nmore += 1
-                        anum = (pa.idx + 1 + nmore)
+                        anum = (atom.idx + 1 + nmore)
+                        rnum = (res.idx + 1)
                     else:
-                        anum = oatom.number or last_number + 1
+                        anum = (pa.number or last_number + 1)
+                        rnum = (atom.residue.number or last_rnumber + 1)
                     anum = anum - anum // 100000 * 100000
+                    rnum = rnum - rnum // 10000 * 10000
                     last_number = anum
-                    if (len(oatom.name) < 4 and
-                            len(Element[oatom.atomic_number]) != 2):
-                        aname = ' %-3s' % oatom.name
+                    last_rnumber = rnum
+                    # Do any necessary name munging to respect the PDB spec
+                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
+                        aname = ' %-3s' % pa.name
                     else:
-                        aname = oatom.name[:4]
-                    if charmm and hasattr(oatom, 'segid'):
-                        segid = oatom.segid[:4]
+                        aname = pa.name[:4]
+                    if charmm and hasattr(pa, 'segid'):
+                        segid = pa.segid[:4]
                     else:
                         segid = ''
-                    dest.write(atomrec % (anum, aname, key, res.name[:reslen],
-                               res.chain[:1], rnum, res.insertion_code[:1],
-                               x, y, z, oatom.occupancy, oatom.bfactor, segid,
-                               Element[oatom.atomic_number].upper(), ''))
-                    if write_anisou and oatom.anisou is not None:
-                        anisou = [int(ani*1e4) for ani in oatom.anisou]
-                        dest.write(anisourec % (anum, aname,
-                            oatom.altloc[:1], res.name[:reslen], res.chain[:1],
-                            rnum, res.insertion_code[:1], anisou[0], anisou[1],
-                            anisou[2], anisou[3], anisou[4], anisou[5],
-                            Element[oatom.atomic_number].upper(), ''))
-            if res.ter:
-                dest.write(terrec % (anum+1, res.name[:reslen],
-                                     res.chain, rnum))
-                if renumber:
-                    nmore += 1
-                else:
-                    last_number += 1
+                    dest.write(atomrec % (anum , aname, pa.altloc,
+                               res.name[:reslen], res.chain[:1], rnum,
+                               res.insertion_code[:1], x, y, z, pa.occupancy,
+                               pa.bfactor, segid,
+                               Element[pa.atomic_number].upper(), ''))
+                    if write_anisou and pa.anisou is not None:
+                        anisou = [int(ani*1e4) for ani in pa.anisou]
+                        dest.write(anisourec % (anum, aname, pa.altloc,
+                                   res.name[:reslen], res.chain[:1], rnum,
+                                   res.insertion_code[:1], anisou[0], anisou[1],
+                                   anisou[2], anisou[3], anisou[4], anisou[5],
+                                   Element[pa.atomic_number].upper(), ''))
+                    for key in sorted(others.keys()):
+                        oatom = others[key]
+                        x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        if renumber:
+                            nmore += 1
+                            anum = (pa.idx + 1 + nmore)
+                        else:
+                            anum = oatom.number or last_number + 1
+                        anum = anum - anum // 100000 * 100000
+                        last_number = anum
+                        if (len(oatom.name) < 4 and
+                                len(Element[oatom.atomic_number]) != 2):
+                            aname = ' %-3s' % oatom.name
+                        else:
+                            aname = oatom.name[:4]
+                        if charmm and hasattr(oatom, 'segid'):
+                            segid = oatom.segid[:4]
+                        else:
+                            segid = ''
+                        dest.write(atomrec % (anum, aname, key,
+                                   res.name[:reslen], res.chain[:1], rnum,
+                                   res.insertion_code[:1], x, y, z,
+                                   oatom.occupancy, oatom.bfactor, segid,
+                                   Element[oatom.atomic_number].upper(), ''))
+                        if write_anisou and oatom.anisou is not None:
+                            anisou = [int(ani*1e4) for ani in oatom.anisou]
+                            el = Element[oatom.atomic_number].upper()
+                            dest.write(anisourec % (anum, aname,
+                                oatom.altloc[:1], res.name[:reslen],
+                                res.chain[:1], rnum, res.insertion_code[:1],
+                                anisou[0], anisou[1], anisou[2], anisou[3],
+                                anisou[4], anisou[5], el, ''))
+                if res.ter:
+                    dest.write(terrec % (anum+1, res.name[:reslen],
+                                         res.chain, rnum))
+                    if renumber:
+                        nmore += 1
+                    else:
+                        last_number += 1
+            if coords.shape[0] > 1:
+                dest.write('ENDMDL\n')
 
-        dest.write("%-80s" % "END")
+        dest.write("%-80s\n" % "END")
         if own_handle:
             dest.close()
 
@@ -876,6 +884,8 @@ class CIFFile(object):
             TITL section of the JRNL record
         year : ``str``
             Year that the article was published, from the JRNL record
+        resolution : ``float``
+            The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
 
@@ -907,6 +917,12 @@ class CIFFile(object):
         for cont in data:
             struct = Structure()
             structures.append(struct)
+            # Add metadata fields
+            struct.experimental = struct.journal = struct.authors = ''
+            struct.keywords = struct.doi = struct.pmid = ''
+            struct.journal_authors = struct.volume_page = struct.title = ''
+            struct.year = struct.resolution = None
+            struct.related_entries = []
 
             # Now we have the data. First get the metadata if it exists
             exptl = cont.getObj('exptl')
@@ -918,6 +934,15 @@ class CIFFile(object):
                 if nameidx != -1:
                     struct.authors = ', '.join([t[nameidx] for t in
                                                auth.getRowList()])
+            reflns = cont.getObj('reflns')
+            if reflns is not None:
+                res = reflns.getValue('d_resolution_high')
+                if res != '?':
+                    try:
+                        struct.resolution = float(res)
+                    except ValueError:
+                        warnings.warn('Could not convert resolution (%s) to '
+                                      'float' % res)
             cite = cont.getObj('citation_author')
             if cite is not None:
                 nameidx = cite.getAttributeIndex('name')
@@ -1062,7 +1087,8 @@ class CIFFile(object):
                                 charge=charge, mass=mass, occupancy=occup,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
-                if _compare_atoms(last_atom, atom, resname, resnum, chain):
+                if (_compare_atoms(last_atom, atom, resname, resnum, chain)
+                        and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
                 else:
@@ -1077,7 +1103,8 @@ class CIFFile(object):
                             raise ValueError('All frames must have same number '
                                              'of atoms')
                         all_coords.append(xyz)
-                        xyz = []
+                        xyz = [x, y, z]
+                        lastmodel = model
                 # Keep a mapping in case we need to go back and add attributes,
                 # like anisotropic b-factors
                 if model == origmodel:
@@ -1094,7 +1121,7 @@ class CIFFile(object):
                 gammaid = cell.getAttributeIndex('angle_gamma')
                 spaceid = cell.getAttributeIndex('space_group_name_H-M')
                 row = cell.getRow(0)
-                struct.box = create_array(
+                struct.box = np.array(
                         [float(row[aid]), float(row[bid]), float(row[cid]),
                          float(row[alphaid]), float(row[betaid]),
                          float(row[gammaid])]
@@ -1142,7 +1169,7 @@ class CIFFile(object):
                             if inscode in '?.': inscode = ''
                             key = (resnum, resname, inscode, chain, atnum,
                                    altloc, atname)
-                            atommap[key].anisou = create_array(
+                            atommap[key].anisou = np.array(
                                     [u11, u22, u33, u12, u13, u23]
                             )
                     except (ValueError, KeyError):
@@ -1236,37 +1263,21 @@ class CIFFile(object):
             cell.append(struct.box[:])
             cont.append(cell)
         if coordinates is not None:
+            coords = np.asarray(coordinates, copy=False, subok=True)
             try:
-                crdsize = len(coordinates)
-            except TypeError:
-                raise TypeError("Cannot find length of coordinates")
-            if crdsize == len(struct.atoms):
-                try:
-                    coords = coordinates.flatten()
-                except AttributeError:
-                    try:
-                        coords = list(itertools.chain(*coordinates))
-                    except TypeError:
-                        raise TypeError("Unsupported coordinate dimensionality")
-                if len(coords) != len(struct.atoms) * 3:
-                    raise TypeError("Unsupported coordinate shape")
-            elif crdsize == len(struct.atoms) * 3:
-                coords = coordinates
-            else:
+                coords = coords.reshape((-1, len(struct.atoms), 3))
+            except ValueError:
                 raise TypeError("Coordinates has unexpected shape")
         else:
-            coords = [[a.xx, a.xy, a.xz] for a in struct.atoms]
-            coords = list(itertools.chain(*coords))
+            coords = struct.get_coordinates('all')
         # Create a function to process each atom and return which one we want
         # to print, based on our alternate location choice
         if altlocs == 'all':
             def print_atoms(atom, coords):
-                i3 = atom.idx * 3
-                return atom, atom.other_locations, coords[i3:i3+3]
+                return atom, atom.other_locations, coords[atom.idx]
         elif altlocs == 'first':
             def print_atoms(atom, coords):
-                i3 = atom.idx * 3
-                return atom, dict(), coords[i3:i3+3]
+                return atom, dict(), coords[atom.idx]
         elif altlocs == 'occupancy':
             def print_atoms(atom, coords):
                 occ = atom.occupancy
@@ -1311,63 +1322,66 @@ class CIFFile(object):
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
         last_rnumber = 0
-        for res in struct.residues:
-            if renumber:
-                atoms = res.atoms
-            else:
-                atoms = sorted(res.atoms, key=lambda atom: atom.number)
-            for atom in atoms:
-                pa, others, (x, y, z) = print_atoms(atom, coords)
-                # Figure out the serial numbers we want to print
+        for model, coord in enumerate(coords):
+            for res in struct.residues:
                 if renumber:
-                    anum = (atom.idx + 1 + nmore)
-                    rnum = (res.idx + 1)
+                    atoms = res.atoms
                 else:
-                    anum = (pa.number or last_number + 1)
-                    rnum = (atom.residue.number or last_rnumber + 1)
-                last_number = anum
-                last_rnumber = rnum
-                cifatoms.append(
-                        ['ATOM', anum, Element[pa.atomic_number].upper(),
-                         pa.name, pa.altloc, res.name, res.chain, '?', rnum,
-                         res.insertion_code, x, y, z, pa.occupancy, pa.bfactor,
-                         '?', '?', '?', '?', '?', '', rnum, res.name, res.chain,
-                         pa.name, '1']
-                )
-                if write_anisou and pa.anisou is not None:
-                    cifanisou.append(
-                            [anum, Element[pa.atomic_number].upper(), pa.name,
-                             pa.altloc, res.name, res.chain, rnum, pa.anisou[0],
-                             pa.anisou[1], pa.anisou[2], pa.anisou[3],
-                             pa.anisou[4], pa.anisou[5], '?', '?', '?', '?',
-                             '?', '?', rnum, res.name, res.chain, pa.name]
-                    )
-                for key in sorted(others.keys()):
-                    oatom = others[key]
-                    x, y, z = oatom.xx, oatom.xy, oatom.xz
+                    atoms = sorted(res.atoms, key=lambda atom: atom.number)
+                for atom in atoms:
+                    pa, others, (x, y, z) = print_atoms(atom, coord)
+                    # Figure out the serial numbers we want to print
                     if renumber:
-                        nmore += 1
-                        anum = (pa.idx + 1 + nmore)
+                        anum = (atom.idx + 1 + nmore)
+                        rnum = (res.idx + 1)
                     else:
-                        anum = oatom.number or last_number + 1
+                        anum = (pa.number or last_number + 1)
+                        rnum = (atom.residue.number or last_rnumber + 1)
                     last_number = anum
+                    last_rnumber = rnum
                     cifatoms.append(
-                            ['ATOM', anum, Element[oatom.atomic_number].upper(),
-                             oatom.name, oatom.altloc, res.name, res.chain, '?',
-                             rnum, res.insertion_code, x, y, z, oatom.occupancy,
-                             oatom.bfactor, '?', '?', '?', '?', '?', '',
-                             rnum, res.name, res.chain, oatom.name, '1']
+                            ['ATOM', anum, Element[pa.atomic_number].upper(),
+                             pa.name, pa.altloc, res.name, res.chain, '?', rnum,
+                             res.insertion_code, x, y, z, pa.occupancy,
+                             pa.bfactor, '?', '?', '?', '?', '?', '', rnum,
+                             res.name, res.chain, pa.name, str(model+1)]
                     )
-                    if write_anisou and oatom.anisou is not None:
+                    if write_anisou and pa.anisou is not None:
                         cifanisou.append(
-                                [anum, Element[oatom.atomic_number].upper(),
-                                 oatom.name, oatom.altloc, res.name, res.chain,
-                                 rnum, oatom.anisou[0], oatom.anisou[1],
-                                 oatom.anisou[2], oatom.anisou[3],
-                                 oatom.anisou[4], oatom.anisou[5], '?', '?',
-                                 '?', '?', '?', '?', rnum, res.name, res.chain,
-                                 oatom.name]
+                                [anum, Element[pa.atomic_number].upper(),
+                                 pa.name, pa.altloc, res.name, res.chain, rnum,
+                                 pa.anisou[0], pa.anisou[1], pa.anisou[2],
+                                 pa.anisou[3], pa.anisou[4], pa.anisou[5], '?',
+                                 '?', '?', '?', '?', '?', rnum, res.name,
+                                 res.chain, pa.name]
                         )
+                    for key in sorted(others.keys()):
+                        oatom = others[key]
+                        x, y, z = oatom.xx, oatom.xy, oatom.xz
+                        if renumber:
+                            nmore += 1
+                            anum = (pa.idx + 1 + nmore)
+                        else:
+                            anum = oatom.number or last_number + 1
+                        last_number = anum
+                        el = Element[oatom.atomic_number].upper()
+                        cifatoms.append(
+                                ['ATOM', anum, el, oatom.name, oatom.altloc,
+                                 res.name, res.chain, '?', rnum,
+                                 res.insertion_code, x, y, z, oatom.occupancy,
+                                 oatom.bfactor, '?', '?', '?', '?', '?', '',
+                                 rnum, res.name, res.chain, oatom.name, '1']
+                        )
+                        if write_anisou and oatom.anisou is not None:
+                            cifanisou.append(
+                                    [anum, Element[oatom.atomic_number].upper(),
+                                     oatom.name, oatom.altloc, res.name,
+                                     res.chain, rnum, oatom.anisou[0],
+                                     oatom.anisou[1], oatom.anisou[2],
+                                     oatom.anisou[3], oatom.anisou[4],
+                                     oatom.anisou[5], '?', '?', '?', '?', '?',
+                                     '?', rnum, res.name, res.chain, oatom.name]
+                            )
         # Now write the PDBx file
         writer = PdbxWriter(dest)
         writer.write([cont])

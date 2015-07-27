@@ -17,6 +17,8 @@ simply inherited from a base class (unless that base class is not a metaclass of
 FileFormatType)
 """
 from __future__ import division, print_function, absolute_import
+from contextlib import closing
+from parmed.utils.io import genopen
 from parmed.utils.six import iteritems
 from parmed.exceptions import FormatNotFound
 import os
@@ -60,7 +62,16 @@ def load_file(filename, *args, **kwargs):
     Parameters
     ----------
     filename : str
-        The name of the file to try to parse
+        The name of the file to try to parse. If the filename starts with
+        http:// or https://, it is treated like a URL and the file will be
+        loaded directly from its remote location on the web
+    structure : object, optional
+        For some classes, such as the Mol2 file class, the default return object
+        is not a Structure, but can be made to return a Structure if the
+        ``structure=True`` keyword argument is passed. To facilitate writing
+        easy code, the ``structure`` keyword is always processed and only passed
+        on to the correct file parser if that parser accepts the structure
+        keyword. There is no default, as each parser has its own default.
     *args : other positional arguments
         Some formats accept positional arguments. These will be passed along
     **kwargs : other options
@@ -75,8 +86,8 @@ def load_file(filename, *args, **kwargs):
 
     Notes
     -----
-    Compressed files are supported and detected by filename extension. The
-    following names are supported:
+    Compressed files are supported and detected by filename extension. This
+    applies both to local and remote files. The following names are supported:
 
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
@@ -96,9 +107,13 @@ def load_file(filename, *args, **kwargs):
     global PARSER_REGISTRY, PARSER_ARGUMENTS
 
     # Check that the file actually exists and that we can read it
-    if not os.path.exists(filename):
+    if filename.startswith('http://') or filename.startswith('https://'):
+        # This raises IOError if it does not exist
+        with closing(genopen(filename)) as f:
+            pass
+    elif not os.path.exists(filename):
         raise IOError('%s does not exist' % filename)
-    if not os.access(filename, os.R_OK):
+    elif not os.access(filename, os.R_OK):
         raise IOError('%s does not have read permissions set' % filename)
 
     for name, cls in iteritems(PARSER_REGISTRY):
@@ -119,10 +134,22 @@ def load_file(filename, *args, **kwargs):
         if not arg in kwargs:
             raise TypeError('%s constructor expects %s keyword argument' %
                             name, arg)
+    # Pass on the "structure" keyword IFF the target function accepts a target
+    # keyword. Otherwise, get rid of it.
     if hasattr(cls, 'parse'):
+        _prune_structure(cls.parse, kwargs)
         return cls.parse(filename, *args, **kwargs)
     elif hasattr(cls, 'open_old'):
+        _prune_structure(cls.open_old, kwargs)
         return cls.open_old(filename, *args, **kwargs)
     elif hasattr(cls, 'open'):
+        _prune_structure(cls.open, kwargs)
         return cls.open(filename, *args, **kwargs)
+    _prune_structure(cls.__init__, kwargs)
     return cls(filename, *args, **kwargs)
+
+def _prune_structure(func, kwargs):
+    if 'structure' in kwargs:
+        if ('structure' not in
+                func.__code__.co_varnames[:func.__code__.co_argcount]):
+            kwargs.pop('structure')

@@ -4,7 +4,7 @@ Tests for the various actions in ParmEd
 from __future__ import division, print_function
 
 import utils
-from parmed import periodic_table
+from parmed import periodic_table, gromacs, load_file
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
@@ -28,6 +28,8 @@ solvparm = AmberParm(get_fn('solv.prmtop'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
+
+gromacs.GROMACS_TOPDIR = get_fn('top')
 
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
@@ -245,23 +247,9 @@ class TestNonParmActions(unittest.TestCase):
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
-class TestAmberParmActions(utils.TestCaseRelative):
+class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
     
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
     def _empty_writes(self):
         """ Empty the "writes" directory """
         try:
@@ -1030,6 +1018,16 @@ class TestAmberParmActions(utils.TestCaseRelative):
         self.assertFalse('ATOM_OCCUPANCY' in parm.flag_list)
         self.assertFalse('ATOM_BFACTOR' in parm.flag_list)
 
+    def testAddPDB2(self):
+        """ Test addPDB with atypical numbering and extra residues """
+        parm = load_file(get_fn('4lzt.parm7'))
+        PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb')).execute()
+        parm.write_parm(get_fn('4lzt_pdb.parm7', written=True))
+        self.assertTrue(utils.diff_files(get_saved_fn('4lzt_pdb.parm7'),
+                                         get_fn('4lzt_pdb.parm7', written=True),
+                                         absolute_error=1e-6)
+        )
+
     def testHMassRepartition(self):
         """ Test HMassRepartition on AmberParm """
         parm = copy(solvparm)
@@ -1122,13 +1120,15 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
                                          get_fn('test.rst7', written=True),
                                          absolute_error=0.0001))
@@ -1136,13 +1136,15 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True)))
+                                         get_fn('test.parm7', written=True),
+                                         absolute_error=1e-6))
         self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
                                          get_fn('test.rst7', written=True),
                                          absolute_error=0.0001))
@@ -2132,23 +2134,21 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
         parm = copy(amoebaparm)
         atoms = [atom for atom in parm.atoms] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        self.assertEqual(parm.ptr('IPTRES'), 0)
+        self.assertEqual(parm.ptr('IPTRES'), 2)
         self.assertEqual(parm.ptr('NSPM'), 819)
-        self.assertEqual(parm.ptr('NSPSOL'), 0)
-        # To keep the output clean
+        self.assertEqual(parm.ptr('NSPSOL'), 2)
         PT.setMolecules(parm).execute()
         self.assertEqual(parm.ptr('IPTRES'), 2)
         self.assertEqual(parm.ptr('NSPM'), 819)
         self.assertEqual(parm.ptr('NSPSOL'), 2)
         self.assertTrue(all([x is y for x,y in zip(parm.atoms, atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
+        # Now check that setMolecules can apply another time
         PT.setMolecules(parm).execute()
 
     def testNetCharge(self):
         """ Test netCharge for AmoebaParm (charge is the monopole) """
         act = PT.netCharge(amoebaparm)
-        chg = act.execute() # check this part of the API
+        chg = act.execute() # check the netCharge.execute return value
         self.assertEqual(str(act), 'The net charge of :* is %.4f' % chg)
         self.assertAlmostEqual(chg, 0.0)
         chg = PT.netCharge(amoebaparm, ':WAT').execute()

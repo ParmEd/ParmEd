@@ -17,6 +17,8 @@ except ImportError:
 import unittest
 import warnings
 
+gromacs.GROMACS_TOPDIR = get_fn('top')
+
 class TestCase(TestCaseRelative):
     def setUp(self):
         warnings.filterwarnings('default', category=GromacsWarning)
@@ -41,6 +43,7 @@ class TestAmberToGromacs(TestCase):
         parm = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'),
                               get_fn('benzene_cyclohexane_10_500.inpcrd'))
         top = gromacs.GromacsTopologyFile.from_structure(parm)
+        self.assertEqual(top.combining_rule, 'lorentz')
         groname = get_fn('benzene_cyclohexane_10_500.gro', written=True)
         gromacs.GromacsGroFile.write(parm, groname, precision=8)
         gro = gromacs.GromacsGroFile.parse(groname)
@@ -63,6 +66,7 @@ class TestGromacsToAmber(TestCase):
     def testSimple(self):
         """ Tests converting standard Gromacs system into Amber prmtop """
         top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
+        self.assertEqual(top.combining_rule, 'lorentz')
         parm = amber.AmberParm.from_structure(top)
         parm.write_parm(get_fn('ala_glu.parm7', written=True))
         parm = load_file(get_fn('ala_glu.parm7', written=True))
@@ -95,8 +99,45 @@ class TestGromacsToAmber(TestCase):
         parm.write_parm(get_fn('1aki.charmm27_fromgmx.parm7', written=True))
         self.assertTrue(diff_files(get_fn('1aki.charmm27_fromgmx.parm7',
                                           written=True),
-                                   get_saved_fn('1aki.charmm27_fromgmx.parm7'))
+                                   get_saved_fn('1aki.charmm27_fromgmx.parm7'),
+                                   relative_error=1e-8)
         )
+
+    def testGeometricCombiningRule(self):
+        """ Tests converting geom. comb. rule from Gromacs to Amber """
+        top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                        xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
+        self.assertEqual(top.combining_rule, 'geometric')
+        del top.rb_torsions[:]
+        parm = amber.AmberParm.from_structure(top)
+        self.assertEqual(parm.combining_rule, 'geometric')
+        parm.write_parm(get_fn('opls.parm7', written=True))
+        self.assertTrue(diff_files(get_fn('opls.parm7', written=True),
+                                   get_saved_fn('opls.parm7'))
+        )
+
+    @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+    def testGeometricCombiningRuleEnergy(self):
+        """ Tests converting geom. comb. rule energy from Gromacs to Amber """
+        top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                        xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
+        self.assertEqual(top.combining_rule, 'geometric')
+        del top.rb_torsions[:]
+        parm = load_file(get_saved_fn('opls.parm7'),
+                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
+        self.assertEqual(parm.combining_rule, 'geometric')
+        self.assertFalse(parm.has_NBFIX())
+
+        sysg = top.createSystem()
+        sysa = parm.createSystem()
+
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
+
+        cong.setPositions(top.positions)
+        cona.setPositions(top.positions)
+        
+        self._check_energies(top, cong, parm, cona)
 
     @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
     def testEnergySimple(self):
@@ -162,6 +203,7 @@ class TestOpenMMToAmber(TestCase):
     def testSimple(self):
         """ Test OpenMM System/Topology -> Amber prmtop conversion """
         parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem()
         amber.AmberParm.from_structure(
                 openmm.load_topology(parm.topology, system)
@@ -198,6 +240,7 @@ class TestOpenMMToGromacs(TestCase):
     def testSimple(self):
         """ Test OpenMM System/Topology -> Gromacs topology conversion """
         parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem()
         gromacs.GromacsTopologyFile.from_structure(
                 openmm.load_topology(parm.topology, system)

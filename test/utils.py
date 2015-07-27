@@ -47,6 +47,22 @@ class TestCaseRelative(unittest.TestCase):
                             '%s != %s with relative tolerance %g (%f)' %
                             (val1, val2, delta, ratio))
 
+class FileIOTestCase(unittest.TestCase):
+
+    def setUp(self):
+        try:
+            os.makedirs(get_fn('writes'))
+        except OSError:
+            pass
+
+    def tearDown(self):
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+            os.rmdir(get_fn('writes'))
+        except OSError:
+            pass
+
 
 def get_fn(filename, written=False):
     """

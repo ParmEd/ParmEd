@@ -194,7 +194,13 @@ class NetCDFRestart(object):
         -------
         is_fmt : bool
             True if it is an Amber NetCDF restart file. False otherwise
+
+        Notes
+        -----
+        Remote NetCDF files cannot be loaded
         """
+        if filename.startswith('http://') or filename.startswith('https://'):
+            return False
         if not HAS_NETCDF:
             return False # Can't determine...
         if not NETCDF_INITIALIZED:
@@ -532,7 +538,13 @@ class NetCDFTraj(object):
         -------
         is_fmt : bool
             True if it is an Amber NetCDF trajectory file. False otherwise
+
+        Notes
+        -----
+        Remote NetCDF files cannot be loaded
         """
+        if filename.startswith('http://') or filename.startswith('https://'):
+            return False
         if not HAS_NETCDF:
             return False # Can't determine...
         if not NETCDF_INITIALIZED:
