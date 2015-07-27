@@ -9,7 +9,7 @@ import simtk.openmm.app as app
 
 # ParmEd Imports
 from chemistry.charmm import CharmmPsfFile, CharmmCrdFile, CharmmParameterSet
-from chemistry.amber.openmmreporters import StateDataReporter
+from chemistry.openmm.reporters import StateDataReporter
 from chemistry import unit as u
 
 # Load the CHARMM files
@@ -41,10 +41,10 @@ for coord in coords:
     max_crds[1] = max(max_crds[1], coord[1])
     max_crds[2] = max(max_crds[2], coord[2])
 
-ala2_solv.setBox(max_crds[0]-min_crds[0],
+ala2_solv.box = [max_crds[0]-min_crds[0],
                  max_crds[1]-min_crds[1],
                  max_crds[2]-min_crds[2],
-)
+                 90.0, 90.0, 90.0]
 
 # Create the OpenMM system
 print('Creating OpenMM System')

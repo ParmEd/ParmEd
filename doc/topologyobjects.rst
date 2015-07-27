@@ -4,7 +4,7 @@ The :mod:`topologyobjects` module
 The :mod:`topologyobjects` module contains a wide array of classes used
 extensively in the core :class:`structure.Structure` class.
 
-.. currentmodule:: chemistry.topologyobjects
+.. currentmodule:: parmed.topologyobjects
 .. autosummary::
     :toctree: topobj/
 
@@ -339,7 +339,7 @@ parameters for use with the AMOEBA force field. For convenience, they are listed
 below. Consult the API documentation in the resulting links for more
 information.
 
-.. currentmodule:: chemistry.topologyobjects
+.. currentmodule:: parmed.topologyobjects
 .. autosummary::
     :toctree: topobj/
 

@@ -1,5 +1,5 @@
 sudo apt-get update
-sudo apt-get install -qq -y g++ gfortran csh
+sudo apt-get install -qq -y g++ gfortran csh gromacs
 
 MINICONDA=Miniconda-latest-Linux-x86_64.sh
 MINICONDA_MD5=$(curl -s http://repo.continuum.io/miniconda/ | grep -A3 $MINICONDA | sed -n '4p' | sed -n 's/ *<td>\(.*\)<\/td> */\1/p')
@@ -14,12 +14,13 @@ export PATH=$HOME/miniconda/bin:$PATH
 conda install --yes conda-build jinja2 binstar pip
 conda config --add channels http://conda.binstar.org/omnia
 
-if [ -z "$NO_NUMPY" ]; then
+if [ -z "$MINIMAL_PACKAGES" ]; then
     conda create -y -n myenv python=$PYTHON_VERSION \
-        numpy scipy netcdf4 pandas nose openmm
+        numpy scipy netcdf4 pandas nose openmm-dev
+    conda update -y -n myenv --all # Make sure we have up-to-date OpenMM
 else
     # Do not install the full numpy/scipy stack
-    conda create -y -n myenv python=$PYTHON_VERSION nose
+    conda create -y -n myenv python=$PYTHON_VERSION nose numpy
 fi
 
 source activate myenv
