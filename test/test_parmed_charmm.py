@@ -308,6 +308,52 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.cmaps), 447)
         self.assertEqual(cpsf.residues[281].insertion_code, 'A')
 
+    def testFromStructure(self):
+        """ Tests the CharmmPsfFile.from_structure constructor """
+        top1 = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
+        psf1 = psf.CharmmPsfFile.from_structure(top1)
+
+        top2 = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top'))
+        psf2 = psf.CharmmPsfFile.from_structure(top2)
+
+        self.assertEqual(len(psf1.atoms), len(top1.atoms))
+        self.assertEqual(len(psf2.atoms), len(top2.atoms))
+
+        self.assertEqual(len(psf1.bonds), len(top1.bonds))
+        self.assertEqual(len(psf2.bonds), len(top2.bonds))
+        self.assertEqual(len(psf1.angles), len(top1.angles))
+        self.assertEqual(len(psf2.angles), len(top2.angles))
+        self.assertEqual(len(psf1.urey_bradleys), len(top1.urey_bradleys))
+        self.assertEqual(len(psf2.urey_bradleys), len(top2.urey_bradleys))
+        self.assertEqual(len(psf1.dihedrals), len(top1.dihedrals))
+        self.assertEqual(len(psf2.dihedrals), len(top2.dihedrals))
+        self.assertEqual(len(psf1.impropers), len(top1.impropers))
+        self.assertEqual(len(psf2.impropers), len(top2.impropers))
+        self.assertEqual(len(psf1.cmaps), len(top1.cmaps))
+        self.assertEqual(len(psf2.cmaps), len(top2.cmaps))
+        self.assertEqual(len(psf1.acceptors), len(top1.acceptors))
+        self.assertEqual(len(psf2.acceptors), len(top2.acceptors))
+        self.assertEqual(len(psf1.donors), len(top1.donors))
+        self.assertEqual(len(psf2.donors), len(top2.donors))
+        self.assertEqual(len(psf1.groups), len(top1.groups))
+        self.assertEqual(len(psf2.groups), len(top2.groups))
+
+        self.assertEqual(len(psf1.bond_types), len(top1.bond_types))
+        self.assertEqual(len(psf2.bond_types), len(top2.bond_types))
+        self.assertEqual(len(psf1.angle_types), len(top1.angle_types))
+        self.assertEqual(len(psf2.angle_types), len(top2.angle_types))
+        self.assertEqual(len(psf1.dihedral_types), len(top1.dihedral_types))
+        self.assertEqual(len(psf2.dihedral_types), len(top2.dihedral_types))
+        self.assertEqual(len(psf1.urey_bradley_types), len(top1.urey_bradley_types))
+        self.assertEqual(len(psf2.urey_bradley_types), len(top2.urey_bradley_types))
+        self.assertEqual(len(psf1.improper_types), len(top1.improper_types))
+        self.assertEqual(len(psf2.improper_types), len(top2.improper_types))
+        self.assertEqual(len(psf1.cmap_types), len(top1.cmap_types))
+        self.assertEqual(len(psf2.cmap_types), len(top2.cmap_types))
+
+        for atom in psf1.atoms:
+            self.assertEqual(atom.type.upper(), atom.type)
+
 class TestCharmmParameters(unittest.TestCase):
     """ Test CHARMM Parameter file parsing """
     
@@ -475,26 +521,35 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
 
     def testCharmmParameterSetConversion(self):
-        """ Tests CharmmParameterSet.from_parameterset """
+        """ Tests CharmmParameterSet.from_parameterset and from_structure """
         params1 = ParameterSet.from_structure(
                 load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
         )
         params2 = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top')).parameterset
+
         chparams1 = parameters.CharmmParameterSet.from_parameterset(params1)
         chparams2 = parameters.CharmmParameterSet.from_parameterset(params2, copy=True)
+        chparams3 = parameters.CharmmParameterSet.from_structure(
+                load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
+        )
 
         self.assertIsInstance(chparams1, parameters.CharmmParameterSet)
         self.assertIsInstance(chparams2, parameters.CharmmParameterSet)
+        self.assertIsInstance(chparams3, parameters.CharmmParameterSet)
 
         self._compare_paramsets(chparams1, params1, copy=False)
         self._compare_paramsets(chparams2, params2, copy=True)
+        self._compare_paramsets(chparams1, chparams3, copy=True)
 
         self._check_uppercase_types(chparams1)
         self._check_uppercase_types(chparams2)
+        self._check_uppercase_types(chparams3)
 
         # GAFF atom types, as in the first parameter set, are all lower-case.
         # Check that name decoration is the established pattern
         for name in chparams1.atom_types:
+            self.assertTrue(name.endswith('LTU'))
+        for name in chparams3.atom_types:
             self.assertTrue(name.endswith('LTU'))
 
     def _check_uppercase_types(self, params):

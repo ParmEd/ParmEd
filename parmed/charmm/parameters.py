@@ -224,6 +224,39 @@ class CharmmParameterSet(ParameterSet):
         return new_params
 
     @classmethod
+    def from_structure(cls, struct):
+        """ Extracts known parameters from a Structure instance
+
+        Parameters
+        ----------
+        struct : :class:`parmed.structure.Structure`
+            The parametrized ``Structure`` instance from which to extract
+            parameters into a ParameterSet
+
+        Returns
+        -------
+        params : :class:`ParameterSet`
+            The parameter set with all parameters defined in the Structure
+
+        Notes
+        -----
+        The parameters here are copies of the ones in the Structure, so
+        modifying the generated ParameterSet will have no effect on ``struct``.
+        Furthermore, the *first* occurrence of each parameter will be used. If
+        future ones differ, they will be silently ignored, since this is
+        expected behavior in some instances (like with Gromacs topologies in the
+        ff99sb-ildn force field).
+
+        Dihedrals are a little trickier. They can be multi-term, which can be
+        represented either as a *single* entry in dihedrals with a type of
+        DihedralTypeList or multiple entries in dihedrals with a DihedralType
+        parameter type. In this case, the parameter is constructed from either
+        the first DihedralTypeList found or the first DihedralType of each
+        periodicity found if no matching DihedralTypeList is found.
+        """
+        return cls.from_parameterset(ParameterSet.from_structure(struct))
+
+    @classmethod
     def load_set(cls, tfile=None, pfile=None, sfiles=None):
         """
         Instantiates a CharmmParameterSet from a Topology file and a Parameter
