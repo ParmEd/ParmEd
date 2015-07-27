@@ -23,6 +23,15 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division, print_function
 
+from collections import defaultdict
+from copy import copy
+import math
+import numpy as np
+import os
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
@@ -32,7 +41,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame,
+        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules
@@ -40,16 +49,7 @@ from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
-from copy import copy
-import math
 import re
-import numpy as np
-
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
@@ -310,6 +310,7 @@ class Structure(object):
         self.unknown_functional = False
         self.nrexcl = 3
         self.title = ''
+        self._combining_rule = 'lorentz'
 
     #===================================================
 
@@ -539,6 +540,7 @@ class Structure(object):
                 )
                 c.dihedrals[-1]._funct = d._funct
         for ub in self.urey_bradleys:
+            if ub.type is NoUreyBradley: continue
             c.urey_bradleys.append(
                     UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
                                 ub.type and c.urey_bradley_types[ub.type.idx])
@@ -623,6 +625,7 @@ class Structure(object):
             c.groups.append(Group(g.bs, g.type, g.move))
         c.box = copy(self.box)
         c._coordinates = copy(self._coordinates)
+        c.combining_rule = self.combining_rule
         return c
 
     #===================================================
@@ -992,12 +995,12 @@ class Structure(object):
         or
 
         atom : :class:`Atom`
-            If only a single atom is selected
-
-        or
-
-        None
-            If no atoms are selected
+            If the selection is a single integer, a tuple of two integers, or a
+            tuple of a string and two integers. This is equivalent to selecting
+            a particular atom, a particular atom from a particular residue, or a
+            particular atom from a particular residue from a particular chain,
+            respectively. All other selections return a Structure instance, even
+            if that selection happens to only select a single atom.
 
         Notes
         -----
@@ -1030,22 +1033,34 @@ class Structure(object):
         elif isinstance(selection, tuple) and len(selection) in (2, 3):
             # This is a selection of chains, and/or residues, and/or atoms
             if len(selection) == 2:
-                # Select just residues and atoms
+                # Select just residues and atoms. Special-case a single-atom
+                # selection for speed -- orders of magnitude improvement in
+                # efficiency
                 ressel, atomsel = selection
+                if (isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    return self.residues[ressel][atomsel]
                 has_chain = False
             elif len(selection) == 3:
                 chainsel, ressel, atomsel = selection
-                chainmap = dict() # First residue in each chain
+                chainmap = defaultdict(TrackedList)
                 for r in self.residues:
-                    if r.chain not in chainmap:
-                        chainmap[r.chain] = r.idx
+                    chainmap[r.chain].append(r)
+                if (isinstance(chainsel, string_types) and
+                        isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    # Special-case single-atom selection for efficiency
+                    try:
+                        return chainmap[chainsel][ressel][atomsel]
+                    except KeyError:
+                        raise IndexError('No chain %s in Structure' % chainsel)
                 if isinstance(chainsel, string_types):
                     if chainsel in chainmap:
                         chainset = set([chainsel])
                     else:
                         # The selected chain is not in the system. Cannot
                         # possibly select *any* atoms. Bail now for speed
-                        return None
+                        return type(self)()
                 elif isinstance(chainsel, slice):
                     # Build an ordered set of chains
                     chains = [self.residues[0].chain]
@@ -1060,7 +1075,7 @@ class Structure(object):
                         break
                 else:
                     # No requested chain is present. Bail now for speed
-                    return None
+                    return type(self)()
                 has_chain = True
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
@@ -1078,13 +1093,26 @@ class Structure(object):
             else:
                 atomset = set(atomsel)
             if has_chain:
-                selection = [
-                        (a.residue.chain in chainset) and
-                        (a.residue.name in resset or
-                         a.residue.idx-chainmap[a.residue.chain] in resset) and
-                        (a.name in atomset or a.idx-a.residue[0].idx in atomset)
+                try:
+                    # To allow us to index the atoms residues from their list of
+                    # chains, temporarily have the chainmap lists claim the
+                    # residues. This must be reversed or the Structure will be
+                    # broken
+                    for chain_name, chain in iteritems(chainmap):
+                        chain.claim()
+                    selection = [
+                            (a.residue.chain in chainset) and
+                            (a.residue.name in resset or
+                                a.residue.idx in resset) and
+                            (a.name in atomset or
+                                a.idx-a.residue[0].idx in atomset)
+
                             for a in self.atoms
-                ]
+                    ]
+                finally:
+                    # Make sure that the residues list *always* reclaims its
+                    # contents
+                    self.residues.claim()
             else:
                 selection = [
                     (a.name in atomset or a.idx-a.residue[0].idx in atomset)
@@ -1114,10 +1142,7 @@ class Structure(object):
         sumsel = sum(selection)
         if sumsel == 0:
             # No atoms selected. Return None
-            return None
-        if sumsel == 1:
-            # 1 atom selected; return that atom
-            return self.atoms[selection.index(1)]
+            return type(self)()
         # The cumulative sum of selection will give our index + 1 of each
         # selected atom into the new structure
         scan = [selection[0]]
@@ -1229,10 +1254,10 @@ class Structure(object):
 
         Returns
         -------
-        [structs, counts] : list of (:class:`Structure`, int) tuples
+        [structs, counts] : list of (:class:`Structure`, list) tuples
             List of all molecules in the order that they appear first in the
-            parent structure accompanied by the number of times that molecule
-            appears in the Structure
+            parent structure accompanied by the list of the molecule numbers
+            in which that molecule appears in the Structure
         """
         tag_molecules(self)
         mollist = [atom.marked for atom in self.atoms]
@@ -1256,7 +1281,7 @@ class Structure(object):
                 res = sel[0].residue
                 names = tuple(a.name for a in res)
                 if (res.name, len(res), names) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names)]] += 1
+                    counts[res_molecules[(res.name, len(res), names)]].add(i)
                     continue
                 else:
                     res_molecules[(res.name, len(res), names)] = len(structs)
@@ -1276,7 +1301,7 @@ class Structure(object):
                         else:
                             if a1.type != a2.type: break
                     else:
-                        counts[j] += 1
+                        counts[j].add(i)
                         is_duplicate = True
                         break
             if not is_duplicate:
@@ -1288,8 +1313,131 @@ class Structure(object):
                                mol.residue.insertion_code)
                     mol = s
                 structs.append(mol)
-                counts.append(1)
+                counts.append(set([i]))
         return list(zip(structs, counts))
+
+    #===================================================
+
+    def save(self, fname, format=None, **kwargs):
+        """
+        Saves the current Structure in the requested file format. Supported
+        formats can be specified explicitly or determined by file-name
+        extension. The following formats are supported, with the recognized
+        suffix and ``format`` keyword shown in parentheses:
+
+            - PDB (.pdb, pdb)
+            - PDBx/mmCIF (.cif, cif)
+            - Amber topology file (.prmtop/.parm7, amber)
+            - CHARMM PSF file (.psf, charmm)
+            - Gromacs topology file (.top, gromacs)
+            - Gromacs GRO file (.gro, gro)
+            - Mol2 file (.mol2, mol2)
+            - Mol3 file (.mol3, mol3)
+
+        Parameters
+        ----------
+        fname : str
+            Name of the file to save. If ``format`` is ``None`` (see below), the
+            file type will be determined based on the filename extension. If the
+            type cannot be determined, a ValueError is raised.
+        format : str, optional
+            The case-insensitive keyword specifying what type of file ``fname``
+            should be saved as. If ``None`` (default), the file type will be
+            determined from filename extension of ``fname``
+        kwargs : keyword-arguments
+            Remaining arguments are passed on to the file writing routines that
+            are called by this function
+
+        Raises
+        ------
+        ValueError if either filename extension or ``format`` are not recognized
+        TypeError if the structure cannot be converted to the desired format for
+        whatever reason
+        """
+        from parmed import amber, formats, gromacs
+        extmap = {
+                '.pdb' : 'PDB',
+                '.cif' : 'CIF',
+                '.parm7' : 'AMBER',
+                '.prmtop' : 'AMBER',
+                '.psf' : 'PSF',
+                '.top' : 'GROMACS',
+                '.gro' : 'GRO',
+                '.mol2' : 'MOL2',
+                '.mol3' : 'MOL3',
+        }
+        # Basically everybody uses atom type names instead of type indexes. So
+        # convert to atom type names and switch back if need be
+        all_ints = True
+        for atom in self.atoms:
+            if isinstance(atom.type, integer_types):
+                atom.type = str(atom.atom_type)
+            else:
+                all_ints = False
+        try:
+            if format is not None:
+                format = format.upper()
+            else:
+                _, ext = os.path.splitext(fname)
+                if ext in ('.bz2', '.gz'):
+                    ext = os.path.splitext(ext)[1]
+                try:
+                    format = extmap[ext]
+                except KeyError:
+                    raise ValueError('Could not determine file type of %s' % fname)
+            # Dispatch
+            if format == 'PDB':
+                self.write_pdb(fname, **kwargs)
+            elif format == 'CIF':
+                self.write_cif(fname, **kwargs)
+            elif format == 'PSF':
+                self.write_psf(fname, **kwargs)
+            elif format == 'GRO':
+                gromacs.GromacsGroFile.write(self, fname, **kwargs)
+            elif format == 'MOL2':
+                formats.Mol2File.write(self, fname, **kwargs)
+            elif format == 'MOL3':
+                formats.Mol2File.write(self, fname, mol3=True, **kwargs)
+            elif format == 'GROMACS':
+                s = gromacs.GromacsTopologyFile.from_structure(self)
+                s.write(fname, **kwargs)
+            elif format == 'AMBER':
+                if (self.trigonal_angles or self.out_of_plane_bends or
+                        self.torsion_torsions or self.pi_torsions or
+                        self.stretch_bends or self.chiral_frames or
+                        self.multipole_frames):
+                    s = amber.AmoebaParm.from_structure(self)
+                    s.write_parm(fname, **kwargs)
+                elif self.urey_bradleys or self.impropers or self.cmaps:
+                    s = amber.ChamberParm.from_structure(self)
+                    s.write_parm(fname, **kwargs)
+                else:
+                    try:
+                        s = amber.AmberParm.from_structure(self)
+                    except TypeError as e:
+                        if 'Cannot translate exceptions' in str(e):
+                            s = amber.ChamberParm.from_structure(self)
+                        else:
+                            raise
+                    s.write_parm(fname, **kwargs)
+            else:
+                raise ValueError('No file type matching %s' % format)
+        finally:
+            if all_ints:
+                for atom in self.atoms:
+                    atom.type = int(atom.atom_type)
+
+    #===================================================
+
+    @property
+    def combining_rule(self):
+        return self._combining_rule
+
+    @combining_rule.setter
+    def combining_rule(self, thing):
+        if thing not in ('lorentz', 'geometric'):
+            raise ValueError("combining_rule must be 'lorentz' or 'geometric'")
+        self._combining_rule = thing
 
     #===================================================
 
@@ -1394,25 +1542,11 @@ class Structure(object):
 
     @property
     def coordinates(self):
-        if self._coordinates is None:
-            try:
-                coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
-            except AttributeError:
-                return None
-            else:
-                return np.array(coords)
-        elif self.is_changed():
-            # Make sure our first frame matches our atomic coordinates. If not,
-            # delete those coordinates
-            coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-            if np.abs(self._coordinates[0] - coords).max() > SMALL:
-                self._coordinates = None
-                return coords
-        assert len(self._coordinates.shape) == 3, \
-                'Internal coordinate shape wrong'
-        assert self._coordinates.shape[1] == len(self.atoms), \
-                'Coordinate shape different from number of atoms'
-        return self._coordinates[0]
+        try:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+        except AttributeError:
+            return None
+        return np.array(coords)
 
     @coordinates.setter
     def coordinates(self, value):
@@ -1458,29 +1592,32 @@ class Structure(object):
         ------
         IndexError if there are fewer than ``frame`` coordinates
         """
-        if self.is_changed() and self._coordinates is not None:
-            try:
-                coords = np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-            except AttributeError:
+        try:
+            coords = [[a.xx, a.xy, a.xz] for a in self.atoms]
+        except AttributeError:
+            coords = None
+        else:
+            coords = np.array(coords)
+        # Wipe out our existing coordinates if we think anything might have
+        # changed
+        if self._coordinates is not None:
+            if coords is None:
                 self._coordinates = None
-            else:
-                if np.abs(self._coordinates[0] - coords).max() > SMALL:
-                    self._coordinates = None
+            elif coords.shape != self._coordinates.shape[1:]:
+                self._coordinates = None
+            elif np.abs(coords - self._coordinates[0]).max() > SMALL:
+                self._coordinates = None
+
         if frame == 'all':
             if self._coordinates is not None:
                 return self._coordinates
-            try:
-                return np.array([[a.xx, a.xy, a.xz]
-                    for a in self.atoms]).reshape((1, len(self.atoms), 3))
-            except AttributeError:
-                return None
+            elif coords is not None:
+                return coords.reshape((1, len(self.atoms), 3))
+            return None
         elif self._coordinates is None:
-            if frame == 0:
-                try:
-                    return np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
-                except AttributeError:
-                    raise IndexError('No coordinate frames present')
-            # We requested *not* the first frame
+            if frame == 0 and coords is not None:
+                return coords
+            # Requested NOT the first frame
             raise IndexError('No coordinate frames present')
         return self._coordinates[frame]
 
@@ -2214,7 +2351,7 @@ class Structure(object):
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
         for atom in self.atoms:
-            force.addParticle(atom.charge, atom.rmin*sigma_scale,
+            force.addParticle(atom.charge, atom.sigma*length_conv,
                               abs(atom.epsilon*ene_conv))
         # Add exclusions from the bond graph out to nrexcl-1 bonds away (atoms
         # nrexcl bonds away will be exceptions defined later)
@@ -2243,8 +2380,12 @@ class Structure(object):
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
         # 1-4 with the appropriate scaling factor is used as the exception.
         sigma_scale = 2**(-1/6) * length_conv
+        if self.combining_rule == 'lorentz':
+            comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
+        elif self.combining_rule == 'geometric':
+            comb_sig = lambda sig1, sig2: math.sqrt(sig1 * sig2)
         if not self.adjusts:
-            for dih in self.dihedrals:
+            for dih in self.dihedrals + self.rb_torsions:
                 if dih.ignore_end: continue
                 if isinstance(dih.type, DihedralTypeList):
                     scee = scnb = 0
@@ -2265,24 +2406,27 @@ class Structure(object):
                 except KeyError:
                     epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (dih.atom1.rmin_14+dih.atom4.rmin_14)*sigma_scale
+                    sigprod = comb_sig(dih.atom1.sigma_14, dih.atom4.sigma_14)
+                    sigprod *= length_conv
                 else:
                     epsprod = wdij14 * ene_conv / scnb
-                    sigprod = rij * length_conv * sigma_scale
+                    sigprod = rij14 * length_conv * sigma_scale
                 chgprod = dih.atom1.charge * dih.atom4.charge / scee
                 force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                    sigprod, epsprod, True)
                 for child in dih.atom1.children:
                     epsprod = abs(child.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (child.rmin_14 + dih.atom4.rmin_14) * sigma_scale
+                    sigprod = comb_sig(child.sigma_14, dih.atom4.sigma_14)
+                    sigprod *= length_conv
                     chgprod = (child.charge * dih.atom4.charge) / scee
                     force.addException(child.idx, dih.atom4.idx, chgprod,
                                        sigprod, epsprod, True)
                 for child in dih.atom4.children:
                     epsprod = abs(child.epsilon_14 * dih.atom1.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                    sigprod = (child.rmin_14 + dih.atom1.rmin_14) * sigma_scale
+                    sigprod = comb_sig(child.sigma_14, dih.atom1.sigma_14)
+                    sigprod *= length_conv
                     chgprod = child.charge * dih.atom1.charge / scee
                     force.addException(child.idx, dih.atom1.idx, chgprod,
                                        sigprod, epsprod, True)
@@ -2290,7 +2434,8 @@ class Structure(object):
                     for c2 in dih.atom2.children:
                         epsprod = abs(c1.epsilon_14 * c2.epsilon_14)
                         epsprod = math.sqrt(epsprod) * ene_conv / scnb
-                        sigprod = (c1.rmin_14 + c2.rmin_14) * sigma_scale
+                        sigprod = comb_sig(c1.sigma_14, c2.sigma_14)
+                        sigprod *= length_conv
                         chgprod = c1.charge * c2.charge / scee
                         force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                            epsprod, True)
@@ -2299,7 +2444,7 @@ class Structure(object):
         for pair in self.adjusts:
             chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
             force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
-                               pair.type.rmin*sigma_scale,
+                               pair.type.sigma*length_conv,
                                pair.type.epsilon*ene_conv, True)
 
         # Any exclusion partners we already added will zero-out existing
@@ -2323,6 +2468,13 @@ class Structure(object):
 
         # Now see if we have any NBFIXes that we need to implement via a
         # CustomNonbondedForce
+        if self.combining_rule == 'geometric':
+            if self.has_NBFIX():
+                return (force, self._omm_nbfixed_force(force, nonbondedMethod),
+                        self._omm_geometric_force(force, nonbondedMethod))
+            else:
+                return force, self._omm_geometric_force(force, nonbondedMethod)
+
         if self.has_NBFIX():
             return force, self._omm_nbfixed_force(force, nonbondedMethod)
 
@@ -2414,6 +2566,77 @@ class Structure(object):
         # Add the particles
         for i in lj_idx_list:
             force.addParticle((i-1,))
+        # Now wipe out the L-J parameters in the nonbonded force
+        for i in range(nonbfrc.getNumParticles()):
+            chg, sig, eps = nonbfrc.getParticleParameters(i)
+            nonbfrc.setParticleParameters(i, chg, 0.5, 0.0)
+        # Now transfer the exclusions
+        for ii in range(nonbfrc.getNumExceptions()):
+            i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
+            force.addExclusion(i, j)
+        # Now transfer the other properties (cutoff, switching function, etc.)
+        force.setUseLongRangeCorrection(True)
+        if nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        else:
+            raise ValueError('Unsupported nonbonded method %s' %
+                             nonbondedMethod)
+        force.setCutoffDistance(nonbfrc.getCutoffDistance())
+        if nonbfrc.getUseSwitchingFunction():
+            force.setUseSwitchingFunction(True)
+            force.setSwitchingDistance(nonbfrc.getSwitchingDistance())
+
+        return force
+
+    #===================================================
+
+    def _omm_geometric_force(self, nonbfrc, nonbondedMethod):
+        """ Private method for creating a CustomNonbondedForce with a lookup
+        table. This should not be called by users -- you have been warned.
+
+        Parameters
+        ----------
+        nonbfrc : NonbondedForce
+            NonbondedForce for the "standard" nonbonded interactions. This will
+            be modified (specifically, L-J ixns will be zeroed)
+        nonbondedMethod : Nonbonded Method (e.g., NoCutoff, PME, etc.)
+            The nonbonded method to apply here. Ewald and PME will be
+            interpreted as CutoffPeriodic for the CustomNonbondedForce.
+
+        Returns
+        -------
+        force : CustomNonbondedForce
+            The L-J force with NBFIX implemented as a lookup table
+        """
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+        # We need a CustomNonbondedForce to implement the geometric combining
+        # rules
+        force = mm.CustomNonbondedForce('eps1*eps2*(sigr6^2-sigr6); '
+                                        'sigr6=sigr2*sigr2*sigr2; '
+                                        'sigr2=(sigc/r)^2; sigc=sig1*sig2')
+        force.addPerParticleParameter('eps')
+        force.addPerParticleParameter('sig')
+        force.setForceGroup(self.NONBONDED_FORCE_GROUP)
+        if (nonbondedMethod is app.PME or nonbondedMethod is app.Ewald or
+                nonbondedMethod is app.CutoffPeriodic):
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+        elif nonbondedMethod is app.NoCutoff:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+        elif nonbondedMethod is app.CutoffNonPeriodic:
+            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+        else:
+            raise ValueError('Unrecognized nonbonded method [%s]' %
+                             nonbondedMethod)
+        # Add the particles
+        for atom in self.atoms:
+            eps = math.sqrt(atom.epsilon*ene_conv) * 2
+            sig = math.sqrt(atom.sigma*length_conv)
+            force.addParticle((eps, sig))
         # Now wipe out the L-J parameters in the nonbonded force
         for i in range(nonbfrc.getNumParticles()):
             chg, sig, eps = nonbfrc.getParticleParameters(i)
@@ -2982,7 +3205,7 @@ class Structure(object):
 
     def __iadd__(self, other):
         if not isinstance(other, Structure):
-            raise TypeError('Must concatenate with Structure')
+            return NotImplemented
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3090,7 +3313,7 @@ class Structure(object):
 
     def __imul__(self, ncopies, other=None):
         if not isinstance(ncopies, integer_types):
-            raise TypeError('Can only multiply a structure by an integer')
+            return NotImplemented
         # The basic approach here is similar to what we used in __iadd__, except
         # we don't have to extend the type arrays at all -- we just point to the
         # same one that the first copy pointed to.
@@ -3175,6 +3398,32 @@ class Structure(object):
                     (-1, len(self.atoms), 3))
             self._coordinates = coords
         return self
+
+    #===================================================
+
+    # For the bool-ness of Structure. An empty structure evaluates to
+    # boolean-false, but this means that the structure must have no atoms,
+    # residues, topological features, or parameter types at all.
+
+    def __bool__(self):
+        return bool(self.atoms or self.residues or self.bonds or self.angles or
+                    self.dihedrals or self.impropers or self.rb_torsions or
+                    self.cmaps or self.torsion_torsions or self.stretch_bends or
+                    self.out_of_plane_bends or self.trigonal_angles or
+                    self.torsion_torsions or self.pi_torsions or
+                    self.urey_bradleys or self.chiral_frames or
+                    self.multipole_frames or self.adjusts or self.acceptors or
+                    self.donors or self.groups or self.bond_types or
+                    self.angle_types or self.dihedral_types or
+                    self.urey_bradley_types or self.improper_types or
+                    self.rb_torsion_types or self.cmap_types or
+                    self.trigonal_angle_types or self.out_of_plane_bend_types or
+                    self.pi_torsion_types or self.torsion_torsion_types or
+                    self.adjust_types)
+
+    def __nonzero__(self):
+        # For Python 2
+        return self.__bool__()
 
     #===================================================
 

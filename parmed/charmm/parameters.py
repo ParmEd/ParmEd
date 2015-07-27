@@ -9,8 +9,9 @@ Date: Apr. 13, 2015
 """
 from __future__ import division
 from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
-                       DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
+                    DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
+from parmed.constants import TINY
 from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
@@ -90,6 +91,11 @@ class CharmmParameterSet(ParameterSet):
         terms for that off-diagonal term
     """
 
+    def __copy__(self):
+        other = super(CharmmParameterSet, self).__copy__()
+        other._declared_nbrules = self._declared_nbrules
+        return other
+
     @staticmethod
     def _convert(data, type, msg=''):
         """
@@ -107,6 +113,7 @@ class CharmmParameterSet(ParameterSet):
         self.parametersets = []
         self.residues = dict()
         self.patches = dict()
+        self._declared_nbrules = False
 
         # Load all of the files
         tops, pars, strs = [], [], []
@@ -214,7 +221,6 @@ class CharmmParameterSet(ParameterSet):
         current_cmap_res = 0
         nonbonded_types = dict() # Holder
         parameterset = None
-        read_first_nonbonded = False
         for i, line in enumerate(f):
             line = line.strip()
             try:
@@ -249,6 +255,31 @@ class CharmmParameterSet(ParameterSet):
             if line.startswith('NONBONDED'):
                 read_first_nonbonded = False
                 section = 'NONBONDED'
+                # Get nonbonded keywords
+                words = line.split()[1:]
+                scee = None
+                for i, word in enumerate(words):
+                    if word.upper() == 'E14FAC':
+                        try:
+                            scee = float(words[i+1])
+                        except (ValueError, IndexError):
+                            raise CharmmError(
+                                    'Could not parse 1-4 electrostatic scaling '
+                                    'factor from NONBONDED card'
+                            )
+                        if self._declared_nbrules:
+                            # We already specified it -- make sure it's the same
+                            # as the one we specified before
+                            if abs(self.dihedral_types[0][0].scee-scee) > TINY:
+                                raise CharmmError('Inconsistent 1-4 scalings')
+                    elif word.upper().startswith('GEOM'):
+                        if (self._declared_nbrules and
+                                self.combining_rule != 'geometric'):
+                            raise CharmmError(
+                                    'Cannot combine parameter files with '
+                                    'different combining rules'
+                            )
+                        self.combining_rule = 'geometric'
                 continue
             if line.startswith('NBFIX'):
                 section = 'NBFIX'
@@ -450,18 +481,46 @@ class CharmmParameterSet(ParameterSet):
                     # 1st column is ignored
                     epsilon = conv(words[2], float, 'vdW epsilon term')
                     rmin = conv(words[3], float, 'vdW Rmin/2 term')
-                except IndexError:
+                except (IndexError, CharmmError):
                     # If we haven't read our first nonbonded term yet, we may
                     # just be parsing the settings that should be used. So
                     # soldier on
-                    if not read_first_nonbonded: continue
-                    raise CharmmError('Could not parse nonbonded terms.')
-                except CharmmError:
-                    if not read_first_nonbonded: continue
-                    raise
+                    if read_first_nonbonded: raise
+                    for i, word in enumerate(words):
+                        if word.upper() == 'E14FAC':
+                            try:
+                                scee = float(words[i+1])
+                            except (ValueError, IndexError):
+                                raise CharmmError(
+                                        'Could not parse electrostatic '
+                                        'scaling constant'
+                                )
+                            if self._declared_nbrules:
+                                # We already specified it -- make sure it's the
+                                # same as the one we specified before
+                                _, dt0 = next(iteritems(self.dihedral_types))
+                                diff = abs(dt0[0].scee - scee)
+                                if diff > TINY:
+                                    raise CharmmError('Inconsistent 1-4 '
+                                                      'scalings')
+                            else:
+                                scee = 1 / scee
+                                for key, dtl in iteritems(self.dihedral_types):
+                                    for dt in dtl:
+                                        dt.scee = scee
+                        elif word.upper().startswith('GEOM'):
+                            if (self._declared_nbrules and
+                                    self.combining_rule != 'geometric'):
+                                raise CharmmError(
+                                        'Cannot combine parameter files with '
+                                        'different combining rules'
+                                )
+                            self.combining_rule = 'geometric'
+                    continue
                 else:
                     # OK, we've read our first nonbonded section for sure now
                     read_first_nonbonded = True
+                    self._declared_nbrules = True
                 # See if we have 1-4 parameters
                 try:
                     # 4th column is ignored

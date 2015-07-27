@@ -494,9 +494,12 @@ class ChamberParm(AmberParm):
         for flag in flags_to_delete:
             self.delete_flag(flag)
         # Now add them back
+        after = 'CHARMM_CMAP_RESOLUTION'
         for i, ct in enumerate(self.cmap_types):
-            self.add_flag('CHARMM_CMAP_PARAMETER_%02d' % (i+1), fmt,
-                          data=ct.grid, comments=ct.comments)
+            newflag = 'CHARMM_CMAP_PARAMETER_%02d' % (i+1)
+            self.add_flag(newflag, fmt, data=ct.grid, comments=ct.comments,
+                          after=after)
+            after = newflag
         # Now do the CMAP_INDEX section
         data['CHARMM_CMAP_INDEX'] = cmap_array = []
         for cm in self.cmaps:

@@ -17,7 +17,7 @@ Test cases for reading PDBx/mmCIF data files PdbxReader class -
 """
 from __future__ import print_function, division
 import sys, unittest, traceback, os
-from utils import get_fn, get_saved_fn, diff_files
+from utils import get_fn, get_saved_fn, diff_files, FileIOTestCase
 
 from parmed.formats.pdbx import PdbxReader, PdbxWriter
 from parmed.formats.pdbx.PdbxContainers import *
@@ -106,19 +106,13 @@ class PdbxReaderTests(unittest.TestCase):
         self.assertAlmostEqual(sumR/icount, 0.547058, delta=0.000002)
         self.assertEqual(icount, 18508)
 
-class PdbxWriterTests(unittest.TestCase):
+class PdbxWriterTests(FileIOTestCase):
     def setUp(self):
+        super(PdbxWriterTests, self).setUp()
         self.lfh=sys.stderr
         self.verbose=False
         self.pathPdbxDataFile = get_fn("1kip.cif")
         self.pathOutputFile = get_fn("testOutputDataFile.cif", written=True)
-        if not os.path.exists(get_fn('writes')):
-            os.makedirs(get_fn('writes'))
-
-    def tearDown(self):
-        if os.path.exists(get_fn('writes')):
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
 
     def testWriteDataFile(self): 
         """ Test writing CIF file """

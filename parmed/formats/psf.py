@@ -7,7 +7,7 @@ from parmed.charmm import CharmmPsfFile
 from parmed.charmm.psf import set_molecules
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass
+from parmed.utils.six import add_metaclass, string_types
 from parmed.utils.six.moves import range
 
 @add_metaclass(FileFormatType)
@@ -111,8 +111,12 @@ class PSFFile(object):
         else:
             dest.write('EXT') # EXT is always active
         dest.write('\n\n')
-        dest.write(intfmt % len(struct.title) + ' !NTITLE\n')
-        dest.write('\n'.join(struct.title) + '\n\n')
+        if isinstance(struct.title, string_types):
+            dest.write(intfmt % 1 + ' !NTITLE\n')
+            dest.write('%s\n\n' % struct.title)
+        else:
+            dest.write(intfmt % len(struct.title) + ' !NTITLE\n')
+            dest.write('\n'.join(struct.title) + '\n\n')
         # Now time for the atoms
         dest.write(intfmt % len(struct.atoms) + ' !NATOM\n')
         # atmfmt1 is for CHARMM format (i.e., atom types are integers)
@@ -134,7 +138,7 @@ class PSFFile(object):
             if hasattr(atom, 'props'):
                 dest.write(atmstr + '   '.join(atom.props) + '\n')
             else:
-                dest.write('\n')
+                dest.write('%s\n' % atmstr)
         dest.write('\n')
         # Bonds
         dest.write(intfmt % len(struct.bonds) + ' !NBOND: bonds\n')
@@ -209,7 +213,11 @@ class PSFFile(object):
         if len(struct.atoms) % 8 != 0: dest.write('\n')
         dest.write('\n')
         # Group section
-        dest.write((intfmt*2) % (len(struct.groups), struct.groups.nst2))
+        try:
+            nst2 = struct.groups.nst2
+        except AttributeError:
+            nst2 = 0
+        dest.write((intfmt*2) % (len(struct.groups), nst2))
         dest.write(' !NGRP NST2\n')
         for i, gp in enumerate(struct.groups):
             dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))

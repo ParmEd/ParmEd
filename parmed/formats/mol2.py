@@ -12,7 +12,7 @@ from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond
 from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass
+from parmed.utils.six import add_metaclass, string_types
 
 @add_metaclass(FileFormatType)
 class Mol2File(object):
@@ -52,8 +52,8 @@ class Mol2File(object):
 
         Parameters
         ----------
-        filename : str
-            Name of the file to parse
+        filename : str or file-like
+            Name of the file to parse or file-like object to parse from
         structure : bool, optional
             If True, the return value is a :class:`Structure` instance. If
             False, it is either a :class:`ResidueTemplate` or
@@ -71,22 +71,47 @@ class Mol2File(object):
         ------
         Mol2Error
             If the file format is not recognized or non-numeric values are
-            present where integers or floating point numbers are expected
+            present where integers or floating point numbers are expected. Also
+            raises Mol2Error if you try to parse a mol2 file that has multiple
+            @<MOLECULE> entries with ``structure=True``.
         """
-        f = genopen(filename, 'r')
+        if isinstance(filename, string_types):
+            f = genopen(filename, 'r')
+            own_handle = True
+        else:
+            f = filename
+            own_handle = False
         rescont = ResidueTemplateContainer()
         struct = Structure()
         restemp = ResidueTemplate()
         mol_info = []
+        multires_structure = False
         try:
             section = None
             last_residue = None
             headtail = 'head'
+            molecule_number = 0
             for line in f:
                 if line.startswith('#'): continue
                 if not line.strip() and section is None: continue
                 if line.startswith('@<TRIPOS>'):
                     section = line[9:].strip()
+                    if section == 'MOLECULE' and (restemp.atoms or rescont):
+                        if structure:
+                            raise Mol2Error('Cannot convert MOL2 with multiple '
+                                            '@<MOLECULE>s to a Structure')
+                        # Set the residue name from the MOL2 title if the
+                        # molecule had only 1 residue and it was given a name in
+                        # the title
+                        if not multires_structure and mol_info[0]:
+                            restemp.name = mol_info[0]
+                        multires_structure = False
+                        rescont.append(restemp)
+                        restemp = ResidueTemplate()
+                        struct = Structure()
+                        last_residue = None
+                        molecule_number += 1
+                        mol_info = []
                     continue
                 if section is None:
                     raise Mol2Error('Bad mol2 file format')
@@ -141,6 +166,8 @@ class Mol2File(object):
                             charge = float(words[8])
                         except IndexError:
                             charge = 0
+                    else:
+                        charge = 0
                     if last_residue is None:
                         last_residue = (resid, resname)
                         restemp.name = resname
@@ -152,6 +179,7 @@ class Mol2File(object):
                         restemp = ResidueTemplate()
                         restemp.name = resname
                         last_residue = (resid, resname)
+                        multires_structure = True
                     restemp.add_atom(copy.copy(atom))
                     continue
                 if section == 'BOND':
@@ -192,6 +220,8 @@ class Mol2File(object):
                         else:
                             res1.head = res1[idx1]
                             res2.tail = res2[idx2]
+                    elif not multires_structure:
+                        restemp.add_bond(a1-1, a2-1)
                     else:
                         # Same residue, add the bond
                         offset = atom1.residue[0].idx
@@ -232,6 +262,7 @@ class Mol2File(object):
                     #   status -- ignored
                     #   comment -- ignored
                     words = line.split()
+                    if not words: continue
                     id = int(words[0])
                     resname = words[1]
                     try:
@@ -247,7 +278,7 @@ class Mol2File(object):
                 if section == 'HEADTAIL':
                     atname, residx = line.split()
                     residx = int(residx)
-                    if residx - 1 == len(rescont):
+                    if residx in (0, 1) or residx - 1 == len(rescont):
                         res = restemp
                     elif residx - 1 < len(rescont):
                         res = rescont[residx-1]
@@ -290,6 +321,8 @@ class Mol2File(object):
             if structure:
                 return struct
             elif len(rescont) > 0:
+                if not multires_structure and mol_info[0]:
+                    restemp.name = mol_info[0]
                 rescont.append(restemp)
                 return rescont
             else:
@@ -297,12 +330,12 @@ class Mol2File(object):
         except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)
         finally:
-            f.close()
+            if own_handle: f.close()
 
     #===================================================
 
     @staticmethod
-    def write(struct, dest, mol3=False):
+    def write(struct, dest, mol3=False, split=False):
         """ Writes a mol2 file from a structure or residue template
 
         Parameters
@@ -315,11 +348,25 @@ class Mol2File(object):
         mol3 : bool, optional
             If True and ``struct`` is a ResidueTemplate or container, write
             HEAD/TAIL sections. Default is False
+        split : bool, optional
+            If True and ``struct`` is a ResidueTemplateContainer or a Structure
+            with multiple residues, each residue is printed in a separate
+            @<MOLECULE> section that appear sequentially in the output file
         """
         own_handle = False
         if not hasattr(dest, 'write'):
             own_handle = True
             dest = genopen(dest, 'w')
+        if split:
+            # Write sequentially if it is a multi-residue container or Structure
+            if isinstance(struct, ResidueTemplateContainer):
+                for res in struct:
+                    Mol2File.write(res, dest, mol3)
+                return
+            elif isinstance(struct, Structure) and len(struct.residues) > 1:
+                for res in ResidueTemplateContainer.from_structure(struct):
+                    Mol2File.write(res, dest, mol3)
+                return
         try:
             if isinstance(struct, ResidueTemplateContainer):
                 natom = sum([len(c) for c in struct])
@@ -397,7 +444,8 @@ class Mol2File(object):
                     except AttributeError:
                         z = 0
                     dest.write('%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s' % (
-                               j, atom.name, x, y, z, atom.type, i+1, res.name))
+                               j, atom.name, x, y, z,
+                               atom.type.strip() or atom.name, i+1, res.name))
                     if printchg:
                         dest.write(' %10.6f\n' % atom.charge)
                     else:

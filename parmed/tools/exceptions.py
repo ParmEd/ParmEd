@@ -1,6 +1,7 @@
-""" Exceptions used in parmed.py """
+""" Exceptions used in parmed script """
 from sys import stderr
 from parmed.exceptions import ParmedError, ParmedWarning, InputError
+import warnings
 
 class ParmError(ParmedError):
     """ Base parmed error """
@@ -18,6 +19,9 @@ class ParmWarning(ParmedWarning):
 
 class SeriousParmWarning(ParmWarning):
     """ These warnings are more serious, and are fatal in strict operation """
+
+# By default, make SeriousParmWarning fatal
+warnings.filterwarnings('error', category=SeriousParmWarning)
 
 class ChangeRadiiError(ParmError):
     pass

@@ -2,7 +2,7 @@
 Tests the functionality in the parmed.amber package
 """
 from __future__ import print_function, division
-from utils import get_fn, has_numpy
+from utils import get_fn, has_numpy, FileIOTestCase
 import numpy as np
 from parmed.amber import readparm, asciicrd, mask
 from parmed import topologyobjects, load_file
@@ -26,11 +26,22 @@ class TestReadParm(unittest.TestCase):
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
 
+    def testGzippedParm(self):
+        """ Check that gzipped prmtop files can be parsed correctly """
+        parm = readparm.LoadParm(get_fn('small.parm7.gz'))
+        self.assertEqual(parm.ptr('natom'), 864)
+
+    def testBzippedParm(self):
+        """ Check that bzip2ed prmtop files can be parsed correctly """
+        parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
+        self.assertEqual(parm.ptr('natom'), 864)
+
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         gasparm = readparm.AmberParm(get_fn('trx.prmtop'))
         gasparm.load_rst7(get_fn('trx.inpcrd'))
+        self.assertEqual(gasparm.combining_rule, 'lorentz')
 
         self.assertEqual([a.xx for a in gasparm.atoms],
                          [a.xx for a in parm.atoms])
@@ -67,6 +78,8 @@ class TestReadParm(unittest.TestCase):
                     self.assertEqual(x1, x2)
                 else:
                     self.assertAlmostEqual(x1, x2)
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        self.assertEqual(parm2.combining_rule, 'lorentz')
 
     def testRemakeChamberParm(self):
         """ Tests the rebuilding of the ChamberParm raw data structures """
@@ -80,11 +93,14 @@ class TestReadParm(unittest.TestCase):
                     self.assertEqual(x1, x2)
                 else:
                     self.assertAlmostEqual(x1, x2)
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        self.assertEqual(parm2.combining_rule, 'lorentz')
 
     def testAmberSolvParm(self):
         """ Test the AmberParm class with a periodic prmtop """
         parm = readparm.AmberParm(get_fn('solv.prmtop'),
                                   get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._solv_pointer_tests(parm)
         self.assertFalse(parm.chamber)
@@ -94,6 +110,7 @@ class TestReadParm(unittest.TestCase):
     def testChamberGasParm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
         parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
         self.assertTrue(parm.chamber)
@@ -103,6 +120,7 @@ class TestReadParm(unittest.TestCase):
     def testChamberSolvParm(self):
         """ Test the ChamberParm class with a periodic prmtop """
         parm = readparm.ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._solv_pointer_tests(parm)
         self.assertTrue(parm.chamber)
@@ -141,6 +159,7 @@ class TestReadParm(unittest.TestCase):
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """
         parm = readparm.AmberParm(get_fn('ff91.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm, has1012=True)
 
     # Tests for individual prmtops
@@ -378,22 +397,8 @@ class TestAmberMask(unittest.TestCase):
             for atom in res.atoms:
                 self.assertEqual(sel[atom.idx], within)
 
-class TestWriteFiles(unittest.TestCase):
+class TestWriteFiles(FileIOTestCase):
     
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
     def testWriteAmberParm(self):
         """ Test writing an AmberParm file """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
@@ -610,7 +615,7 @@ class TestObjectAPIs(unittest.TestCase):
         mylist2 = topologyobjects.TrackedList(reversed(range(20)))
         self.assertFalse(mylist.changed)
         self.assertIsInstance(mylist[0], int)
-        self.assertIsInstance(mylist[0:5], topologyobjects.TrackedList)
+        self.assertIsInstance(mylist[0:5], list)
         self.assertIsInstance(mylist + mylist2, topologyobjects.TrackedList)
         self.assertIsInstance(mylist * 2, topologyobjects.TrackedList)
         mylist += mylist2
@@ -650,13 +655,13 @@ class TestAmberParmSlice(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('solv.prmtop'))
         parts = parm.split()
         # Make sure the sum of the parts is equal to the whole
-        natom = sum(len(part[0].atoms)*part[1] for part in parts)
+        natom = sum(len(part[0].atoms)*len(part[1]) for part in parts)
         self.assertEqual(len(parm.atoms), natom)
         self.assertEqual(len(parts), 4) # 4 types of molecules
-        self.assertEqual(parts[0][1], 1)
-        self.assertEqual(parts[1][1], 1)
-        self.assertEqual(parts[2][1], 8)
-        self.assertEqual(parts[3][1], 9086)
+        self.assertEqual(len(parts[0][1]), 1)
+        self.assertEqual(len(parts[1][1]), 1)
+        self.assertEqual(len(parts[2][1]), 8)
+        self.assertEqual(len(parts[3][1]), 9086)
 
     def testSplit2(self):
         """ Tests splitting distinct single-residue molecules with same name """
@@ -675,8 +680,8 @@ class TestAmberParmSlice(unittest.TestCase):
         self.assertEqual(len(parts), 2)
         self.assertEqual(len(parts[0][0].atoms), len(parm.atoms))
         self.assertEqual(len(parts[1][0].atoms), len(parm2.atoms))
-        self.assertEqual(parts[0][1], 20)
-        self.assertEqual(parts[1][1], 30)
+        self.assertEqual(len(parts[0][1]), 20)
+        self.assertEqual(len(parts[1][1]), 30)
 
     def testAdd(self):
         """ Tests combining AmberParm instances """

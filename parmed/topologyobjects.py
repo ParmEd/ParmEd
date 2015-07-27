@@ -25,7 +25,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group', 'AtomType',
            'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
-           'RBTorsionType', 'lorentz_berthelot', 'geometric']
+           'RBTorsionType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -2198,6 +2198,10 @@ class RBTorsionType(_ListItem, _ParameterType):
         The coefficient of the quartic term in kcal/mol
     c5 : float
         The coefficient of the quintic term in kcal/mol
+    scee : float, optional
+        1-4 electrostatic scaling factor. Default is 1.0
+    scnb : float, optional
+        1-4 van der Waals scaling factor. Default is 1.0
     list : TrackedList=None
         A list of `RBTorsionType`s in which this is a member
 
@@ -2236,7 +2240,7 @@ class RBTorsionType(_ListItem, _ParameterType):
 
     #===================================================
    
-    def __init__(self, c0, c1, c2, c3, c4, c5, list=None):
+    def __init__(self, c0, c1, c2, c3, c4, c5, scee=1.0, scnb=1.0, list=None):
         _ParameterType.__init__(self)
         self.c0 = _strip_units(c0, u.kilocalories_per_mole)
         self.c1 = _strip_units(c1, u.kilocalories_per_mole)
@@ -2244,6 +2248,8 @@ class RBTorsionType(_ListItem, _ParameterType):
         self.c3 = _strip_units(c3, u.kilocalories_per_mole)
         self.c4 = _strip_units(c4, u.kilocalories_per_mole)
         self.c5 = _strip_units(c5, u.kilocalories_per_mole)
+        self.scee = scee
+        self.scnb = scnb
         self.list = list
         self._idx = -1
 
@@ -2255,13 +2261,14 @@ class RBTorsionType(_ListItem, _ParameterType):
                 self.c4 == other.c4 and self.c5 == other.c5)
 
     def __copy__(self):
-        return RBTorsionType(self.c0, self.c1, self.c2,
-                             self.c3, self.c4, self.c5)
+        return RBTorsionType(self.c0, self.c1, self.c2, self.c3, self.c4,
+                             self.c5, self.scee, self.scnb)
 
     def __repr__(self):
         return ('<RBTorsionType; c0=%.3f; c1=%.3f; c2=%.3f; c3=%.3f; c4=%.3f; '
-                'c5=%.3f>' % (self.c0, self.c1, self.c2, self.c3, self.c4,
-                              self.c5))
+                'c5=%.3f; scee=%s; scnb=%s>' %
+                (self.c0, self.c1, self.c2, self.c3, self.c4, self.c5,
+                 self.scee, self.scnb))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3909,6 +3916,17 @@ class TrackedList(list):
         self.needs_indexing = False
         return list.__init__(self, *args)
 
+    def __repr__(self):
+        retstr = ['%s([\n' % (type(self).__name__)]
+        if len(self) > 30:
+            retstr.extend('\t%r\n' % self[i] for i in range(24))
+            retstr.append('\t...\n')
+            retstr.extend('\t%r\n' % self[i] for i in range(-5, 0))
+        else:
+            retstr.extend('\t%r\n' % i for i in self)
+        retstr.append('])')
+        return ''.join(retstr)
+
     @_changes
     def __delitem__(self, item):
         """ Deletes items and slices. Make sure all items """
@@ -3977,14 +3995,6 @@ class TrackedList(list):
 
     def __mul__(self, fac):
         return TrackedList(list.__mul__(self, fac))
-
-    def __getitem__(self, thing):
-        if isinstance(thing, slice):
-            return TrackedList(list.__getitem__(self, thing))
-        return list.__getitem__(self, thing)
-
-    def __getslice__(self, start, end):
-        return TrackedList(list.__getslice__(self, start, end))
 
     def index_members(self):
         """
@@ -4406,7 +4416,7 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
         self.polar_weight = polar_weight
         self.mutual_weight = mutual_weight
         self._idx = -1
-        self.list = None
+        self.list = list
 
     def __eq__(self, other):
         return (self.vdw_weight == other.vdw_weight and
@@ -4690,94 +4700,6 @@ class Group(object):
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 NoUreyBradley = BondType(0.0, 0.0) # singleton representing lack of a U-B term
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-# Various combining rules and their inverses for homogenous pairs (i.e., a pair
-# interacting with itself)
-
-def lorentz_berthelot(eps1, eps2, sig1, sig2):
-    """
-    Uses the Lorentz-Berthelot combining rules to compute Lennard-Jones
-    parameters for a particular atom pair. For flexibility, this function allows
-    you to specify *either* Rmin/2 or sigma values for the radii. You must
-    specify either rmin1 and rmin2 *or* sig1 and sig2, exactly.
-
-    The equation for these combining rules are:
-
-    eps_12 = sqrt(eps1*eps2)
-    rmin_12 = rmin1 + rmin2   or  sig_12 = 0.5*(sig1 + sig2)
-
-    Parameters
-    ----------
-    eps1 : float
-        The epsilon of the first atom. Can have energy units
-    eps2 : float
-        The epsilon of the second atom.
-    sig1 : float
-        The sigma value of the first atom. Can have length units
-    sig2 : float
-        The sigma value of the second atom.
-
-    Returns
-    -------
-    eps12, sig12 : float, float
-        The well-depth (epsilon) parameter in kcal/mol and the sigma parameter
-        in angstroms.
-
-    Raises
-    ------
-    TypeError if the units are incompatible
-    """
-    sigs = (sig1, sig2)
-    eps1 = _strip_units(eps1, u.kilocalories_per_mole)
-    eps2 = _strip_units(eps2, u.kilocalories_per_mole)
-    eps12 = math.sqrt(abs(eps1) * abs(eps2))
-    sig1 = _strip_units(sig1, u.angstroms)
-    sig2 = _strip_units(sig2, u.angstroms)
-    sig12 = (sig1 + sig2) / 2
-    return eps12, sig12
-
-def geometric(eps1, eps2, sig1, sig2):
-    """
-    Uses the geometric combining rules to compute Lennard-Jones parameters for a
-    particular atom pair. For flexibility, this function allows you to specify
-    *either* Rmin/2 or sigma values for the radii. You must specify either rmin1
-    and rmin2 *or* sig1 and sig2, exactly.
-
-    The equation for these combining rules are:
-
-    eps_12 = sqrt(eps1*eps2)
-    sig_12 = sqrt(sig1*sig2)
-
-    Parameters
-    ----------
-    eps1 : float
-        The epsilon of the first atom. Can have energy units
-    eps2 : float
-        The epsilon of the second atom.
-    sig1 : float
-        The sigma value of the first atom. Can have length units
-    sig2 : float
-        The sigma value of the second atom.
-
-    Returns
-    -------
-    eps12, sig12 : float, float
-        The well-depth (epsilon) parameter in kcal/mol and the sigma parameter
-        in angstroms.
-
-    Raises
-    ------
-    TypeError if the units are incompatible
-    """
-    eps1 = _strip_units(eps1, u.kilocalories_per_mole)
-    eps2 = _strip_units(eps2, u.kilocalories_per_mole)
-    eps12 = math.sqrt(abs(eps1) * abs(eps2))
-    sig1 = _strip_units(sig1, u.angstroms)
-    sig2 = _strip_units(sig2, u.angstroms)
-    sig12 = math.sqrt(sig1 * sig2)
-    return eps12, sig12
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

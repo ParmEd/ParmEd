@@ -6,7 +6,8 @@ loaded.
 from __future__ import print_function, division, absolute_import
 
 from parmed.utils.six import string_types
-from parmed import load_file, Structure
+from parmed.structure import Structure
+from parmed.formats.registry import load_file
 from parmed.exceptions import FormatNotFound
 from parmed.tools.exceptions import DuplicateParm, ParmIndexError, ParmError
 
@@ -34,7 +35,7 @@ class ParmList(object):
             if parm in self._parm_names:
                 raise DuplicateParm('%s already in ParmList' % parm)
             try:
-                parm = load_file(parm)
+                parm = load_file(parm, structure=True)
             except FormatNotFound:
                 raise ParmError('Could not determine file type of %s' % parm)
             if not isinstance(parm, Structure):

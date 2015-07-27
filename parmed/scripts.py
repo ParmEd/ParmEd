@@ -111,8 +111,8 @@ def clapp():
         print(splash)
     
     # Set our warning filter
-    if opt.strict:
-        warnings.filterwarnings('error', category=SeriousParmWarning)
+    if not opt.strict:
+        warnings.filterwarnings('always', category=SeriousParmWarning)
     
     # Set our overwrite preferences
     Action.overwrite = opt.overwrite
@@ -175,6 +175,7 @@ def clapp():
                     for line in f:
                         if line.startswith('# Log started on'): continue
                         readline.add_history(line.rstrip())
+                    f.close()
             try:
                 logfile = open(opt.logfile, 'a')
             except IOError:
@@ -210,7 +211,7 @@ def guiapp():
     from optparse import OptionParser
     from os.path import exists, split
     from parmed.tools.exceptions import ParmError
-    from parmed.tools import __version__
+    from parmed import __version__
     from parmed.tools.gui.guitools import ParmedApp
     from parmed.tools.gui.guifiletools import file_chooser
     from parmed.tools.logos import Logo
