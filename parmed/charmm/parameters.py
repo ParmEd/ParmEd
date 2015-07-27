@@ -17,6 +17,7 @@ from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
+from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, integer_types
 from parmed.utils.six.moves import zip
 import os
@@ -906,6 +907,58 @@ class CharmmParameterSet(ParameterSet):
                 # This is a Parameter file section
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
+
+    def write(self, top=None, par=None, str=None):
+        """ Write a CHARMM parameter set to a file
+
+        Parameters
+        ----------
+        top : str or file-like object, optional
+            If provided, the atom types will be written to this file in RTF
+            format.
+        par : str or file-like object, optional
+            If provided, the parameters will be written to this file in PAR
+            format. Either this or the ``str`` argument *must* be provided
+        str : str or file-like object, optional
+            If provided, the atom types and parameters will be written to this
+            file as separate RTF and PAR cards that can be read as a CHARMM
+            stream file. Either this or the ``par`` argument *must* be provided
+
+        Raises
+        ------
+        ValueError if both par and str are None
+        """
+
+        if par is None and str is None:
+            raise ValueError('Must specify either par *or* str')
+
+        if top is not None:
+            if isinstance(top, string_types):
+                f = genopen(top, 'w')
+                ownhandle = True
+            else:
+                f = top
+                ownhandle = False
+            self._write_top_to(top)
+            if ownhandle: f.close()
+        if par is not None:
+            if isinstance(par, string_types):
+                f = genopen(par, 'w')
+                ownhandle = True
+            else:
+                f = par
+                ownhandle = False
+            self._write_par_to(par)
+            if ownhandle: f.close()
+        if str is not None:
+            if isinstance(str, string_types):
+                f = genopen(str, 'w')
+                ownhandle = True
+            else:
+                f = str
+                ownhandle = False
+            self._write_str_to(str)
+            if ownhandle: f.close()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
