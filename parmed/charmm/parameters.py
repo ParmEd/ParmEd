@@ -566,7 +566,7 @@ class CharmmParameterSet(ParameterSet):
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
                 else:
-                    improp = DihedralType(k, per, theteq, improper=True)
+                    improp = DihedralType(k, per, theteq)
                     self.improper_periodic_types[key].append(improp)
                 improp.penalty = penalty
                 continue
