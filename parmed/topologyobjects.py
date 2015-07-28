@@ -2108,10 +2108,12 @@ class DihedralType(_ListItem, _ParameterType):
         The dihedral periodicity
     phase : ``float``
         The dihedral phase in degrees
-    scee : ``float``
-        1-4 electrostatic scaling factor
-    scnb : ``float``
-        1-4 Lennard-Jones scaling factor
+    scee : ``float``, optional
+        1-4 electrostatic scaling factor. Default is 1.0
+    scnb : ``float``, optional
+        1-4 Lennard-Jones scaling factor. Default is 1.0
+    improper : ``bool``, optional
+        If this DihedralType represents an improper torsion. Default is False
     list : :class:`TrackedList`
         A list of `DihedralType`s in which this is a member
 
@@ -2151,7 +2153,8 @@ class DihedralType(_ListItem, _ParameterType):
 
     #===================================================
    
-    def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
+    def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0,
+                 improper=False, list=None):
         """ DihedralType constructor """
         _ParameterType.__init__(self)
         self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
@@ -2159,6 +2162,7 @@ class DihedralType(_ListItem, _ParameterType):
         self.phase = _strip_units(phase, u.degrees)
         self.scee = scee
         self.scnb = scnb
+        self.improper = improper
         self.list = list
         self._idx = -1
 
@@ -2170,13 +2174,17 @@ class DihedralType(_ListItem, _ParameterType):
                 self.scnb == other.scnb)
 
     def __repr__(self):
-        return ('<%s; phi_k=%.3f, per=%d, phase=%.3f, scee=%.3f, scnb=%.3f>' %
-                (type(self).__name__, self.phi_k, self.per, self.phase,
-                 self.scee, self.scnb))
+        retstr = ['<%s; phi_k=%.3f, per=%d, phase=%.3f, ' %
+                  (type(self).__name__, self.phi_k, self.per, self.phase)]
+        if self.improper:
+            retstr.append(['IMPROPER>'])
+        else:
+            retstr.append(' scee=%.3f, scnb=%.3f>' % (self.scee, self.scnb))
+        return ''.join(retstr)
 
     def __copy__(self):
         return DihedralType(self.phi_k, self.per, self.phase, self.scee,
-                            self.scnb)
+                            self.scnb, self.improper)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -406,30 +406,6 @@ class CharmmPsfFile(Structure):
             if atom.atom_type is not None:
                 atom.atom_type.name = typeconv(atom.atom_type.name)
 
-        # In some cases, 1-4 interactions are defined in the dihedral list. If
-        # 1-4 van der Waals scalings exist, these are implemented in CHARMM
-        # through scaled 1-4 epsilon parameters. So first we update our dihedral
-        # exclusions to make sure we skip over torsions that have no effect on
-        # the 1-4 pairlist, then walk through the pairlist and assign the
-        # correct 1-4 epsilon parameter
-        psf.update_dihedral_exclusions()
-        for dihedral in psf.dihedrals:
-            if dihedral.improper or dihedral.ignore_end: continue
-            if dihedral.type is None: continue
-            a1, a2 = dihedral.atom1, dihedral.atom4
-            if a1.epsilon_14 == a1.epsilon and a2.epsilon_14 == a2.epsilon:
-                if isinstance(dihedral.type, DihedralType):
-                    scnb = dihedral.type.scnb
-                elif isinstance(dihedral.type, DihedralTypeList):
-                    scnb = dihedral.type[0].scnb
-                elif dihedral.type is None:
-                    continue
-                else:
-                    assert False, "Should not be here"
-                if scnb != 1:
-                    a1.epsilon_14 = a1.epsilon / scnb
-                    a2.epsilon_14 = a2.epsilon / scnb
-
         return psf
 
     #===================================================
