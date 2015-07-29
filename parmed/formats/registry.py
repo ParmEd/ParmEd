@@ -107,7 +107,7 @@ def load_file(filename, *args, **kwargs):
     global PARSER_REGISTRY, PARSER_ARGUMENTS
 
     # Check that the file actually exists and that we can read it
-    if filename.startswith('http://') or filename.startswith('https://')\
+    if filename.startswith('http://') or filename.startswith('https://')
             or filename.startswith('ftp://'):
         # This raises IOError if it does not exist
         with closing(genopen(filename)) as f:
