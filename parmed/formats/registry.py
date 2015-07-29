@@ -63,7 +63,7 @@ def load_file(filename, *args, **kwargs):
     ----------
     filename : str
         The name of the file to try to parse. If the filename starts with
-        http:// or https://, it is treated like a URL and the file will be
+        http:// or https:// or ftp://, it is treated like a URL and the file will be
         loaded directly from its remote location on the web
     structure : object, optional
         For some classes, such as the Mol2 file class, the default return object
@@ -107,7 +107,8 @@ def load_file(filename, *args, **kwargs):
     global PARSER_REGISTRY, PARSER_ARGUMENTS
 
     # Check that the file actually exists and that we can read it
-    if filename.startswith('http://') or filename.startswith('https://'):
+    if filename.startswith('http://') or filename.startswith('https://')\
+            or filename.startswith('ftp://'):
         # This raises IOError if it does not exist
         with closing(genopen(filename)) as f:
             pass
