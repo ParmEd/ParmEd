@@ -915,7 +915,7 @@ class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
 
     def tearDown(self):
         os.chdir(self.cwd)
-        utils.FileIOTestCase.tearDown()
+        utils.FileIOTestCase.tearDown(self)
 
     @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def testAmberAminoInternal(self):
