@@ -72,6 +72,12 @@ class TestGenopen(FileIOTestCase):
         with closing(genopen(url, 'r')) as f:
             self.assertEqual(f.read(), genopen(get_fn('4lzt.pdb.gz')).read())
 
+    def testReadFtpURL(self):
+        """ Tests genopen reading a ftp remote file """
+        url = 'ftp://ftp.wwpdb.org/pub/pdb/data/structures/divided/mmCIF/05/205l.cif.gz'
+        with closing(genopen(url, 'r')) as f:
+            self.assertEqual(f.read(), genopen(get_fn('205l.cif.gz')).read())
+
     def testAppendNormal(self):
         """ Tests genopen appending a normal text file """
         with closing(genopen(get_fn('test.txt', written=True), 'a')) as f:
