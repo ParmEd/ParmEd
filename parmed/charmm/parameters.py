@@ -429,13 +429,13 @@ class CharmmParameterSet(ParameterSet):
                 words = line.split()
                 try:
                     idx = conv(words[1], int, 'atom type')
-                    name = words[2]
+                    name = words[2].upper()
                     mass = conv(words[3], float, 'atom mass')
                 except IndexError:
                     raise CharmmError('Could not parse MASS section.')
                 # The parameter file might or might not have an element name
                 try:
-                    elem = words[4]
+                    elem = words[4].upper()
                     if len(elem) == 2:
                         elem = elem[0] + elem[1].lower()
                     atomic_number = AtomicNum[elem]
@@ -451,8 +451,8 @@ class CharmmParameterSet(ParameterSet):
             if section == 'BONDS':
                 words = line.split()
                 try:
-                    type1 = words[0]
-                    type2 = words[1]
+                    type1 = words[0].upper()
+                    type2 = words[1].upper()
                     k = conv(words[2], float, 'bond force constant')
                     req = conv(words[3], float, 'bond equilibrium dist')
                 except IndexError:
@@ -466,9 +466,9 @@ class CharmmParameterSet(ParameterSet):
             if section == 'ANGLES':
                 words = line.split()
                 try:
-                    type1 = words[0]
-                    type2 = words[1]
-                    type3 = words[2]
+                    type1 = words[0].upper()
+                    type2 = words[1].upper()
+                    type3 = words[2].upper()
                     k = conv(words[3], float, 'angle force constant')
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
@@ -491,10 +491,10 @@ class CharmmParameterSet(ParameterSet):
             if section == 'DIHEDRALS':
                 words = line.split()
                 try:
-                    type1 = words[0]
-                    type2 = words[1]
-                    type3 = words[2]
-                    type4 = words[3]
+                    type1 = words[0].upper()
+                    type2 = words[1].upper()
+                    type3 = words[2].upper()
+                    type4 = words[3].upper()
                     k = conv(words[4], float, 'dihedral force constant')
                     n = conv(words[5], float, 'dihedral periodicity')
                     phase = conv(words[6], float, 'dihedral phase')
@@ -539,10 +539,10 @@ class CharmmParameterSet(ParameterSet):
             if section == 'IMPROPER':
                 words = line.split()
                 try:
-                    type1 = words[0]
-                    type2 = words[1]
-                    type3 = words[2]
-                    type4 = words[3]
+                    type1 = words[0].upper()
+                    type2 = words[1].upper()
+                    type3 = words[2].upper()
+                    type4 = words[3].upper()
                     k = conv(words[4], float, 'improper force constant')
                     theteq = conv(words[5], float, 'improper equil. value')
                 except IndexError:
@@ -587,14 +587,14 @@ class CharmmParameterSet(ParameterSet):
                         self.cmap_types[current_cmap] = ty
                         self.cmap_types[current_cmap2] = ty
                     try:
-                        type1 = words[0]
-                        type2 = words[1]
-                        type3 = words[2]
-                        type4 = words[3]
-                        type5 = words[4]
-                        type6 = words[5]
-                        type7 = words[6]
-                        type8 = words[7]
+                        type1 = words[0].upper()
+                        type2 = words[1].upper()
+                        type3 = words[2].upper()
+                        type4 = words[3].upper()
+                        type5 = words[4].upper()
+                        type6 = words[5].upper()
+                        type7 = words[6].upper()
+                        type8 = words[7].upper()
                         res = conv(words[8], int, 'CMAP resolution')
                     except IndexError:
                         raise CharmmError('Could not parse CMAP data.')
@@ -610,7 +610,7 @@ class CharmmParameterSet(ParameterSet):
                 # Now get the nonbonded values
                 words = line.split()
                 try:
-                    atype = words[0]
+                    atype = words[0].upper()
                     # 1st column is ignored
                     epsilon = conv(words[2], float, 'vdW epsilon term')
                     rmin = conv(words[3], float, 'vdW Rmin/2 term')
@@ -666,8 +666,8 @@ class CharmmParameterSet(ParameterSet):
             if section == 'NBFIX':
                 words = line.split()
                 try:
-                    at1 = words[0]
-                    at2 = words[1]
+                    at1 = words[0].upper()
+                    at2 = words[1].upper()
                     emin = abs(conv(words[2], float, 'NBFIX Emin'))
                     rmin = conv(words[3], float, 'NBFIX Rmin')
                     try:
@@ -740,14 +740,14 @@ class CharmmParameterSet(ParameterSet):
                     words = line.split()
                     try:
                         idx = conv(words[1], int, 'atom type')
-                        name = words[2]
+                        name = words[2].upper()
                         mass = conv(words[3], float, 'atom mass')
                     except IndexError:
                         raise CharmmError('Could not parse MASS section of %s' %
                                           tfile)
                     # The parameter file might or might not have an element name
                     try:
-                        elem = words[4]
+                        elem = words[4].upper()
                         if len(elem) == 2:
                             elem = elem[0] + elem[1].lower()
                         atomic_number = AtomicNum[elem]
@@ -781,7 +781,7 @@ class CharmmParameterSet(ParameterSet):
                     restype = line[:4].upper()
                     # Get the residue definition
                     words = line.split()
-                    resname = words[1]
+                    resname = words[1].upper()
                     # Assign default patches
                     hpatches[resname] = hpatch
                     tpatches[resname] = tpatch
@@ -799,21 +799,22 @@ class CharmmParameterSet(ParameterSet):
                     group = []
                     ictable = []
                     while line:
+                        line = line.lstrip()
                         if line[:5].upper() == 'GROUP':
                             if group:
                                 res.groups.append(group)
                             group = []
                         elif line[:4].upper() == 'ATOM':
                             words = line.split()
-                            name, type, charge = words[1:4]
-                            charge = float(charge)
+                            name = words[1].upper()
+                            type = words[2].upper()
+                            charge = float(words[3])
                             atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
                         elif line.strip() and line.split()[0].upper() in \
                                 ('BOND', 'DOUBLE'):
-                            words = line.split()[1:]
-                            it = iter(words)
+                            it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
                                 if a1.startswith('-'):
                                     res.head = res[a2]
@@ -841,8 +842,9 @@ class CharmmParameterSet(ParameterSet):
                         elif line[:6].upper() == 'ACCEPT':
                             pass
                         elif line[:2].upper() == 'IC':
-                            w = line.split()[1:]
-                            ictable.append((w[:4], [float(x) for x in w[4:]]))
+                            words = line.split()[1:]
+                            ictable.append(([w.upper() for w in words[:4]],
+                                            [float(w) for w in words[4:]]))
                         elif line[:3].upper() == 'END':
                             break
                         elif line[:5].upper() == 'PATCH':
@@ -856,7 +858,7 @@ class CharmmParameterSet(ParameterSet):
                         elif line[:5].upper() == 'DELETE':
                             pass
                         elif line[:4].upper() == 'IMPR':
-                            it = iter(line.split()[1:])
+                            it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2, a3, a4 in zip(it, it, it, it):
                                 if a2[0] == '-' or a3[0] == '-' or a4 == '-':
                                     res.head = res[a1]
