@@ -558,9 +558,10 @@ class CharmmParameterSet(ParameterSet):
                 else:
                     per = int(theteq)
                     theteq = tmp
-                # Improper types seem not to have the central atom defined in
-                # the first place, so just have the key a fully sorted list. We
-                # still depend on the PSF having properly ordered improper atoms
+                # Improper types seem not to always have the central atom
+                # defined in the first place, so just have the key a fully
+                # sorted list. We still depend on the PSF having properly
+                # ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
                 if per == 0:
                     improp = ImproperType(k, theteq)
@@ -1054,6 +1055,10 @@ class CharmmParameterSet(ParameterSet):
         for key, typ in iteritems(self.improper_periodic_types):
             if isinstance(typ, DihedralTypeList):
                 for t in typ:
+                    if key[2] == 'X':
+                        key = (key[0], key[2], key[3], key[1])
+                    elif key[3] == 'X':
+                        key = (key[0], key[3], key[1], key[2])
                     f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                             (key[0], key[1], key[2], key[3], t.phi_k,
                              int(t.per), t.phase))
@@ -1062,6 +1067,10 @@ class CharmmParameterSet(ParameterSet):
                         (key[0], key[1], key[2], key[3], typ.phi_k,
                          int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
+            if key[2] == 'X':
+                key = (key[0], key[2], key[3], key[1])
+            elif key[3] == 'X':
+                key = (key[0], key[3], key[1], key[2])
             f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                     (key[0], key[1], key[2], key[3], typ.psi_k,
                      0, typ.psi_eq))
