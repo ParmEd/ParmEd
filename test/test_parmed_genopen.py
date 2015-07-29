@@ -75,7 +75,6 @@ class TestGenopen(FileIOTestCase):
     def testReadFtpURL(self):
         """ Tests genopen reading a ftp remote file """
         url = 'ftp://ftp.wwpdb.org/pub/pdb/data/structures/divided/mmCIF/05/205l.cif.gz'
-        print(url)
         with closing(genopen(url, 'r')) as f:
             self.assertEqual(f.read(), genopen(get_fn('205l.cif.gz')).read())
 
