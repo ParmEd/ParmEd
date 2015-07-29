@@ -3678,9 +3678,9 @@ class chamber(Action):
                 elif base.endswith('.str'):
                     self.streamfiles.append(fname)
                 elif base.endswith('.inp'):
-                    if 'par' in fname:
+                    if 'par' in base:
                         self.paramfiles.append(fname)
-                    elif 'top' in fname:
+                    elif 'top' in base:
                         self.topfiles.append(fname)
                     else:
                         raise InputError('Cannot detect filetype of %s' % fname)

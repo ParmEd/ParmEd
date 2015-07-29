@@ -75,6 +75,24 @@ class TestNonParmActions(unittest.TestCase):
         self.assertTrue(parm.has_cmap)
         self.assertEqual(parm.ptr('ifbox'), 0)
 
+    def testChamberModel(self):
+        """ Test the chamber action with a model compound """
+        # To keep stderr clean
+        warnings.filterwarnings('ignore', category=CharmmWarning,
+                                module='psf')
+        a = PT.chamber(self.parm, '-psf %s' % get_fn('propane.psf'),
+                       '-top %s' % get_fn('top_all36_prot.rtf'),
+                       '-param %s' % get_fn('par_all36_prot.prm'),
+                       '-str %s' % get_fn('toppar_all36_prot_model.str'),
+                       '-str %s' % get_fn('toppar_water_ions.str'),
+                       '-crd %s' % get_fn('propane.pdb'))
+        a.execute()
+        parm = a.parm
+        self._standard_parm_tests(parm)
+        self._extensive_checks(parm)
+        self.assertTrue(parm.chamber)
+        self.assertEqual(parm.ptr('ifbox'), 0)
+
     def testChamberGlobbing(self):
         """ Test globbing in the chamber action """
         warnings.filterwarnings('ignore', category=CharmmWarning,
