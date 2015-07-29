@@ -199,7 +199,7 @@ class NetCDFRestart(object):
         -----
         Remote NetCDF files cannot be loaded
         """
-        if filename.startswith('http://') or filename.startswith('https://'):
+        if filename.startswith('http://') or filename.startswith('https://')\
             or filename.startswith('ftp://') or filename.startswith('ftplib'):
             return False
         if not HAS_NETCDF:
@@ -544,7 +544,7 @@ class NetCDFTraj(object):
         -----
         Remote NetCDF files cannot be loaded
         """
-        if filename.startswith('http://') or filename.startswith('https://')
+        if filename.startswith('http://') or filename.startswith('https://')\
             or filename.startswith('ftp://') or filename.startswith('ftplib'):
             return False
         if not HAS_NETCDF:
