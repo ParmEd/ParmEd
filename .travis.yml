@@ -15,10 +15,9 @@ install:
 
 script:
     # Skip tests that use a lot of memory so Travis doesn't sporadically kill
-    # them
+    # them. Also fix the number of running threads to 1.
     - export PARMED_SKIP_BIG_TESTS=1
-    # Print out the version of OpenMM we're using
-    - test -z $MINIMAL_PACKAGES && python -c "import simtk.openmm as mm; print('OPENMM VERSION = %s [git rev. %s]' % (mm.version.full_version, mm.version.git_revision))" || true
+    - export OPENMM_CPU_THREADS=1
     - cd test
     - echo "Using `which python` (`python -V`)::"
     - nosetests -vs .

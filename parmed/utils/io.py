@@ -67,7 +67,8 @@ def genopen(name, mode='r'):
     is_url = False
     if name.startswith('file:///'):
         name = name[7:]
-    elif name.startswith('http://') or name.startswith('https://'):
+    elif name.startswith('http://') or name.startswith('https://')\
+            or name.startswith('ftp://'):
         is_url = True
         if mode in ['w', 'a']:
             raise ValueError('Cannot write or append a webpage')

@@ -430,7 +430,9 @@ class AmberFormat(object):
         # The optimized parser only works on local, uncompressed files
         # TODO: Add gzip and bzip2 support to the optimized reader
         if (slow or fname.startswith('http://') or fname.startswith('https://')
+                or fname.startswith('ftp://')
                 or fname.endswith('.bz2') or fname.endswith('.gz')):
+
             return self.rdparm_slow(fname)
 
         # We have the optimized version and a local file
