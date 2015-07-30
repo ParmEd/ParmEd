@@ -233,6 +233,13 @@ class TestChemistryPDBStructure(FileIOTestCase):
         self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
+    def testPdbBigCoordinates(self):
+        """ Test proper PDB coordinate parsing for large coordinates """
+        pdbfile = read_PDB(get_fn('bigz.pdb'))
+        self.assertAlmostEqual(pdbfile.coordinates[0,0], -100.024)
+        self.assertAlmostEqual(pdbfile.coordinates[0,1], -100.103)
+        self.assertAlmostEqual(pdbfile.coordinates[0,2], -100.101)
+
     def testPdbWriteXtal(self):
         """ Test PDB file writing from a Xtal structure """
         pdbfile = read_PDB(self.pdb)
