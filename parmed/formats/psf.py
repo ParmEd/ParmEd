@@ -105,11 +105,11 @@ class PSFFile(object):
             intfmt = '%8d' # For pointers
 
         # Now print the header then the title
-        dest.write('PSF ')
+        dest.write('PSF CHEQ ')
         if hasattr(struct, 'flags'):
-            dest.write(' '.join(struct.flags))
+            dest.write(' '.join(f for f in struct.flags if f not in ('CHEQ',)))
         else:
-            dest.write('EXT') # EXT is always active
+            dest.write('EXT') # EXT is always active if no flags present
         dest.write('\n\n')
         if isinstance(struct.title, string_types):
             dest.write(intfmt % 1 + ' !NTITLE\n')

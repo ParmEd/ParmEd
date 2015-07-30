@@ -1054,7 +1054,11 @@ class CharmmParameterSet(ParameterSet):
                         (key[0], key[1], key[2], key[3], typ.phi_k,
                          int(typ.per), typ.phase))
         f.write('\nIMPROPERS\n')
+        written = set()
         for key, typ in iteritems(self.improper_periodic_types):
+            sortkey = tuple(sorted(key))
+            if sortkey in written: continue
+            written.add(sortkey)
             if isinstance(typ, DihedralTypeList):
                 for t in typ:
                     if key[2] == 'X':
