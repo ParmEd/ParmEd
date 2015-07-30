@@ -3,16 +3,18 @@ Tests for the parmed/charmm subpackage
 """
 from __future__ import division, print_function
 
-import utils
+import numpy as np
 from parmed.utils.six import iteritems, string_types
+from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
 import os
 import unittest
+import utils
 
 get_fn = utils.get_fn
 
-class TestCharmmCoords(unittest.TestCase):
+class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
     
     def testCharmmCrd(self):
@@ -27,6 +29,14 @@ class TestCharmmCoords(unittest.TestCase):
         self.assertEqual(len(crd.resid), crd.natom)
         self.assertEqual(len(crd.resname), crd.natom)
         self.assertEqual(len(crd.weighting), crd.natom)
+
+    def testWriteCrd(self):
+        """ Test CHARMM coordinate writing capabilities """
+        struct = load_file(get_fn('4lzt.pdb'))
+        charmmcrds.CharmmCrdFile.write(struct, get_fn('test.crd', written=True))
+        crd = charmmcrds.CharmmCrdFile(get_fn('test.crd', written=True))
+        np.testing.assert_allclose(struct.coordinates,
+                                   crd.coordinates.reshape((len(struct.atoms), 3)))
 
     def testCharmmRst(self):
         """ Test CHARMM restart file parser """

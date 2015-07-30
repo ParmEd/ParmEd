@@ -1329,6 +1329,7 @@ class Structure(object):
             - PDBx/mmCIF (.cif, cif)
             - Amber topology file (.prmtop/.parm7, amber)
             - CHARMM PSF file (.psf, charmm)
+            - CHARMM coordinate file (.crd, charmmcrd)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)
             - Mol2 file (.mol2, mol2)
@@ -1354,7 +1355,7 @@ class Structure(object):
         TypeError if the structure cannot be converted to the desired format for
         whatever reason
         """
-        from parmed import amber, formats, gromacs
+        from parmed import amber, charmm, formats, gromacs
         extmap = {
                 '.pdb' : 'PDB',
                 '.cif' : 'CIF',
@@ -1365,6 +1366,7 @@ class Structure(object):
                 '.gro' : 'GRO',
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
+                '.crd' : 'CHARMMCRD',
         }
         # Basically everybody uses atom type names instead of type indexes. So
         # convert to atom type names and switch back if need be
@@ -1401,6 +1403,8 @@ class Structure(object):
             elif format == 'GROMACS':
                 s = gromacs.GromacsTopologyFile.from_structure(self)
                 s.write(fname, **kwargs)
+            elif format == 'CHARMMCRD':
+                charmm.CharmmCrdFile.write(self, fname, **kwargs)
             elif format == 'AMBER':
                 if (self.trigonal_angles or self.out_of_plane_bends or
                         self.torsion_torsions or self.pi_torsions or
