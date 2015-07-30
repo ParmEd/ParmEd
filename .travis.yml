@@ -18,6 +18,7 @@ script:
     # them. Also fix the number of running threads to 1.
     - export PARMED_SKIP_BIG_TESTS=1
     - export OPENMM_CPU_THREADS=1
+    - cat /proc/cpuinfo
     - cd test
     - echo "Using `which python` (`python -V`)::"
     - nosetests -vs .
