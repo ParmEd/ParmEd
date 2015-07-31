@@ -1132,6 +1132,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.rb_torsion_types = struct.rb_torsion_types
         gmxtop.urey_bradley_types = struct.urey_bradley_types
         gmxtop.combining_rule = struct.combining_rule
+        gmxtop.box = struct.box
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
