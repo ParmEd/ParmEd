@@ -761,7 +761,6 @@ def ConvertFromPSF(struct, params, title=''):
         if 'CHARMM' not in pset: # needed to trigger "charmm_active"...
             pset = 'CHARMM: %s' % pset
         fftype.extend([len(params.parametersets), pset])
-    print(fftype)
     # Convert atom types back to integers if that's how they started
     if int_starting:
         for atom in struct.atoms:
