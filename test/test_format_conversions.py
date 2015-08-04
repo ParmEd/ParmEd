@@ -18,8 +18,6 @@ except ImportError:
 import unittest
 import warnings
 
-gromacs.GROMACS_TOPDIR = get_fn('top')
-
 class TestCase(TestCaseRelative):
     def setUp(self):
         warnings.filterwarnings('default', category=GromacsWarning)
