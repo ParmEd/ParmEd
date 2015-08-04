@@ -1,6 +1,13 @@
 language: python
 
 sudo: false
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++
+            - gromacs
 
 env:
     matrix:
