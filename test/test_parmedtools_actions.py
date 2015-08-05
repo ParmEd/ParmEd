@@ -29,8 +29,6 @@ gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
 
-gromacs.GROMACS_TOPDIR = get_fn('top')
-
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
 
@@ -73,6 +71,24 @@ class TestNonParmActions(unittest.TestCase):
         self._extensive_checks(parm)
         self.assertTrue(parm.chamber)
         self.assertTrue(parm.has_cmap)
+        self.assertEqual(parm.ptr('ifbox'), 0)
+
+    def testChamberModel(self):
+        """ Test the chamber action with a model compound """
+        # To keep stderr clean
+        warnings.filterwarnings('ignore', category=CharmmWarning,
+                                module='psf')
+        a = PT.chamber(self.parm, '-psf %s' % get_fn('propane.psf'),
+                       '-top %s' % get_fn('top_all36_prot.rtf'),
+                       '-param %s' % get_fn('par_all36_prot.prm'),
+                       '-str %s' % get_fn('toppar_all36_prot_model.str'),
+                       '-str %s' % get_fn('toppar_water_ions.str'),
+                       '-crd %s' % get_fn('propane.pdb'))
+        a.execute()
+        parm = a.parm
+        self._standard_parm_tests(parm)
+        self._extensive_checks(parm)
+        self.assertTrue(parm.chamber)
         self.assertEqual(parm.ptr('ifbox'), 0)
 
     def testChamberGlobbing(self):

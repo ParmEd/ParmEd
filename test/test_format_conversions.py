@@ -3,6 +3,7 @@ from __future__ import print_function, division, absolute_import
 from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative
 
 import os
+import numpy as np
 from parmed import load_file, gromacs, amber, openmm
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
@@ -16,8 +17,6 @@ except ImportError:
     has_openmm = False
 import unittest
 import warnings
-
-gromacs.GROMACS_TOPDIR = get_fn('top')
 
 class TestCase(TestCaseRelative):
     def setUp(self):
@@ -48,6 +47,7 @@ class TestAmberToGromacs(TestCase):
         gromacs.GromacsGroFile.write(parm, groname, precision=8)
         gro = gromacs.GromacsGroFile.parse(groname)
         self.assertEqual(len(gro.atoms), len(parm.atoms))
+        np.testing.assert_allclose(gro.box, parm.box)
         for a1, a2 in zip(gro.atoms, parm.atoms):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
@@ -59,6 +59,20 @@ class TestAmberToGromacs(TestCase):
         saved = GromacsFile(get_saved_fn('benzene_cyclohexane_10_500.top'))
         written = GromacsFile(get_fn('benzene_cyclohexane_10_500.top', written=True))
         self.assertTrue(diff_files(saved, written))
+        # Check that Gromacs topology is given the correct box information when
+        # generated from a Structure
+        gromacs.GromacsGroFile.write(top, groname, precision=8)
+        gro = gromacs.GromacsGroFile.parse(groname)
+        self.assertEqual(len(gro.atoms), len(parm.atoms))
+        for a1, a2 in zip(gro.atoms, parm.atoms):
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+            self.assertEqual(a1.name, a2.name)
+            self.assertAlmostEqual(a1.xx, a2.xx)
+            self.assertAlmostEqual(a1.xy, a2.xy)
+            self.assertAlmostEqual(a1.xz, a2.xz)
+        np.testing.assert_allclose(gro.box, parm.box)
+        np.testing.assert_allclose(top.box, parm.box)
 
 class TestGromacsToAmber(TestCase):
     """ Tests converting Gromacs top/gro files to Amber """

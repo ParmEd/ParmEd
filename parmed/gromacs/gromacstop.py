@@ -1132,6 +1132,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.rb_torsion_types = struct.rb_torsion_types
         gmxtop.urey_bradley_types = struct.urey_bradley_types
         gmxtop.combining_rule = struct.combining_rule
+        gmxtop.box = struct.box
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
@@ -1459,6 +1460,15 @@ class GromacsTopologyFile(Structure):
             elif isinstance(combine, string_types) and combine.lower() == 'all':
                 GromacsTopologyFile._write_molecule(self, dest, 'system',
                                     params, parameters == 'inline')
+                dest.write('[ system ]\n; Name\n')
+                if self.title:
+                    dest.write(self.title)
+                else:
+                    dest.write('Generic title')
+                dest.write('\n\n')
+                # Molecules
+                dest.write('[ molecules ]\n; Compound       #mols\n')
+                dest.write('%-15s %6d\n' % ('system', 1))
             else:
                 raise NotImplementedError('Specialized molecule splitting is '
                                           'not yet supported')
@@ -1640,11 +1650,11 @@ class GromacsTopologyFile(Structure):
                 if writeparams or key not in params.rb_torsion_types or \
                         params.rb_torsion_types[key] != dihed.type:
                     dest.write(paramfmt % (dihed.type.c0*conv,
-                                           dihed.type.c1.conv,
-                                           dihed.type.c2.conv,
-                                           dihed.type.c3.conv,
-                                           dihed.type.c4.conv,
-                                           dihed.type.c5.conv))
+                                           dihed.type.c1*conv,
+                                           dihed.type.c2*conv,
+                                           dihed.type.c3*conv,
+                                           dihed.type.c4*conv,
+                                           dihed.type.c5*conv))
                     dest.write('\n')
             dest.write('\n')
         # Impropers
