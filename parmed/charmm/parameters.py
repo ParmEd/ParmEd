@@ -262,7 +262,10 @@ class CharmmParameterSet(ParameterSet):
         the first DihedralTypeList found or the first DihedralType of each
         periodicity found if no matching DihedralTypeList is found.
         """
-        return cls.from_parameterset(ParameterSet.from_structure(struct))
+        return cls.from_parameterset(
+                ParameterSet.from_structure(struct,
+                                            allow_unequal_duplicates=False)
+        )
 
     @classmethod
     def load_set(cls, tfile=None, pfile=None, sfiles=None):
