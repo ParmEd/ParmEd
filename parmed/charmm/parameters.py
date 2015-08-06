@@ -234,16 +234,16 @@ class CharmmParameterSet(ParameterSet):
                 parameterset = line.strip()[1:78]
                 continue
             # Set section if this is a section header
-            if line.startswith('ATOMS'):
+            if line.startswith('ATOM'):
                 section = 'ATOMS'
                 continue
-            if line.startswith('BONDS'):
+            if line.startswith('BOND'):
                 section = 'BONDS'
                 continue
-            if line.startswith('ANGLES'):
+            if line.startswith('ANGLE'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRALS'):
+            if line.startswith('DIHEDRAL'):
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER'):
@@ -419,25 +419,41 @@ class CharmmParameterSet(ParameterSet):
                     type2 = words[1].upper()
                     type3 = words[2].upper()
                     type4 = words[3].upper()
-                    k = conv(words[4], float, 'improper force constant')
-                    theteq = conv(words[5], float, 'improper equil. value')
                 except IndexError:
-                    raise CharmmError('Could not parse dihedrals.')
-                # If we have a 7th column, that is the real psi0 (and the 6th
-                # is just a dummy 0)
+                    raise CharmmError('Could not parse impropers.')
+                # If periodicity is 0, improper is a CHARMM-style harmonic term
+                # If periodicity is greater than 0, improper is an AMBER-style
+                # cosine term
+                # If only 2 numbers are provided, periodicity defaults to 0
                 try:
-                    tmp = conv(words[6], float, 'improper equil. value')
-                    theteq = tmp
+                    k = conv(words[4], float, 'improper force constant')
+                    n = conv(words[5], float, 'improper equil. value')
+                    theteq = conv(words[6], float, 'improper equil. value')
                 except IndexError:
-                    pass # Do nothing
+                    try:
+                        k = conv(words[4], float, 'improper force constant')
+                        n = 0
+                        theteq = conv(words[5], float, 'improper equil. value')
+                    except IndexError:
+                        raise CharmmError('Could not parse impropers.')
                 # Improper types seem not to have the central atom defined in
                 # the first place, so just have the key a fully sorted list. We
                 # still depend on the PSF having properly ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                improp = ImproperType(k, theteq)
-                self.improper_types[key] = improp
-                improp.penalty = penalty
-                continue
+                # CHARMM-style terms go to improper_types
+                # AMBER-style terms go to dihedral_types
+                if n == 0:
+                    improp = ImproperType(k, theteq)
+                    self.improper_types[key] = improp
+                    improp.penalty = penalty
+                    continue
+                else:
+                    dtl = DihedralTypeList()
+                    improp = DihedralType(k, n, phase=theteq)
+                    dtl.append(improp)
+                    self.dihedral_types[key] = dtl
+                    improp.penalty = penalty
+                    continue
             if section == 'CMAP':
                 # This is the most complicated part, since cmap parameters span
                 # many lines. We won't do much error catching here.
