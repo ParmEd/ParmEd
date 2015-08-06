@@ -217,7 +217,7 @@ class PSFFile(object):
             nst2 = struct.groups.nst2
         except AttributeError:
             nst2 = 0
-        dest.write((intfmt*2) % (len(struct.groups), nst2))
+        dest.write((intfmt*2) % (len(struct.groups) or 1, nst2))
         dest.write(' !NGRP NST2\n')
         if struct.groups:
             for i, gp in enumerate(struct.groups):
