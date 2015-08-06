@@ -760,6 +760,16 @@ class TestMol2File(FileIOTestCase):
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
 
+    def testMol3File2(self):
+        """ Tests parsing a Mol3 file with RESIDUECONNECT atoms """
+        mol3 = formats.Mol2File.parse(get_fn('m2-c1_f3.mol2'))
+        self.assertEqual(len(mol3.atoms), 27)
+        self.assertEqual(len(mol3.bonds), 29)
+        self.assertIs(mol3.head, None)
+        self.assertIs(mol3.tail, None)
+        self.assertIs(mol3.connections[0], mol3[5])
+        self.assertIs(mol3.connections[1], mol3[9])
+
     def testMol2FileWithBlankLines(self):
         """ Tests parsing a Mol2 file with blank lines at the end """
         mol2 = formats.Mol2File.parse(get_fn('tripos1.mol2'))
