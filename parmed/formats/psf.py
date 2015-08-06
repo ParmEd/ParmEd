@@ -96,8 +96,8 @@ class PSFFile(object):
 
         # Assign the formats we need to write with
         if ext:
-            atmfmt1 = ('%10d %-8s %-8i %-8s %-8s %4d %10.6f %13.4f' + 11*' ')
-            atmfmt2 = ('%10d %-8s %-8i %-8s %-8s %-4s %10.6f %13.4f' + 11*' ')
+            atmfmt1 = ('%10d %-8s %-8i %-8s %-8s %6d %10.6f %13.4f' + 11*' ')
+            atmfmt2 = ('%10d %-8s %-8i %-8s %-8s %-6s %10.6f %13.4f' + 11*' ')
             intfmt = '%10d' # For pointers
         else:
             atmfmt1 = ('%8d %-4s %-4i %-4s %-4s %4d %10.6f %13.4f' + 11*' ')
