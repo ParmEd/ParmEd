@@ -173,6 +173,9 @@ class _ParameterType(object):
         self.used = False
         self.penalty = None
 
+    def __ne__(self, other):
+        return not self == other
+
 def _delete_from_list(list, item):
     """
     Deletes a requested item from a list. If the item does not exist in the
