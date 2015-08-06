@@ -4682,21 +4682,26 @@ class Group(object):
     Parameters
     ----------
     bs : ``int``
-        Not sure
+        Smallest atom number within a group (0-based)
     type : ``int``
-        The group type (??)
+        Flag for group information; 0 when all atoms have zero charge,
+        1 when group has a net zero charge but at least one atom has a non-zero
+        partial charge, 2 when the net charge of the group is not zero
     move : ``int``
-        If the group moves (??)
+        0 if the atoms are not fixed, 1 when they are
 
-    Disclaimer
-    ----------
-    I really don't know what these numbers mean. I'm speculating based on the
-    source code of 'chamber', and this section is simply ignored there.
+    Notes
+    -----
+    See the discussion on Github for the source of the meanings of these
+    variables: https://github.com/ParmEd/ParmEd/pull/307#issuecomment-128244134
     """
     def __init__(self, bs, type, move):
         self.bs = bs
         self.type = type
         self.move = move
+
+    def __copy__(self):
+        other = type(self)(self.bs, self.type, self.move)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
