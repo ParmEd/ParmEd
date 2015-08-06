@@ -219,10 +219,15 @@ class PSFFile(object):
             nst2 = 0
         dest.write((intfmt*2) % (len(struct.groups), nst2))
         dest.write(' !NGRP NST2\n')
-        for i, gp in enumerate(struct.groups):
-            dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
-            if i % 3 == 2: dest.write('\n')
-        if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
+        if struct.groups:
+            for i, gp in enumerate(struct.groups):
+                dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
+                if i % 3 == 2: dest.write('\n')
+            if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
+                dest.write('\n')
+        else:
+            typ = 1 if abs(sum(a.charge for a in struct.atoms)) < 1e-4 else 2
+            dest.write((intfmt*3) % (0, typ, 0))
             dest.write('\n')
         dest.write('\n')
         # The next two sections are never found in VMD prmtops...
