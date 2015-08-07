@@ -453,19 +453,72 @@ class CharmmPsfFile(Structure):
             ang.type.used = True
             self.angle_types.append(ang.type)
             ang.type.list = self.angle_types
+        # Load impropers before dihedrals; we don't know until now if they are
+        # CHARMM-style harmonic terms or AMBER-style cosine terms
+        for imp in list(self.impropers):
+            # Store the atoms
+            a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
+            at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
+            key = tuple(sorted([at1, at2, at3, at4]))
+            if not key in parmset.improper_types:
+                # Check for wild-cards
+                for anchor in (at2, at3, at4):
+                    key = tuple(sorted([at1, anchor, 'X', 'X']))
+                    if key in parmset.improper_types:
+                        break # This is the right key
+            try:
+                imp.type = parmset.improper_types[key]
+            except KeyError:
+                # Could be an AMBER-style term
+                key = tuple(sorted([at1, at2, at3, at4]))
+                try:
+                    if not key in parmset.dihedral_types:
+                        # Check for wild-cards
+                        for anchor in (at2, at3, at4):
+                            key = tuple(sorted([at1, anchor, 'X', 'X']))
+                            if key in parmset.dihedral_types:
+                                break # This is the right key
+                    imp.type = parmset.dihedral_types[key]
+                    self.impropers.remove(imp)
+                    dih = Dihedral(a1, a2, a3, a4)
+                    dih.improper = True
+                    self.dihedrals.append(dih)
+                except KeyError:
+                    raise ParameterError('No improper parameters found for %r' %
+                                           imp)
+            imp.type.used = False
+        del self.improper_types[:]
+        for improper in self.impropers:
+            if improper.type.used: continue
+            improper.type.used = True
+            self.improper_types.append(improper.type)
+            improper.type.list = self.improper_types
         # Next load all of the dihedrals.
         active_dih_list = set()
         for dih in self.dihedrals:
             # Store the atoms
             a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
-            key = (a1.type, a2.type, a3.type, a4.type)
-            # First see if the exact dihedral is specified
-            if not key in parmset.dihedral_types:
-                # Check for wild-cards
-                key = ('X', a2.type, a3.type, 'X')
+            if dih.improper:
+                # First see if the exact dihedral is specified
+                at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
+                key = tuple(sorted([at1, at2, at3, at4]))
+                if not key in parmset.dihedral_types:
+                    for anchor in (at2, at3, at4):
+                        key = tuple(sorted([at1, anchor, 'X', 'X']))
+                        if key in parmset.dihedral_types:
+                            break # This is the right key
                 if not key in parmset.dihedral_types:
                     raise ParameterError('No dihedral parameters found for '
                                            '%r' % dih)
+            else:
+                # First see if the exact dihedral is specified
+                key = (a1.type, a2.type, a3.type, a4.type)
+                if not key in parmset.dihedral_types:
+                    # Check for wild-cards
+                    key = ('X', a2.type, a3.type, 'X')
+                    if not key in parmset.dihedral_types:
+                        raise ParameterError('No dihedral parameters found for '
+                                               '%r' % dih)
             dih.type = parmset.dihedral_types[key]
             dih.type.used = False
             pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions
@@ -483,30 +536,6 @@ class CharmmPsfFile(Structure):
             dihedral.type.used = True
             self.dihedral_types.append(dihedral.type)
             dihedral.type.list = self.dihedral_types
-        # Now do the impropers
-        for imp in self.impropers:
-            # Store the atoms
-            a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
-            at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
-            key = tuple(sorted([at1, at2, at3, at4]))
-            if not key in parmset.improper_types:
-                # Check for wild-cards
-                for anchor in (at2, at3, at4):
-                    key = tuple(sorted([at1, anchor, 'X', 'X']))
-                    if key in parmset.improper_types:
-                        break # This is the right key
-            try:
-                imp.type = parmset.improper_types[key]
-            except KeyError:
-                raise ParameterError('No improper parameters found for %r' %
-                                       imp)
-            imp.type.used = False
-        del self.improper_types[:]
-        for improper in self.impropers:
-            if improper.type.used: continue
-            improper.type.used = True
-            self.improper_types.append(improper.type)
-            improper.type.list = self.improper_types
         # Now do the cmaps. These will not have wild-cards
         for cmap in self.cmaps:
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
