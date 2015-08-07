@@ -1115,9 +1115,9 @@ class CharmmParameterSet(ParameterSet):
             f.write('%-6s %14.6f %10.6f %14.6f' % (key, 0.0, -abs(typ.epsilon),
                     typ.rmin))
             if typ.epsilon == typ.epsilon_14 and typ.rmin == typ.rmin_14:
-                f.write('%10.6f %14.6f\n' % (typ.epsilon/scnb, typ.rmin))
+                f.write('%10.6f %14.6f\n' % (-abs(typ.epsilon)/scnb, typ.rmin))
             else:
-                f.write('%10.6f %14.6f\n' % (typ.epsilon_14, typ.rmin_14))
+                f.write('%10.6f %14.6f\n' % (-abs(typ.epsilon_14), typ.rmin_14))
         f.write('\nEND\n')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
