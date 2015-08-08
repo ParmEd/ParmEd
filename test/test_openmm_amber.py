@@ -27,6 +27,7 @@ get_fn = utils.get_fn
 
 if has_openmm:
     CPU = mm.Platform.getPlatformByName('CPU')
+    Reference = mm.Platform.getPlatformByName('Reference')
 
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
@@ -85,7 +86,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 # Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
@@ -172,7 +173,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0)

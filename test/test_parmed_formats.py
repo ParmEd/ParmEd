@@ -233,6 +233,13 @@ class TestChemistryPDBStructure(FileIOTestCase):
         self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
+    def testPdbBigCoordinates(self):
+        """ Test proper PDB coordinate parsing for large coordinates """
+        pdbfile = read_PDB(get_fn('bigz.pdb'))
+        self.assertAlmostEqual(pdbfile.coordinates[0,0], -100.024)
+        self.assertAlmostEqual(pdbfile.coordinates[0,1], -100.103)
+        self.assertAlmostEqual(pdbfile.coordinates[0,2], -100.101)
+
     def testPdbWriteXtal(self):
         """ Test PDB file writing from a Xtal structure """
         pdbfile = read_PDB(self.pdb)
@@ -752,6 +759,16 @@ class TestMol2File(FileIOTestCase):
         self.assertEqual(len(mol3.bonds), 35)
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
+
+    def testMol3File2(self):
+        """ Tests parsing a Mol3 file with RESIDUECONNECT atoms """
+        mol3 = formats.Mol2File.parse(get_fn('m2-c1_f3.mol2'))
+        self.assertEqual(len(mol3.atoms), 27)
+        self.assertEqual(len(mol3.bonds), 29)
+        self.assertIs(mol3.head, None)
+        self.assertIs(mol3.tail, None)
+        self.assertIs(mol3.connections[0], mol3[5])
+        self.assertIs(mol3.connections[1], mol3[9])
 
     def testMol2FileWithBlankLines(self):
         """ Tests parsing a Mol2 file with blank lines at the end """

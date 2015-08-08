@@ -227,6 +227,9 @@ class TestGromacsTop(FileIOTestCase):
                          xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
         self.assertEqual(parm.combining_rule, 'geometric')
         self.assertEqual(parm.defaults.comb_rule, 3)
+        parm.write(get_fn('test.topol', written=True), combine='all')
+        parm2 = load_file(get_fn('test.topol', written=True))
+        self.assertEqual(len(parm.atoms), len(parm2.atoms))
 
     def testMoleculeOrdering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """

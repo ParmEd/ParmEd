@@ -313,7 +313,7 @@ class Mol2File(object):
                         if a == '0': continue
                         for atom in res:
                             if atom.name == a:
-                                atom.connections.append(atom)
+                                res.connections.append(atom)
                                 break
                         else:
                             raise Mol2Error('Residue connection atom %s not '
