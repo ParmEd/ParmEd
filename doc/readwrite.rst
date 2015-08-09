@@ -76,14 +76,14 @@ format specifications taking precedence).  The supported file formats, along
 with their supported extra keyword arguments, are detailed in the following
 table.
 
-+==============+=========================+================+==========================+
++--------------+-------------------------+----------------+--------------------------+
 | File type    | Recognized extension(s) | Format keyword | Supported arguments      |
 +==============+=========================+================+==========================+
 | PDB          | ``.pdb``                | ``pdb``        |  ``charmm``\*,           |
 |              |                         |                |  ``renumber``,           |
 +--------------+-------------------------+----------------+  ``coordinates``,        |
-| PDBx/        | ``.cif``, ``.pdbx``     |                |  ``altlocs``,            |
-|   mmCIF      |                         |                |  ``write_anisou``        |
+| PDBx/mmCIF   | ``.cif``, ``.pdbx``     | ``cif``        |  ``altlocs``,            |
+|              |                         |                |  ``write_anisou``        |
 +--------------+-------------------------+----------------+--------------------------+
 | Amber prmtop | ``.parm7``, ``.prmtop`` | ``amber``      |  None                    |
 +--------------+-------------------------+----------------+--------------------------+
@@ -98,6 +98,7 @@ table.
 +--------------+-------------------------+----------------+--------------------------+
 | Mol3         | ``.mol3``               | ``mol3``       | ``split``                |
 +--------------+-------------------------+----------------+--------------------------+
+
 \* PDB format only
 
 The meanings and default values of each of the keywords is described in the next
