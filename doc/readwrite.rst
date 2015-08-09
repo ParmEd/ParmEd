@@ -75,3 +75,67 @@ format is specified either explicitly or by file name extension (with explicit
 format specifications taking precedence).  The supported file formats, along
 with their supported extra keyword arguments, are detailed in the following
 table.
+
++==============+=========================+================+==========================+
+| File type    | Recognized extension(s) | Format keyword | Supported arguments      |
++==============+=========================+================+==========================+
+| PDB          | ``.pdb``                | ``pdb``        |  ``charmm``\*,           |
+|              |                         |                |  ``renumber``,           |
++--------------+-------------------------+----------------+  ``coordinates``,        |
+| PDBx/        | ``.cif``, ``.pdbx``     |                |  ``altlocs``,            |
+|   mmCIF      |                         |                |  ``write_anisou``        |
++--------------+-------------------------+----------------+--------------------------+
+| Amber prmtop | ``.parm7``, ``.prmtop`` | ``amber``      |  None                    |
++--------------+-------------------------+----------------+--------------------------+
+| CHARMM PSF   | ``.psf``                | ``charmm``     | ``vmd``                  |
++--------------+-------------------------+----------------+--------------------------+
+| Gromacs      | ``.top``                | ``gromacs``    | ``combine``,             |
+| topology     |                         |                | ``parameters``           |
++--------------+-------------------------+----------------+--------------------------+
+| Gromacs GRO  | ``.gro``                | ``gro``        | ``precision``, ``nobox`` |
++--------------+-------------------------+----------------+--------------------------+
+| Mol2         | ``.mol2``               | ``mol2``       | ``split``                |
++--------------+-------------------------+----------------+--------------------------+
+| Mol3         | ``.mol3``               | ``mol3``       | ``split``                |
++--------------+-------------------------+----------------+--------------------------+
+\* PDB format only
+
+The meanings and default values of each of the keywords is described in the next
+subsection.
+
+Keywords
+~~~~~~~~
+
+* ``charmm`` -- If ``True``, the SEGID will be printed in columns 73 to 76 of
+  the PDB file (default is ``False``)
+* ``renumber`` -- If ``True``, atoms and residues will be numbered according to
+  their absolute index (starting from 1) in the system. If ``False``, the
+  numbers will be retained from their original source (e.g., in the original PDB
+  file). Default is ``True``
+* ``coordinates`` -- A set of coordinates for one or multiple frames. If more
+  than one frame is provided, the resulting PDB or PDBx/mmCIF file will have
+  multiple models defined. Default is ``None``, and the generated coordinates
+  are the ones stored on the atoms themselves.
+* ``altlocs`` -- Allowable values are ``all`` (print all alternate locations for
+  all conformers), ``first`` (print only the first alternate conformer), and
+  ``occupancy`` (print the conformer with the highest occupancy). Default is
+  ``all``
+* ``write_anisou`` -- If ``True``, print anistropic B-factors for the various
+  atoms (either as a separate CIF section or as ``ANISOU`` records in a PDB
+  file). Default is ``False``
+* ``vmd`` -- If ``True``, write a VMD-style PSF file. This is very similar to
+  XPLOR format PSF files. Default is ``False``.
+* ``combine`` -- Can be ``None`` to combine no molecules when writing a GROMACS
+  topology file. A value of ``all`` will combine all of the molecules into a
+  single moleculetype. Default is ``None``.
+* ``parameters`` -- Can be ``inline`` (write the parameters inline in the
+  GROMACS topology file). Can also be a string or a file-like object. If it is
+  the same as the topology file name, it will be written in the previous
+  sections of the GROMACS topology file. Other strings will be interpreted as
+  filenames to print the parameters to as an include topology file. Default is
+  ``inline``.
+* ``precision`` -- The number of decimal places to print coordinates with in GRO
+  files. Default is 3.
+* ``nobox`` -- If ``True`` and the ``Structure`` does not have a unit cell
+  defined, no box is written to the bottom of the GRO file. Otherwise, an
+  enclosing box (buffered by 5 angstroms) is written
