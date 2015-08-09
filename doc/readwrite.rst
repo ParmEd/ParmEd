@@ -139,3 +139,7 @@ Keywords
 * ``nobox`` -- If ``True`` and the ``Structure`` does not have a unit cell
   defined, no box is written to the bottom of the GRO file. Otherwise, an
   enclosing box (buffered by 5 angstroms) is written
+* ``split`` -- If ``True``, all residues will be split into separate mol2 or
+  mol3 entries in the same file (like the ZINC database, for example). If
+  ``False``, all residues will be part of the same mol2 or mol3 entry. Default
+  is ``False``.
