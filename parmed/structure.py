@@ -1358,6 +1358,7 @@ class Structure(object):
         extmap = {
                 '.pdb' : 'PDB',
                 '.cif' : 'CIF',
+                '.pdbx' : 'CIF',
                 '.parm7' : 'AMBER',
                 '.prmtop' : 'AMBER',
                 '.psf' : 'PSF',
