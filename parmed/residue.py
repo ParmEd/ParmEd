@@ -114,9 +114,10 @@ class AminoAcidResidue(BiomolecularResidue):
         residue : :class:`AminoAcidResidue`
             The residue corresponding to the given key
 
-        Notes
-        -----
-        If the symbol is not defined, a KeyError is raised
+        Raises
+        ------
+        KeyError if ``key`` is not a symbol, abbreviation, or case-insensitive
+        name of an amino acid residue, or any of its abbreviations.
         """
         if len(key) == 1:
             return cls._all_residues_by_symbol[key.upper()]
@@ -199,9 +200,10 @@ class DNAResidue(BiomolecularResidue):
         residue : :class:`DNAResidue`
             The residue corresponding to the given key
 
-        Notes
-        -----
-        If the symbol is not defined, a KeyError is raised
+        Raises
+        ------
+        KeyError if ``key`` is not a recognized residue name or abbreviation for
+        an DNA residue.
         """
         try:
             if key[-1] in '35':
@@ -246,9 +248,10 @@ class RNAResidue(DNAResidue):
         residue : :class:`RNAResidue`
             The residue corresponding to the given key
 
-        Notes
-        -----
-        If the symbol is not defined, a KeyError is raised
+        Raises
+        ------
+        KeyError if ``key`` is not a recognized residue name or abbreviation for
+        an RNA residue.
         """
         try:
             if key[-1] in '35':

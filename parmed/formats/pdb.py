@@ -16,6 +16,7 @@ from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
+from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
 from parmed.utils.io import genopen
@@ -55,6 +56,21 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     if old_atom.residue.number != resid: return False
     if old_atom.residue.chain != chain.strip(): return False
     return True
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _standardize_resname(resname):
+    """ Looks up a standardized residue name for the given resname """
+    try:
+        return AminoAcidResidue.get(resname).abbr
+    except KeyError:
+        try:
+            return RNAResidue.get(resname).abbr
+        except KeyError:
+            try:
+                return DNAResidue.get(resname).abbr
+            except KeyError:
+                return resname
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -551,7 +567,7 @@ class PDBFile(object):
 
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
-              write_anisou=False, charmm=False):
+              write_anisou=False, charmm=False, standard_resnames=False):
         """ Write a PDB file from a Structure instance
 
         Parameters
@@ -593,6 +609,9 @@ class PDBFile(object):
             If True, SEGID will be written in columns 73 to 76 of the PDB file
             in the typical CHARMM-style PDB output. This will be omitted for any
             atom that does not contain a SEGID identifier. Default is False
+        standard_resnames : bool, optional
+            If True, common aliases for various amino and nucleic acid residues
+            will be converted into the PDB-standard values. Default is False
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -652,6 +671,10 @@ class PDBFile(object):
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             raise Exception("Should not be here!")
+        if standard_resnames:
+            standardize = lambda x: _standardize_resname(x)[:reslen]
+        else:
+            standardize = lambda x: x[:reslen]
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
         last_rnumber = 0
@@ -686,14 +709,14 @@ class PDBFile(object):
                     else:
                         segid = ''
                     dest.write(atomrec % (anum , aname, pa.altloc,
-                               res.name[:reslen], res.chain[:1], rnum,
+                               standardize(res.name), res.chain[:1], rnum,
                                res.insertion_code[:1], x, y, z, pa.occupancy,
                                pa.bfactor, segid,
                                Element[pa.atomic_number].upper(), ''))
                     if write_anisou and pa.anisou is not None:
                         anisou = [int(ani*1e4) for ani in pa.anisou]
                         dest.write(anisourec % (anum, aname, pa.altloc,
-                                   res.name[:reslen], res.chain[:1], rnum,
+                                   standardize(res.name), res.chain[:1], rnum,
                                    res.insertion_code[:1], anisou[0], anisou[1],
                                    anisou[2], anisou[3], anisou[4], anisou[5],
                                    Element[pa.atomic_number].upper(), ''))
@@ -717,7 +740,7 @@ class PDBFile(object):
                         else:
                             segid = ''
                         dest.write(atomrec % (anum, aname, key,
-                                   res.name[:reslen], res.chain[:1], rnum,
+                                   standardize(res.name), res.chain[:1], rnum,
                                    res.insertion_code[:1], x, y, z,
                                    oatom.occupancy, oatom.bfactor, segid,
                                    Element[oatom.atomic_number].upper(), ''))
@@ -725,12 +748,12 @@ class PDBFile(object):
                             anisou = [int(ani*1e4) for ani in oatom.anisou]
                             el = Element[oatom.atomic_number].upper()
                             dest.write(anisourec % (anum, aname,
-                                oatom.altloc[:1], res.name[:reslen],
+                                oatom.altloc[:1], standardize(res.name),
                                 res.chain[:1], rnum, res.insertion_code[:1],
                                 anisou[0], anisou[1], anisou[2], anisou[3],
                                 anisou[4], anisou[5], el, ''))
                 if res.ter:
-                    dest.write(terrec % (anum+1, res.name[:reslen],
+                    dest.write(terrec % (anum+1, standardize(res.name),
                                          res.chain, rnum))
                     if renumber:
                         nmore += 1
@@ -1196,7 +1219,7 @@ class CIFFile(object):
 
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None,
-              altlocs='all', write_anisou=False):
+              altlocs='all', write_anisou=False, standard_resnames=False):
         """
         Write a PDB file from the current Structure instance
 
@@ -1235,6 +1258,9 @@ class CIFFile(object):
         write_anisou : ``bool``
             If True, an ANISOU record is written for every atom that has one. If
             False, ANISOU records are not written
+        standard_resnames : bool, optional
+            If True, common aliases for various amino and nucleic acid residues
+            will be converted into the PDB-standard values. Default is False
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -1289,6 +1315,10 @@ class CIFFile(object):
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
             assert False, 'Should not be here'
+        if standard_resnames:
+            standardize = lambda x: _standardize_resname(x)
+        else:
+            standardize = lambda x: x
         # Now add the atom section. Include all names that the CIF standard
         # usually includes, but put '?' in sections that contain data we don't
         # store in the Structure, Residue, or Atom classes
@@ -1328,6 +1358,7 @@ class CIFFile(object):
                     atoms = res.atoms
                 else:
                     atoms = sorted(res.atoms, key=lambda atom: atom.number)
+                resname = standardize(res.name)
                 for atom in atoms:
                     pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
@@ -1341,18 +1372,18 @@ class CIFFile(object):
                     last_rnumber = rnum
                     cifatoms.append(
                             ['ATOM', anum, Element[pa.atomic_number].upper(),
-                             pa.name, pa.altloc, res.name, res.chain, '?', rnum,
+                             pa.name, pa.altloc, resname, res.chain, '?', rnum,
                              res.insertion_code, x, y, z, pa.occupancy,
                              pa.bfactor, '?', '?', '?', '?', '?', '', rnum,
-                             res.name, res.chain, pa.name, str(model+1)]
+                             resname, res.chain, pa.name, str(model+1)]
                     )
                     if write_anisou and pa.anisou is not None:
                         cifanisou.append(
                                 [anum, Element[pa.atomic_number].upper(),
-                                 pa.name, pa.altloc, res.name, res.chain, rnum,
+                                 pa.name, pa.altloc, resname, res.chain, rnum,
                                  pa.anisou[0], pa.anisou[1], pa.anisou[2],
                                  pa.anisou[3], pa.anisou[4], pa.anisou[5], '?',
-                                 '?', '?', '?', '?', '?', rnum, res.name,
+                                 '?', '?', '?', '?', '?', rnum, resname,
                                  res.chain, pa.name]
                         )
                     for key in sorted(others.keys()):
@@ -1367,20 +1398,20 @@ class CIFFile(object):
                         el = Element[oatom.atomic_number].upper()
                         cifatoms.append(
                                 ['ATOM', anum, el, oatom.name, oatom.altloc,
-                                 res.name, res.chain, '?', rnum,
+                                 resname, res.chain, '?', rnum,
                                  res.insertion_code, x, y, z, oatom.occupancy,
                                  oatom.bfactor, '?', '?', '?', '?', '?', '',
-                                 rnum, res.name, res.chain, oatom.name, '1']
+                                 rnum, resname, res.chain, oatom.name, '1']
                         )
                         if write_anisou and oatom.anisou is not None:
                             cifanisou.append(
                                     [anum, Element[oatom.atomic_number].upper(),
-                                     oatom.name, oatom.altloc, res.name,
+                                     oatom.name, oatom.altloc, resname,
                                      res.chain, rnum, oatom.anisou[0],
                                      oatom.anisou[1], oatom.anisou[2],
                                      oatom.anisou[3], oatom.anisou[4],
                                      oatom.anisou[5], '?', '?', '?', '?', '?',
-                                     '?', rnum, res.name, res.chain, oatom.name]
+                                     '?', rnum, resname, res.chain, oatom.name]
                             )
         # Now write the PDBx file
         writer = PdbxWriter(dest)
