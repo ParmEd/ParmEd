@@ -59,6 +59,27 @@
 <dd><p>A class to parse Amber ASCII trajectory files. This is <em>much</em> slower than
 parsing NetCDF files (or the equivalent parsing done in a compiled language
 like C or C++). For large trajectories, this may be significant.</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">frame</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -72,14 +93,8 @@ like C or C++). For large trajectories, this may be significant.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>([frame])</td>
-<td>Returns the frame&#8217;th frame of the box lengths as a length-3 array</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
 <td>Close the open file handler</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
-<td>Returns the requested coordinates</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.id_format" title="parmed.amber.AmberMdcrd.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as an Amber mdcrd file</td>
@@ -107,14 +122,14 @@ like C or C++). For large trajectories, this may be significant.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>([frame])</td>
-<td>Returns the frame&#8217;th frame of the box lengths as a length-3 array</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
 <td>Close the open file handler</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>([frame])</td>
-<td>Returns the requested coordinates</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.id_format" title="parmed.amber.AmberMdcrd.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as an Amber mdcrd file</td>
@@ -194,65 +209,9 @@ be flattened to a 3*natom-length array</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="parmed.amber.AmberMdcrd.box">
-<tt class="descname">box</tt><big>(</big><em>frame=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the frame&#8217;th frame of the box lengths as a length-3 array</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int, optional</p>
-<blockquote>
-<div><p>If provided, this is the frame number whose box dimensions will be
-returned. If not provided, all of the box dimensions are returned as
-a list in which each entry is a length-3 array of box lengths</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box_lengths</strong> : array or list of array</p>
-<blockquote class="last">
-<div><p>If <tt class="docutils literal"><span class="pre">frame</span></tt> is None, the box lengths will be a list of length the
-number of frames in the trajectory with each item being an array
-(numpy if available) of box lengths.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="parmed.amber.AmberMdcrd.close">
 <tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the open file handler</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.AmberMdcrd.coordinates">
-<tt class="descname">coordinates</tt><big>(</big><em>frame=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.coordinates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the requested coordinates</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int, optional</p>
-<blockquote>
-<div><p>If provided, this is the frame number whose coordinates will be
-returned. If not provided, all of the coordinates are returned as a
-list in which each entry is a 3*natom-length array of coordinates</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>coordinates</strong> : array or list of array</p>
-<blockquote class="last">
-<div><p>If <tt class="docutils literal"><span class="pre">frame</span></tt> is None, the coordinates will be a list of length the
-number of frames in the trajectory with each item being an array
-(numpy if available) of 3*natom length of coordinates.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="staticmethod">

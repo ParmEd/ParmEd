@@ -129,15 +129,6 @@ such as &#8216;meters per second&#8217;.</p>
 5 - numpy.arrays</p>
 </dd>
 </dl>
-<p>Create numpy.arrays with units using the Quantity constructor, not the
-multiply operator.  e.g.</p>
-<blockquote>
-<div><p>Quantity(numpy.array([1,2,3]), centimeters) # correct</p>
-<blockquote>
-<div><em>NOT</em></div></blockquote>
-<p>numpy.array([1,2,3]) * centimeters # won&#8217;t work</p>
-</div></blockquote>
-<p>because numpy.arrays already overload the multiply operator for EVERYTHING.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>

@@ -51,11 +51,11 @@
             
   <div class="section" id="the-parmed-gromacs-package">
 <h1>The <a class="reference internal" href="api/parmed/parmed.gromacs.html#module-parmed.gromacs" title="parmed.gromacs"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.gromacs</span></tt></a> package<a class="headerlink" href="#the-parmed-gromacs-package" title="Permalink to this headline">¶</a></h1>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">gromacs</span></tt> package contains classes that can parse the Gromacs topology
-and coordinate files. Like <cite>grompp</cite>, ParmEd pre-processes the the topology file,
-automatically finding and parsing the include topology files (ITP) referenced by
-your topology file.  It also recognizes <tt class="docutils literal"><span class="pre">#define</span></tt> tokens, which can be used in
-ParmEd the same way you can with Gromacs.</p>
+<p>The <a class="reference internal" href="api/parmed/parmed.gromacs.html#module-parmed.gromacs" title="parmed.gromacs"><tt class="xref py py-mod docutils literal"><span class="pre">gromacs</span></tt></a> package contains classes that can parse the
+Gromacs topology and coordinate files. Like <cite>grompp</cite>, ParmEd pre-processes the
+topology file, automatically finding and parsing the include topology files
+(ITP) referenced by your topology file.  It also recognizes <tt class="docutils literal"><span class="pre">#define</span></tt> tokens,
+which can be used in ParmEd the same way you can with Gromacs.</p>
 <p>Note, like with the standard C and Gromacs preprocessors, include files will
 <em>first</em> be looked for in the directory in which the processed file resides. If
 it is not found there, ParmEd will look in the Gromacs installation directory.</p>
@@ -159,28 +159,29 @@ is the recommended way to parse these files.</p>
 </div>
 <div class="section" id="example-usage">
 <h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
-<p>Many exciting possibilities are available with <cite>GromacsTopologyFile</cite> and <cite>GromacsGroFile</cite>.
-For example, ParmEd is the first software package to enable conversion of Gromacs simulation
-input files to AMBER format in just a few lines of code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span>
+<p>Many exciting possibilities are available with <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> and
+<a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a>.  For example, ParmEd is the first software package to
+enable conversion of Gromacs simulation input files to AMBER format in just a
+few lines of code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span><span class="p">,</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s">&#39;topol.top&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_gro</span> <span class="o">=</span> <span class="n">GromacsGroFile</span><span class="p">(</span><span class="s">&#39;conf.gro&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_gro</span> <span class="o">=</span> <span class="n">GromacsGroFile</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;conf.gro&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">gmx_gro</span><span class="o">.</span><span class="n">box</span> <span class="c"># Needed because .prmtop contains box info</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">gmx_gro</span><span class="o">.</span><span class="n">positions</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_prm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="o">.</span><span class="n">load_from_structure</span><span class="p">(</span><span class="n">gmx_top</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_prm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="n">gmx_top</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb_prm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;prmtop&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span> <span class="o">=</span> <span class="n">amber</span><span class="o">.</span><span class="n">AmberAsciiRestart</span><span class="p">(</span><span class="s">&quot;inpcrd&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&quot;w&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">coordinates</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">box</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb_inpcrd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Furthermore, you may check the correctness of topology loading by using the <cite>GromacsTopologyFile</cite>
-object to calculate an OpenMM potential energy and force, then comparing that result with your own
-output from Gromacs:</p>
+<p>Furthermore, you may check the correctness of topology loading by using the
+<a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object to calculate an OpenMM potential energy and
+force, then comparing that result with your own output from Gromacs:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">createSystem</span><span class="p">()</span> <span class="c"># OpenMM system creation; make sure to pass keyword arguments consistent with your .mdp file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">createSystem</span><span class="p">()</span> <span class="c"># OpenMM System creation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integ</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plat</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s">&#39;Reference&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">integ</span><span class="p">,</span> <span class="n">plat</span><span class="p">)</span>
@@ -190,12 +191,14 @@ output from Gromacs:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>A typical protein/water system with 23,000 atoms at ambient conditions with periodic boundary conditions
-and PME electrostatics has average forces on the order of 20 kcal/mol/Angstrom. ParmEd allows us to run
-this same simulation in OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
-the forces between the software packages are accurate to 1 part in 10,000. The remaining differences
-are due to how the different software packages treat nonbonded interactions in the cut-off region, use
-of single precision in the computation, and other small factors that are not expected to affect the
+<p>A typical protein/water system with 23,000 atoms at ambient conditions with
+periodic boundary conditions and PME electrostatics has average forces on the
+order of 20 kcal/mol/Angstrom. ParmEd allows us to run this same simulation in
+OpenMM or AMBER with a RMS force difference of 0.002 kcal/mol/Angstrom, i.e.
+the forces between the software packages are accurate to 1 part in 10,000. The
+remaining differences are due to how the different software packages treat
+nonbonded interactions in the cut-off region, use of single precision in the
+computation, and other small factors that are not expected to affect the
 simulation results.</p>
 </div>
 </div>

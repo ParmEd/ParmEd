@@ -69,6 +69,8 @@
 <span class="sd">FileFormatType)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">FormatNotFound</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -104,7 +106,7 @@
                 <span class="n">PARSER_ARGUMENTS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="load_file"><a class="viewcode-back" href="../../../structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file">[docs]</a><span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="load_file"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file">[docs]</a><span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Identifies the file format of the specified file and returns its parsed</span>
 <span class="sd">    contents.</span>
@@ -112,7 +114,16 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    filename : str</span>
-<span class="sd">        The name of the file to try to parse</span>
+<span class="sd">        The name of the file to try to parse. If the filename starts with</span>
+<span class="sd">        http:// or https:// or ftp://, it is treated like a URL and the file will be</span>
+<span class="sd">        loaded directly from its remote location on the web</span>
+<span class="sd">    structure : object, optional</span>
+<span class="sd">        For some classes, such as the Mol2 file class, the default return object</span>
+<span class="sd">        is not a Structure, but can be made to return a Structure if the</span>
+<span class="sd">        ``structure=True`` keyword argument is passed. To facilitate writing</span>
+<span class="sd">        easy code, the ``structure`` keyword is always processed and only passed</span>
+<span class="sd">        on to the correct file parser if that parser accepts the structure</span>
+<span class="sd">        keyword. There is no default, as each parser has its own default.</span>
 <span class="sd">    *args : other positional arguments</span>
 <span class="sd">        Some formats accept positional arguments. These will be passed along</span>
 <span class="sd">    **kwargs : other options</span>
@@ -127,8 +138,8 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Compressed files are supported and detected by filename extension. The</span>
-<span class="sd">    following names are supported:</span>
+<span class="sd">    Compressed files are supported and detected by filename extension. This</span>
+<span class="sd">    applies both to local and remote files. The following names are supported:</span>
 
 <span class="sd">        - ``.gz`` : gzip compressed file</span>
 <span class="sd">        - ``.bz2`` : bzip2 compressed file</span>
@@ -148,9 +159,14 @@
     <span class="k">global</span> <span class="n">PARSER_REGISTRY</span><span class="p">,</span> <span class="n">PARSER_ARGUMENTS</span>
 
     <span class="c"># Check that the file actually exists and that we can read it</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>\
+            <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">):</span>
+        <span class="c"># This raises IOError if it does not exist</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not exist&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not have read permissions set&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">PARSER_REGISTRY</span><span class="p">):</span>
@@ -171,13 +187,25 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> constructor expects </span><span class="si">%s</span><span class="s"> keyword argument&#39;</span> <span class="o">%</span>
                             <span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+    <span class="c"># Pass on the &quot;structure&quot; keyword IFF the target function accepts a target</span>
+    <span class="c"># keyword. Otherwise, get rid of it.</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;parse&#39;</span><span class="p">):</span>
+        <span class="n">_prune_structure</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;open_old&#39;</span><span class="p">):</span>
+        <span class="n">_prune_structure</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;open&#39;</span><span class="p">):</span>
+        <span class="n">_prune_structure</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="n">_prune_structure</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">_prune_structure</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s">&#39;structure&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s">&#39;structure&#39;</span> <span class="ow">not</span> <span class="ow">in</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[:</span><span class="n">func</span><span class="o">.</span><span class="n">__code__</span><span class="o">.</span><span class="n">co_argcount</span><span class="p">]):</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;structure&#39;</span><span class="p">)</span>
 </pre></div>
 
           </div>

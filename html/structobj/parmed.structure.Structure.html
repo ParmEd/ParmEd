@@ -72,6 +72,17 @@ torsion_torsion_types, adjust_types</div></blockquote>
 torsion profiles are often represented by a Fourier series with multiple
 terms</p>
 <p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.positions" title="parmed.structure.Structure.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
+</tr>
+</tbody>
+</table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="8%" />
@@ -147,6 +158,9 @@ terms</p>
 <tr class="row-odd"><td>title</td>
 <td>(<tt class="docutils literal"><span class="pre">str</span></tt>) Cosmetic only, it is an arbitrary title assigned to the system. Default value is an empty string</td>
 </tr>
+<tr class="row-even"><td>coordinates</td>
+<td>(np.ndarray of shape (nframes, natom, 3)) If no coordinates are set, this is set to None. The first frame will match the coordinates present on the atoms.</td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
@@ -168,62 +182,68 @@ terms</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.has_NBFIX" title="parmed.structure.Structure.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.get_coordinates" title="parmed.structure.Structure.get_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></tt></a>([frame])</td>
+<td>In some cases, multiple conformations may be stored in the Structure.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.has_NBFIX" title="parmed.structure.Structure.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
 <td>Returns whether or not any pairs of atom types have their LJ</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.is_changed" title="parmed.structure.Structure.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.is_changed" title="parmed.structure.Structure.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
 <td>Determines if any of the topology has changed for this structure</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_add_constraints" title="parmed.structure.Structure.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_add_constraints" title="parmed.structure.Structure.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_angle_force" title="parmed.structure.Structure.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_angle_force" title="parmed.structure.Structure.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_bond_force" title="parmed.structure.Structure.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_bond_force" title="parmed.structure.Structure.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_cmap_force" title="parmed.structure.Structure.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_cmap_force" title="parmed.structure.Structure.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_dihedral_force" title="parmed.structure.Structure.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_dihedral_force" title="parmed.structure.Structure.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_gbsa_force" title="parmed.structure.Structure.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_gbsa_force" title="parmed.structure.Structure.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_improper_force" title="parmed.structure.Structure.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_improper_force" title="parmed.structure.Structure.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_nonbonded_force" title="parmed.structure.Structure.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_nonbonded_force" title="parmed.structure.Structure.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM NonbondedForce instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_out_of_plane_bend_force" title="parmed.structure.Structure.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_out_of_plane_bend_force" title="parmed.structure.Structure.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_pi_torsion_force" title="parmed.structure.Structure.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_pi_torsion_force" title="parmed.structure.Structure.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_rb_torsion_force" title="parmed.structure.Structure.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_rb_torsion_force" title="parmed.structure.Structure.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_set_virtual_sites" title="parmed.structure.Structure.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_set_virtual_sites" title="parmed.structure.Structure.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_stretch_bend_force" title="parmed.structure.Structure.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_stretch_bend_force" title="parmed.structure.Structure.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_torsion_torsion_force" title="parmed.structure.Structure.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_torsion_torsion_force" title="parmed.structure.Structure.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_trigonal_angle_force" title="parmed.structure.Structure.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_trigonal_angle_force" title="parmed.structure.Structure.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.omm_urey_bradley_force" title="parmed.structure.Structure.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.omm_urey_bradley_force" title="parmed.structure.Structure.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.prune_empty_terms" title="parmed.structure.Structure.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.prune_empty_terms" title="parmed.structure.Structure.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>(fname[,&nbsp;format])</td>
+<td>Saves the current Structure in the requested file format.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.structure.Structure.split" title="parmed.structure.Structure.split"><tt class="xref py py-obj docutils literal"><span class="pre">split</span></tt></a>()</td>
 <td>Split the current Structure into separate Structure instances for each unique molecule.</td>
@@ -417,7 +437,7 @@ terms</p>
 <td>The OpenMM Topology object.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.structure.Structure.velocities" title="parmed.structure.Structure.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
-<td>A list of 3-element Quantity tuples of dimension length representing the</td>
+<td>A (natom, 3)-shape numpy array with atomic velocities for every atom in</td>
 </tr>
 </tbody>
 </table>
@@ -631,6 +651,38 @@ of freedom will <em>still</em> be constrained).</p>
 </table>
 <p class="rubric">Notes</p>
 <p>This function calls prune_empty_terms if any Topology lists have changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.structure.Structure.get_coordinates">
+<tt class="descname">get_coordinates</tt><big>(</big><em>frame='all'</em><big>)</big><a class="reference internal" href="../_modules/parmed/structure.html#Structure.get_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.structure.Structure.get_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>In some cases, multiple conformations may be stored in the Structure.
+This function retrieves a particular frame&#8217;s coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
+<blockquote>
+<div><p>The frame number whose coordinates should be retrieved. Default is
+&#8216;all&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>coords</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<blockquote>
+<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
+(#, natom, 3). Otherwise the requested frame is returned with shape
+(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError if there are fewer than ``frame`` coordinates</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1081,7 +1133,8 @@ for this system</p>
 <tt class="descname">positions</tt><a class="reference internal" href="../_modules/parmed/structure.html#Structure.positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.structure.Structure.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of 3-element Quantity tuples of dimension length representing the
 atomic positions for every atom in the system. If set with unitless
-numbers, those numbers are assumed to be in angstroms</p>
+numbers, those numbers are assumed to be in angstroms. If any atoms do
+not have coordinates, this is simply <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1090,6 +1143,57 @@ numbers, those numbers are assumed to be in angstroms</p>
 <dd><p>Looks through all of the topological lists and gets rid of terms
 in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
 to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.structure.Structure.save">
+<tt class="descname">save</tt><big>(</big><em>fname</em>, <em>format=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/parmed/structure.html#Structure.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.structure.Structure.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current Structure in the requested file format. Supported
+formats can be specified explicitly or determined by file-name
+extension. The following formats are supported, with the recognized
+suffix and <tt class="docutils literal"><span class="pre">format</span></tt> keyword shown in parentheses:</p>
+<blockquote>
+<div><ul class="simple">
+<li>PDB (.pdb, pdb)</li>
+<li>PDBx/mmCIF (.cif, cif)</li>
+<li>Amber topology file (.prmtop/.parm7, amber)</li>
+<li>CHARMM PSF file (.psf, charmm)</li>
+<li>Gromacs topology file (.top, gromacs)</li>
+<li>Gromacs GRO file (.gro, gro)</li>
+<li>Mol2 file (.mol2, mol2)</li>
+<li>Mol3 file (.mol3, mol3)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to save. If <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (see below), the
+file type will be determined based on the filename extension. If the
+type cannot be determined, a ValueError is raised.</p>
+</div></blockquote>
+<p><strong>format</strong> : str, optional</p>
+<blockquote>
+<div><p>The case-insensitive keyword specifying what type of file <tt class="docutils literal"><span class="pre">fname</span></tt>
+should be saved as. If <tt class="docutils literal"><span class="pre">None</span></tt> (default), the file type will be
+determined from filename extension of <tt class="docutils literal"><span class="pre">fname</span></tt></p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword-arguments</p>
+<blockquote>
+<div><p>Remaining arguments are passed on to the file writing routines that
+are called by this function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if either filename extension or ``format`` are not recognized</strong></p>
+<p><strong>TypeError if the structure cannot be converted to the desired format for</strong></p>
+<p class="last"><strong>whatever reason</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1102,11 +1206,11 @@ of covalent bonds.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<a class="reference internal" href="#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, int) tuples</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<a class="reference internal" href="#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, list) tuples</p>
 <blockquote class="last">
 <div><p>List of all molecules in the order that they appear first in the
-parent structure accompanied by the number of times that molecule
-appears in the Structure</p>
+parent structure accompanied by the list of the molecule numbers
+in which that molecule appears in the Structure</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1256,8 +1360,9 @@ partners arrays</p>
 <dl class="attribute">
 <dt id="parmed.structure.Structure.velocities">
 <tt class="descname">velocities</tt><a class="reference internal" href="../_modules/parmed/structure.html#Structure.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.structure.Structure.velocities" title="Permalink to this definition">¶</a></dt>
-<dd><p>A list of 3-element Quantity tuples of dimension length representing the
-atomic velocities for every atom in the system</p>
+<dd><p>A (natom, 3)-shape numpy array with atomic velocities for every atom in
+the system (in units of angstrom/picosecond), or None if there are no
+velocities</p>
 </dd></dl>
 
 <dl class="method">

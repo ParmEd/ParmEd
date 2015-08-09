@@ -57,7 +57,8 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span>
 
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">FormatNotFound</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="n">DuplicateParm</span><span class="p">,</span> <span class="n">ParmIndexError</span><span class="p">,</span> <span class="n">ParmError</span>
 
@@ -85,7 +86,7 @@
             <span class="k">if</span> <span class="n">parm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parm_names</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">DuplicateParm</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> already in ParmList&#39;</span> <span class="o">%</span> <span class="n">parm</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">parm</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+                <span class="n">parm</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">FormatNotFound</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ParmError</span><span class="p">(</span><span class="s">&#39;Could not determine file type of </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">parm</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">Structure</span><span class="p">):</span>

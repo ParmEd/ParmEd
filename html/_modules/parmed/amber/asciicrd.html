@@ -60,17 +60,14 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="kn">from</span> <span class="nn">array</span> <span class="kn">import</span> <span class="n">array</span>
-
+<span class="kn">import</span> <span class="nn">parmed.unit</span> <span class="kn">as</span> <span class="nn">u</span>
+<span class="kn">from</span> <span class="nn">parmed.vec3</span> <span class="kn">import</span> <span class="n">Vec3</span>
 <span class="kn">import</span> <span class="nn">warnings</span> <span class="kn">as</span> <span class="nn">_warnings</span>
 
 <span class="n">VELSCALE</span> <span class="o">=</span> <span class="mf">20.455</span>
@@ -135,6 +132,10 @@
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Handles actual file parsing &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;virtual method not overwritten&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="n">xyz</span><span class="p">)</span> <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Close the open file handler &quot;&quot;&quot;</span>
@@ -228,8 +229,7 @@
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the data out of the ASCII restart file and creates</span>
-<span class="sd">        self._coordinates and self._velocities as np.ndarray(natom*3) arrays if</span>
-<span class="sd">        numpy is available or array.array instances if numpy is not available</span>
+<span class="sd">        self._coordinates and self._velocities as np.ndarray(natom*3) arrays</span>
 
 <span class="sd">        This method is called automatically for &#39;old&#39; restart files and should</span>
 <span class="sd">        not be called by external callers</span>
@@ -261,22 +261,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Badly formatted restart file. Has </span><span class="si">%d</span><span class="s"> lines &#39;</span>
                                <span class="s">&#39;for </span><span class="si">%d</span><span class="s"> atoms.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)])</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[:]</span> <span class="c"># copy for efficiency</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="c"># Now it&#39;s time to parse. Coordinates first</span>
         <span class="n">startline</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">endline</span> <span class="o">=</span> <span class="n">startline</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
@@ -286,15 +276,18 @@
             <span class="n">x1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span> <span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span>
             <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
             <span class="n">z1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">24</span><span class="p">:</span><span class="mi">36</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">x2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="mi">48</span><span class="p">])</span>
                 <span class="n">y2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">60</span><span class="p">])</span>
                 <span class="n">z2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">72</span><span class="p">])</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">z1</span><span class="p">])</span>
+                <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">z1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">z2</span><span class="p">])</span>
-            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">6</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span><span class="p">]</span>
+                <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">startline</span> <span class="o">=</span> <span class="n">endline</span>
         <span class="c"># Now it&#39;s time to parse the velocities if we have them</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
@@ -305,25 +298,28 @@
                 <span class="n">x1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span> <span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
                 <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
                 <span class="n">z1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">24</span><span class="p">:</span><span class="mi">36</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span><span class="p">]</span>
+                <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">x2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="mi">48</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
                     <span class="n">y2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">60</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
                     <span class="n">z2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">72</span><span class="p">])</span> <span class="o">*</span> <span class="n">VELSCALE</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span><span class="p">])</span>
+                    <span class="k">pass</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">z1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">z2</span><span class="p">])</span>
-                <span class="n">idx</span> <span class="o">+=</span> <span class="mi">6</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">z2</span><span class="p">]</span>
+                    <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">startline</span> <span class="o">=</span> <span class="n">endline</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="c"># Now it&#39;s time to parse the box info if we have it</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">startline</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">]),</span>
-                                                 <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">]),</span>
-                                                 <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">24</span><span class="p">:</span><span class="mi">36</span><span class="p">])])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="mi">48</span><span class="p">]),</span>
-                                                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">60</span><span class="p">]),</span>
-                                                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">72</span><span class="p">])])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">]),</span>
+                                       <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">]),</span>
+                                       <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">24</span><span class="p">:</span><span class="mi">36</span><span class="p">])]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">36</span><span class="p">:</span><span class="mi">48</span><span class="p">]),</span>
+                                      <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">48</span><span class="p">:</span><span class="mi">60</span><span class="p">]),</span>
+                                      <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">72</span><span class="p">])]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -335,30 +331,22 @@
 <div class="viewcode-block" id="AmberAsciiRestart.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberAsciiRestart.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot set coordinates on an old restart&#39;</span><span class="p">)</span>
-        <span class="c"># Try to flatten the array if we got a 3-D numpy array. Don&#39;t worry if</span>
-        <span class="c"># it doesn&#39;t work, just go on</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">stuff</span> <span class="o">=</span> <span class="n">stuff</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
+        <span class="n">stuff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Only got </span><span class="si">%d</span><span class="s"> coordinates for </span><span class="si">%d</span><span class="s"> atoms&#39;</span> <span class="o">%</span>
                              <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Number of coordinates (</span><span class="si">%d</span><span class="s">) is not a &#39;</span>
-                             <span class="s">&#39;multiple of 3&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords_written</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Coordinates have already been written.&#39;</span><span class="p">)</span>
         <span class="c"># Error checking done. If we didn&#39;t already set our number of atoms,</span>
         <span class="c"># set that now</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">stuff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">stuff</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%5d%15.7e</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
         <span class="n">numwrit</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="s">&#39;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]))</span>
             <span class="n">numwrit</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">numwrit</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -376,11 +364,7 @@
 <div class="viewcode-block" id="AmberAsciiRestart.velocities"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberAsciiRestart.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot set velocities on an old restart&#39;</span><span class="p">)</span>
-        <span class="c"># Try to flatten the array if we got a 3-D numpy array</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">stuff</span> <span class="o">=</span> <span class="n">stuff</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
+        <span class="n">stuff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords_written</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Coordinates must be set before velocities&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths_written</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles_written</span><span class="p">:</span>
@@ -390,14 +374,14 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Got </span><span class="si">%d</span><span class="s"> velocities for </span><span class="si">%d</span><span class="s"> atoms.&#39;</span> <span class="o">%</span>
                              <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="n">stuff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="n">stuff</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="s">&#39;</span>
         <span class="n">numwrit</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="n">i3</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="n">i3</span>  <span class="p">]</span> <span class="o">*</span> <span class="n">ONEVELSCALE</span><span class="p">,</span>
-                                    <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ONEVELSCALE</span><span class="p">,</span>
-                                    <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">ONEVELSCALE</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="n">i3</span>  <span class="p">]</span><span class="o">*</span><span class="n">ONEVELSCALE</span><span class="p">,</span>
+                                    <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">ONEVELSCALE</span><span class="p">,</span>
+                                    <span class="n">stuff</span><span class="p">[</span><span class="n">i3</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">ONEVELSCALE</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="n">numwrit</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">numwrit</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -428,13 +412,10 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cell parameters not yet set&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> has no periodic box information&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">box</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
         <span class="n">lengths</span><span class="p">,</span> <span class="n">angles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_angles</span>
-        <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">box</span>
 
     <span class="nd">@cell_lengths.setter</span>
@@ -447,7 +428,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Can only write cell lengths once&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Expected 3 numbers for cell lengths&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span> <span class="o">=</span> <span class="n">stuff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_lengths_written</span> <span class="o">=</span> <span class="bp">True</span>
 </div>
@@ -463,7 +444,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Can only write cell angles once&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Expected 3 numbers for cell lengths&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">stuff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%12.7f%12.7f%12.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">stuff</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">stuff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_angles_written</span> <span class="o">=</span> <span class="bp">True</span>
 </div>
@@ -521,59 +502,45 @@
 </div>
     <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This method parses the data out of the mdcrd file and creates self.data</span>
-<span class="sd">        as a list of np.ndarray(natom*3) (or list of array.array(natom*3) if</span>
-<span class="sd">        numpy is not available) and self.cell_lengths as a list of np.ndarray(3)</span>
-<span class="sd">        (or list of array.array(3) if numpy is not available) for each frame in</span>
-<span class="sd">        the trajectory. This method is called automatically for &#39;old&#39; trajectory</span>
+<span class="sd">        This method parses the data out of the mdcrd file and creates</span>
+<span class="sd">        self._coordinates as a list of np.ndarray(1, natom, 3) and</span>
+<span class="sd">        self.cell_lengths as a list of np.ndarray(3) for each frame in the</span>
+<span class="sd">        trajectory. This method is called automatically for &#39;old&#39; trajectory</span>
 <span class="sd">        files and should not be called by external callers.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">mainiter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">CRDS_PER_LINE</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-        <span class="n">extraiter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextras</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">natom3iter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="n">converter</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mainiter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">CRDS_PER_LINE</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">extraiter</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_nextras</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">_FileEOF</span><span class="p">()</span>
-                    <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">frame</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">natom3iter</span><span class="p">])</span>
-                    <span class="n">cell</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">raise</span> <span class="n">_FileEOF</span><span class="p">()</span>
+                <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_full_lines_per_frame</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">_FileEOF</span><span class="p">()</span>
-                    <span class="n">frame</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span> 
-                                                   <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">mainiter</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">raise</span> <span class="n">_FileEOF</span><span class="p">()</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">mainiter</span><span class="p">]</span>
                     <span class="n">idx</span> <span class="o">+=</span> <span class="mi">10</span>
-                    <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextras</span><span class="p">:</span>
-                    <span class="n">frame</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_nextras</span><span class="p">]</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span>
-                            <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">extraiter</span><span class="p">]</span>
-                    <span class="p">)</span>
+                    <span class="n">frame</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_nextras</span><span class="p">]</span> <span class="o">=</span> \
+                            <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">extraiter</span><span class="p">]</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
-                    <span class="n">rawline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rawline</span><span class="p">:</span> <span class="k">raise</span> <span class="n">_FileEOF</span><span class="p">()</span>
-                    <span class="n">cell</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span>
-                    <span class="n">cell</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>
-                    <span class="n">cell</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rawline</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">raise</span> <span class="n">_FileEOF</span><span class="p">()</span>
+                    <span class="n">cell</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span>
+                    <span class="n">cell</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>
+                    <span class="n">cell</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">,</span> <span class="n">frame</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="p">,</span> <span class="n">cell</span><span class="p">))</span>
 
         <span class="k">except</span> <span class="n">_FileEOF</span><span class="p">:</span>
             <span class="n">_warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unexpected EOF in parsing mdcrd. natom and/or &#39;</span>
@@ -581,54 +548,22 @@
         <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
             <span class="k">pass</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="AmberMdcrd.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberMdcrd.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the requested coordinates</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int, optional</span>
-<span class="sd">            If provided, this is the frame number whose coordinates will be</span>
-<span class="sd">            returned. If not provided, all of the coordinates are returned as a</span>
-<span class="sd">            list in which each entry is a 3*natom-length array of coordinates</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        coordinates : array or list of array</span>
-<span class="sd">            If ``frame`` is None, the coordinates will be a list of length the</span>
-<span class="sd">            number of frames in the trajectory with each item being an array</span>
-<span class="sd">            (numpy if available) of 3*natom length of coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot access coordinates of a new mdcrd&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-   </div>
-<div class="viewcode-block" id="AmberMdcrd.box"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberMdcrd.box">[docs]</a>    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the frame&#39;th frame of the box lengths as a length-3 array</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int, optional</span>
-<span class="sd">            If provided, this is the frame number whose box dimensions will be</span>
-<span class="sd">            returned. If not provided, all of the box dimensions are returned as</span>
-<span class="sd">            a list in which each entry is a length-3 array of box lengths</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        box_lengths : array or list of array</span>
-<span class="sd">            If ``frame`` is None, the box lengths will be a list of length the</span>
-<span class="sd">            number of frames in the trajectory with each item being an array</span>
-<span class="sd">            (numpy if available) of box lengths.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="AmberMdcrd.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberMdcrd.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="AmberMdcrd.frame"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberMdcrd.frame">[docs]</a>    <span class="k">def</span> <span class="nf">frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="AmberMdcrd.box"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberMdcrd.box">[docs]</a>    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="s">&#39;old&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Cannot access box of a new mdcrd&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span>
 </div>
 <div class="viewcode-block" id="AmberMdcrd.add_coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.asciicrd.html#parmed.amber.asciicrd.AmberMdcrd.add_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">add_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>

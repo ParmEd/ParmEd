@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using parmed.py &mdash; ParmEd 2.0 documentation</title>
+    <title>Using parmed &mdash; ParmEd 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -53,21 +53,21 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="using-parmed-py">
-<h1>Using <tt class="docutils literal"><span class="pre">parmed.py</span></tt><a class="headerlink" href="#using-parmed-py" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="using-parmed">
+<h1>Using <tt class="docutils literal"><span class="pre">parmed</span></tt><a class="headerlink" href="#using-parmed" title="Permalink to this headline">¶</a></h1>
 <p>This page details using the command-line version of ParmEd, which is the
 primary front-end program using the <a class="reference internal" href="api/parmed/parmed.html#module-parmed" title="parmed"><tt class="xref py py-mod docutils literal"><span class="pre">parmed</span></tt></a> and <a class="reference internal" href="api/parmed/parmed.tools.html#module-parmed.tools" title="parmed.tools"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.tools</span></tt></a>
 packages to provide a set of <em>Actions</em> by which you can modify a system topology
 and parameters (it currently only works for Amber topology files, although
-support for the entire <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+support for the entire <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
 hierarchy is planned).</p>
 <p>There are two ways in which ParmEd can be run&#8212;in batch reading from an input
 file or <em>script</em>, and with an interactive interpreter. A script can either be
-given to <tt class="docutils literal"><span class="pre">parmed.py</span></tt> on the command-line, or fed via pipes through standard
+given to <tt class="docutils literal"><span class="pre">parmed</span></tt> on the command-line, or fed via pipes through standard
 input. You can provide an input file using the <tt class="docutils literal"><span class="pre">-i/--input</span></tt> flag.</p>
 <div class="section" id="command-syntax">
 <h2>Command syntax<a class="headerlink" href="#command-syntax" title="Permalink to this headline">¶</a></h2>
-<p>All actions should be specified on the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> command-line in the
+<p>All actions should be specified on the <tt class="docutils literal"><span class="pre">parmed</span></tt> command-line in the
 following format:</p>
 <div class="highlight-none"><div class="highlight"><pre>ActionName arg1 arg2 arg3 ... argN [parm &lt;idx|name&gt;]
 </pre></div>
@@ -83,7 +83,7 @@ below.</p>
 <div class="section" id="available-commands">
 <h2>Available commands<a class="headerlink" href="#available-commands" title="Permalink to this headline">¶</a></h2>
 <p>The following <tt class="docutils literal"><span class="pre">Action</span></tt> commands are available in ParmEd. The information here
-is available via the <a href="#id1"><span class="problematic" id="id2">help_</span></a> command in the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> interpreter.</p>
+is available via the <a href="#id1"><span class="problematic" id="id2">help_</span></a> command in the <tt class="docutils literal"><span class="pre">parmed</span></tt> interpreter.</p>
 <div class="section" id="add12-6-4">
 <h3>add12_6_4<a class="headerlink" href="#add12-6-4" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-none"><div class="highlight"><pre>add12_6_4 [&lt;divalent ion mask&gt;] [c4file &lt;C4 Param. File&gt; | watermodel &lt;water model&gt;] [polfile &lt;Pol. Param File&gt; [tunfactor &lt;tunfactor&gt;]
@@ -100,7 +100,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <dt><tt class="docutils literal"><span class="pre">[2]</span></tt> Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,</dt>
 <dd>119, 883-895</dd>
 <dt><tt class="docutils literal"><span class="pre">[3]</span></tt> Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,</dt>
-<dd>Accepted.</dd>
+<dd>2015, 11, 1645-1657.</dd>
 </dl>
 </div>
 <div class="section" id="addatomicnumber">
@@ -412,6 +412,8 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <li>Amber NetCDF trajectory</li>
 <li>PDB file</li>
 <li>PDBx/mmCIF file</li>
+<li>Gromacs GRO file</li>
+<li>Mol2 file</li>
 </ul>
 </div></blockquote>
 </div>
@@ -525,14 +527,14 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 </div>
 <div class="section" id="printangles">
 <h3>printAngles<a class="headerlink" href="#printangles" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>printAngles &lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ]
+<div class="highlight-none"><div class="highlight"><pre>printAngles [&lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ] ]
 </pre></div>
 </div>
 <p>Prints all of the angles (with their details) for the given atoms in the mask. If a second mask is given, only atoms whose central atom is in the second mask and another atom is in the first mask is printed. If a third mask is given, the central atom must be in the second mask and the other two atoms must appear in the first <em>and</em> third masks (in any order)</p>
 </div>
 <div class="section" id="printbonds">
 <h3>printBonds<a class="headerlink" href="#printbonds" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>printBonds &lt;mask&gt; [&lt;mask&gt;]
+<div class="highlight-none"><div class="highlight"><pre>printBonds [&lt;mask&gt; [&lt;mask&gt;] ]
 </pre></div>
 </div>
 <p>Prints all of the bonds (with their details) for the given atoms in the mask. If a second mask is given, only bonds in which one atom appears in <em>each</em> list will be printed.</p>
@@ -546,7 +548,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 </div>
 <div class="section" id="printdihedrals">
 <h3>printDihedrals<a class="headerlink" href="#printdihedrals" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>printDihedrals &lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ] ]
+<div class="highlight-none"><div class="highlight"><pre>printDihedrals [&lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ] ] ]
 </pre></div>
 </div>
 <p>Prints all of the dihedrals (with their details) for the given atoms in the mask. If multiple masks are given, only dihedrals that have one atom in each mask are printed. Ordering is important here, so the first atom must be in the first mask, the second atom in the second, etc. The order can be precisely reversed, but no other ordering is recognized.</p>
@@ -818,20 +820,20 @@ confusing, so I will try to walk through it carefully.</p>
 </div>
 <div class="section" id="limited-embedded-python-interpreter">
 <h2>Limited Embedded Python Interpreter<a class="headerlink" href="#limited-embedded-python-interpreter" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">parmed.py</span></tt> also comes equipped with a fully-fledged Python interpreter under
+<p><tt class="docutils literal"><span class="pre">parmed</span></tt> also comes equipped with a fully-fledged Python interpreter under
 the hood.  You can run individual Python commands by starting the command with a
-bang (<tt class="docutils literal"><span class="pre">!</span></tt>).  A double-bang (<tt class="docutils literal"><span class="pre">!!</span></tt>) indicates to <tt class="docutils literal"><span class="pre">parmed.py</span></tt> that a
+bang (<tt class="docutils literal"><span class="pre">!</span></tt>).  A double-bang (<tt class="docutils literal"><span class="pre">!!</span></tt>) indicates to <tt class="docutils literal"><span class="pre">parmed</span></tt> that a
 multi-line Python code segment follows, and to interpret everything that comes
 afterwards as Python code until another double-bang line (<tt class="docutils literal"><span class="pre">!!</span></tt>) appears. If
 you are typing at the prompt inside the interpreter, the prompt changes to
 <tt class="docutils literal"><span class="pre">py</span> <span class="pre">&gt;&gt;&gt;</span></tt> to indicate you are in the Python interpreter.</p>
 <p>Note that running Python code can be insecure if the source of that code is
-untrusted.  As a result, <tt class="docutils literal"><span class="pre">parmed.py</span></tt> will refuse to execute raw Python code
+untrusted.  As a result, <tt class="docutils literal"><span class="pre">parmed</span></tt> will refuse to execute raw Python code
 unless you explicitly give the interpreter permission to do so with the <tt class="docutils literal"><span class="pre">-e</span></tt>
 command-line flag.</p>
 <p>A simple example is shown below (input follows the prompts <tt class="docutils literal"><span class="pre">&gt;</span></tt> and <tt class="docutils literal"><span class="pre">py</span>
 <span class="pre">&gt;&gt;&gt;</span></tt>):</p>
-<div class="highlight-none"><div class="highlight"><pre>$ parmed.py -e
+<div class="highlight-none"><div class="highlight"><pre>$ parmed -e
 
                                   /^^^/           /]
                                  /   ]           / ]
@@ -945,13 +947,13 @@ around!</p>
 </div>
 </div>
 </div>
-<div class="section" id="using-xparmed-py">
-<h1>Using <tt class="docutils literal"><span class="pre">xparmed.py</span></tt><a class="headerlink" href="#using-xparmed-py" title="Permalink to this headline">¶</a></h1>
-<p>An alternative to running the command-line-based <tt class="docutils literal"><span class="pre">parmed.py</span></tt> program is to use
-the <em>Tkinter</em>-based GUI front-end, <tt class="docutils literal"><span class="pre">xparmed.py</span></tt>.  Note that not all actions
-have been implemented in <tt class="docutils literal"><span class="pre">xparmed.py</span></tt>&#8212;if the one you need gives a message to
-this effect, you will need to use <tt class="docutils literal"><span class="pre">parmed.py</span></tt> instead.</p>
-<p><tt class="docutils literal"><span class="pre">xparmed.py</span></tt> is significantly more limited.  It cannot be scripted, and it
+<div class="section" id="using-xparmed">
+<h1>Using <tt class="docutils literal"><span class="pre">xparmed</span></tt><a class="headerlink" href="#using-xparmed" title="Permalink to this headline">¶</a></h1>
+<p>An alternative to running the command-line-based <tt class="docutils literal"><span class="pre">parmed</span></tt> program is to use
+the <em>Tkinter</em>-based GUI front-end, <tt class="docutils literal"><span class="pre">xparmed</span></tt>.  Note that not all actions
+have been implemented in <tt class="docutils literal"><span class="pre">xparmed</span></tt>&#8212;if the one you need gives a message to
+this effect, you will need to use <tt class="docutils literal"><span class="pre">parmed</span></tt> instead.</p>
+<p><tt class="docutils literal"><span class="pre">xparmed</span></tt> is significantly more limited.  It cannot be scripted, and it
 cannot process multiple topology files in the same session.  It may, however,
 help you learn ParmEd better as well as lessen the learning curve for performing
 basic tasks.</p>
@@ -968,7 +970,7 @@ that action.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Using <tt class="docutils literal"><span class="pre">parmed.py</span></tt></a><ul>
+<li><a class="reference internal" href="#">Using <tt class="docutils literal"><span class="pre">parmed</span></tt></a><ul>
 <li><a class="reference internal" href="#command-syntax">Command syntax</a></li>
 <li><a class="reference internal" href="#available-commands">Available commands</a><ul>
 <li><a class="reference internal" href="#add12-6-4">add12_6_4</a></li>
@@ -1046,7 +1048,7 @@ that action.</p>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#using-xparmed-py">Using <tt class="docutils literal"><span class="pre">xparmed.py</span></tt></a></li>
+<li><a class="reference internal" href="#using-xparmed">Using <tt class="docutils literal"><span class="pre">xparmed</span></tt></a></li>
 </ul>
 
   <h3>This Page</h3>

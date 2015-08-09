@@ -65,63 +65,136 @@
     <span class="kn">import</span> <span class="nn">gzip</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">gzip</span> <span class="o">=</span> <span class="bp">None</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">TextIOWrapper</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">TextIOWrapper</span><span class="p">,</span> <span class="n">BytesIO</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">PY2</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves.urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves.urllib.error</span> <span class="kn">import</span> <span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span>
 
-<div class="viewcode-block" id="genopen"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.io.html#parmed.utils.io.genopen">[docs]</a><span class="k">def</span> <span class="nf">genopen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="genopen"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.io.html#parmed.utils.io.genopen">[docs]</a><span class="k">def</span> <span class="nf">genopen</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Opens a file, automatically detecting compression schemes by filename</span>
-<span class="sd">    extension. Note, these files are opened in binary format, so all lines need</span>
-<span class="sd">    to be decoded after reading or encoded before writing to make sure that the</span>
-<span class="sd">    code is Py2-Py3 compatible.</span>
+<span class="sd">    extension. Note, these files are opened in a way that *always* returns a</span>
+<span class="sd">    string. This is an important distinction in Python 3 where many file-like</span>
+<span class="sd">    objects return bytes instead of strings. This is detected and handled</span>
+<span class="sd">    properly so that the object returned from this function is always</span>
+<span class="sd">    string-based (so you cannot write or read bytes directly from a file opened</span>
+<span class="sd">    via ``genopen``).</span>
+
+<span class="sd">    This routine also recognizes URLs and will read remote files when given a</span>
+<span class="sd">    URL starting with either http:// or https://. Like with standard local file</span>
+<span class="sd">    names, compression is automatically detected by filename extension, and both</span>
+<span class="sd">    gzip and bzip2 files are supported.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    name : str</span>
-<span class="sd">        Name of the file to open</span>
+<span class="sd">        Name of the file to open or URL to a remote file to access</span>
 <span class="sd">    mode : str, optional</span>
-<span class="sd">        Whether to open the file to &#39;r&#39;ead or &#39;w&#39;rite. Default is &#39;r&#39;</span>
-<span class="sd">    buffering : int, optional</span>
-<span class="sd">        The buffer size to use. You are suggested to leave this at the default</span>
+<span class="sd">        Whether to open the file to &#39;r&#39;ead, &#39;w&#39;rite, or &#39;a&#39;ppend. Default is &#39;r&#39;</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    file : file-like</span>
 <span class="sd">        A file-like object in the requested mode</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Python&#39;s BZ2File does not support writing to ``append`` mode (mode=&#39;a&#39;), so</span>
+<span class="sd">    it is faked here. The entire file contents are read into memory and then</span>
+<span class="sd">    written into a &#39;new&#39; file with the same name as the original. As such, it is</span>
+<span class="sd">    noticeably slower and more resource-intensive (particularly for large files)</span>
+<span class="sd">    than using gzipped files.</span>
+
+<span class="sd">    In Python 2, opened URLs are not file-like *enough* for GzipFile or BZ2File</span>
+<span class="sd">    to read directly from them, so they must first be loaded entirely into</span>
+<span class="sd">    memory. With Python 3, this limitation is not present, so reading remote</span>
+<span class="sd">    Gzipped or Bzipped files is significantly cheaper with respect to memory</span>
+<span class="sd">    requirements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;open mode must be &quot;w&quot; or &quot;r&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;open mode must be &quot;w&quot;, &quot;r&quot;, or &quot;a&quot;&#39;</span><span class="p">)</span>
+
+    <span class="c"># Handle arbitrary online files. file:// is just an alias for a local file</span>
+    <span class="n">is_url</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;file:///&#39;</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>\
+            <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">):</span>
+        <span class="n">is_url</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Cannot write or append a webpage&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">open_url</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">HTTPError</span><span class="p">,</span> <span class="n">URLError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Could not open </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.bz2&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">bz2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;bz2 unavailable; cannot read </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">buffering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c"># BZ2File does not have a way of taking an arbitrary file-like object in</span>
+        <span class="c"># Python 2, so we have to read everything into memory, decompress it,</span>
+        <span class="c"># and then pass it back as a BytesIO object wrapped with TextIOWrapper</span>
+        <span class="c"># if it is a URL in Python 2</span>
+        <span class="k">if</span> <span class="n">PY2</span> <span class="ow">and</span> <span class="n">is_url</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+            <span class="n">fileobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bz2</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">open_url</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
+            <span class="n">open_url</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
+        <span class="c"># BZ2File cannot open in append mode, so we have to fake it. Read the</span>
+        <span class="c"># entire existing contents into memory, open a new file, write the</span>
+        <span class="c"># contents back, and return the file that is now open for writing</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;a&#39;</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">tmp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="k">del</span> <span class="n">tmp</span>
             <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">f</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="c"># Not a URL in Py2, so handle like a regular file</span>
+        <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">))</span>
+            <span class="c"># If it is a URL, just pass in the urlopen object as a filename</span>
+            <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">open_url</span>
+            <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">bz2</span><span class="o">.</span><span class="n">BZ2File</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">))</span>
     <span class="k">elif</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.gz&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">gzip</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;gzip is unavailable; cannot read </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">buffering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+                <span class="c"># addinfourl in Python 2 does not have a &quot;tell&quot; attribute, so we</span>
+                <span class="c"># need to take the same approach for BZ2File above with the</span>
+                <span class="c"># BytesIO object... sigh. Yet another reason to migrate to</span>
+                <span class="c"># Python 3</span>
+                <span class="n">fileobj</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+                <span class="n">fileobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">open_url</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">open_url</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">open_url</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">buffering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">+</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">buffering</span><span class="p">))</span>
-    <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">open_url</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">open_url</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

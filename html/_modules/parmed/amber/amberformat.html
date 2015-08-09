@@ -206,6 +206,9 @@
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span>
 
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+
     <span class="c">#===================================================</span>
 
 <div class="viewcode-block" id="FortranFormat.write"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.amberformat.html#parmed.amber.amberformat.FortranFormat.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
@@ -476,10 +479,15 @@
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdparm_slow</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">slow</span><span class="p">:</span>
+        <span class="c"># The optimized parser only works on local, uncompressed files</span>
+        <span class="c"># TODO: Add gzip and bzip2 support to the optimized reader</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">slow</span> <span class="ow">or</span> <span class="n">fname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">fname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">fname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.bz2&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.gz&#39;</span><span class="p">)):</span>
+
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdparm_slow</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
-        <span class="c"># We have the optimized version</span>
+        <span class="c"># We have the optimized version and a local file</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="n">_rdparm</span><span class="o">.</span><span class="n">rdparm</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
@@ -555,11 +563,9 @@
             <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">CHARMM_ELECTROSTATIC</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">CHARGE_SCALE</span> <span class="o">=</span> <span class="n">AMBER_ELECTROSTATIC</span>
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">]):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">chg</span> <span class="o">/</span> <span class="n">CHARGE_SCALE</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
         <span class="c"># If we don&#39;t have a version, then read in an old-file topology</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -894,7 +900,7 @@
 <span class="sd">            should be written and read. Do not enclose in ()</span>
 <span class="sd">        data : list=None</span>
 <span class="sd">            Sequence with data for the new flag. If None, a list of zeros of</span>
-<span class="sd">            length `num_items` (see below) is given as a holder</span>
+<span class="sd">            length ``num_items`` (see below) is given as a holder</span>
 <span class="sd">        num_items : int=-1</span>
 <span class="sd">            Number of items in the section. This variable is ignored if a set of</span>
 <span class="sd">            data are given in `data`</span>

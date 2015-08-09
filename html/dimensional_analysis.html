@@ -96,8 +96,7 @@ been imported as follows:</p>
 <td>Physical unit expressed in exactly one BaseDimension.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><tt class="xref py py-obj docutils literal"><span class="pre">UnitSystem</span></tt></a>(units)</td>
-<td><p class="rubric">Methods</p>
-</td>
+<td>A complete system of units defining the <em>base</em> unit in each dimension</td>
 </tr>
 </tbody>
 </table>
@@ -176,11 +175,7 @@ the <a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#par
 </ol>
 </div></blockquote>
 <p>Seems easy enough, and I usually use method 2 when turning a <tt class="docutils literal"><span class="pre">float</span></tt>, <tt class="docutils literal"><span class="pre">int</span></tt>,
-<tt class="docutils literal"><span class="pre">list</span></tt>, or <tt class="docutils literal"><span class="pre">tuple</span></tt> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. However, this does <em>not</em> work
-for numpy arrays, since numpy arrays overload all of the multiplication
-operators (<tt class="docutils literal"><span class="pre">__mul__</span></tt>, <tt class="docutils literal"><span class="pre">__imul__</span></tt>, ... etc.), which is the mechanism by which
-unit multiplication creates a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>. As a result, you <em>must</em> use
-method #1 when converting a <tt class="docutils literal"><span class="pre">numpy.ndarray</span></tt> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>.</p>
+<tt class="docutils literal"><span class="pre">list</span></tt>, or <tt class="docutils literal"><span class="pre">tuple</span></tt> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><tt class="xref py py-class docutils literal"><span class="pre">Quantity</span></tt></a>.</p>
 </div>
 <div class="section" id="converting-to-another-unit">
 <h3>Converting to another unit<a class="headerlink" href="#converting-to-another-unit" title="Permalink to this headline">¶</a></h3>

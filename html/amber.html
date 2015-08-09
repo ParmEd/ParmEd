@@ -25,7 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
-    <link rel="next" title="parmed.amber.AmberFormat" href="amberobj/parmed.amber.AmberFormat.html" /> 
+    <link rel="next" title="parmed.amber.AmberFormat" href="amberobj/parmed.amber.AmberFormat.html" />
+    <link rel="prev" title="parmed.formats.registry.load_file" href="fileio/parmed.formats.registry.load_file.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,6 +41,9 @@
         <li class="right" >
           <a href="amberobj/parmed.amber.AmberFormat.html" title="parmed.amber.AmberFormat"
              accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fileio/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -73,16 +77,16 @@ the format specification.</p>
 <tr class="row-odd"><td><a class="reference internal" href="amberobj/parmed.amber.AmberFormat.html#parmed.amber.AmberFormat" title="parmed.amber.AmberFormat"><tt class="xref py py-obj docutils literal"><span class="pre">AmberFormat</span></tt></a>([fname])</td>
 <td>A class that can parse and print files stored in the Amber topology or MDL format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="amberobj/parmed.amber.AmberParm.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-obj docutils literal"><span class="pre">AmberParm</span></tt></a>([prm_name,&nbsp;rst7_name])</td>
+<tr class="row-even"><td><a class="reference internal" href="amberobj/parmed.amber.AmberParm.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-obj docutils literal"><span class="pre">AmberParm</span></tt></a>([prm_name,&nbsp;xyz,&nbsp;box,&nbsp;rst7_name])</td>
 <td>Amber Topology (parm7 format) class.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="amberobj/parmed.amber.ChamberParm.html#parmed.amber.ChamberParm" title="parmed.amber.ChamberParm"><tt class="xref py py-obj docutils literal"><span class="pre">ChamberParm</span></tt></a>([prm_name,&nbsp;rst7_name])</td>
+<tr class="row-odd"><td><a class="reference internal" href="amberobj/parmed.amber.ChamberParm.html#parmed.amber.ChamberParm" title="parmed.amber.ChamberParm"><tt class="xref py py-obj docutils literal"><span class="pre">ChamberParm</span></tt></a>([prm_name,&nbsp;xyz,&nbsp;box,&nbsp;rst7_name])</td>
 <td>Chamber Topology (parm7 format) class.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="amberobj/parmed.amber.AmoebaParm.html#parmed.amber.AmoebaParm" title="parmed.amber.AmoebaParm"><tt class="xref py py-obj docutils literal"><span class="pre">AmoebaParm</span></tt></a>([prm_name,&nbsp;rst7_name])</td>
+<tr class="row-even"><td><a class="reference internal" href="amberobj/parmed.amber.AmoebaParm.html#parmed.amber.AmoebaParm" title="parmed.amber.AmoebaParm"><tt class="xref py py-obj docutils literal"><span class="pre">AmoebaParm</span></tt></a>([prm_name,&nbsp;xyz,&nbsp;box,&nbsp;rst7_name])</td>
 <td>Tinker Topology (parm7 format) class defining the AMOEBA force field.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="amberobj/parmed.amber.LoadParm.html#parmed.amber.LoadParm" title="parmed.amber.LoadParm"><tt class="xref py py-obj docutils literal"><span class="pre">LoadParm</span></tt></a>(parmname[,&nbsp;rst7name])</td>
+<tr class="row-odd"><td><a class="reference internal" href="amberobj/parmed.amber.LoadParm.html#parmed.amber.LoadParm" title="parmed.amber.LoadParm"><tt class="xref py py-obj docutils literal"><span class="pre">LoadParm</span></tt></a>(parmname[,&nbsp;xyz,&nbsp;box,&nbsp;rst7_name])</td>
 <td>Loads a topology file using the correct class.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="amberobj/parmed.amber.AmberMask.html#parmed.amber.AmberMask" title="parmed.amber.AmberMask"><tt class="xref py py-obj docutils literal"><span class="pre">AmberMask</span></tt></a>(parm,&nbsp;mask)</td>
@@ -445,9 +449,9 @@ first demonstrate how to <em>parse</em> an existing mdcrd file, then we will
 demonstrate how to <em>write</em> a new one.</p>
 <p>You must specify&#8212;for both an existing mdcrd and one that you wish to
 create&#8212;the total number of atoms specified by the system and whether or not
-the trajectory will contain unit cell dimensions.  The <a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><tt class="xref py py-meth docutils literal"><span class="pre">coordinates</span></tt></a> method, which takes as an optional argument a frame
+the trajectory will contain unit cell dimensions.  The <tt class="xref py py-meth docutils literal"><span class="pre">coordinates</span></tt> method, which takes as an optional argument a frame
 number, returns either all or just the requested coordinates. The analogous
-<a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><tt class="xref py py-meth docutils literal"><span class="pre">box</span></tt></a> method returns the unit cell lengths. The example
+<tt class="xref py py-meth docutils literal"><span class="pre">box</span></tt> method returns the unit cell lengths. The example
 below uses the file <tt class="docutils literal"><span class="pre">tz2.truncoct.crd</span></tt> from the ParmEd unit tests, which has
 5827 atoms and box lengths:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
@@ -473,8 +477,8 @@ below uses the file <tt class="docutils literal"><span class="pre">tz2.truncoct.
 </pre></div>
 </div>
 <p>When you are writing an <a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd" title="parmed.amber.AmberMdcrd"><tt class="xref py py-class docutils literal"><span class="pre">AmberMdcrd</span></tt></a> file, you need to use the methods
-<a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-meth docutils literal"><span class="pre">add_coordinates</span></tt></a> and <a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><tt class="xref py py-meth docutils literal"><span class="pre">add_box</span></tt></a> instead of <a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><tt class="xref py py-meth docutils literal"><span class="pre">coordinates</span></tt></a>
-and <a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><tt class="xref py py-meth docutils literal"><span class="pre">box</span></tt></a>, as shown in the example below:</p>
+<a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-meth docutils literal"><span class="pre">add_coordinates</span></tt></a> and <a class="reference internal" href="amberobj/parmed.amber.AmberMdcrd.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><tt class="xref py py-meth docutils literal"><span class="pre">add_box</span></tt></a> instead of <tt class="xref py py-meth docutils literal"><span class="pre">coordinates</span></tt>
+and <tt class="xref py py-meth docutils literal"><span class="pre">box</span></tt>, as shown in the example below:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
 <span class="n">crd</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="s">&#39;new.mdcrd&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
@@ -525,7 +529,7 @@ present. Furthermore, unlike the <a class="reference internal" href="amberobj/pa
 the unit cell lengths&#8212;the <a class="reference internal" href="amberobj/parmed.amber.NetCDFTraj.html#parmed.amber.NetCDFTraj" title="parmed.amber.NetCDFTraj"><tt class="xref py py-class docutils literal"><span class="pre">NetCDFTraj</span></tt></a> stores both unit cell lengths
 <em>and</em> angles.</p>
 <p>Furthermore, velocities and forces can be saved in NetCDF trajectory files,
-allowing you to extract them with the analogous <a class="reference internal" href="amberobj/parmed.amber.NetCDFTraj.html#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><tt class="xref py py-meth docutils literal"><span class="pre">velocities</span></tt></a> and <a class="reference internal" href="amberobj/parmed.amber.NetCDFTraj.html#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><tt class="xref py py-meth docutils literal"><span class="pre">forces</span></tt></a> methods.
+allowing you to extract them with the analogous <tt class="xref py py-meth docutils literal"><span class="pre">velocities</span></tt> and <tt class="xref py py-meth docutils literal"><span class="pre">forces</span></tt> methods.
 Likewise, you can set them with <a class="reference internal" href="amberobj/parmed.amber.NetCDFTraj.html#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><tt class="xref py py-meth docutils literal"><span class="pre">add_velocities</span></tt></a> and <a class="reference internal" href="amberobj/parmed.amber.NetCDFTraj.html#parmed.amber.NetCDFTraj.add_forces" title="parmed.amber.NetCDFTraj.add_forces"><tt class="xref py py-meth docutils literal"><span class="pre">add_forces</span></tt></a>.</p>
 <p>An example of writing a NetCDF trajectory (with velocities and forces) is shown
 below:</p>
@@ -774,6 +778,9 @@ distance that defines the criteria.  Examples are shown below with annotations:<
         <li class="right" >
           <a href="amberobj/parmed.amber.AmberFormat.html" title="parmed.amber.AmberFormat"
              >next</a> |</li>
+        <li class="right" >
+          <a href="fileio/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
+             >previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>

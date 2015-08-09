@@ -115,6 +115,25 @@
 <dt id="parmed.amber.AmberMask.Selected">
 <tt class="descname">Selected</tt><big>(</big><em>invert=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMask.Selected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generator that returns the indexes of selected atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>invert</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, all atoms <em>not</em> selected by the mask will be returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">generator of int</p>
+<blockquote class="last">
+<div><p>Each iteration will yield the index of the next atom that has been
+selected by the mask. Atom indices are 0-based</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -122,6 +141,35 @@
 <tt class="descname">Selection</tt><big>(</big><em>prnlev=0</em>, <em>invert=False</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMask.Selection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the mask and analyzes the result to return an atom
 selection array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prnlev</strong> : int, optional</p>
+<blockquote>
+<div><p>Print debug information on the processing of the Amber mask string.
+This is mainly useful if you are modifying the mask parser. Default
+value is 0 (no printout), values between 1 and 8 control the level
+of output (larger values produce more output). Default 0</p>
+</div></blockquote>
+<p><strong>invert</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, the returned array will invert the selection of the mask
+(i.e., selected atoms will not be selected and vice-versa)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>mask</strong> : list of int</p>
+<blockquote class="last">
+<div><p>A list with length equal to the number of atoms in the assigned
+<a class="reference internal" href="../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance. Selected
+atoms will have a value of 1 placed in the corresponding slot in the
+return list while atoms not selected will be assigned 0.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

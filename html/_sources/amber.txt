@@ -1,5 +1,5 @@
 The :mod:`parmed.amber` package
-==================================
+===============================
 
 The :mod:`amber` package contains classes that can parse most of the file
 formats used by the Amber molecular dynamics package.  In particular are Amber

@@ -102,6 +102,9 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Physical unit such as meter or ampere.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">100</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_or_scaled_units</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a new Unit.</span>
 
@@ -548,6 +551,8 @@
 <span class="sd">    ScaledUnit and BaseUnit are both used in the internals of Unit.  They</span>
 <span class="sd">    should only be used during the construction of Units.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">100</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">master</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
         <span class="c"># Convert to one base_unit per dimension</span>

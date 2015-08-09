@@ -57,7 +57,6 @@
 <span class="sd">or any other meaningful attribute. It&#39;s just a container to put an extra </span>
 <span class="sd">charge </span>
 <span class="sd">&quot;&quot;&quot;</span>
-
 <span class="c"># Data descriptions:</span>
 <span class="c">#</span>
 <span class="c">#  KNOWN_ELEMENTS: number of known elements</span>
@@ -276,6 +275,8 @@
           <span class="s">&#39;LP&#39;</span> <span class="p">:</span> <span class="s">&#39;N/A&#39;</span>          <span class="p">,</span><span class="s">&#39;Lp&#39;</span> <span class="p">:</span> <span class="s">&#39;N/A&#39;</span>
 <span class="p">}</span>
 
+<span class="n">_sorted_masses</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Mass</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
 <div class="viewcode-block" id="element_by_mass"><a class="viewcode-back" href="../../api/parmed/parmed.periodic_table.html#parmed.periodic_table.element_by_mass">[docs]</a><span class="k">def</span> <span class="nf">element_by_mass</span><span class="p">(</span><span class="n">mass</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine the element that has a mass closest to the input mass</span>
@@ -290,16 +291,62 @@
 <span class="sd">    element: str</span>
 <span class="sd">        The returned string is the name of the element whose atomic mass is</span>
 <span class="sd">        closest to the input mass</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This actually fails (i.e., produces poor predictions) for some cases when</span>
+<span class="sd">    masses have changed -- particularly in the case of Hydrogen mass</span>
+<span class="sd">    repartitioning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">diff</span> <span class="o">=</span> <span class="n">mass</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">best_guess</span> <span class="o">=</span> <span class="s">&#39;EP&#39;</span>
 
-    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">Element</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">-</span> <span class="n">mass</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">diff</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">element</span><span class="p">,</span> <span class="n">element_mass</span> <span class="ow">in</span> <span class="n">_sorted_masses</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">element_mass</span> <span class="o">-</span> <span class="n">mass</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="n">diff</span><span class="p">:</span>
             <span class="n">best_guess</span> <span class="o">=</span> <span class="n">element</span>
-            <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">-</span> <span class="n">mass</span><span class="p">)</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
 
-    <span class="k">return</span> <span class="n">best_guess</span></div>
+    <span class="k">return</span> <span class="n">best_guess</span>
+</div>
+<div class="viewcode-block" id="element_by_name"><a class="viewcode-back" href="../../api/parmed/parmed.periodic_table.html#parmed.periodic_table.element_by_name">[docs]</a><span class="k">def</span> <span class="nf">element_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine the element based on the name of an atom. This is very naive. It</span>
+<span class="sd">    first tries to match the first letter of the element. If that doesn&#39;t work,</span>
+<span class="sd">    it tries to match the first *two* atoms. If that still doesn&#39;t work, it</span>
+<span class="sd">    defaults to an extra point</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the atom to determine an element for</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    element : str</span>
+<span class="sd">        The name of the best-matching element</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This should be a last-case scenario for guessing element information. For</span>
+<span class="sd">    instance, Ca will never be matched, since calcium atoms will be tagged as</span>
+<span class="sd">    carbon before the second letter is tried. This is usually OK for</span>
+<span class="sd">    biomolecules, but you are better off using the mass or, even better, an</span>
+<span class="sd">    appropriate representation of the atomic number to begin with</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">sym</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sym</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">sym</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">sym</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="n">atomic_number</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># give up</span>
+
+    <span class="k">return</span> <span class="n">Element</span><span class="p">[</span><span class="n">atomic_number</span><span class="p">]</span></div>
 </pre></div>
 
           </div>

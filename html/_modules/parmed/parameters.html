@@ -129,6 +129,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pair_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parametersets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combining_rule</span> <span class="o">=</span> <span class="s">&#39;lorentz&#39;</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">other</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
@@ -181,6 +182,7 @@
             <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
             <span class="n">other</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
             <span class="n">other</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span>
 
         <span class="k">return</span> <span class="n">other</span>
 
@@ -396,7 +398,17 @@
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">keylist</span><span class="p">)):</span>
                 <span class="n">key2</span> <span class="o">=</span> <span class="n">keylist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">==</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]:</span>
-                    <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span></div>
+                    <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">combining_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combining_rule</span>
+
+    <span class="nd">@combining_rule.setter</span>
+<div class="viewcode-block" id="ParameterSet.combining_rule"><a class="viewcode-back" href="../../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet.combining_rule">[docs]</a>    <span class="k">def</span> <span class="nf">combining_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s">&#39;geometric&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;combining_rule must be &quot;lorentz&quot; or &quot;geometric&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combining_rule</span> <span class="o">=</span> <span class="n">value</span></div></div>
 </pre></div>
 
           </div>

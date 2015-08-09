@@ -53,6 +53,7 @@
 <span class="sd">This module contains all of the exceptions that are used in the chemistry</span>
 <span class="sd">package</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c"># Hard errors</span>
 
@@ -116,12 +117,18 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">ERROR - [at line: </span><span class="si">%d</span><span class="s">] </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineNumber</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InputError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.InputError">[docs]</a><span class="k">class</span> <span class="nc">InputError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; When there is an error with input &quot;&quot;&quot;</span>
 
 <span class="c"># Warnings</span>
 </div>
 <div class="viewcode-block" id="ParmedWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParmedWarning">[docs]</a><span class="k">class</span> <span class="nc">ParmedWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Base class for all warnings raised by ParmEd &quot;&quot;&quot;</span>
-</div>
+
+<span class="c"># Make sure that all warnings are always printed</span></div>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;always&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">ParmedWarning</span><span class="p">)</span>
+
 <div class="viewcode-block" id="PDBWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PDBWarning">[docs]</a><span class="k">class</span> <span class="nc">PDBWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A non-fatal error to indicate a problematic PDB file &quot;&quot;&quot;</span>
 </div>

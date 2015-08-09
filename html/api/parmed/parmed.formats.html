@@ -104,7 +104,18 @@ contents.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
 <blockquote>
-<div><p>The name of the file to try to parse</p>
+<div><p>The name of the file to try to parse. If the filename starts with
+<a class="reference external" href="http://">http://</a> or <a class="reference external" href="https://">https://</a> or <a class="reference external" href="ftp://">ftp://</a>, it is treated like a URL and the file will be
+loaded directly from its remote location on the web</p>
+</div></blockquote>
+<p><strong>structure</strong> : object, optional</p>
+<blockquote>
+<div><p>For some classes, such as the Mol2 file class, the default return object
+is not a Structure, but can be made to return a Structure if the
+<tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword argument is passed. To facilitate writing
+easy code, the <tt class="docutils literal"><span class="pre">structure</span></tt> keyword is always processed and only passed
+on to the correct file parser if that parser accepts the structure
+keyword. There is no default, as each parser has its own default.</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
 <blockquote>
@@ -142,8 +153,8 @@ provided as keyword arguments in addition to the file name</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Compressed files are supported and detected by filename extension. The
-following names are supported:</p>
+<p>Compressed files are supported and detected by filename extension. This
+applies both to local and remote files. The following names are supported:</p>
 <blockquote>
 <div><ul class="simple">
 <li><tt class="docutils literal"><span class="pre">.gz</span></tt> : gzip compressed file</li>
@@ -164,7 +175,7 @@ following names are supported:</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.download" title="parmed.formats.PDBFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.download" title="parmed.formats.PDBFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
 <td>Goes to the wwPDB website and downloads the requested PDB, loading it</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.id_format" title="parmed.formats.PDBFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
@@ -180,7 +191,7 @@ following names are supported:</p>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.PDBFile.download">
-<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em><big>)</big><a class="headerlink" href="#parmed.formats.PDBFile.download" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><big>)</big><a class="headerlink" href="#parmed.formats.PDBFile.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Goes to the wwPDB website and downloads the requested PDB, loading it
 as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -196,9 +207,17 @@ as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</
 <div><p>The number of seconds to wait before raising a timeout error.
 Default is 10 seconds</p>
 </div></blockquote>
+<p><strong>saveto</strong> : str, optional</p>
+<blockquote>
+<div><p>If provided, this will be treated as a file name to which the PDB
+file will be saved. If None (default), no PDB file will be written.
+This will be a verbatim copy of the downloaded PDB file, unlike the
+somewhat-stripped version you would get by using
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></tt></a></p>
+</div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDB</p>
 </div></blockquote>
@@ -206,7 +225,8 @@ Default is 10 seconds</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>socket.timeout if the connection times out while trying to contact the</strong></p>
 <p><strong>FTP server</strong></p>
-<p><strong>IOError if there is a problem retrieving the requested PDB</strong></p>
+<p><strong>IOError if there is a problem retrieving the requested PDB or writing a</strong></p>
+<p><strong>requested ``saveto`` file</strong></p>
 <p><strong>ImportError if the gzip module is not available</strong></p>
 <p class="last"><strong>TypeError if pdb_id is not a 4-character string</strong></p>
 </td>
@@ -267,10 +287,6 @@ default.</p>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>The returned structure has an extra attribute, pdbxyz, that contains all
-of the coordinates for all of the frames in the PDB file as a list of
-NATOM*3 lists.</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -354,7 +370,7 @@ atom that does not contain a SEGID identifier. Default is False</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.download" title="parmed.formats.CIFFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.download" title="parmed.formats.CIFFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
 <td>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.id_format" title="parmed.formats.CIFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
@@ -370,7 +386,7 @@ atom that does not contain a SEGID identifier. Default is False</p>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.CIFFile.download">
-<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em><big>)</big><a class="headerlink" href="#parmed.formats.CIFFile.download" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><big>)</big><a class="headerlink" href="#parmed.formats.CIFFile.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
 loading it as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -386,11 +402,19 @@ loading it as a <tt class="xref py py-class docutils literal"><span class="pre">
 <div><p>The number of seconds to wait before raising a timeout error.
 Default is 10 seconds</p>
 </div></blockquote>
+<p><strong>saveto</strong> : str, optional</p>
+<blockquote>
+<div><p>If provided, this will be treated as a file name to which the PDB
+file will be saved. If None (default), no CIF file will be written.
+This will be a verbatim copy of the downloaded CIF file, unlike the
+somewhat-stripped version you would get by using
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></tt></a></p>
+</div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
-<div><p>Structure instance populated by the requested PDB</p>
+<div><p>Structure instance populated by the requested PDBx/mmCIF</p>
 </div></blockquote>
 </td>
 </tr>
@@ -458,10 +482,6 @@ file, multiple Structure instances will be returned as a tuple.</p>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>The returned structure has an extra attribute, pdbxyz, that contains all
-of the coordinates for all of the frames in the PDB file as a list of
-NATOM*3 lists.</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -545,7 +565,7 @@ False, ANISOU records are not written</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.Mol2File.parse" title="parmed.formats.Mol2File.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename[,&nbsp;structure])</td>
 <td>Parses a mol2 file (or mol3) file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.write" title="parmed.formats.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.write" title="parmed.formats.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3,&nbsp;split])</td>
 <td>Writes a mol2 file from a structure or residue template</td>
 </tr>
 </tbody>
@@ -582,9 +602,9 @@ False, ANISOU records are not written</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
 <blockquote>
-<div><p>Name of the file to parse</p>
+<div><p>Name of the file to parse or file-like object to parse from</p>
 </div></blockquote>
 <p><strong>structure</strong> : bool, optional</p>
 <blockquote>
@@ -608,7 +628,9 @@ False</p>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>Mol2Error</strong></p>
 <blockquote class="last">
 <div><p>If the file format is not recognized or non-numeric values are
-present where integers or floating point numbers are expected</p>
+present where integers or floating point numbers are expected. Also
+raises Mol2Error if you try to parse a mol2 file that has multiple
+&#64;&lt;MOLECULE&gt; entries with <tt class="docutils literal"><span class="pre">structure=True</span></tt>.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -618,7 +640,7 @@ present where integers or floating point numbers are expected</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.Mol2File.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em><big>)</big><a class="headerlink" href="#parmed.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em>, <em>split=False</em><big>)</big><a class="headerlink" href="#parmed.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a mol2 file from a structure or residue template</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -636,9 +658,15 @@ present where integers or floating point numbers are expected</p>
 <div><p>Name of the file to write or open file handle to write to</p>
 </div></blockquote>
 <p><strong>mol3</strong> : bool, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplate or container, write
 HEAD/TAIL sections. Default is False</p>
+</div></blockquote>
+<p><strong>split</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplateContainer or a Structure
+with multiple residues, each residue is printed in a separate
+&#64;&lt;MOLECULE&gt; section that appear sequentially in the output file</p>
 </div></blockquote>
 </td>
 </tr>

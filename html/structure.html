@@ -59,7 +59,7 @@ class look intimidating, but its core features are the <tt class="docutils liter
 (e.g., PDB and PDBx/mmCIF), and these are the only two attributes currently
 populated through the PDB and mmCIF parsing routines.</p>
 <div class="section" id="structure-class">
-<h2><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -74,140 +74,112 @@ populated through the PDB and mmCIF parsing routines.</p>
 <p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class may be instantiated directly, but is more often
 created by one of the parsers (see below for <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a>) or extended to
 support the structure files of various computational parmed programs.</p>
-</div>
-<div class="section" id="load-file">
-<h2><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<div class="section" id="attributes-of-structure-instances">
+<h3>Attributes of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances<a class="headerlink" href="#attributes-of-structure-instances" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class has many attributes that store the various
+topological features and force field parameters of the molecular model. These
+include valence bonds, angles, torsions, and other more complex valence bond
+terms (like coupled-torsion correction maps and a variety of other terms
+describing common vibrational modes in the AMOEBA force field).</p>
+<p>Each of these attributes is stored in a <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a> instance, which is a simple subclass of
+the built-in <tt class="docutils literal"><span class="pre">list</span></tt> type that registers every time the list itself is changed
+(e.g., by adding an item, deleting an item, swapping two items, etc.). In this
+way, <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> can determine whether or not certain cached attributes
+need to be updated. This is particularly important for various subclasses, like
+<tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt> in which the topological
+arrays and a dictionary of &#8220;raw data&#8221; need to be kept synchronized.</p>
+<p>You should never delete or reassign any of these list attributes&#8212;instead you
+should delete all of the items from the list using the idiom <tt class="docutils literal"><span class="pre">del</span> <span class="pre">mylist[:]</span></tt>.</p>
+<p>Every <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance has the following <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a> attributes:</p>
+<table border="1" class="docutils">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col width="18%" />
+<col width="82%" />
 </colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attribute</th>
+<th class="head">Description</th>
+</tr>
+</thead>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
-<td>Identifies the file format of the specified file and returns its parsed contents.</td>
+<tr class="row-even"><td>bonds</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> instances</td>
+</tr>
+<tr class="row-odd"><td>angles</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle" title="parmed.topologyobjects.Angle"><tt class="xref py py-class docutils literal"><span class="pre">Angle</span></tt></a> instances</td>
+</tr>
+<tr class="row-even"><td>urey_bradleys</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley" title="parmed.topologyobjects.UreyBradley"><tt class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></tt></a> instances</td>
+</tr>
+<tr class="row-odd"><td>dihedrals</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">Dihedral</span></tt></a> instances</td>
+</tr>
+<tr class="row-even"><td>impropers</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper" title="parmed.topologyobjects.Improper"><tt class="xref py py-class docutils literal"><span class="pre">Improper</span></tt></a> instances</td>
+</tr>
+<tr class="row-odd"><td>cmaps</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap" title="parmed.topologyobjects.Cmap"><tt class="xref py py-class docutils literal"><span class="pre">Cmap</span></tt></a> instances</td>
+</tr>
+<tr class="row-even"><td>adjusts</td>
+<td>List of <tt class="xref py py-class docutils literal"><span class="pre">NonbondedException</span></tt> &lt;parmed.topologyobjects.NonbondedException&gt;` instances</td>
+</tr>
+<tr class="row-odd"><td>stretch_bends</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.StretchBend.html#parmed.topologyobjects.StretchBend" title="parmed.topologyobjects.StretchBend"><tt class="xref py py-class docutils literal"><span class="pre">StretchBend</span></tt></a> instances</td>
+</tr>
+<tr class="row-even"><td>out_of_plane_bends</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.OutOfPlaneBend.html#parmed.topologyobjects.OutOfPlaneBend" title="parmed.topologyobjects.OutOfPlaneBend"><tt class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBend</span></tt></a> instances</td>
+</tr>
+<tr class="row-odd"><td>trigonal_angles</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TrigonalAngle.html#parmed.topologyobjects.TrigonalAngle" title="parmed.topologyobjects.TrigonalAngle"><tt class="xref py py-class docutils literal"><span class="pre">TrigonalAngle</span></tt></a> instances</td>
+</tr>
+<tr class="row-even"><td>torsion_torsions</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TorsionTorsion.html#parmed.topologyobjects.TorsionTorsion" title="parmed.topologyobjects.TorsionTorsion"><tt class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></tt></a> instances</td>
+</tr>
+<tr class="row-odd"><td>pi_torsions</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.PiTorsion.html#parmed.topologyobjects.PiTorsion" title="parmed.topologyobjects.PiTorsion"><tt class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></tt></a> instances</td>
+</tr>
+<tr class="row-even"><td>chiral_frames</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.ChiralFrame.html#parmed.topologyobjects.ChiralFrame" title="parmed.topologyobjects.ChiralFrame"><tt class="xref py py-class docutils literal"><span class="pre">ChiralFrame</span></tt></a> instances</td>
+</tr>
+<tr class="row-odd"><td>multipole_frames</td>
+<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.MultipoleFrame.html#parmed.topologyobjects.MultipoleFrame" title="parmed.topologyobjects.MultipoleFrame"><tt class="xref py py-class docutils literal"><span class="pre">MultipoleFrame</span></tt></a> instances</td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
-whose name is passed as an argument. The following formats are currently
-recognized and result in the instantiation of either a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. or one of its subclasses:</p>
-<ol class="arabic simple">
-<li>PDB</li>
-<li>PDBx/mmCIF</li>
-<li>Gromacs GRO</li>
-<li>Gromacs topology file</li>
-<li>Amber topology file</li>
-<li>CHARMM PSF file</li>
-<li>Mol2 file</li>
-</ol>
-<p>Here, we will focus on instantiating a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from PDB and
-mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
-Bank or the world wide Protein Data Bank often contain a large amount of
-metadata describing the structure, such as the citation information,
-experimental method (e.g., X-ray crystallography or NMR spectroscopy), authors,
-and related database entries (such as BMRB entries for NMR-solved structures).
-This information is extracted from both PDB and PDBx/mmCIF files when available,
-along with anisotropic B-factors.</p>
-<p>The following sections will briefly demonstrate parsing a PDB file and a mmCIF
-file to a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+<p>If the list is empty, then no terms of that type exist in the model.  All terms
+from <tt class="docutils literal"><span class="pre">stretch_bends</span></tt> to the bottom are exclusive to the Amoeba force field.</p>
+<p>In addition to those attributes, there is a list of parameter <em>types</em>
+corresponding to each of those valence parameters as well (except for the chiral
+and multipole frame lists).  For example, a <tt class="docutils literal"><span class="pre">bond_types</span></tt>, <tt class="docutils literal"><span class="pre">angle_types</span></tt>,
+<tt class="docutils literal"><span class="pre">urey_bradley_types</span></tt>, ... etc, that contain the parameter type objects
+(<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a>,
+<a class="reference internal" href="topobj/parmed.topologyobjects.AngleType.html#parmed.topologyobjects.AngleType" title="parmed.topologyobjects.AngleType"><tt class="xref py py-class docutils literal"><span class="pre">AngleType</span></tt></a>, and
+<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a> objects, respectively, since
+the Urey-Bradley term is identical in functional form to a simple bond). The
+same warnings apply here&#8212;do not explicitly delete or reassign these lists.</p>
+<p>There are also two <em>special</em> subclasses of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a> tracking <tt class="docutils literal"><span class="pre">atoms</span></tt> and <tt class="docutils literal"><span class="pre">residues</span></tt>
+(namely the <a class="reference internal" href="topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList" title="parmed.topologyobjects.AtomList"><tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt></a> and the
+<a class="reference internal" href="topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList" title="parmed.topologyobjects.ResidueList"><tt class="xref py py-class docutils literal"><span class="pre">ResidueList</span></tt></a> classes that have
+extra functionality aiding in the automatic bookkeeping, as described below).</p>
 </div>
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>For the purposes of this example, we will download the 4LZT structure as both a
-PDB file and a CIF file. These structures are both used in the ParmEd unittest
-suite, so you can get the files from there, or <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT">download them from here.</a></p>
-<hr class="docutils" />
-<p>The first example demonstrates reading the PDB file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-<span class="go">1164</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
-<span class="go">274</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">experimental</span> <span class="c"># See the experimental method</span>
-<span class="go">&#39;X-RAY DIFFRACTION&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># See how many chains we have</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">chain_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span>
-<span class="go">set([&#39;A&#39;])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># Only one chain. Now see how many atoms have alternate conformations</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms_with_altconf</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span>
-<span class="gp">... </span>                          <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">atoms_with_altconf</span><span class="p">)</span>
-<span class="go">19</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># Just for sanity&#39;s sake, make sure that the sum of all atoms in all</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># residues is equal to the total number of atoms</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
-<span class="go">1164</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-<span class="go">1164</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">anisou</span> <span class="c"># Look, we even get anisotropic B-factors!</span>
-<span class="go">array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])</span>
-<span class="go">&gt;&gt;&gt;</span>
-</pre></div>
-</div>
-<p>The second example demonstrates reading the CIF file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-<span class="go">1164</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
-<span class="go">274</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">experimental</span> <span class="c"># See the experimental method</span>
-<span class="go">&#39;X-RAY DIFFRACTION&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># See how many chains we have</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">chain_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span>
-<span class="go">set([&#39;A&#39;])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># Only one chain. Now see how many atoms have alternate conformations</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms_with_altconf</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span>
-<span class="gp">... </span>                         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">atoms_with_altconf</span><span class="p">)</span>
-<span class="go">19</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># Just for sanity&#39;s sake, make sure that the sum of all atoms in all</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c"># residues is equal to the total number of atoms</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
-<span class="go">1164</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-<span class="go">1164</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">anisou</span> <span class="c"># Look, we even get anisotropic B-factors!</span>
-<span class="go">array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])</span>
-<span class="go">&gt;&gt;&gt;</span>
-</pre></div>
+<div class="section" id="automated-bookkeeping">
+<h3>Automated Bookkeeping<a class="headerlink" href="#automated-bookkeeping" title="Permalink to this headline">¶</a></h3>
+<p>One of the strengths of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class and its corresponding
+components (such as <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a>) is that it
+automates the process of <em>bookkeeping</em> for your structure&#8217;s model. For instance,
+creating a <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> instance automatically
+registers the pair of atoms involved in the bond as partners in the &#8220;bond
+graph&#8221;, which is used to determine atom connectivity. So when you create a
+<a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> object, you should immediately add
+it to that <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>&#8216;s <tt class="docutils literal"><span class="pre">bonds</span></tt> attribute. Likewise, if you give that
+bond a <a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a>, you should
+immediately add that instance to the <tt class="docutils literal"><span class="pre">bond_types</span></tt> attribute of the
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance as well.</p>
+<p>If you plan on creating your own models directly through the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+API, you are encouraged to use existing parsers as examples, such as those for
+the AMBER, GROMACS, and CHARMM topology files.</p>
 </div>
 </div>
-<hr class="docutils" />
-<div class="section" id="converting-pdbx-mmcif-files-to-pdb-files">
-<h2>Converting PDBx/mmCIF files to PDB files<a class="headerlink" href="#converting-pdbx-mmcif-files-to-pdb-files" title="Permalink to this headline">¶</a></h2>
-<p>If you noticed the <tt class="docutils literal"><span class="pre">write_cif</span></tt> and <tt class="docutils literal"><span class="pre">write_pdb</span></tt> methods attached to the
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class, you may have deduced
-that you can very simply convert a PDBx/mmCIF file to a PDB file.</p>
-<p>This is likely to be increasingly popular, since the PDB is moving to the mmCIF
-format, but many programs in the field of computational parmed and physics
-has decades worth of legacy code built around PDB files. Not to worry!  A quick
-1-liner will seamlessly convert PDBx to PDB:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
-<span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                                <span class="n">renumber</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>In this case, the metadata is <em>not</em> copied (i.e., the <tt class="docutils literal"><span class="pre">EXPTL</span></tt>, <tt class="docutils literal"><span class="pre">JRNL</span></tt>,
-and <tt class="docutils literal"><span class="pre">AUTHOR</span></tt> records, to name a few). Only the coordinates, unit cell
-(<tt class="docutils literal"><span class="pre">CYRST1</span></tt> record), and optionally anisotropic B-factor lines are translated.</p>
-<p>The <tt class="docutils literal"><span class="pre">renumber</span></tt> argument tells <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> to use the original PDB numbers, rather than
-its internal number scheme that numbers sequentially from 1 to N, where N is
-the number of residues.</p>
-<p>If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
-numbering cycles back, such that the atom serial number after 99,999 is 0, and
-the numbering starts again.</p>
-</div>
-<hr class="docutils" />
 <div class="section" id="structure-manipulation-slicing-combining-replicating-and-splitting">
 <h2>Structure manipulation: slicing, combining, replicating, and splitting<a class="headerlink" href="#structure-manipulation-slicing-combining-replicating-and-splitting" title="Permalink to this headline">¶</a></h2>
 <p>This section describes a number of simple, yet powerful manipulations you can do
@@ -215,7 +187,7 @@ to <a class="reference internal" href="structobj/parmed.structure.Structure.html
 extension, instances of their subclasses).  In order, these are <em>slicing</em>,
 <em>combining</em> (or <em>merging</em>), and <em>replicating</em>.</p>
 <div class="section" id="structure-slicing-and-selections">
-<h3><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> Slicing and Selections<a class="headerlink" href="#structure-slicing-and-selections" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> Slicing and Selections<a class="headerlink" href="#structure-slicing-and-selections" title="Permalink to this headline">¶</a></h3>
 <p>One of the things that ParmEd tries to make easy to do is to select a subset of
 a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance as a new
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> (complete with all
@@ -470,8 +442,8 @@ double the size of its type arrays, while replicating it will not.</p>
 <p>Finally, replication is more efficient than combination arising from the simpler
 nature of replicating a structure than combining two different ones.</p>
 </div>
-<div class="section" id="class-structure-parmed-structure-structure-splitting">
-<h3>:class:<a href="#id2"><span class="problematic" id="id3">`</span></a>Structure &lt;parmed.structure.Structure&gt; splitting<a class="headerlink" href="#class-structure-parmed-structure-structure-splitting" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="structure-splitting">
+<h3><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> splitting<a class="headerlink" href="#structure-splitting" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes you want to be able to manipulate individual <em>molecules</em> inside a
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance individually. The
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.split" title="parmed.structure.Structure.split"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.split</span></tt></a> method does just
@@ -496,6 +468,137 @@ biphenyl examples from earlier:</p>
 </div>
 </div>
 </div>
+<div class="section" id="load-file">
+<h2><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<td>Identifies the file format of the specified file and returns its parsed contents.</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
+whose name is passed as an argument. The following formats are currently
+recognized and result in the instantiation of either a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. or one of its subclasses:</p>
+<ol class="arabic simple">
+<li>PDB</li>
+<li>PDBx/mmCIF</li>
+<li>Gromacs GRO</li>
+<li>Gromacs topology file</li>
+<li>Amber topology file</li>
+<li>CHARMM PSF file</li>
+<li>Mol2 file</li>
+</ol>
+<p>Here, we will focus on instantiating a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from PDB and
+mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
+Bank or the world wide Protein Data Bank often contain a large amount of
+metadata describing the structure, such as the citation information,
+experimental method (e.g., X-ray crystallography or NMR spectroscopy), authors,
+and related database entries (such as BMRB entries for NMR-solved structures).
+This information is extracted from both PDB and PDBx/mmCIF files when available,
+along with anisotropic B-factors.</p>
+<p>The following sections will briefly demonstrate parsing a PDB file and a mmCIF
+file to a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>For the purposes of this example, we will download the 4LZT structure as both a
+PDB file and a CIF file. These structures are both used in the ParmEd unittest
+suite, so you can get the files from there, or <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT">download them from here.</a></p>
+<hr class="docutils" />
+<p>The first example demonstrates reading the PDB file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+<span class="go">1164</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+<span class="go">274</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">experimental</span> <span class="c"># See the experimental method</span>
+<span class="go">&#39;X-RAY DIFFRACTION&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># See how many chains we have</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">chain_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span>
+<span class="go">set([&#39;A&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Only one chain. Now see how many atoms have alternate conformations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms_with_altconf</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span>
+<span class="gp">... </span>                          <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">atoms_with_altconf</span><span class="p">)</span>
+<span class="go">19</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Just for sanity&#39;s sake, make sure that the sum of all atoms in all</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># residues is equal to the total number of atoms</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+<span class="go">1164</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+<span class="go">1164</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">anisou</span> <span class="c"># Look, we even get anisotropic B-factors!</span>
+<span class="go">array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])</span>
+</pre></div>
+</div>
+<p>The second example demonstrates reading the CIF file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+<span class="go">1164</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+<span class="go">274</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">experimental</span> <span class="c"># See the experimental method</span>
+<span class="go">&#39;X-RAY DIFFRACTION&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># See how many chains we have</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">chain_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain_list</span>
+<span class="go">set([&#39;A&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Only one chain. Now see how many atoms have alternate conformations</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms_with_altconf</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span>
+<span class="gp">... </span>                         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">atoms_with_altconf</span><span class="p">)</span>
+<span class="go">19</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Just for sanity&#39;s sake, make sure that the sum of all atoms in all</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># residues is equal to the total number of atoms</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">lzt_cif</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+<span class="go">1164</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+<span class="go">1164</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">anisou</span> <span class="c"># Look, we even get anisotropic B-factors!</span>
+<span class="go">array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])</span>
+</pre></div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="converting-pdbx-mmcif-files-to-pdb-files">
+<h2>Converting PDBx/mmCIF files to PDB files<a class="headerlink" href="#converting-pdbx-mmcif-files-to-pdb-files" title="Permalink to this headline">¶</a></h2>
+<p>If you noticed the <tt class="docutils literal"><span class="pre">write_cif</span></tt> and <tt class="docutils literal"><span class="pre">write_pdb</span></tt> methods attached to the
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class, you may have deduced
+that you can very simply convert a PDBx/mmCIF file to a PDB file.</p>
+<p>This is likely to be increasingly popular, since the PDB is moving to the mmCIF
+format, but many programs in the field of computational parmed and physics
+has decades worth of legacy code built around PDB files. Not to worry!  A quick
+1-liner will seamlessly convert PDBx to PDB:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                <span class="n">renumber</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, the metadata is <em>not</em> copied (i.e., the <tt class="docutils literal"><span class="pre">EXPTL</span></tt>, <tt class="docutils literal"><span class="pre">JRNL</span></tt>,
+and <tt class="docutils literal"><span class="pre">AUTHOR</span></tt> records, to name a few). Only the coordinates, unit cell
+(<tt class="docutils literal"><span class="pre">CYRST1</span></tt> record), and optionally anisotropic B-factor lines are translated.</p>
+<p>The <tt class="docutils literal"><span class="pre">renumber</span></tt> argument tells <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> to use the original PDB numbers, rather than
+its internal number scheme that numbers sequentially from 1 to N, where N is
+the number of residues.</p>
+<p>If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
+numbering cycles back, such that the atom serial number after 99,999 is 0, and
+the numbering starts again.</p>
+<hr class="docutils" />
+</div>
 </div>
 
 
@@ -507,17 +610,21 @@ biphenyl examples from earlier:</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a><ul>
-<li><a class="reference internal" href="#structure-class"><tt class="docutils literal"><span class="pre">Structure</span></tt> class</a></li>
-<li><a class="reference internal" href="#load-file"><tt class="docutils literal"><span class="pre">load_file</span></tt></a></li>
-<li><a class="reference internal" href="#examples">Examples</a></li>
-<li><a class="reference internal" href="#converting-pdbx-mmcif-files-to-pdb-files">Converting PDBx/mmCIF files to PDB files</a></li>
+<li><a class="reference internal" href="#structure-class"><tt class="docutils literal"><span class="pre">Structure</span></tt> class</a><ul>
+<li><a class="reference internal" href="#attributes-of-structure-instances">Attributes of <tt class="docutils literal"><span class="pre">Structure</span></tt> instances</a></li>
+<li><a class="reference internal" href="#automated-bookkeeping">Automated Bookkeeping</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#structure-manipulation-slicing-combining-replicating-and-splitting">Structure manipulation: slicing, combining, replicating, and splitting</a><ul>
 <li><a class="reference internal" href="#structure-slicing-and-selections"><tt class="docutils literal"><span class="pre">Structure</span></tt> Slicing and Selections</a></li>
 <li><a class="reference internal" href="#structure-combining">Structure Combining</a></li>
 <li><a class="reference internal" href="#structure-replicating">Structure Replicating</a></li>
-<li><a class="reference internal" href="#class-structure-parmed-structure-structure-splitting">:class:`Structure &lt;parmed.structure.Structure&gt; splitting</a></li>
+<li><a class="reference internal" href="#structure-splitting"><tt class="docutils literal"><span class="pre">Structure</span></tt> splitting</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#load-file"><tt class="docutils literal"><span class="pre">load_file</span></tt></a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#converting-pdbx-mmcif-files-to-pdb-files">Converting PDBx/mmCIF files to PDB files</a></li>
 </ul>
 </li>
 </ul>

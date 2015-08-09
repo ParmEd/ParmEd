@@ -76,6 +76,43 @@ closest to the input mass</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>This actually fails (i.e., produces poor predictions) for some cases when
+masses have changed &#8211; particularly in the case of Hydrogen mass
+repartitioning.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.periodic_table.element_by_name">
+<tt class="descclassname">parmed.periodic_table.</tt><tt class="descname">element_by_name</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/periodic_table.html#element_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.periodic_table.element_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the element based on the name of an atom. This is very naive. It
+first tries to match the first letter of the element. If that doesn&#8217;t work,
+it tries to match the first <em>two</em> atoms. If that still doesn&#8217;t work, it
+defaults to an extra point</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
+<blockquote>
+<div><p>Name of the atom to determine an element for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>element</strong> : str</p>
+<blockquote class="last">
+<div><p>The name of the best-matching element</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This should be a last-case scenario for guessing element information. For
+instance, Ca will never be matched, since calcium atoms will be tagged as
+carbon before the second letter is tried. This is usually OK for
+biomolecules, but you are better off using the mass or, even better, an
+appropriate representation of the atomic number to begin with</p>
 </dd></dl>
 
 </div>

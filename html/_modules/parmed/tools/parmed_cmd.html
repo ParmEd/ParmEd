@@ -55,7 +55,7 @@
 
 <span class="c"># Load some system modules that may be useful for various users in shell mode</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">cmd</span>
@@ -102,19 +102,16 @@
         <span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">stdin</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">stdout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">continued</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">isatty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populated</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">populate_actions</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ParmedCmd.setlog"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.parmed_cmd.html#parmed.tools.parmed_cmd.ParmedCmd.setlog">[docs]</a>    <span class="k">def</span> <span class="nf">setlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Open up a log file to start logging the commands. If we log these</span>
-<span class="sd">        commands, then we want to catch any fatal error for an action and avoid</span>
-<span class="sd">        bailing out of the interpreter (so do NOT exit on fatal).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Open up a log file to start logging the commands. &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">f</span>
         <span class="k">else</span><span class="p">:</span>
@@ -169,6 +166,8 @@
             <span class="k">return</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">line</span>
         <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;?&#39;</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="s">&#39;help &#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;?&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s">&#39;help &#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;do_shell&#39;</span><span class="p">):</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="s">&#39;shell &#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -188,11 +187,11 @@
         <span class="c"># Store this action for later use. This action is unique</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parmout</span> <span class="o">=</span> <span class="n">COMMANDMAP</span><span class="p">[</span><span class="s">&#39;parmout&#39;</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">ParmedError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Action parmout failed.</span><span class="se">\n\t</span><span class="s">&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">err</span>
+                <span class="k">raise</span>
    </div>
     <span class="k">def</span> <span class="nf">_normaldo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ActionClass</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The standard action command does this stuff &quot;&quot;&quot;</span>
@@ -202,7 +201,7 @@
             <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
                 <span class="n">action</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-        <span class="k">except</span> <span class="n">ParmedError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Action </span><span class="si">%s</span><span class="s"> failed</span><span class="se">\n\t</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">actionname</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
@@ -257,7 +256,7 @@
             <span class="k">except</span> <span class="n">ParmedError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">err</span>
+                    <span class="k">raise</span>
 
         <span class="k">return</span> <span class="bp">True</span>
 

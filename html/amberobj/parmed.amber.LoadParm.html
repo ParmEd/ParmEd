@@ -55,7 +55,7 @@
 <h1>parmed.amber.LoadParm<a class="headerlink" href="#parmed-amber-loadparm" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="parmed.amber.LoadParm">
-<tt class="descclassname">parmed.amber.</tt><tt class="descname">LoadParm</tt><big>(</big><em>parmname</em>, <em>rst7name=None</em><big>)</big><a class="headerlink" href="#parmed.amber.LoadParm" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">parmed.amber.</tt><tt class="descname">LoadParm</tt><big>(</big><em>parmname</em>, <em>xyz=None</em>, <em>box=None</em>, <em>rst7_name=None</em><big>)</big><a class="headerlink" href="#parmed.amber.LoadParm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a topology file using the correct class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -65,9 +65,16 @@
 <blockquote>
 <div><p>The name of the topology file to load</p>
 </div></blockquote>
-<p><strong>rst7name</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
+<p><strong>xyz</strong> : str or array, optional</p>
 <blockquote>
-<div><p>The name of the restart file to load</p>
+<div><p>If provided, the coordinates and unit cell dimensions from the provided
+Amber inpcrd/restart file will be loaded into the molecule, or the
+coordinates will be loaded from the coordinate array</p>
+</div></blockquote>
+<p><strong>box</strong> : array, optional</p>
+<blockquote>
+<div><p>If provided, the unit cell information will be set from the provided
+unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 </div></blockquote>
 </td>
 </tr>

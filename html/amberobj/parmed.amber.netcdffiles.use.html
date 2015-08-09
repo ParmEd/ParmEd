@@ -64,7 +64,7 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>package</strong> : str</p>
 <blockquote class="last">
 <div><p>This specifies which package to use, and may be either scipy, netCDF4,
-Scientific/ScientificPython, pynetcdf, or None.  If None, it chooses the
+Scientific/ScientificPython, or None.  If None, it chooses the
 first available implementation from the above list (in that order).</p>
 </div></blockquote>
 </td>
@@ -77,9 +77,6 @@ implementation if none has been selected before, so calling this function is
 unnecessary if the default implementation is sufficient. This is mostly
 useful for development testing as the backend NetCDF choice is virtually
 invisible to the user.</p>
-<p>The pynetcdf implementation has long since been abandoned (ca. 2006), and is
-not recommended for use. It appears to parse NetCDF files just fine, but it
-does not seem to write them successfully according to my tests.</p>
 <p>The NetCDF files have been tested against netCDF v. 1.0.4, Scientific
 v. 2.9.1, and scipy v. 0.13.1. Later versions are expected to work barring
 backwards-incompatible changes. Other versions are expected to work barring

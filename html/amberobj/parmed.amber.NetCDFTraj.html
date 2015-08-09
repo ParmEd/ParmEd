@@ -86,7 +86,31 @@ the default constructor</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">remd_dimtype</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></td>
 <td></td>
 </tr>
 </tbody>
@@ -122,23 +146,11 @@ the default constructor</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><tt class="xref py py-obj docutils literal"><span class="pre">add_velocities</span></tt></a>(stuff)</td>
 <td>Adds a new velocities frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.box" title="parmed.amber.NetCDFTraj.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>(frame)</td>
-<td>Get the cell lengths and angles as one array</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.cell_lengths_angles" title="parmed.amber.NetCDFTraj.cell_lengths_angles"><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></tt></a>(frame)</td>
-<td>Get the cell lengths and cell angles of a particular frame in the</td>
-</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.close" title="parmed.amber.NetCDFTraj.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
 <td>Closes the NetCDF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.coordinates" title="parmed.amber.NetCDFTraj.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>(frame)</td>
-<td>Get the coordinates of a particular frame in the trajectory</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt>()</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt>()</td>
 <td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></a>(frame)</td>
-<td>Get the forces of a particular frame in the trajectory</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as an Amber NetCDF trajectory file</td>
@@ -148,18 +160,6 @@ the default constructor</p>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.remd_indices" title="parmed.amber.NetCDFTraj.remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></a>(frame)</td>
-<td>Returns the REMD indices for the desired frame</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.temp0" title="parmed.amber.NetCDFTraj.temp0"><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></a>(frame)</td>
-<td>Returns the temperature of the current frame in kelvin</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.time" title="parmed.amber.NetCDFTraj.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a>(frame)</td>
-<td>Get the time of a particular frame in the trajectory</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a>(frame)</td>
-<td>Get the velocities of a particular frame in the trajectory</td>
 </tr>
 </tbody>
 </table>
@@ -203,23 +203,23 @@ the default constructor</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><tt class="xref py py-obj docutils literal"><span class="pre">add_velocities</span></tt></a>(stuff)</td>
 <td>Adds a new velocities frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.box" title="parmed.amber.NetCDFTraj.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a>(frame)</td>
-<td>Get the cell lengths and angles as one array</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.cell_lengths_angles" title="parmed.amber.NetCDFTraj.cell_lengths_angles"><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></tt></a>(frame)</td>
-<td>Get the cell lengths and cell angles of a particular frame in the</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.close" title="parmed.amber.NetCDFTraj.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
 <td>Closes the NetCDF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.coordinates" title="parmed.amber.NetCDFTraj.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a>(frame)</td>
-<td>Get the coordinates of a particular frame in the trajectory</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></a>(frame)</td>
-<td>Get the forces of a particular frame in the trajectory</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as an Amber NetCDF trajectory file</td>
@@ -230,17 +230,17 @@ the default constructor</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.remd_indices" title="parmed.amber.NetCDFTraj.remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></a>(frame)</td>
-<td>Returns the REMD indices for the desired frame</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.temp0" title="parmed.amber.NetCDFTraj.temp0"><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></a>(frame)</td>
-<td>Returns the temperature of the current frame in kelvin</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.time" title="parmed.amber.NetCDFTraj.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a>(frame)</td>
-<td>Get the time of a particular frame in the trajectory</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a>(frame)</td>
-<td>Get the velocities of a particular frame in the trajectory</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -436,106 +436,9 @@ constructor.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="parmed.amber.NetCDFTraj.box">
-<tt class="descname">box</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the cell lengths and angles as one array</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Frame to get the box from</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">6-element array with 3 lengths followed by 3 angles (in degrees)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.cell_lengths_angles">
-<tt class="descname">cell_lengths_angles</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.cell_lengths_angles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the cell lengths and cell angles of a particular frame in the
-trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Which snapshot to get (first snapshot is frame 0)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">lengths, angles</p>
-<blockquote class="last">
-<div><p>2-element tuple: (length-3 numpy array of cell lengths, length-3
-numpy array of cell angles) in Angstroms</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="parmed.amber.NetCDFTraj.close">
 <tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes the NetCDF file</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.coordinates">
-<tt class="descname">coordinates</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.coordinates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the coordinates of a particular frame in the trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Which snapshot to get (first snapshot is frame 0)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">coordinates</p>
-<blockquote class="last">
-<div><p>numpy array of length 3*natom with the given coordinates in the
-format [x1, y1, z1, x2, y2, z2, ...] in Angstroms</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.forces">
-<tt class="descname">forces</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.forces" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the forces of a particular frame in the trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Which snapshot to get (first snapshot is frame 0)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">forces</p>
-<blockquote class="last">
-<div><p>numpy array of length 3*atom with the given forces properly
-scaled to be of kcal/mol/Angstroms</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -560,6 +463,8 @@ scaled to be of kcal/mol/Angstroms</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>Remote NetCDF files cannot be loaded</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -625,91 +530,6 @@ None if no REMD information is written</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
 <blockquote class="last">
 <div><p>File name of the trajectory to open. It must exist</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.remd_indices">
-<tt class="descname">remd_indices</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.remd_indices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the REMD indices for the desired frame</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote class="last">
-<div><p>The frame to get the REMD indices from (0 is the first frame)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.temp0">
-<tt class="descname">temp0</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.temp0" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the temperature of the current frame in kelvin</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote class="last">
-<div><p>The frame to get the temperature from (0 is the first frame)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.time">
-<tt class="descname">time</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the time of a particular frame in the trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Which snapshot to get (first snapshot is frame 0)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>time</strong> : float</p>
-<blockquote class="last">
-<div><p>The time of the given frame in ps</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.NetCDFTraj.velocities">
-<tt class="descname">velocities</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.velocities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the velocities of a particular frame in the trajectory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Which snapshot to get (first snapshot is frame 0)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">velocities</p>
-<blockquote class="last">
-<div><p>numpy array of length 3*atom with the given velocities properly
-scaled to be of units angstrom/picosecond</p>
 </div></blockquote>
 </td>
 </tr>

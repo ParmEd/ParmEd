@@ -210,13 +210,10 @@
                                 <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 
     <span class="c"># Check that ATOMS_PER_MOLECULE == NATOM</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">])</span> <span class="o">!=</span> 
-            <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="s">&#39;ATOMS_PER_MOLECULE&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;sum(ATOMS_PER_MOLECULE) != NATOM. Use &#39;</span>
-                <span class="s">&#39;&quot;setMolecules&quot; to fix this&#39;</span><span class="p">,</span> <span class="n">FixableParmWarning</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="k">pass</span>
+                          <span class="s">&#39;&quot;setMolecules&quot; to fix this&#39;</span><span class="p">,</span> <span class="n">FixableParmWarning</span><span class="p">)</span>
 
     <span class="c"># Duplicate pmemd&#39;s checks</span>
     <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifpert&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -268,7 +265,7 @@
                           <span class="s">&#39;disulfide bond?&#39;</span><span class="p">,</span> <span class="n">MissingDisulfide</span><span class="p">)</span>
             <span class="k">break</span>
 
-    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="c"># Check if we think any disulfide bonds might be missing.</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="s">&#39;:CYS,CYM@SG&#39;</span><span class="p">)</span>
         <span class="n">s_atms</span> <span class="o">=</span> <span class="p">[]</span>

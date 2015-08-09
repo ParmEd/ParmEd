@@ -162,8 +162,8 @@
         <span class="k">print</span><span class="p">(</span><span class="n">splash</span><span class="p">)</span>
     
     <span class="c"># Set our warning filter</span>
-    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;error&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">SeriousParmWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;always&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">SeriousParmWarning</span><span class="p">)</span>
     
     <span class="c"># Set our overwrite preferences</span>
     <span class="n">Action</span><span class="o">.</span><span class="n">overwrite</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">overwrite</span>
@@ -226,6 +226,7 @@
                     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;# Log started on&#39;</span><span class="p">):</span> <span class="k">continue</span>
                         <span class="n">readline</span><span class="o">.</span><span class="n">add_history</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">logfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">logfile</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
@@ -261,7 +262,7 @@
     <span class="kn">from</span> <span class="nn">optparse</span> <span class="kn">import</span> <span class="n">OptionParser</span>
     <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">split</span>
     <span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="n">ParmError</span>
-    <span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">__version__</span>
+    <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">__version__</span>
     <span class="kn">from</span> <span class="nn">parmed.tools.gui.guitools</span> <span class="kn">import</span> <span class="n">ParmedApp</span>
     <span class="kn">from</span> <span class="nn">parmed.tools.gui.guifiletools</span> <span class="kn">import</span> <span class="n">file_chooser</span>
     <span class="kn">from</span> <span class="nn">parmed.tools.logos</span> <span class="kn">import</span> <span class="n">Logo</span>

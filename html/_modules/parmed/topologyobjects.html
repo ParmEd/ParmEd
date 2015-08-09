@@ -76,7 +76,7 @@
            <span class="s">&#39;AmoebaNonbondedExceptionType&#39;</span><span class="p">,</span> <span class="s">&#39;AcceptorDonor&#39;</span><span class="p">,</span> <span class="s">&#39;Group&#39;</span><span class="p">,</span> <span class="s">&#39;AtomType&#39;</span><span class="p">,</span>
            <span class="s">&#39;NoUreyBradley&#39;</span><span class="p">,</span> <span class="s">&#39;ExtraPoint&#39;</span><span class="p">,</span> <span class="s">&#39;TwoParticleExtraPointFrame&#39;</span><span class="p">,</span>
            <span class="s">&#39;ThreeParticleExtraPointFrame&#39;</span><span class="p">,</span> <span class="s">&#39;OutOfPlaneExtraPointFrame&#39;</span><span class="p">,</span>
-           <span class="s">&#39;RBTorsionType&#39;</span><span class="p">,</span> <span class="s">&#39;lorentz_berthelot&#39;</span><span class="p">,</span> <span class="s">&#39;geometric&#39;</span><span class="p">]</span>
+           <span class="s">&#39;RBTorsionType&#39;</span><span class="p">]</span>
 
 <span class="c"># Create the AKMA unit system which is the unit system used by Amber and CHARMM</span>
 
@@ -250,7 +250,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    An atom. Only use these as elements in AtomList instances, since AtomList</span>
 <span class="sd">    will keep track of when indexes and other stuff needs to be updated. All</span>
@@ -320,11 +320,10 @@
 <span class="sd">        In some cases, &quot;type&quot; is an ambiguous choice of an integer serial number</span>
 <span class="sd">        or a string descriptor. In this case, atom_type is an AtomType instance</span>
 <span class="sd">        that disambiguates this discrepancy.</span>
-<span class="sd">    anisou : ``numpy.ndarray(float64) (or list of floats)``</span>
+<span class="sd">    anisou : numpy.ndarray(float64) (or list of floats)</span>
 <span class="sd">        Anisotropic temperature scaling factors. This is a 6-element numpy array</span>
-<span class="sd">        (if numpy is not available, it is a 6-element list) of floating point</span>
-<span class="sd">        numbers. They are the 3x3 symmetric matrix elements U(1,1), U(2,2),</span>
-<span class="sd">        U(3,3), U(1,2), U(1,3), U(2,3). If no factors available, it is None.</span>
+<span class="sd">        They are the 3x3 symmetric matrix elements U(1,1), U(2,2), U(3,3),</span>
+<span class="sd">        U(1,2), U(1,3), U(2,3). If no factors available, it is None.</span>
 <span class="sd">    idx : ``int``</span>
 <span class="sd">        The index of this atom in the list. Set to -1 if this atom is not part</span>
 <span class="sd">        of a list or the index cannot otherwise be determined (i.e., if the</span>
@@ -578,7 +577,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Atom.bond_partners"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.bond_partners">[docs]</a>    <span class="k">def</span> <span class="nf">bond_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.bond_partners"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.bond_partners">[docs]</a>    <span class="k">def</span> <span class="nf">bond_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Go through all bonded partners &quot;&quot;&quot;</span>
         <span class="n">bp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bond_partners</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bond_partners</span><span class="p">:</span>
@@ -587,7 +586,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bp</span><span class="p">))</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Atom.angle_partners"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.angle_partners">[docs]</a>    <span class="k">def</span> <span class="nf">angle_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.angle_partners"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.angle_partners">[docs]</a>    <span class="k">def</span> <span class="nf">angle_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; List of all angle partners that are NOT bond partners &quot;&quot;&quot;</span>
         <span class="n">bp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bond_partners</span><span class="p">)</span>
         <span class="n">ap</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_angle_partners</span><span class="p">)</span> <span class="o">-</span> <span class="n">bp</span>
@@ -599,7 +598,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ap</span><span class="p">))</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Atom.dihedral_partners"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.dihedral_partners">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.dihedral_partners"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.dihedral_partners">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s">&quot; List of all dihedral partners that are NOT angle or bond partners &quot;</span>
         <span class="n">bp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bond_partners</span><span class="p">)</span>
         <span class="n">ap</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_angle_partners</span><span class="p">)</span>
@@ -612,7 +611,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dp</span><span class="p">))</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Atom.tortor_partners"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.tortor_partners">[docs]</a>    <span class="k">def</span> <span class="nf">tortor_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.tortor_partners"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.tortor_partners">[docs]</a>    <span class="k">def</span> <span class="nf">tortor_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of all 1-5 partners that are NOT in angle or bond partners. This is</span>
 <span class="sd">        *only* used in the Amoeba force field</span>
@@ -629,7 +628,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
 </div>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Atom.exclusion_partners"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.exclusion_partners">[docs]</a>    <span class="k">def</span> <span class="nf">exclusion_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.exclusion_partners"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.exclusion_partners">[docs]</a>    <span class="k">def</span> <span class="nf">exclusion_partners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        List of all exclusions not otherwise excluded by bonds/angles/torsions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -661,7 +660,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span>
 
     <span class="nd">@rmin.setter</span>
-<div class="viewcode-block" id="Atom.rmin"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.rmin">[docs]</a>    <span class="k">def</span> <span class="nf">rmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.rmin"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.rmin">[docs]</a>    <span class="k">def</span> <span class="nf">rmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Lennard-Jones Rmin/2 parameter (the Lennard-Jones radius) &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -675,7 +674,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="nd">@sigma.setter</span>
-<div class="viewcode-block" id="Atom.sigma"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.sigma">[docs]</a>    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.sigma"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.sigma">[docs]</a>    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </div>
     <span class="nd">@property</span>
@@ -689,7 +688,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span>
 
     <span class="nd">@epsilon.setter</span>
-<div class="viewcode-block" id="Atom.epsilon"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.epsilon">[docs]</a>    <span class="k">def</span> <span class="nf">epsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.epsilon"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.epsilon">[docs]</a>    <span class="k">def</span> <span class="nf">epsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Lennard-Jones epsilon parameter (the Lennard-Jones well depth) &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -704,7 +703,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span>
 
     <span class="nd">@rmin_14.setter</span>
-<div class="viewcode-block" id="Atom.rmin_14"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.rmin_14">[docs]</a>    <span class="k">def</span> <span class="nf">rmin_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.rmin_14"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.rmin_14">[docs]</a>    <span class="k">def</span> <span class="nf">rmin_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The 1-4 Lennard-Jones Rmin/2 parameter &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -719,7 +718,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="nd">@sigma_14.setter</span>
-<div class="viewcode-block" id="Atom.sigma_14"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.sigma_14">[docs]</a>    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.sigma_14"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.sigma_14">[docs]</a>    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </div>
     <span class="nd">@property</span>
@@ -733,13 +732,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon14</span>
 
     <span class="nd">@epsilon_14.setter</span>
-<div class="viewcode-block" id="Atom.epsilon_14"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.epsilon_14">[docs]</a>    <span class="k">def</span> <span class="nf">epsilon_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.epsilon_14"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.epsilon_14">[docs]</a>    <span class="k">def</span> <span class="nf">epsilon_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The 1-4 Lennard-Jones Rmin/2 parameter &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.nonbonded_exclusions"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.nonbonded_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">nonbonded_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only_greater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">index_from</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.nonbonded_exclusions"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.nonbonded_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">nonbonded_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only_greater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">index_from</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the total number of nonbonded atom exclusions for this atom. The</span>
 <span class="sd">        general rules for building the exclusion list is to include both</span>
@@ -815,7 +814,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.bond_to"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.bond_to">[docs]</a>    <span class="k">def</span> <span class="nf">bond_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.bond_to"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.bond_to">[docs]</a>    <span class="k">def</span> <span class="nf">bond_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log this atom as bonded to another atom.</span>
 <span class="sd">        </span>
@@ -840,7 +839,7 @@
 
     <span class="c">#===================================================</span>
       </div>
-<div class="viewcode-block" id="Atom.angle_to"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.angle_to">[docs]</a>    <span class="k">def</span> <span class="nf">angle_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.angle_to"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.angle_to">[docs]</a>    <span class="k">def</span> <span class="nf">angle_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log this atom as angled to another atom.</span>
 
@@ -861,7 +860,7 @@
    
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.dihedral_to"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.dihedral_to">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.dihedral_to"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.dihedral_to">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log this atom as dihedral-ed to another atom.</span>
 <span class="sd">        </span>
@@ -882,7 +881,7 @@
       
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.tortor_to"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.tortor_to">[docs]</a>    <span class="k">def</span> <span class="nf">tortor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.tortor_to"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.tortor_to">[docs]</a>    <span class="k">def</span> <span class="nf">tortor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log this atom as 1-5 partners to another atom</span>
 
@@ -903,7 +902,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.exclude"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.exclude">[docs]</a>    <span class="k">def</span> <span class="nf">exclude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.exclude"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.exclude">[docs]</a>    <span class="k">def</span> <span class="nf">exclude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add one atom to my arbitrary exclusion list</span>
 
@@ -924,7 +923,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.reset_topology"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.reset_topology">[docs]</a>    <span class="k">def</span> <span class="nf">reset_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_exclusions</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.reset_topology"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.reset_topology">[docs]</a>    <span class="k">def</span> <span class="nf">reset_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_exclusions</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Empties all of the bond, angle, and dihedral partners so they can be set</span>
 <span class="sd">        up again with updated data.</span>
@@ -944,7 +943,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Atom.prune_exclusions"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom.prune_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">prune_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.prune_exclusions"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.prune_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">prune_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For extra points, the exclusion partners may be filled before the bond,</span>
 <span class="sd">        angle, dihedral, and tortor partners. Since we don&#39;t want memory of</span>
@@ -1652,7 +1651,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div></div>
-<div class="viewcode-block" id="Bond"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond">[docs]</a><span class="k">class</span> <span class="nc">Bond</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Bond"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Bond">[docs]</a><span class="k">class</span> <span class="nc">Bond</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A covalent bond connecting two atoms.</span>
 
@@ -1705,7 +1704,7 @@
         <span class="sd">&quot;&quot;&quot; Quick and easy way to see if an Atom is in this Bond &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">thing</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">or</span> <span class="n">thing</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span>
 
-<div class="viewcode-block" id="Bond.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Bond.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Bond.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this bond from the atoms that make it up. This method removes</span>
 <span class="sd">        this bond from the `bonds` list for both atom1 and atom2 as well as</span>
@@ -1724,7 +1723,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="BondType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType">[docs]</a><span class="k">class</span> <span class="nc">BondType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="BondType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.BondType">[docs]</a><span class="k">class</span> <span class="nc">BondType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A bond type with a set of bond parameters</span>
 
@@ -1791,7 +1790,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="Angle"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle">[docs]</a><span class="k">class</span> <span class="nc">Angle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Angle"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Angle">[docs]</a><span class="k">class</span> <span class="nc">Angle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A valence angle between 3 atoms separated by two covalent bonds.</span>
 
@@ -1855,7 +1854,7 @@
         <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Angle.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Angle.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Angle.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this angle from the atoms that make it up. This method removes</span>
 <span class="sd">        this angle from the `angles` list for atom1, atom2, and atom3 as well as</span>
@@ -1880,7 +1879,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="AngleType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AngleType.html#parmed.topologyobjects.AngleType">[docs]</a><span class="k">class</span> <span class="nc">AngleType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="AngleType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AngleType">[docs]</a><span class="k">class</span> <span class="nc">AngleType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An angle type with a set of angle parameters</span>
 
@@ -1942,7 +1941,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="Dihedral"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral">[docs]</a><span class="k">class</span> <span class="nc">Dihedral</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
+<div class="viewcode-block" id="Dihedral"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Dihedral">[docs]</a><span class="k">class</span> <span class="nc">Dihedral</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A valence dihedral between 4 atoms separated by three covalent bonds.</span>
 
@@ -2059,7 +2058,7 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Dihedral.same_atoms"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral.same_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">same_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+<div class="viewcode-block" id="Dihedral.same_atoms"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Dihedral.same_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">same_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines if this dihedral has the same atoms (or atom indexes) as</span>
 <span class="sd">        another object</span>
@@ -2108,7 +2107,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Dihedral.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dihedral.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Dihedral.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this dihedral from the atoms that make it up. This method</span>
 <span class="sd">        removes this dihedral from the `dihedrals` list for atom1, atom2, atom3,</span>
@@ -2148,7 +2147,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="DihedralType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.DihedralType.html#parmed.topologyobjects.DihedralType">[docs]</a><span class="k">class</span> <span class="nc">DihedralType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="DihedralType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralType">[docs]</a><span class="k">class</span> <span class="nc">DihedralType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A dihedral type with a set of dihedral parameters</span>
 
@@ -2250,6 +2249,10 @@
 <span class="sd">        The coefficient of the quartic term in kcal/mol</span>
 <span class="sd">    c5 : float</span>
 <span class="sd">        The coefficient of the quintic term in kcal/mol</span>
+<span class="sd">    scee : float, optional</span>
+<span class="sd">        1-4 electrostatic scaling factor. Default is 1.0</span>
+<span class="sd">    scnb : float, optional</span>
+<span class="sd">        1-4 van der Waals scaling factor. Default is 1.0</span>
 <span class="sd">    list : TrackedList=None</span>
 <span class="sd">        A list of `RBTorsionType`s in which this is a member</span>
 
@@ -2288,7 +2291,7 @@
 
     <span class="c">#===================================================</span>
    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">c5</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">c5</span><span class="p">,</span> <span class="n">scee</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scnb</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c0</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c1</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
@@ -2296,6 +2299,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">c3</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">c3</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c4</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">c4</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c5</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">c5</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scee</span> <span class="o">=</span> <span class="n">scee</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span> <span class="o">=</span> <span class="n">scnb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
@@ -2307,17 +2312,18 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">c4</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">c4</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">c5</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">c5</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">RBTorsionType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">c3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c5</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RBTorsionType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c4</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">c5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s">&#39;&lt;RBTorsionType; c0=</span><span class="si">%.3f</span><span class="s">; c1=</span><span class="si">%.3f</span><span class="s">; c2=</span><span class="si">%.3f</span><span class="s">; c3=</span><span class="si">%.3f</span><span class="s">; c4=</span><span class="si">%.3f</span><span class="s">; &#39;</span>
-                <span class="s">&#39;c5=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c4</span><span class="p">,</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">c5</span><span class="p">))</span>
+                <span class="s">&#39;c5=</span><span class="si">%.3f</span><span class="s">; scee=</span><span class="si">%s</span><span class="s">; scnb=</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c5</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="DihedralTypeList"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList">[docs]</a><span class="k">class</span> <span class="nc">DihedralTypeList</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">_ListItem</span><span class="p">):</span>
+<div class="viewcode-block" id="DihedralTypeList"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList">[docs]</a><span class="k">class</span> <span class="nc">DihedralTypeList</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">_ListItem</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dihedral types are a Fourier expansion of terms. In some cases, they are</span>
 <span class="sd">    stored in a list like this one inside another TrackedList. In other cases,</span>
@@ -2353,7 +2359,7 @@
                 <span class="k">return</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="bp">True</span>
 
-<div class="viewcode-block" id="DihedralTypeList.append"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="DihedralTypeList.append"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds a DihedralType to the DihedralTypeList</span>
 
 <span class="sd">        Parameters</span>
@@ -2399,7 +2405,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="UreyBradley"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley">[docs]</a><span class="k">class</span> <span class="nc">UreyBradley</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="UreyBradley"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.UreyBradley">[docs]</a><span class="k">class</span> <span class="nc">UreyBradley</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A Urey-Bradley angle type with a set of parameters. It has the same</span>
 <span class="sd">    functional form as a bond, but it is defined between two atoms forming a</span>
@@ -2485,7 +2491,7 @@
         <span class="c"># bonds</span>
         <span class="k">return</span> <span class="bp">False</span>
 
-<div class="viewcode-block" id="UreyBradley.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="UreyBradley.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.UreyBradley.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this Urey-Bradley from the atoms that make it up. This method</span>
 <span class="sd">        removes this urey-bradley from the `urey_bradleys` list for atom1 and</span>
@@ -2502,7 +2508,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="Improper"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper">[docs]</a><span class="k">class</span> <span class="nc">Improper</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
+<div class="viewcode-block" id="Improper"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Improper">[docs]</a><span class="k">class</span> <span class="nc">Improper</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A CHARMM-style improper torsion between 4 atoms. The first atom must be the</span>
 <span class="sd">    central atom, as shown in the schematic below</span>
@@ -2569,7 +2575,7 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Improper.same_atoms"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper.same_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">same_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+<div class="viewcode-block" id="Improper.same_atoms"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Improper.same_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">same_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        An improper has the same 4 atoms if atom1 is the same for both and the</span>
 <span class="sd">        other 3 can be in any order</span>
@@ -2588,14 +2594,14 @@
         <span class="c"># Here, atoms are expected to index from 0 (Python standard) if we</span>
         <span class="c"># are comparing with a list or tuple</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DihedralError</span><span class="p">(</span><span class="s">&#39;Impropers have 4 atoms, not </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">MoleculeError</span><span class="p">(</span><span class="s">&#39;Impropers have 4 atoms, not </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">!=</span> <span class="n">thing</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">False</span>
         <span class="n">selfset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">])</span>
         <span class="n">otherset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">thing</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">thing</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">thing</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span>
         <span class="k">return</span> <span class="n">selfset</span> <span class="o">==</span> <span class="n">otherset</span>
 </div>
-<div class="viewcode-block" id="Improper.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Improper.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Improper.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this Improper from the atoms that make it up. This method</span>
 <span class="sd">        removes this Improper from the `impropers` list for atom1, atom2, atom3,</span>
@@ -2614,7 +2620,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="ImproperType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.ImproperType.html#parmed.topologyobjects.ImproperType">[docs]</a><span class="k">class</span> <span class="nc">ImproperType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="ImproperType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ImproperType">[docs]</a><span class="k">class</span> <span class="nc">ImproperType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An improper type with a set of improper torsion parameters</span>
 
@@ -2677,7 +2683,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="Cmap"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap">[docs]</a><span class="k">class</span> <span class="nc">Cmap</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Cmap"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Cmap">[docs]</a><span class="k">class</span> <span class="nc">Cmap</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A coupled-torsion correction map term defined between 5 atoms connected by</span>
 <span class="sd">    four covalent bonds. This is a coupled-torsion potential in which the</span>
@@ -2737,7 +2743,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">funct</span> <span class="o">=</span> <span class="mi">1</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Cmap.extended"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap.extended">[docs]</a>    <span class="k">def</span> <span class="nf">extended</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span>
+<div class="viewcode-block" id="Cmap.extended"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Cmap.extended">[docs]</a>    <span class="k">def</span> <span class="nf">extended</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span>
                  <span class="n">atom5</span><span class="p">,</span> <span class="n">atom6</span><span class="p">,</span> <span class="n">atom7</span><span class="p">,</span> <span class="n">atom8</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Alternative constructor for correction maps defined with 8 atoms (each</span>
@@ -2794,7 +2800,7 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Cmap.same_atoms"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap.same_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">same_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+<div class="viewcode-block" id="Cmap.same_atoms"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Cmap.same_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">same_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A coupled-torsion is equivalent if the 5 atoms are in the same or</span>
 <span class="sd">        reverse order Allow comparison with another type of cmap or with a</span>
@@ -2813,8 +2819,8 @@
         <span class="c"># Here, atoms are expected to index from 0 (Python standard) if we</span>
         <span class="c"># are comparing with a list or tuple</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DihedralError</span><span class="p">(</span><span class="s">&#39;CMAP can compare to 5 elements, not </span><span class="si">%d</span><span class="s">&#39;</span>
-                                <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">thing</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">MoleculeError</span><span class="p">(</span><span class="s">&#39;CMAP can compare to 5 elements, not </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span>
+                                <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">thing</span><span class="p">)))</span>
         <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span>
                  <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">and</span>
                  <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="ow">or</span>
@@ -2822,7 +2828,7 @@
                  <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span>
                  <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">thing</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </div>
-<div class="viewcode-block" id="Cmap.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Cmap.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Cmap.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this Cmap from the atoms that make it up. This method removes</span>
 <span class="sd">        the Cmap from the `cmaps` list for atom1, atom2, atom3, atom4, and atom5</span>
@@ -2966,10 +2972,8 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The transpose of the potential grid &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_transpose&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transpose</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
         <span class="n">_transpose</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">):</span>
@@ -3065,7 +3069,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="TrigonalAngle"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.TrigonalAngle.html#parmed.topologyobjects.TrigonalAngle">[docs]</a><span class="k">class</span> <span class="nc">TrigonalAngle</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
+<div class="viewcode-block" id="TrigonalAngle"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrigonalAngle">[docs]</a><span class="k">class</span> <span class="nc">TrigonalAngle</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A trigonal-angle term in the AMOEBA force field. It exists in a pattern like</span>
 <span class="sd">    the one shown below</span>
@@ -3115,7 +3119,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="OutOfPlaneBend"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.OutOfPlaneBend.html#parmed.topologyobjects.OutOfPlaneBend">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneBend</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
+<div class="viewcode-block" id="OutOfPlaneBend"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.OutOfPlaneBend">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneBend</span><span class="p">(</span><span class="n">_FourAtomTerm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Out-of-plane bending term in the AMOEBA force field. The bond pattern is the</span>
 <span class="sd">    same as :class:`TrigonalAngle`</span>
@@ -3160,7 +3164,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="OutOfPlaneBendType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.OutOfPlaneBendType.html#parmed.topologyobjects.OutOfPlaneBendType">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneBendType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="OutOfPlaneBendType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.OutOfPlaneBendType">[docs]</a><span class="k">class</span> <span class="nc">OutOfPlaneBendType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An angle type with a set of angle parameters</span>
 
@@ -3218,7 +3222,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="PiTorsion"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.PiTorsion.html#parmed.topologyobjects.PiTorsion">[docs]</a><span class="k">class</span> <span class="nc">PiTorsion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PiTorsion"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.PiTorsion">[docs]</a><span class="k">class</span> <span class="nc">PiTorsion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;</span>
 <span class="sd">    Defines a pi-torsion term in the AMOEBA force field. The Pi-torsion is</span>
 <span class="sd">    defined around a sp2-hybridized pi-delocalized orbital (like an amide) by 6</span>
@@ -3285,7 +3289,7 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom6</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">))</span>
 
-<div class="viewcode-block" id="PiTorsion.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.PiTorsion.html#parmed.topologyobjects.PiTorsion.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PiTorsion.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.PiTorsion.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sets all atoms to None and deletes the type &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom6</span> <span class="o">=</span> <span class="bp">None</span>
@@ -3297,7 +3301,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="StretchBend"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.StretchBend.html#parmed.topologyobjects.StretchBend">[docs]</a><span class="k">class</span> <span class="nc">StretchBend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StretchBend"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.StretchBend">[docs]</a><span class="k">class</span> <span class="nc">StretchBend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This term models the stretching and bending of a standard valence angle, and</span>
 <span class="sd">    is used in the AMOEBA force field</span>
@@ -3336,7 +3340,7 @@
         <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="ow">in</span> <span class="n">thing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">))</span>
 
-<div class="viewcode-block" id="StretchBend.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.StretchBend.html#parmed.topologyobjects.StretchBend.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StretchBend.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.StretchBend.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sets all of the atoms and parameter type to None &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">None</span>
 </div>
@@ -3346,7 +3350,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="StretchBendType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.StretchBendType.html#parmed.topologyobjects.StretchBendType">[docs]</a><span class="k">class</span> <span class="nc">StretchBendType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="StretchBendType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.StretchBendType">[docs]</a><span class="k">class</span> <span class="nc">StretchBendType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A stretch-bend type with two distances and an angle in AMOEBA</span>
 
@@ -3424,7 +3428,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="TorsionTorsion"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.TorsionTorsion.html#parmed.topologyobjects.TorsionTorsion">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsion</span><span class="p">(</span><span class="n">Cmap</span><span class="p">):</span>
+<div class="viewcode-block" id="TorsionTorsion"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsion</span><span class="p">(</span><span class="n">Cmap</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a coupled-torsion map used in the AMOEBA force field similar to the</span>
 <span class="sd">    correction-map (CMAP) potential used by the CHARMM force field</span>
@@ -3483,7 +3487,7 @@
                       <span class="ne">DeprecationWarning</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
 </div>
-<div class="viewcode-block" id="TorsionTorsion.delete"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.TorsionTorsion.html#parmed.topologyobjects.TorsionTorsion.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TorsionTorsion.delete"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes this TorsionTorsion from the atoms that make it up. This method</span>
 <span class="sd">        removes the TorsionTorsion from the `tortors` list for atom1, atom2,</span>
@@ -3601,7 +3605,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="TorsionTorsionType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.TorsionTorsionType.html#parmed.topologyobjects.TorsionTorsionType">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsionType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
+<div class="viewcode-block" id="TorsionTorsionType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsionType">[docs]</a><span class="k">class</span> <span class="nc">TorsionTorsionType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The type containing the parameter maps for the Amoeba torsion-torsion</span>
 <span class="sd">    potentials. It contains the original potential as well as interpolated first</span>
@@ -3706,7 +3710,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="ChiralFrame"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.ChiralFrame.html#parmed.topologyobjects.ChiralFrame">[docs]</a><span class="k">class</span> <span class="nc">ChiralFrame</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ChiralFrame"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ChiralFrame">[docs]</a><span class="k">class</span> <span class="nc">ChiralFrame</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A chiral frame as defined in the AMOEBA force field. It defines the frame of</span>
 <span class="sd">    reference for a chiral center</span>
@@ -3741,7 +3745,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="MultipoleFrame"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.MultipoleFrame.html#parmed.topologyobjects.MultipoleFrame">[docs]</a><span class="k">class</span> <span class="nc">MultipoleFrame</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MultipoleFrame"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.MultipoleFrame">[docs]</a><span class="k">class</span> <span class="nc">MultipoleFrame</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This defines the frame of reference for computing multipole interactions in</span>
 <span class="sd">    the AMOEBA force field.</span>
@@ -3786,7 +3790,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="Residue"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue">[docs]</a><span class="k">class</span> <span class="nc">Residue</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">):</span>
+<div class="viewcode-block" id="Residue"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Residue">[docs]</a><span class="k">class</span> <span class="nc">Residue</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A single residue that is composed of a small number of atoms</span>
 
@@ -3843,7 +3847,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ter</span> <span class="o">=</span> <span class="bp">False</span>
 </div>
-<div class="viewcode-block" id="Residue.add_atom"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+<div class="viewcode-block" id="Residue.add_atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Residue.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds an atom to this residue</span>
 
 <span class="sd">        Parameters</span>
@@ -3858,7 +3862,7 @@
         <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Residue.delete_atom"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue.delete_atom">[docs]</a>    <span class="k">def</span> <span class="nf">delete_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+<div class="viewcode-block" id="Residue.delete_atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Residue.delete_atom">[docs]</a>    <span class="k">def</span> <span class="nf">delete_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If an atom is present in this residue, delete it from the list of</span>
 <span class="sd">        atoms. No change if an atom is not present in this residue.</span>
@@ -3879,7 +3883,7 @@
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Residue.is_empty"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Residue.is_empty"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Residue.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines if there are any atoms in this residue</span>
 
@@ -3890,7 +3894,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 </div>
-<div class="viewcode-block" id="Residue.sort"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue.sort">[docs]</a>    <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Residue.sort"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Residue.sort">[docs]</a>    <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sorts the atoms in this list by atom index &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 </div>
@@ -3958,10 +3962,21 @@
 <span class="sd">    &gt;&gt;&gt; tl.needs_indexing, tl.changed</span>
 <span class="sd">    (False, False)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_indexing</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">([</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">...</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;])&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">retstr</span><span class="p">)</span>
 
     <span class="nd">@_changes</span>
     <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
@@ -3975,10 +3990,12 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="c"># If we can&#39;t set _idx attribute on this object, don&#39;t fret</span>
                 <span class="k">pass</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="c"># If we can&#39;t set list attribute on this object, don&#39;t fret</span>
                 <span class="k">pass</span>
 
         <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
@@ -3992,10 +4009,12 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="c"># If we can&#39;t set _idx attribute on this object, don&#39;t fret</span>
                 <span class="k">pass</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="c"># If we can&#39;t set list attribute on this object, don&#39;t fret</span>
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__delslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
 
@@ -4027,15 +4046,6 @@
 
     <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fac</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TrackedList</span><span class="p">(</span><span class="nb">list</span><span class="o">.</span><span class="n">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fac</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="s">&#39;indices&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">TrackedList</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">retval</span>
-
-    <span class="k">def</span> <span class="nf">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">TrackedList</span><span class="p">(</span><span class="nb">list</span><span class="o">.</span><span class="n">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
 
 <div class="viewcode-block" id="TrackedList.index_members"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList.index_members">[docs]</a>    <span class="k">def</span> <span class="nf">index_members</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -4078,10 +4088,10 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div></div>
-<div class="viewcode-block" id="ResidueList"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList">[docs]</a><span class="k">class</span> <span class="nc">ResidueList</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueList"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList">[docs]</a><span class="k">class</span> <span class="nc">ResidueList</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Array of `Residue` instances &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ResidueList.add_atom"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueList.add_atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the ResidueList, adding a new residue to this list if</span>
 <span class="sd">        it has a different name or number as the last residue</span>
@@ -4122,7 +4132,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">last</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="ResidueList.prune"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.prune">[docs]</a>    <span class="k">def</span> <span class="nf">prune</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueList.prune"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.prune">[docs]</a>    <span class="k">def</span> <span class="nf">prune</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function goes through the residue list and removes all empty</span>
 <span class="sd">        residues from the list. This isn&#39;t done automatically when atoms are</span>
@@ -4136,7 +4146,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div></div>
-<div class="viewcode-block" id="AtomList"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList">[docs]</a><span class="k">class</span> <span class="nc">AtomList</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomList"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList">[docs]</a><span class="k">class</span> <span class="nc">AtomList</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Array of Atoms</span>
 
@@ -4191,7 +4201,7 @@
         <span class="n">atom</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="nb">list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="AtomList.unmark"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.unmark">[docs]</a>    <span class="k">def</span> <span class="nf">unmark</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomList.unmark"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.unmark">[docs]</a>    <span class="k">def</span> <span class="nf">unmark</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Unmark all atoms in this list &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">atm</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">atm</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="mi">0</span>
 </div>
@@ -4253,7 +4263,7 @@
         <span class="n">item</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="AtomList.assign_nbidx_from_types"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.assign_nbidx_from_types">[docs]</a>    <span class="k">def</span> <span class="nf">assign_nbidx_from_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomList.assign_nbidx_from_types"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.assign_nbidx_from_types">[docs]</a>    <span class="k">def</span> <span class="nf">assign_nbidx_from_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assigns the nb_idx attribute of every atom inside here from the</span>
 <span class="sd">        atom_type definition. If the atom_type is not assigned, RuntimeError is</span>
@@ -4310,7 +4320,7 @@
 
         <span class="k">return</span> <span class="n">nbfix_list</span>
 </div>
-<div class="viewcode-block" id="AtomList.find_original_index"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.find_original_index">[docs]</a>    <span class="k">def</span> <span class="nf">find_original_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomList.find_original_index"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList.find_original_index">[docs]</a>    <span class="k">def</span> <span class="nf">find_original_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds an atom with the given original index. Cannot assume that the</span>
 <span class="sd">        original indexes are in order, since reordering may have been necessary.</span>
@@ -4340,7 +4350,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="NonbondedException"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.NonbondedException.html#parmed.topologyobjects.NonbondedException">[docs]</a><span class="k">class</span> <span class="nc">NonbondedException</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="NonbondedException"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.NonbondedException">[docs]</a><span class="k">class</span> <span class="nc">NonbondedException</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The AMOEBA force field has complex exclusion and exception rules (referred</span>
 <span class="sd">    to as &quot;adjustments&quot; in the Amber-converted files). This class stores</span>
@@ -4381,7 +4391,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="NonbondedExceptionType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.NonbondedExceptionType.html#parmed.topologyobjects.NonbondedExceptionType">[docs]</a><span class="k">class</span> <span class="nc">NonbondedExceptionType</span><span class="p">(</span><span class="n">_ParameterType</span><span class="p">,</span> <span class="n">_ListItem</span><span class="p">):</span>
+<div class="viewcode-block" id="NonbondedExceptionType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.NonbondedExceptionType">[docs]</a><span class="k">class</span> <span class="nc">NonbondedExceptionType</span><span class="p">(</span><span class="n">_ParameterType</span><span class="p">,</span> <span class="n">_ListItem</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A parameter describing how the various nonbonded interactions between a</span>
 <span class="sd">    particular pair of atoms behaves in a specified nonbonded exception (e.g.,</span>
@@ -4457,7 +4467,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">polar_weight</span> <span class="o">=</span> <span class="n">polar_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mutual_weight</span> <span class="o">=</span> <span class="n">mutual_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vdw_weight</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">vdw_weight</span> <span class="ow">and</span>
@@ -4473,7 +4483,7 @@
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
-<div class="viewcode-block" id="AtomType"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomType.html#parmed.topologyobjects.AtomType">[docs]</a><span class="k">class</span> <span class="nc">AtomType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType">[docs]</a><span class="k">class</span> <span class="nc">AtomType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Atom types can either be compared by indexes or names. Can be assigned with</span>
 <span class="sd">    a string, integer, (string is not automatically cast) or with both.</span>
@@ -4578,7 +4588,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="n">other</span>
         <span class="k">return</span> <span class="n">other</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AtomType.set_lj_params"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomType.html#parmed.topologyobjects.AtomType.set_lj_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_lj_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">eps14</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rmin14</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomType.set_lj_params"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType.set_lj_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_lj_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">eps14</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rmin14</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sets Lennard-Jones parameters on this atom type &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">eps</span><span class="p">):</span>
             <span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
@@ -4607,7 +4617,7 @@
         <span class="sd">&quot;&quot;&quot; The integer representation of an AtomType is its index &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span>
 
-<div class="viewcode-block" id="AtomType.add_nbfix"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomType.html#parmed.topologyobjects.AtomType.add_nbfix">[docs]</a>    <span class="k">def</span> <span class="nf">add_nbfix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typename</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span>
+<div class="viewcode-block" id="AtomType.add_nbfix"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType.add_nbfix">[docs]</a>    <span class="k">def</span> <span class="nf">add_nbfix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typename</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span>
                   <span class="n">rmin14</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">epsilon14</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds a new NBFIX exclusion for this atom type</span>
 
@@ -4638,7 +4648,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmin</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="nd">@sigma.setter</span>
-<div class="viewcode-block" id="AtomType.sigma"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomType.html#parmed.topologyobjects.AtomType.sigma">[docs]</a>    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomType.sigma"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType.sigma">[docs]</a>    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rmin</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </div>
     <span class="nd">@property</span>
@@ -4647,7 +4657,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmin_14</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
     <span class="nd">@sigma_14.setter</span>
-<div class="viewcode-block" id="AtomType.sigma_14"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.AtomType.html#parmed.topologyobjects.AtomType.sigma_14">[docs]</a>    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomType.sigma_14"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomType.sigma_14">[docs]</a>    <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rmin_14</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 </div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -4744,94 +4754,6 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<span class="c"># Various combining rules and their inverses for homogenous pairs (i.e., a pair</span>
-<span class="c"># interacting with itself)</span>
-
-<div class="viewcode-block" id="lorentz_berthelot"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.lorentz_berthelot">[docs]</a><span class="k">def</span> <span class="nf">lorentz_berthelot</span><span class="p">(</span><span class="n">eps1</span><span class="p">,</span> <span class="n">eps2</span><span class="p">,</span> <span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Uses the Lorentz-Berthelot combining rules to compute Lennard-Jones</span>
-<span class="sd">    parameters for a particular atom pair. For flexibility, this function allows</span>
-<span class="sd">    you to specify *either* Rmin/2 or sigma values for the radii. You must</span>
-<span class="sd">    specify either rmin1 and rmin2 *or* sig1 and sig2, exactly.</span>
-
-<span class="sd">    The equation for these combining rules are:</span>
-
-<span class="sd">    eps_12 = sqrt(eps1*eps2)</span>
-<span class="sd">    rmin_12 = rmin1 + rmin2   or  sig_12 = 0.5*(sig1 + sig2)</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    eps1 : float</span>
-<span class="sd">        The epsilon of the first atom. Can have energy units</span>
-<span class="sd">    eps2 : float</span>
-<span class="sd">        The epsilon of the second atom.</span>
-<span class="sd">    sig1 : float</span>
-<span class="sd">        The sigma value of the first atom. Can have length units</span>
-<span class="sd">    sig2 : float</span>
-<span class="sd">        The sigma value of the second atom.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    eps12, sig12 : float, float</span>
-<span class="sd">        The well-depth (epsilon) parameter in kcal/mol and the sigma parameter</span>
-<span class="sd">        in angstroms.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    TypeError if the units are incompatible</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sigs</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">)</span>
-    <span class="n">eps1</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">eps1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
-    <span class="n">eps2</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">eps2</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
-    <span class="n">eps12</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">eps1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eps2</span><span class="p">))</span>
-    <span class="n">sig1</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
-    <span class="n">sig2</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">sig2</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
-    <span class="n">sig12</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig1</span> <span class="o">+</span> <span class="n">sig2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="k">return</span> <span class="n">eps12</span><span class="p">,</span> <span class="n">sig12</span>
-</div>
-<div class="viewcode-block" id="geometric"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.geometric">[docs]</a><span class="k">def</span> <span class="nf">geometric</span><span class="p">(</span><span class="n">eps1</span><span class="p">,</span> <span class="n">eps2</span><span class="p">,</span> <span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Uses the geometric combining rules to compute Lennard-Jones parameters for a</span>
-<span class="sd">    particular atom pair. For flexibility, this function allows you to specify</span>
-<span class="sd">    *either* Rmin/2 or sigma values for the radii. You must specify either rmin1</span>
-<span class="sd">    and rmin2 *or* sig1 and sig2, exactly.</span>
-
-<span class="sd">    The equation for these combining rules are:</span>
-
-<span class="sd">    eps_12 = sqrt(eps1*eps2)</span>
-<span class="sd">    sig_12 = sqrt(sig1*sig2)</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    eps1 : float</span>
-<span class="sd">        The epsilon of the first atom. Can have energy units</span>
-<span class="sd">    eps2 : float</span>
-<span class="sd">        The epsilon of the second atom.</span>
-<span class="sd">    sig1 : float</span>
-<span class="sd">        The sigma value of the first atom. Can have length units</span>
-<span class="sd">    sig2 : float</span>
-<span class="sd">        The sigma value of the second atom.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    eps12, sig12 : float, float</span>
-<span class="sd">        The well-depth (epsilon) parameter in kcal/mol and the sigma parameter</span>
-<span class="sd">        in angstroms.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    TypeError if the units are incompatible</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">eps1</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">eps1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
-    <span class="n">eps2</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">eps2</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
-    <span class="n">eps12</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">eps1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eps2</span><span class="p">))</span>
-    <span class="n">sig1</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">sig1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
-    <span class="n">sig2</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">sig2</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
-    <span class="n">sig12</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sig1</span> <span class="o">*</span> <span class="n">sig2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">eps12</span><span class="p">,</span> <span class="n">sig12</span>
-
-<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
-</div>
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">doctest</span>
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>

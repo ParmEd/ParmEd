@@ -9,8 +9,8 @@ class look intimidating, but its core features are the ``atoms`` attribute
 (e.g., PDB and PDBx/mmCIF), and these are the only two attributes currently
 populated through the PDB and mmCIF parsing routines.
 
-:class:`Structure` class
-------------------------
+:class:`Structure <parmed.structure.Structure>` class
+-----------------------------------------------------
 .. currentmodule:: parmed.structure
 .. autosummary::
     :toctree: structobj/
@@ -22,148 +22,99 @@ created by one of the parsers (see below for :func:`load_file
 <parmed.formats.registry.load_file>`) or extended to
 support the structure files of various computational parmed programs.
 
-:func:`load_file <parmed.formats.registry.load_file>`
---------------------------------------------------------
-.. currentmodule:: parmed.formats.registry
-.. autosummary::
-    :toctree: structobj/
+Attributes of :class:`Structure` instances
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    load_file
+The :class:`Structure` class has many attributes that store the various
+topological features and force field parameters of the molecular model. These
+include valence bonds, angles, torsions, and other more complex valence bond
+terms (like coupled-torsion correction maps and a variety of other terms
+describing common vibrational modes in the AMOEBA force field).
 
-The :func:`load_file` function automatically determines the format of the file
-whose name is passed as an argument. The following formats are currently
-recognized and result in the instantiation of either a :class:`Structure
-<parmed.structure.Structure>`. or one of its subclasses:
+Each of these attributes is stored in a :class:`TrackedList
+<parmed.topologyobjects.TrackedList>` instance, which is a simple subclass of
+the built-in ``list`` type that registers every time the list itself is changed
+(e.g., by adding an item, deleting an item, swapping two items, etc.). In this
+way, :class:`Structure` can determine whether or not certain cached attributes
+need to be updated. This is particularly important for various subclasses, like
+:class:`AmberParm <parmed.amber._amberparm.AmberParm>` in which the topological
+arrays and a dictionary of "raw data" need to be kept synchronized.
 
-1. PDB
-2. PDBx/mmCIF
-3. Gromacs GRO
-4. Gromacs topology file
-5. Amber topology file
-6. CHARMM PSF file
-7. Mol2 file
+You should never delete or reassign any of these list attributes---instead you
+should delete all of the items from the list using the idiom ``del mylist[:]``.
 
-Here, we will focus on instantiating a :class:`Structure
-<parmed.structure.Structure>` instance from PDB and
-mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
-Bank or the world wide Protein Data Bank often contain a large amount of
-metadata describing the structure, such as the citation information,
-experimental method (e.g., X-ray crystallography or NMR spectroscopy), authors,
-and related database entries (such as BMRB entries for NMR-solved structures).
-This information is extracted from both PDB and PDBx/mmCIF files when available,
-along with anisotropic B-factors.
+Every :class:`Structure` instance has the following :class:`TrackedList
+<parmed.topologyobjects.TrackedList>` attributes:
 
-The following sections will briefly demonstrate parsing a PDB file and a mmCIF
-file to a :class:`Structure <parmed.structure.Structure>` instance.
++--------------------+--------------------------------------------------------------------------------------------+
+| Attribute          | Description                                                                                |
++====================+============================================================================================+
+| bonds              | List of :class:`Bond <parmed.topologyobjects.Bond>` instances                              |
++--------------------+--------------------------------------------------------------------------------------------+
+| angles             | List of :class:`Angle <parmed.topologyobjects.Angle>` instances                            |
++--------------------+--------------------------------------------------------------------------------------------+
+| urey_bradleys      | List of :class:`UreyBradley <parmed.topologyobjects.UreyBradley>` instances                |
++--------------------+--------------------------------------------------------------------------------------------+
+| dihedrals          | List of :class:`Dihedral <parmed.topologyobjects.Dihedral>` instances                      |
++--------------------+--------------------------------------------------------------------------------------------+
+| impropers          | List of :class:`Improper <parmed.topologyobjects.Improper>` instances                      |
++--------------------+--------------------------------------------------------------------------------------------+
+| cmaps              | List of :class:`Cmap <parmed.topologyobjects.Cmap>` instances                              |
++--------------------+--------------------------------------------------------------------------------------------+
+| adjusts            | List of :class:`NonbondedException` <parmed.topologyobjects.NonbondedException>` instances |
++--------------------+--------------------------------------------------------------------------------------------+
+| stretch_bends      | List of :class:`StretchBend <parmed.topologyobjects.StretchBend>` instances                |
++--------------------+--------------------------------------------------------------------------------------------+
+| out_of_plane_bends | List of :class:`OutOfPlaneBend <parmed.topologyobjects.OutOfPlaneBend>` instances          |
++--------------------+--------------------------------------------------------------------------------------------+
+| trigonal_angles    | List of :class:`TrigonalAngle <parmed.topologyobjects.TrigonalAngle>` instances            |
++--------------------+--------------------------------------------------------------------------------------------+
+| torsion_torsions   | List of :class:`TorsionTorsion <parmed.topologyobjects.TorsionTorsion>` instances          |
++--------------------+--------------------------------------------------------------------------------------------+
+| pi_torsions        | List of :class:`PiTorsion <parmed.topologyobjects.PiTorsion>` instances                    |
++--------------------+--------------------------------------------------------------------------------------------+
+| chiral_frames      | List of :class:`ChiralFrame <parmed.topologyobjects.ChiralFrame>` instances                |
++--------------------+--------------------------------------------------------------------------------------------+
+| multipole_frames   | List of :class:`MultipoleFrame <parmed.topologyobjects.MultipoleFrame>` instances          |
++--------------------+--------------------------------------------------------------------------------------------+
 
-Examples
---------
+If the list is empty, then no terms of that type exist in the model.  All terms
+from ``stretch_bends`` to the bottom are exclusive to the Amoeba force field.
 
-For the purposes of this example, we will download the 4LZT structure as both a
-PDB file and a CIF file. These structures are both used in the ParmEd unittest
-suite, so you can get the files from there, or `download them from here.`__
+In addition to those attributes, there is a list of parameter *types*
+corresponding to each of those valence parameters as well (except for the chiral
+and multipole frame lists).  For example, a ``bond_types``, ``angle_types``,
+``urey_bradley_types``, ... etc, that contain the parameter type objects
+(:class:`BondType <parmed.topologyobjects.BondType>`,
+:class:`AngleType <parmed.topologyobjects.AngleType>`, and
+:class:`BondType <parmed.topologyobjects.BondType>` objects, respectively, since
+the Urey-Bradley term is identical in functional form to a simple bond). The
+same warnings apply here---do not explicitly delete or reassign these lists.
 
-.. _4lzt_structures: http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT
-__ 4lzt_structures_
+There are also two *special* subclasses of :class:`TrackedList
+<parmed.topologyobjects.TrackedList>` tracking ``atoms`` and ``residues``
+(namely the :class:`AtomList <parmed.topologyobjects.AtomList>` and the
+:class:`ResidueList <parmed.topologyobjects.ResidueList>` classes that have
+extra functionality aiding in the automatic bookkeeping, as described below).
 
-------
+Automated Bookkeeping
+~~~~~~~~~~~~~~~~~~~~~
 
-The first example demonstrates reading the PDB file::
+One of the strengths of the :class:`Structure` class and its corresponding
+components (such as :class:`Bond <parmed.topologyobjects.Bond>`) is that it
+automates the process of *bookkeeping* for your structure's model. For instance,
+creating a :class:`Bond <parmed.topologyobjects.Bond>` instance automatically
+registers the pair of atoms involved in the bond as partners in the "bond
+graph", which is used to determine atom connectivity. So when you create a
+:class:`Bond <parmed.topologyobjects.Bond>` object, you should immediately add
+it to that :class:`Structure`'s ``bonds`` attribute. Likewise, if you give that
+bond a :class:`BondType <parmed.topologyobjects.BondType>`, you should
+immediately add that instance to the ``bond_types`` attribute of the
+:class:`Structure` instance as well.
 
-    >>> from parmed import load_file
-    >>> lzt_pdb = load_file('4lzt.pdb')
-    >>> len(lzt_pdb.atoms)
-    1164
-    >>> len(lzt_pdb.residues)
-    274
-    >>> lzt_pdb.experimental # See the experimental method
-    'X-RAY DIFFRACTION'
-    >>> # See how many chains we have
-    >>> chain_list = set()
-    >>> for residue in lzt_pdb.residues:
-    ...     chain_list.add(residue.chain)
-    ... 
-    >>> chain_list
-    set(['A'])
-    >>> # Only one chain. Now see how many atoms have alternate conformations
-    >>> atoms_with_altconf = [atom for atom in lzt_pdb.atoms
-    ...                           if atom.other_locations]
-    >>> len(atoms_with_altconf)
-    19
-    >>> # Just for sanity's sake, make sure that the sum of all atoms in all
-    >>> # residues is equal to the total number of atoms
-    >>> sum(len(residue) for residue in lzt_pdb.residues)
-    1164
-    >>> len(lzt_pdb.atoms)
-    1164
-    >>> lzt_pdb.atoms[0].anisou # Look, we even get anisotropic B-factors!
-    array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])
-    >>> 
-
-The second example demonstrates reading the CIF file::
-
-    >>> from parmed import load_file
-    >>> lzt_cif = load_file('4LZT.cif')
-    >>> len(lzt_cif.atoms)
-    1164
-    >>> len(lzt_cif.residues)
-    274
-    >>> lzt_cif.experimental # See the experimental method
-    'X-RAY DIFFRACTION'
-    >>> # See how many chains we have
-    >>> chain_list = set()
-    >>> for residue in lzt_cif.residues:
-    ...     chain_list.add(residue.chain)
-    ... 
-    >>> chain_list
-    set(['A'])
-    >>> # Only one chain. Now see how many atoms have alternate conformations
-    >>> atoms_with_altconf = [atom for atom in lzt_cif.atoms
-    ...                          if atom.other_locations]
-    >>> len(atoms_with_altconf)
-    19
-    >>> # Just for sanity's sake, make sure that the sum of all atoms in all
-    >>> # residues is equal to the total number of atoms
-    >>> sum(len(residue) for residue in lzt_cif.residues)
-    1164
-    >>> len(lzt_pdb.atoms)
-    1164
-    >>> lzt_cif.atoms[0].anisou # Look, we even get anisotropic B-factors!
-    array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])
-    >>> 
-
--------
-
-Converting PDBx/mmCIF files to PDB files
-----------------------------------------
-
-If you noticed the ``write_cif`` and ``write_pdb`` methods attached to the
-:class:`Structure <parmed.structure.Structure>` class, you may have deduced
-that you can very simply convert a PDBx/mmCIF file to a PDB file.
-
-This is likely to be increasingly popular, since the PDB is moving to the mmCIF
-format, but many programs in the field of computational parmed and physics
-has decades worth of legacy code built around PDB files. Not to worry!  A quick
-1-liner will seamlessly convert PDBx to PDB::
-
-    from parmed import load_file
-    load_file('4LZT.cif').write_pdb('4lzt_converted.pdb', write_anisou=True,
-                                    renumber=False)
-
-In this case, the metadata is *not* copied (i.e., the ``EXPTL``, ``JRNL``,
-and ``AUTHOR`` records, to name a few). Only the coordinates, unit cell
-(``CYRST1`` record), and optionally anisotropic B-factor lines are translated.
-
-The ``renumber`` argument tells :class:`Structure
-<parmed.structure.Structure>` to use the original PDB numbers, rather than
-its internal number scheme that numbers sequentially from 1 to N, where N is
-the number of residues.
-
-If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
-numbering cycles back, such that the atom serial number after 99,999 is 0, and
-the numbering starts again.
-
--------
+If you plan on creating your own models directly through the :class:`Structure`
+API, you are encouraged to use existing parsers as examples, such as those for
+the AMBER, GROMACS, and CHARMM topology files.
 
 Structure manipulation: slicing, combining, replicating, and splitting
 ----------------------------------------------------------------------
@@ -450,8 +401,8 @@ double the size of its type arrays, while replicating it will not.
 Finally, replication is more efficient than combination arising from the simpler
 nature of replicating a structure than combining two different ones.
 
-:class:`Structure <parmed.structure.Structure> splitting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`Structure <parmed.structure.Structure>` splitting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes you want to be able to manipulate individual *molecules* inside a
 :class:`Structure <parmed.structure.Structure>` instance individually. The
@@ -476,3 +427,145 @@ biphenyl examples from earlier::
     <AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>
     >>> (phenol*10 + biphenyl*10).split()
     [(<AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>, 10), (<AmberParm 22 atoms; 1 residues; 23 bonds; parametrized>, 10)]
+
+:func:`load_file <parmed.formats.registry.load_file>`
+--------------------------------------------------------
+.. currentmodule:: parmed.formats.registry
+.. autosummary::
+    :toctree: structobj/
+
+    load_file
+
+The :func:`load_file` function automatically determines the format of the file
+whose name is passed as an argument. The following formats are currently
+recognized and result in the instantiation of either a :class:`Structure
+<parmed.structure.Structure>`. or one of its subclasses:
+
+1. PDB
+2. PDBx/mmCIF
+3. Gromacs GRO
+4. Gromacs topology file
+5. Amber topology file
+6. CHARMM PSF file
+7. Mol2 file
+
+Here, we will focus on instantiating a :class:`Structure
+<parmed.structure.Structure>` instance from PDB and
+mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
+Bank or the world wide Protein Data Bank often contain a large amount of
+metadata describing the structure, such as the citation information,
+experimental method (e.g., X-ray crystallography or NMR spectroscopy), authors,
+and related database entries (such as BMRB entries for NMR-solved structures).
+This information is extracted from both PDB and PDBx/mmCIF files when available,
+along with anisotropic B-factors.
+
+The following sections will briefly demonstrate parsing a PDB file and a mmCIF
+file to a :class:`Structure <parmed.structure.Structure>` instance.
+
+Examples
+--------
+
+For the purposes of this example, we will download the 4LZT structure as both a
+PDB file and a CIF file. These structures are both used in the ParmEd unittest
+suite, so you can get the files from there, or `download them from here.`__
+
+.. _4lzt_structures: http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT
+__ 4lzt_structures_
+
+------
+
+The first example demonstrates reading the PDB file::
+
+    >>> from parmed import load_file
+    >>> lzt_pdb = load_file('4lzt.pdb')
+    >>> len(lzt_pdb.atoms)
+    1164
+    >>> len(lzt_pdb.residues)
+    274
+    >>> lzt_pdb.experimental # See the experimental method
+    'X-RAY DIFFRACTION'
+    >>> # See how many chains we have
+    >>> chain_list = set()
+    >>> for residue in lzt_pdb.residues:
+    ...     chain_list.add(residue.chain)
+    ... 
+    >>> chain_list
+    set(['A'])
+    >>> # Only one chain. Now see how many atoms have alternate conformations
+    >>> atoms_with_altconf = [atom for atom in lzt_pdb.atoms
+    ...                           if atom.other_locations]
+    >>> len(atoms_with_altconf)
+    19
+    >>> # Just for sanity's sake, make sure that the sum of all atoms in all
+    >>> # residues is equal to the total number of atoms
+    >>> sum(len(residue) for residue in lzt_pdb.residues)
+    1164
+    >>> len(lzt_pdb.atoms)
+    1164
+    >>> lzt_pdb.atoms[0].anisou # Look, we even get anisotropic B-factors!
+    array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])
+
+The second example demonstrates reading the CIF file::
+
+    >>> from parmed import load_file
+    >>> lzt_cif = load_file('4LZT.cif')
+    >>> len(lzt_cif.atoms)
+    1164
+    >>> len(lzt_cif.residues)
+    274
+    >>> lzt_cif.experimental # See the experimental method
+    'X-RAY DIFFRACTION'
+    >>> # See how many chains we have
+    >>> chain_list = set()
+    >>> for residue in lzt_cif.residues:
+    ...     chain_list.add(residue.chain)
+    ... 
+    >>> chain_list
+    set(['A'])
+    >>> # Only one chain. Now see how many atoms have alternate conformations
+    >>> atoms_with_altconf = [atom for atom in lzt_cif.atoms
+    ...                          if atom.other_locations]
+    >>> len(atoms_with_altconf)
+    19
+    >>> # Just for sanity's sake, make sure that the sum of all atoms in all
+    >>> # residues is equal to the total number of atoms
+    >>> sum(len(residue) for residue in lzt_cif.residues)
+    1164
+    >>> len(lzt_pdb.atoms)
+    1164
+    >>> lzt_cif.atoms[0].anisou # Look, we even get anisotropic B-factors!
+    array([ 0.2066,  0.1204,  0.1269,  0.0044,  0.0126,  0.0191])
+
+-------
+
+Converting PDBx/mmCIF files to PDB files
+----------------------------------------
+
+If you noticed the ``write_cif`` and ``write_pdb`` methods attached to the
+:class:`Structure <parmed.structure.Structure>` class, you may have deduced
+that you can very simply convert a PDBx/mmCIF file to a PDB file.
+
+This is likely to be increasingly popular, since the PDB is moving to the mmCIF
+format, but many programs in the field of computational parmed and physics
+has decades worth of legacy code built around PDB files. Not to worry!  A quick
+1-liner will seamlessly convert PDBx to PDB::
+
+    from parmed import load_file
+    load_file('4LZT.cif').write_pdb('4lzt_converted.pdb', write_anisou=True,
+                                    renumber=False)
+
+In this case, the metadata is *not* copied (i.e., the ``EXPTL``, ``JRNL``,
+and ``AUTHOR`` records, to name a few). Only the coordinates, unit cell
+(``CYRST1`` record), and optionally anisotropic B-factor lines are translated.
+
+The ``renumber`` argument tells :class:`Structure
+<parmed.structure.Structure>` to use the original PDB numbers, rather than
+its internal number scheme that numbers sequentially from 1 to N, where N is
+the number of residues.
+
+If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
+numbering cycles back, such that the atom serial number after 99,999 is 0, and
+the numbering starts again.
+
+-------
+

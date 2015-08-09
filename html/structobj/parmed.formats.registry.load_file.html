@@ -64,7 +64,18 @@ contents.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
 <blockquote>
-<div><p>The name of the file to try to parse</p>
+<div><p>The name of the file to try to parse. If the filename starts with
+<a class="reference external" href="http://">http://</a> or <a class="reference external" href="https://">https://</a> or <a class="reference external" href="ftp://">ftp://</a>, it is treated like a URL and the file will be
+loaded directly from its remote location on the web</p>
+</div></blockquote>
+<p><strong>structure</strong> : object, optional</p>
+<blockquote>
+<div><p>For some classes, such as the Mol2 file class, the default return object
+is not a Structure, but can be made to return a Structure if the
+<tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword argument is passed. To facilitate writing
+easy code, the <tt class="docutils literal"><span class="pre">structure</span></tt> keyword is always processed and only passed
+on to the correct file parser if that parser accepts the structure
+keyword. There is no default, as each parser has its own default.</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
 <blockquote>
@@ -102,8 +113,8 @@ provided as keyword arguments in addition to the file name</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Compressed files are supported and detected by filename extension. The
-following names are supported:</p>
+<p>Compressed files are supported and detected by filename extension. This
+applies both to local and remote files. The following names are supported:</p>
 <blockquote>
 <div><ul class="simple">
 <li><tt class="docutils literal"><span class="pre">.gz</span></tt> : gzip compressed file</li>

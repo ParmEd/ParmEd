@@ -52,7 +52,7 @@
 _charmmfile.py for reading files</p>
 <p>Author: Jason Deckman
 Contributors: Jason Swails
-Date: Feb. 24, 2015</p>
+Date: June 19, 2015</p>
 <dl class="class">
 <dt id="parmed.charmm.charmmcrds.CharmmCrdFile">
 <em class="property">class </em><tt class="descclassname">parmed.charmm.charmmcrds.</tt><tt class="descname">CharmmCrdFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmCrdFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmCrdFile" title="Permalink to this definition">¶</a></dt>
@@ -85,8 +85,8 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="43%" />
-<col width="57%" />
+<col width="13%" />
+<col width="87%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>natom</td>
@@ -95,26 +95,8 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 <tr class="row-even"><td>resname</td>
 <td>(list of str) List of all residue names in the system</td>
 </tr>
-<tr class="row-odd"><td>coords</td>
-<td>(list of float) List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
-</tr>
-<tr class="row-even"><td>Example:</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">chm</span> <span class="o">=</span> <span class="n">CharmmCrdFile</span><span class="p">(</span><span class="s">&#39;testfiles/1tnm.crd&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> atoms; </span><span class="si">%d</span><span class="s"> coords&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">coords</span><span class="p">)))</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td>1414 atoms; 4242 coords</td>
-<td>&nbsp;</td>
+<tr class="row-odd"><td>coordinates</td>
+<td>(np.ndarray with shape (1, natom, 3)) Atomic coordinates in a numpy array</td>
 </tr>
 </tbody>
 </table>
@@ -130,6 +112,11 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="parmed.charmm.charmmcrds.CharmmCrdFile.box">
+<tt class="descname">box</tt><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmCrdFile.box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmCrdFile.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.charmm.charmmcrds.CharmmCrdFile.coordinates">
 <tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmCrdFile.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmCrdFile.coordinates" title="Permalink to this definition">¶</a></dt>
@@ -192,21 +179,21 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.positions" title="parmed.charmm.charmmcrds.CharmmRstFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.velocities" title="parmed.charmm.charmmcrds.CharmmRstFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<td>Atomic velocities in Angstroms/picoseconds</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.positions" title="parmed.charmm.charmmcrds.CharmmRstFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
 <td>Atomic positions with units</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.positionsold" title="parmed.charmm.charmmcrds.CharmmRstFile.positionsold"><tt class="xref py py-obj docutils literal"><span class="pre">positionsold</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.positionsold" title="parmed.charmm.charmmcrds.CharmmRstFile.positionsold"><tt class="xref py py-obj docutils literal"><span class="pre">positionsold</span></tt></a></td>
 <td>Old atomic positions with units</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.velocities" title="parmed.charmm.charmmcrds.CharmmRstFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
-<td>Atomic velocities with units</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="46%" />
-<col width="54%" />
+<col width="12%" />
+<col width="88%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>natom</td>
@@ -215,53 +202,11 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <tr class="row-even"><td>resname</td>
 <td>(list of str) Names of all residues in the system</td>
 </tr>
-<tr class="row-odd"><td>coords</td>
-<td>(list of float) List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
+<tr class="row-odd"><td>coordinates</td>
+<td>(np.ndarray shape(1, natom, 3)) List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
 </tr>
-<tr class="row-even"><td>coordsold</td>
-<td>(list of float) List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
-</tr>
-<tr class="row-odd"><td>vels</td>
-<td>(list of float) List of all velocities in the format [x1, y1, z1, x2, y2, z2, ...]</td>
-</tr>
-<tr class="row-even"><td>Example:</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">chm</span> <span class="o">=</span> <span class="n">CharmmRstFile</span><span class="p">(</span><span class="s">&#39;testfiles/sample-charmm.rst&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td>REST    37     1</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">natom</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">nco</span> <span class="o">=</span> <span class="n">chm</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">coords</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">coordsold</span><span class="p">)</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">nv</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chm</span><span class="o">.</span><span class="n">vels</span><span class="p">)</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> atoms; </span><span class="si">%d</span><span class="s"> crds; </span><span class="si">%d</span><span class="s"> old crds; </span><span class="si">%d</span><span class="s"> vels&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">nco</span><span class="p">,</span> <span class="n">nv</span><span class="p">))</span>
-</pre></div>
-</div>
-</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td>256 atoms; 768 crds; 768 old crds; 768 vels</td>
-<td>&nbsp;</td>
+<tr class="row-even"><td>coordinatesold</td>
+<td>(np.ndarray shape(1, natom, 3)) List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
 </tr>
 </tbody>
 </table>
@@ -275,17 +220,24 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.id_format" title="parmed.charmm.charmmcrds.CharmmRstFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as a CHARMM restart file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.printcoords" title="parmed.charmm.charmmcrds.CharmmRstFile.printcoords"><tt class="xref py py-obj docutils literal"><span class="pre">printcoords</span></tt></a>(crds)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.scan" title="parmed.charmm.charmmcrds.CharmmRstFile.scan"><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt></a>(handle,&nbsp;str[,&nbsp;r])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.charmmcrds.CharmmRstFile.scan" title="parmed.charmm.charmmcrds.CharmmRstFile.scan"><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt></a>(handle,&nbsp;str[,&nbsp;r])</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
+<dt id="parmed.charmm.charmmcrds.CharmmRstFile.box">
+<tt class="descname">box</tt><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmRstFile.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="parmed.charmm.charmmcrds.CharmmRstFile.coordinates">
 <tt class="descname">coordinates</tt><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmRstFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.charmmcrds.CharmmRstFile.coordinatesold">
+<tt class="descname">coordinatesold</tt><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.coordinatesold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmRstFile.coordinatesold" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
@@ -325,11 +277,6 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="parmed.charmm.charmmcrds.CharmmRstFile.printcoords">
-<tt class="descname">printcoords</tt><big>(</big><em>crds</em><big>)</big><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.printcoords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmRstFile.printcoords" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="parmed.charmm.charmmcrds.CharmmRstFile.scan">
 <tt class="descname">scan</tt><big>(</big><em>handle</em>, <em>str</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmRstFile.scan" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -337,7 +284,7 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
 <dl class="attribute">
 <dt id="parmed.charmm.charmmcrds.CharmmRstFile.velocities">
 <tt class="descname">velocities</tt><a class="reference internal" href="../../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.charmmcrds.CharmmRstFile.velocities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomic velocities with units</p>
+<dd><p>Atomic velocities in Angstroms/picoseconds</p>
 </dd></dl>
 
 </dd></dl>

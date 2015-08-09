@@ -57,7 +57,6 @@
 <span class="sd">    -  scipy</span>
 <span class="sd">    -  netCDF4</span>
 <span class="sd">    -  ScientificPython</span>
-<span class="sd">    -  pynetcdf</span>
 
 <span class="sd">This module contains objects relevant to Amber NetCDF files. The use() function</span>
 <span class="sd">is responsible for selecting the API based on a default choice or user-selection</span>
@@ -75,7 +74,7 @@
 <span class="c"># This determines which NetCDF package we&#39;re going to use...</span>
 <span class="n">NETCDF_PACKAGE</span> <span class="o">=</span> <span class="bp">None</span>
 
-<span class="n">ALLOWED_NETCDF_PACKAGES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;netCDF4&#39;</span><span class="p">,</span> <span class="s">&#39;Scientific&#39;</span><span class="p">,</span> <span class="s">&#39;pynetcdf&#39;</span><span class="p">,</span> <span class="s">&#39;scipy&#39;</span><span class="p">)</span>
+<span class="n">ALLOWED_NETCDF_PACKAGES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;netCDF4&#39;</span><span class="p">,</span> <span class="s">&#39;Scientific&#39;</span><span class="p">,</span> <span class="s">&#39;scipy&#39;</span><span class="p">)</span>
 
 <span class="n">NETCDF_INITIALIZED</span> <span class="o">=</span> <span class="bp">False</span>
 <span class="n">SELECTED_NETCDF</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
@@ -115,16 +114,6 @@
     <span class="n">_HAS_SCIENTIFIC_PYTHON</span> <span class="o">=</span> <span class="bp">False</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pynetcdf.NetCDF</span> <span class="kn">import</span> <span class="n">NetCDFFile</span> <span class="k">as</span> <span class="n">pynNetCDFFile</span>
-    <span class="n">pynopen_netcdf</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">pynNetCDFFile</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
-    <span class="n">pynget_int_dimension</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="n">pynget_float</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
-    <span class="n">_HAS_PYNETCDF</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">pynopen_netcdf</span> <span class="o">=</span> <span class="n">pynget_int_dimension</span> <span class="o">=</span> <span class="n">pynget_float</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="n">_HAS_PYNETCDF</span> <span class="o">=</span> <span class="bp">False</span>
-
-<span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">scipy.io.netcdf</span> <span class="kn">import</span> <span class="n">netcdf_file</span> <span class="k">as</span> <span class="n">spNetCDFFile</span>
     <span class="n">spopen_netcdf</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">spNetCDFFile</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
     <span class="n">spget_int_dimension</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
@@ -134,8 +123,7 @@
     <span class="n">spopen_netcdf</span> <span class="o">=</span> <span class="n">spget_int_dimension</span> <span class="o">=</span> <span class="n">spget_float</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">_HAS_SCIPY_NETCDF</span> <span class="o">=</span> <span class="bp">False</span>
 
-<span class="n">HAS_NETCDF</span> <span class="o">=</span> <span class="p">(</span><span class="n">_HAS_NC4</span> <span class="ow">or</span> <span class="n">_HAS_SCIENTIFIC_PYTHON</span> <span class="ow">or</span> 
-              <span class="n">_HAS_PYNETCDF</span> <span class="ow">or</span> <span class="n">_HAS_SCIPY_NETCDF</span><span class="p">)</span>
+<span class="n">HAS_NETCDF</span> <span class="o">=</span> <span class="p">(</span><span class="n">_HAS_NC4</span> <span class="ow">or</span> <span class="n">_HAS_SCIENTIFIC_PYTHON</span> <span class="ow">or</span> <span class="n">_HAS_SCIPY_NETCDF</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_coerce_to_string</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;ascii&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -156,7 +144,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    package : str</span>
 <span class="sd">        This specifies which package to use, and may be either scipy, netCDF4,</span>
-<span class="sd">        Scientific/ScientificPython, pynetcdf, or None.  If None, it chooses the</span>
+<span class="sd">        Scientific/ScientificPython, or None.  If None, it chooses the</span>
 <span class="sd">        first available implementation from the above list (in that order).</span>
 
 <span class="sd">    Notes</span>
@@ -167,10 +155,6 @@
 <span class="sd">    useful for development testing as the backend NetCDF choice is virtually</span>
 <span class="sd">    invisible to the user.</span>
 
-<span class="sd">    The pynetcdf implementation has long since been abandoned (ca. 2006), and is</span>
-<span class="sd">    not recommended for use. It appears to parse NetCDF files just fine, but it</span>
-<span class="sd">    does not seem to write them successfully according to my tests.</span>
-<span class="sd">    </span>
 <span class="sd">    The NetCDF files have been tested against netCDF v. 1.0.4, Scientific</span>
 <span class="sd">    v. 2.9.1, and scipy v. 0.13.1. Later versions are expected to work barring</span>
 <span class="sd">    backwards-incompatible changes. Other versions are expected to work barring</span>
@@ -180,7 +164,7 @@
     <span class="k">global</span> <span class="n">HAS_NETCDF</span><span class="p">,</span> <span class="n">SELECTED_NETCDF</span><span class="p">,</span> <span class="n">nc4open_netcdf</span><span class="p">,</span> <span class="n">nc4get_int_dimension</span>
     <span class="k">global</span> <span class="n">nc4get_float</span><span class="p">,</span> <span class="n">sciopen_netcdf</span><span class="p">,</span> <span class="n">sciget_int_dimension</span><span class="p">,</span> <span class="n">sciget_float</span>
     <span class="k">global</span> <span class="n">pynopen_netcdf</span><span class="p">,</span> <span class="n">pynget_int</span><span class="p">,</span> <span class="n">pynget_float</span><span class="p">,</span> <span class="n">ALLOWED_NETCDF_PACKAGES</span>
-    <span class="k">global</span> <span class="n">_HAS_NC4</span><span class="p">,</span> <span class="n">_HAS_SCIENTIFIC_PYTHON</span><span class="p">,</span> <span class="n">_HAS_PYNETCDF</span><span class="p">,</span> <span class="n">_HAS_SCIPY_NETCDF</span>
+    <span class="k">global</span> <span class="n">_HAS_NC4</span><span class="p">,</span> <span class="n">_HAS_SCIENTIFIC_PYTHON</span><span class="p">,</span> <span class="n">_HAS_SCIPY_NETCDF</span>
 
     <span class="k">if</span> <span class="n">package</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">NETCDF_INITIALIZED</span><span class="p">:</span>
@@ -200,11 +184,6 @@
             <span class="n">get_int_dimension</span> <span class="o">=</span> <span class="n">sciget_int_dimension</span>
             <span class="n">get_float</span> <span class="o">=</span> <span class="n">sciget_float</span>
             <span class="n">SELECTED_NETCDF</span> <span class="o">=</span> <span class="s">&#39;ScientificPython&#39;</span>
-        <span class="k">elif</span> <span class="n">_HAS_PYNETCDF</span><span class="p">:</span>
-            <span class="n">open_netcdf</span> <span class="o">=</span> <span class="n">pynopen_netcdf</span>
-            <span class="n">get_int_dimension</span> <span class="o">=</span> <span class="n">pynget_int_dimension</span>
-            <span class="n">get_float</span> <span class="o">=</span> <span class="n">pynget_float</span>
-            <span class="n">SELECTED_NETCDF</span> <span class="o">=</span> <span class="s">&#39;pynetcdf&#39;</span>
     <span class="k">elif</span> <span class="n">package</span> <span class="o">==</span> <span class="s">&#39;netCDF4&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_NC4</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Could not find netCDF4 package&#39;</span><span class="p">)</span>
@@ -225,17 +204,6 @@
         <span class="n">open_netcdf</span> <span class="o">=</span> <span class="n">spopen_netcdf</span>
         <span class="n">get_int_dimension</span> <span class="o">=</span> <span class="n">spget_int_dimension</span>
         <span class="n">get_float</span> <span class="o">=</span> <span class="n">spget_float</span>
-    <span class="k">elif</span> <span class="n">package</span> <span class="o">==</span> <span class="s">&#39;pynetcdf&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_PYNETCDF</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Could not find package pynetcdf&#39;</span><span class="p">)</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;pynetcdf is no longer maintained and may not work &#39;</span>
-                      <span class="s">&#39;properly. If you experience problems, try installing a &#39;</span>
-                      <span class="s">&#39;different NetCDF package like Scientific, scipy, or &#39;</span>
-                      <span class="s">&#39;netCDF4.&#39;</span><span class="p">)</span>
-        <span class="n">open_netcdf</span> <span class="o">=</span> <span class="n">pynopen_netcdf</span>
-        <span class="n">get_int_dimension</span> <span class="o">=</span> <span class="n">pynget_int_dimension</span>
-        <span class="n">get_float</span> <span class="o">=</span> <span class="n">pynget_float</span>
-        <span class="n">SELECTED_NETCDF</span> <span class="o">=</span> <span class="s">&#39;pynetcdf&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> not a valid NetCDF package. Available options &#39;</span>
                           <span class="s">&#39;are </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">package</span><span class="p">,</span> 
@@ -244,14 +212,8 @@
     
     <span class="n">NETCDF_INITIALIZED</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># We have now selected a NetCDF implementation</span>
 </div>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">__version__</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c"># This is just to prevent NetCDF imports from bringing everything down if</span>
-    <span class="c"># numpy is not available. np can be used inside any method since it will be</span>
-    <span class="c"># required for any NetCDF to work in the first place.</span>
-    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
 
 <div class="viewcode-block" id="needs_netcdf"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.needs_netcdf">[docs]</a><span class="k">def</span> <span class="nf">needs_netcdf</span><span class="p">(</span><span class="n">fcn</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -284,7 +246,14 @@
 <span class="sd">        -------</span>
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an Amber NetCDF restart file. False otherwise</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Remote NetCDF files cannot be loaded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>\
+                <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_NETCDF</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span> <span class="c"># Can&#39;t determine...</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">NETCDF_INITIALIZED</span><span class="p">:</span>
@@ -484,18 +453,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:]</span>
+        <span class="k">return</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
     <span class="nd">@coordinates.setter</span>
 <div class="viewcode-block" id="NetCDFRestart.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFRestart.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:]</span> <span class="o">=</span> \
-                                <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">stuff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">stuff</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">][:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">velocity_scale</span><span class="p">)</span>
+        <span class="n">vels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">][:]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">vels</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity_scale</span><span class="p">)</span>
 
     <span class="nd">@velocities.setter</span>
 <div class="viewcode-block" id="NetCDFRestart.velocities"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFRestart.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
@@ -621,7 +591,14 @@
 <span class="sd">        -------</span>
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an Amber NetCDF trajectory file. False otherwise</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Remote NetCDF files cannot be loaded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>\
+                <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_NETCDF</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span> <span class="c"># Can&#39;t determine...</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">NETCDF_INITIALIZED</span><span class="p">:</span>
@@ -805,41 +782,37 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">hasfrcs</span> <span class="o">=</span> <span class="s">&#39;forces&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;cell_lengths&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span> <span class="ow">and</span>
                        <span class="s">&#39;cell_angles&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hascrds</span><span class="p">:</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:])</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">velocity_scale</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">scale_factor</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">scale_factor</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c"># Prevent NetCDF4 from trying to autoscale the values. Ugh.</span>
                 <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_auto_maskandscale</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="c"># Other packages do not have this variable.</span>
                 <span class="k">pass</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">_velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">][:])</span><span class="o">*</span><span class="n">scale</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">velocity_scale</span> <span class="o">=</span> <span class="n">scale</span>
+        <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasfrcs</span><span class="p">:</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">_forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;forces&#39;</span><span class="p">][:])</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="s">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
                 <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">][:])</span>
             <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">hascrds</span><span class="p">:</span>
-                <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][:])</span>
+                <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">_coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasvels</span><span class="p">:</span>
-                <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">][:])</span>
+                <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">_velocities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasfrcs</span><span class="p">:</span>
-                <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;forces&#39;</span><span class="p">][:])</span>
+                <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">_forces</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">inst</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the coordinates of a particular frame in the trajectory</span>
-<span class="sd">    </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            Which snapshot to get (first snapshot is frame 0)</span>
-<span class="sd">    </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        coordinates</span>
-<span class="sd">            numpy array of length 3*natom with the given coordinates in the</span>
-<span class="sd">            format [x1, y1, z1, x2, y2, z2, ...] in Angstroms</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">][:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span>
 </div>
 <div class="viewcode-block" id="NetCDFTraj.add_coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">add_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -863,23 +836,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_crd_frame</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.velocities"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the velocities of a particular frame in the trajectory</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            Which snapshot to get (first snapshot is frame 0)</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        velocities</span>
-<span class="sd">            numpy array of length 3*atom with the given velocities properly</span>
-<span class="sd">            scaled to be of units angstrom/picosecond</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;velocities&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">][:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> 
-                <span class="bp">self</span><span class="o">.</span><span class="n">velocity_scale</span><span class="p">)</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.velocities"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocities</span>
 </div>
 <div class="viewcode-block" id="NetCDFTraj.add_velocities"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_velocities">[docs]</a>    <span class="k">def</span> <span class="nf">add_velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -903,22 +862,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_vel_frame</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.forces"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.forces">[docs]</a>    <span class="k">def</span> <span class="nf">forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the forces of a particular frame in the trajectory</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            Which snapshot to get (first snapshot is frame 0)</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        forces</span>
-<span class="sd">            numpy array of length 3*atom with the given forces properly</span>
-<span class="sd">            scaled to be of kcal/mol/Angstroms</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;forces&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">][:]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.forces"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.forces">[docs]</a>    <span class="k">def</span> <span class="nf">forces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forces</span>
 </div>
 <div class="viewcode-block" id="NetCDFTraj.add_forces"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_forces">[docs]</a>    <span class="k">def</span> <span class="nf">add_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -941,40 +887,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_frc_frame</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.cell_lengths_angles"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.cell_lengths_angles">[docs]</a>    <span class="k">def</span> <span class="nf">cell_lengths_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the cell lengths and cell angles of a particular frame in the</span>
-<span class="sd">        trajectory</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            Which snapshot to get (first snapshot is frame 0)</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        lengths, angles</span>
-<span class="sd">            2-element tuple: (length-3 numpy array of cell lengths, length-3</span>
-<span class="sd">            numpy array of cell angles) in Angstroms</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;cell_lengths&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">][:],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;cell_angles&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">][:])</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.cell_lengths_angles"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.cell_lengths_angles">[docs]</a>    <span class="k">def</span> <span class="nf">cell_lengths_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;cell_lengths&#39;</span><span class="p">][:],</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;cell_angles&#39;</span><span class="p">][:]))</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.box"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.box">[docs]</a>    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the cell lengths and angles as one array</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">cell_lengths_angles</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            Frame to get the box from</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            6-element array with 3 lengths followed by 3 angles (in degrees)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths_angles</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
-   </div>
 <div class="viewcode-block" id="NetCDFTraj.add_cell_lengths_angles"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_cell_lengths_angles">[docs]</a>    <span class="k">def</span> <span class="nf">add_cell_lengths_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new cell length and angle frame to the end of a NetCDF</span>
@@ -1013,21 +932,9 @@
 </div>
     <span class="n">add_box</span> <span class="o">=</span> <span class="n">add_cell_lengths_angles</span>
 
-<div class="viewcode-block" id="NetCDFTraj.time"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.time">[docs]</a>    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the time of a particular frame in the trajectory</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            Which snapshot to get (first snapshot is frame 0)</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        time : float</span>
-<span class="sd">            The time of the given frame in ps</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">]</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.time"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.time">[docs]</a>    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">][:]</span>
 </div>
 <div class="viewcode-block" id="NetCDFTraj.add_time"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_time">[docs]</a>    <span class="k">def</span> <span class="nf">add_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds the time to the current frame of the NetCDF file</span>
@@ -1042,15 +949,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_time_frame</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.remd_indices"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.remd_indices">[docs]</a>    <span class="k">def</span> <span class="nf">remd_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns the REMD indices for the desired frame</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            The frame to get the REMD indices from (0 is the first frame)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;remd_indices&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">][:]</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.remd_indices"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.remd_indices">[docs]</a>    <span class="k">def</span> <span class="nf">remd_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;remd_indices&#39;</span><span class="p">][:]</span>
 </div>
 <div class="viewcode-block" id="NetCDFTraj.add_remd_indices"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_remd_indices">[docs]</a>    <span class="k">def</span> <span class="nf">add_remd_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add REMD indices to the current frame of the NetCDF file</span>
@@ -1065,15 +966,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_remd_frame</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="NetCDFTraj.temp0"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.temp0">[docs]</a>    <span class="k">def</span> <span class="nf">temp0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns the temperature of the current frame in kelvin</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        frame : int</span>
-<span class="sd">            The frame to get the temperature from (0 is the first frame)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;temp0&#39;</span><span class="p">][</span><span class="n">frame</span><span class="p">]</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NetCDFTraj.temp0"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.temp0">[docs]</a>    <span class="k">def</span> <span class="nf">temp0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s">&#39;temp0&#39;</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="NetCDFTraj.add_temp0"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.netcdffiles.NetCDFTraj.add_temp0">[docs]</a>    <span class="k">def</span> <span class="nf">add_temp0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The temperature to add to the current frame of the NetCDF file</span>

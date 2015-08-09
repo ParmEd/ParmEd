@@ -67,7 +67,7 @@ extension described at <a class="reference external" href="http://q4md-forcefiel
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.mol2.Mol2File.parse" title="parmed.formats.mol2.Mol2File.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename[,&nbsp;structure])</td>
 <td>Parses a mol2 file (or mol3) file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.mol2.Mol2File.write" title="parmed.formats.mol2.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.mol2.Mol2File.write" title="parmed.formats.mol2.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3,&nbsp;split])</td>
 <td>Writes a mol2 file from a structure or residue template</td>
 </tr>
 </tbody>
@@ -104,9 +104,9 @@ extension described at <a class="reference external" href="http://q4md-forcefiel
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
 <blockquote>
-<div><p>Name of the file to parse</p>
+<div><p>Name of the file to parse or file-like object to parse from</p>
 </div></blockquote>
 <p><strong>structure</strong> : bool, optional</p>
 <blockquote>
@@ -130,7 +130,9 @@ False</p>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>Mol2Error</strong></p>
 <blockquote class="last">
 <div><p>If the file format is not recognized or non-numeric values are
-present where integers or floating point numbers are expected</p>
+present where integers or floating point numbers are expected. Also
+raises Mol2Error if you try to parse a mol2 file that has multiple
+&#64;&lt;MOLECULE&gt; entries with <tt class="docutils literal"><span class="pre">structure=True</span></tt>.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -140,7 +142,7 @@ present where integers or floating point numbers are expected</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.mol2.Mol2File.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.mol2.Mol2File.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em>, <em>split=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.mol2.Mol2File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a mol2 file from a structure or residue template</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -158,9 +160,15 @@ present where integers or floating point numbers are expected</p>
 <div><p>Name of the file to write or open file handle to write to</p>
 </div></blockquote>
 <p><strong>mol3</strong> : bool, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplate or container, write
 HEAD/TAIL sections. Default is False</p>
+</div></blockquote>
+<p><strong>split</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplateContainer or a Structure
+with multiple residues, each residue is printed in a separate
+&#64;&lt;MOLECULE&gt; section that appear sequentially in the output file</p>
 </div></blockquote>
 </td>
 </tr>

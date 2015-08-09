@@ -78,22 +78,14 @@
 <span class="kn">from</span> <span class="nn">parmed.amber._amberparm</span> <span class="kn">import</span> <span class="n">AmberParm</span><span class="p">,</span> <span class="n">Rst7</span>
 <span class="kn">from</span> <span class="nn">parmed.amber._chamberparm</span> <span class="kn">import</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">ConvertFromPSF</span>
 <span class="kn">from</span> <span class="nn">parmed.amber._tinkerparm</span> <span class="kn">import</span> <span class="n">AmoebaParm</span><span class="p">,</span> <span class="n">BeemanRestart</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span> <span class="k">as</span> <span class="n">_warn</span>
 
 <span class="c"># Define importables via *</span>
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;AmberFormat&#39;</span><span class="p">,</span> <span class="s">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberParm&#39;</span><span class="p">,</span> <span class="s">&#39;LoadParm&#39;</span><span class="p">,</span> <span class="s">&#39;Rst7&#39;</span><span class="p">]</span>
 
-<span class="c"># For backwards compatibility, but this will be eliminated</span>
-<span class="k">class</span> <span class="nc">rst7</span><span class="p">(</span><span class="n">Rst7</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Amber input coordinate (or restart coordinate) file format &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">_warn</span><span class="p">(</span><span class="s">&#39;rst7 is deprecated. Use Rst7 instead.&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">rst7</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-   
-
 <span class="c"># Supply a function to load a topology file in the &#39;correct&#39; format</span>
-<div class="viewcode-block" id="LoadParm"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.readparm.LoadParm">[docs]</a><span class="k">def</span> <span class="nf">LoadParm</span><span class="p">(</span><span class="n">parmname</span><span class="p">,</span> <span class="n">rst7name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="LoadParm"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.readparm.LoadParm">[docs]</a><span class="k">def</span> <span class="nf">LoadParm</span><span class="p">(</span><span class="n">parmname</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rst7_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads a topology file using the correct class.</span>
 
@@ -101,8 +93,13 @@
 <span class="sd">    ----------</span>
 <span class="sd">    parmname : ``str``</span>
 <span class="sd">        The name of the topology file to load</span>
-<span class="sd">    rst7name : ``str``, optional</span>
-<span class="sd">        The name of the restart file to load</span>
+<span class="sd">    xyz : str or array, optional</span>
+<span class="sd">        If provided, the coordinates and unit cell dimensions from the provided</span>
+<span class="sd">        Amber inpcrd/restart file will be loaded into the molecule, or the</span>
+<span class="sd">        coordinates will be loaded from the coordinate array</span>
+<span class="sd">    box : array, optional</span>
+<span class="sd">        If provided, the unit cell information will be set from the provided</span>
+<span class="sd">        unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -112,6 +109,8 @@
 <span class="sd">        (i.e., CHARMM force field), or Amoeba-style (i.e., Amoeba force field),</span>
 <span class="sd">        and then returns an instance of the appropriate type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+    <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">IFBOX</span>
     <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">parmname</span><span class="p">)</span>
     <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
         <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">)</span>
@@ -120,10 +119,33 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">)</span>
 
-    <span class="c"># Now load the restart file</span>
-    <span class="k">if</span> <span class="n">rst7name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">rst</span> <span class="o">=</span> <span class="n">Rst7</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">rst7name</span><span class="p">)</span>
-        <span class="n">parm</span><span class="o">.</span><span class="n">load_rst7</span><span class="p">(</span><span class="n">rst</span><span class="p">)</span>
+    <span class="c"># Now read the coordinate file if applicable</span>
+    <span class="k">if</span> <span class="n">xyz</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rst7_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">_warn</span><span class="p">(</span><span class="s">&#39;rst7_name keyword is deprecated. Use xyz instead&#39;</span><span class="p">,</span>
+              <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="n">xyz</span> <span class="o">=</span> <span class="n">rst7_name</span>
+    <span class="k">elif</span> <span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rst7_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">_warn</span><span class="p">(</span><span class="s">&#39;rst7_name keyword is deprecated and ignored in favor of xyz&#39;</span><span class="p">,</span>
+              <span class="ne">DeprecationWarning</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;coordinates&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not have coordinates&#39;</span> <span class="o">%</span> <span class="n">xyz</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">coordinates</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#39;box&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">box</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">xyz</span>
+    <span class="k">if</span> <span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+
+    <span class="c"># If all else fails, set the box from the prmtop file</span>
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;BOX_DIMENSIONS&#39;</span><span class="p">]</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="n">parm</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
 
     <span class="k">return</span> <span class="n">parm</span></div>
 </pre></div>

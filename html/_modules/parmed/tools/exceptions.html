@@ -49,9 +49,10 @@
           <div class="body">
             
   <h1>Source code for parmed.tools.exceptions</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; Exceptions used in parmed.py &quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot; Exceptions used in parmed script &quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span><span class="p">,</span> <span class="n">InputError</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <div class="viewcode-block" id="ParmError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.ParmError">[docs]</a><span class="k">class</span> <span class="nc">ParmError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Base parmed error &quot;&quot;&quot;</span>
@@ -69,7 +70,10 @@
 </div>
 <div class="viewcode-block" id="SeriousParmWarning"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.SeriousParmWarning">[docs]</a><span class="k">class</span> <span class="nc">SeriousParmWarning</span><span class="p">(</span><span class="n">ParmWarning</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; These warnings are more serious, and are fatal in strict operation &quot;&quot;&quot;</span>
-</div>
+
+<span class="c"># By default, make SeriousParmWarning fatal</span></div>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;error&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">SeriousParmWarning</span><span class="p">)</span>
+
 <div class="viewcode-block" id="ChangeRadiiError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.ChangeRadiiError">[docs]</a><span class="k">class</span> <span class="nc">ChangeRadiiError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
@@ -173,9 +177,6 @@
     <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="UnhandledArgumentWarning"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.UnhandledArgumentWarning">[docs]</a><span class="k">class</span> <span class="nc">UnhandledArgumentWarning</span><span class="p">(</span><span class="n">SeriousParmWarning</span><span class="p">):</span>
-    <span class="k">pass</span>
-</div>
-<div class="viewcode-block" id="InputError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.InputError">[docs]</a><span class="k">class</span> <span class="nc">InputError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="ParmIndexError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.ParmIndexError">[docs]</a><span class="k">class</span> <span class="nc">ParmIndexError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>

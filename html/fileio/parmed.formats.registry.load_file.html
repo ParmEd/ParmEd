@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.formats.registry.load_file &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="File input/output with ParmEd" href="../readwrite.html" />
+    <link rel="next" title="The parmed.amber package" href="../amber.html" />
+    <link rel="prev" title="parmed.formats.registry.load_file" href="" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../amber.html" title="The parmed.amber package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="#" title="parmed.formats.registry.load_file"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../readwrite.html" accesskey="U">File input/output with ParmEd</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="parmed-formats-registry-load-file">
+<h1>parmed.formats.registry.load_file<a class="headerlink" href="#parmed-formats-registry-load-file" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="parmed.formats.registry.load_file">
+<tt class="descclassname">parmed.formats.registry.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/parmed/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.registry.load_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file format of the specified file and returns its parsed
+contents.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>The name of the file to try to parse. If the filename starts with
+<a class="reference external" href="http://">http://</a> or <a class="reference external" href="https://">https://</a> or <a class="reference external" href="ftp://">ftp://</a>, it is treated like a URL and the file will be
+loaded directly from its remote location on the web</p>
+</div></blockquote>
+<p><strong>structure</strong> : object, optional</p>
+<blockquote>
+<div><p>For some classes, such as the Mol2 file class, the default return object
+is not a Structure, but can be made to return a Structure if the
+<tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword argument is passed. To facilitate writing
+easy code, the <tt class="docutils literal"><span class="pre">structure</span></tt> keyword is always processed and only passed
+on to the correct file parser if that parser accepts the structure
+keyword. There is no default, as each parser has its own default.</p>
+</div></blockquote>
+<p><strong>*args</strong> : other positional arguments</p>
+<blockquote>
+<div><p>Some formats accept positional arguments. These will be passed along</p>
+</div></blockquote>
+<p><strong>**kwargs</strong> : other options</p>
+<blockquote>
+<div><p>Some formats can only be instantiated with other options besides just a
+file name.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object</p>
+<blockquote>
+<div><p>The returned object is the result of the parsing function of the class
+associated with the file format being parsed</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong></p>
+<blockquote>
+<div><p>If <tt class="docutils literal"><span class="pre">filename</span></tt> does not exist</p>
+</div></blockquote>
+<p><strong>parmed.exceptions.FormatNotFound</strong></p>
+<blockquote>
+<div><p>If no suitable file format can be identified, a TypeError is raised</p>
+</div></blockquote>
+<p><strong>TypeError</strong></p>
+<blockquote class="last">
+<div><p>If the identified format requires additional arguments that are not
+provided as keyword arguments in addition to the file name</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Compressed files are supported and detected by filename extension. This
+applies both to local and remote files. The following names are supported:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">.gz</span></tt> : gzip compressed file</li>
+<li><tt class="docutils literal"><span class="pre">.bz2</span></tt> : bzip2 compressed file</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/fileio/parmed.formats.registry.load_file.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../amber.html" title="The parmed.amber package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="#" title="parmed.formats.registry.load_file"
+             >previous</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../readwrite.html" >File input/output with ParmEd</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
