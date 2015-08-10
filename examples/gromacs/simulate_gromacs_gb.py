@@ -8,14 +8,13 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry import load_file
-from chemistry.openmm.reporters import NetCDFReporter
-from chemistry import unit as u
+from parmed import load_file
+from parmed.openmm.reporters import NetCDFReporter
+from parmed import unit as u
 
 # Load the Gromacs files
 print('Loading Gromacs files...')
-top = load_file('dhfr_gas.top')
-gro = load_file('dhfr_gas.gro')
+top = load_file('dhfr_gas.top', xyz='dhfr_gas.gro')
 
 # Create the OpenMM system
 print('Creating OpenMM System')
@@ -40,7 +39,7 @@ prop = dict(CudaPrecision='mixed') # Use mixed single/double precision
 sim = app.Simulation(top.topology, system, integrator, platform, prop)
 
 # Set the particle positions
-sim.context.setPositions(gro.positions)
+sim.context.setPositions(top.positions)
 
 # Minimize the energy
 print('Minimizing energy')
