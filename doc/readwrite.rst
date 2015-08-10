@@ -60,6 +60,13 @@ Except in rare, pathological cases, the file format detection mechanism is
 fairly robust. If any files *fail* this detection, feel free to file an issue on
 the Github issue tracker to improve file type prediction.
 
+:func:`load_file` has a number of helpful features. For instance, files ending
+with the ``.gz`` or ``.bz2`` suffix will automatically be decompressed in-memory
+using Gzip or Bzip2, respectively (except for some binary file formats, like
+NetCDF). Furthermore, URLs beginning with ``http://``, ``https://``, or
+``ftp://`` are valid file names and will result in the remote file being
+downloaded and processed (again, in-memory).
+
 Writing files with :meth:`Structure.save <parmed.structure.Structure.save>`
 ---------------------------------------------------------------------------
 
@@ -98,7 +105,6 @@ table.
 +--------------+-------------------------+----------------+--------------------------+
 | Mol3         | ``.mol3``               | ``mol3``       | ``split``                |
 +--------------+-------------------------+----------------+--------------------------+
-
 \* PDB format only
 
 The meanings and default values of each of the keywords is described in the next
@@ -144,3 +150,57 @@ Keywords
   mol3 entries in the same file (like the ZINC database, for example). If
   ``False``, all residues will be part of the same mol2 or mol3 entry. Default
   is ``False``.
+
+Examples
+--------
+
+The following examples use various files from the ParmEd test suite, which can
+be found in the ``test/files/`` directory of the ParmEd source code::
+
+    >>> import parmed as pmd
+    >>> # Load a Mol2 file
+    ... pmd.load_file('tripos1.mol2')
+    <ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None>
+    >>> # Load a Mol2 file as a Structure
+    ... pmd.load_file('tripos1.mol2', structure=True)
+    <Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized>
+    >>> # Load an Amber topology file
+    ... parm = pmd.load_file('trx.prmtop', xyz='trx.inpcrd')
+    >>> parm
+    <AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized>
+    >>> # Load a CHARMM PSF file
+    ... psf = pmd.load_file('ala_ala_ala.psf')
+    >>> psf
+    <CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized>
+    >>> # Load a PDB and CIF file
+    ... pdb = pmd.load_file('4lzt.pdb')
+    >>> cif = pmd.load_file('4LZT.cif')
+    >>> pdb
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    >>> cif
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    >>> # Load a Gromacs topology file -- only works with Gromacs installed
+    ... top = pmd.load_file('1aki.ff99sbildn.top')
+    >>> top
+    <GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized>
+
+Any of the :class:`Structure <parmed.structure.Structure>` subclasses shown
+above can be saved as any other kind of :class:`Structure
+<parmed.structure.Structure>` class or subclass *for which the conversion is
+supported*. For instance, a raw PDB file has no defined parameters, so it cannot
+be saved as an Amber topology file. An Amber topology file, on the other hand,
+has all of the information required for a PDB, and so that conversion is
+supported::
+
+    >>> parm.save('test_parm.pdb')
+    >>> # You can also convert CIF to PDB
+    ... cif.save('test_cif.pdb')
+    >>> # Or you can convert PDB to CIF
+    ... pdb.save('test_pdb.cif')
+    >>> # Check the resulting saved files
+    ... pmd.load_file('test_parm.pdb')
+    <Structure 1654 atoms; 108 residues; 0 bonds; NOT parametrized>
+    >>> pmd.load_file('test_cif.pdb')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    >>> pmd.load_file('test_pdb.cif')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
