@@ -120,15 +120,17 @@ abbreviation or 1-letter symbol. It is case-insensitive.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#parmed.residue.AminoAcidResidue" title="parmed.residue.AminoAcidResidue"><tt class="xref py py-class docutils literal"><span class="pre">AminoAcidResidue</span></tt></a></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The residue corresponding to the given key</p>
 </div></blockquote>
 </td>
 </tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>KeyError if ``key`` is not a symbol, abbreviation, or case-insensitive</strong></p>
+<p class="last"><strong>name of an amino acid residue, or any of its abbreviations.</strong></p>
+</td>
+</tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>If the symbol is not defined, a KeyError is raised</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -217,15 +219,17 @@ abbreviation. It is case-insensitive.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#parmed.residue.RNAResidue" title="parmed.residue.RNAResidue"><tt class="xref py py-class docutils literal"><span class="pre">RNAResidue</span></tt></a></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The residue corresponding to the given key</p>
 </div></blockquote>
 </td>
 </tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>KeyError if ``key`` is not a recognized residue name or abbreviation for</strong></p>
+<p class="last"><strong>an RNA residue.</strong></p>
+</td>
+</tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>If the symbol is not defined, a KeyError is raised</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -314,15 +318,17 @@ abbreviation. It is case-insensitive.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residue</strong> : <a class="reference internal" href="#parmed.residue.DNAResidue" title="parmed.residue.DNAResidue"><tt class="xref py py-class docutils literal"><span class="pre">DNAResidue</span></tt></a></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The residue corresponding to the given key</p>
 </div></blockquote>
 </td>
 </tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>KeyError if ``key`` is not a recognized residue name or abbreviation for</strong></p>
+<p class="last"><strong>an DNA residue.</strong></p>
+</td>
+</tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>If the symbol is not defined, a KeyError is raised</p>
 </dd></dl>
 
 <dl class="classmethod">

@@ -55,9 +55,9 @@
 input/output easier for a wide range of file formats.</p>
 <p>The API for parsing different file types is not always consistent due to the
 technical needs of each class.  For instance, the Amber topology file class
-subclasses from <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, so it can be
+subclasses from <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, so it can be
 instantiated directly from a filename. On the other hand, <a class="reference internal" href="api/parmed/parmed.formats.pdb.html#parmed.formats.pdb.PDBFile" title="parmed.formats.pdb.PDBFile"><tt class="xref py py-class docutils literal"><span class="pre">PDBFile</span></tt></a> contains a <tt class="docutils literal"><span class="pre">parse</span></tt> static method that returns a
-<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance directly rather than
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance directly rather than
 subclassing.</p>
 <div class="section" id="reading-files-with-load-file">
 <h2>Reading files with <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
@@ -98,7 +98,7 @@ preprocessor defines to apply to the processing of the topology file,
 <tt class="docutils literal"><span class="pre">xyz=None</span></tt> is the file name of a coordinate file or an array of coordinates,
 and <tt class="docutils literal"><span class="pre">box=None</span></tt> is the array of unit cell dimensions and angles)</li>
 <li>SYBYL mol2 files and the R.E.D. mol3 extension (<tt class="docutils literal"><span class="pre">structure=False</span></tt> is a flag
-that determines whether or not the returned object is a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> or <a class="reference internal" href="api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate" title="parmed.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a>/<a class="reference internal" href="api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplateContainer" title="parmed.modeller.residue.ResidueTemplateContainer"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></a> instance)</li>
+that determines whether or not the returned object is a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> or <a class="reference internal" href="api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate" title="parmed.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a>/<a class="reference internal" href="api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplateContainer" title="parmed.modeller.residue.ResidueTemplateContainer"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></a> instance)</li>
 <li>PDB files</li>
 <li>CHARMM/XPLOR PSF files</li>
 </ul>
@@ -107,15 +107,21 @@ name to determine what format the file is based on the first couple lines.
 Except in rare, pathological cases, the file format detection mechanism is
 fairly robust. If any files <em>fail</em> this detection, feel free to file an issue on
 the Github issue tracker to improve file type prediction.</p>
+<p><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> has a number of helpful features. For instance, files ending
+with the <tt class="docutils literal"><span class="pre">.gz</span></tt> or <tt class="docutils literal"><span class="pre">.bz2</span></tt> suffix will automatically be decompressed in-memory
+using Gzip or Bzip2, respectively (except for some binary file formats, like
+NetCDF). Furthermore, URLs beginning with <tt class="docutils literal"><span class="pre">http://</span></tt>, <tt class="docutils literal"><span class="pre">https://</span></tt>, or
+<tt class="docutils literal"><span class="pre">ftp://</span></tt> are valid file names and will result in the remote file being
+downloaded and processed (again, in-memory).</p>
 </div>
 <div class="section" id="writing-files-with-structure-save">
-<h2>Writing files with <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
+<h2>Writing files with <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
 <p>Many of the file formats supported by ParmEd either parse directly to a
-<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance or subclass, and many
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance or subclass, and many
 of the desired file type conversions that ParmEd is designed to facilitate are
 between these formats (e.g., Amber topology, PDB, CHARMM PSF file, etc.).</p>
 <p>To facilitate the required conversion and file writing, the base
-<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class has a <tt class="docutils literal"><span class="pre">save</span></tt> method that
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class has a <tt class="docutils literal"><span class="pre">save</span></tt> method that
 will convert to the requested file format and write the output file. The desired
 format is specified either explicitly or by file name extension (with explicit
 format specifications taking precedence).  The supported file formats, along
@@ -229,6 +235,59 @@ is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
 </ul>
 </div>
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>The following examples use various files from the ParmEd test suite, which can
+be found in the <tt class="docutils literal"><span class="pre">test/files/</span></tt> directory of the ParmEd source code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Load a Mol2 file</span>
+<span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
+<span class="go">&lt;ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Load a Mol2 file as a Structure</span>
+<span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;tripos1.mol2&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">&lt;Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Load an Amber topology file</span>
+<span class="gp">... </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;trx.prmtop&#39;</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="s">&#39;trx.inpcrd&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span>
+<span class="go">&lt;AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Load a CHARMM PSF file</span>
+<span class="gp">... </span><span class="n">psf</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;ala_ala_ala.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psf</span>
+<span class="go">&lt;CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Load a PDB and CIF file</span>
+<span class="gp">... </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cif</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cif</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Load a Gromacs topology file -- only works with Gromacs installed</span>
+<span class="gp">... </span><span class="n">top</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top</span>
+<span class="go">&lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Any of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> subclasses shown
+above can be saved as any other kind of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class or subclass <em>for which the conversion is
+supported</em>. For instance, a raw PDB file has no defined parameters, so it cannot
+be saved as an Amber topology file. An Amber topology file, on the other hand,
+has all of the information required for a PDB, and so that conversion is
+supported:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;test_parm.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># You can also convert CIF to PDB</span>
+<span class="gp">... </span><span class="n">cif</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;test_cif.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Or you can convert PDB to CIF</span>
+<span class="gp">... </span><span class="n">pdb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;test_pdb.cif&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Check the resulting saved files</span>
+<span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;test_parm.pdb&#39;</span><span class="p">)</span>
+<span class="go">&lt;Structure 1654 atoms; 108 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;test_cif.pdb&#39;</span><span class="p">)</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;test_pdb.cif&#39;</span><span class="p">)</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -245,6 +304,7 @@ is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
 <li><a class="reference internal" href="#keywords">Keywords</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
 </ul>

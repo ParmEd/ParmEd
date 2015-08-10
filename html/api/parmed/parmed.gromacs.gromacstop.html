@@ -52,7 +52,7 @@ and building a Structure from it</p>
 <dl class="class">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile">
 <em class="property">class </em><tt class="descclassname">parmed.gromacs.gromacstop.</tt><tt class="descname">GromacsTopologyFile</tt><big>(</big><em>fname=None</em>, <em>defines=None</em>, <em>parametrize=True</em>, <em>xyz=None</em>, <em>box=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
 <p>Class providing a parser and writer for a GROMACS topology file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1361,7 +1361,7 @@ parameter types will be written to the same topologyfile.</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1410,9 +1410,14 @@ as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
 <p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1422,7 +1427,7 @@ False, ANISOU records are not written</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1476,10 +1481,15 @@ identifies the choice.</p>
 False, ANISOU records are not written. Default is False</p>
 </div></blockquote>
 <p><strong>charmm</strong> : bool, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
 atom that does not contain a SEGID identifier. Default is False</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 </td>
 </tr>

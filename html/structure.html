@@ -72,7 +72,7 @@ populated through the PDB and mmCIF parsing routines.</p>
 </tbody>
 </table>
 <p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class may be instantiated directly, but is more often
-created by one of the parsers (see below for <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a>) or extended to
+created by one of the parsers (see below for <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a>) or extended to
 support the structure files of various computational parmed programs.</p>
 <div class="section" id="attributes-of-structure-instances">
 <h3>Attributes of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances<a class="headerlink" href="#attributes-of-structure-instances" title="Permalink to this headline">¶</a></h3>
@@ -103,46 +103,46 @@ should delete all of the items from the list using the idiom <tt class="docutils
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>bonds</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> instances</td>
 </tr>
 <tr class="row-odd"><td>angles</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle" title="parmed.topologyobjects.Angle"><tt class="xref py py-class docutils literal"><span class="pre">Angle</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Angle" title="parmed.topologyobjects.Angle"><tt class="xref py py-class docutils literal"><span class="pre">Angle</span></tt></a> instances</td>
 </tr>
 <tr class="row-even"><td>urey_bradleys</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley" title="parmed.topologyobjects.UreyBradley"><tt class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.UreyBradley" title="parmed.topologyobjects.UreyBradley"><tt class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></tt></a> instances</td>
 </tr>
 <tr class="row-odd"><td>dihedrals</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">Dihedral</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">Dihedral</span></tt></a> instances</td>
 </tr>
 <tr class="row-even"><td>impropers</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper" title="parmed.topologyobjects.Improper"><tt class="xref py py-class docutils literal"><span class="pre">Improper</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Improper" title="parmed.topologyobjects.Improper"><tt class="xref py py-class docutils literal"><span class="pre">Improper</span></tt></a> instances</td>
 </tr>
 <tr class="row-odd"><td>cmaps</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap" title="parmed.topologyobjects.Cmap"><tt class="xref py py-class docutils literal"><span class="pre">Cmap</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Cmap" title="parmed.topologyobjects.Cmap"><tt class="xref py py-class docutils literal"><span class="pre">Cmap</span></tt></a> instances</td>
 </tr>
 <tr class="row-even"><td>adjusts</td>
 <td>List of <tt class="xref py py-class docutils literal"><span class="pre">NonbondedException</span></tt> &lt;parmed.topologyobjects.NonbondedException&gt;` instances</td>
 </tr>
 <tr class="row-odd"><td>stretch_bends</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.StretchBend.html#parmed.topologyobjects.StretchBend" title="parmed.topologyobjects.StretchBend"><tt class="xref py py-class docutils literal"><span class="pre">StretchBend</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.StretchBend" title="parmed.topologyobjects.StretchBend"><tt class="xref py py-class docutils literal"><span class="pre">StretchBend</span></tt></a> instances</td>
 </tr>
 <tr class="row-even"><td>out_of_plane_bends</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.OutOfPlaneBend.html#parmed.topologyobjects.OutOfPlaneBend" title="parmed.topologyobjects.OutOfPlaneBend"><tt class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBend</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.OutOfPlaneBend" title="parmed.topologyobjects.OutOfPlaneBend"><tt class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBend</span></tt></a> instances</td>
 </tr>
 <tr class="row-odd"><td>trigonal_angles</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TrigonalAngle.html#parmed.topologyobjects.TrigonalAngle" title="parmed.topologyobjects.TrigonalAngle"><tt class="xref py py-class docutils literal"><span class="pre">TrigonalAngle</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrigonalAngle" title="parmed.topologyobjects.TrigonalAngle"><tt class="xref py py-class docutils literal"><span class="pre">TrigonalAngle</span></tt></a> instances</td>
 </tr>
 <tr class="row-even"><td>torsion_torsions</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TorsionTorsion.html#parmed.topologyobjects.TorsionTorsion" title="parmed.topologyobjects.TorsionTorsion"><tt class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TorsionTorsion" title="parmed.topologyobjects.TorsionTorsion"><tt class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></tt></a> instances</td>
 </tr>
 <tr class="row-odd"><td>pi_torsions</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.PiTorsion.html#parmed.topologyobjects.PiTorsion" title="parmed.topologyobjects.PiTorsion"><tt class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.PiTorsion" title="parmed.topologyobjects.PiTorsion"><tt class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></tt></a> instances</td>
 </tr>
 <tr class="row-even"><td>chiral_frames</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.ChiralFrame.html#parmed.topologyobjects.ChiralFrame" title="parmed.topologyobjects.ChiralFrame"><tt class="xref py py-class docutils literal"><span class="pre">ChiralFrame</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ChiralFrame" title="parmed.topologyobjects.ChiralFrame"><tt class="xref py py-class docutils literal"><span class="pre">ChiralFrame</span></tt></a> instances</td>
 </tr>
 <tr class="row-odd"><td>multipole_frames</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.MultipoleFrame.html#parmed.topologyobjects.MultipoleFrame" title="parmed.topologyobjects.MultipoleFrame"><tt class="xref py py-class docutils literal"><span class="pre">MultipoleFrame</span></tt></a> instances</td>
+<td>List of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.MultipoleFrame" title="parmed.topologyobjects.MultipoleFrame"><tt class="xref py py-class docutils literal"><span class="pre">MultipoleFrame</span></tt></a> instances</td>
 </tr>
 </tbody>
 </table>
@@ -152,27 +152,27 @@ from <tt class="docutils literal"><span class="pre">stretch_bends</span></tt> to
 corresponding to each of those valence parameters as well (except for the chiral
 and multipole frame lists).  For example, a <tt class="docutils literal"><span class="pre">bond_types</span></tt>, <tt class="docutils literal"><span class="pre">angle_types</span></tt>,
 <tt class="docutils literal"><span class="pre">urey_bradley_types</span></tt>, ... etc, that contain the parameter type objects
-(<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a>,
-<a class="reference internal" href="topobj/parmed.topologyobjects.AngleType.html#parmed.topologyobjects.AngleType" title="parmed.topologyobjects.AngleType"><tt class="xref py py-class docutils literal"><span class="pre">AngleType</span></tt></a>, and
-<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a> objects, respectively, since
+(<a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a>,
+<a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AngleType" title="parmed.topologyobjects.AngleType"><tt class="xref py py-class docutils literal"><span class="pre">AngleType</span></tt></a>, and
+<a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a> objects, respectively, since
 the Urey-Bradley term is identical in functional form to a simple bond). The
 same warnings apply here&#8212;do not explicitly delete or reassign these lists.</p>
 <p>There are also two <em>special</em> subclasses of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a> tracking <tt class="docutils literal"><span class="pre">atoms</span></tt> and <tt class="docutils literal"><span class="pre">residues</span></tt>
-(namely the <a class="reference internal" href="topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList" title="parmed.topologyobjects.AtomList"><tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt></a> and the
-<a class="reference internal" href="topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList" title="parmed.topologyobjects.ResidueList"><tt class="xref py py-class docutils literal"><span class="pre">ResidueList</span></tt></a> classes that have
+(namely the <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AtomList" title="parmed.topologyobjects.AtomList"><tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt></a> and the
+<a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList" title="parmed.topologyobjects.ResidueList"><tt class="xref py py-class docutils literal"><span class="pre">ResidueList</span></tt></a> classes that have
 extra functionality aiding in the automatic bookkeeping, as described below).</p>
 </div>
 <div class="section" id="automated-bookkeeping">
 <h3>Automated Bookkeeping<a class="headerlink" href="#automated-bookkeeping" title="Permalink to this headline">¶</a></h3>
 <p>One of the strengths of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class and its corresponding
-components (such as <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a>) is that it
+components (such as <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a>) is that it
 automates the process of <em>bookkeeping</em> for your structure&#8217;s model. For instance,
-creating a <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> instance automatically
+creating a <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> instance automatically
 registers the pair of atoms involved in the bond as partners in the &#8220;bond
 graph&#8221;, which is used to determine atom connectivity. So when you create a
-<a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> object, you should immediately add
+<a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> object, you should immediately add
 it to that <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>&#8216;s <tt class="docutils literal"><span class="pre">bonds</span></tt> attribute. Likewise, if you give that
-bond a <a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a>, you should
+bond a <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a>, you should
 immediately add that instance to the <tt class="docutils literal"><span class="pre">bond_types</span></tt> attribute of the
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance as well.</p>
 <p>If you plan on creating your own models directly through the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
@@ -206,7 +206,7 @@ atoms.</li>
 instance, the return value can be one of three things:</p>
 <ol class="arabic simple">
 <li><tt class="docutils literal"><span class="pre">None</span></tt> if no atoms match the selection criteria</li>
-<li><a class="reference internal" href="topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance if the selection
+<li><a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance if the selection
 matches only a single atom. This instance is a reference to the original
 atom, it is <em>not</em> a copy.</li>
 <li><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> with all of the selected
@@ -469,19 +469,19 @@ biphenyl examples from earlier:</p>
 </div>
 </div>
 <div class="section" id="load-file">
-<h2><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
+<p>The <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
 whose name is passed as an argument. The following formats are currently
 recognized and result in the instantiation of either a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. or one of its subclasses:</p>
 <ol class="arabic simple">

@@ -55,7 +55,7 @@ Date: April 20, 2014</p>
 <dl class="class">
 <dt id="parmed.charmm.psf.CharmmPsfFile">
 <em class="property">class </em><tt class="descclassname">parmed.charmm.psf.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/charmm/psf.html#CharmmPsfFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
 <p>A chemical <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instantiated from CHARMM files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -432,8 +432,8 @@ with the remaining args and kwargs</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.structure.Structure.createSystem()</span></tt></a></dt>
-<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.structure.Structure.createSystem()</span></tt></a></dd>
+<dt><a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.structure.Structure.createSystem()</span></tt></a></dt>
+<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.structure.Structure.createSystem()</span></tt></a></dd>
 </dl>
 </div>
 </dd></dl>
@@ -1184,7 +1184,7 @@ velocities</p>
 
 <dl class="method">
 <dt id="parmed.charmm.psf.CharmmPsfFile.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1233,9 +1233,14 @@ as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
 <p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1245,7 +1250,7 @@ False, ANISOU records are not written</p>
 
 <dl class="method">
 <dt id="parmed.charmm.psf.CharmmPsfFile.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1299,10 +1304,15 @@ identifies the choice.</p>
 False, ANISOU records are not written. Default is False</p>
 </div></blockquote>
 <p><strong>charmm</strong> : bool, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
 atom that does not contain a SEGID identifier. Default is False</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
