@@ -61,6 +61,7 @@ if has_openmm:
                                  get_fn('toppar_water_ions.str'))
 
     CPU = mm.Platform.getPlatformByName('CPU')
+    Reference = mm.Platform.getPlatformByName('Reference')
 
 def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     """ Gets a decomposed energy for a given system """
@@ -286,7 +287,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstrom)
         self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
@@ -307,7 +308,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
@@ -325,7 +326,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms)
         self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)

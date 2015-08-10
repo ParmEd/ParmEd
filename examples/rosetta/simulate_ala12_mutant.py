@@ -8,7 +8,7 @@ from simtk.openmm.app import *
 from simtk.unit import *
 
 # ParmEd imports
-from chemistry import load_rosetta
+from parmed import load_rosetta
 
 # PyRosetta imports
 from toolbox import mutate_residue

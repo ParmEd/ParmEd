@@ -9,6 +9,7 @@ try:
     import simtk.openmm.app as app
     has_openmm = True
     CPU = mm.Platform.getPlatformByName('CPU')
+    Reference = mm.Platform.getPlatformByName('Reference')
 except ImportError:
     from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
@@ -204,7 +205,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -234,7 +235,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 

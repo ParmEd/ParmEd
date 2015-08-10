@@ -8,15 +8,15 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.charmm import CharmmPsfFile, CharmmCrdFile, CharmmParameterSet
-from chemistry.openmm import StateDataReporter
-from chemistry import unit as u
+from parmed import load_file, unit as u
+from parmed.charmm import CharmmParameterSet
+from parmed.openmm import StateDataReporter
 
 # Load the CHARMM files
 print('Loading CHARMM files...')
 params = CharmmParameterSet('toppar/par_all36_prot.prm')
-ala5_gas = CharmmPsfFile('ala5_autopsf.psf')
-ala5_crds = app.PDBFile('ala5_autopsf.pdb')
+ala5_gas = load_file('ala5_autopsf.psf')
+ala5_crds = load_file('ala5_autopsf.pdb')
 
 # NOTE NOTE
 # The parameter set we used here is the CHARMM 36 force field, but this is

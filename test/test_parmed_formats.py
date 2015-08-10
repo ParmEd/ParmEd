@@ -5,7 +5,7 @@ from __future__ import division
 import utils
 
 import numpy as np
-from parmed import amber, charmm, exceptions, formats, gromacs
+from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
@@ -295,6 +295,18 @@ class TestChemistryPDBStructure(FileIOTestCase):
         # A that has an occupancy of 0.37 and conformer B with occupancy 0.63
         self.assertEqual(pdbfile3.residues[84][4].xx, -4.162)
         self.assertEqual(pdbfile4.residues[84][4].xx, -4.157)
+
+    def testPdbWriteStandardNames(self):
+        """ Test PDB file writing converting to standard names """
+        parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        output = StringIO()
+        write_PDB(parm, output, standard_resnames=True)
+        output.seek(0)
+        pdb = read_PDB(output)
+        for res in pdb.residues:
+            self.assertEqual(
+                    residue.AminoAcidResidue.get(res.name).abbr, res.name
+            )
 
     def testAnisouRead(self):
         """ Tests that read_PDB properly reads ANISOU records """
@@ -612,6 +624,18 @@ class TestChemistryCIFStructure(FileIOTestCase):
         self.assertEqual(len(pdbfile2.atoms), 451)
         self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
 
+    def testCIFWriteStandardNames(self):
+        """ Test PDBx/mmCIF file writing converting to standard names """
+        parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        output = StringIO()
+        write_CIF(parm, output, standard_resnames=True)
+        output.seek(0)
+        pdb = read_CIF(output)
+        for res in pdb.residues:
+            self.assertEqual(
+                    residue.AminoAcidResidue.get(res.name).abbr, res.name
+            )
+
     def _check4lzt(self, cif):
         pdb = read_PDB(self.lztpdb)
         self.assertEqual(len(cif.atoms), len(pdb.atoms))
@@ -759,6 +783,16 @@ class TestMol2File(FileIOTestCase):
         self.assertEqual(len(mol3.bonds), 35)
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
+
+    def testMol3File2(self):
+        """ Tests parsing a Mol3 file with RESIDUECONNECT atoms """
+        mol3 = formats.Mol2File.parse(get_fn('m2-c1_f3.mol2'))
+        self.assertEqual(len(mol3.atoms), 27)
+        self.assertEqual(len(mol3.bonds), 29)
+        self.assertIs(mol3.head, None)
+        self.assertIs(mol3.tail, None)
+        self.assertIs(mol3.connections[0], mol3[5])
+        self.assertIs(mol3.connections[1], mol3[9])
 
     def testMol2FileWithBlankLines(self):
         """ Tests parsing a Mol2 file with blank lines at the end """
