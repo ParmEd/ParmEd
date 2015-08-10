@@ -8,6 +8,8 @@ try:
     import simtk.openmm as mm
     from simtk.openmm import app
     has_openmm = True
+    Reference = mm.Platform.getPlatformByName('Reference')
+    CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
     has_openmm = False
 import numpy as np
@@ -34,7 +36,7 @@ class TestStateDataReporter(utils.FileIOTestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=CPU)
         sim.context.setPositions(amber_gas.positions)
         f = open(get_fn('akma5.dat', written=True), 'w')
         sim.reporters.extend([
@@ -139,7 +141,7 @@ class TestStateDataReporter(utils.FileIOTestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=CPU)
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.append(
             ProgressReporter(get_fn('progress_reporter.dat', written=True), 10,
@@ -165,7 +167,7 @@ class TestTrajRestartReporter(utils.FileIOTestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator, platform=mm.Platform.getPlatformByName('CPU'))
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=CPU)
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj1.nc', written=True), 10),
@@ -257,7 +259,7 @@ class TestTrajRestartReporter(utils.FileIOTestCase):
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_solv.topology, system, integrator)
+        sim = app.Simulation(amber_solv.topology, system, integrator, Reference)
         sim.context.setPositions(amber_solv.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj.nc', written=True), 1,

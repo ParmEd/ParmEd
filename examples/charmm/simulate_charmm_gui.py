@@ -8,16 +8,16 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.charmm import CharmmPsfFile, CharmmCrdFile, CharmmParameterSet
-from chemistry.openmm.reporters import StateDataReporter
-from chemistry import unit as u
+from parmed import load_file, unit as u
+from parmed.charmm import CharmmParameterSet
+from parmed.openmm import StateDataReporter
 
 # Load the CHARMM files
 print('Loading CHARMM files...')
 params = CharmmParameterSet('toppar/par_all36_prot.prm',
                             'toppar/toppar_water_ions.str')
-ala2_solv = CharmmPsfFile('ala2_charmmgui.psf')
-ala2_crds = CharmmCrdFile('ala2_charmmgui.crd')
+ala2_solv = load_file('ala2_charmmgui.psf')
+ala2_crds = load_file('ala2_charmmgui.crd')
 
 # NOTE NOTE
 # The parameter set we used here is the CHARMM 36 force field, but this is

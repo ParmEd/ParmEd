@@ -8,13 +8,12 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.amber import AmberParm
-from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
-from chemistry import unit as u
+from parmed import load_file, unit as u
+from parmed.openmm import StateDataReporter, NetCDFReporter
 
 # Load the Amber files
 print('Loading AMBER files...')
-ala5_gas = AmberParm('ala5_gas.parm7', 'ala5_gas.rst7')
+ala5_gas = load_file('ala5_gas.parm7', 'ala5_gas.rst7')
 
 # Create the OpenMM system
 print('Creating OpenMM System')
