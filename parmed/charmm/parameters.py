@@ -81,6 +81,10 @@ class CharmmParameterSet(ParameterSet):
     improper_types : dict((str,str,str,str):ImproperType)
         Dictionary mapping the 4-element tuple of the names of the four atom
         types involved in the improper torsion to the ImproperType instances
+    improper_periodic_types : dict((str,str,str,str):DihedralType)
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the improper torsion (modeled as a Fourier series) to
+        the DihedralType instances
     cmap_types : dict((str,str,str,str,str):CmapType)
         Dictionary mapping the 5-element tuple of the names of the five atom
         types involved in the correction map to the CmapType instances

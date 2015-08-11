@@ -8,14 +8,43 @@ Date: Aug. 11, 2015
 from __future__ import division, print_function
 
 from contextlib import closing
+from parmed.exceptions import ParameterError
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
-from parmed.periodic_table import Mass
+from parmed.periodic_table import Mass, element_by_mass
+from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
+                                    DihedralTypeList)
 from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass
+from parmed.utils.six import add_metaclass, string_types
+import re
+
+subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
+_bondre = re.compile(r'(..?)-(..?) *%(FLOATRE)s *%(FLOATRE)s' % subs)
+_anglere = re.compile(r'(..?)-(..?)-(..?) ' '*%(FLOATRE)s *%(FLOATRE)s' % subs)
+_dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?) *%(FLOATRE)s '
+                      '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
+_sceere = re.compile(r'SCEE=%(FLOATRE)s' % subs)
+_scnbre = re.compile(r'SCNB=%(FLOATRE)s' % subs)
+_impropre = re.compile(r'(..?)-(..?)-(..?)-(..?) '
+                       '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
 
 @add_metaclass(FileFormatType)
 class AmberParameterSet(ParameterSet):
+    """ Class storing parameters from an Amber parameter set
+
+    Parameters
+    ----------
+    filenames : str or list of str
+        Either the name of a file or a list of filenames from which parameters
+        should be parsed.
+
+    Notes
+    -----
+    Order is important in the list of files provided. The parameters are loaded
+    in the order they are provided, and any parameters that are specified in
+    multiple places are overwritten (that is, the *last* occurrence is the
+    parameter type that is used)
+    """
 
     @staticmethod
     def id_format(filename):
@@ -130,6 +159,192 @@ class AmberParameterSet(ParameterSet):
                     return True
             else:
                 return True
+
+    def __init__(self, *filenames):
+        super(AmberParameterSet, self).__init__()
+        self.titles = []
+        for filename in filenames:
+            if isinstance(filename, string_types):
+                self.load_parameters(filename)
+            else:
+                for fname in filename:
+                    self.load_parameters(fname)
+
+    def load_parameters(self, fname):
+        """ Load a set of parameters from a single parameter file
+
+        Parameters
+        ----------
+        fname : str or file-like
+            Parameter file to parse
+        """
+        if isinstance(fname, string_types):
+            f = genopen(fname, 'r')
+            own_handle = True
+        else:
+            f = fname
+            own_handle = False
+        self.titles.append(f.readline().strip())
+        for line in f:
+            if not line.strip():
+                return self._parse_frcmod(f, line)
+            elif line.strip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE',
+                                  'DIHED', 'DIHEDRAL', 'IMPR', 'IMPROP',
+                                  'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
+                                  'NONBONDED'):
+                return self._parse_frcmod(f, line)
+            else:
+                return self._parse_parm_dat(f, line)
+
+    def _parse_frcmod(self, f, line):
+        """ Parses an frcmod file from an open file object """
+        def fiter():
+            yield line
+            for l in f: yield l
+        section = None
+        dihed_type = None
+        for line in fiter():
+            line = line.rstrip()
+            if not line: continue
+            if line.startswith('MASS'):
+                section = 'MASS'
+                continue
+            elif line.startswith('BOND'):
+                section = 'BOND'
+                continue
+            elif line.startswith('ANGL'):
+                section = 'ANGLE'
+                continue
+            elif line.startswith('DIHE'):
+                section = 'DIHEDRAL'
+                continue
+            elif line.startswith('IMPR'):
+                section = 'IMPROPER'
+                continue
+            elif line.startswith('NONB'):
+                section = 'NONBOND'
+                continue
+            elif line.startswith('LJEDIT'):
+                section = 'NBFIX'
+                continue
+
+            if section == 'MASS':
+                words = line.split()
+                try:
+                    mass = float(words[1])
+                except ValueError:
+                    raise ParameterError('Could not convert mass to float [%s]'
+                                         % words[1])
+                except IndexError:
+                    raise ParameterError('Error parsing MASS line. Not enough '
+                                         'tokens')
+                if words[0] in self.atom_types:
+                    self.atom_types[words[0]].mass = mass
+                else:
+                    n_types = len(self.atom_types) + 1
+                    atype = AtomType(words[0], len(self.atom_types)+1, mass,
+                                     element_by_mass(mass))
+                    self.atom_types[words[0]] = atype
+            elif section == 'BOND':
+                rematch = _bondre.match(line)
+                if not rematch:
+                    raise ParameterError('Could not understand BOND line [%s]' %
+                                         line)
+                a1, a2, k, eq = rematch.groups()
+                a1 = a1.strip(); a2 = a2.strip()
+                typ = BondType(float(k), float(eq))
+                self.bond_types[(a1, a2)] = typ
+                self.bond_types[(a2, a1)] = typ
+            elif section == 'ANGLE':
+                rematch = _anglere.match(line)
+                if not rematch:
+                    raise ParameterError('Could not understand ANGLE line [%s]'
+                                         % line)
+                a1, a2, a3, k, eq = rematch.groups()
+                a1 = a1.strip(); a2 = a2.strip(); a3 = a3.strip()
+                typ = AngleType(float(k), float(eq))
+                self.angle_types[(a1, a2, a3)] = typ
+                self.angle_types[(a3, a2, a1)] = typ
+            elif section == 'DIHEDRAL':
+                rematch = _dihedre.match(line)
+                if not rematch:
+                    raise ParameterError('Could not understand DIHEDRAL line '
+                                         '[%s]' % line)
+                a1, a2, a3, a4, div, k, phi, per = rematch.groups()
+                scee = [float(x) for x in _sceere.findall(line)] or [1.2]
+                scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
+                a1 = a1.strip(); a2 = a2.strip();
+                a3 = a3.strip(); a4 = a4.strip()
+                per = float(per)
+                typ = DihedralType(float(k)/float(div), abs(per), float(phi),
+                                   scee[0], scnb[0])
+                if per < 0:
+                    # Part of a multi-term dihedral definition
+                    if dihed_type is not None:
+                        # Middle term of a multi-term dihedral
+                        self.dihedral_types[dihed_type].append(typ)
+                    else:
+                        # First term of the multi-term dihedral
+                        dihed_type = (a1, a2, a3, a4)
+                        typs = DihedralTypeList()
+                        typs.append(typ)
+                        self.dihedral_types[dihed_type] = typs
+                        self.dihedral_types[tuple(reversed(dihed_type))] = typs
+                else:
+                    if dihed_type is not None:
+                        # Finish the existing multi-term dihedral
+                        self.dihedral_types[dihed_type].append(typ)
+                        dihed_type = None
+                    else:
+                        typs = DihedralTypeList()
+                        typs.append(typ)
+                        self.dihedral_types[(a1, a2, a3, a4)] = typs
+                        self.dihedral_types[(a4, a3, a2, a1)] = typs
+            elif section == 'IMPROPER':
+                rematch = _impropre.match(line)
+                if not rematch:
+                    raise ParameterError('Could not understand IMPROPER line '
+                                         '[%s]' % line)
+                a1, a2, a3, a4, k, phi, per = rematch.groups()
+                a1 = a1.strip(); a2 = a2.strip();
+                a3 = a3.strip(); a4 = a4.strip()
+                key = tuple(sorted([a1, a2, a3, a4]))
+                self.improper_periodic_types[key] = \
+                        DihedralType(float(k), float(per), float(phi))
+            elif section == 'NONBOND':
+                try:
+                    atyp, rmin, eps = line.split()[:3]
+                except ValueError:
+                    raise ParameterError('Could not understand nonbond '
+                                         'parameter line [%s]' % line)
+                try:
+                    self.atom_types[atyp].rmin = float(rmin)
+                    self.atom_types[atyp].eps = float(eps)
+                except KeyError:
+                    raise ParameterError('Atom type %s not present in the '
+                                         'database.' % atyp)
+                except ValueError:
+                    raise ParameterError('Could not convert nonbond parameters '
+                                         'to floats [%s, %s]' % (rmin, eps))
+            elif section == 'NBFIX':
+                try:
+                    a1, a2, rmin1, eps1, rmin2, eps2 = line.split()[:6]
+                except ValueError:
+                    raise ParameterError('Could not understand LJEDIT line [%s]'
+                                         % line)
+                try:
+                    rmin1 = float(rmin1)
+                    eps1 = float(eps1)
+                    rmin2 = float(rmin2)
+                    eps2 = float(eps2)
+                except ValueError:
+                    raise ParameterError('Could not convert LJEDIT parameters '
+                                         'to floats.')
+                self.nbfix_types[(min(a1, a2), max(a1, a2))] = \
+                        (math.sqrt(eps1*eps2), rmin1+rmin2)
+
+    def _parse_parm_dat(self, f, line):
+        """ Internal parser for parm.dat files from open file handle """
 
     def write(self, dest, style='frcmod'):
         """ Writes a parm.dat file with the current parameters

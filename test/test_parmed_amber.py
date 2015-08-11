@@ -8,7 +8,7 @@ import numpy as np
 import os
 from parmed.amber import readparm, asciicrd, mask, parameters
 from parmed import topologyobjects, load_file
-from parmed.utils.six import string_types
+from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
@@ -219,6 +219,9 @@ class TestReadParm(unittest.TestCase):
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
+def _num_unique_types(dct):
+    return len(set(id(item) for _, item in iteritems(dct)))
+
 class TestParameterFiles(unittest.TestCase):
     """ Tests Amber parameter and frcmod files """
 
@@ -231,6 +234,84 @@ class TestParameterFiles(unittest.TestCase):
         """ Tests the detection of Amber parm.dat files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'parm*.dat')):
             self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+
+    def testFrcmodParsing(self):
+        """ Tests parsing an Amber frcmod file """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'frcmod.ff99SB')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 0)
+        self.assertEqual(_num_unique_types(params.bond_types), 0)
+        self.assertEqual(_num_unique_types(params.angle_types), 0)
+        self.assertEqual(_num_unique_types(params.dihedral_types), 4)
+        self.assertEqual(_num_unique_types(params.improper_periodic_types), 0)
+        # Small enough to check all of the parameters
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][1],
+                         topologyobjects.DihedralType(0.42, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][2],
+                         topologyobjects.DihedralType(0.27, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
+                         topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
+
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][1],
+                         topologyobjects.DihedralType(0.55, 3, 180, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][2],
+                         topologyobjects.DihedralType(1.58, 2, 180, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][3],
+                         topologyobjects.DihedralType(0.45, 1, 180, 1.2, 2.0))
+
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][1],
+                         topologyobjects.DihedralType(0.4, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][2],
+                         topologyobjects.DihedralType(2.0, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][3],
+                         topologyobjects.DihedralType(2.0, 1, 0, 1.2, 2.0))
+
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][1],
+                         topologyobjects.DihedralType(0.4, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][2],
+                         topologyobjects.DihedralType(0.2, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][3],
+                         topologyobjects.DihedralType(0.2, 1, 0, 1.2, 2.0))
+
+    def testParmParsing(self):
+        """ Tests parsing an Amber parm.dat file """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm10.dat')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 63)
+        self.assertEqual(_num_unique_types(params.bond_types), 151)
+        self.assertEqual(_num_unique_types(params.angle_types), 400)
+        self.assertEqual(_num_unique_types(params.dihedral_types), 275)
+        self.assertEqual(_num_unique_types(params.improper_periodic_types), 59)
+
+    def testParmParsingLJEDIT(self):
+        """ Tests parsing an Amber parm.dat file with an LJEDIT section """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm14ipq.dat')
+        )
+        self.assertEqual(_num_unique_types(params.nbfix_types), 6)
+
+    def testParmSetParsing(self):
+        """ Tests parsing a set of Amber parameter files """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm99.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff99SB'),
+                os.path.join(get_fn('parm'), 'frcmod.parmbsc0'),
+        )
+        self.assertGreater(_num_unique_types(params.atom_types), 0)
+        self.assertGreater(_num_unique_types(params.bond_types), 0)
+        self.assertGreater(_num_unique_types(params.angle_types), 0)
+        self.assertGreater(_num_unique_types(params.dihedral_types), 0)
+        self.assertGreater(_num_unique_types(params.improper_periodic_types), 0)
 
 class TestCoordinateFiles(unittest.TestCase):
     """ Tests the various coordinate file classes """
@@ -811,5 +892,6 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(d1.improper, d2.improper)
             self.assertEqual(d1.type, d2.type)
 
+#del TestReadParm, TestCoordinateFiles, TestAmberParmSlice, TestObjectAPIs, TestWriteFiles, TestAmberMask
 if __name__ == '__main__':
     unittest.main()
