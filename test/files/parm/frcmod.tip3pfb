@@ -1,0 +1,15 @@
+TIP3P-FB Water Model (Wang LP, Martinez TJ and Pande VS, J. Phys. Chem. Lett., 2014)
+MASS
+OW    16.0
+ 
+BOND
+OW-HW  553.0    1.011811      TIP3P-FB water
+HW-HW  553.0    1.638684      TIP3P-FB water
+ 
+ANGLE
+
+DIHE
+
+NONBON
+  OW       1.7835723    0.155866
+
