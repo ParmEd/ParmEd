@@ -34,8 +34,6 @@ get_fn = utils.get_fn
 #   3 - Ewald
 #   4 - PME
 
-gromacs.GROMACS_TOPDIR = get_fn('top')
-
 def get_forces_from_xvg(frcfile):
     with open(frcfile, 'r') as f:
         frc = [float(x) for x in f.readline().split()[1:]]

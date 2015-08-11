@@ -755,6 +755,8 @@ def ConvertFromPSF(struct, params, title=''):
             atom.type = str(atom.atom_type)
     parm = ChamberParm.from_structure(struct)
     parm.parm_data['FORCE_FIELD_TYPE'] = fftype = []
+    if params.parametersets == []:
+        params.parametersets.append('')
     for pset in params.parametersets:
         if 'CHARMM' not in pset: # needed to trigger "charmm_active"...
             pset = 'CHARMM: %s' % pset

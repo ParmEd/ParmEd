@@ -29,8 +29,6 @@ gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
 
-gromacs.GROMACS_TOPDIR = get_fn('top')
-
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
 

@@ -255,7 +255,7 @@ class PDBFile(object):
                     atnum, atname, altloc = line[6:11], line[12:16], line[16]
                     resname, chain = line[17:21], line[21]
                     resid, inscode = line[22:resend], line[26]
-                    x, y, z = line[30:38], line[38:46], line[47:54]
+                    x, y, z = line[30:38], line[38:46], line[46:54]
                     occupancy, bfactor = line[54:60], line[60:66]
                     elem, chg = line[76:78], line[78:80]
                     segid = line[72:76].strip() # CHARMM-specific
