@@ -1,7 +1,6 @@
 """
 This module contains classes for parsing and processing CHARMM parameter,
-topology, and stream files. It only extracts atom properties from the
-topology files and extracts all parameters from the parameter files
+topology, and stream files.
 
 Author: Jason M. Swails
 Contributors:

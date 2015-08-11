@@ -2,15 +2,17 @@
 Tests the functionality in the parmed.amber package
 """
 from __future__ import print_function, division
-from utils import get_fn, has_numpy, FileIOTestCase
+
+import glob
 import numpy as np
-from parmed.amber import readparm, asciicrd, mask
+import os
+from parmed.amber import readparm, asciicrd, mask, parameters
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import range, zip
-import os
 import random
 import unittest
+from utils import get_fn, has_numpy, FileIOTestCase
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -216,6 +218,19 @@ class TestReadParm(unittest.TestCase):
             for cmap in parm.cmaps:
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
+
+class TestParameterFiles(unittest.TestCase):
+    """ Tests Amber parameter and frcmod files """
+
+    def testFileDetectionFrcmod(self):
+        """ Tests the detection of Amber frcmod files """
+        for fname in glob.glob(os.path.join(get_fn('parm'), 'frcmod.*')):
+            self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+
+    def testFileDetectionParm(self):
+        """ Tests the detection of Amber parm.dat files """
+        for fname in glob.glob(os.path.join(get_fn('parm'), 'parm*.dat')):
+            self.assertTrue(parameters.AmberParameterSet.id_format(fname))
 
 class TestCoordinateFiles(unittest.TestCase):
     """ Tests the various coordinate file classes """
