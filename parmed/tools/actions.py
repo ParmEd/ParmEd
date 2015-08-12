@@ -318,11 +318,11 @@ class writeFrcmod(Action):
 
     def execute(self):
         """ Writes the frcmod file """
-        from parmed.amber.parameters import ParameterSet
+        from parmed.amber.parameters import AmberParameterSet
         if not Action.overwrite and os.path.exists(self.frcmod_name):
             raise FileExists('%s exists; not overwriting' % self.frcmod_name)
-        parmset = ParameterSet()
-        parmset.load_from_parm(self.parm)
+        parmset = AmberParameterSet()
+        parmset.from_structure(self.parm)
         frcmod = open(self.frcmod_name, 'w')
         frcmod.write('Force field parameters from %s\n' % self.parm)
         parmset.write(frcmod)
