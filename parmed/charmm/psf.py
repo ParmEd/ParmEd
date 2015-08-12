@@ -607,9 +607,12 @@ class CharmmPsfFile(Structure):
             improper.type.used = True
             if isinstance(improper.type, ImproperType):
                 self.improper_types.append(improper.type)
-            if isinstance(improper.type, DihedralType):
+                improper.type.list = self.improper_types
+            elif isinstance(improper.type, DihedralType):
                 self.dihedral_types.append(improper.type)
-            improper.type.list = self.improper_types
+                improper.type.list = self.dihedral_types
+            else:
+                raise RuntimeError('Should not be here') # Avoid masking errors
         # Now do the cmaps. These will not have wild-cards
         for cmap in self.cmaps:
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
