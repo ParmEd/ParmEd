@@ -264,7 +264,7 @@ def element_by_name(name):
     """
     Determine the element based on the name of an atom. This is very naive. It
     first tries to match the first letter of the element. If that doesn't work,
-    it tries to match the first *two* atoms. If that still doesn't work, it
+    it tries to match the first *two* letters. If that still doesn't work, it
     defaults to an extra point
 
     Parameters

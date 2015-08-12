@@ -8,12 +8,14 @@ import math
 import numpy as np
 import os
 from parmed.amber import readparm, asciicrd, mask, parameters
+from parmed.exceptions import AmberWarning
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
 from utils import get_fn, has_numpy, FileIOTestCase
+import warnings
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -432,6 +434,19 @@ class TestParameterFiles(unittest.TestCase):
                          math.sqrt(0.162750*0.2104))
         self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
                          1.775931+1.66)
+
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def testLoadLeaprc(self):
+        """ Tests loading a leaprc file to define a force field """
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        params = parameters.AmberParameterSet.load_leaprc(
+                os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd',
+                             'leaprc.ff14SB')
+        )
+        self.assertEqual(params.atom_types['H'].atomic_number, 1)
+        self.assertEqual(params.atom_types['3C'].atomic_number, 6)
+        self.assertEqual(params.atom_types['K+'].atomic_number, 19)
+        self.assertTrue(params.residues)
 
     def testParmSetParsing(self):
         """ Tests parsing a set of Amber parameter files """
@@ -1048,5 +1063,6 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(d1.improper, d2.improper)
             self.assertEqual(d1.type, d2.type)
 
+del TestReadParm, TestCoordinateFiles, TestAmberParmSlice, TestObjectAPIs, TestWriteFiles, TestAmberMask
 if __name__ == '__main__':
     unittest.main()

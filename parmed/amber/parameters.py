@@ -10,6 +10,8 @@ from __future__ import division, print_function
 from collections import defaultdict
 from contextlib import closing
 import math
+import os
+from parmed.amber.offlib import AmberOFFLibrary
 from parmed.exceptions import ParameterError
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
@@ -20,6 +22,7 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 import re
 
+# parameter file regexes
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
 _bondre = re.compile(r'(..?)-(..?) *%(FLOATRE)s *%(FLOATRE)s' % subs)
 _anglere = re.compile(r'(..?)-(..?)-(..?) ' '*%(FLOATRE)s *%(FLOATRE)s' % subs)
@@ -29,6 +32,31 @@ _sceere = re.compile(r'SCEE=%(FLOATRE)s' % subs)
 _scnbre = re.compile(r'SCNB=%(FLOATRE)s' % subs)
 _impropre = re.compile(r'(..?)-(..?)-(..?)-(..?) '
                        '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
+del subs
+
+# Leaprc regexes
+_atomtypere = re.compile(r"""({\s*["']([\w\+\-]+)["']\s*["'](\w+)["']\s*"""
+                         r"""["'](\w+)["']\s*})""")
+_loadparamsre = re.compile(r'loadamberparams (\S*)', re.I)
+_loadoffre = re.compile(r'loadoff (\S*)', re.I)
+
+def _find_amber_file(fname):
+    """
+    Finds an Amber file. Looks in the current directory, then the following
+    locations:
+
+    - $AMBERHOME/dat/leap/lib
+    - $AMBERHOME/dat/leap/parm
+    """
+    from parmed.amber import AMBERHOME
+    if os.path.exists(fname):
+        return fname
+    leapdir = os.path.join(AMBERHOME, 'dat', 'leap')
+    if os.path.exists(os.path.join(leapdir, 'lib', fname)):
+        return os.path.join(leapdir, 'lib', fname)
+    if os.path.exists(os.path.join(leapdir, 'parm', fname)):
+        return os.path.join(leapdir, 'parm', fname)
+    raise ValueError('Cannot find Amber file %s' % fname)
 
 @add_metaclass(FileFormatType)
 class AmberParameterSet(ParameterSet):
@@ -169,12 +197,98 @@ class AmberParameterSet(ParameterSet):
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
         self.titles = []
+        self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
                 self.load_parameters(filename)
             else:
                 for fname in filename:
                     self.load_parameters(fname)
+
+    #===================================================
+
+    @classmethod
+    def load_leaprc(cls, fname):
+        """ Load a parameter set from a leaprc file
+
+        Parameters
+        ----------
+        fname : str or file-like
+            Name of the file or open file-object from which a leaprc-style file
+            will be read
+
+        Notes
+        -----
+        This does not read all parts of a leaprc file -- only those pertinent to
+        defining force field information. For instance, the following sections
+        and commands are processed:
+
+        - addAtomTypes
+        - loadAmberParams
+        - loadOFF
+        """
+        params = cls()
+        if isinstance(fname, string_types):
+            f = genopen(fname, 'r')
+            own_handle = True
+        else:
+            f = fname
+            own_handle = False
+        # To make parsing easier, and because leaprc files are usually quite
+        # short, I'll read the whole file into memory
+        text = f.read()
+        if own_handle: f.close()
+        lowertext = text.lower() # commands are case-insensitive
+        try:
+            idx = lowertext.index('addatomtypes')
+        except ValueError:
+            # Does not exist in this file
+            atom_types_str = ''
+        else:
+            # Now process the addAtomTypes
+            i = idx + len('addatomtypes')
+            while i < len(text) and text[i] != '{':
+                if text[i] not in '\r\n\t ':
+                    raise ParameterError('Unsupported addAtomTypes syntax in '
+                                         'leaprc file')
+                i += 1
+            if i == len(text):
+                raise ParameterError('Unsupported addAtomTypes syntax in '
+                                     'leaprc file')
+            # We are at our first brace
+            chars = []
+            nopen = 1
+            i += 1
+            while i < len(text):
+                char = text[i]
+                if char == '{':
+                    nopen += 1
+                elif char == '}':
+                    nopen -= 1
+                    if nopen == 0: break
+                elif char == '\n':
+                    char = ' '
+                chars.append(char)
+                i += 1
+            atom_types_str = ''.join(chars).strip()
+        for _, name, symb, hyb in _atomtypere.findall(atom_types_str):
+            if symb not in AtomicNum:
+                raise ParameterError('%s is not a recognized element' % symb)
+            if name in params.atom_types:
+                params.atom_types[name].atomic_number = AtomicNum[symb]
+            else:
+                params.atom_types[name] = \
+                        AtomType(name, len(params.atom_types)+1, Mass[symb],
+                                 AtomicNum[symb])
+        # Now process the parameter files
+        for fname in _loadparamsre.findall(text):
+            params.load_parameters(_find_amber_file(fname))
+        # Now process the library file
+        for fname in _loadoffre.findall(text):
+            params.residues.update(
+                    AmberOFFLibrary.parse(_find_amber_file(fname))
+            )
+        return params
 
     #===================================================
 
@@ -193,16 +307,20 @@ class AmberParameterSet(ParameterSet):
             f = fname
             own_handle = False
         self.titles.append(f.readline().strip())
-        for line in f:
-            if not line.strip():
-                return self._parse_frcmod(f, line)
-            elif line.strip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE',
-                                  'DIHED', 'DIHEDRAL', 'IMPR', 'IMPROP',
-                                  'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
-                                  'NONBONDED'):
-                return self._parse_frcmod(f, line)
-            else:
-                return self._parse_parm_dat(f, line)
+        try:
+            for line in f:
+                if not line.strip():
+                    return self._parse_frcmod(f, line)
+                elif line.strip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE',
+                                      'DIHED', 'DIHEDRAL', 'IMPR', 'IMPROP',
+                                      'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
+                                      'NONBONDED'):
+                    return self._parse_frcmod(f, line)
+                else:
+                    return self._parse_parm_dat(f, line)
+        finally:
+            if own_handle:
+                f.close()
 
     #===================================================
 

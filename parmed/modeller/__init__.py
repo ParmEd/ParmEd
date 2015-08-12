@@ -3,9 +3,8 @@ This package contains functionality necessary to carry out basic molecular
 modelling tasks.
 """
 
-__author__ = 'Jason Swails'
+__author__ = 'Jason Swails <jason.swails@gmail.com>'
 __date__ = '2015'
-__license__ = 'LGPL'
 
 from parmed.modeller.residue import *
-from parmed.modeller.offlib import AmberOFFLibrary
+from parmed.amber.offlib import AmberOFFLibrary

@@ -4,6 +4,9 @@ ResidueTemplate objects
 """
 from __future__ import print_function
 
+from collections import OrderedDict
+from contextlib import closing
+import numpy
 from parmed import Atom
 from parmed.constants import RAD_TO_DEG
 from parmed.exceptions import AmberWarning
@@ -14,12 +17,6 @@ from parmed import periodic_table as pt
 from parmed.utils.io import genopen
 from parmed.utils.six import string_types, add_metaclass
 from parmed.utils.six.moves import range
-from collections import OrderedDict
-from contextlib import closing
-try:
-    import numpy as np
-except ImportError:
-    np = None
 import re
 import warnings
 
@@ -265,28 +262,29 @@ class AmberOFFLibrary(object):
                               'Ignored...' % name, AmberWarning)
         # Get the connectivity array to set bonds
         line = fileobj.readline()
-        rematch = AmberOFFLibrary._sec6re.match(line)
-        if not rematch:
-            raise RuntimeError('Expected connectivity table not found')
-        elif rematch.groups()[0] != name:
-            raise RuntimeError('Found residue %s while processing residue %s' %
-                               (rematch.groups()[0], name))
-        line = fileobj.readline()
-        while line[0] != '!':
-            i, j, flag = line.split()
+        if len(templ.atoms) > 1:
+            rematch = AmberOFFLibrary._sec6re.match(line)
+            if not rematch:
+                raise RuntimeError('Expected connectivity table not found')
+            elif rematch.groups()[0] != name:
+                raise RuntimeError('Found residue %s while processing residue %s' %
+                                   (rematch.groups()[0], name))
             line = fileobj.readline()
-            if nres > 1:
-                # Find which residue we belong in
-                i = int(i) - 1
-                j = int(j) - 1
-                for ii, idx in enumerate(start_atoms):
-                    if idx > i:
-                        ii -= 1
-                        break
-                start_idx = start_atoms[ii]
-                container[ii].add_bond(i-start_idx, j-start_idx)
-            else:
-                templ.add_bond(int(i)-1, int(j)-1)
+            while line[0] != '!':
+                i, j, flag = line.split()
+                line = fileobj.readline()
+                if nres > 1:
+                    # Find which residue we belong in
+                    i = int(i) - 1
+                    j = int(j) - 1
+                    for ii, idx in enumerate(start_atoms):
+                        if idx > i:
+                            ii -= 1
+                            break
+                    start_idx = start_atoms[ii]
+                    container[ii].add_bond(i-start_idx, j-start_idx)
+                else:
+                    templ.add_bond(int(i)-1, int(j)-1)
         # Get the hierarchy table
         rematch = AmberOFFLibrary._sec7re.match(line)
         if not rematch:
@@ -593,10 +591,6 @@ def _imaging_atom(res):
         if heavy_idx != -1:
             return heavy_idx
         return 0 # No heavy atoms?? No imaging atom, then.
-    # Now pick the atom closest to COM (if numpy is available)
-    if np is None:
-        warnings.warn('numpy not available. imaging atom set to 0')
-        return 0
     coords = res.coordinates.reshape((len(res), 3))
     masses = np.zeros(len(res))
     for i, atom in enumerate(res):

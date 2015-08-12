@@ -11,10 +11,10 @@ except ImportError:
     pd = None
 import os
 from parmed import Atom, read_PDB
-from parmed.amber import AmberParm
+from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
-                             PROTEIN, SOLVENT, AmberOFFLibrary)
+                             PROTEIN, SOLVENT)
 from parmed.formats import Mol2File
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
