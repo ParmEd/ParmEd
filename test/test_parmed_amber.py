@@ -222,6 +222,15 @@ class TestReadParm(unittest.TestCase):
 def _num_unique_types(dct):
     return len(set(id(item) for _, item in iteritems(dct)))
 
+def _num_unique_dtypes(dct):
+    used_types = set()
+    num = 0
+    for _, x in iteritems(dct):
+        if id(x) in used_types: continue
+        used_types.add(id(x))
+        num += len(x)
+    return num
+
 class TestParameterFiles(unittest.TestCase):
     """ Tests Amber parameter and frcmod files """
 
@@ -244,6 +253,7 @@ class TestParameterFiles(unittest.TestCase):
         self.assertEqual(_num_unique_types(params.bond_types), 0)
         self.assertEqual(_num_unique_types(params.angle_types), 0)
         self.assertEqual(_num_unique_types(params.dihedral_types), 4)
+        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 16)
         self.assertEqual(_num_unique_types(params.improper_periodic_types), 0)
         # Small enough to check all of the parameters
         self.assertEqual(params.dihedral_types[('C','N','CT','C')][0],
@@ -290,7 +300,7 @@ class TestParameterFiles(unittest.TestCase):
         self.assertEqual(_num_unique_types(params.atom_types), 63)
         self.assertEqual(_num_unique_types(params.bond_types), 151)
         self.assertEqual(_num_unique_types(params.angle_types), 400)
-        self.assertEqual(_num_unique_types(params.dihedral_types), 275)
+        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 275)
         self.assertEqual(_num_unique_types(params.improper_periodic_types), 59)
 
     def testParmParsingLJEDIT(self):

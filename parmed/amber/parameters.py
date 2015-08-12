@@ -7,6 +7,7 @@ Date: Aug. 11, 2015
 """
 from __future__ import division, print_function
 
+from collections import defaultdict
 from contextlib import closing
 from parmed.exceptions import ParameterError
 from parmed.formats.registry import FileFormatType
@@ -15,7 +16,7 @@ from parmed.periodic_table import Mass, element_by_mass
 from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
                                     DihedralTypeList)
 from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types
+from parmed.utils.six import add_metaclass, string_types, iteritems
 import re
 
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
@@ -209,6 +210,7 @@ class AmberParameterSet(ParameterSet):
         def fiter():
             yield line
             for l in f: yield l
+            yield '' # Keep yielding empty string after file has ended
         section = None
         dihed_type = None
         for line in fiter():
@@ -258,6 +260,8 @@ class AmberParameterSet(ParameterSet):
         def fiter():
             yield line
             for l in f: yield l
+            # Keep yielding empty string after file has ended
+            yield ''
         i = 0
         fiter = fiter()
         rawline = next(fiter)
@@ -302,7 +306,61 @@ class AmberParameterSet(ParameterSet):
                 break
             self._process_improper_line(line)
             rawline = next(fiter)
-        # 
+        # Process the 10-12 terms
+        rawline = next(fiter)
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            try:
+                a1, a2, acoef, bcoef = line.split()[:4]
+                acoef = float(acoef)
+                bcoef = float(bcoef)
+            except ValueError:
+                raise ParameterError('Trouble parsing 10-12 terms')
+            if acoef != 0 or bcoef != 0:
+                raise ParameterError('10-12 potential not supported in '
+                                     'AmberParameterSet currently')
+            rawline = next(fiter)
+        # Process 12-6 terms. Get Equivalencing first
+        rawline = next(fiter)
+        equivalent_ljtypes = dict()
+        equivalent_types = defaultdict(list)
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            words = line.split()
+            for typ in words[1:]:
+                equivalent_ljtypes[typ] = words[0]
+                equivalent_types[words[0]].append(typ)
+            rawline = next(fiter)
+        words = next(fiter).split()
+        if len(words) < 2:
+            raise ParameterError('Could not parse the kind of nonbonded '
+                                 'parameters in Amber parameter file')
+            if words[1].upper() != 'RE':
+                raise ParameterError('Only RE nonbonded parameters supported')
+        rawline = next(fiter)
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            self._process_nonbond_line(line)
+            rawline = next(fiter)
+        # Now assign all of the equivalenced atoms
+        for atyp, otyp in iteritems(equivalent_ljtypes):
+            otyp = self.atom_types[otyp]
+            self.atom_types[atyp].set_lj_params(otyp.epsilon, otyp.rmin)
+        line = next(fiter).strip()
+        if line == 'LJEDIT':
+            rawline = next(fiter)
+            while rawline:
+                line = rawline.strip()
+                if not line:
+                    break
+                self._process_nbfix_line(line, equivalent_types)
+                rawline = next(fiter)
 
     #===================================================
 
@@ -402,8 +460,7 @@ class AmberParameterSet(ParameterSet):
             raise ParameterError('Could not understand nonbond parameter line '
                                  '[%s]' % line)
         try:
-            self.atom_types[atyp].rmin = float(rmin)
-            self.atom_types[atyp].eps = float(eps)
+            self.atom_types[atyp].set_lj_params(float(eps), float(rmin))
         except KeyError:
             raise ParameterError('Atom type %s not present in the database.' %
                                  atyp)
@@ -411,7 +468,7 @@ class AmberParameterSet(ParameterSet):
             raise ParameterError('Could not convert nonbond parameters to '
                                  'floats [%s, %s]' % (rmin, eps))
 
-    def _process_nbfix_line(self, line):
+    def _process_nbfix_line(self, line, equivalents=None):
         try:
             a1, a2, rmin1, eps1, rmin2, eps2 = line.split()[:6]
         except ValueError:
@@ -426,6 +483,20 @@ class AmberParameterSet(ParameterSet):
                                  'to floats.')
         self.nbfix_types[(min(a1, a2), max(a1, a2))] = \
                 (math.sqrt(eps1*eps2), rmin1+rmin2)
+        if equivalents is not None:
+            # We need to add the same nbfixes to all atom types that are
+            # equivalent to the atom types defined in the LJEDIT line
+            for oa1 in equivalents[a1]:
+                self.nbfix_types[(min(oa1, a2), max(oa1, a2))] = \
+                        (math.sqrt(eps1*eps2), rmin1+rmin2)
+            for oa2 in equivalents[a2]:
+                self.nbfix_types[(min(a1, oa2), max(a1, oa2))] = \
+                        (math.sqrt(eps1*eps2), rmin1+rmin2)
+            # Now do the equivalenced of atom 1 with the equivalenced of atom 2
+            for oa1 in equivalents[a1]:
+                for oa2 in equivalents[a2]:
+                    self.nbfix_types[(min(oa1, oa2), max(oa1, oa2))] = \
+                            (math.sqrt(eps1*eps2), rmin1+rmin2)
 
     #===================================================
 
