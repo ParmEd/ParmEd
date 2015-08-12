@@ -46,6 +46,8 @@ class AmberParameterSet(ParameterSet):
     parameter type that is used)
     """
 
+    #===================================================
+
     @staticmethod
     def id_format(filename):
         """
@@ -160,6 +162,8 @@ class AmberParameterSet(ParameterSet):
             else:
                 return True
 
+    #===================================================
+
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
         self.titles = []
@@ -169,6 +173,8 @@ class AmberParameterSet(ParameterSet):
             else:
                 for fname in filename:
                     self.load_parameters(fname)
+
+    #===================================================
 
     def load_parameters(self, fname):
         """ Load a set of parameters from a single parameter file
@@ -195,6 +201,8 @@ class AmberParameterSet(ParameterSet):
                 return self._parse_frcmod(f, line)
             else:
                 return self._parse_parm_dat(f, line)
+
+    #===================================================
 
     def _parse_frcmod(self, f, line):
         """ Parses an frcmod file from an open file object """
@@ -229,122 +237,197 @@ class AmberParameterSet(ParameterSet):
                 continue
 
             if section == 'MASS':
-                words = line.split()
-                try:
-                    mass = float(words[1])
-                except ValueError:
-                    raise ParameterError('Could not convert mass to float [%s]'
-                                         % words[1])
-                except IndexError:
-                    raise ParameterError('Error parsing MASS line. Not enough '
-                                         'tokens')
-                if words[0] in self.atom_types:
-                    self.atom_types[words[0]].mass = mass
-                else:
-                    n_types = len(self.atom_types) + 1
-                    atype = AtomType(words[0], len(self.atom_types)+1, mass,
-                                     element_by_mass(mass))
-                    self.atom_types[words[0]] = atype
+                self._process_mass_line(line)
             elif section == 'BOND':
-                rematch = _bondre.match(line)
-                if not rematch:
-                    raise ParameterError('Could not understand BOND line [%s]' %
-                                         line)
-                a1, a2, k, eq = rematch.groups()
-                a1 = a1.strip(); a2 = a2.strip()
-                typ = BondType(float(k), float(eq))
-                self.bond_types[(a1, a2)] = typ
-                self.bond_types[(a2, a1)] = typ
+                self._process_bond_line(line)
             elif section == 'ANGLE':
-                rematch = _anglere.match(line)
-                if not rematch:
-                    raise ParameterError('Could not understand ANGLE line [%s]'
-                                         % line)
-                a1, a2, a3, k, eq = rematch.groups()
-                a1 = a1.strip(); a2 = a2.strip(); a3 = a3.strip()
-                typ = AngleType(float(k), float(eq))
-                self.angle_types[(a1, a2, a3)] = typ
-                self.angle_types[(a3, a2, a1)] = typ
+                self._process_angle_line(line)
             elif section == 'DIHEDRAL':
-                rematch = _dihedre.match(line)
-                if not rematch:
-                    raise ParameterError('Could not understand DIHEDRAL line '
-                                         '[%s]' % line)
-                a1, a2, a3, a4, div, k, phi, per = rematch.groups()
-                scee = [float(x) for x in _sceere.findall(line)] or [1.2]
-                scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
-                a1 = a1.strip(); a2 = a2.strip();
-                a3 = a3.strip(); a4 = a4.strip()
-                per = float(per)
-                typ = DihedralType(float(k)/float(div), abs(per), float(phi),
-                                   scee[0], scnb[0])
-                if per < 0:
-                    # Part of a multi-term dihedral definition
-                    if dihed_type is not None:
-                        # Middle term of a multi-term dihedral
-                        self.dihedral_types[dihed_type].append(typ)
-                    else:
-                        # First term of the multi-term dihedral
-                        dihed_type = (a1, a2, a3, a4)
-                        typs = DihedralTypeList()
-                        typs.append(typ)
-                        self.dihedral_types[dihed_type] = typs
-                        self.dihedral_types[tuple(reversed(dihed_type))] = typs
-                else:
-                    if dihed_type is not None:
-                        # Finish the existing multi-term dihedral
-                        self.dihedral_types[dihed_type].append(typ)
-                        dihed_type = None
-                    else:
-                        typs = DihedralTypeList()
-                        typs.append(typ)
-                        self.dihedral_types[(a1, a2, a3, a4)] = typs
-                        self.dihedral_types[(a4, a3, a2, a1)] = typs
+                dihed_type = self._process_dihedral_line(line, dihed_type)
             elif section == 'IMPROPER':
-                rematch = _impropre.match(line)
-                if not rematch:
-                    raise ParameterError('Could not understand IMPROPER line '
-                                         '[%s]' % line)
-                a1, a2, a3, a4, k, phi, per = rematch.groups()
-                a1 = a1.strip(); a2 = a2.strip();
-                a3 = a3.strip(); a4 = a4.strip()
-                key = tuple(sorted([a1, a2, a3, a4]))
-                self.improper_periodic_types[key] = \
-                        DihedralType(float(k), float(per), float(phi))
+                self._process_improper_line(line)
             elif section == 'NONBOND':
-                try:
-                    atyp, rmin, eps = line.split()[:3]
-                except ValueError:
-                    raise ParameterError('Could not understand nonbond '
-                                         'parameter line [%s]' % line)
-                try:
-                    self.atom_types[atyp].rmin = float(rmin)
-                    self.atom_types[atyp].eps = float(eps)
-                except KeyError:
-                    raise ParameterError('Atom type %s not present in the '
-                                         'database.' % atyp)
-                except ValueError:
-                    raise ParameterError('Could not convert nonbond parameters '
-                                         'to floats [%s, %s]' % (rmin, eps))
+                self._process_nonbond_line(line)
             elif section == 'NBFIX':
-                try:
-                    a1, a2, rmin1, eps1, rmin2, eps2 = line.split()[:6]
-                except ValueError:
-                    raise ParameterError('Could not understand LJEDIT line [%s]'
-                                         % line)
-                try:
-                    rmin1 = float(rmin1)
-                    eps1 = float(eps1)
-                    rmin2 = float(rmin2)
-                    eps2 = float(eps2)
-                except ValueError:
-                    raise ParameterError('Could not convert LJEDIT parameters '
-                                         'to floats.')
-                self.nbfix_types[(min(a1, a2), max(a1, a2))] = \
-                        (math.sqrt(eps1*eps2), rmin1+rmin2)
+                self._process_nbfix_line(line)
+
+    #===================================================
 
     def _parse_parm_dat(self, f, line):
         """ Internal parser for parm.dat files from open file handle """
+        def fiter():
+            yield line
+            for l in f: yield l
+        i = 0
+        fiter = fiter()
+        rawline = next(fiter)
+        # Parse the masses
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            self._process_mass_line(line)
+            rawline = next(fiter)
+        next(fiter) # Skip the list of hydrophobic atom types
+        # Process the bonds
+        rawline = next(fiter)
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            self._process_bond_line(line)
+            rawline = next(fiter)
+        # Process the angles
+        rawline = next(fiter)
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            self._process_angle_line(line)
+            rawline = next(fiter)
+        # Process the dihedrals
+        rawline = next(fiter)
+        dihed_type = None
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            dihed_type = self._process_dihedral_line(line, dihed_type)
+            rawline = next(fiter)
+        # Process the impropers
+        rawline = next(fiter)
+        while rawline:
+            line = rawline.strip()
+            if not line:
+                break
+            self._process_improper_line(line)
+            rawline = next(fiter)
+        # 
+
+    #===================================================
+
+    # Private methods for processing parts of the file
+    def _process_mass_line(self, line):
+        words = line.split()
+        try:
+            mass = float(words[1])
+        except ValueError:
+            raise ParameterError('Could not convert mass to float [%s]'
+                                    % words[1])
+        except IndexError:
+            raise ParameterError('Error parsing MASS line. Not enough tokens')
+        if words[0] in self.atom_types:
+            self.atom_types[words[0]].mass = mass
+        else:
+            n_types = len(self.atom_types) + 1
+            atype = AtomType(words[0], len(self.atom_types)+1, mass,
+                                element_by_mass(mass))
+            self.atom_types[words[0]] = atype
+
+    #===================================================
+
+    def _process_bond_line(self, line):
+        rematch = _bondre.match(line)
+        if not rematch:
+            raise ParameterError('Could not understand BOND line [%s]' % line)
+        a1, a2, k, eq = rematch.groups()
+        a1 = a1.strip(); a2 = a2.strip()
+        typ = BondType(float(k), float(eq))
+        self.bond_types[(a1, a2)] = typ
+        self.bond_types[(a2, a1)] = typ
+
+    def _process_angle_line(self, line):
+        rematch = _anglere.match(line)
+        if not rematch:
+            raise ParameterError('Could not understand ANGLE line [%s]' % line)
+        a1, a2, a3, k, eq = rematch.groups()
+        a1 = a1.strip(); a2 = a2.strip(); a3 = a3.strip()
+        typ = AngleType(float(k), float(eq))
+        self.angle_types[(a1, a2, a3)] = typ
+        self.angle_types[(a3, a2, a1)] = typ
+
+    def _process_dihedral_line(self, line, dihed_type):
+        rematch = _dihedre.match(line)
+        if not rematch:
+            raise ParameterError('Could not understand DIHEDRAL line '
+                                 '[%s]' % line)
+        a1, a2, a3, a4, div, k, phi, per = rematch.groups()
+        scee = [float(x) for x in _sceere.findall(line)] or [1.2]
+        scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
+        a1 = a1.strip(); a2 = a2.strip();
+        a3 = a3.strip(); a4 = a4.strip()
+        per = float(per)
+        typ = DihedralType(float(k)/float(div), abs(per), float(phi),
+                           scee[0], scnb[0])
+        if per < 0:
+            # Part of a multi-term dihedral definition
+            if dihed_type is not None:
+                # Middle term of a multi-term dihedral
+                self.dihedral_types[dihed_type].append(typ)
+            else:
+                # First term of the multi-term dihedral
+                dihed_type = (a1, a2, a3, a4)
+                typs = DihedralTypeList()
+                typs.append(typ)
+                self.dihedral_types[dihed_type] = typs
+                self.dihedral_types[tuple(reversed(dihed_type))] = typs
+        else:
+            if dihed_type is not None:
+                # Finish the existing multi-term dihedral
+                self.dihedral_types[dihed_type].append(typ)
+                dihed_type = None
+            else:
+                typs = DihedralTypeList()
+                typs.append(typ)
+                self.dihedral_types[(a1, a2, a3, a4)] = typs
+                self.dihedral_types[(a4, a3, a2, a1)] = typs
+        return dihed_type
+
+    def _process_improper_line(self, line):
+        rematch = _impropre.match(line)
+        if not rematch:
+            raise ParameterError('Could not understand IMPROPER line '
+                                    '[%s]' % line)
+        a1, a2, a3, a4, k, phi, per = rematch.groups()
+        a1 = a1.strip(); a2 = a2.strip();
+        a3 = a3.strip(); a4 = a4.strip()
+        key = tuple(sorted([a1, a2, a3, a4]))
+        self.improper_periodic_types[key] = \
+                DihedralType(float(k), float(per), float(phi))
+
+    def _process_nonbond_line(self, line):
+        try:
+            atyp, rmin, eps = line.split()[:3]
+        except ValueError:
+            raise ParameterError('Could not understand nonbond parameter line '
+                                 '[%s]' % line)
+        try:
+            self.atom_types[atyp].rmin = float(rmin)
+            self.atom_types[atyp].eps = float(eps)
+        except KeyError:
+            raise ParameterError('Atom type %s not present in the database.' %
+                                 atyp)
+        except ValueError:
+            raise ParameterError('Could not convert nonbond parameters to '
+                                 'floats [%s, %s]' % (rmin, eps))
+
+    def _process_nbfix_line(self, line):
+        try:
+            a1, a2, rmin1, eps1, rmin2, eps2 = line.split()[:6]
+        except ValueError:
+            raise ParameterError('Could not understand LJEDIT line [%s]' % line)
+        try:
+            rmin1 = float(rmin1)
+            eps1 = float(eps1)
+            rmin2 = float(rmin2)
+            eps2 = float(eps2)
+        except ValueError:
+            raise ParameterError('Could not convert LJEDIT parameters '
+                                 'to floats.')
+        self.nbfix_types[(min(a1, a2), max(a1, a2))] = \
+                (math.sqrt(eps1*eps2), rmin1+rmin2)
+
+    #===================================================
 
     def write(self, dest, style='frcmod'):
         """ Writes a parm.dat file with the current parameters
