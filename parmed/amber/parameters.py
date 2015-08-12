@@ -9,10 +9,11 @@ from __future__ import division, print_function
 
 from collections import defaultdict
 from contextlib import closing
+import math
 from parmed.exceptions import ParameterError
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
-from parmed.periodic_table import Mass, element_by_mass
+from parmed.periodic_table import Mass, element_by_mass, AtomicNum
 from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
                                     DihedralTypeList)
 from parmed.utils.io import genopen
@@ -212,7 +213,7 @@ class AmberParameterSet(ParameterSet):
             for l in f: yield l
             yield '' # Keep yielding empty string after file has ended
         section = None
-        dihed_type = None
+        finished_diheds = defaultdict(lambda: True)
         for line in fiter():
             line = line.rstrip()
             if not line: continue
@@ -245,7 +246,7 @@ class AmberParameterSet(ParameterSet):
             elif section == 'ANGLE':
                 self._process_angle_line(line)
             elif section == 'DIHEDRAL':
-                dihed_type = self._process_dihedral_line(line, dihed_type)
+                self._process_dihedral_line(line, finished_diheds)
             elif section == 'IMPROPER':
                 self._process_improper_line(line)
             elif section == 'NONBOND':
@@ -262,9 +263,9 @@ class AmberParameterSet(ParameterSet):
             for l in f: yield l
             # Keep yielding empty string after file has ended
             yield ''
-        i = 0
         fiter = fiter()
         rawline = next(fiter)
+        finished_diheds = defaultdict(lambda: True)
         # Parse the masses
         while rawline:
             line = rawline.strip()
@@ -296,7 +297,7 @@ class AmberParameterSet(ParameterSet):
             line = rawline.strip()
             if not line:
                 break
-            dihed_type = self._process_dihedral_line(line, dihed_type)
+            self._process_dihedral_line(line, finished_diheds)
             rawline = next(fiter)
         # Process the impropers
         rawline = next(fiter)
@@ -379,7 +380,7 @@ class AmberParameterSet(ParameterSet):
         else:
             n_types = len(self.atom_types) + 1
             atype = AtomType(words[0], len(self.atom_types)+1, mass,
-                                element_by_mass(mass))
+                             AtomicNum[element_by_mass(mass)])
             self.atom_types[words[0]] = atype
 
     #===================================================
@@ -404,7 +405,7 @@ class AmberParameterSet(ParameterSet):
         self.angle_types[(a1, a2, a3)] = typ
         self.angle_types[(a3, a2, a1)] = typ
 
-    def _process_dihedral_line(self, line, dihed_type):
+    def _process_dihedral_line(self, line, finished_diheds):
         rematch = _dihedre.match(line)
         if not rematch:
             raise ParameterError('Could not understand DIHEDRAL line '
@@ -417,29 +418,17 @@ class AmberParameterSet(ParameterSet):
         per = float(per)
         typ = DihedralType(float(k)/float(div), abs(per), float(phi),
                            scee[0], scnb[0])
-        if per < 0:
-            # Part of a multi-term dihedral definition
-            if dihed_type is not None:
-                # Middle term of a multi-term dihedral
-                self.dihedral_types[dihed_type].append(typ)
-            else:
-                # First term of the multi-term dihedral
-                dihed_type = (a1, a2, a3, a4)
-                typs = DihedralTypeList()
-                typs.append(typ)
-                self.dihedral_types[dihed_type] = typs
-                self.dihedral_types[tuple(reversed(dihed_type))] = typs
+        key = (a1, a2, a3, a4)
+        rkey = (a4, a3, a2, a1)
+        if finished_diheds[key]:
+            # This dihedral is already finished its definition, which means we
+            # go ahead and add a new one to override it
+            typs = DihedralTypeList()
+            typs.append(typ)
+            self.dihedral_types[key] = self.dihedral_types[rkey] = typs
         else:
-            if dihed_type is not None:
-                # Finish the existing multi-term dihedral
-                self.dihedral_types[dihed_type].append(typ)
-                dihed_type = None
-            else:
-                typs = DihedralTypeList()
-                typs.append(typ)
-                self.dihedral_types[(a1, a2, a3, a4)] = typs
-                self.dihedral_types[(a4, a3, a2, a1)] = typs
-        return dihed_type
+            self.dihedral_types[key].append(typ)
+        finished_diheds[key] = finished_diheds[rkey] = per >= 0
 
     def _process_improper_line(self, line):
         rematch = _impropre.match(line)
