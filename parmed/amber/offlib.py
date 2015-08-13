@@ -6,7 +6,7 @@ from __future__ import print_function
 
 from collections import OrderedDict
 from contextlib import closing
-import numpy
+import numpy as np
 from parmed import Atom
 from parmed.constants import RAD_TO_DEG
 from parmed.exceptions import AmberWarning

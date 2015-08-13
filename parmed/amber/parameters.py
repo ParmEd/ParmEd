@@ -607,13 +607,15 @@ class AmberParameterSet(ParameterSet):
 
     #===================================================
 
-    def write(self, dest, style='frcmod'):
+    def write(self, dest, title='Created by ParmEd', style='frcmod'):
         """ Writes a parm.dat file with the current parameters
 
         Parameters
         ----------
         dest : str or file-like
             The file name or file-like object to write the parameters to
+        title : str, optional
+            The title of the frcmod to write. Default is 'Created by ParmEd'
         style : str, optional
             If 'frcmod', the parameters are written in frcmod-format. If 'parm',
             the parameters are written in parm.dat-format. Default is 'frcmod'
@@ -629,6 +631,8 @@ class AmberParameterSet(ParameterSet):
             raise ValueError('style must be either frcmod or parm, not %s' %
                              style)
 
+        outfile.write(title.rstrip('\r\n'))
+        outfile.write('\n')
         # Write the atom mass
         outfile.write('MASS\n')
         for atom, typ in iteritems(self.atom_types):

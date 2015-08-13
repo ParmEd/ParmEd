@@ -239,8 +239,7 @@ class ParameterSet(object):
                                         'between %s, %s, %s, and %s' % key)
                     continue
                 typ = copy(dihedral.type)
-                params.improper_periodic_types[key] = typ
-                params.improper_periodic_types[tuple(reversed(key))] = typ
+                params.improper_periodic_types[tuple(sorted(key))] = typ
             else:
                 # Proper dihedral. Look out for multi-term forms
                 if (key in params.dihedral_types and
