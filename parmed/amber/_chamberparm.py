@@ -446,29 +446,10 @@ class ChamberParm(AmberParm):
                 [type.psi_eq for type in self.improper_types]
         data['CHARMM_IMPROPERS'] = improper_array = []
         for imp in self.impropers:
-            if isinstance(imp.type, ImproperType):
-                improper_array.extend([imp.atom1.idx+1, imp.atom2.idx+1,
-                                       imp.atom3.idx+1, imp.atom4.idx+1,
-                                       imp.type.idx+1])
-            elif isinstance(imp.type, DihedralType):
-                if (imp.atom1.element == 1 or imp.atom2.element == 1
-                or  imp.atom3.element == 1 or imp.atom4.element == 1):
-                    self.parm_data['DIHEDRALS_INC_HYDROGEN'].extend(
-                        [imp.atom1.idx*3, imp.atom2.idx*3,
-                         imp.atom3.idx*-3, imp.atom4.idx*-3,
-                         imp.type.idx+1])
-                    data['POINTERS'][NPHIH] += 1
-                    self.pointers['NPHIH'] += 1
-                else:
-                    self.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'].extend(
-                        [imp.atom1.idx*3, imp.atom2.idx*3,
-                         imp.atom3.idx*-3, imp.atom4.idx*-3,
-                         imp.type.idx+1])
-                    data['POINTERS'][NPHIA] += 1
-                    data['POINTERS'][MPHIA] += 1
-                    self.pointers['NPHIA'] += 1
-                    self.pointers['MPHIA'] += 1
-        data['CHARMM_NUM_IMPROPERS'] = [len(improper_array)]
+            improper_array.extend([imp.atom1.idx+1, imp.atom2.idx+1,
+                                   imp.atom3.idx+1, imp.atom4.idx+1,
+                                   imp.type.idx+1])
+        data['CHARMM_NUM_IMPROPERS'] = [len(self.impropers)]
         data['CHARMM_NUM_IMPR_TYPES'] = [len(self.improper_types)]
         self.pointers['NIMPHI'] = len(improper_array)
         self.pointers['NIMPRTYPES'] = len(self.improper_types)

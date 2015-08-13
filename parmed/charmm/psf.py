@@ -613,6 +613,15 @@ class CharmmPsfFile(Structure):
                 improper.type.list = self.dihedral_types
             else:
                 raise RuntimeError('Should not be here') # Avoid masking errors
+        # Look through the list of impropers -- if there are any periodic
+        # impropers, move them over to the dihedrals list
+        for i in reversed(range(len(self.impropers))):
+            if isinstance(self.impropers[i].type, DihedralType):
+                imp = self.impropers.pop(i)
+                dih = Dihedral(imp.atom1, imp.atom2, imp.atom3, imp.atom4,
+                               improper=True, ignore_end=True, type=imp.type)
+                imp.delete()
+                self.dihedrals.append(dih)
         # Now do the cmaps. These will not have wild-cards
         for cmap in self.cmaps:
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,

@@ -547,17 +547,10 @@ class Structure(object):
                                 ub.type and c.urey_bradley_types[ub.type.idx])
             )
         for i in self.impropers:
-            if i.type is None:
-                typ = None
-            else:
-                if isinstance(i.type, ImproperType):
-                    typ = c.improper_types[i.type.idx]
-                else:
-                    typ = c.dihedral_types[i.type.idx]
             c.impropers.append(
                     Improper(atoms[i.atom1.idx], atoms[i.atom2.idx],
                              atoms[i.atom3.idx], atoms[i.atom4.idx],
-                             type=typ)
+                             i.type and c.improper_types[i.type.idx])
             )
         for r in self.rb_torsions:
             c.rb_torsions.append(

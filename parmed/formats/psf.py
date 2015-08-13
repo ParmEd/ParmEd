@@ -163,27 +163,38 @@ class PSFFile(object):
             dest.write('\n')
         dest.write('\n')
         # Dihedrals
-        dest.write(intfmt % len(struct.dihedrals) + ' !NPHI: dihedrals\n')
-        for i, dih in enumerate(struct.dihedrals):
+        # impropers need to be split off in the "improper" section. Find those
+        nimprop = sum(1 for dih in struct.dihedrals if dih.improper)
+        nnormal = len(struct.dihedrals) - nimprop
+        dest.write(intfmt % nnormal + ' !NPHI: dihedrals\n')
+        for i, dih in enumerate(dih for dih in struct.dihedrals
+                                    if not dih.improper):
             dest.write((intfmt*4) % (dih.atom1.idx+1, dih.atom2.idx+1,
                                      dih.atom3.idx+1, dih.atom4.idx+1)
             )
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(struct.dihedrals) % 2 != 0 or len(struct.dihedrals) == 0:
+        if nnormal % 2 != 0 or nnormal == 0:
             dest.write('\n')
         dest.write('\n')
         # Impropers
-        dest.write(intfmt % len(struct.impropers) + ' !NIMPHI: impropers\n')
-        for i, imp in enumerate(struct.impropers):
+        nimprop += len(struct.impropers)
+        dest.write(intfmt % (nimprop) + ' !NIMPHI: impropers\n')
+        def improp_gen(struct):
+            for imp in struct.impropers:
+                yield imp
+            for dih in struct.dihedrals:
+                if dih.improper:
+                    yield dih
+        for i, imp in enumerate(improp_gen(struct)):
             dest.write((intfmt*4) % (imp.atom1.idx+1, imp.atom2.idx+1,
                                      imp.atom3.idx+1, imp.atom4.idx+1)
             )
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(struct.impropers) % 2 != 0 or len(struct.impropers) == 0:
+        if nimprop % 2 != 0 or nimprop == 0:
             dest.write('\n')
         dest.write('\n')
         # Donor section
