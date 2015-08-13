@@ -38,11 +38,12 @@ from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
 from parmed.residue import WATER_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
-        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
-        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
-        NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
+        DihedralTypeList, DihedralType, ImproperType, Bond, Angle, Dihedral,
+        UreyBradley, Improper, Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion,
+        StretchBend, TorsionTorsion, NonbondedException, AcceptorDonor, Group,
+        Atom, ExtraPoint, TwoParticleExtraPointFrame, ChiralFrame,
+        MultipoleFrame, NoUreyBradley, ThreeParticleExtraPointFrame,
+        OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules
 from parmed.utils.decorators import needs_openmm
@@ -509,10 +510,10 @@ class Structure(object):
                         ie = d.ignore_end or i < len(d.type) - 1
                         ti = mapdt[d.type.idx][i]
                         c.dihedrals.append(
-                                Dihedral(c.atoms[d.atom1.idx],
-                                         c.atoms[d.atom2.idx],
-                                         c.atoms[d.atom3.idx],
-                                         c.atoms[d.atom4.idx],
+                                Dihedral(atoms[d.atom1.idx],
+                                         atoms[d.atom2.idx],
+                                         atoms[d.atom3.idx],
+                                         atoms[d.atom4.idx],
                                          improper=d.improper, ignore_end=ie,
                                          type=c.dihedral_types[ti])
                         )
@@ -520,8 +521,8 @@ class Structure(object):
                 else:
                     ti = mapdt[d.type.idx][0]
                     c.dihedrals.append(
-                        Dihedral(c.atoms[d.atom1.idx], c.atoms[d.atom2.idx],
-                                 c.atoms[d.atom3.idx], c.atoms[d.atom4.idx],
+                        Dihedral(atoms[d.atom1.idx], atoms[d.atom2.idx],
+                                 atoms[d.atom3.idx], atoms[d.atom4.idx],
                                  improper=d.improper, ignore_end=d.ignore_end,
                                  type=d.type and c.dihedral_types[ti])
                     )
@@ -546,10 +547,17 @@ class Structure(object):
                                 ub.type and c.urey_bradley_types[ub.type.idx])
             )
         for i in self.impropers:
+            if i.type is None:
+                typ = None
+            else:
+                if isinstance(i.type, ImproperType):
+                    typ = c.improper_types[i.type.idx]
+                else:
+                    typ = c.dihedral_types[i.type.idx]
             c.impropers.append(
                     Improper(atoms[i.atom1.idx], atoms[i.atom2.idx],
                              atoms[i.atom3.idx], atoms[i.atom4.idx],
-                             i.type and c.improper_types[i.type.idx])
+                             type=typ)
             )
         for r in self.rb_torsions:
             c.rb_torsions.append(

@@ -13,7 +13,8 @@ from copy import copy as _copy
 from math import sqrt
 from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                     Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
-                    DihedralType, AngleType, ExtraPoint, DihedralTypeList)
+                    DihedralType, ImproperType, AngleType, ExtraPoint,
+                    DihedralTypeList)
 from parmed.constants import SMALL
 from parmed.exceptions import (CharmmError, MoleculeError, CharmmWarning,
         ParameterError)
@@ -575,24 +576,43 @@ class CharmmPsfFile(Structure):
             a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
             at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
             key = tuple(sorted([at1, at2, at3, at4]))
-            if not key in parmset.improper_types:
-                # Check for wild-cards
+            # Check for exact harmonic or exact periodic
+            if key in parmset.improper_types:
+                imp.type = parmset.improper_types[key]
+            elif key in parmset.improper_periodic_types:
+                imp.type = parmset.improper_periodic_types[key]
+            else:
+                # Check for wild-card harmonic
                 for anchor in (at2, at3, at4):
                     key = tuple(sorted([at1, anchor, 'X', 'X']))
                     if key in parmset.improper_types:
-                        break # This is the right key
-            try:
-                imp.type = parmset.improper_types[key]
-            except KeyError:
-                raise ParameterError('No improper parameters found for %r' %
-                                       imp)
+                        imp.type = parmset.improper_types[key]
+                        break
+                # Check for wild-card periodic
+                if key not in parmset.improper_types:
+                    for anchor in (at2, at3, at4):
+                        key = tuple(sorted([at1, anchor, 'X', 'X']))
+                        if key in parmset.improper_periodic_types:
+                            imp.type = parmset.improper_periodic_types[key]
+                            break
+                    # Not found anywhere
+                    if key not in parmset.improper_periodic_types:
+                        raise ParameterError('No improper parameters found for'
+                                             '%r' % imp)
             imp.type.used = False
+        # prepare list of harmonic impropers present in system
         del self.improper_types[:]
         for improper in self.impropers:
             if improper.type.used: continue
             improper.type.used = True
-            self.improper_types.append(improper.type)
-            improper.type.list = self.improper_types
+            if isinstance(improper.type, ImproperType):
+                self.improper_types.append(improper.type)
+                improper.type.list = self.improper_types
+            elif isinstance(improper.type, DihedralType):
+                self.dihedral_types.append(improper.type)
+                improper.type.list = self.dihedral_types
+            else:
+                raise RuntimeError('Should not be here') # Avoid masking errors
         # Now do the cmaps. These will not have wild-cards
         for cmap in self.cmaps:
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,

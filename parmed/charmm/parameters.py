@@ -361,16 +361,16 @@ class CharmmParameterSet(ParameterSet):
                 parameterset = line.strip()[1:78]
                 continue
             # Set section if this is a section header
-            if line.startswith('ATOMS'):
+            if line.startswith('ATOM'):
                 section = 'ATOMS'
                 continue
-            if line.startswith('BONDS'):
+            if line.startswith('BOND'):
                 section = 'BONDS'
                 continue
-            if line.startswith('ANGLES'):
+            if line.startswith('ANGLE'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRALS'):
+            if line.startswith('DIHEDRAL'):
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER'):
@@ -571,7 +571,8 @@ class CharmmParameterSet(ParameterSet):
                     self.improper_types[key] = improp
                 else:
                     improp = DihedralType(k, per, theteq)
-                    self.improper_periodic_types[key].append(improp)
+                    self.improper_periodic_types[key] = improp
+                    improp.improper = True
                 improp.penalty = penalty
                 continue
             if section == 'CMAP':
