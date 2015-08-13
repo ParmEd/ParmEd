@@ -2886,6 +2886,9 @@ class summary(Action):
         pass
 
     def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
         """ Collect statistics """
         nnuc = namin = ncion = naion = nwat = nunk = 0
         for res in self.parm.residues:
