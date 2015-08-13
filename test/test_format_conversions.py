@@ -1,10 +1,9 @@
 """ Test various topology format conversions """
 from __future__ import print_function, division, absolute_import
-from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative
 
 import os
 import numpy as np
-from parmed import load_file, gromacs, amber, openmm
+from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import unit as u
@@ -16,25 +15,10 @@ try:
 except ImportError:
     has_openmm = False
 import unittest
+from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative, FileIOTestCase
 import warnings
 
-class TestCase(TestCaseRelative):
-    def setUp(self):
-        warnings.filterwarnings('default', category=GromacsWarning)
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
-class TestAmberToGromacs(TestCase):
+class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
     """ Tests converting Amber prmtop files to Gromacs topologies """
 
     def testBenzeneCyclohexane(self):
@@ -74,7 +58,7 @@ class TestAmberToGromacs(TestCase):
         np.testing.assert_allclose(gro.box, parm.box)
         np.testing.assert_allclose(top.box, parm.box)
 
-class TestGromacsToAmber(TestCase):
+class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
     """ Tests converting Gromacs top/gro files to Amber """
 
     def testSimple(self):
@@ -208,8 +192,29 @@ class TestGromacsToAmber(TestCase):
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
+class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
+    """ Tests converting Amber files to CHARMM """
+
+    def testSimple(self):
+        """ Tests converting simple Amber system to CHARMM PSF/parameters """
+        parm = load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        parm.save(get_fn('amber_to_charmm.psf', written=True))
+        params = charmm.CharmmParameterSet.from_structure(parm)
+        params.write(str=get_fn('amber_to_charmm.str', written=True))
+
+        self.assertTrue(
+                diff_files(get_saved_fn('amber_to_charmm.psf'),
+                           get_fn('amber_to_charmm.psf', written=True)
+                )
+        )
+        self.assertTrue(
+                diff_files(get_saved_fn('amber_to_charmm.str'),
+                           get_fn('amber_to_charmm.str', written=True)
+                )
+        )
+
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
-class TestOpenMMToAmber(TestCase):
+class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
     """
@@ -246,7 +251,7 @@ class TestOpenMMToAmber(TestCase):
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
-class TestOpenMMToGromacs(TestCase):
+class TestOpenMMToGromacs(FileIOTestCase, TestCaseRelative):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
     """

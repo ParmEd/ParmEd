@@ -96,8 +96,8 @@ class PSFFile(object):
 
         # Assign the formats we need to write with
         if ext:
-            atmfmt1 = ('%10d %-8s %-8i %-8s %-8s %4d %10.6f %13.4f' + 11*' ')
-            atmfmt2 = ('%10d %-8s %-8i %-8s %-8s %-4s %10.6f %13.4f' + 11*' ')
+            atmfmt1 = ('%10d %-8s %-8i %-8s %-8s %6d %10.6f %13.4f' + 11*' ')
+            atmfmt2 = ('%10d %-8s %-8i %-8s %-8s %-6s %10.6f %13.4f' + 11*' ')
             intfmt = '%10d' # For pointers
         else:
             atmfmt1 = ('%8d %-4s %-4i %-4s %-4s %4d %10.6f %13.4f' + 11*' ')
@@ -105,11 +105,11 @@ class PSFFile(object):
             intfmt = '%8d' # For pointers
 
         # Now print the header then the title
-        dest.write('PSF ')
+        dest.write('PSF CHEQ ')
         if hasattr(struct, 'flags'):
-            dest.write(' '.join(struct.flags))
+            dest.write(' '.join(f for f in struct.flags if f not in ('CHEQ',)))
         else:
-            dest.write('EXT') # EXT is always active
+            dest.write('EXT') # EXT is always active if no flags present
         dest.write('\n\n')
         if isinstance(struct.title, string_types):
             dest.write(intfmt % 1 + ' !NTITLE\n')
@@ -163,27 +163,38 @@ class PSFFile(object):
             dest.write('\n')
         dest.write('\n')
         # Dihedrals
-        dest.write(intfmt % len(struct.dihedrals) + ' !NPHI: dihedrals\n')
-        for i, dih in enumerate(struct.dihedrals):
+        # impropers need to be split off in the "improper" section. Find those
+        nimprop = sum(1 for dih in struct.dihedrals if dih.improper)
+        nnormal = len(struct.dihedrals) - nimprop
+        dest.write(intfmt % nnormal + ' !NPHI: dihedrals\n')
+        for i, dih in enumerate(dih for dih in struct.dihedrals
+                                    if not dih.improper):
             dest.write((intfmt*4) % (dih.atom1.idx+1, dih.atom2.idx+1,
                                      dih.atom3.idx+1, dih.atom4.idx+1)
             )
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(struct.dihedrals) % 2 != 0 or len(struct.dihedrals) == 0:
+        if nnormal % 2 != 0 or nnormal == 0:
             dest.write('\n')
         dest.write('\n')
         # Impropers
-        dest.write(intfmt % len(struct.impropers) + ' !NIMPHI: impropers\n')
-        for i, imp in enumerate(struct.impropers):
+        nimprop += len(struct.impropers)
+        dest.write(intfmt % (nimprop) + ' !NIMPHI: impropers\n')
+        def improp_gen(struct):
+            for imp in struct.impropers:
+                yield imp
+            for dih in struct.dihedrals:
+                if dih.improper:
+                    yield dih
+        for i, imp in enumerate(improp_gen(struct)):
             dest.write((intfmt*4) % (imp.atom1.idx+1, imp.atom2.idx+1,
                                      imp.atom3.idx+1, imp.atom4.idx+1)
             )
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
-        if len(struct.impropers) % 2 != 0 or len(struct.impropers) == 0:
+        if nimprop % 2 != 0 or nimprop == 0:
             dest.write('\n')
         dest.write('\n')
         # Donor section
@@ -217,12 +228,17 @@ class PSFFile(object):
             nst2 = struct.groups.nst2
         except AttributeError:
             nst2 = 0
-        dest.write((intfmt*2) % (len(struct.groups), nst2))
+        dest.write((intfmt*2) % (len(struct.groups) or 1, nst2))
         dest.write(' !NGRP NST2\n')
-        for i, gp in enumerate(struct.groups):
-            dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
-            if i % 3 == 2: dest.write('\n')
-        if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
+        if struct.groups:
+            for i, gp in enumerate(struct.groups):
+                dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
+                if i % 3 == 2: dest.write('\n')
+            if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
+                dest.write('\n')
+        else:
+            typ = 1 if abs(sum(a.charge for a in struct.atoms)) < 1e-4 else 2
+            dest.write((intfmt*3) % (0, typ, 0))
             dest.write('\n')
         dest.write('\n')
         # The next two sections are never found in VMD prmtops...

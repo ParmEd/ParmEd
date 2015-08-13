@@ -173,6 +173,9 @@ class _ParameterType(object):
         self.used = False
         self.penalty = None
 
+    def __ne__(self, other):
+        return not self == other
+
 def _delete_from_list(list, item):
     """
     Deletes a requested item from a list. If the item does not exist in the
@@ -2108,10 +2111,10 @@ class DihedralType(_ListItem, _ParameterType):
         The dihedral periodicity
     phase : ``float``
         The dihedral phase in degrees
-    scee : ``float``
-        1-4 electrostatic scaling factor
-    scnb : ``float``
-        1-4 Lennard-Jones scaling factor
+    scee : ``float``, optional
+        1-4 electrostatic scaling factor. Default is 1.0
+    scnb : ``float``, optional
+        1-4 Lennard-Jones scaling factor. Default is 1.0
     list : :class:`TrackedList`
         A list of `DihedralType`s in which this is a member
 
@@ -2170,9 +2173,10 @@ class DihedralType(_ListItem, _ParameterType):
                 self.scnb == other.scnb)
 
     def __repr__(self):
-        return ('<%s; phi_k=%.3f, per=%d, phase=%.3f, scee=%.3f, scnb=%.3f>' %
-                (type(self).__name__, self.phi_k, self.per, self.phase,
-                 self.scee, self.scnb))
+        retstr = ['<%s; phi_k=%.3f, per=%d, phase=%.3f, ' %
+                  (type(self).__name__, self.phi_k, self.per, self.phase)]
+        retstr.append(' scee=%.3f, scnb=%.3f>' % (self.scee, self.scnb))
+        return ''.join(retstr)
 
     def __copy__(self):
         return DihedralType(self.phi_k, self.per, self.phase, self.scee,
@@ -4681,21 +4685,26 @@ class Group(object):
     Parameters
     ----------
     bs : ``int``
-        Not sure
+        Smallest atom number within a group (0-based)
     type : ``int``
-        The group type (??)
+        Flag for group information; 0 when all atoms have zero charge,
+        1 when group has a net zero charge but at least one atom has a non-zero
+        partial charge, 2 when the net charge of the group is not zero
     move : ``int``
-        If the group moves (??)
+        0 if the atoms are not fixed, 1 when they are
 
-    Disclaimer
-    ----------
-    I really don't know what these numbers mean. I'm speculating based on the
-    source code of 'chamber', and this section is simply ignored there.
+    Notes
+    -----
+    See the discussion on Github for the source of the meanings of these
+    variables: https://github.com/ParmEd/ParmEd/pull/307#issuecomment-128244134
     """
     def __init__(self, bs, type, move):
         self.bs = bs
         self.type = type
         self.move = move
+
+    def __copy__(self):
+        other = type(self)(self.bs, self.type, self.move)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
