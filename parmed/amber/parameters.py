@@ -208,7 +208,7 @@ class AmberParameterSet(ParameterSet):
     #===================================================
 
     @classmethod
-    def load_leaprc(cls, fname):
+    def from_leaprc(cls, fname):
         """ Load a parameter set from a leaprc file
 
         Parameters
@@ -620,11 +620,10 @@ class AmberParameterSet(ParameterSet):
         """
         if isinstance(dest, string_types):
             outfile = genopen(dest, 'w')
-        elif hasattr(dest, 'write'):
-            outfile = dest
+            own_handle = True
         else:
-            raise TypeError('Cannot write parameter set to a %s' %
-                            type(dest).__name__)
+            outfile = dest
+            own_handle = False
 
         if style not in ('frcmod', 'parm'):
             raise ValueError('style must be either frcmod or parm, not %s' %
@@ -632,36 +631,73 @@ class AmberParameterSet(ParameterSet):
 
         # Write the atom mass
         outfile.write('MASS\n')
-        for atom in self.atoms:
-            outfile.write('%s%6.3f\n' % (atom.type.ljust(6), atom.mass))
+        for atom, typ in iteritems(self.atom_types):
+            outfile.write('%s%6.3f\n' % (atom.ljust(6), typ.mass))
         outfile.write('\n')
         # Write the bonds
         outfile.write('BOND\n')
-        for bond in self.bonds:
-            outfile.write('%s\n' % bond)
+        done = set()
+        for (a1, a2), typ in iteritems(self.bond_types):
+            if id(typ) in done: continue
+            done.add(id(typ))
+            outfile.write('%s-%s   %8.3f  %6.3f\n' %
+                          (a1.ljust(2), a2.ljust(2), typ.k, typ.req))
         outfile.write('\n')
         # Write the angles
         outfile.write('ANGLE\n')
-        for angle in self.angles:
-            outfile.write('%s\n' % angle)
+        done = set()
+        for (a1, a2, a3), typ in iteritems(self.angle_types):
+            if id(typ) in done: continue
+            done.add(id(typ))
+            outfile.write('%s-%s-%s   %8.3f  %6.3f\n' %
+                          (a1.ljust(2), a2.ljust(2), a3.ljust(2), typ.k,
+                           typ.theteq))
         outfile.write('\n')
         # Write the dihedrals
         outfile.write('DIHE\n')
-        for dihedral in self.dihedrals:
-            if dihedral[0].dihtype == 'improper': continue
-            outfile.write('%s\n' % dihedral)
+        done = set()
+        for (a1, a2, a3, a4), typ in iteritems(self.dihedral_types):
+            if id(typ) in done: continue
+            done.add(id(typ))
+            if isinstance(typ, DihedralType) or len(typ) == 1:
+                if not isinstance(typ, DihedralType):
+                    typ = typ[0]
+                outfile.write('%s-%s-%s-%s %4i %8.3f %8.3f %5.1f    '
+                              'SCEE=%s SCNB=%s\n' % (a1.ljust(2), a2.ljust(2),
+                              a3.ljust(2), a4.ljust(2), 1, typ.phi_k, typ.phase,
+                              typ.per, typ.scee, typ.scnb))
+            else:
+                for dtyp in typ[:-1]:
+                    outfile.write('%s-%s-%s-%s %4i %8.3f %8.3f %5.1f    '
+                                  'SCEE=%s SCNB=%s\n'%(a1.ljust(2), a2.ljust(2),
+                                  a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
+                                  dtyp.phase, -dtyp.per, dtyp.scee, dtyp.scnb))
+                dtyp = typ[-1]
+                outfile.write('%s-%s-%s-%s %4i %8.3f %8.3f %5.1f    '
+                              'SCEE=%s SCNB=%s\n' % (a1.ljust(2), a2.ljust(2),
+                              a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
+                              dtyp.phase, dtyp.per, dtyp.scee, dtyp.scnb))
         outfile.write('\n')
         # Write the impropers
         outfile.write('IMPROPER\n')
-        for dihedral in self.dihedrals:
-            if dihedral[0].dihtype != 'improper': continue
-            outfile.write('%s\n' % dihedral)
+        for (a1, a2, a3, a4), typ in iteritems(self.improper_periodic_types):
+            outfile.write('%s-%s-%s-%s %8.3f %8.3f %5.1f\n' %
+                          (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2),
+                           typ.phi_k, typ.phase, typ.per))
         outfile.write('\n')
         # Write the LJ terms
         outfile.write('NONB\n')
-        for atom in self.atoms:
-            outfile.write('%s\n' % atom.lennard_jones())
+        for atom, typ in iteritems(self.atom_types):
+            outfile.write('%s  %8.4f %8.4f\n' %
+                          (atom.ljust(2), typ.rmin, typ.epsilon))
         outfile.write('\n')
+        # Write the NBFIX terms
+        if self.nbfix_types:
+            outfile.write('LJEDIT\n')
+            for (a1, a2), (eps, rmin) in iteritems(self.nbfix_types):
+                outfile.write('%s %s %8.3f %8.3f %8.3f %8.3f\n' %
+                              (a1.ljust(2), a2.ljust(2), eps, rmin/2,
+                               eps, rmin/2))
 
-        if isinstance(dest, string_types):
+        if own_handle:
             outfile.close()

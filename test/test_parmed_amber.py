@@ -439,7 +439,7 @@ class TestParameterFiles(unittest.TestCase):
     def testLoadLeaprc(self):
         """ Tests loading a leaprc file to define a force field """
         warnings.filterwarnings('ignore', category=AmberWarning)
-        params = parameters.AmberParameterSet.load_leaprc(
+        params = parameters.AmberParameterSet.from_leaprc(
                 os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd',
                              'leaprc.ff14SB')
         )

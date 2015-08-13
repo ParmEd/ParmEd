@@ -3,8 +3,17 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division, print_function
 
-from parmed import (Bond, BondType, Angle, AngleType, Dihedral, DihedralType,
-        Structure, load_file, gromacs)
+from collections import OrderedDict
+from contextlib import closing
+import copy
+import math
+import numpy as np
+import os
+from parmed.topologyobjects import (Bond, BondType, Angle, AngleType, Dihedral,
+                                    DihedralType)
+from parmed.structure import Structure
+from parmed.formats.registry import load_file
+import parmed.gromacs as gromacs
 from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
         HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
@@ -13,14 +22,10 @@ from parmed.exceptions import ParmedError, FormatNotFound
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
+from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
-from collections import OrderedDict
-import copy
-import math
-import numpy as np
-import os
 from parmed.tools.argumentlist import ArgumentList
 from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
               ChangeStateError, ChangeLJPairError, ParmedChangeError,
@@ -323,10 +328,9 @@ class writeFrcmod(Action):
             raise FileExists('%s exists; not overwriting' % self.frcmod_name)
         parmset = AmberParameterSet()
         parmset.from_structure(self.parm)
-        frcmod = open(self.frcmod_name, 'w')
-        frcmod.write('Force field parameters from %s\n' % self.parm)
-        parmset.write(frcmod)
-        frcmod.close()
+        with closing(genopen(self.frcmod_name, 'w')) as frcmod:
+            frcmod.write('Force field parameters from %s\n' % self.parm)
+            parmset.write(frcmod)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
