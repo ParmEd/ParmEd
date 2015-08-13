@@ -20,15 +20,6 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
-while True:
-    for i, folder in enumerate(sys.path):
-        if os.path.exists(os.path.join(folder, 'parmed.py')) and not \
-                os.path.isdir(os.path.join(folder, 'parmed')):
-            break
-    else:
-        break
-    sys.path.pop(i)
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -413,7 +404,7 @@ quit
 
     %s
 
-Quits ``parmed.py`` *without* running any final parmout_ command.
+Quits ``parmed`` *without* running any final parmout_ command.
 
 """ % usage)
         continue
@@ -429,8 +420,8 @@ with open('parmed.rst', 'w') as f:
     f.write(r""".. Do NOT modify this file directly. conf.py creates it.
 .. modify conf.py instead
 
-Using ``parmed.py``
-===================
+Using ``parmed``
+================
 
 This page details using the command-line version of ParmEd, which is the
 primary front-end program using the :mod:`parmed` and :mod:`parmed.tools`
@@ -441,13 +432,13 @@ hierarchy is planned).
 
 There are two ways in which ParmEd can be run---in batch reading from an input
 file or *script*, and with an interactive interpreter. A script can either be
-given to ``parmed.py`` on the command-line, or fed via pipes through standard
+given to ``parmed`` on the command-line, or fed via pipes through standard
 input. You can provide an input file using the ``-i/--input`` flag.
 
 Command syntax
 --------------
 
-All actions should be specified on the ``parmed.py`` command-line in the
+All actions should be specified on the ``parmed`` command-line in the
 following format:
 
 .. code-block:: none
@@ -467,7 +458,7 @@ Available commands
 ------------------
 
 The following ``Action`` commands are available in ParmEd. The information here
-is available via the help_ command in the ``parmed.py`` interpreter.
+is available via the help_ command in the ``parmed`` interpreter.
 
 %s
 
@@ -581,16 +572,16 @@ confusing, so I will try to walk through it carefully.
 Limited Embedded Python Interpreter
 -----------------------------------
 
-``parmed.py`` also comes equipped with a fully-fledged Python interpreter under
+``parmed`` also comes equipped with a fully-fledged Python interpreter under
 the hood.  You can run individual Python commands by starting the command with a
-bang (``!``).  A double-bang (``!!``) indicates to ``parmed.py`` that a
+bang (``!``).  A double-bang (``!!``) indicates to ``parmed`` that a
 multi-line Python code segment follows, and to interpret everything that comes
 afterwards as Python code until another double-bang line (``!!``) appears. If
 you are typing at the prompt inside the interpreter, the prompt changes to
 ``py >>>`` to indicate you are in the Python interpreter.
 
 Note that running Python code can be insecure if the source of that code is
-untrusted.  As a result, ``parmed.py`` will refuse to execute raw Python code
+untrusted.  As a result, ``parmed`` will refuse to execute raw Python code
 unless you explicitly give the interpreter permission to do so with the ``-e``
 command-line flag.
 
@@ -599,7 +590,7 @@ A simple example is shown below (input follows the prompts ``>`` and ``py
 
 .. code-block:: none
 
-    $ parmed.py -e
+    $ parmed -e
     
                                       /^^^/           /]
                                      /   ]           / ]
@@ -729,15 +720,15 @@ that this alternative also worked:
 So it seemed rather fruitless to prohibit behavior that was so easy to work
 around!
 
-Using ``xparmed.py``
+Using ``xparmed``
 ====================
 
-An alternative to running the command-line-based ``parmed.py`` program is to use
-the *Tkinter*\ -based GUI front-end, ``xparmed.py``.  Note that not all actions
-have been implemented in ``xparmed.py``---if the one you need gives a message to
-this effect, you will need to use ``parmed.py`` instead.
+An alternative to running the command-line-based ``parmed`` program is to use
+the *Tkinter*\ -based GUI front-end, ``xparmed``.  Note that not all actions
+have been implemented in ``xparmed``---if the one you need gives a message to
+this effect, you will need to use ``parmed`` instead.
 
-``xparmed.py`` is significantly more limited.  It cannot be scripted, and it
+``xparmed`` is significantly more limited.  It cannot be scripted, and it
 cannot process multiple topology files in the same session.  It may, however,
 help you learn ParmEd better as well as lessen the learning curve for performing
 basic tasks.
