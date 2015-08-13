@@ -749,6 +749,17 @@ class TestStructureSave(unittest.TestCase):
         x1 = pmd.charmm.CharmmPsfFile(get_fn('test.psf', written=True))
         x2 = pmd.charmm.CharmmPsfFile(get_fn('test2.psf', written=True))
         x3 = pmd.charmm.CharmmPsfFile(get_fn('test3.psf', written=True))
+        # PSF files save "improper periodic" torsions under the improper list,
+        # only moving them over to the dihedral list once parameters have been
+        # assigned and the fact that it's a periodic improper torsion becomes
+        # known. Since no parameters are assigned in this section, we need to
+        # have a way of making sure that we don't get a false positive based on
+        # this difference. Add methods to determine the numbers of proper and
+        # improper torsions
+        def _propers(struct):
+            return sum(1 for dih in struct.dihedrals if not dih.improper)
+        def _impropers(struct):
+            return sum(1 for dih in struct.dihedrals if dih.improper) + len(struct.impropers)
         # Check equivalence of topologies
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
@@ -759,12 +770,12 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual(len(self.sys1.angles), len(x1.angles))
         self.assertEqual(len(self.sys2.angles), len(x2.angles))
         self.assertEqual(len(self.sys3.angles), len(x3.angles))
-        self.assertEqual(len(self.sys1.dihedrals), len(x1.dihedrals))
-        self.assertEqual(len(self.sys2.dihedrals), len(x2.dihedrals))
-        self.assertEqual(len(self.sys3.dihedrals), len(x3.dihedrals))
-        self.assertEqual(len(self.sys1.impropers), len(x1.impropers))
-        self.assertEqual(len(self.sys2.impropers), len(x2.impropers))
-        self.assertEqual(len(self.sys3.impropers), len(x3.impropers))
+        self.assertEqual(_propers(self.sys1), len(x1.dihedrals))
+        self.assertEqual(_propers(self.sys2), len(x2.dihedrals))
+        self.assertEqual(_propers(self.sys3), len(x3.dihedrals))
+        self.assertEqual(_impropers(self.sys1), len(x1.impropers))
+        self.assertEqual(_impropers(self.sys2), len(x2.impropers))
+        self.assertEqual(_impropers(self.sys3), len(x3.impropers))
         self.assertEqual(len(self.sys1.cmaps), len(x1.cmaps))
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
