@@ -13,7 +13,7 @@ conda config --add channels omnia
 
 if [ -z "$MINIMAL_PACKAGES" ]; then
     conda create -y -n myenv python=$PYTHON_VERSION \
-        numpy scipy netcdf4 pandas nose openmm
+        numpy scipy netcdf4 pandas nose openmm-dev
     conda update -y -n myenv --all
 else
     # Do not install the full numpy/scipy stack

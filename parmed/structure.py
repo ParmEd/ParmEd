@@ -38,11 +38,12 @@ from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
 from parmed.residue import WATER_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
-        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
-        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
-        NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
+        DihedralTypeList, DihedralType, ImproperType, Bond, Angle, Dihedral,
+        UreyBradley, Improper, Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion,
+        StretchBend, TorsionTorsion, NonbondedException, AcceptorDonor, Group,
+        Atom, ExtraPoint, TwoParticleExtraPointFrame, ChiralFrame,
+        MultipoleFrame, NoUreyBradley, ThreeParticleExtraPointFrame,
+        OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules
 from parmed.utils.decorators import needs_openmm
@@ -509,10 +510,10 @@ class Structure(object):
                         ie = d.ignore_end or i < len(d.type) - 1
                         ti = mapdt[d.type.idx][i]
                         c.dihedrals.append(
-                                Dihedral(c.atoms[d.atom1.idx],
-                                         c.atoms[d.atom2.idx],
-                                         c.atoms[d.atom3.idx],
-                                         c.atoms[d.atom4.idx],
+                                Dihedral(atoms[d.atom1.idx],
+                                         atoms[d.atom2.idx],
+                                         atoms[d.atom3.idx],
+                                         atoms[d.atom4.idx],
                                          improper=d.improper, ignore_end=ie,
                                          type=c.dihedral_types[ti])
                         )
@@ -520,8 +521,8 @@ class Structure(object):
                 else:
                     ti = mapdt[d.type.idx][0]
                     c.dihedrals.append(
-                        Dihedral(c.atoms[d.atom1.idx], c.atoms[d.atom2.idx],
-                                 c.atoms[d.atom3.idx], c.atoms[d.atom4.idx],
+                        Dihedral(atoms[d.atom1.idx], atoms[d.atom2.idx],
+                                 atoms[d.atom3.idx], atoms[d.atom4.idx],
                                  improper=d.improper, ignore_end=d.ignore_end,
                                  type=d.type and c.dihedral_types[ti])
                     )
@@ -1329,6 +1330,7 @@ class Structure(object):
             - PDBx/mmCIF (.cif, cif)
             - Amber topology file (.prmtop/.parm7, amber)
             - CHARMM PSF file (.psf, charmm)
+            - CHARMM coordinate file (.crd, charmmcrd)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)
             - Mol2 file (.mol2, mol2)
@@ -1354,7 +1356,7 @@ class Structure(object):
         TypeError if the structure cannot be converted to the desired format for
         whatever reason
         """
-        from parmed import amber, formats, gromacs
+        from parmed import amber, charmm, formats, gromacs
         extmap = {
                 '.pdb' : 'PDB',
                 '.cif' : 'CIF',
@@ -1366,6 +1368,7 @@ class Structure(object):
                 '.gro' : 'GRO',
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
+                '.crd' : 'CHARMMCRD',
         }
         # Basically everybody uses atom type names instead of type indexes. So
         # convert to atom type names and switch back if need be
@@ -1402,6 +1405,8 @@ class Structure(object):
             elif format == 'GROMACS':
                 s = gromacs.GromacsTopologyFile.from_structure(self)
                 s.write(fname, **kwargs)
+            elif format == 'CHARMMCRD':
+                charmm.CharmmCrdFile.write(self, fname, **kwargs)
             elif format == 'AMBER':
                 if (self.trigonal_angles or self.out_of_plane_bends or
                         self.torsion_torsions or self.pi_torsions or
