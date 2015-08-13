@@ -27,7 +27,6 @@ get_fn = utils.get_fn
 
 if has_openmm:
     CPU = mm.Platform.getPlatformByName('CPU')
-    Reference = mm.Platform.getPlatformByName('Reference')
 
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
@@ -86,7 +85,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 # Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
@@ -136,8 +135,8 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                     constraints=app.HBonds,
                                     rigidWater=True,
                                     flexibleConstraints=True)
-        con1 = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
-        con2 = mm.Context(system2, mm.VerletIntegrator(0.001), Reference)
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
         con1.setPositions(parm.positions)
         con2.setPositions(parm.positions)
         e1 = decomposed_energy(con1, parm)
@@ -173,7 +172,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0)
@@ -489,8 +488,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator,
-                             platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -516,8 +514,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator,
-                             platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -541,8 +538,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator,
-                             platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -569,8 +565,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                 self.assertTrue(force.getUseLongRangeCorrection())
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator,
-                             platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =   193.6
@@ -613,7 +608,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
             if isinstance(force, mm.CustomNonbondedForce):
                 self.assertTrue(force.getUseLongRangeCorrection())
         integrator = mm.VerletIntegrator(1*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0.9675961, places=3)
@@ -1145,7 +1140,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #Bond         =            1.1324222     Angle        =            1.0688008
@@ -1174,7 +1169,7 @@ class TestChamberParm(utils.TestCaseRelative):
             elif isinstance(force, mm.CustomNonbondedForce):
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #Bond         =            1.1324222     Angle        =            1.0688008
@@ -1200,7 +1195,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -1225,7 +1220,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1256,7 +1251,7 @@ class TestChamberParm(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1286,7 +1281,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
