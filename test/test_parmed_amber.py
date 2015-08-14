@@ -368,11 +368,11 @@ class TestParameterFiles(unittest.TestCase):
         self.assertEqual(d[0].per, 3)
         self.assertEqual(d[0].phase, 0)
         # Check a couple random improper types
-        d = params.improper_periodic_types[('C', 'O', 'X', 'X')]
+        d = params.improper_periodic_types[('O', 'X', 'C', 'X')]
         self.assertEqual(d.phi_k, 10.5)
         self.assertEqual(d.per, 2)
         self.assertEqual(d.phase, 180)
-        d = params.improper_periodic_types[('CB', 'CK', 'CT', 'N*')]
+        d = params.improper_periodic_types[('CB', 'CK', 'N*', 'CT')]
         self.assertEqual(d.phi_k, 1.0)
         self.assertEqual(d.per, 2)
         self.assertEqual(d.phase, 180)
