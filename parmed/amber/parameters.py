@@ -731,6 +731,12 @@ class AmberParameterSet(ParameterSet):
         # Write the impropers
         outfile.write('IMPROPER\n')
         for (a1, a2, a3, a4), typ in iteritems(self.improper_periodic_types):
+            # Make sure wild-cards come at the beginning
+            if a2 == 'X':
+                assert a4 == 'X', 'Malformed generic improper!'
+                a1, a2, a3, a4 = a2, a4, a3, a1
+            elif a4 == 'X':
+                a1, a2, a3, a4 = a4, a1, a3, a2
             outfile.write('%s-%s-%s-%s %14.8f %8.3f %5.1f\n' %
                           (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2),
                            typ.phi_k, typ.phase, typ.per))
