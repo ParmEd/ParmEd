@@ -366,7 +366,7 @@ like with combination, replication can be done both in-place and not::
     <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
     >>> phenol * 2
     <AmberParm 26 atoms; 2 residues; 26 bonds; parametrized>
-    >>> phenol * 100
+    >>> 100 * phenol # multiplication can commute
     <AmberParm 1300 atoms; 100 residues; 1300 bonds; parametrized>
     >>> # phenol still hasn't changed
     ... phenol
@@ -375,16 +375,6 @@ like with combination, replication can be done both in-place and not::
     ... phenol *= 10
     >>> phenol
     <AmberParm 130 atoms; 10 residues; 130 bonds; parametrized>
-
-A word of caution here -- the multiplication operator for integers is not
-implemented for :class:`Structure <parmed.structure.Structure>` instances as
-the other operand, so multiplying an integer by the structure will result in a
-``TypeError``::
-
-    >>> 20 * phenol
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    TypeError: unsupported operand type(s) for *: 'int' and 'AmberParm'
 
 One comment about the parameter *type* arrays (e.g., ``bond_type``) -- unlike
 structure combination, all replicates have the *same* parameters, so there is no

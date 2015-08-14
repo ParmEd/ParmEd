@@ -593,6 +593,11 @@ class TestStructureAdd(unittest.TestCase):
         self.assertIsNot(s1, s2)
         self.assertEqual(len(s2.atoms), len(s1.atoms) * multfac)
         self._check_mult(s2, s1, multfac)
+        # Check commutativity
+        s3 = multfac * s1
+        self.assertIsNot(s1, s3)
+        self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
+        self._check_mult(s3, s1, multfac)
 
     def testMultiplyNotParametrized(self):
         """ Tests replicating a non-parametrized Structure instance """
@@ -602,6 +607,11 @@ class TestStructureAdd(unittest.TestCase):
         self.assertIsNot(s1, s2)
         self.assertEqual(len(s2.atoms), len(s1.atoms) * multfac)
         self._check_mult(s2, s1, multfac)
+        # Check commutativity
+        s3 = multfac * s1
+        self.assertIsNot(s1, s3)
+        self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
+        self._check_mult(s3, s1, multfac)
 
     def testMultNoValence(self):
         """ Tests addition of two minimal Structure instances """
