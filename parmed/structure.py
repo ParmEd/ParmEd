@@ -3317,6 +3317,8 @@ class Structure(object):
         cp = copy(self)
         return cp.__imul__(ncopies, self)
 
+    __rmul__ = __mul__
+
     def __imul__(self, ncopies, other=None):
         if not isinstance(ncopies, integer_types):
             return NotImplemented
