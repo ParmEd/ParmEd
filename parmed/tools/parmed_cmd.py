@@ -3,13 +3,13 @@ This sets up the command interpreter for textual ParmEd (parmed).
 """
 
 # Load some system modules that may be useful for various users in shell mode
+import cmd
+from glob import glob
+import os
 from parmed.amber.readparm import AmberParm
 from parmed.exceptions import ParmedError, ParmedWarning
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range
-import cmd
-from glob import glob
-import os
 from parmed.tools.actions import COMMANDMAP, Usages
 from parmed.tools.argumentlist import ArgumentList
 from parmed.tools.exceptions import InterpreterError
@@ -17,6 +17,8 @@ try:
     import readline
 except ImportError:
     readline = None
+import sys
+import traceback
 
 _COMMANDLOGS = []
 
@@ -141,7 +143,13 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
                 raise
-   
+        except Exception as err:
+            if self._exit_on_fatal:
+                raise
+            self.stdout.write('Unexpected failure:\n%s: %s\n\n'
+                              'Traceback is\n\n' % (type(err).__name__, err))
+            traceback.print_tb(sys.exc_info()[2], file=self.stdout)
+
     def _normaldo(self, ActionClass, line):
         """ The standard action command does this stuff """
         actionname = ActionClass.__name__
@@ -155,6 +163,12 @@ class ParmedCmd(cmd.Cmd):
             self.stdout.write('%s: %s\n' % (type(err).__name__, err))
             if self._exit_on_fatal:
                 raise
+        except Exception as err:
+            if self._exit_on_fatal:
+                raise
+            self.stdout.write('Unexpected failure:\n%s: %s\n\n'
+                              'Traceback is\n\n' % (type(err).__name__, err))
+            traceback.print_tb(sys.exc_info()[2], file=self.stdout)
 
     @classmethod
     def populate_actions(cls):
@@ -190,9 +204,9 @@ class ParmedCmd(cmd.Cmd):
             # command from the user.
             try:
                 _cmd.cmdloop()
-            except ParmedError:
+            except:
                 pass
-      
+
     def do_go(self, line):
         """
         Stops reading commands and executes any 'parmout' command that had
@@ -206,6 +220,12 @@ class ParmedCmd(cmd.Cmd):
                 self.stdout.write('%s: %s\n' % (type(err).__name__, err))
                 if self._exit_on_fatal:
                     raise
+            except Exception as err:
+                if self._exit_on_fatal:
+                    raise
+                self.stdout.write('Unexpected failure:\n%s: %s\n\nTraceback is'
+                                  '\n\n' % (type(err).__name__, err))
+                traceback.print_tb(sys.exc_info()[2], file=self.stdout)
 
         return True
 
