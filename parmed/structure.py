@@ -968,7 +968,7 @@ class Structure(object):
         self.unchange()
         # Slice out coordinates if present
         if self._coordinates is not None:
-            self._coordinates = self._coordinates[np.array(sel)==0]
+            self._coordinates = self._coordinates[:, np.array(sel)==0]
 
     #===================================================
 

@@ -194,6 +194,31 @@ class TestStructureAPI(unittest.TestCase):
         diff = (old_crds - s.coordinates).ravel()**2
         self.assertGreater(diff.sum(), 0.01)
 
+    def testStrip(self):
+        """ Tests the Structure.strip method """
+        s = create_random_structure(parametrized=True)
+        nres = len(s.residues)
+        natom_per_res = [len(res) for res in s.residues]
+        s.strip(':1-5')
+        self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
+
+    def testStripWithCoords(self):
+        """ Tests the Structure.strip method when it has coordinates """
+        s = create_random_structure(parametrized=True)
+        coords = np.random.rand(10, len(s.atoms), 3)
+        s.coordinates = coords
+        nres = len(s.residues)
+        natom_per_res = [len(res) for res in s.residues]
+        s.strip(':1-5')
+        self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
+        self.assertEqual(s.get_coordinates().shape, (10, len(s.atoms), 3))
+        # No longer equal -- it's truncated
+        self.assertNotEqual(coords.shape, (10, len(s.atoms), 3))
+        # Check that the coordinates left are the same as the original
+        # coordinates corresponding to the ones that did *not* get stripped
+        n = sum(natom_per_res[:5])
+        self.assertTrue((coords[:,n:,:] == s.get_coordinates()).all())
+
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
 

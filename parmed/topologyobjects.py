@@ -849,7 +849,7 @@ class Atom(_ListItem):
         """
         if self is other:
             raise MoleculeError('Cannot coupled-dihedral atom to itself')
-        self._tortor_partners.append(self)
+        self._tortor_partners.append(other)
         other._tortor_partners.append(self)
 
     #===================================================
