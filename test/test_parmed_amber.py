@@ -2,15 +2,20 @@
 Tests the functionality in the parmed.amber package
 """
 from __future__ import print_function, division
-from utils import get_fn, has_numpy, FileIOTestCase
+
+import glob
+import math
 import numpy as np
-from parmed.amber import readparm, asciicrd, mask
-from parmed import topologyobjects, load_file
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import range, zip
 import os
+from parmed.amber import readparm, asciicrd, mask, parameters
+from parmed.exceptions import AmberWarning
+from parmed import topologyobjects, load_file
+from parmed.utils.six import string_types, iteritems
+from parmed.utils.six.moves import range, zip
 import random
 import unittest
+from utils import get_fn, has_numpy, FileIOTestCase
+import warnings
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -216,6 +221,268 @@ class TestReadParm(unittest.TestCase):
             for cmap in parm.cmaps:
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
+
+def _num_unique_types(dct):
+    return len(set(id(item) for _, item in iteritems(dct)))
+
+def _num_unique_dtypes(dct):
+    used_types = set()
+    num = 0
+    for _, x in iteritems(dct):
+        if id(x) in used_types: continue
+        used_types.add(id(x))
+        num += len(x)
+    return num
+
+class TestParameterFiles(unittest.TestCase):
+    """ Tests Amber parameter and frcmod files """
+
+    def testFileDetectionFrcmod(self):
+        """ Tests the detection of Amber frcmod files """
+        for fname in glob.glob(os.path.join(get_fn('parm'), 'frcmod.*')):
+            self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+
+    def testFileDetectionParm(self):
+        """ Tests the detection of Amber parm.dat files """
+        for fname in glob.glob(os.path.join(get_fn('parm'), 'parm*.dat')):
+            self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+
+    def testFrcmodParsing(self):
+        """ Tests parsing an Amber frcmod file """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'frcmod.ff99SB')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 0)
+        self.assertEqual(_num_unique_types(params.bond_types), 0)
+        self.assertEqual(_num_unique_types(params.angle_types), 0)
+        self.assertEqual(_num_unique_types(params.dihedral_types), 4)
+        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 16)
+        self.assertEqual(_num_unique_types(params.improper_periodic_types), 0)
+        # Small enough to check all of the parameters
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][1],
+                         topologyobjects.DihedralType(0.42, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][2],
+                         topologyobjects.DihedralType(0.27, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
+                         topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
+
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][1],
+                         topologyobjects.DihedralType(0.55, 3, 180, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][2],
+                         topologyobjects.DihedralType(1.58, 2, 180, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('N','CT','C','N')][3],
+                         topologyobjects.DihedralType(0.45, 1, 180, 1.2, 2.0))
+
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][1],
+                         topologyobjects.DihedralType(0.4, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][2],
+                         topologyobjects.DihedralType(2.0, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','N','C')][3],
+                         topologyobjects.DihedralType(2.0, 1, 0, 1.2, 2.0))
+
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][1],
+                         topologyobjects.DihedralType(0.4, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][2],
+                         topologyobjects.DihedralType(0.2, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('CT','CT','C','N')][3],
+                         topologyobjects.DihedralType(0.2, 1, 0, 1.2, 2.0))
+
+    def testParmParsing(self):
+        """ Tests parsing an Amber parm.dat file """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm10.dat')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 63)
+        self.assertEqual(_num_unique_types(params.bond_types), 151)
+        self.assertEqual(_num_unique_types(params.angle_types), 400)
+        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 275)
+        self.assertEqual(_num_unique_types(params.improper_periodic_types), 59)
+        # Check a couple random atom types
+        self.assertEqual(params.atom_types['C'].mass, 12.01)
+        self.assertEqual(params.atom_types['C'].atomic_number, 6)
+        self.assertEqual(params.atom_types['H3'].mass, 1.008)
+        self.assertEqual(params.atom_types['H3'].atomic_number, 1)
+        self.assertEqual(params.atom_types['EP'].atomic_number, 0)
+        self.assertEqual(params.atom_types['EP'].mass, 0)
+        self.assertEqual(params.atom_types['N*'].mass, 14.01)
+        self.assertEqual(params.atom_types['N*'].atomic_number, 7)
+        # Check a couple random bond types
+        self.assertEqual(params.bond_types[('OW', 'HW')].req, 0.9572)
+        self.assertEqual(params.bond_types[('OW', 'HW')].k, 553)
+        self.assertEqual(params.bond_types[('C', 'C')].req, 1.525)
+        self.assertEqual(params.bond_types[('C', 'C')].k, 310)
+        self.assertEqual(params.bond_types[('OH', 'P')].req, 1.61)
+        self.assertEqual(params.bond_types[('OH', 'P')].k, 230)
+        self.assertEqual(params.bond_types[('C4', 'N*')].req, 1.365)
+        self.assertEqual(params.bond_types[('C4', 'N*')].k, 448)
+        # Check a couple random angle types
+        self.assertEqual(params.angle_types[('HW', 'OW', 'HW')].theteq, 104.52)
+        self.assertEqual(params.angle_types[('HW', 'OW', 'HW')].k, 100)
+        self.assertEqual(params.angle_types[('CC', 'NA', 'P')].theteq, 125.10)
+        self.assertEqual(params.angle_types[('CC', 'NA', 'P')].k, 76.7)
+        self.assertEqual(params.angle_types[('HA', 'CM', 'CT')].theteq, 120.00)
+        self.assertEqual(params.angle_types[('HA', 'CM', 'CT')].k, 50.0)
+        self.assertEqual(params.angle_types[('C4', 'N*', 'CT')].theteq, 121.2)
+        self.assertEqual(params.angle_types[('C4', 'N*', 'CT')].k, 70)
+        self.assertEqual(params.angle_types[('EP', 'S', 'S')].theteq, 96.70)
+        self.assertEqual(params.angle_types[('EP', 'S', 'S')].k, 150)
+        # Check a couple random dihedral types
+        d = params.dihedral_types[('X', 'C', 'C', 'X')]
+        self.assertEqual(len(d), 1)
+        self.assertEqual(d[0].phi_k, 14.5/4)
+        self.assertEqual(d[0].per, 2)
+        self.assertEqual(d[0].phase, 180)
+        d = params.dihedral_types[('CT', 'OS', 'CT', 'CI')]
+        self.assertEqual(len(d), 2)
+        self.assertEqual(d[0].phi_k, 0.383)
+        self.assertEqual(d[0].per, 3)
+        self.assertEqual(d[0].phase, 0)
+        self.assertEqual(d[1].phi_k, 0.1)
+        self.assertEqual(d[1].per, 2)
+        self.assertEqual(d[1].phase, 180)
+        d = params.dihedral_types[('N', 'CT', 'CT', 'OH')]
+        self.assertEqual(len(d), 4)
+        self.assertEqual(d[0].phi_k, 0)
+        self.assertEqual(d[0].per, 1)
+        self.assertEqual(d[0].phase, 0)
+        self.assertEqual(d[1].phi_k, 1.49)
+        self.assertEqual(d[1].per, 2)
+        self.assertEqual(d[1].phase, 0)
+        self.assertEqual(d[2].phi_k, 0.156)
+        self.assertEqual(d[2].per, 3)
+        self.assertEqual(d[2].phase, 0)
+        self.assertEqual(d[3].phi_k, 0)
+        self.assertEqual(d[3].per, 4)
+        self.assertEqual(d[3].phase, 0)
+        d = params.dihedral_types[('EP', 'S', 'S', 'EP')]
+        self.assertEqual(len(d), 1)
+        self.assertEqual(d[0].phi_k, 0)
+        self.assertEqual(d[0].per, 3)
+        self.assertEqual(d[0].phase, 0)
+        # Check a couple random improper types
+        d = params.improper_periodic_types[('O', 'X', 'C', 'X')]
+        self.assertEqual(d.phi_k, 10.5)
+        self.assertEqual(d.per, 2)
+        self.assertEqual(d.phase, 180)
+        d = params.improper_periodic_types[('CB', 'CK', 'N*', 'CT')]
+        self.assertEqual(d.phi_k, 1.0)
+        self.assertEqual(d.per, 2)
+        self.assertEqual(d.phase, 180)
+        d = params.improper_periodic_types[('CC', 'CR', 'NA', 'P')]
+        self.assertEqual(d.phi_k, 1.1)
+        self.assertEqual(d.per, 2)
+        self.assertEqual(d.phase, 180)
+        # Check some of the L-J parameters
+        self.assertEqual(params.atom_types['H'].rmin, 0.6)
+        self.assertEqual(params.atom_types['H'].epsilon, 0.0157)
+        self.assertEqual(params.atom_types['N'].rmin, 1.824)
+        self.assertEqual(params.atom_types['N'].epsilon, 0.17)
+        self.assertEqual(params.atom_types['I'].rmin, 2.35)
+        self.assertEqual(params.atom_types['I'].epsilon, 0.4)
+        self.assertEqual(params.atom_types['C*'].rmin, 1.908)
+        self.assertEqual(params.atom_types['C*'].epsilon, 0.086)
+        # Now check some of the equivalenced atom types
+        self.assertEqual(params.atom_types['NA'].rmin, 1.824)
+        self.assertEqual(params.atom_types['NA'].epsilon, 0.17)
+        self.assertEqual(params.atom_types['NY'].rmin, 1.824)
+        self.assertEqual(params.atom_types['NY'].epsilon, 0.17)
+        self.assertEqual(params.atom_types['CA'].rmin, 1.908)
+        self.assertEqual(params.atom_types['CA'].epsilon, 0.086)
+        self.assertEqual(params.atom_types['CP'].rmin, 1.908)
+        self.assertEqual(params.atom_types['CP'].epsilon, 0.086)
+
+    def testParmParsingLJEDIT(self):
+        """ Tests parsing an Amber parm.dat file with an LJEDIT section """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm14ipq.dat')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 74)
+        self.assertEqual(_num_unique_types(params.bond_types), 217)
+        self.assertEqual(_num_unique_types(params.angle_types), 724)
+        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 1848)
+        self.assertEqual(_num_unique_types(params.improper_periodic_types), 102)
+        self.assertEqual(_num_unique_types(params.nbfix_types), 6)
+        # Check a couple dihedral types, since this file has them disordered
+        d = params.dihedral_types[('TN', 'TG', 'C', 'N')]
+        self.assertEqual(len(d), 4)
+        self.assertEqual(d[0].phi_k, 0.04031)
+        self.assertEqual(d[0].per, 4)
+        self.assertEqual(d[0].phase, 0)
+        self.assertEqual(d[1].phi_k, 0.06853)
+        self.assertEqual(d[1].per, 3)
+        self.assertEqual(d[1].phase, 180)
+        self.assertEqual(d[2].phi_k, 0.19829)
+        self.assertEqual(d[2].per, 2)
+        self.assertEqual(d[2].phase, 180)
+        self.assertEqual(d[3].phi_k, 1.46258)
+        self.assertEqual(d[3].per, 1)
+        self.assertEqual(d[3].phase, 180)
+        # Check the nbfix types
+        self.assertEqual(params.nbfix_types[('O3', 'OW')][0],
+                         math.sqrt(0.162750*0.21))
+        self.assertEqual(params.nbfix_types[('O3', 'OW')][1],
+                         1.775931+1.8605)
+        self.assertEqual(params.nbfix_types[('OA', 'OW')][0],
+                         math.sqrt(0.162750*0.2104))
+        self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
+                         1.775931+1.66)
+
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def testLoadLeaprc(self):
+        """ Tests loading a leaprc file to define a force field """
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        params = parameters.AmberParameterSet.from_leaprc(
+                os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd',
+                             'leaprc.ff14SB')
+        )
+        self.assertEqual(params.atom_types['H'].atomic_number, 1)
+        self.assertEqual(params.atom_types['3C'].atomic_number, 6)
+        self.assertEqual(params.atom_types['K+'].atomic_number, 19)
+        self.assertTrue(params.residues)
+
+    def testParmSetParsing(self):
+        """ Tests parsing a set of Amber parameter files """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm99.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff99SB'),
+                os.path.join(get_fn('parm'), 'frcmod.parmbsc0'),
+        )
+        self.assertGreater(_num_unique_types(params.atom_types), 0)
+        self.assertGreater(_num_unique_types(params.bond_types), 0)
+        self.assertGreater(_num_unique_types(params.angle_types), 0)
+        self.assertGreater(_num_unique_types(params.dihedral_types), 0)
+        self.assertGreater(_num_unique_types(params.improper_periodic_types), 0)
+        # Check that parameters were properly overridden. parm99.dat defines
+        # C-N-CT-C torsion as follows:
+        #
+        # C -N -CT-C    1    0.850       180.000          -2.
+        # C -N -CT-C    1    0.800         0.000           1.
+        #
+        # whereas ff99SB defines that torsion as:
+        #
+        # C -N -CT-C    1    0.00          0.0            -4.
+        # C -N -CT-C    1    0.42          0.0            -3.
+        # C -N -CT-C    1    0.27          0.0            -2.
+        # C -N -CT-C    1    0.00          0.0             1.
+        #
+        # Since ff99SB is loaded last, this should be the one that is stored
+        self.assertEqual(len(params.dihedral_types[('C','N','CT','C')]), 4)
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][0],
+                         topologyobjects.DihedralType(0, 4, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][1],
+                         topologyobjects.DihedralType(0.42, 3, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][2],
+                         topologyobjects.DihedralType(0.27, 2, 0, 1.2, 2.0))
+        self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
+                         topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
 
 class TestCoordinateFiles(unittest.TestCase):
     """ Tests the various coordinate file classes """
@@ -796,5 +1063,6 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(d1.improper, d2.improper)
             self.assertEqual(d1.type, d2.type)
 
+del TestReadParm, TestCoordinateFiles, TestAmberParmSlice, TestObjectAPIs, TestWriteFiles, TestAmberMask
 if __name__ == '__main__':
     unittest.main()

@@ -2157,6 +2157,7 @@ class DihedralType(_ListItem, _ParameterType):
     def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
         """ DihedralType constructor """
         _ParameterType.__init__(self)
+        self.locked = True
         self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
         self.per = per
         self.phase = _strip_units(phase, u.degrees)
@@ -2164,6 +2165,7 @@ class DihedralType(_ListItem, _ParameterType):
         self.scnb = scnb
         self.list = list
         self._idx = -1
+        self.locked = True
 
     #===================================================
 
@@ -2351,7 +2353,7 @@ class DihedralTypeList(list, _ListItem):
         return penalty
 
     def __repr__(self):
-        return '<DihedralTypes %s>' % (super(DihedralTypeList, self).__repr__())
+        return '<DihedralTypes %s>' % (list.__repr__(self))
 
     def __copy__(self):
         return DihedralTypeList([copy(x) for x in self])
