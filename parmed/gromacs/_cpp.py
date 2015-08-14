@@ -144,7 +144,7 @@ class CPreProcessor(object):
         self.close()
 
     def close(self):
-        if self._ownhandle:
+        if hasattr(self, '_ownhandle') and self._ownhandle:
             self._fileobj.close()
 
     def readline(self):
