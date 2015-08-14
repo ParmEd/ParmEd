@@ -292,6 +292,27 @@ class AmberParameterSet(ParameterSet):
 
     #===================================================
 
+    @classmethod
+    def from_structure(cls, struct):
+        """ Extracts known parameters from a Structure instance
+
+        Parameters
+        ----------
+        struct : :class:`parmed.structure.Structure`
+            The parametrized ``Structure`` instance from which to extract
+            parameters into a ParameterSet
+
+        Returns
+        -------
+        params : :class:`ParameterSet`
+            The parameter set with all parameters defined in the Structure
+        """
+        return super(AmberParameterSet, cls).from_structure(
+                struct, allow_unequal_duplicates=False
+        )
+
+    #===================================================
+
     def load_parameters(self, fname):
         """ Load a set of parameters from a single parameter file
 
@@ -321,6 +342,28 @@ class AmberParameterSet(ParameterSet):
         finally:
             if own_handle:
                 f.close()
+
+    #===================================================
+
+    @staticmethod
+    def _periodic_improper_key(atom1, atom2, atom3, atom4):
+        """ The central atom must always come third """
+        all_atoms = set([atom1, atom2, atom3, atom4])
+        for atom in all_atoms:
+            for atom2 in all_atoms:
+                if atom2 is atom: continue
+                if not atom2 in atom.bond_partners:
+                    break
+            else:
+                # We found our central atom
+                others = sorted(all_atoms - set([atom]))
+                key = (others[0].type, others[1].type, atom.type,
+                       others[2].type)
+                break
+        else:
+            # No atom identified as "central". Just assume that the third is
+            key = (atom1.type, atom2.type, atom3.type, atom4.type)
+        return key
 
     #===================================================
 
@@ -556,7 +599,10 @@ class AmberParameterSet(ParameterSet):
         a1, a2, a3, a4, k, phi, per = rematch.groups()
         a1 = a1.strip(); a2 = a2.strip();
         a3 = a3.strip(); a4 = a4.strip()
-        key = tuple(sorted([a1, a2, a3, a4]))
+        # Pre-sort the improper types, assuming atom3 is the central atom (which
+        # it must be in Amber parameter files!!!!)
+        a1, a2, a4 = sorted([a1, a2, a4])
+        key = (a1, a2, a3, a4)
         self.improper_periodic_types[key] = \
                 DihedralType(float(k), float(per), float(phi))
 

@@ -232,6 +232,10 @@ class ParameterSet(object):
             key = (dihedral.atom1.type, dihedral.atom2.type,
                    dihedral.atom3.type, dihedral.atom4.type)
             if dihedral.improper:
+                key = cls._periodic_improper_key(
+                        dihedral.atom1, dihedral.atom2,
+                        dihedral.atom3, dihedral.atom4,
+                )
                 if key in params.improper_periodic_types:
                     if (not allow_unequal_duplicates and
                             params.improper_periodic_types[key] != dihedral.type):
@@ -239,7 +243,7 @@ class ParameterSet(object):
                                         'between %s, %s, %s, and %s' % key)
                     continue
                 typ = copy(dihedral.type)
-                params.improper_periodic_types[tuple(sorted(key))] = typ
+                params.improper_periodic_types[key] = typ
             else:
                 # Proper dihedral. Look out for multi-term forms
                 if (key in params.dihedral_types and
@@ -404,6 +408,35 @@ class ParameterSet(object):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]
+
+    @staticmethod
+    def _periodic_improper_key(atom1, atom2, atom3, atom4):
+        """
+        Controls how improper torsion keys are generated from Structures.
+        Different programs have different conventions as far as where the
+        "central" atom is placed. This function should be overridden for each
+        subclass
+
+        The default is to *always* put the central atom first, and assume it
+        comes first already if no central atom is detected. A central atom is
+        defined as one that is bonded to the other 3
+        """
+        all_atoms = set([atom1, atom2, atom3, atom4])
+        for atom in all_atoms:
+            for atom2 in all_atoms:
+                if atom2 is atom: continue
+                if not atom2 in atom.bond_partners:
+                    break
+            else:
+                # We found our central atom
+                others = sorted(all_atoms - set([atom]))
+                key = (atom.type, others[0].type, others[1].type,
+                       others[2].type)
+                break
+        else:
+            # No atom identified as "central". Just assume that the third is
+            key = (atom1.type, atom2.type, atom3.type, atom4.type)
+        return key
 
     @property
     def combining_rule(self):
