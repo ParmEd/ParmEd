@@ -492,11 +492,13 @@ class AmberOFFLibrary(object):
                 dest.write(' %d\n' % (res[0].tail.idx + 1))
             else:
                 dest.write(' 0\n')
-        dest.write('!entry.%s.unit.connectivity table  int atom1x  int atom2x  '
-                   'int flags\n' % res.name)
-        for r in res:
-            for bond in r.bonds:
-                dest.write(' %d %d 1\n' % (bond.atom1.idx+1, bond.atom2.idx+1))
+        if any(len(r) > 1 for r in res):
+            dest.write('!entry.%s.unit.connectivity table  int atom1x  '
+                       'int atom2x  int flags\n' % res.name)
+            for r in res:
+                for bond in r.bonds:
+                    dest.write(' %d %d 1\n' % (bond.atom1.idx+1,
+                                               bond.atom2.idx+1))
         dest.write('!entry.%s.unit.hierarchy table  str abovetype  int '
                    'abovex  str belowtype  int belowx\n' % res.name)
         c = 1

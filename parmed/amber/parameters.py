@@ -666,18 +666,18 @@ class AmberParameterSet(ParameterSet):
             if isinstance(typ, DihedralType) or len(typ) == 1:
                 if not isinstance(typ, DihedralType):
                     typ = typ[0]
-                outfile.write('%s-%s-%s-%s %4i %8.3f %8.3f %5.1f    '
+                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    '
                               'SCEE=%s SCNB=%s\n' % (a1.ljust(2), a2.ljust(2),
                               a3.ljust(2), a4.ljust(2), 1, typ.phi_k, typ.phase,
                               typ.per, typ.scee, typ.scnb))
             else:
                 for dtyp in typ[:-1]:
-                    outfile.write('%s-%s-%s-%s %4i %8.3f %8.3f %5.1f    '
+                    outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    '
                                   'SCEE=%s SCNB=%s\n'%(a1.ljust(2), a2.ljust(2),
                                   a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
                                   dtyp.phase, -dtyp.per, dtyp.scee, dtyp.scnb))
                 dtyp = typ[-1]
-                outfile.write('%s-%s-%s-%s %4i %8.3f %8.3f %5.1f    '
+                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    '
                               'SCEE=%s SCNB=%s\n' % (a1.ljust(2), a2.ljust(2),
                               a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
                               dtyp.phase, dtyp.per, dtyp.scee, dtyp.scnb))
@@ -685,7 +685,7 @@ class AmberParameterSet(ParameterSet):
         # Write the impropers
         outfile.write('IMPROPER\n')
         for (a1, a2, a3, a4), typ in iteritems(self.improper_periodic_types):
-            outfile.write('%s-%s-%s-%s %8.3f %8.3f %5.1f\n' %
+            outfile.write('%s-%s-%s-%s %14.8f %8.3f %5.1f\n' %
                           (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2),
                            typ.phi_k, typ.phase, typ.per))
         outfile.write('\n')

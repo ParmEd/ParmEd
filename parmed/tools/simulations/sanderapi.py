@@ -66,12 +66,11 @@ def energy(parm, args, output=sys.stdout):
         inp.vdwmeth = int(vdw_longrange)
         inp.lj1264 = int(has_1264)
 
-    if not hasattr(parm, 'coords'):
+    if parm.coordinates is None:
         raise SimulationError('No coordinates are loaded')
     # Time to set up sander
-    sander.setup(parm, parm.coords, parm.box, inp)
-
-    e, f = sander.energy_forces()
+    with sander.setup(parm, parm.coordinates, parm.box, inp):
+        e, f = sander.energy_forces()
 
     if parm.chamber:
         output.write('Bond          = %20.7f     Angle         = %20.7f\n'
@@ -95,5 +94,3 @@ def energy(parm, args, output=sys.stdout):
         elif e.hbond != 0:
             output.write('     EHbond   = %20.7f' % e.hbond)
         output.write('\nTOTAL    = %20.7f\n' % e.tot)
-
-    sander.cleanup()
