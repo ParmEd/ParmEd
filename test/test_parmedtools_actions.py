@@ -22,6 +22,7 @@ import warnings
 
 get_fn = utils.get_fn
 get_saved_fn = utils.get_saved_fn
+diff_files = utils.diff_files
 
 gasparm = AmberParm(get_fn('trx.prmtop'))
 solvparm = AmberParm(get_fn('solv.prmtop'))
@@ -266,14 +267,6 @@ class TestNonParmActions(unittest.TestCase):
 class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
     
-    def _empty_writes(self):
-        """ Empty the "writes" directory """
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-        except OSError:
-            pass
-
     def testParmoutOutparmLoadRestrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
@@ -285,38 +278,38 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             self.assertTrue(hasattr(atom, 'xz'))
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(utils.diff_files(get_fn('trx.prmtop'),
-                                         get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('trx.prmtop'),
+                                   get_fn('test.parm7', written=True)))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(utils.diff_files(get_fn('trx.prmtop'),
-                                         get_fn('test.parm7', written=True)))
-        self.assertTrue(utils.diff_files(get_fn('trx.inpcrd'),
-                                         get_fn('test.rst7', written=True),
-                                         absolute_error=0.0001))
+        self.assertTrue(diff_files(get_fn('trx.prmtop'),
+                                   get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('trx.inpcrd'),
+                                   get_fn('test.rst7', written=True),
+                                   absolute_error=0.0001))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(utils.diff_files(get_fn('trx.prmtop'),
-                                         get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('trx.prmtop'),
+                                   get_fn('test.parm7', written=True)))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(utils.diff_files(get_fn('trx.prmtop'),
-                                         get_fn('test.parm7', written=True)))
-        self.assertTrue(utils.diff_files(get_fn('trx.inpcrd'),
-                                         get_fn('test.rst7', written=True),
-                                         absolute_error=0.0001))
+        self.assertTrue(diff_files(get_fn('trx.prmtop'),
+                                   get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('trx.inpcrd'),
+                                   get_fn('test.rst7', written=True),
+                                   absolute_error=0.0001))
 
     def testWriteFrcmod(self):
         """ Test writeFrcmod on AmberParm """
         parm = gasparm
         PT.writeFrcmod(parm, get_fn('test.frcmod', written=True)).execute()
-        self.assertTrue(utils.diff_files(get_saved_fn('test.frcmod'),
-                                         get_fn('test.frcmod', written=True)))
+        self.assertTrue(diff_files(get_saved_fn('test.frcmod'),
+                                   get_fn('test.frcmod', written=True)))
 
     def testWriteOffLoadRestrt(self):
         """ Test writeOFF on AmberParm """
@@ -324,13 +317,13 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
         PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
         if utils.has_numpy():
-            self.assertTrue(utils.diff_files(get_saved_fn('test.off'),
-                                             get_fn('test.off', written=True),
-                                             absolute_error=0.0001))
+            self.assertTrue(diff_files(get_saved_fn('test.off'),
+                                       get_fn('test.off', written=True),
+                                       absolute_error=0.0001))
         else:
-            self.assertTrue(utils.diff_files(get_saved_fn('test_nonpy.off'),
-                                             get_fn('test.off', written=True),
-                                             absolute_error=0.0001))
+            self.assertTrue(diff_files(get_saved_fn('test_nonpy.off'),
+                                       get_fn('test.off', written=True),
+                                       absolute_error=0.0001))
 
     def testChangeRadii(self):
         """ Test changeRadii on AmberParm """
@@ -1039,9 +1032,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = load_file(get_fn('4lzt.parm7'))
         PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb')).execute()
         parm.write_parm(get_fn('4lzt_pdb.parm7', written=True))
-        self.assertTrue(utils.diff_files(get_saved_fn('4lzt_pdb.parm7'),
-                                         get_fn('4lzt_pdb.parm7', written=True),
-                                         absolute_error=1e-6)
+        self.assertTrue(diff_files(get_saved_fn('4lzt_pdb.parm7'),
+                                   get_fn('4lzt_pdb.parm7', written=True),
+                                   absolute_error=1e-6)
         )
 
     def testHMassRepartition(self):
@@ -1099,31 +1092,20 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestChamberParmActions(utils.TestCaseRelative):
+    def testTIMerge(self):
+        """ Tests the tiMerge action on AmberParm """
+        parm = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
+        PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute()
+        parm.write_parm(get_fn('abs_merged.prmtop', written=True))
+        parm.write_rst7(get_fn('abs_merged.inpcrd', written=True))
+        self.assertTrue(diff_files(get_fn('abs_merged.prmtop', written=True),
+                                   get_saved_fn('abs_merged.prmtop')))
+        self.assertTrue(diff_files(get_fn('abs_merged.inpcrd', written=True),
+                                   get_saved_fn('abs_merged.inpcrd')))
+
+class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
     
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
-    def _empty_writes(self):
-        """ Empty the "writes" directory """
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-        except OSError:
-            pass
-
     def testParmoutOutparmLoadRestrt(self):
         """ Test parmout, outparm, and loadRestrt actions for ChamberParm """
         self._empty_writes()
@@ -1135,35 +1117,35 @@ class TestChamberParmActions(utils.TestCaseRelative):
             self.assertTrue(hasattr(atom, 'xz'))
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True),
-                                         absolute_error=1e-6))
+        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+                                   get_fn('test.parm7', written=True),
+                                   absolute_error=1e-6))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True),
-                                         absolute_error=1e-6))
-        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
-                                         get_fn('test.rst7', written=True),
-                                         absolute_error=0.0001))
+        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+                                   get_fn('test.parm7', written=True),
+                                   absolute_error=1e-6))
+        self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
+                                   get_fn('test.rst7', written=True),
+                                   absolute_error=0.0001))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True),
-                                         absolute_error=1e-6))
+        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+                                   get_fn('test.parm7', written=True),
+                                   absolute_error=1e-6))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.parm7'),
-                                         get_fn('test.parm7', written=True),
-                                         absolute_error=1e-6))
-        self.assertTrue(utils.diff_files(get_fn('ala_ala_ala.rst7'),
-                                         get_fn('test.rst7', written=True),
-                                         absolute_error=0.0001))
+        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+                                   get_fn('test.parm7', written=True),
+                                   absolute_error=1e-6))
+        self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
+                                   get_fn('test.rst7', written=True),
+                                   absolute_error=0.0001))
 
     def testWriteFrcmod(self):
         """ Check that writeFrcmod fails for ChamberParm """
@@ -1177,6 +1159,13 @@ class TestChamberParmActions(utils.TestCaseRelative):
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
                 PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
+
+    def testTIMerge(self):
+        """ Check that tiMerge fails for ChamberParm """
+        parm = copy(gascham)
+        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        self.assertRaises(exc.ParmError, lambda:
+                PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
     def testChangeRadii(self):
         """ Test changeRadii for ChamberParm """
@@ -1931,31 +1920,9 @@ class TestChamberParmActions(utils.TestCaseRelative):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestAmoebaParmActions(utils.TestCaseRelative):
+class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
     
-    def setUp(self):
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
-
-    def tearDown(self):
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
-
-    def _empty_writes(self):
-        """ Empty the "writes" directory """
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-        except OSError:
-            pass
-
     def testParmoutOutparmLoadRestrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()
@@ -1967,31 +1934,31 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
             self.assertTrue(hasattr(atom, 'xz'))
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(utils.diff_files(get_fn('nma.parm7'),
-                                         get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('nma.parm7'),
+                                   get_fn('test.parm7', written=True)))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(utils.diff_files(get_fn('nma.parm7'),
-                                         get_fn('test.parm7', written=True)))
-        self.assertTrue(utils.diff_files(get_fn('nma.rst7'),
-                                         get_fn('test.rst7', written=True),
-                                         absolute_error=0.0001))
+        self.assertTrue(diff_files(get_fn('nma.parm7'),
+                                   get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('nma.rst7'),
+                                   get_fn('test.rst7', written=True),
+                                   absolute_error=0.0001))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(utils.diff_files(get_fn('nma.parm7'),
-                                         get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('nma.parm7'),
+                                   get_fn('test.parm7', written=True)))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(utils.diff_files(get_fn('nma.parm7'),
-                                         get_fn('test.parm7', written=True)))
-        self.assertTrue(utils.diff_files(get_fn('nma.rst7'),
-                                         get_fn('test.rst7', written=True),
-                                         absolute_error=0.0001))
+        self.assertTrue(diff_files(get_fn('nma.parm7'),
+                                   get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(get_fn('nma.rst7'),
+                                   get_fn('test.rst7', written=True),
+                                   absolute_error=0.0001))
 
     def testWriteFrcmod(self):
         """ Check that writeFrcmod fails for AmoebaParm """
@@ -2383,6 +2350,13 @@ class TestAmoebaParmActions(utils.TestCaseRelative):
             self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
+
+    def testTIMerge(self):
+        """ Check that tiMerge fails for AmoebaParm """
+        parm = copy(amoebaparm)
+        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        self.assertRaises(exc.ParmError, lambda:
+                PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
 if __name__ == '__main__':
     unittest.main()

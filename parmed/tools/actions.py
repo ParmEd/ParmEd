@@ -2350,7 +2350,7 @@ class tiMerge(Action):
                 atm_j = mol2common[j]
                 diff_count = 0
                 diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
-                if (diff.abs() < self.tol).sum() == 3:
+                if (np.abs(diff) < self.tol).sum() == 3:
                     mol2common_sort.append(atm_j)
 
         mol2common = mol2common_sort
@@ -2366,7 +2366,7 @@ class tiMerge(Action):
             atm_i = mol1common[i]
             atm_j = mol2common[i]               
             diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
-            if (diff.abs() > self.tol).any():
+            if (np.abs(diff) > self.tol).any():
                 raise TiMergeError('Common (nonsoftcore) atoms must have the '
                                    'same coordinates.')
       
