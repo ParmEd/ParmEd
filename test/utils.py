@@ -56,13 +56,19 @@ class FileIOTestCase(unittest.TestCase):
             pass
 
     def tearDown(self):
+        self._empty_writes()
         try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
             os.rmdir(get_fn('writes'))
         except OSError:
             pass
 
+    def _empty_writes(self):
+        """ Empty the "writes" directory """
+        try:
+            for f in os.listdir(get_fn('writes')):
+                os.unlink(get_fn(f, written=True))
+        except OSError:
+            pass
 
 def get_fn(filename, written=False):
     """
