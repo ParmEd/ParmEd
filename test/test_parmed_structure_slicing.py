@@ -308,16 +308,28 @@ class TestStructureViewSlicing(unittest.TestCase):
         # Check that the atoms sliced out are correct
         for atom in sl11.atoms:
             self.assertIs(atom, parm.atoms[atom.idx])
+        for atom in sl12.atoms:
+            self.assertIs(atom, parm.atoms[atom.idx])
+        for atom in sl13.atoms:
+            self.assertIs(atom, parm.atoms[atom.idx])
+        for atom in sl21.atoms:
+            self.assertIs(atom, pdb1.atoms[atom.idx])
         for atom in sl22.atoms:
-            self.assertIs(atom, parm.atoms[atom.idx])
+            self.assertIs(atom, pdb1.atoms[atom.idx])
+        for atom in sl23.atoms:
+            self.assertIs(atom, pdb1.atoms[atom.idx])
+        for atom in sl31.atoms:
+            self.assertIs(atom, pdb2.atoms[atom.idx])
+        for atom in sl32.atoms:
+            self.assertIs(atom, pdb2.atoms[atom.idx])
         for atom in sl33.atoms:
-            self.assertIs(atom, parm.atoms[atom.idx])
+            self.assertIs(atom, pdb2.atoms[atom.idx])
 
     def testMaskArray(self):
         """ Tests Structure selection using a mask array (view) """
         mask = [a.name in ('CA', 'CB') for a in parm.atoms]
         sel = parm.view[mask]
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         self.assertEqual(len(sel.atoms), 207)
         for atom in sel.atoms:
             self.assertIn(atom.name, ('CA', 'CB'))
@@ -334,7 +346,7 @@ class TestStructureViewSlicing(unittest.TestCase):
     def testResidueAtomSelection(self):
         """ Tests combined residue,atom slicing/selections (view) """
         sel = pdb1.view[10:20,:5] # First five atoms of residues 10-19
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         self.assertEqual(len(sel.atoms), 49) # 1 residue has only 4 atoms
         c = 0
         for res in pdb1.residues[10:20]:
@@ -343,7 +355,7 @@ class TestStructureViewSlicing(unittest.TestCase):
                 c += 1
 
         sel = pdb1.view[[0,2,3,5], :2] # First 2 atoms of residues 0, 2, 3, and 5
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         self.assertEqual(len(sel.atoms), 8)
         c = 0
         for i, res in enumerate([0, 2, 3, 5]):
@@ -354,7 +366,7 @@ class TestStructureViewSlicing(unittest.TestCase):
             c += 1
 
         sel = pdb1.view[8,:]
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         self.assertEqual(len(sel.atoms), len(pdb1.residues[8]))
         for a1, a2 in zip(sel.atoms, pdb1.residues[8]):
             self.assertIs(a1, a2)
@@ -362,7 +374,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         self.assertIs(pdb1[8,4], pdb1.residues[8][4])
 
         sel = pdb1.view[['ALA', 'GLY'], :]
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         for atom in sel.atoms:
             self.assertIn(atom.residue.name, ('ALA', 'GLY'))
             self.assertIs(atom.list, pdb1.atoms)
@@ -375,7 +387,7 @@ class TestStructureViewSlicing(unittest.TestCase):
     def testChainResidueAtomSelection(self):
         """ Tests combined chain,residue,atom slicing/selections (view) """
         sel = pdb2.view['A',:,:] # All of chain A
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         for a in sel.atoms:
             self.assertEqual(a.residue.chain, 'A')
             self.assertIs(a.list, pdb2.atoms)
@@ -387,5 +399,5 @@ class TestStructureViewSlicing(unittest.TestCase):
         sel = pdb2.view['B',0,0]
         self.assertIs(sel, pdb2.atoms[826])
         sel = pdb2.view[['A','B'], :10:2, 0]
-        self.assertIsInstance(sel, parmed.structure.StructureView)
+        self.assertIsInstance(sel, pmd.structure.StructureView)
         self.assertEqual(len(sel.atoms), 2*5*1)
