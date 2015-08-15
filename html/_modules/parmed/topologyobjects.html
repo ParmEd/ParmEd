@@ -224,6 +224,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="bp">None</span>
 
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
 <span class="k">def</span> <span class="nf">_delete_from_list</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Deletes a requested item from a list. If the item does not exist in the</span>
@@ -897,7 +900,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MoleculeError</span><span class="p">(</span><span class="s">&#39;Cannot coupled-dihedral atom to itself&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tortor_partners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tortor_partners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="n">other</span><span class="o">.</span><span class="n">_tortor_partners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
@@ -2159,10 +2162,10 @@
 <span class="sd">        The dihedral periodicity</span>
 <span class="sd">    phase : ``float``</span>
 <span class="sd">        The dihedral phase in degrees</span>
-<span class="sd">    scee : ``float``</span>
-<span class="sd">        1-4 electrostatic scaling factor</span>
-<span class="sd">    scnb : ``float``</span>
-<span class="sd">        1-4 Lennard-Jones scaling factor</span>
+<span class="sd">    scee : ``float``, optional</span>
+<span class="sd">        1-4 electrostatic scaling factor. Default is 1.0</span>
+<span class="sd">    scnb : ``float``, optional</span>
+<span class="sd">        1-4 Lennard-Jones scaling factor. Default is 1.0</span>
 <span class="sd">    list : :class:`TrackedList`</span>
 <span class="sd">        A list of `DihedralType`s in which this is a member</span>
 
@@ -2205,6 +2208,7 @@
 <div class="viewcode-block" id="DihedralType.__init__"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.DihedralType.html#parmed.topologyobjects.DihedralType.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phi_k</span><span class="p">,</span> <span class="n">per</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">scee</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scnb</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; DihedralType constructor &quot;&quot;&quot;</span>
         <span class="n">_ParameterType</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">phi_k</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="n">per</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">_strip_units</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
@@ -2212,6 +2216,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span> <span class="o">=</span> <span class="n">scnb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="nb">list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="bp">True</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -2221,9 +2226,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; phi_k=</span><span class="si">%.3f</span><span class="s">, per=</span><span class="si">%d</span><span class="s">, phase=</span><span class="si">%.3f</span><span class="s">, scee=</span><span class="si">%.3f</span><span class="s">, scnb=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
-                 <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; phi_k=</span><span class="si">%.3f</span><span class="s">, per=</span><span class="si">%d</span><span class="s">, phase=</span><span class="si">%.3f</span><span class="s">, &#39;</span> <span class="o">%</span>
+                  <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">)]</span>
+        <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; scee=</span><span class="si">%.3f</span><span class="s">, scnb=</span><span class="si">%.3f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">retstr</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DihedralType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span>
@@ -2398,7 +2404,7 @@
         <span class="k">return</span> <span class="n">penalty</span>
 </div>
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;&lt;DihedralTypes </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">DihedralTypeList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__repr__</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;DihedralTypes </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">list</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DihedralTypeList</span><span class="p">([</span><span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
@@ -4732,21 +4738,26 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    bs : ``int``</span>
-<span class="sd">        Not sure</span>
+<span class="sd">        Smallest atom number within a group (0-based)</span>
 <span class="sd">    type : ``int``</span>
-<span class="sd">        The group type (??)</span>
+<span class="sd">        Flag for group information; 0 when all atoms have zero charge,</span>
+<span class="sd">        1 when group has a net zero charge but at least one atom has a non-zero</span>
+<span class="sd">        partial charge, 2 when the net charge of the group is not zero</span>
 <span class="sd">    move : ``int``</span>
-<span class="sd">        If the group moves (??)</span>
+<span class="sd">        0 if the atoms are not fixed, 1 when they are</span>
 
-<span class="sd">    Disclaimer</span>
-<span class="sd">    ----------</span>
-<span class="sd">    I really don&#39;t know what these numbers mean. I&#39;m speculating based on the</span>
-<span class="sd">    source code of &#39;chamber&#39;, and this section is simply ignored there.</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    See the discussion on Github for the source of the meanings of these</span>
+<span class="sd">    variables: https://github.com/ParmEd/ParmEd/pull/307#issuecomment-128244134</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bs</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">move</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bs</span> <span class="o">=</span> <span class="n">bs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="n">move</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">move</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>

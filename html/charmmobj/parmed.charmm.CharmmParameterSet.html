@@ -81,8 +81,8 @@ Otherwise, ValueError is raised.</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="5%" />
-<col width="95%" />
+<col width="6%" />
+<col width="94%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>atom_types</td>
@@ -112,10 +112,13 @@ Otherwise, ValueError is raised.</p>
 <tr class="row-odd"><td>improper_types</td>
 <td>(dict((str,str,str,str):ImproperType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion to the ImproperType instances</td>
 </tr>
-<tr class="row-even"><td>cmap_types</td>
+<tr class="row-even"><td>improper_periodic_types</td>
+<td>(dict((str,str,str,str):DihedralType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion (modeled as a Fourier series) to the DihedralType instances</td>
+</tr>
+<tr class="row-odd"><td>cmap_types</td>
 <td>(dict((str,str,str,str,str):CmapType)) Dictionary mapping the 5-element tuple of the names of the five atom types involved in the correction map to the CmapType instances</td>
 </tr>
-<tr class="row-odd"><td>nbfix_types</td>
+<tr class="row-even"><td>nbfix_types</td>
 <td>(dict((str,str):(float,float))) Dictionary mapping the 2-element tuple of the names of the two atom types whose LJ terms are modified to the tuple of the (epsilon,rmin) terms for that off-diagonal term</td>
 </tr>
 </tbody>
@@ -130,20 +133,26 @@ Otherwise, ValueError is raised.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.condense" title="parmed.charmm.CharmmParameterSet.condense"><tt class="xref py py-obj docutils literal"><span class="pre">condense</span></tt></a>([do_dihedrals])</td>
 <td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="parmed.charmm.CharmmParameterSet.from_parameterset"><tt class="xref py py-obj docutils literal"><span class="pre">from_parameterset</span></tt></a>(params[,&nbsp;copy])</td>
+<td>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
 <td>Extracts known parameters from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><tt class="xref py py-obj docutils literal"><span class="pre">load_set</span></tt></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><tt class="xref py py-obj docutils literal"><span class="pre">load_set</span></tt></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
 <td>Instantiates a CharmmParameterSet from a Topology file and a Parameter</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></tt></a>(pfile[,&nbsp;comments])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></tt></a>(pfile[,&nbsp;comments])</td>
 <td>Reads all of the parameters from a parameter file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></tt></a>(sfile)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></tt></a>(sfile)</td>
 <td>Reads RTF and PAR sections from a stream file and dispatches the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></tt></a>(tfile)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></tt></a>(tfile)</td>
 <td>Reads _only_ the atom type definitions from a topology file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.write" title="parmed.charmm.CharmmParameterSet.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>([top,&nbsp;par,&nbsp;str])</td>
+<td>Write a CHARMM parameter set to a file</td>
 </tr>
 </tbody>
 </table>
@@ -213,6 +222,42 @@ the compression time in half)</p>
 </table>
 <p class="rubric">Notes</p>
 <p>The return value allows you to condense the types at construction time.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.charmm.CharmmParameterSet.from_parameterset">
+<em class="property">classmethod </em><tt class="descname">from_parameterset</tt><big>(</big><em>params</em>, <em>copy=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a CharmmParameterSet from another ParameterSet (or
+subclass). The main thing this feature is responsible for is converting
+lower-case atom type names into all upper-case and decorating the name
+to ensure each atom type name is unique.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>params</strong> : <a class="reference internal" href="../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></tt></a></p>
+<blockquote>
+<div><p>ParameterSet containing the list of parameters to be converted to a
+CHARMM-compatible set</p>
+</div></blockquote>
+<p><strong>copy</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, the returned parameter set is a deep copy of <tt class="docutils literal"><span class="pre">params</span></tt>. If
+False, the returned parameter set is a shallow copy, and the
+original set may be modified if any lower-case atom type names are
+present. Default is False.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>new_params</strong> : CharmmParameterSet</p>
+<blockquote class="last">
+<div><p>The parameter set whose atom type names are converted to all
+upper-case</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="classmethod">
@@ -352,6 +397,39 @@ unnecessary for versions 36 and later of the CHARMM force field.</p>
 <blockquote class="last">
 <div><p>Name of the CHARMM topology file to read</p>
 </div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmParameterSet.write">
+<tt class="descname">write</tt><big>(</big><em>top=None</em>, <em>par=None</em>, <em>str=None</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a CHARMM parameter set to a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>top</strong> : str or file-like object, optional</p>
+<blockquote>
+<div><p>If provided, the atom types will be written to this file in RTF
+format.</p>
+</div></blockquote>
+<p><strong>par</strong> : str or file-like object, optional</p>
+<blockquote>
+<div><p>If provided, the parameters will be written to this file in PAR
+format. Either this or the <tt class="docutils literal"><span class="pre">str</span></tt> argument <em>must</em> be provided</p>
+</div></blockquote>
+<p><strong>str</strong> : str or file-like object, optional</p>
+<blockquote>
+<div><p>If provided, the atom types and parameters will be written to this
+file as separate RTF and PAR cards that can be read as a CHARMM
+stream file. Either this or the <tt class="docutils literal"><span class="pre">par</span></tt> argument <em>must</em> be provided</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if both par and str are None</strong></p>
 </td>
 </tr>
 </tbody>

@@ -58,8 +58,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
 
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParameterError</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">,</span>
-                <span class="n">AtomType</span><span class="p">)</span>
+                <span class="n">AtomType</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
@@ -187,7 +188,7 @@
         <span class="k">return</span> <span class="n">other</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ParameterSet.from_structure"><a class="viewcode-back" href="../../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+<div class="viewcode-block" id="ParameterSet.from_structure"><a class="viewcode-back" href="../../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">allow_unequal_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extracts known parameters from a Structure instance</span>
 
 <span class="sd">        Parameters</span>
@@ -195,6 +196,10 @@
 <span class="sd">        struct : :class:`parmed.structure.Structure`</span>
 <span class="sd">            The parametrized ``Structure`` instance from which to extract</span>
 <span class="sd">            parameters into a ParameterSet</span>
+<span class="sd">        allow_unequal_duplicates : bool, optional</span>
+<span class="sd">            If True, if two or more unequal parameter types are defined by the</span>
+<span class="sd">            same atom types, the last one encountered will be assigned. If</span>
+<span class="sd">            False, an exception will be raised. Default is True</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -208,7 +213,8 @@
 <span class="sd">        Furthermore, the *first* occurrence of each parameter will be used. If</span>
 <span class="sd">        future ones differ, they will be silently ignored, since this is</span>
 <span class="sd">        expected behavior in some instances (like with Gromacs topologies in the</span>
-<span class="sd">        ff99sb-ildn force field).</span>
+<span class="sd">        ff99sb-ildn force field) unless ``allow_unequal_duplicates`` is set to</span>
+<span class="sd">        ``False``</span>
 
 <span class="sd">        Dihedrals are a little trickier. They can be multi-term, which can be</span>
 <span class="sd">        represented either as a *single* entry in dihedrals with a type of</span>
@@ -216,6 +222,14 @@
 <span class="sd">        parameter type. In this case, the parameter is constructed from either</span>
 <span class="sd">        the first DihedralTypeList found or the first DihedralType of each</span>
 <span class="sd">        periodicity found if no matching DihedralTypeList is found.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        :class:`parmed.exceptions.ParameterError` if allow_unequal_duplicates is</span>
+<span class="sd">        False and 2+ unequal parameters are defined between the same atom types.</span>
+
+<span class="sd">        `NotImplementedError` if any AMOEBA potential terms are defined in the</span>
+<span class="sd">        input structure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
         <span class="n">found_dihed_type_list</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -236,7 +250,12 @@
                             <span class="n">atom_type</span>
         <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_unequal_duplicates</span> <span class="ow">and</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal bond types defined between &#39;</span>
+                                         <span class="s">&#39;</span><span class="si">%s</span><span class="s"> and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
@@ -244,8 +263,12 @@
             <span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
         <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">angle</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">((</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">in</span>
-                    <span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_unequal_duplicates</span> <span class="ow">and</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">angle</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal angle types defined between &#39;</span>
+                                         <span class="s">&#39;</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">angle</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
@@ -260,15 +283,37 @@
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                    <span class="n">dihedral</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">improper</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_periodic_improper_key</span><span class="p">(</span>
+                        <span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span>
+                        <span class="n">dihedral</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_unequal_duplicates</span> <span class="ow">and</span>
+                            <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal dihedral types defined &#39;</span>
+                                        <span class="s">&#39;between </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+                    <span class="k">continue</span>
                 <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c"># Proper dihedral. Look out for multi-term forms</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span> <span class="ow">and</span>
                         <span class="n">found_dihed_type_list</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
                     <span class="c"># Already found a multi-term dihedral type list</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_unequal_duplicates</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal dihedral types &#39;</span>
+                                        <span class="s">&#39;defined between </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                        <span class="n">key</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">):</span>
+                            <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                                <span class="k">if</span> <span class="n">dt</span> <span class="o">==</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+                                    <span class="k">break</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal dihedral types &#39;</span>
+                                        <span class="s">&#39;defined between </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                        <span class="n">key</span><span class="p">)</span>
                     <span class="k">continue</span>
                 <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
                     <span class="c"># We have one term of a potentially multi-term dihedral.</span>
@@ -284,6 +329,11 @@
                         <span class="c"># with its periodicity does not already exist</span>
                         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
                             <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">per</span> <span class="o">==</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">per</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_unequal_duplicates</span> <span class="ow">and</span>
+                                        <span class="n">t</span> <span class="o">!=</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+                                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal dihedral &#39;</span>
+                                            <span class="s">&#39;types defined bewteen </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, &#39;</span>
+                                            <span class="s">&#39;and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
                                 <span class="k">break</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="c"># If we got here, we did NOT find this periodicity.</span>
@@ -312,13 +362,23 @@
             <span class="k">if</span> <span class="n">improper</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">improper</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                     <span class="n">improper</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">improper</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_unequal_duplicates</span> <span class="ow">and</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal improper types defined &#39;</span>
+                            <span class="s">&#39;between </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cmap</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                     <span class="n">cmap</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom5</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_unequal_duplicates</span> <span class="ow">and</span>
+                        <span class="n">cmap</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unequal CMAP types defined between &#39;</span>
+                            <span class="s">&#39;</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, and </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="n">typ</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span>
             <span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">typ</span>
@@ -399,6 +459,35 @@
                 <span class="n">key2</span> <span class="o">=</span> <span class="n">keylist</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">==</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]:</span>
                     <span class="n">typedict</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">typedict</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_periodic_improper_key</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Controls how improper torsion keys are generated from Structures.</span>
+<span class="sd">        Different programs have different conventions as far as where the</span>
+<span class="sd">        &quot;central&quot; atom is placed. This function should be overridden for each</span>
+<span class="sd">        subclass</span>
+
+<span class="sd">        The default is to *always* put the central atom first, and assume it</span>
+<span class="sd">        comes first already if no central atom is detected. A central atom is</span>
+<span class="sd">        defined as one that is bonded to the other 3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom2</span> <span class="ow">is</span> <span class="n">atom</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># We found our central atom</span>
+                <span class="n">others</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_atoms</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom</span><span class="p">]))</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                       <span class="n">others</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># No atom identified as &quot;central&quot;. Just assume that the third is</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">key</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">combining_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

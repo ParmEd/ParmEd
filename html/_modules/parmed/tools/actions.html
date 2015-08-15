@@ -54,8 +54,17 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span>
-        <span class="n">Structure</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">gromacs</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span>
+                                    <span class="n">DihedralType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="kn">import</span> <span class="nn">parmed.gromacs</span> <span class="kn">as</span> <span class="nn">gromacs</span>
 <span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AmberMask</span><span class="p">,</span> <span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">AmoebaParm</span><span class="p">,</span>
         <span class="n">HAS_NETCDF</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">NetCDFRestart</span><span class="p">,</span> <span class="n">AmberMdcrd</span><span class="p">,</span> <span class="n">AmberAsciiRestart</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.amber._chamberparm</span> <span class="kn">import</span> <span class="n">ConvertFromPSF</span>
@@ -64,14 +73,10 @@
 <span class="kn">from</span> <span class="nn">parmed.formats</span> <span class="kn">import</span> <span class="n">PDBFile</span><span class="p">,</span> <span class="n">CIFFile</span><span class="p">,</span> <span class="n">Mol2File</span>
 <span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplateContainer</span><span class="p">,</span> <span class="n">AmberOFFLibrary</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span> <span class="k">as</span> <span class="n">_Element</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.argumentlist</span> <span class="kn">import</span> <span class="n">ArgumentList</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">WriteOFFError</span><span class="p">,</span> <span class="n">ParmError</span><span class="p">,</span> <span class="n">ParmWarning</span><span class="p">,</span>
               <span class="n">ChangeStateError</span><span class="p">,</span> <span class="n">ChangeLJPairError</span><span class="p">,</span> <span class="n">ParmedChangeError</span><span class="p">,</span>
@@ -369,15 +374,13 @@
 
 <div class="viewcode-block" id="writeFrcmod.execute"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.writeFrcmod.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Writes the frcmod file &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber.parameters</span> <span class="kn">import</span> <span class="n">ParameterSet</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber.parameters</span> <span class="kn">import</span> <span class="n">AmberParameterSet</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">Action</span><span class="o">.</span><span class="n">overwrite</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">FileExists</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> exists; not overwriting&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span><span class="p">)</span>
-        <span class="n">parmset</span> <span class="o">=</span> <span class="n">ParameterSet</span><span class="p">()</span>
-        <span class="n">parmset</span><span class="o">.</span><span class="n">load_from_parm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span>
-        <span class="n">frcmod</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
-        <span class="n">frcmod</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Force field parameters from </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span>
-        <span class="n">parmset</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frcmod</span><span class="p">)</span>
-        <span class="n">frcmod</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">parmset</span> <span class="o">=</span> <span class="n">AmberParameterSet</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s">&#39;Force field parameters from </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> \
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">parmset</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frcmod_name</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </div></div>
@@ -2398,7 +2401,7 @@
                 <span class="n">atm_j</span> <span class="o">=</span> <span class="n">mol2common</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="n">diff_count</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">atm_i</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">atm_j</span><span class="p">]</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">mol2common_sort</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atm_j</span><span class="p">)</span>
 
         <span class="n">mol2common</span> <span class="o">=</span> <span class="n">mol2common_sort</span>
@@ -2414,7 +2417,7 @@
             <span class="n">atm_i</span> <span class="o">=</span> <span class="n">mol1common</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">atm_j</span> <span class="o">=</span> <span class="n">mol2common</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>               
             <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">atm_i</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">atm_j</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="n">TiMergeError</span><span class="p">(</span><span class="s">&#39;Common (nonsoftcore) atoms must have the &#39;</span>
                                    <span class="s">&#39;same coordinates.&#39;</span><span class="p">)</span>
       
@@ -2933,6 +2936,9 @@
         <span class="k">pass</span>
 </div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__repr__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Collect statistics &quot;&quot;&quot;</span>
         <span class="n">nnuc</span> <span class="o">=</span> <span class="n">namin</span> <span class="o">=</span> <span class="n">ncion</span> <span class="o">=</span> <span class="n">naion</span> <span class="o">=</span> <span class="n">nwat</span> <span class="o">=</span> <span class="n">nunk</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>

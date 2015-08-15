@@ -1764,6 +1764,7 @@ suffix and <tt class="docutils literal"><span class="pre">format</span></tt> key
 <li>PDBx/mmCIF (.cif, cif)</li>
 <li>Amber topology file (.prmtop/.parm7, amber)</li>
 <li>CHARMM PSF file (.psf, charmm)</li>
+<li>CHARMM coordinate file (.crd, charmmcrd)</li>
 <li>Gromacs topology file (.top, gromacs)</li>
 <li>Gromacs GRO file (.gro, gro)</li>
 <li>Mol2 file (.mol2, mol2)</li>
@@ -2003,7 +2004,7 @@ be converted into</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em><big>)</big><a class="headerlink" href="#parmed.amber.ChamberParm.write_cif" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.amber.ChamberParm.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2052,9 +2053,14 @@ as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
 <p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 </td>
 </tr>
@@ -2083,7 +2089,7 @@ given name.</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em><big>)</big><a class="headerlink" href="#parmed.amber.ChamberParm.write_pdb" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.amber.ChamberParm.write_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2137,10 +2143,15 @@ identifies the choice.</p>
 False, ANISOU records are not written. Default is False</p>
 </div></blockquote>
 <p><strong>charmm</strong> : bool, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
 atom that does not contain a SEGID identifier. Default is False</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 </td>
 </tr>

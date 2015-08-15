@@ -1489,13 +1489,13 @@ iterable</p>
 <blockquote>
 <div><p>The dihedral phase in degrees</p>
 </div></blockquote>
-<p><strong>scee</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<p><strong>scee</strong> : <tt class="docutils literal"><span class="pre">float</span></tt>, optional</p>
 <blockquote>
-<div><p>1-4 electrostatic scaling factor</p>
+<div><p>1-4 electrostatic scaling factor. Default is 1.0</p>
 </div></blockquote>
-<p><strong>scnb</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<p><strong>scnb</strong> : <tt class="docutils literal"><span class="pre">float</span></tt>, optional</p>
 <blockquote>
-<div><p>1-4 Lennard-Jones scaling factor</p>
+<div><p>1-4 Lennard-Jones scaling factor. Default is 1.0</p>
 </div></blockquote>
 <p><strong>list</strong> : <a class="reference internal" href="#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a></p>
 <blockquote class="last">
@@ -3426,20 +3426,25 @@ particular pair of atoms is scaled in the AMOEBA force field</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>bs</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
 <blockquote>
-<div><p>Not sure</p>
+<div><p>Smallest atom number within a group (0-based)</p>
 </div></blockquote>
 <p><strong>type</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
 <blockquote>
-<div><p>The group type (??)</p>
+<div><p>Flag for group information; 0 when all atoms have zero charge,
+1 when group has a net zero charge but at least one atom has a non-zero
+partial charge, 2 when the net charge of the group is not zero</p>
 </div></blockquote>
 <p><strong>move</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
 <blockquote class="last">
-<div><p>If the group moves (??)</p>
+<div><p>0 if the atoms are not fixed, 1 when they are</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>See the discussion on Github for the source of the meanings of these
+variables: <a class="reference external" href="https://github.com/ParmEd/ParmEd/pull/307#issuecomment-128244134">https://github.com/ParmEd/ParmEd/pull/307#issuecomment-128244134</a></p>
 </dd></dl>
 
 <dl class="class">

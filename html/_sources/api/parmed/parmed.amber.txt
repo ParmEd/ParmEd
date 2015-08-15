@@ -17,6 +17,7 @@ Submodules
    parmed.amber.asciicrd
    parmed.amber.mask
    parmed.amber.netcdffiles
+   parmed.amber.offlib
    parmed.amber.parameters
    parmed.amber.readparm
    parmed.amber.titratable_residues

@@ -60,17 +60,20 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
 
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span> <span class="k">as</span> <span class="n">_copy</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span>
-                       <span class="n">Cmap</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Atom</span><span class="p">)</span>
+                    <span class="n">Cmap</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span>
+                    <span class="n">DihedralType</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span>
+                    <span class="n">DihedralTypeList</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">SMALL</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CharmmError</span><span class="p">,</span> <span class="n">MoleculeError</span><span class="p">,</span> <span class="n">CharmmWarning</span><span class="p">,</span>
         <span class="n">ParameterError</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -125,7 +128,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    psf_name : str</span>
+<span class="sd">    psf_name : str, optional</span>
 <span class="sd">        Name of the PSF file (it must exist)</span>
 
 <span class="sd">    Raises</span>
@@ -218,13 +221,16 @@
     <span class="c">#===================================================</span>
 
     <span class="nd">@_catchindexerror</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psf_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psf_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens and parses a PSF file, then instantiates a CharmmPsfFile</span>
 <span class="sd">        instance from the data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">_resre</span>
         <span class="n">Structure</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c"># Bail out if we don&#39;t have a filename</span>
+        <span class="k">if</span> <span class="n">psf_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="n">conv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_convert</span>
         <span class="c"># Open the PSF and read the first line. It must start with &quot;PSF&quot;</span>
         <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">psf_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">psf</span><span class="p">:</span>
@@ -385,6 +391,87 @@
 
     <span class="c">#===================================================</span>
 
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CharmmPsfFile.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.psf.html#parmed.charmm.psf.CharmmPsfFile.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a CharmmPsfFile from an input Structure instance. This</span>
+<span class="sd">        method makes sure all atom types have uppercase-only names</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        struct : :class:`parmed.structure.Structure`</span>
+<span class="sd">            The input structure to convert to a CharmmPsfFile instance</span>
+<span class="sd">        copy : bool, optional</span>
+<span class="sd">            If True, a copy of all items are made. Otherwise, the resulting</span>
+<span class="sd">            CharmmPsfFile is a shallow copy</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        psf : :class:`CharmmPsfFile`</span>
+<span class="sd">            CHARMM PSF file</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError if the functional form is not recognized or cannot be</span>
+<span class="sd">        implemented through the PSF and parameter/stream files</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If copy is False, the original object may have its atom type names</span>
+<span class="sd">        changed if any of them have lower-case letters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">rb_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">stretch_bends</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">chiral_frames</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">multipole_frames</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">nrexcl</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Unsupported functional form for CHARMM PSF&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="n">_copy</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+        <span class="n">psf</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">angles</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">urey_bradleys</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">urey_bradleys</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">dihedrals</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">impropers</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">impropers</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">acceptors</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">acceptors</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">donors</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">donors</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">groups</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">cmaps</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span>
+
+        <span class="n">psf</span><span class="o">.</span><span class="n">bond_types</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">bond_types</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">angle_types</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">angle_types</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">urey_bradley_types</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">urey_bradley_types</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">dihedral_types</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">dihedral_types</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">improper_types</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">improper_types</span>
+        <span class="n">psf</span><span class="o">.</span><span class="n">cmap_types</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">cmap_types</span>
+
+        <span class="c"># Make all atom type names upper-case</span>
+        <span class="k">def</span> <span class="nf">typeconv</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">name</span>
+            <span class="c"># Lowercase letters present -- decorate the type name with LTU --</span>
+            <span class="c"># Lower To Upper</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">LTU&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">psf</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">typeconv</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">typeconv</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c"># If no groups are defined, make the entire system one group</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">psf</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">psf</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-4</span><span class="p">:</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">psf</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="n">psf</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">nst2</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">psf</span>
+
+    <span class="c">#===================================================</span>
+</div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
@@ -440,7 +527,7 @@
 <span class="sd">        ------</span>
 <span class="sd">        ParameterError if any parameters cannot be found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">parmset</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">parmset</span><span class="p">)</span>
+        <span class="n">parmset</span> <span class="o">=</span> <span class="n">_copy</span><span class="p">(</span><span class="n">parmset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">combining_rule</span>
         <span class="c"># First load the atom types</span>
         <span class="n">types_are_int</span> <span class="o">=</span> <span class="bp">False</span>
@@ -541,24 +628,52 @@
             <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span>
             <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a4</span><span class="o">.</span><span class="n">type</span>
             <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span><span class="p">]))</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
-                <span class="c"># Check for wild-cards</span>
+            <span class="c"># Check for exact harmonic or exact periodic</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
+                <span class="n">imp</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span>
+                <span class="n">imp</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># Check for wild-card harmonic</span>
                 <span class="k">for</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="p">(</span><span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span><span class="p">):</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">at1</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">]))</span>
                     <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
-                        <span class="k">break</span> <span class="c"># This is the right key</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">imp</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;No improper parameters found for </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span>
-                                       <span class="n">imp</span><span class="p">)</span>
+                        <span class="n">imp</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                        <span class="k">break</span>
+                <span class="c"># Check for wild-card periodic</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="p">(</span><span class="n">at2</span><span class="p">,</span> <span class="n">at3</span><span class="p">,</span> <span class="n">at4</span><span class="p">):</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">at1</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">,</span> <span class="s">&#39;X&#39;</span><span class="p">]))</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span>
+                            <span class="n">imp</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                            <span class="k">break</span>
+                    <span class="c"># Not found anywhere</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parmset</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;No improper parameters found for&#39;</span>
+                                             <span class="s">&#39;</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">imp</span><span class="p">)</span>
             <span class="n">imp</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># prepare list of harmonic impropers present in system</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[:]</span>
         <span class="k">for</span> <span class="n">improper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-            <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;Should not be here&#39;</span><span class="p">)</span> <span class="c"># Avoid masking errors</span>
+        <span class="c"># Look through the list of impropers -- if there are any periodic</span>
+        <span class="c"># impropers, move them over to the dihedrals list</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">):</span>
+                <span class="n">imp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">dih</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="p">,</span>
+                               <span class="n">improper</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ignore_end</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">imp</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">imp</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dih</span><span class="p">)</span>
         <span class="c"># Now do the cmaps. These will not have wild-cards</span>
         <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>

@@ -52,14 +52,14 @@
   <h1>Source code for parmed.charmm.parameters</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains classes for parsing and processing CHARMM parameter,</span>
-<span class="sd">topology, and stream files. It only extracts atom properties from the</span>
-<span class="sd">topology files and extracts all parameters from the parameter files</span>
+<span class="sd">topology, and stream files.</span>
 
 <span class="sd">Author: Jason M. Swails</span>
 <span class="sd">Contributors:</span>
 <span class="sd">Date: Apr. 13, 2015</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span> <span class="k">as</span> <span class="n">_copy</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Atom</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span>
                     <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.charmm._charmmfile</span> <span class="kn">import</span> <span class="n">CharmmFile</span><span class="p">,</span> <span class="n">CharmmStreamFile</span>
@@ -68,7 +68,8 @@
 <span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplate</span><span class="p">,</span> <span class="n">PatchTemplate</span>
 <span class="kn">from</span> <span class="nn">parmed.parameters</span> <span class="kn">import</span> <span class="n">ParameterSet</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">element_by_mass</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">integer_types</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -134,6 +135,10 @@
 <span class="sd">    improper_types : dict((str,str,str,str):ImproperType)</span>
 <span class="sd">        Dictionary mapping the 4-element tuple of the names of the four atom</span>
 <span class="sd">        types involved in the improper torsion to the ImproperType instances</span>
+<span class="sd">    improper_periodic_types : dict((str,str,str,str):DihedralType)</span>
+<span class="sd">        Dictionary mapping the 4-element tuple of the names of the four atom</span>
+<span class="sd">        types involved in the improper torsion (modeled as a Fourier series) to</span>
+<span class="sd">        the DihedralType instances</span>
 <span class="sd">    cmap_types : dict((str,str,str,str,str):CmapType)</span>
 <span class="sd">        Dictionary mapping the 5-element tuple of the names of the five atom</span>
 <span class="sd">        types involved in the correction map to the CmapType instances</span>
@@ -192,6 +197,131 @@
         <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">pars</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">strf</span> <span class="ow">in</span> <span class="n">strs</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">strf</span><span class="p">)</span>
 
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CharmmParameterSet.from_parameterset"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.parameters.CharmmParameterSet.from_parameterset">[docs]</a>    <span class="k">def</span> <span class="nf">from_parameterset</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiates a CharmmParameterSet from another ParameterSet (or</span>
+<span class="sd">        subclass). The main thing this feature is responsible for is converting</span>
+<span class="sd">        lower-case atom type names into all upper-case and decorating the name</span>
+<span class="sd">        to ensure each atom type name is unique.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : :class:`parmed.parameters.ParameterSet`</span>
+<span class="sd">            ParameterSet containing the list of parameters to be converted to a</span>
+<span class="sd">            CHARMM-compatible set</span>
+<span class="sd">        copy : bool, optional</span>
+<span class="sd">            If True, the returned parameter set is a deep copy of ``params``. If</span>
+<span class="sd">            False, the returned parameter set is a shallow copy, and the</span>
+<span class="sd">            original set may be modified if any lower-case atom type names are</span>
+<span class="sd">            present. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        new_params : CharmmParameterSet</span>
+<span class="sd">            The parameter set whose atom type names are converted to all</span>
+<span class="sd">            upper-case</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_params</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">typeconv</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">name</span>
+            <span class="c"># Lowercase letters present -- decorate the type name with LTU --</span>
+            <span class="c"># Lower To Upper</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">LTU&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+            <span class="n">do_copy</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">do_copy</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+        <span class="c"># Convert all parameters</span>
+        <span class="n">id_typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">typeconv</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">typeconv</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">)</span>
+            <span class="c"># NoUreyBradley should never be copied</span>
+            <span class="k">if</span> <span class="n">typ</span> <span class="ow">is</span> <span class="n">NoUreyBradley</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">NoUreyBradley</span>
+            <span class="k">elif</span> <span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span> <span class="ow">in</span> <span class="n">id_typemap</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_typemap</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newtype</span> <span class="o">=</span> <span class="n">do_copy</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
+                <span class="n">id_typemap</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">)]</span> <span class="o">=</span> <span class="n">newtype</span>
+                <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">newtype</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">):</span>
+            <span class="n">atom_type</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">typeconv</span><span class="p">(</span><span class="n">atom_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">typename</span><span class="p">,</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">):</span>
+            <span class="n">atom_type</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">typeconv</span><span class="p">(</span><span class="n">atom_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">typename</span><span class="p">,</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">):</span>
+            <span class="n">atom_type</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">typeconv</span><span class="p">(</span><span class="n">atom_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">atom_type</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">bond_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">angle_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">improper_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                       <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">):</span>
+            <span class="n">copy_paramtype</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">new_params</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_params</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="CharmmParameterSet.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.parameters.CharmmParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Extracts known parameters from a Structure instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        struct : :class:`parmed.structure.Structure`</span>
+<span class="sd">            The parametrized ``Structure`` instance from which to extract</span>
+<span class="sd">            parameters into a ParameterSet</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        params : :class:`ParameterSet`</span>
+<span class="sd">            The parameter set with all parameters defined in the Structure</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The parameters here are copies of the ones in the Structure, so</span>
+<span class="sd">        modifying the generated ParameterSet will have no effect on ``struct``.</span>
+<span class="sd">        Furthermore, the *first* occurrence of each parameter will be used. If</span>
+<span class="sd">        future ones differ, they will be silently ignored, since this is</span>
+<span class="sd">        expected behavior in some instances (like with Gromacs topologies in the</span>
+<span class="sd">        ff99sb-ildn force field).</span>
+
+<span class="sd">        Dihedrals are a little trickier. They can be multi-term, which can be</span>
+<span class="sd">        represented either as a *single* entry in dihedrals with a type of</span>
+<span class="sd">        DihedralTypeList or multiple entries in dihedrals with a DihedralType</span>
+<span class="sd">        parameter type. In this case, the parameter is constructed from either</span>
+<span class="sd">        the first DihedralTypeList found or the first DihedralType of each</span>
+<span class="sd">        periodicity found if no matching DihedralTypeList is found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">from_parameterset</span><span class="p">(</span>
+                <span class="n">ParameterSet</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span>
+                                            <span class="n">allow_unequal_duplicates</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="p">)</span>
+</div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="CharmmParameterSet.load_set"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.parameters.CharmmParameterSet.load_set">[docs]</a>    <span class="k">def</span> <span class="nf">load_set</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sfiles</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -286,16 +416,16 @@
                 <span class="n">parameterset</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">1</span><span class="p">:</span><span class="mi">78</span><span class="p">]</span>
                 <span class="k">continue</span>
             <span class="c"># Set section if this is a section header</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ATOMS&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ATOM&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;ATOMS&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;BONDS&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;BOND&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;BONDS&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ANGLES&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ANGLE&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;ANGLES&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;DIHEDRALS&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;DIHEDRAL&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;DIHEDRALS&#39;</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;IMPROPER&#39;</span><span class="p">):</span>
@@ -476,18 +606,28 @@
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s">&#39;Could not parse dihedrals.&#39;</span><span class="p">)</span>
                 <span class="c"># If we have a 7th column, that is the real psi0 (and the 6th</span>
-                <span class="c"># is just a dummy 0)</span>
+                <span class="c"># is the multiplicity, which will indicate this is a periodic</span>
+                <span class="c"># improper torsion (so it needs to be added to the</span>
+                <span class="c"># improper_periodic_types list)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">tmp</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s">&#39;improper equil. value&#39;</span><span class="p">)</span>
-                    <span class="n">theteq</span> <span class="o">=</span> <span class="n">tmp</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                    <span class="k">pass</span> <span class="c"># Do nothing</span>
-                <span class="c"># Improper types seem not to have the central atom defined in</span>
-                <span class="c"># the first place, so just have the key a fully sorted list. We</span>
-                <span class="c"># still depend on the PSF having properly ordered improper atoms</span>
+                    <span class="n">per</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">per</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">theteq</span><span class="p">)</span>
+                    <span class="n">theteq</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="c"># Improper types seem not to always have the central atom</span>
+                <span class="c"># defined in the first place, so just have the key a fully</span>
+                <span class="c"># sorted list. We still depend on the PSF having properly</span>
+                <span class="c"># ordered improper atoms</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">,</span> <span class="n">type4</span><span class="p">]))</span>
-                <span class="n">improp</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">improp</span>
+                <span class="k">if</span> <span class="n">per</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">improp</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">improp</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">improp</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">per</span><span class="p">,</span> <span class="n">theteq</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">improp</span>
+                    <span class="n">improp</span><span class="o">.</span><span class="n">improper</span> <span class="o">=</span> <span class="bp">True</span>
                 <span class="n">improp</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;CMAP&#39;</span><span class="p">:</span>
@@ -844,9 +984,200 @@
                 <span class="c"># This is a Parameter file section</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
             <span class="n">title</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="CharmmParameterSet.write"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.parameters.CharmmParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">str</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write a CHARMM parameter set to a file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        top : str or file-like object, optional</span>
+<span class="sd">            If provided, the atom types will be written to this file in RTF</span>
+<span class="sd">            format.</span>
+<span class="sd">        par : str or file-like object, optional</span>
+<span class="sd">            If provided, the parameters will be written to this file in PAR</span>
+<span class="sd">            format. Either this or the ``str`` argument *must* be provided</span>
+<span class="sd">        str : str or file-like object, optional</span>
+<span class="sd">            If provided, the atom types and parameters will be written to this</span>
+<span class="sd">            file as separate RTF and PAR cards that can be read as a CHARMM</span>
+<span class="sd">            stream file. Either this or the ``par`` argument *must* be provided</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError if both par and str are None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">par</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">str</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Must specify either par *or* str&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">ownhandle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">top</span>
+                <span class="n">ownhandle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;*&gt;&gt;&gt;&gt; CHARMM Topology file generated by ParmEd &lt;&lt;&lt;&lt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;*</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_top_to</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ownhandle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">par</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">par</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">ownhandle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">par</span>
+                <span class="n">ownhandle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;*&gt;&gt;&gt;&gt; CHARMM Parameter file generated by ParmEd &lt;&lt;&lt;&lt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;*</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_par_to</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ownhandle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">ownhandle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">str</span>
+                <span class="n">ownhandle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_str_to</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ownhandle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">_write_str_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Private method to write stream items to open file object &quot;&quot;&quot;</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;read rtf card @app</span><span class="se">\n</span><span class="s">* Topology generated by ParmEd</span><span class="se">\n</span><span class="s">*</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_top_to</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">read para card @app</span><span class="se">\n</span><span class="s">* Parameters generated by ParmEd</span><span class="se">\n</span><span class="s">*</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_par_to</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_top_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">write_version</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Private method to write topology items to open file object &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">write_version</span><span class="p">:</span>
+            <span class="c"># This version is known to work</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;36   1</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">atom</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;MASS </span><span class="si">%5d</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%9.5f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">write_version</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">END</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_par_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Private method to write parameter items to open file object &quot;&quot;&quot;</span>
+        <span class="c"># Find out what the 1-4 electrostatic scaling factors and the 1-4</span>
+        <span class="c"># van der Waals scaling factors are</span>
+        <span class="n">scee</span><span class="p">,</span> <span class="n">scnb</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">typ</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scee</span><span class="p">:</span> <span class="n">scee</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">scee</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scnb</span><span class="p">:</span> <span class="n">scnb</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scee</span><span class="p">:</span> <span class="n">scee</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">scee</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scnb</span><span class="p">:</span> <span class="n">scnb</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scee</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">scnb</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Mixed 1-4 scaling not supported in CHARMM&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scee</span><span class="p">:</span>
+            <span class="n">scee</span> <span class="o">=</span> <span class="n">scee</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scee</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">scnb</span><span class="p">:</span>
+            <span class="n">scnb</span> <span class="o">=</span> <span class="n">scnb</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scnb</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;ATOMS</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_top_to</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">BONDS</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">written</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">);</span> <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%7.2f</span><span class="s"> </span><span class="si">%10.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">req</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">ANGLES</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">written</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">);</span> <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%7.2f</span><span class="s"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">theteq</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">DIHEDRALS</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">written</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">);</span> <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">typ</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%11.4f</span><span class="s"> </span><span class="si">%2d</span><span class="s"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">t</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
+                             <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">per</span><span class="p">),</span> <span class="n">t</span><span class="o">.</span><span class="n">phase</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%11.4f</span><span class="s"> </span><span class="si">%2d</span><span class="s"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
+                         <span class="nb">int</span><span class="p">(</span><span class="n">typ</span><span class="o">.</span><span class="n">per</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">phase</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">IMPROPERS</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">written</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">):</span>
+            <span class="n">sortkey</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">sortkey</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sortkey</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">typ</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%11.4f</span><span class="s"> </span><span class="si">%2d</span><span class="s"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">t</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
+                             <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">per</span><span class="p">),</span> <span class="n">t</span><span class="o">.</span><span class="n">phase</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%11.4f</span><span class="s"> </span><span class="si">%2d</span><span class="s"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
+                         <span class="nb">int</span><span class="p">(</span><span class="n">typ</span><span class="o">.</span><span class="n">per</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">phase</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%11.4f</span><span class="s"> </span><span class="si">%2d</span><span class="s"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">psi_k</span><span class="p">,</span>
+                     <span class="mi">0</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">psi_eq</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">CMAPS</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">written</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">);</span> <span class="n">written</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%-6s</span><span class="s"> </span><span class="si">%5d</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+                         <span class="n">key</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">resolution</span><span class="p">))</span>
+                <span class="n">resm1</span> <span class="o">=</span> <span class="n">typ</span><span class="o">.</span><span class="n">resolution</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">typ</span><span class="o">.</span><span class="n">resolution</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">typ</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">typ</span><span class="o">.</span><span class="n">resolution</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">elif</span> <span class="n">i</span> <span class="o">%</span> <span class="n">typ</span><span class="o">.</span><span class="n">resolution</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; </span><span class="si">%13.6f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n\n\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;NONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance &#39;</span>
+                <span class="s">&#39;vfswitch -</span><span class="se">\n</span><span class="s">cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 &#39;</span>
+                <span class="s">&#39;e14fac </span><span class="si">%s</span><span class="s"> wmin 1.5</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">scee</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%-6s</span><span class="s"> </span><span class="si">%14.6f</span><span class="s"> </span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%14.6f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">typ</span><span class="o">.</span><span class="n">epsilon</span><span class="p">),</span>
+                    <span class="n">typ</span><span class="o">.</span><span class="n">rmin</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">typ</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">==</span> <span class="n">typ</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="ow">and</span> <span class="n">typ</span><span class="o">.</span><span class="n">rmin</span> <span class="o">==</span> <span class="n">typ</span><span class="o">.</span><span class="n">rmin_14</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%14.6f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">typ</span><span class="o">.</span><span class="n">epsilon</span><span class="p">)</span><span class="o">/</span><span class="n">scnb</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">rmin</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%10.6f</span><span class="s"> </span><span class="si">%14.6f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">typ</span><span class="o">.</span><span class="n">epsilon_14</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">rmin_14</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">END</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
-</div></div>
+</div>
 <span class="k">def</span> <span class="nf">_fit_IC_table</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ictable</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines cartesian coordinates from an internal coordinate table stored in</span>

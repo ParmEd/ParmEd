@@ -89,11 +89,12 @@
         <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">WATER_NAMES</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AtomList</span><span class="p">,</span> <span class="n">ResidueList</span><span class="p">,</span> <span class="n">TrackedList</span><span class="p">,</span>
-        <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span>
-        <span class="n">TrigonalAngle</span><span class="p">,</span> <span class="n">OutOfPlaneBend</span><span class="p">,</span> <span class="n">PiTorsion</span><span class="p">,</span> <span class="n">StretchBend</span><span class="p">,</span> <span class="n">TorsionTorsion</span><span class="p">,</span>
-        <span class="n">NonbondedException</span><span class="p">,</span> <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span>
-        <span class="n">TwoParticleExtraPointFrame</span><span class="p">,</span> <span class="n">ChiralFrame</span><span class="p">,</span> <span class="n">MultipoleFrame</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span>
-        <span class="n">ThreeParticleExtraPointFrame</span><span class="p">,</span> <span class="n">OutOfPlaneExtraPointFrame</span><span class="p">)</span>
+        <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span>
+        <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span> <span class="n">TrigonalAngle</span><span class="p">,</span> <span class="n">OutOfPlaneBend</span><span class="p">,</span> <span class="n">PiTorsion</span><span class="p">,</span>
+        <span class="n">StretchBend</span><span class="p">,</span> <span class="n">TorsionTorsion</span><span class="p">,</span> <span class="n">NonbondedException</span><span class="p">,</span> <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span>
+        <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">TwoParticleExtraPointFrame</span><span class="p">,</span> <span class="n">ChiralFrame</span><span class="p">,</span>
+        <span class="n">MultipoleFrame</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">ThreeParticleExtraPointFrame</span><span class="p">,</span>
+        <span class="n">OutOfPlaneExtraPointFrame</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">parmed.utils</span> <span class="kn">import</span> <span class="n">tag_molecules</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
@@ -560,10 +561,10 @@
                         <span class="n">ie</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">ignore_end</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
                         <span class="n">ti</span> <span class="o">=</span> <span class="n">mapdt</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">idx</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
                         <span class="n">c</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="n">Dihedral</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
-                                         <span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
-                                         <span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
-                                         <span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                                <span class="n">Dihedral</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                                         <span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                                         <span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                                         <span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
                                          <span class="n">improper</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">improper</span><span class="p">,</span> <span class="n">ignore_end</span><span class="o">=</span><span class="n">ie</span><span class="p">,</span>
                                          <span class="nb">type</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">ti</span><span class="p">])</span>
                         <span class="p">)</span>
@@ -571,8 +572,8 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">ti</span> <span class="o">=</span> <span class="n">mapdt</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">c</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">Dihedral</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
-                                 <span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                        <span class="n">Dihedral</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span> <span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                                 <span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span> <span class="n">atoms</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
                                  <span class="n">improper</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">improper</span><span class="p">,</span> <span class="n">ignore_end</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">ignore_end</span><span class="p">,</span>
                                  <span class="nb">type</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">type</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">ti</span><span class="p">])</span>
                     <span class="p">)</span>
@@ -1018,7 +1019,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
         <span class="c"># Slice out coordinates if present</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sel</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -1380,6 +1381,7 @@
 <span class="sd">            - PDBx/mmCIF (.cif, cif)</span>
 <span class="sd">            - Amber topology file (.prmtop/.parm7, amber)</span>
 <span class="sd">            - CHARMM PSF file (.psf, charmm)</span>
+<span class="sd">            - CHARMM coordinate file (.crd, charmmcrd)</span>
 <span class="sd">            - Gromacs topology file (.top, gromacs)</span>
 <span class="sd">            - Gromacs GRO file (.gro, gro)</span>
 <span class="sd">            - Mol2 file (.mol2, mol2)</span>
@@ -1405,7 +1407,7 @@
 <span class="sd">        TypeError if the structure cannot be converted to the desired format for</span>
 <span class="sd">        whatever reason</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">amber</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">gromacs</span>
+        <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">amber</span><span class="p">,</span> <span class="n">charmm</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">gromacs</span>
         <span class="n">extmap</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s">&#39;.pdb&#39;</span> <span class="p">:</span> <span class="s">&#39;PDB&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.cif&#39;</span> <span class="p">:</span> <span class="s">&#39;CIF&#39;</span><span class="p">,</span>
@@ -1417,6 +1419,7 @@
                 <span class="s">&#39;.gro&#39;</span> <span class="p">:</span> <span class="s">&#39;GRO&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.mol2&#39;</span> <span class="p">:</span> <span class="s">&#39;MOL2&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s">&#39;MOL3&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.crd&#39;</span> <span class="p">:</span> <span class="s">&#39;CHARMMCRD&#39;</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="c"># Basically everybody uses atom type names instead of type indexes. So</span>
         <span class="c"># convert to atom type names and switch back if need be</span>
@@ -1453,6 +1456,8 @@
             <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;GROMACS&#39;</span><span class="p">:</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="n">gromacs</span><span class="o">.</span><span class="n">GromacsTopologyFile</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                 <span class="n">s</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;CHARMMCRD&#39;</span><span class="p">:</span>
+                <span class="n">charmm</span><span class="o">.</span><span class="n">CharmmCrdFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;AMBER&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span>
@@ -3362,6 +3367,8 @@
         <span class="sd">&quot;&quot;&quot; Replicates the current Structure `ncopies` times &quot;&quot;&quot;</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cp</span><span class="o">.</span><span class="n">__imul__</span><span class="p">(</span><span class="n">ncopies</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="n">__rmul__</span> <span class="o">=</span> <span class="n">__mul__</span>
 
     <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncopies</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ncopies</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>

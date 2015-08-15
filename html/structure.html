@@ -179,6 +179,202 @@ immediately add that instance to the <tt class="docutils literal"><span class="p
 API, you are encouraged to use existing parsers as examples, such as those for
 the AMBER, GROMACS, and CHARMM topology files.</p>
 </div>
+<div class="section" id="coordinate-handling">
+<h3>Coordinate handling<a class="headerlink" href="#coordinate-handling" title="Permalink to this headline">¶</a></h3>
+<p>It is often of interest to store (and use) a particular conformation of a
+molecule defined by the Cartesian coordinates of each atom. A <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+need not have an assigned set of atomic positions (many files do not provide
+them by default, such as Amber prmtops, CHARMM PSF, and GROMACS topologies, just
+to name a few). Others <em>do</em> define them, such as PDB and PDBx/mmCIF files.</p>
+<p>ParmEd offers limited support for coordinate handling, and supports a handful of
+coordinate and trajectory file formats. However, it is <em>not</em> optimized for
+trajectory analysis, as there are far superior libraries for doing that (e.g.,
+<a class="reference external" href="http://mdtraj.org">MDTraj</a> and <a class="reference external" href="https://amber-md.github.io/pytraj">pytraj</a>
+to name two). However, it is still often desirable to have access to atomic
+coordinates.</p>
+<p>In a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance, coordinates can be accessed as the <tt class="docutils literal"><span class="pre">xx</span></tt>,
+<tt class="docutils literal"><span class="pre">xy</span></tt>, and <tt class="docutils literal"><span class="pre">xz</span></tt> attributes on each atom individually, <em>or</em> they can be
+accessed from the <tt class="docutils literal"><span class="pre">coordinates</span></tt> attribute on the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance
+itself. The <tt class="docutils literal"><span class="pre">coordinates</span></tt> attribute is a numpy array of shape <tt class="docutils literal"><span class="pre">(natom,</span> <span class="pre">3)</span></tt>.
+For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s">&#39;2koc&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
+<span class="go">(-8.886, -5.163, 9.647)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<span class="go">array([[ -8.886,  -5.163,   9.647],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">coordinates</span></tt> attribute is simply a copy of the position attributes on
+each atom (and is set to <tt class="docutils literal"><span class="pre">None</span></tt> if any of the atoms do not have defined
+positions). As such, if you modify individual positions in the <tt class="docutils literal"><span class="pre">coordinates</span></tt>
+array, they will <em>not</em> actually change the locations of that atom. In fact, if
+you change the <tt class="docutils literal"><span class="pre">coordinates</span></tt> array, all of the cached coordinates will be
+discarded and replaced with a copy of the position attributes on each atom:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
+<span class="go">(-8.886, -5.163, 9.647)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<span class="go">array([[ -8.886,  -5.163,   9.647],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+</pre></div>
+</div>
+<p>Note if you change the position of the first atom directly, that does get
+reflected in the coordinate array, but <em>not</em> in a reference to the old
+coordinates &#8211; i.e., the <tt class="docutils literal"><span class="pre">coordinates</span></tt> array is a cache that may be discarded
+when it no longer matches the positions on each atom:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="c"># A reference to the original cache!</span>
+<span class="go">array([[ -8.886,  -5.163,   9.647],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span> <span class="c"># A new cache is created</span>
+<span class="go">array([[  0.   ,   0.   ,   0.   ],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+</pre></div>
+</div>
+<p>This may seem surprising at first, but makes sense when you realize that
+<tt class="docutils literal"><span class="pre">Structure.coordinates</span></tt> is simply a descriptor that reports on the positions
+of each atom.</p>
+<p>However, <em>assigning</em> to the <tt class="docutils literal"><span class="pre">coordinates</span></tt> attribute has special meaning.  You
+may assign any iterable of floating point numbers (must be reshape-able into a
+numpy array with the last two dimensions being <tt class="docutils literal"><span class="pre">(natom,</span> <span class="pre">3)</span></tt>), which will be
+automatically converted into a numpy array <em>and assigned to the individual
+atoms</em>. For example, using the <tt class="docutils literal"><span class="pre">coords</span></tt> reference we stored in our previous
+example and assigned to <tt class="docutils literal"><span class="pre">pdb.coordinates</span></tt> will reset the first atoms&#8217; position
+to its original value:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coords</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
+<span class="go">(-8.8859999999999992, -5.1630000000000003, 9.6470000000000002)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<span class="go">array([[ -8.886,  -5.163,   9.647],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+</pre></div>
+</div>
+<p>This brings us to our last note about working with coordinates. Several file
+types, like PDB and PDBx/mmCIF, permit storing multiple <em>conformations</em> of the
+molecule. The <tt class="docutils literal"><span class="pre">coordinates</span></tt> attribute only returns the first one, and each
+atom only stores a single x-, y-, and z-coordinate. However, <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+caches all of the conformations it reads (or is assigned). You can access all
+conformers using the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.get_coordinates" title="parmed.structure.Structure.get_coordinates"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.get_coordinates()</span></tt></a> method, passing either a
+conformer number or the word <cite>&#8216;all&#8217;</cite> to get all coordinates.</p>
+<p>As an example, consider the PDB 2KOC, which is an NMR structure with 20
+conformers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s">&#39;2KOC&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">array([[ -8.886,  -5.163,   9.647],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">array([[-10.637,  -4.586,  11.116],</span>
+<span class="go">       [-11.86 ,  -5.331,  10.426],</span>
+<span class="go">       [-13.048,  -4.453,  10.55 ],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.703,   4.539,   3.584],</span>
+<span class="go">       [-10.407,   5.725,   1.585],</span>
+<span class="go">       [-11.594,   5.52 ,  -0.533]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="mi">19</span><span class="p">)</span>
+<span class="go">array([[-10.439,  -4.998,   9.616],</span>
+<span class="go">       [-11.992,  -4.669,   9.507],</span>
+<span class="go">       [-12.19 ,  -3.251,   9.891],</span>
+<span class="go">       ...,</span>
+<span class="go">       [-10.938,   4.441,   2.276],</span>
+<span class="go">       [-11.359,   5.537,   0.158],</span>
+<span class="go">       [-12.051,   5.205,  -2.146]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="c"># default is &#39;all&#39;</span>
+<span class="go">(20, 451, 3)</span>
+</pre></div>
+</div>
+<p>Be careful, though! Anything you do that makes the first conformer differ from
+the positions on each of the atoms will invalidate the cache and delete <em>all</em>
+conformers, as shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># Invalidates cached coordinates!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<span class="go">array([[  0.   ,  -5.163,   9.647],</span>
+<span class="go">       [-10.305,  -4.745,  10.229],</span>
+<span class="go">       [-10.282,  -3.296,  10.528],</span>
+<span class="go">       ...,</span>
+<span class="go">       [ -9.693,   3.638,   2.337],</span>
+<span class="go">       [-10.552,   4.682,   0.317],</span>
+<span class="go">       [-11.877,   4.323,  -1.696]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="c"># only one frame now...</span>
+<span class="go">(1, 451, 3)</span>
+</pre></div>
+</div>
+<p><strong>Performance note</strong></p>
+<p>The way that ParmEd ensures that <tt class="docutils literal"><span class="pre">Structure.coordinates</span></tt> is always correct is
+to generate a new numpy array from the positions each time the attribute is
+accessed. As a result, repeated access to <tt class="docutils literal"><span class="pre">Structure.coordinates</span></tt> can be
+<em>very</em> slow, and should be avoided. Iterating over the coordinates directly
+requires only a single access, as does storing a reference to it and accessing
+that instead. Below, I show some performance timings from IPython for a simple
+task of finding the lowest x-coordinate value among all atoms:</p>
+<div class="highlight-python"><div class="highlight"><pre>In [1]: import parmed as pmd
+
+In [2]: def slow_min_x(struct):
+   ...:     return min([struct.coordinates[i][0]
+   ...:                 for i in range(len(struct.atoms))])
+   ...:
+
+In [3]: def iter_min_x(struct):
+   ...:     return min([x[0] for x in struct.coordinates])
+   ...:
+
+In [4]: def ref_min_x(struct):
+   ...:     coords = struct.coordinates
+   ...:     return min([coords[i][0] for i in range(len(struct.atoms))])
+   ...:
+
+In [5]: pmd.download_PDB(&#39;4lzt&#39;)
+Out[5]: &lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;
+
+In [6]: struct = pmd.download_PDB(&#39;4lzt&#39;)
+
+In [7]: %timeit slow_min_x(struct)
+1 loops, best of 3: 1.08 s per loop
+
+In [8]: %timeit iter_min_x(struct)
+1000 loops, best of 3: 1.2 ms per loop
+
+In [9]: %timeit ref_min_x(struct)
+1000 loops, best of 3: 1.29 ms per loop
+</pre></div>
+</div>
+<p>Notice &#8211; the <tt class="docutils literal"><span class="pre">slow_min_x</span></tt> function is about 1000x slower than all of the
+others! This is a contrived example, but it shows the danger of repeatedly
+accessing elements of <tt class="docutils literal"><span class="pre">Structure.coordinates</span></tt> instead of iterating over it or
+working with a reference to the cached numpy array.</p>
+</div>
 </div>
 <div class="section" id="structure-manipulation-slicing-combining-replicating-and-splitting">
 <h2>Structure manipulation: slicing, combining, replicating, and splitting<a class="headerlink" href="#structure-manipulation-slicing-combining-replicating-and-splitting" title="Permalink to this headline">¶</a></h2>
@@ -408,7 +604,7 @@ like with combination, replication can be done both in-place and not:</p>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="go">&lt;AmberParm 26 atoms; 2 residues; 26 bonds; parametrized&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">100</span> <span class="o">*</span> <span class="n">phenol</span> <span class="c"># multiplication can commute</span>
 <span class="go">&lt;AmberParm 1300 atoms; 100 residues; 1300 bonds; parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c"># phenol still hasn&#39;t changed</span>
 <span class="gp">... </span><span class="n">phenol</span>
@@ -417,16 +613,6 @@ like with combination, replication can be done both in-place and not:</p>
 <span class="gp">... </span><span class="n">phenol</span> <span class="o">*=</span> <span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 130 atoms; 10 residues; 130 bonds; parametrized&gt;</span>
-</pre></div>
-</div>
-<p>A word of caution here &#8211; the multiplication operator for integers is not
-implemented for <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances as
-the other operand, so multiplying an integer by the structure will result in a
-<tt class="docutils literal"><span class="pre">TypeError</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">20</span> <span class="o">*</span> <span class="n">phenol</span>
-<span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-<span class="gr">TypeError</span>: <span class="n">unsupported operand type(s) for *: &#39;int&#39; and &#39;AmberParm&#39;</span>
 </pre></div>
 </div>
 <p>One comment about the parameter <em>type</em> arrays (e.g., <tt class="docutils literal"><span class="pre">bond_type</span></tt>) &#8211; unlike
@@ -613,6 +799,7 @@ the numbering starts again.</p>
 <li><a class="reference internal" href="#structure-class"><tt class="docutils literal"><span class="pre">Structure</span></tt> class</a><ul>
 <li><a class="reference internal" href="#attributes-of-structure-instances">Attributes of <tt class="docutils literal"><span class="pre">Structure</span></tt> instances</a></li>
 <li><a class="reference internal" href="#automated-bookkeeping">Automated Bookkeeping</a></li>
+<li><a class="reference internal" href="#coordinate-handling">Coordinate handling</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#structure-manipulation-slicing-combining-replicating-and-splitting">Structure manipulation: slicing, combining, replicating, and splitting</a><ul>

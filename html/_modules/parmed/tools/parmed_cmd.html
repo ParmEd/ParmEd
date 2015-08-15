@@ -54,13 +54,13 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c"># Load some system modules that may be useful for various users in shell mode</span>
+<span class="kn">import</span> <span class="nn">cmd</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="kn">import</span> <span class="nn">cmd</span>
-<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.actions</span> <span class="kn">import</span> <span class="n">COMMANDMAP</span><span class="p">,</span> <span class="n">Usages</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.argumentlist</span> <span class="kn">import</span> <span class="n">ArgumentList</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="n">InterpreterError</span>
@@ -68,6 +68,8 @@
     <span class="kn">import</span> <span class="nn">readline</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">readline</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 
 <span class="n">_COMMANDLOGS</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -192,7 +194,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
                 <span class="k">raise</span>
-   </div>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Unexpected failure:</span><span class="se">\n</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s">&#39;</span>
+                              <span class="s">&#39;Traceback is</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</div>
     <span class="k">def</span> <span class="nf">_normaldo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ActionClass</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The standard action command does this stuff &quot;&quot;&quot;</span>
         <span class="n">actionname</span> <span class="o">=</span> <span class="n">ActionClass</span><span class="o">.</span><span class="n">__name__</span>
@@ -206,6 +214,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
                 <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Unexpected failure:</span><span class="se">\n</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s">&#39;</span>
+                              <span class="s">&#39;Traceback is</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="ParmedCmd.populate_actions"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.parmed_cmd.html#parmed.tools.parmed_cmd.ParmedCmd.populate_actions">[docs]</a>    <span class="k">def</span> <span class="nf">populate_actions</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
@@ -241,9 +255,9 @@
             <span class="c"># command from the user.</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">_cmd</span><span class="o">.</span><span class="n">cmdloop</span><span class="p">()</span>
-            <span class="k">except</span> <span class="n">ParmedError</span><span class="p">:</span>
+            <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
-      </div>
+</div>
 <div class="viewcode-block" id="ParmedCmd.do_go"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.parmed_cmd.html#parmed.tools.parmed_cmd.ParmedCmd.do_go">[docs]</a>    <span class="k">def</span> <span class="nf">do_go</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stops reading commands and executes any &#39;parmout&#39; command that had</span>
@@ -257,6 +271,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
                     <span class="k">raise</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_on_fatal</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Unexpected failure:</span><span class="se">\n</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s">Traceback is&#39;</span>
+                                  <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">True</span>
 

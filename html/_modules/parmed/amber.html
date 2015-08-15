@@ -57,9 +57,16 @@
 <span class="kn">from</span> <span class="nn">parmed.amber.asciicrd</span> <span class="kn">import</span> <span class="n">AmberAsciiRestart</span><span class="p">,</span> <span class="n">AmberMdcrd</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.mask</span> <span class="kn">import</span> <span class="n">AmberMask</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.netcdffiles</span> <span class="kn">import</span> <span class="n">use</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">NetCDFRestart</span><span class="p">,</span> <span class="n">HAS_NETCDF</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.parameters</span> <span class="kn">import</span> <span class="n">AmberParameterSet</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.readparm</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">AmoebaParm</span><span class="p">,</span>
                 <span class="n">Rst7</span><span class="p">,</span> <span class="n">BeemanRestart</span><span class="p">,</span> <span class="n">ConvertFromPSF</span><span class="p">,</span> <span class="n">LoadParm</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
+
+<span class="c"># See if there is an AMBERHOME defined, which we will use by default. Otherwise,</span>
+<span class="c"># set it to the empty string</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="kn">as</span> <span class="nn">_os</span>
+<span class="n">AMBERHOME</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;AMBERHOME&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span>
+<span class="k">del</span> <span class="n">_os</span>
 </pre></div>
 
           </div>

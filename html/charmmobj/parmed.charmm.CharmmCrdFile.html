@@ -105,6 +105,9 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmCrdFile.id_format" title="parmed.charmm.CharmmCrdFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as a CHARMM coordinate file</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmCrdFile.write" title="parmed.charmm.CharmmCrdFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest)</td>
+<td>Writes a CHARMM coordinate file from a structure</td>
+</tr>
 </tbody>
 </table>
 <dl class="method">
@@ -170,6 +173,28 @@ namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
 <dt id="parmed.charmm.CharmmCrdFile.positions">
 <tt class="descname">positions</tt><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Atomic coordinates with units attached to them with the shape (natom, 3)</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.charmm.CharmmCrdFile.write">
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a CHARMM coordinate file from a structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The input structure to write the CHARMM coordinate file from</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like object</p>
+<blockquote class="last">
+<div><p>The file name or file object to write the coordinate file to</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

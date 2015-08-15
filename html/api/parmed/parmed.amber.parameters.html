@@ -47,662 +47,42 @@
             
   <div class="section" id="module-parmed.amber.parameters">
 <span id="parmed-amber-parameters-module"></span><h1>parmed.amber.parameters module<a class="headerlink" href="#module-parmed.amber.parameters" title="Permalink to this headline">¶</a></h1>
-<p>Classes helpful for reading/storing Amber parameters</p>
+<p>This module contains classes for parsing and processing Amber parameter files.</p>
+<p>Author: Jason M. Swails
+Contributors:
+Date: Aug. 11, 2015</p>
 <dl class="class">
-<dt id="parmed.amber.parameters.AngleParam">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">AngleParam</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>thetk=None</em>, <em>theteq=None</em>, <em>angletype=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AngleParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AngleParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.AngleParamList">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">AngleParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AngleParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AngleParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#parmed.amber.parameters.ParamList" title="parmed.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">parmed.amber.parameters.ParamList</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.add_param" title="parmed.amber.parameters.AngleParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.append" title="parmed.amber.parameters.AngleParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
-<td>L.append(object) &#8211; append object to end</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.count" title="parmed.amber.parameters.AngleParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.extend" title="parmed.amber.parameters.AngleParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.index" title="parmed.amber.parameters.AngleParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.insert" title="parmed.amber.parameters.AngleParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.pop" title="parmed.amber.parameters.AngleParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.remove" title="parmed.amber.parameters.AngleParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.reverse" title="parmed.amber.parameters.AngleParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.sort" title="parmed.amber.parameters.AngleParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AngleParamList.type" title="parmed.amber.parameters.AngleParamList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <a class="reference internal" href="#parmed.amber.parameters.AngleParam" title="parmed.amber.parameters.AngleParam"><tt class="xref py py-class docutils literal"><span class="pre">AngleParam</span></tt></a></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.add_param" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.parameters.AngleParamList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.parameters.AngleParamList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.parameters.AngleParamList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AngleParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.amber.parameters.AngleParamList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#parmed.amber.parameters.AngleParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#parmed.amber.parameters.AngleParam" title="parmed.amber.parameters.AngleParam"><tt class="xref py py-class docutils literal"><span class="pre">AngleParam</span></tt></a></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.AtomType">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">AtomType</tt><big>(</big><em>atype</em>, <em>mass</em>, <em>rmin</em>, <em>epsilon</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AtomType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomType.lennard_jones" title="parmed.amber.parameters.AtomType.lennard_jones"><tt class="xref py py-obj docutils literal"><span class="pre">lennard_jones</span></tt></a>()</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomType.lennard_jones">
-<tt class="descname">lennard_jones</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AtomType.lennard_jones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AtomType.lennard_jones" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.AtomTypeList">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">AtomTypeList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AtomTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#parmed.amber.parameters.ParamList" title="parmed.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">parmed.amber.parameters.ParamList</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.add_param" title="parmed.amber.parameters.AtomTypeList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.append" title="parmed.amber.parameters.AtomTypeList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
-<td>L.append(object) &#8211; append object to end</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.count" title="parmed.amber.parameters.AtomTypeList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.extend" title="parmed.amber.parameters.AtomTypeList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.index" title="parmed.amber.parameters.AtomTypeList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.insert" title="parmed.amber.parameters.AtomTypeList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.pop" title="parmed.amber.parameters.AtomTypeList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.remove" title="parmed.amber.parameters.AtomTypeList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.reverse" title="parmed.amber.parameters.AtomTypeList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.sort" title="parmed.amber.parameters.AtomTypeList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AtomTypeList.type" title="parmed.amber.parameters.AtomTypeList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <a class="reference internal" href="#parmed.amber.parameters.AtomType" title="parmed.amber.parameters.AtomType"><tt class="xref py py-class docutils literal"><span class="pre">AtomType</span></tt></a></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.add_param" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.AtomTypeList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.amber.parameters.AtomTypeList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#parmed.amber.parameters.AtomTypeList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#parmed.amber.parameters.AtomType" title="parmed.amber.parameters.AtomType"><tt class="xref py py-class docutils literal"><span class="pre">AtomType</span></tt></a></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.BondParam">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">BondParam</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>rk=None</em>, <em>req=None</em>, <em>bondtype=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#BondParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.BondParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.BondParamList">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">BondParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#BondParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.BondParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#parmed.amber.parameters.ParamList" title="parmed.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">parmed.amber.parameters.ParamList</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.add_param" title="parmed.amber.parameters.BondParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.append" title="parmed.amber.parameters.BondParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
-<td>L.append(object) &#8211; append object to end</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.count" title="parmed.amber.parameters.BondParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.extend" title="parmed.amber.parameters.BondParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.index" title="parmed.amber.parameters.BondParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.insert" title="parmed.amber.parameters.BondParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.pop" title="parmed.amber.parameters.BondParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.remove" title="parmed.amber.parameters.BondParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.reverse" title="parmed.amber.parameters.BondParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.sort" title="parmed.amber.parameters.BondParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.BondParamList.type" title="parmed.amber.parameters.BondParamList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <a class="reference internal" href="#parmed.amber.parameters.BondParam" title="parmed.amber.parameters.BondParam"><tt class="xref py py-class docutils literal"><span class="pre">BondParam</span></tt></a></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.add_param" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.parameters.BondParamList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.parameters.BondParamList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.parameters.BondParamList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.BondParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.BondParamList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.amber.parameters.BondParamList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#parmed.amber.parameters.BondParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#parmed.amber.parameters.BondParam" title="parmed.amber.parameters.BondParam"><tt class="xref py py-class docutils literal"><span class="pre">BondParam</span></tt></a></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.DihedralParam">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">DihedralParam</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>atype4</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#DihedralParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.DihedralParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.add_term" title="parmed.amber.parameters.DihedralParam.add_term"><tt class="xref py py-obj docutils literal"><span class="pre">add_term</span></tt></a>(term)</td>
-<td>Add this to the current dihedral IFF it is not already there</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.add_term_from_args" title="parmed.amber.parameters.DihedralParam.add_term_from_args"><tt class="xref py py-obj docutils literal"><span class="pre">add_term_from_args</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Convert the args to a _DihedralTerm first</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.append" title="parmed.amber.parameters.DihedralParam.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
-<td>L.append(object) &#8211; append object to end</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.count" title="parmed.amber.parameters.DihedralParam.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.extend" title="parmed.amber.parameters.DihedralParam.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.index" title="parmed.amber.parameters.DihedralParam.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.insert" title="parmed.amber.parameters.DihedralParam.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.pop" title="parmed.amber.parameters.DihedralParam.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.remove" title="parmed.amber.parameters.DihedralParam.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.reverse" title="parmed.amber.parameters.DihedralParam.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.same_atoms" title="parmed.amber.parameters.DihedralParam.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(atomlist)</td>
-<td>Determine if two dihedrals are assigned to the same sets of atom types</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParam.sort" title="parmed.amber.parameters.DihedralParam.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.add_term">
-<tt class="descname">add_term</tt><big>(</big><em>term</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#DihedralParam.add_term"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.add_term" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add this to the current dihedral IFF it is not already there</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.add_term_from_args">
-<tt class="descname">add_term_from_args</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#DihedralParam.add_term_from_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.add_term_from_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert the args to a _DihedralTerm first</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.parameters.DihedralParam.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.parameters.DihedralParam.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.parameters.DihedralParam.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.same_atoms">
-<tt class="descname">same_atoms</tt><big>(</big><em>atomlist</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#DihedralParam.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.same_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if two dihedrals are assigned to the same sets of atom types</p>
+<dt id="parmed.amber.parameters.AmberParameterSet">
+<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">AmberParameterSet</tt><big>(</big><em>*filenames</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AmberParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></tt></a></p>
+<p>Class storing parameters from an Amber parameter set</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atomlist</strong> : list</p>
-<blockquote>
-<div><p>4-element list of atom types to compare against this DihedralParam</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bool, bool</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filenames</strong> : str or list of str</p>
 <blockquote class="last">
-<div><p>First bool is True if all atoms are the same; False otherwise
-Second bool is True if atoms are in the same order; False otherwise</p>
+<div><p>Either the name of a file or a list of filenames from which parameters
+should be parsed.</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>If this torsion is an improper, the first atom is fixed and the other 3
-atoms must be the same (but in any order). If this torsion is a proper,
-then the torsions must match in either the forward or reverse
-directions, only.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParam.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParam.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.DihedralParamList">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">DihedralParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#DihedralParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#parmed.amber.parameters.ParamList" title="parmed.amber.parameters.ParamList"><tt class="xref py py-class docutils literal"><span class="pre">parmed.amber.parameters.ParamList</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.add_param" title="parmed.amber.parameters.DihedralParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(atype1,&nbsp;atype2,&nbsp;atype3,&nbsp;atype4,&nbsp;param)</td>
-<td>Override this since dihedral parameters are actually lists of dihedral</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.append" title="parmed.amber.parameters.DihedralParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
-<td>L.append(object) &#8211; append object to end</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.count" title="parmed.amber.parameters.DihedralParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.extend" title="parmed.amber.parameters.DihedralParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.index" title="parmed.amber.parameters.DihedralParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.insert" title="parmed.amber.parameters.DihedralParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.pop" title="parmed.amber.parameters.DihedralParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.remove" title="parmed.amber.parameters.DihedralParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.reverse" title="parmed.amber.parameters.DihedralParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.sort" title="parmed.amber.parameters.DihedralParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.DihedralParamList.type" title="parmed.amber.parameters.DihedralParamList.type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
-<td>alias of <tt class="xref py py-class docutils literal"><span class="pre">_DihedralTerm</span></tt></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>atype1</em>, <em>atype2</em>, <em>atype3</em>, <em>atype4</em>, <em>param</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#DihedralParamList.add_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.add_param" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override this since dihedral parameters are actually lists of dihedral
-terms, so adding a DihedralParam to a DihedralParamList is different
-than the other parameter lists</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.DihedralParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.amber.parameters.DihedralParamList.type">
-<tt class="descname">type</tt><a class="headerlink" href="#parmed.amber.parameters.DihedralParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">_DihedralTerm</span></tt></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.ParamList">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">ParamList</tt><big>(</big><em>unique_only=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#ParamList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.ParamList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p>Order is important in the list of files provided. The parameters are loaded
+in the order they are provided, and any parameters that are specified in
+multiple places are overwritten (that is, the <em>last</em> occurrence is the
+parameter type that is used)</p>
 <p class="rubric">Attributes</p>
-<table border="1" class="docutils">
+<table border="1" class="longtable docutils">
 <colgroup>
-<col width="29%" />
-<col width="71%" />
+<col width="10%" />
+<col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td>type</td>
-<td>&nbsp;</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.combining_rule" title="parmed.amber.parameters.AmberParameterSet.combining_rule"><tt class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></tt></a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -713,133 +93,185 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.add_param" title="parmed.amber.parameters.ParamList.add_param"><tt class="xref py py-obj docutils literal"><span class="pre">add_param</span></tt></a>(param)</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.condense" title="parmed.amber.parameters.AmberParameterSet.condense"><tt class="xref py py-obj docutils literal"><span class="pre">condense</span></tt></a>([do_dihedrals])</td>
+<td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.append" title="parmed.amber.parameters.ParamList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
-<td>L.append(object) &#8211; append object to end</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.from_leaprc" title="parmed.amber.parameters.AmberParameterSet.from_leaprc"><tt class="xref py py-obj docutils literal"><span class="pre">from_leaprc</span></tt></a>(fname)</td>
+<td>Load a parameter set from a leaprc file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.count" title="parmed.amber.parameters.ParamList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.from_structure" title="parmed.amber.parameters.AmberParameterSet.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
+<td>Extracts known parameters from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.extend" title="parmed.amber.parameters.ParamList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.id_format" title="parmed.amber.parameters.AmberParameterSet.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as either an Amber-style frcmod or parm.dat file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.index" title="parmed.amber.parameters.ParamList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.load_parameters" title="parmed.amber.parameters.AmberParameterSet.load_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameters</span></tt></a>(fname)</td>
+<td>Load a set of parameters from a single parameter file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.insert" title="parmed.amber.parameters.ParamList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.pop" title="parmed.amber.parameters.ParamList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.remove" title="parmed.amber.parameters.ParamList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.reverse" title="parmed.amber.parameters.ParamList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.ParamList.sort" title="parmed.amber.parameters.ParamList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.add_param">
-<tt class="descname">add_param</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#ParamList.add_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.ParamList.add_param" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.append">
-<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.ParamList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.parameters.ParamList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.extend">
-<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.ParamList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.parameters.ParamList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.insert">
-<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.ParamList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.pop">
-<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.parameters.ParamList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.remove">
-<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.ParamList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.ParamList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.parameters.ParamList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.parameters.ParamList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.amber.parameters.ParamList.type">
-<tt class="descname">type</tt><em class="property"> = None</em><a class="headerlink" href="#parmed.amber.parameters.ParamList.type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="parmed.amber.parameters.ParameterSet">
-<em class="property">class </em><tt class="descclassname">parmed.amber.parameters.</tt><tt class="descname">ParameterSet</tt><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.parameters.ParameterSet.load_from_parm" title="parmed.amber.parameters.ParameterSet.load_from_parm"><tt class="xref py py-obj docutils literal"><span class="pre">load_from_parm</span></tt></a>(parm)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.ParameterSet.write" title="parmed.amber.parameters.ParameterSet.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(dest)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.parameters.AmberParameterSet.write" title="parmed.amber.parameters.AmberParameterSet.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(dest[,&nbsp;title,&nbsp;style])</td>
 <td>Writes a parm.dat file with the current parameters</td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="parmed.amber.parameters.ParameterSet.load_from_parm">
-<tt class="descname">load_from_parm</tt><big>(</big><em>parm</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#ParameterSet.load_from_parm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.ParameterSet.load_from_parm" title="Permalink to this definition">¶</a></dt>
+<dl class="attribute">
+<dt id="parmed.amber.parameters.AmberParameterSet.combining_rule">
+<tt class="descname">combining_rule</tt><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.combining_rule" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="parmed.amber.parameters.ParameterSet.write">
-<tt class="descname">write</tt><big>(</big><em>dest</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#ParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.ParameterSet.write" title="Permalink to this definition">¶</a></dt>
+<dt id="parmed.amber.parameters.AmberParameterSet.condense">
+<tt class="descname">condense</tt><big>(</big><em>do_dihedrals=True</em><big>)</big><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.condense" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function goes through each of the parameter type dicts and
+eliminates duplicate types. After calling this function, every unique
+bond, angle, dihedral, improper, or cmap type will pair with EVERY key
+in the type mapping dictionaries that points to the equivalent type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>do_dihedrals</strong> : bool=True</p>
+<blockquote>
+<div><p>Dihedrals can take the longest time to compress since testing their
+equality takes the longest (this is complicated by the existence of
+multi-term torsions). This flag will allow you to <em>skip</em> condensing
+the dihedral parameter types (for large parameter sets, this can cut
+the compression time in half)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">self</p>
+<blockquote class="last">
+<div><p>The instance that is being condensed</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The return value allows you to condense the types at construction time.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.amber.parameters.AmberParameterSet.from_leaprc">
+<em class="property">classmethod </em><tt class="descname">from_leaprc</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AmberParameterSet.from_leaprc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.from_leaprc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a parameter set from a leaprc file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like</p>
+<blockquote class="last">
+<div><p>Name of the file or open file-object from which a leaprc-style file
+will be read</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This does not read all parts of a leaprc file &#8211; only those pertinent to
+defining force field information. For instance, the following sections
+and commands are processed:</p>
+<ul class="simple">
+<li>addAtomTypes</li>
+<li>loadAmberParams</li>
+<li>loadOFF</li>
+</ul>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.amber.parameters.AmberParameterSet.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AmberParameterSet.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts known parameters from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The parametrized <tt class="docutils literal"><span class="pre">Structure</span></tt> instance from which to extract
+parameters into a ParameterSet</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : <tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt></p>
+<blockquote class="last">
+<div><p>The parameter set with all parameters defined in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.amber.parameters.AmberParameterSet.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AmberParameterSet.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as either an Amber-style frcmod or parm.dat
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber-style parameter file. False otherwise.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.parameters.AmberParameterSet.load_parameters">
+<tt class="descname">load_parameters</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AmberParameterSet.load_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.load_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a set of parameters from a single parameter file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like</p>
+<blockquote class="last">
+<div><p>Parameter file to parse</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.parameters.AmberParameterSet.write">
+<tt class="descname">write</tt><big>(</big><em>dest</em>, <em>title='Created by ParmEd'</em>, <em>style='frcmod'</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/parameters.html#AmberParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.parameters.AmberParameterSet.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a parm.dat file with the current parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The file name or file-like object to write the parameters to</p>
+</div></blockquote>
+<p><strong>title</strong> : str, optional</p>
+<blockquote>
+<div><p>The title of the frcmod to write. Default is &#8216;Created by ParmEd&#8217;</p>
+</div></blockquote>
+<p><strong>style</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>If &#8216;frcmod&#8217;, the parameters are written in frcmod-format. If &#8216;parm&#8217;,
+the parameters are written in parm.dat-format. Default is &#8216;frcmod&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

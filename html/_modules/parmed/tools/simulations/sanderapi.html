@@ -117,12 +117,11 @@
         <span class="n">inp</span><span class="o">.</span><span class="n">vdwmeth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vdw_longrange</span><span class="p">)</span>
         <span class="n">inp</span><span class="o">.</span><span class="n">lj1264</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">has_1264</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="s">&#39;coords&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;No coordinates are loaded&#39;</span><span class="p">)</span>
     <span class="c"># Time to set up sander</span>
-    <span class="n">sander</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span><span class="p">,</span> <span class="n">inp</span><span class="p">)</span>
-
-    <span class="n">e</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">sander</span><span class="o">.</span><span class="n">energy_forces</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">sander</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span><span class="p">,</span> <span class="n">inp</span><span class="p">):</span>
+        <span class="n">e</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">sander</span><span class="o">.</span><span class="n">energy_forces</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">chamber</span><span class="p">:</span>
         <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Bond          = </span><span class="si">%20.7f</span><span class="s">     Angle         = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s">&#39;</span>
@@ -145,9 +144,7 @@
             <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;     Egb      = </span><span class="si">%20.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">gb</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;     EHbond   = </span><span class="si">%20.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span><span class="p">)</span>
-        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">TOTAL    = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">)</span>
-
-    <span class="n">sander</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">TOTAL    = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

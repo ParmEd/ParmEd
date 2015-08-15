@@ -6,7 +6,6 @@ Submodules
 
 .. toctree::
 
-   parmed.modeller.offlib
    parmed.modeller.residue
 
 Module contents
