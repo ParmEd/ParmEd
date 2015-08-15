@@ -5,7 +5,7 @@ from __future__ import division
 
 import numpy as np
 import parmed as pmd
-from parmed.exceptions import CharmmWarning
+from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
@@ -16,7 +16,7 @@ import random
 import string
 import os
 import unittest
-from utils import create_random_structure, get_fn
+from utils import create_random_structure, get_fn, FileIOTestCase
 import warnings
 
 class TestStructureAPI(unittest.TestCase):
@@ -193,6 +193,25 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.coordinates.shape, (natom, 3))
         diff = (old_crds - s.coordinates).ravel()**2
         self.assertGreater(diff.sum(), 0.01)
+
+    def testCoordinateSetToEmptyList(self):
+        """ Tests behavior of setting coordinates to an empty iterable """
+        s = create_random_structure(parametrized=True)
+        xyz = np.random.random((len(s.atoms), 3))
+        s.coordinates = xyz
+        # Make sure that the x, y, and z attributes of atoms are equal to the
+        # given coordinates
+        for atom, pos in zip(s.atoms, xyz):
+            self.assertEqual(atom.xx, pos[0])
+            self.assertEqual(atom.xy, pos[1])
+            self.assertEqual(atom.xz, pos[2])
+        # Now set coordinates to an empty list
+        s.coordinates = []
+        self.assertIs(s.coordinates, None)
+        for atom in s.atoms:
+            self.assertFalse(hasattr(atom, 'xx'))
+            self.assertFalse(hasattr(atom, 'xy'))
+            self.assertFalse(hasattr(atom, 'xz'))
 
     def testStrip(self):
         """ Tests the Structure.strip method """
@@ -653,7 +672,7 @@ class TestStructureAdd(unittest.TestCase):
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
 
-class TestStructureSave(unittest.TestCase):
+class TestStructureSave(FileIOTestCase):
     """ Tests the universal "save" function in Structure """
 
     def setUp(self):
@@ -670,19 +689,12 @@ class TestStructureSave(unittest.TestCase):
         self.sys2 = pmd.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         self.sys3 = pmd.load_file(get_fn(os.path.join('01.1water', 'topol.top')),
                                   xyz=get_fn(os.path.join('01.1water', 'conf.gro')))
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
+        super(TestStructureSave, self).setUp()
 
     def tearDown(self):
         warnings.filterwarnings('default', category=CharmmWarning)
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        warnings.filterwarnings('default', category=ParameterWarning)
+        super(TestStructureSave, self).tearDown()
 
     def testSavePDB(self):
         """ Test saving various Structure instances as a PDB """
@@ -833,6 +845,7 @@ class TestStructureSave(unittest.TestCase):
 
     def testSaveGromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
+        warnings.filterwarnings('ignore', category=ParameterWarning)
         self.sys1.save(get_fn('test.top', written=True))
         self.sys2.save(get_fn('test2.top', written=True))
         self.sys3.save(get_fn('test3.top', written=True))
