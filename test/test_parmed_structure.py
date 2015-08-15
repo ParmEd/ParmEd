@@ -194,6 +194,25 @@ class TestStructureAPI(unittest.TestCase):
         diff = (old_crds - s.coordinates).ravel()**2
         self.assertGreater(diff.sum(), 0.01)
 
+    def testCoordinateSetToEmptyList(self):
+        """ Tests behavior of setting coordinates to an empty iterable """
+        s = create_random_structure(parametrized=True)
+        xyz = np.random.random((len(s.atoms), 3))
+        s.coordinates = xyz
+        # Make sure that the x, y, and z attributes of atoms are equal to the
+        # given coordinates
+        for atom, pos in zip(s.atoms, xyz):
+            self.assertEqual(atom.xx, pos[0])
+            self.assertEqual(atom.xy, pos[1])
+            self.assertEqual(atom.xz, pos[2])
+        # Now set coordinates to an empty list
+        s.coordinates = []
+        self.assertIs(s.coordinates, None)
+        for atom in s.atoms:
+            self.assertFalse(hasattr(atom, 'xx'))
+            self.assertFalse(hasattr(atom, 'xy'))
+            self.assertFalse(hasattr(atom, 'xz'))
+
     def testStrip(self):
         """ Tests the Structure.strip method """
         s = create_random_structure(parametrized=True)
