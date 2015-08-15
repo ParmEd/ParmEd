@@ -3673,6 +3673,18 @@ class StructureView(object):
                     self.donors)
         # Ignore types here because it's just a view
 
+    def __repr__(self):
+        natom = len(self.atoms)
+        nres = len(self.residues)
+        nextra = sum([isinstance(a, ExtraPoint) for a in self.atoms])
+        retstr = ['<%s %d atoms' % (type(self).__name__, natom)]
+        if nextra > 0:
+            retstr.append(' [%d EPs]' % nextra)
+        retstr.append('; %d residues' % nres)
+        nbond = len(self.bonds)
+        retstr.append('; %d bonds>' % nbond)
+        return ''.join(retstr)
+
     def __nonzero__(self):
         # For Python 2
         return self.__bool__()

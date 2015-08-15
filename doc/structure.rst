@@ -347,15 +347,31 @@ There are three many ways to select from a :class:`Structure
    atoms.
 
 When selecting from a :class:`Structure <parmed.structure.Structure>`
-instance, the return value can be one of three things:
+instance, the return value can be one of two things:
 
-1. ``None`` if no atoms match the selection criteria
-2. :class:`Atom <parmed.topologyobjects.Atom>` instance if the selection
-   matches only a single atom. This instance is a reference to the original
-   atom, it is *not* a copy.
-3. :class:`Structure <parmed.structure.Structure>` with all of the selected
+1. :class:`Atom <parmed.topologyobjects.Atom>` instance if the selection
+   specified only a single atom either by atom index, atom index *within* a
+   residue index, or an atom index *within* a residue index *within* a single
+   chain.
+2. :class:`Structure <parmed.structure.Structure>` with all of the selected
    atoms and all parameters that were present between the selected atoms. In
-   this case, a copy is made of all selected atoms.
+   this case, a copy is made of all selected atoms. If no atoms were selected,
+   the resulting structure is empty, and will evaluate to boolean ``False``.
+   Note that selections return the same type as the original object being
+   selected, so the resulting object may be a subclass of :class:`Structure
+   <parmed.structure.Structure>`.
+
+**NOTE**
+
+The return value of a selection---unless it is selecting a single atom---is a
+*copy* of the original structure, meaning that changes to the result of the
+slice will *not* change the structure from which you sliced.
+
+This is not always desirable. In cases where you want the resulting structure to
+contain the *same* atoms, residues, bonds, etc. as the original Structure so
+that you can simplify the process of modifying a subset of the structure, you
+want to use the ``view`` descriptor of :class:`Structure
+<parmed.structure.Structure>` instead.  This is described in more detail below.
 
 **Let's look at the simplest form of the selection syntax -- by atom index**::
 
@@ -484,6 +500,31 @@ we defined above::
 
 There is so much flexiblity in the Atom selection here that we can't possibly
 cover everything. You are encouraged to try things out!
+
+Structure views
+~~~~~~~~~~~~~~~
+
+In the previous section, we alluded to a way of applying the selection syntax to
+obtain a *view* of a structure, rather than a full copy of the subset of
+selected atoms. You still need to familiarize yourself with the selection
+syntax, as it is the same when you are trying to take a view.
+
+However, instead of selecting directly from the :class:`Structure
+<parmed.structure.Structure>` instance, you instead select from
+``Structure.view``, as demonstrated below on a downloaded PDB::
+
+    >>> import parmed as pmd
+    >>> pdb = pmd.download_PDB('4lzt')
+    >>> pdb.residues[0]
+    <Residue LYS[1]; chain=A>
+    >>> # Changing a slice does NOT change the original
+    ... pdb[:1,:].residues[0].name = 'MOL'
+    >>> pdb.residues[0]
+    <Residue LYS[1]; chain=A>
+    >>> # However, changing a view DOES change the original
+    ... pdb.view[:1,:].residues[0].name = 'MOL'
+    >>> pdb.residues[0]
+    <Residue MOL[1]; chain=A>
 
 Structure Combining
 ~~~~~~~~~~~~~~~~~~~
