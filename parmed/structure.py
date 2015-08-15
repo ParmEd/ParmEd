@@ -183,9 +183,9 @@ class Structure(object):
     angles : :class:`TrackedList` (:class:`Angle`)
         List of all angles in the structure
     dihedrals : :class:`TrackedList` (:class:`Dihedral`)
-        List of all dihedrals in the structure -- only one term per dihedral, so
-        multi-term dihedral parameters will have the same 4 atoms appear
-        multiple times in the list
+        List of all dihedrals in the structure
+    rb_torsions : :class:`TrackedList` (:class:`RBTorsion`)
+        List of all Ryckaert-Bellemans torsions in the structure
     urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)
         List of all Urey-Bradley angle bends in the structure
     impropers : :class:`TrackedList` (:class:`Improper`)
@@ -1017,129 +1017,17 @@ class Structure(object):
         ``ValueError`` : if the selection is a boolean-like list and its length
                          is not the same as the number of atoms in the system
         """
-        from parmed.amber import AmberMask
         if isinstance(selection, integer_types):
             return self.atoms[selection]
 
-        # Now we select a subset of atoms. Convert "selection" into a natom list
-        # with 0s and 1s, depending on what the input selection is
-        if isinstance(selection, string_types):
-            mask = AmberMask(self, selection)
-            selection = mask.Selection()
-        elif isinstance(selection, slice):
-            sel = [0 for a in self.atoms]
-            for idx in list(range(len(self.atoms)))[selection]:
-                sel[idx] = 1
-            selection = sel
-        elif isinstance(selection, tuple) and len(selection) in (2, 3):
-            # This is a selection of chains, and/or residues, and/or atoms
-            if len(selection) == 2:
-                # Select just residues and atoms. Special-case a single-atom
-                # selection for speed -- orders of magnitude improvement in
-                # efficiency
-                ressel, atomsel = selection
-                if (isinstance(ressel, integer_types) and
-                        isinstance(atomsel, integer_types)):
-                    return self.residues[ressel][atomsel]
-                has_chain = False
-            elif len(selection) == 3:
-                chainsel, ressel, atomsel = selection
-                chainmap = defaultdict(TrackedList)
-                for r in self.residues:
-                    chainmap[r.chain].append(r)
-                if (isinstance(chainsel, string_types) and
-                        isinstance(ressel, integer_types) and
-                        isinstance(atomsel, integer_types)):
-                    # Special-case single-atom selection for efficiency
-                    try:
-                        return chainmap[chainsel][ressel][atomsel]
-                    except KeyError:
-                        raise IndexError('No chain %s in Structure' % chainsel)
-                if isinstance(chainsel, string_types):
-                    if chainsel in chainmap:
-                        chainset = set([chainsel])
-                    else:
-                        # The selected chain is not in the system. Cannot
-                        # possibly select *any* atoms. Bail now for speed
-                        return type(self)()
-                elif isinstance(chainsel, slice):
-                    # Build an ordered set of chains
-                    chains = [self.residues[0].chain]
-                    for res in self.residues:
-                        if res.chain != chains[-1]:
-                            chains.append(res.chain)
-                    chainset = set(chains[chainsel])
-                else:
-                    chainset = set(chainsel)
-                for chain in chainset:
-                    if chain in chainmap:
-                        break
-                else:
-                    # No requested chain is present. Bail now for speed
-                    return type(self)()
-                has_chain = True
-            # Residue selection can either be by name or index
-            if isinstance(ressel, slice):
-                resset = set(list(range(len(self.residues)))[ressel])
-            elif isinstance(ressel, string_types) or isinstance(ressel,
-                    integer_types):
-                resset = set([ressel])
-            else:
-                resset = set(ressel)
-            if isinstance(atomsel, slice):
-                atomset = set(list(range(len(self.atoms)))[atomsel])
-            elif isinstance(atomsel, string_types) or isinstance(atomsel,
-                    integer_types):
-                atomset = set([atomsel])
-            else:
-                atomset = set(atomsel)
-            if has_chain:
-                try:
-                    # To allow us to index the atoms residues from their list of
-                    # chains, temporarily have the chainmap lists claim the
-                    # residues. This must be reversed or the Structure will be
-                    # broken
-                    for chain_name, chain in iteritems(chainmap):
-                        chain.claim()
-                    selection = [
-                            (a.residue.chain in chainset) and
-                            (a.residue.name in resset or
-                                a.residue.idx in resset) and
-                            (a.name in atomset or
-                                a.idx-a.residue[0].idx in atomset)
-
-                            for a in self.atoms
-                    ]
-                finally:
-                    # Make sure that the residues list *always* reclaims its
-                    # contents
-                    self.residues.claim()
-            else:
-                selection = [
-                    (a.name in atomset or a.idx-a.residue[0].idx in atomset)
-                    and (a.residue.name in resset or a.residue.idx in resset)
-                            for a in self.atoms
-                ]
-        else:
-            # Assume it is an iterable. If it is the same length as the atoms,
-            # it is a boolean mask array. Otherwise, it is a list of atom
-            # indices to select
-            sel = [0 for atom in self.atoms]
-            selection = list(selection)
-            if len(selection) == len(self.atoms):
-                for i, val in enumerate(selection):
-                    if val: sel[i] = 1
-            elif len(selection) > len(self.atoms):
-                raise ValueError('Selection iterable is too long')
-            else:
-                try:
-                    for val in selection:
-                        sel[val] = 1
-                except IndexError:
-                    raise ValueError('Selected atom out of range')
-            selection = sel
-        # Make sure we have an integer array of 0s and 1s
-        selection = [int(bool(x)) for x in selection]
+        selection = self._get_selection_array(selection)
+        # _get_selection_array might have returned either an Atom or None if
+        # there is no selection. Handle those and return, or continue if we got
+        # a list of atoms
+        if selection is None:
+            return type(self)()
+        elif isinstance(selection, Atom):
+            return selection
         sumsel = sum(selection)
         if sumsel == 0:
             # No atoms selected. Return None
@@ -1244,6 +1132,151 @@ class Structure(object):
         copy_valence_terms(struct.groups, [], self.groups, [],
                            ['bs', 'type', 'move'])
         return struct
+
+    def _get_selection_array(self, selection):
+        """
+        Private method to convert a selection into an array -- common use for
+        viewing and regular selection
+
+        Parameters
+        ----------
+        selection : selector (slice, tuple, ... etc.)
+            The selection given to the [] operator
+        """
+        from parmed.amber import AmberMask
+        # Now we select a subset of atoms. Convert "selection" into a natom list
+        # with 0s and 1s, depending on what the input selection is
+        if isinstance(selection, string_types):
+            mask = AmberMask(self, selection)
+            selection = mask.Selection()
+        elif isinstance(selection, slice):
+            sel = [0 for a in self.atoms]
+            for idx in list(range(len(self.atoms)))[selection]:
+                sel[idx] = 1
+            selection = sel
+        elif isinstance(selection, tuple) and len(selection) in (2, 3):
+            # This is a selection of chains, and/or residues, and/or atoms
+            if len(selection) == 2:
+                # Select just residues and atoms. Special-case a single-atom
+                # selection for speed -- orders of magnitude improvement in
+                # efficiency
+                ressel, atomsel = selection
+                if (isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    return self.residues[ressel][atomsel]
+                has_chain = False
+            elif len(selection) == 3:
+                chainsel, ressel, atomsel = selection
+                chainmap = defaultdict(TrackedList)
+                for r in self.residues:
+                    chainmap[r.chain].append(r)
+                if (isinstance(chainsel, string_types) and
+                        isinstance(ressel, integer_types) and
+                        isinstance(atomsel, integer_types)):
+                    # Special-case single-atom selection for efficiency
+                    try:
+                        return chainmap[chainsel][ressel][atomsel]
+                    except KeyError:
+                        raise IndexError('No chain %s in Structure' % chainsel)
+                if isinstance(chainsel, string_types):
+                    if chainsel in chainmap:
+                        chainset = set([chainsel])
+                    else:
+                        # The selected chain is not in the system. Cannot
+                        # possibly select *any* atoms. Bail now for speed
+                        return None
+                elif isinstance(chainsel, slice):
+                    # Build an ordered set of chains
+                    chains = [self.residues[0].chain]
+                    for res in self.residues:
+                        if res.chain != chains[-1]:
+                            chains.append(res.chain)
+                    chainset = set(chains[chainsel])
+                else:
+                    chainset = set(chainsel)
+                for chain in chainset:
+                    if chain in chainmap:
+                        break
+                else:
+                    # No requested chain is present. Bail now for speed
+                    return None
+                has_chain = True
+            # Residue selection can either be by name or index
+            if isinstance(ressel, slice):
+                resset = set(list(range(len(self.residues)))[ressel])
+            elif isinstance(ressel, string_types) or isinstance(ressel,
+                    integer_types):
+                resset = set([ressel])
+            else:
+                resset = set(ressel)
+            if isinstance(atomsel, slice):
+                atomset = set(list(range(len(self.atoms)))[atomsel])
+            elif isinstance(atomsel, string_types) or isinstance(atomsel,
+                    integer_types):
+                atomset = set([atomsel])
+            else:
+                atomset = set(atomsel)
+            if has_chain:
+                try:
+                    # To allow us to index the atoms residues from their list of
+                    # chains, temporarily have the chainmap lists claim the
+                    # residues. This must be reversed or the Structure will be
+                    # broken
+                    for chain_name, chain in iteritems(chainmap):
+                        chain.claim()
+                    selection = [
+                            (a.residue.chain in chainset) and
+                            (a.residue.name in resset or
+                                a.residue.idx in resset) and
+                            (a.name in atomset or
+                                a.idx-a.residue[0].idx in atomset)
+
+                            for a in self.atoms
+                    ]
+                finally:
+                    # Make sure that the residues list *always* reclaims its
+                    # contents
+                    self.residues.claim()
+            else:
+                selection = [
+                    (a.name in atomset or a.idx-a.residue[0].idx in atomset)
+                    and (a.residue.name in resset or a.residue.idx in resset)
+                            for a in self.atoms
+                ]
+        else:
+            # Assume it is an iterable. If it is the same length as the atoms,
+            # it is a boolean mask array. Otherwise, it is a list of atom
+            # indices to select
+            sel = [0 for atom in self.atoms]
+            selection = list(selection)
+            if len(selection) == len(self.atoms):
+                for i, val in enumerate(selection):
+                    if val: sel[i] = 1
+            elif len(selection) > len(self.atoms):
+                raise ValueError('Selection iterable is too long')
+            else:
+                try:
+                    for val in selection:
+                        sel[val] = 1
+                except IndexError:
+                    raise ValueError('Selected atom out of range')
+            selection = sel
+        # Make sure we have an integer array of 0s and 1s
+        return [int(bool(x)) for x in selection]
+
+    #===================================================
+
+    @property
+    def view(self):
+        """
+        Returns an indexable object that can be indexed like a standard
+        Structure, but returns a *view* rather than a copy
+
+        See Also
+        --------
+        Structure.__getitem__
+        """
+        return _StructureViewerCreator(self)
 
     #===================================================
 
@@ -3445,5 +3478,216 @@ class Structure(object):
                 system.addForce(f)
             return
         system.addForce(force)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class _StructureViewerCreator(object):
+    """ Class responsible for creating a StructureView when indexed """
+
+    def __init__(self, struct):
+        self.struct = struct
+
+    def __getitem__(self, selection):
+        struct = self.struct
+        if isinstance(selection, integer_types):
+            return struct.atoms[selection]
+
+        view = StructureView()
+        selection = struct._get_selection_array(selection)
+        # _get_selection_array might have returned either an Atom or None if
+        # there is no selection. Handle those and return, or continue if we got
+        # a list of atoms
+        if selection is None:
+            return view
+        elif isinstance(selection, Atom):
+            return selection
+        sumsel = sum(selection)
+        if sumsel == 0:
+            # No atoms selected. Return None
+            return view
+        # The cumulative sum of selection will give our index + 1 of each
+        # selected atom into the new structure
+        scan = [selection[0]]
+        for i in range(1, len(selection)):
+            scan.append(scan[i-1] + selection[i])
+        # Zero-out the unselected atoms
+        scan = [x * y for x, y in zip(scan, selection)]
+        # Copy all parameters
+        sel_res = set()
+        for i, atom in enumerate(struct.atoms):
+            if not selection[i]: continue
+            view.atoms.append(atom)
+            if atom.residue in sel_res: continue
+            view.residues.append(atom.residue)
+            sel_res.add(atom.residue)
+        def add_valence_terms(oval, sval, attrlist):
+            """ Adds the valence terms from one list to another;
+            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
+            styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
+            """
+            for val in sval:
+                ats = [getattr(val, attr) for attr in attrlist]
+                # Make sure all of our atoms in this valence term is "selected"
+                indices = [scan[at.idx] for at in ats if isinstance(at, Atom)]
+                if not all(indices):
+                    continue
+                # Add the type if applicable
+                oval.append(val)
+        add_valence_terms(view.bonds, struct.bonds, ['atom1', 'atom2'])
+        add_valence_terms(view.angles, struct.angles,
+                          ['atom1', 'atom2', 'atom3'])
+        add_valence_terms(view.dihedrals, struct.dihedrals,
+                          ['atom1', 'atom2', 'atom3', 'atom4'])
+        add_valence_terms(view.rb_torsions, struct.rb_torsions,
+                          ['atom1', 'atom2', 'atom3', 'atom4'])
+        add_valence_terms(view.urey_bradleys, struct.urey_bradleys,
+                          ['atom1', 'atom2'])
+        add_valence_terms(view.impropers, struct.impropers,
+                          ['atom1', 'atom2', 'atom3', 'atom4'])
+        add_valence_terms(view.cmaps, struct.cmaps,
+                          ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+        add_valence_terms(view.trigonal_angles, struct.trigonal_angles,
+                          ['atom1', 'atom2', 'atom3', 'atom4'])
+        add_valence_terms(view.out_of_plane_bends, struct.out_of_plane_bends,
+                          ['atom1', 'atom2', 'atom3', 'atom4'])
+        add_valence_terms(view.pi_torsions, struct.pi_torsions,
+                          ['atom1', 'atom2', 'atom3', 'atom4', 'atom5',
+                           'atom6'])
+        add_valence_terms(view.stretch_bends, struct.stretch_bends,
+                          ['atom1', 'atom2', 'atom3'])
+        add_valence_terms(view.torsion_torsions, struct.torsion_torsions,
+                          ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
+        add_valence_terms(view.chiral_frames, struct.chiral_frames,
+                          ['atom1', 'atom2'])
+        add_valence_terms(view.multipole_frames, struct.multipole_frames,
+                          ['atom'])
+        add_valence_terms(view.adjusts, struct.adjusts, ['atom1', 'atom2'])
+        add_valence_terms(view.donors, struct.donors, ['atom1', 'atom2'])
+        add_valence_terms(view.acceptors, struct.acceptors, ['atom1', 'atom2'])
+        return view
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class StructureView(object):
+    """
+    A view of a Structure. In many cases, this can serve as a duck-typed
+    Structure and it has many of the same attributes. However, none of its lists
+    *own* their objects, and the lists of atoms, residues, and
+    parameters/topologies are regular lists, rather than TrackedList instances.
+    Therefore, the indexes correspond to the indexes from the *original*
+    Structure from which this view was taken. Furthermore, there are no "type"
+    lists, as they would be exactly equivalent to the type lists of the parent
+    Structure instance.
+
+    Attributes
+    ----------
+    atoms : :class:`AtomList`
+        List of all atoms in the structure
+    residues : :class:`ResidueList`
+        List of all residues in the structure
+    bonds : :class:`TrackedList` (:class:`Bond`)
+        List of all bonds in the structure
+    angles : :class:`TrackedList` (:class:`Angle`)
+        List of all angles in the structure
+    dihedrals : :class:`TrackedList` (:class:`Dihedral`)
+        List of all dihedrals in the structure
+    rb_torsions : :class:`TrackedList` (:class:`RBTorsion`)
+        List of all Ryckaert-Bellemans torsions in the structure
+    urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)
+        List of all Urey-Bradley angle bends in the structure
+    impropers : :class:`TrackedList` (:class:`Improper`)
+        List of all CHARMM-style improper torsions in the structure
+    cmaps : :class:`TrackedList` (:class:`Cmap`)
+        List of all CMAP objects in the structure
+    trigonal_angles : :class:`TrackedList` (:class:`TrigonalAngle`)
+        List of all AMOEBA-style trigonal angles in the structure
+    out_of_plane_bends : :class:`TrackedList` (:class:`OutOfPlaneBends`)
+        List of all AMOEBA-style out-of-plane bending angles
+    pi_torsions : :class:`TrackedList` (:class:`PiTorsion`)
+        List of all AMOEBA-style pi-torsion angles
+    stretch_bends : :class:`TrackedList` (:class:`StretchBend`)
+        List of all AMOEBA-style stretch-bend compound bond/angle terms
+    torsion_torsions : :class:`TrackedList` (:class:`TorsionTorsion`)
+        List of all AMOEBA-style coupled torsion-torsion terms
+    chiral_frames : :class:`TrackedList` (:class:`ChiralFrame`)
+        List of all AMOEBA-style chiral frames defined in the structure
+    multipole_frames : :class:`TrackedList` (:class:`MultipoleFrame`)
+        List of all AMOEBA-style multipole frames defined in the structure
+    adjusts : :class:`TrackedList` (:class:`NonbondedException`)
+        List of all nonbonded pair-exception rules
+    acceptors : :class:`TrackedList` (:class:`AcceptorDonor`)
+        List of all H-bond acceptors, if that information is present
+    donors : :class:`TrackedList` (:class:`AcceptorDonor`)
+        List of all H-bond donors, if that information is present
+    positions : u.Quantity(list(Vec3), u.angstroms)
+        Unit-bearing atomic coordinates. If not all atoms have coordinates, this
+        property is None
+    coordinates : np.ndarray of shape (nframes, natom, 3)
+        If no coordinates are set, this is set to None. The first frame will
+        match the coordinates present on the atoms.
+    """
+
+    def __init__(self):
+        self.atoms = []
+        self.residues = []
+        self.bonds = []
+        self.angles = []
+        self.dihedrals = []
+        self.rb_torsions = []
+        self.urey_bradleys = []
+        self.impropers = []
+        self.cmaps = []
+        self.trigonal_angles = []
+        self.out_of_plane_bends = []
+        self.pi_torsions = []
+        self.stretch_bends = []
+        self.torsion_torsions = []
+        self.chiral_frames = []
+        self.multipole_frames = []
+        self.adjusts = []
+        self.acceptors = []
+        self.donors = []
+
+    @property
+    def coordinates(self):
+        try:
+            return np.array([[a.xx, a.xy, a.xz] for a in self.atoms])
+        except AttributeError:
+            return None
+
+    @property
+    def positions(self):
+        try:
+            return [Vec3(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
+        except AttributeError:
+            return None
+
+    def __bool__(self):
+        return bool(self.atoms or self.residues or self.bonds or self.angles or
+                    self.dihedrals or self.impropers or self.rb_torsions or
+                    self.cmaps or self.torsion_torsions or self.stretch_bends or
+                    self.out_of_plane_bends or self.trigonal_angles or
+                    self.torsion_torsions or self.pi_torsions or
+                    self.urey_bradleys or self.chiral_frames or
+                    self.multipole_frames or self.adjusts or self.acceptors or
+                    self.donors)
+        # Ignore types here because it's just a view
+
+    def __repr__(self):
+        natom = len(self.atoms)
+        nres = len(self.residues)
+        nextra = sum([isinstance(a, ExtraPoint) for a in self.atoms])
+        retstr = ['<%s %d atoms' % (type(self).__name__, natom)]
+        if nextra > 0:
+            retstr.append(' [%d EPs]' % nextra)
+        retstr.append('; %d residues' % nres)
+        nbond = len(self.bonds)
+        retstr.append('; %d bonds>' % nbond)
+        return ''.join(retstr)
+
+    def __nonzero__(self):
+        # For Python 2
+        return self.__bool__()
+
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
