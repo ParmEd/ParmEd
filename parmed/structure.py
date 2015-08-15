@@ -1604,9 +1604,18 @@ class Structure(object):
             value = list(value)
             coords = np.array(value, dtype=np.float64, copy=False, subok=True)
             coords = coords.reshape((-1, len(self.atoms), 3))
-            for a, xyz in zip(self.atoms, coords[0]):
-                a.xx, a.xy, a.xz = xyz
-            self._coordinates = coords
+            if len(coords) > 0:
+                for a, xyz in zip(self.atoms, coords[0]):
+                    a.xx, a.xy, a.xz = xyz
+                self._coordinates = coords
+            else:
+                # We set coordinates to an empty iterable. Wipe them out here
+                for a in self.atoms:
+                    try:
+                        del a.xx, a.xy, a.xz
+                    except AttributeError:
+                        pass
+                self._coordinates = None
 
     def get_coordinates(self, frame='all'):
         """

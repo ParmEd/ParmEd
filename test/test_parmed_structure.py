@@ -5,7 +5,7 @@ from __future__ import division
 
 import numpy as np
 import parmed as pmd
-from parmed.exceptions import CharmmWarning
+from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
@@ -16,7 +16,7 @@ import random
 import string
 import os
 import unittest
-from utils import create_random_structure, get_fn
+from utils import create_random_structure, get_fn, FileIOTestCase
 import warnings
 
 class TestStructureAPI(unittest.TestCase):
@@ -672,7 +672,7 @@ class TestStructureAdd(unittest.TestCase):
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
 
-class TestStructureSave(unittest.TestCase):
+class TestStructureSave(FileIOTestCase):
     """ Tests the universal "save" function in Structure """
 
     def setUp(self):
@@ -689,19 +689,12 @@ class TestStructureSave(unittest.TestCase):
         self.sys2 = pmd.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         self.sys3 = pmd.load_file(get_fn(os.path.join('01.1water', 'topol.top')),
                                   xyz=get_fn(os.path.join('01.1water', 'conf.gro')))
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
+        super(TestStructureSave, self).setUp()
 
     def tearDown(self):
         warnings.filterwarnings('default', category=CharmmWarning)
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        warnings.filterwarnings('default', category=ParameterWarning)
+        super(TestStructureSave, self).tearDown()
 
     def testSavePDB(self):
         """ Test saving various Structure instances as a PDB """
@@ -852,6 +845,7 @@ class TestStructureSave(unittest.TestCase):
 
     def testSaveGromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
+        warnings.filterwarnings('ignore', category=ParameterWarning)
         self.sys1.save(get_fn('test.top', written=True))
         self.sys2.save(get_fn('test2.top', written=True))
         self.sys3.save(get_fn('test3.top', written=True))
