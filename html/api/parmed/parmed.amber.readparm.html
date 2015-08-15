@@ -162,7 +162,7 @@ from the data in this file</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.readparm.AmberFormat.set_version" title="parmed.amber.readparm.AmberFormat.set_version"><tt class="xref py py-obj docutils literal"><span class="pre">set_version</span></tt></a>()</td>
 <td>Sets the version string</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.readparm.AmberFormat.view" title="parmed.amber.readparm.AmberFormat.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.readparm.AmberFormat.view_as" title="parmed.amber.readparm.AmberFormat.view_as"><tt class="xref py py-obj docutils literal"><span class="pre">view_as</span></tt></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.readparm.AmberFormat.writeParm" title="parmed.amber.readparm.AmberFormat.writeParm"><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt></a>(*args,&nbsp;**kwargs)</td>
@@ -353,8 +353,8 @@ is therefore slower than the C++-optimized version</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="parmed.amber.readparm.AmberFormat.view">
-<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.readparm.AmberFormat.view" title="Permalink to this definition">¶</a></dt>
+<dt id="parmed.amber.readparm.AmberFormat.view_as">
+<tt class="descname">view_as</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.readparm.AmberFormat.view_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a view of the current object as another object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -713,7 +713,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.readparm.AmberParm.update_dihedral_exclusions" title="parmed.amber.readparm.AmberParm.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.readparm.AmberParm.view" title="parmed.amber.readparm.AmberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.readparm.AmberParm.view_as" title="parmed.amber.readparm.AmberParm.view_as"><tt class="xref py py-obj docutils literal"><span class="pre">view_as</span></tt></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.readparm.AmberParm.writeParm" title="parmed.amber.readparm.AmberParm.writeParm"><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt></a>(*args,&nbsp;**kwargs)</td>
@@ -2217,9 +2217,20 @@ velocities</p>
 <tt class="descname">vels</tt><a class="headerlink" href="#parmed.amber.readparm.AmberParm.vels" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="attribute">
 <dt id="parmed.amber.readparm.AmberParm.view">
-<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.readparm.AmberParm.view" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">view</tt><a class="headerlink" href="#parmed.amber.readparm.AmberParm.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an indexable object that can be indexed like a standard
+Structure, but returns a <em>view</em> rather than a copy</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></tt></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.readparm.AmberParm.view_as">
+<tt class="descname">view_as</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.readparm.AmberParm.view_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a view of the current object as another object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2729,7 +2740,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.readparm.ChamberParm.update_dihedral_exclusions" title="parmed.amber.readparm.ChamberParm.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.readparm.ChamberParm.view" title="parmed.amber.readparm.ChamberParm.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a>(cls)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.readparm.ChamberParm.view_as" title="parmed.amber.readparm.ChamberParm.view_as"><tt class="xref py py-obj docutils literal"><span class="pre">view_as</span></tt></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.readparm.ChamberParm.writeParm" title="parmed.amber.readparm.ChamberParm.writeParm"><tt class="xref py py-obj docutils literal"><span class="pre">writeParm</span></tt></a>(*args,&nbsp;**kwargs)</td>
@@ -4221,9 +4232,20 @@ velocities</p>
 <tt class="descname">vels</tt><a class="headerlink" href="#parmed.amber.readparm.ChamberParm.vels" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="attribute">
 <dt id="parmed.amber.readparm.ChamberParm.view">
-<tt class="descname">view</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.readparm.ChamberParm.view" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">view</tt><a class="headerlink" href="#parmed.amber.readparm.ChamberParm.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an indexable object that can be indexed like a standard
+Structure, but returns a <em>view</em> rather than a copy</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></tt></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.readparm.ChamberParm.view_as">
+<tt class="descname">view_as</tt><big>(</big><em>cls</em><big>)</big><a class="headerlink" href="#parmed.amber.readparm.ChamberParm.view_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a view of the current object as another object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

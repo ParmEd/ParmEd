@@ -399,16 +399,27 @@ intuitive (although accomplishing all of these is a challenge!).</p>
 atoms.</li>
 </ol>
 <p>When selecting from a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
-instance, the return value can be one of three things:</p>
+instance, the return value can be one of two things:</p>
 <ol class="arabic simple">
-<li><tt class="docutils literal"><span class="pre">None</span></tt> if no atoms match the selection criteria</li>
 <li><a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance if the selection
-matches only a single atom. This instance is a reference to the original
-atom, it is <em>not</em> a copy.</li>
+specified only a single atom either by atom index, atom index <em>within</em> a
+residue index, or an atom index <em>within</em> a residue index <em>within</em> a single
+chain.</li>
 <li><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> with all of the selected
 atoms and all parameters that were present between the selected atoms. In
-this case, a copy is made of all selected atoms.</li>
+this case, a copy is made of all selected atoms. If no atoms were selected,
+the resulting structure is empty, and will evaluate to boolean <tt class="docutils literal"><span class="pre">False</span></tt>.
+Note that selections return the same type as the original object being
+selected, so the resulting object may be a subclass of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>.</li>
 </ol>
+<p><strong>NOTE</strong></p>
+<p>The return value of a selection&#8212;unless it is selecting a single atom&#8212;is a
+<em>copy</em> of the original structure, meaning that changes to the result of the
+slice will <em>not</em> change the structure from which you sliced.</p>
+<p>This is not always desirable. In cases where you want the resulting structure to
+contain the <em>same</em> atoms, residues, bonds, etc. as the original Structure so
+that you can simplify the process of modifying a subset of the structure, you
+want to use the <tt class="docutils literal"><span class="pre">view</span></tt> descriptor of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instead.  This is described in more detail below.</p>
 <p><strong>Let&#8217;s look at the simplest form of the selection syntax &#8211; by atom index</strong>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;4LZT.cif&#39;</span><span class="p">)</span> <span class="c"># use the 4LZT.cif file in test/files/</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span>
@@ -529,6 +540,29 @@ we defined above:</p>
 </div>
 <p>There is so much flexiblity in the Atom selection here that we can&#8217;t possibly
 cover everything. You are encouraged to try things out!</p>
+</div>
+<div class="section" id="structure-views">
+<h3>Structure views<a class="headerlink" href="#structure-views" title="Permalink to this headline">¶</a></h3>
+<p>In the previous section, we alluded to a way of applying the selection syntax to
+obtain a <em>view</em> of a structure, rather than a full copy of the subset of
+selected atoms. You still need to familiarize yourself with the selection
+syntax, as it is the same when you are trying to take a view.</p>
+<p>However, instead of selecting directly from the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance, you instead select from
+<tt class="docutils literal"><span class="pre">Structure.view</span></tt>, as demonstrated below on a downloaded PDB:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s">&#39;4lzt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;Residue LYS[1]; chain=A&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Changing a slice does NOT change the original</span>
+<span class="gp">... </span><span class="n">pdb</span><span class="p">[:</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;MOL&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;Residue LYS[1]; chain=A&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># However, changing a view DOES change the original</span>
+<span class="gp">... </span><span class="n">pdb</span><span class="o">.</span><span class="n">view</span><span class="p">[:</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;MOL&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;Residue MOL[1]; chain=A&gt;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="structure-combining">
 <h3>Structure Combining<a class="headerlink" href="#structure-combining" title="Permalink to this headline">¶</a></h3>
@@ -804,6 +838,7 @@ the numbering starts again.</p>
 </li>
 <li><a class="reference internal" href="#structure-manipulation-slicing-combining-replicating-and-splitting">Structure manipulation: slicing, combining, replicating, and splitting</a><ul>
 <li><a class="reference internal" href="#structure-slicing-and-selections"><tt class="docutils literal"><span class="pre">Structure</span></tt> Slicing and Selections</a></li>
+<li><a class="reference internal" href="#structure-views">Structure views</a></li>
 <li><a class="reference internal" href="#structure-combining">Structure Combining</a></li>
 <li><a class="reference internal" href="#structure-replicating">Structure Replicating</a></li>
 <li><a class="reference internal" href="#structure-splitting"><tt class="docutils literal"><span class="pre">Structure</span></tt> splitting</a></li>

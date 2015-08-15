@@ -234,9 +234,9 @@
 <span class="sd">    angles : :class:`TrackedList` (:class:`Angle`)</span>
 <span class="sd">        List of all angles in the structure</span>
 <span class="sd">    dihedrals : :class:`TrackedList` (:class:`Dihedral`)</span>
-<span class="sd">        List of all dihedrals in the structure -- only one term per dihedral, so</span>
-<span class="sd">        multi-term dihedral parameters will have the same 4 atoms appear</span>
-<span class="sd">        multiple times in the list</span>
+<span class="sd">        List of all dihedrals in the structure</span>
+<span class="sd">    rb_torsions : :class:`TrackedList` (:class:`RBTorsion`)</span>
+<span class="sd">        List of all Ryckaert-Bellemans torsions in the structure</span>
 <span class="sd">    urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)</span>
 <span class="sd">        List of all Urey-Bradley angle bends in the structure</span>
 <span class="sd">    impropers : :class:`TrackedList` (:class:`Improper`)</span>
@@ -1068,129 +1068,17 @@
 <span class="sd">        ``ValueError`` : if the selection is a boolean-like list and its length</span>
 <span class="sd">                         is not the same as the number of atoms in the system</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMask</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
 
-        <span class="c"># Now we select a subset of atoms. Convert &quot;selection&quot; into a natom list</span>
-        <span class="c"># with 0s and 1s, depending on what the input selection is</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)))[</span><span class="n">selection</span><span class="p">]:</span>
-                <span class="n">sel</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-            <span class="c"># This is a selection of chains, and/or residues, and/or atoms</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="c"># Select just residues and atoms. Special-case a single-atom</span>
-                <span class="c"># selection for speed -- orders of magnitude improvement in</span>
-                <span class="c"># efficiency</span>
-                <span class="n">ressel</span><span class="p">,</span> <span class="n">atomsel</span> <span class="o">=</span> <span class="n">selection</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)</span> <span class="ow">and</span>
-                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)):</span>
-                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">ressel</span><span class="p">][</span><span class="n">atomsel</span><span class="p">]</span>
-                <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">False</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">chainsel</span><span class="p">,</span> <span class="n">ressel</span><span class="p">,</span> <span class="n">atomsel</span> <span class="o">=</span> <span class="n">selection</span>
-                <span class="n">chainmap</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
-                    <span class="n">chainmap</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">and</span>
-                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)</span> <span class="ow">and</span>
-                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)):</span>
-                    <span class="c"># Special-case single-atom selection for efficiency</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">chainmap</span><span class="p">[</span><span class="n">chainsel</span><span class="p">][</span><span class="n">ressel</span><span class="p">][</span><span class="n">atomsel</span><span class="p">]</span>
-                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;No chain </span><span class="si">%s</span><span class="s"> in Structure&#39;</span> <span class="o">%</span> <span class="n">chainsel</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">chainsel</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
-                        <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">chainsel</span><span class="p">])</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="c"># The selected chain is not in the system. Cannot</span>
-                        <span class="c"># possibly select *any* atoms. Bail now for speed</span>
-                        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-                    <span class="c"># Build an ordered set of chains</span>
-                    <span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                            <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
-                    <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="n">chainsel</span><span class="p">])</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chainsel</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainset</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
-                        <span class="k">break</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c"># No requested chain is present. Bail now for speed</span>
-                    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
-                <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="c"># Residue selection can either be by name or index</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)))[</span><span class="n">ressel</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span>
-                    <span class="n">integer_types</span><span class="p">):</span>
-                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">ressel</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ressel</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)))[</span><span class="n">atomsel</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span>
-                    <span class="n">integer_types</span><span class="p">):</span>
-                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atomsel</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atomsel</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">has_chain</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="c"># To allow us to index the atoms residues from their list of</span>
-                    <span class="c"># chains, temporarily have the chainmap lists claim the</span>
-                    <span class="c"># residues. This must be reversed or the Structure will be</span>
-                    <span class="c"># broken</span>
-                    <span class="k">for</span> <span class="n">chain_name</span><span class="p">,</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">chainmap</span><span class="p">):</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
-                    <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
-                            <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="ow">in</span> <span class="n">chainset</span><span class="p">)</span> <span class="ow">and</span>
-                            <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resset</span> <span class="ow">or</span>
-                                <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">resset</span><span class="p">)</span> <span class="ow">and</span>
-                            <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">atomset</span> <span class="ow">or</span>
-                                <span class="n">a</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">atomset</span><span class="p">)</span>
-
-                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
-                    <span class="p">]</span>
-                <span class="k">finally</span><span class="p">:</span>
-                    <span class="c"># Make sure that the residues list *always* reclaims its</span>
-                    <span class="c"># contents</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">atomset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">atomset</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">resset</span><span class="p">)</span>
-                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
-                <span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c"># Assume it is an iterable. If it is the same length as the atoms,</span>
-            <span class="c"># it is a boolean mask array. Otherwise, it is a list of atom</span>
-            <span class="c"># indices to select</span>
-            <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">val</span><span class="p">:</span> <span class="n">sel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selection iterable is too long&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
-                        <span class="n">sel</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selected atom out of range&#39;</span><span class="p">)</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
-        <span class="c"># Make sure we have an integer array of 0s and 1s</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">]</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_selection_array</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="c"># _get_selection_array might have returned either an Atom or None if</span>
+        <span class="c"># there is no selection. Handle those and return, or continue if we got</span>
+        <span class="c"># a list of atoms</span>
+        <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">selection</span>
         <span class="n">sumsel</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sumsel</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c"># No atoms selected. Return None</span>
@@ -1296,8 +1184,153 @@
                            <span class="p">[</span><span class="s">&#39;bs&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="s">&#39;move&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">struct</span>
 
+    <span class="k">def</span> <span class="nf">_get_selection_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method to convert a selection into an array -- common use for</span>
+<span class="sd">        viewing and regular selection</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selection : selector (slice, tuple, ... etc.)</span>
+<span class="sd">            The selection given to the [] operator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMask</span>
+        <span class="c"># Now we select a subset of atoms. Convert &quot;selection&quot; into a natom list</span>
+        <span class="c"># with 0s and 1s, depending on what the input selection is</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">Selection</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)))[</span><span class="n">selection</span><span class="p">]:</span>
+                <span class="n">sel</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="c"># This is a selection of chains, and/or residues, and/or atoms</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c"># Select just residues and atoms. Special-case a single-atom</span>
+                <span class="c"># selection for speed -- orders of magnitude improvement in</span>
+                <span class="c"># efficiency</span>
+                <span class="n">ressel</span><span class="p">,</span> <span class="n">atomsel</span> <span class="o">=</span> <span class="n">selection</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)):</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">ressel</span><span class="p">][</span><span class="n">atomsel</span><span class="p">]</span>
+                <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">chainsel</span><span class="p">,</span> <span class="n">ressel</span><span class="p">,</span> <span class="n">atomsel</span> <span class="o">=</span> <span class="n">selection</span>
+                <span class="n">chainmap</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                    <span class="n">chainmap</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)):</span>
+                    <span class="c"># Special-case single-atom selection for efficiency</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">chainmap</span><span class="p">[</span><span class="n">chainsel</span><span class="p">][</span><span class="n">ressel</span><span class="p">][</span><span class="n">atomsel</span><span class="p">]</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;No chain </span><span class="si">%s</span><span class="s"> in Structure&#39;</span> <span class="o">%</span> <span class="n">chainsel</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">chainsel</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
+                        <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">chainsel</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c"># The selected chain is not in the system. Cannot</span>
+                        <span class="c"># possibly select *any* atoms. Bail now for speed</span>
+                        <span class="k">return</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chainsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                    <span class="c"># Build an ordered set of chains</span>
+                    <span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chains</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
+                    <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="n">chainsel</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">chainset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chainsel</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainset</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainmap</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># No requested chain is present. Bail now for speed</span>
+                    <span class="k">return</span> <span class="bp">None</span>
+                <span class="n">has_chain</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="c"># Residue selection can either be by name or index</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)))[</span><span class="n">ressel</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ressel</span><span class="p">,</span>
+                    <span class="n">integer_types</span><span class="p">):</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">ressel</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">resset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ressel</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)))[</span><span class="n">atomsel</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomsel</span><span class="p">,</span>
+                    <span class="n">integer_types</span><span class="p">):</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atomsel</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">atomset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atomsel</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">has_chain</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c"># To allow us to index the atoms residues from their list of</span>
+                    <span class="c"># chains, temporarily have the chainmap lists claim the</span>
+                    <span class="c"># residues. This must be reversed or the Structure will be</span>
+                    <span class="c"># broken</span>
+                    <span class="k">for</span> <span class="n">chain_name</span><span class="p">,</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">chainmap</span><span class="p">):</span>
+                        <span class="n">chain</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
+                    <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="ow">in</span> <span class="n">chainset</span><span class="p">)</span> <span class="ow">and</span>
+                            <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resset</span> <span class="ow">or</span>
+                                <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">resset</span><span class="p">)</span> <span class="ow">and</span>
+                            <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">atomset</span> <span class="ow">or</span>
+                                <span class="n">a</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">atomset</span><span class="p">)</span>
+
+                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+                    <span class="p">]</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="c"># Make sure that the residues list *always* reclaims its</span>
+                    <span class="c"># contents</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">atomset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">atomset</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resset</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">resset</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+                <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Assume it is an iterable. If it is the same length as the atoms,</span>
+            <span class="c"># it is a boolean mask array. Otherwise, it is a list of atom</span>
+            <span class="c"># indices to select</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selection</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">val</span><span class="p">:</span> <span class="n">sel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selection iterable is too long&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
+                        <span class="n">sel</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Selected atom out of range&#39;</span><span class="p">)</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">sel</span>
+        <span class="c"># Make sure we have an integer array of 0s and 1s</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">]</span>
+
     <span class="c">#===================================================</span>
 
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Structure.view"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an indexable object that can be indexed like a standard</span>
+<span class="sd">        Structure, but returns a *view* rather than a copy</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Structure.__getitem__</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_StructureViewerCreator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
 <div class="viewcode-block" id="Structure.split"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split the current Structure into separate Structure instances for each</span>
@@ -3496,6 +3529,217 @@
                 <span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">force</span><span class="p">)</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+</div>
+<span class="k">class</span> <span class="nc">_StructureViewerCreator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Class responsible for creating a StructureView when indexed &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">struct</span> <span class="o">=</span> <span class="n">struct</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+        <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
+
+        <span class="n">view</span> <span class="o">=</span> <span class="n">StructureView</span><span class="p">()</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">_get_selection_array</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="c"># _get_selection_array might have returned either an Atom or None if</span>
+        <span class="c"># there is no selection. Handle those and return, or continue if we got</span>
+        <span class="c"># a list of atoms</span>
+        <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">view</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">selection</span>
+        <span class="n">sumsel</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sumsel</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c"># No atoms selected. Return None</span>
+            <span class="k">return</span> <span class="n">view</span>
+        <span class="c"># The cumulative sum of selection will give our index + 1 of each</span>
+        <span class="c"># selected atom into the new structure</span>
+        <span class="n">scan</span> <span class="o">=</span> <span class="p">[</span><span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)):</span>
+            <span class="n">scan</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">selection</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="c"># Zero-out the unselected atoms</span>
+        <span class="n">scan</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">selection</span><span class="p">)]</span>
+        <span class="c"># Copy all parameters</span>
+        <span class="n">sel_res</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">selection</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="k">continue</span>
+            <span class="n">view</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">in</span> <span class="n">sel_res</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">view</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span>
+            <span class="n">sel_res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">add_valence_terms</span><span class="p">(</span><span class="n">oval</span><span class="p">,</span> <span class="n">sval</span><span class="p">,</span> <span class="n">attrlist</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot; Adds the valence terms from one list to another;</span>
+<span class="sd">            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;</span>
+<span class="sd">            styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sval</span><span class="p">:</span>
+                <span class="n">ats</span> <span class="o">=</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrlist</span><span class="p">]</span>
+                <span class="c"># Make sure all of our atoms in this valence term is &quot;selected&quot;</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">scan</span><span class="p">[</span><span class="n">at</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">ats</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">at</span><span class="p">,</span> <span class="n">Atom</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="c"># Add the type if applicable</span>
+                <span class="n">oval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">bonds</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">rb_torsions</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">rb_torsions</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">impropers</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">impropers</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">cmaps</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">,</span> <span class="s">&#39;atom5&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">out_of_plane_bends</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">out_of_plane_bends</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">pi_torsions</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">,</span> <span class="s">&#39;atom5&#39;</span><span class="p">,</span>
+                           <span class="s">&#39;atom6&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">torsion_torsions</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">,</span> <span class="s">&#39;atom3&#39;</span><span class="p">,</span> <span class="s">&#39;atom4&#39;</span><span class="p">,</span> <span class="s">&#39;atom5&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">chiral_frames</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">chiral_frames</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">,</span>
+                          <span class="p">[</span><span class="s">&#39;atom&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">adjusts</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">adjusts</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">donors</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">donors</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">])</span>
+        <span class="n">add_valence_terms</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">acceptors</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">acceptors</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;atom1&#39;</span><span class="p">,</span> <span class="s">&#39;atom2&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">view</span>
+
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<div class="viewcode-block" id="StructureView"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.StructureView">[docs]</a><span class="k">class</span> <span class="nc">StructureView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A view of a Structure. In many cases, this can serve as a duck-typed</span>
+<span class="sd">    Structure and it has many of the same attributes. However, none of its lists</span>
+<span class="sd">    *own* their objects, and the lists of atoms, residues, and</span>
+<span class="sd">    parameters/topologies are regular lists, rather than TrackedList instances.</span>
+<span class="sd">    Therefore, the indexes correspond to the indexes from the *original*</span>
+<span class="sd">    Structure from which this view was taken. Furthermore, there are no &quot;type&quot;</span>
+<span class="sd">    lists, as they would be exactly equivalent to the type lists of the parent</span>
+<span class="sd">    Structure instance.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms : :class:`AtomList`</span>
+<span class="sd">        List of all atoms in the structure</span>
+<span class="sd">    residues : :class:`ResidueList`</span>
+<span class="sd">        List of all residues in the structure</span>
+<span class="sd">    bonds : :class:`TrackedList` (:class:`Bond`)</span>
+<span class="sd">        List of all bonds in the structure</span>
+<span class="sd">    angles : :class:`TrackedList` (:class:`Angle`)</span>
+<span class="sd">        List of all angles in the structure</span>
+<span class="sd">    dihedrals : :class:`TrackedList` (:class:`Dihedral`)</span>
+<span class="sd">        List of all dihedrals in the structure</span>
+<span class="sd">    rb_torsions : :class:`TrackedList` (:class:`RBTorsion`)</span>
+<span class="sd">        List of all Ryckaert-Bellemans torsions in the structure</span>
+<span class="sd">    urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)</span>
+<span class="sd">        List of all Urey-Bradley angle bends in the structure</span>
+<span class="sd">    impropers : :class:`TrackedList` (:class:`Improper`)</span>
+<span class="sd">        List of all CHARMM-style improper torsions in the structure</span>
+<span class="sd">    cmaps : :class:`TrackedList` (:class:`Cmap`)</span>
+<span class="sd">        List of all CMAP objects in the structure</span>
+<span class="sd">    trigonal_angles : :class:`TrackedList` (:class:`TrigonalAngle`)</span>
+<span class="sd">        List of all AMOEBA-style trigonal angles in the structure</span>
+<span class="sd">    out_of_plane_bends : :class:`TrackedList` (:class:`OutOfPlaneBends`)</span>
+<span class="sd">        List of all AMOEBA-style out-of-plane bending angles</span>
+<span class="sd">    pi_torsions : :class:`TrackedList` (:class:`PiTorsion`)</span>
+<span class="sd">        List of all AMOEBA-style pi-torsion angles</span>
+<span class="sd">    stretch_bends : :class:`TrackedList` (:class:`StretchBend`)</span>
+<span class="sd">        List of all AMOEBA-style stretch-bend compound bond/angle terms</span>
+<span class="sd">    torsion_torsions : :class:`TrackedList` (:class:`TorsionTorsion`)</span>
+<span class="sd">        List of all AMOEBA-style coupled torsion-torsion terms</span>
+<span class="sd">    chiral_frames : :class:`TrackedList` (:class:`ChiralFrame`)</span>
+<span class="sd">        List of all AMOEBA-style chiral frames defined in the structure</span>
+<span class="sd">    multipole_frames : :class:`TrackedList` (:class:`MultipoleFrame`)</span>
+<span class="sd">        List of all AMOEBA-style multipole frames defined in the structure</span>
+<span class="sd">    adjusts : :class:`TrackedList` (:class:`NonbondedException`)</span>
+<span class="sd">        List of all nonbonded pair-exception rules</span>
+<span class="sd">    acceptors : :class:`TrackedList` (:class:`AcceptorDonor`)</span>
+<span class="sd">        List of all H-bond acceptors, if that information is present</span>
+<span class="sd">    donors : :class:`TrackedList` (:class:`AcceptorDonor`)</span>
+<span class="sd">        List of all H-bond donors, if that information is present</span>
+<span class="sd">    positions : u.Quantity(list(Vec3), u.angstroms)</span>
+<span class="sd">        Unit-bearing atomic coordinates. If not all atoms have coordinates, this</span>
+<span class="sd">        property is None</span>
+<span class="sd">    coordinates : np.ndarray of shape (nframes, natom, 3)</span>
+<span class="sd">        If no coordinates are set, this is set to None. The first frame will</span>
+<span class="sd">        match the coordinates present on the atoms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rb_torsions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stretch_bends</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chiral_frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multipole_frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">donors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="StructureView.coordinates"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.StructureView.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="StructureView.positions"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.StructureView.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Vec3</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span><span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">rb_torsions</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">stretch_bends</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">chiral_frames</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">multipole_frames</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">donors</span><span class="p">)</span>
+        <span class="c"># Ignore types here because it&#39;s just a view</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">natom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">nres</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+        <span class="n">nextra</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s"> atoms&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">natom</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">nextra</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; [</span><span class="si">%d</span><span class="s"> EPs]&#39;</span> <span class="o">%</span> <span class="n">nextra</span><span class="p">)</span>
+        <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; </span><span class="si">%d</span><span class="s"> residues&#39;</span> <span class="o">%</span> <span class="n">nres</span><span class="p">)</span>
+        <span class="n">nbond</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span>
+        <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;; </span><span class="si">%d</span><span class="s"> bonds&gt;&#39;</span> <span class="o">%</span> <span class="n">nbond</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">retstr</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># For Python 2</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bool__</span><span class="p">()</span>
+
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span></div>
 </pre></div>

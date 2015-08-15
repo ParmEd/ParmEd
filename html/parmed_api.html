@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The ParmEd API &mdash; ParmEd 2.0 documentation</title>
+    <title>The API for ParmEd Command-line Utilities &mdash; ParmEd 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -53,18 +53,18 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="the-parmed-api">
-<h1>The ParmEd API<a class="headerlink" href="#the-parmed-api" title="Permalink to this headline">¶</a></h1>
-<p>In some cases, <tt class="docutils literal"><span class="pre">parmed.py</span></tt> interpreter is insufficient to do what you need it
-to do, or perhaps you want to use some of ParmEd&#8217;s functionality in your own
+  <div class="section" id="the-api-for-parmed-command-line-utilities">
+<h1>The API for ParmEd Command-line Utilities<a class="headerlink" href="#the-api-for-parmed-command-line-utilities" title="Permalink to this headline">¶</a></h1>
+<p>In some cases, <tt class="docutils literal"><span class="pre">parmed</span></tt> interpreter is insufficient to do what you need it
+to do, or perhaps you want to use some of <tt class="docutils literal"><span class="pre">parmed</span></tt>&#8216;s functionality in your own
 Python script or program.</p>
 <p>In that case, the ParmEd API is here! Every <a class="reference internal" href="api/parmed/parmed.tools.actions.html#parmed.tools.actions.Action" title="parmed.tools.actions.Action"><tt class="xref py py-class docutils literal"><span class="pre">Action</span></tt></a> subclass is available for import from
 <a class="reference internal" href="api/parmed/parmed.tools.html#module-parmed.tools" title="parmed.tools"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.tools</span></tt></a>. For a full listing of available actions, you are forward to
-the auto-generated list in <a class="reference internal" href="parmed.html"><em>the parmed.py page</em></a>.</p>
+the auto-generated list in <a class="reference internal" href="parmed.html"><em>the parmed page</em></a>.</p>
 <div class="section" id="importing-the-actions">
 <h2>Importing the actions<a class="headerlink" href="#importing-the-actions" title="Permalink to this headline">¶</a></h2>
 <p>All actions can be imported from <tt class="docutils literal"><span class="pre">parmed.tools</span></tt> with the same camelcase shown
-in the <tt class="docutils literal"><span class="pre">parmed.py</span></tt> page. Examples are shown below:</p>
+in the <tt class="docutils literal"><span class="pre">parmed</span></tt> page. Examples are shown below:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">change</span><span class="p">,</span> <span class="n">addLJType</span><span class="p">,</span> <span class="n">changeRadii</span><span class="p">,</span> <span class="n">tiMerge</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">setBond</span><span class="p">,</span> <span class="n">deleteBond</span><span class="p">,</span> <span class="n">addDihedral</span><span class="p">,</span> <span class="n">addPDB</span>
 </pre></div>
@@ -88,7 +88,7 @@ constructor.</p>
 
 <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s">&#39;trx.prmtop&#39;</span><span class="p">)</span>
 
-<span class="c"># All arguments as one string, a la parmed.py</span>
+<span class="c"># All arguments as one string, a la parmed</span>
 <span class="n">action</span> <span class="o">=</span> <span class="n">addLJType</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="s">&quot;@1 radius 1.5 epsilon 0.5&quot;</span><span class="p">)</span>
 
 <span class="c"># Equivalent; all arguments separate</span>
@@ -123,7 +123,7 @@ the action to a string:</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">The ParmEd API</a><ul>
+<li><a class="reference internal" href="#">The API for ParmEd Command-line Utilities</a><ul>
 <li><a class="reference internal" href="#importing-the-actions">Importing the actions</a></li>
 <li><a class="reference internal" href="#using-the-actions">Using the actions</a></li>
 </ul>

@@ -85,8 +85,8 @@ terms</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="8%" />
-<col width="92%" />
+<col width="10%" />
+<col width="90%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>atoms</td>
@@ -102,63 +102,66 @@ terms</p>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">Angle</span></tt>)) List of all angles in the structure</td>
 </tr>
 <tr class="row-odd"><td>dihedrals</td>
-<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">Dihedral</span></tt>)) List of all dihedrals in the structure &#8211; only one term per dihedral, so multi-term dihedral parameters will have the same 4 atoms appear multiple times in the list</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">Dihedral</span></tt>)) List of all dihedrals in the structure</td>
 </tr>
-<tr class="row-even"><td>urey_bradleys</td>
+<tr class="row-even"><td>rb_torsions</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">RBTorsion</span></tt>)) List of all Ryckaert-Bellemans torsions in the structure</td>
+</tr>
+<tr class="row-odd"><td>urey_bradleys</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></tt>)) List of all Urey-Bradley angle bends in the structure</td>
 </tr>
-<tr class="row-odd"><td>impropers</td>
+<tr class="row-even"><td>impropers</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">Improper</span></tt>)) List of all CHARMM-style improper torsions in the structure</td>
 </tr>
-<tr class="row-even"><td>cmaps</td>
+<tr class="row-odd"><td>cmaps</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">Cmap</span></tt>)) List of all CMAP objects in the structure</td>
 </tr>
-<tr class="row-odd"><td>trigonal_angles</td>
+<tr class="row-even"><td>trigonal_angles</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">TrigonalAngle</span></tt>)) List of all AMOEBA-style trigonal angles in the structure</td>
 </tr>
-<tr class="row-even"><td>out_of_plane_bends</td>
+<tr class="row-odd"><td>out_of_plane_bends</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBends</span></tt>)) List of all AMOEBA-style out-of-plane bending angles</td>
 </tr>
-<tr class="row-odd"><td>pi_torsions</td>
+<tr class="row-even"><td>pi_torsions</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></tt>)) List of all AMOEBA-style pi-torsion angles</td>
 </tr>
-<tr class="row-even"><td>stretch_bends</td>
+<tr class="row-odd"><td>stretch_bends</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">StretchBend</span></tt>)) List of all AMOEBA-style stretch-bend compound bond/angle terms</td>
 </tr>
-<tr class="row-odd"><td>torsion_torsions</td>
+<tr class="row-even"><td>torsion_torsions</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></tt>)) List of all AMOEBA-style coupled torsion-torsion terms</td>
 </tr>
-<tr class="row-even"><td>chiral_frames</td>
+<tr class="row-odd"><td>chiral_frames</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">ChiralFrame</span></tt>)) List of all AMOEBA-style chiral frames defined in the structure</td>
 </tr>
-<tr class="row-odd"><td>multipole_frames</td>
+<tr class="row-even"><td>multipole_frames</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">MultipoleFrame</span></tt>)) List of all AMOEBA-style multipole frames defined in the structure</td>
 </tr>
-<tr class="row-even"><td>adjusts</td>
+<tr class="row-odd"><td>adjusts</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">NonbondedException</span></tt>)) List of all nonbonded pair-exception rules</td>
 </tr>
-<tr class="row-odd"><td>acceptors</td>
+<tr class="row-even"><td>acceptors</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">AcceptorDonor</span></tt>)) List of all H-bond acceptors, if that information is present</td>
 </tr>
-<tr class="row-even"><td>donors</td>
+<tr class="row-odd"><td>donors</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">AcceptorDonor</span></tt>)) List of all H-bond donors, if that information is present</td>
 </tr>
-<tr class="row-odd"><td>groups</td>
+<tr class="row-even"><td>groups</td>
 <td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt> (<tt class="xref py py-class docutils literal"><span class="pre">Group</span></tt>)) List of all CHARMM-style GROUP objects (whatever those are used for)</td>
 </tr>
-<tr class="row-even"><td>box</td>
+<tr class="row-odd"><td>box</td>
 <td>(<tt class="docutils literal"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">6</span> <span class="pre">floats</span></tt>) Box dimensions (a, b, c, alpha, beta, gamma) for the unit cell. If no box is defined, <cite>box</cite> is set to <cite>None</cite></td>
 </tr>
-<tr class="row-odd"><td>space_group</td>
+<tr class="row-even"><td>space_group</td>
 <td>(<tt class="docutils literal"><span class="pre">str</span></tt>) The space group of the structure (default is &#8220;P 1&#8221;)</td>
 </tr>
-<tr class="row-even"><td>nrexcl</td>
+<tr class="row-odd"><td>nrexcl</td>
 <td>(<tt class="docutils literal"><span class="pre">int</span></tt>) The number of bonds away that an atom can be in order to be excluded from the direct nonbonded summation</td>
 </tr>
-<tr class="row-odd"><td>title</td>
+<tr class="row-even"><td>title</td>
 <td>(<tt class="docutils literal"><span class="pre">str</span></tt>) Cosmetic only, it is an arbitrary title assigned to the system. Default value is an empty string</td>
 </tr>
-<tr class="row-even"><td>coordinates</td>
+<tr class="row-odd"><td>coordinates</td>
 <td>(np.ndarray of shape (nframes, natom, 3)) If no coordinates are set, this is set to None. The first frame will match the coordinates present on the atoms.</td>
 </tr>
 </tbody>
@@ -1364,6 +1367,17 @@ partners arrays</p>
 <dd><p>A (natom, 3)-shape numpy array with atomic velocities for every atom in
 the system (in units of angstrom/picosecond), or None if there are no
 velocities</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.structure.Structure.view">
+<tt class="descname">view</tt><a class="reference internal" href="../_modules/parmed/structure.html#Structure.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.structure.Structure.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an indexable object that can be indexed like a standard
+Structure, but returns a <em>view</em> rather than a copy</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></tt></p>
+</div>
 </dd></dl>
 
 <dl class="method">

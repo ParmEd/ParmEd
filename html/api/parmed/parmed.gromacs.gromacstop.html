@@ -125,6 +125,9 @@ file unless it has its default value of <tt class="docutils literal"><span class
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.velocities" title="parmed.gromacs.gromacstop.GromacsTopologyFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
 <td>A (natom, 3)-shape numpy array with atomic velocities for every atom in</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.view" title="parmed.gromacs.gromacstop.GromacsTopologyFile.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a></td>
+<td>Returns an indexable object that can be indexed like a standard</td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
@@ -1320,6 +1323,17 @@ partners arrays</p>
 <dd><p>A (natom, 3)-shape numpy array with atomic velocities for every atom in
 the system (in units of angstrom/picosecond), or None if there are no
 velocities</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.view">
+<tt class="descname">view</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an indexable object that can be indexed like a standard
+Structure, but returns a <em>view</em> rather than a copy</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></tt></p>
+</div>
 </dd></dl>
 
 <dl class="method">

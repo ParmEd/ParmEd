@@ -113,11 +113,11 @@
     <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">IFBOX</span>
     <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">parmname</span><span class="p">)</span>
     <span class="k">if</span> <span class="s">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
-        <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">)</span>
+        <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">)</span>
     <span class="k">elif</span> <span class="s">&#39;AMOEBA_FORCEFIELD&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
-        <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">AmoebaParm</span><span class="p">)</span>
+        <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">AmoebaParm</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">)</span>
+        <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">)</span>
 
     <span class="c"># Now read the coordinate file if applicable</span>
     <span class="k">if</span> <span class="n">xyz</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rst7_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
