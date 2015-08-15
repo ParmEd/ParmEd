@@ -15,7 +15,7 @@ What is it?
 
 There are two parts to ParmEd -- the Python API that exposes the core classes
 used in its modeling capabilities, and two front-end Python programs
-(``parmed.py`` and its GUI counterpart, ``xparmed.py``) that make use of the
+(``parmed`` and its GUI counterpart, ``xparmed``) that make use of the
 ParmEd API to allow rapid prototyping and parameter-topology modifications for
 use in molecular simulations.
 
@@ -170,7 +170,7 @@ Program and API Reference
    The CHARMM file classes <charmm>
    The GROMACS file classes <gromacs>
    PyRosetta Integration <rosetta>
-   Using the ParmEd programs (``parmed.py`` and ``xparmed.py``) <parmed>
+   Using the ParmEd programs (``parmed`` and ``xparmed``) <parmed>
    The ParmEd API <parmed_api>
    OpenMM Functionality <openmm>
 

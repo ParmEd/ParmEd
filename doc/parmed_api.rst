@@ -1,20 +1,20 @@
-The ParmEd API
-==============
+The API for ParmEd Command-line Utilities
+=========================================
 
-In some cases, ``parmed.py`` interpreter is insufficient to do what you need it
-to do, or perhaps you want to use some of ParmEd's functionality in your own
+In some cases, ``parmed`` interpreter is insufficient to do what you need it
+to do, or perhaps you want to use some of ``parmed``'s functionality in your own
 Python script or program.
 
 In that case, the ParmEd API is here! Every :class:`Action
 <parmed.tools.actions.Action>` subclass is available for import from
 :mod:`parmed.tools`. For a full listing of available actions, you are forward to
-the auto-generated list in :doc:`the parmed.py page <parmed>`.
+the auto-generated list in :doc:`the parmed page <parmed>`.
 
 Importing the actions
 ---------------------
 
 All actions can be imported from ``parmed.tools`` with the same camelcase shown
-in the ``parmed.py`` page. Examples are shown below::
+in the ``parmed`` page. Examples are shown below::
 
     >>> from parmed.tools import change, addLJType, changeRadii, tiMerge
     >>> from parmed.tools import setBond, deleteBond, addDihedral, addPDB
@@ -43,7 +43,7 @@ Examples of valid syntax for :doc:`addLJType` are shown below::
 
     parm = AmberParm('trx.prmtop')
 
-    # All arguments as one string, a la parmed.py
+    # All arguments as one string, a la parmed
     action = addLJType(parm, "@1 radius 1.5 epsilon 0.5")
 
     # Equivalent; all arguments separate
