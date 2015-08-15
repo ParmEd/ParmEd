@@ -689,7 +689,7 @@ class TestFileWriting(utils.FileIOTestCase):
             if attr.startswith('_'): continue
             # Skip descriptors
             if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name'):
+                        'velocities', 'name', 'view'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
@@ -717,7 +717,7 @@ class TestFileWriting(utils.FileIOTestCase):
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name'):
+                        'velocities', 'name', 'view'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
