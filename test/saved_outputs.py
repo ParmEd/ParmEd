@@ -6,8 +6,8 @@ the actual test scripts
 PRINT_DETAILS = """
 The mask @1 matches 1 atoms:
 
-   ATOM    RES  RESNAME  NAME  TYPE   At.#  LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
-      1      1      SER     N    N3      7     1.8240      0.1700   14.0100    0.1849    1.5500    0.7900
+   ATOM    RES  RESNAME  NAME  TYPE   At.#   LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
+      1      1      SER     N    N3      7      1.8240      0.1700   14.0100    0.1849    1.5500    0.7900
 """
 
 PRINT_BONDS = """\
@@ -250,8 +250,8 @@ System density (g/mL): 0.854596
 PRINT_DETAILSC = """
 The mask @1 matches 1 atoms:
 
-   ATOM    RES  RESNAME  NAME  TYPE   At.#  LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
-      1      1      ALA     N   NH3      7     1.8500      0.2000   14.0070   -0.3000    1.5500    0.7900
+   ATOM    RES  RESNAME  NAME  TYPE   At.#   LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
+      1      1      ALA     N   NH3      7      1.8500      0.2000   14.0070   -0.3000    1.5500    0.7900
 """
 
 PRINT_BONDSC = """\
