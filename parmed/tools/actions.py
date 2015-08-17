@@ -1102,27 +1102,28 @@ class printDetails(Action):
                         self.mask, sum(selection))]
         # Separate printout for Amoeba-style prmtop files
         if isinstance(self.parm, AmoebaParm):
-            retstr.append('%7s%7s%9s%6s%6s%10s\n' % ('ATOM', 'RES', 'RESNAME',
-                                                     'NAME', 'TYPE', 'Mass'))
+            retstr.append('%7s%7s%9s%6s%6s%7s%10s\n' % ('ATOM', 'RES',
+                          'RESNAME', 'NAME', 'TYPE', 'At.#', 'Mass'))
             for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
                 retstr.append(
-                        '%7d%7d%9s%6s%6s%10.4f\n' %
+                        '%7d%7d%9s%6s%6s%7d%10.4f\n' %
                             (i+1, atm.residue.idx+1, atm.residue.name,
-                             atm.name, atm.type, atm.mass)
+                             atm.name, atm.type, atm.atomic_number, atm.mass)
                 )
         else:
-            retstr.append("%7s%7s%9s%6s%6s%12s%12s%10s%10s%10s%10s\n" %
-                       ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'LJ Radius',
-                        'LJ Depth', 'Mass', 'Charge','GB Radius','GB Screen')
+            retstr.append("%7s%7s%9s%6s%6s%7s%12s%12s%10s%10s%10s%10s\n" %
+                       ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'At.#',
+                        'LJ Radius', 'LJ Depth', 'Mass', 'Charge', 'GB Radius',
+                        'GB Screen')
             )
             for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
                 retstr.append(
-                        "%7d%7d%9s%6s%6s%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n"
-                        % (i+1, atm.residue.idx+1, atm.residue.name, atm.name,
-                           atm.type, atm.rmin, atm.epsilon, atm.mass,
-                           atm.charge, atm.radii, atm.screen)
+                    "%7d%7d%9s%6s%6s%7d%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n" %
+                    (i+1, atm.residue.idx+1, atm.residue.name, atm.name,
+                     atm.type, atm.atomic_number, atm.rmin, atm.epsilon,
+                     atm.mass, atm.charge, atm.radii, atm.screen)
                 )
         return ''.join(retstr)
 
