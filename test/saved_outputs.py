@@ -6,8 +6,8 @@ the actual test scripts
 PRINT_DETAILS = """
 The mask @1 matches 1 atoms:
 
-   ATOM    RES  RESNAME  NAME  TYPE   LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
-      1      1      SER     N    N3      1.8240      0.1700   14.0100    0.1849    1.5500    0.7900
+   ATOM    RES  RESNAME  NAME  TYPE   At.#  LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
+      1      1      SER     N    N3      7     1.8240      0.1700   14.0100    0.1849    1.5500    0.7900
 """
 
 PRINT_BONDS = """\
@@ -250,8 +250,8 @@ System density (g/mL): 0.854596
 PRINT_DETAILSC = """
 The mask @1 matches 1 atoms:
 
-   ATOM    RES  RESNAME  NAME  TYPE   LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
-      1      1      ALA     N   NH3      1.8500      0.2000   14.0070   -0.3000    1.5500    0.7900
+   ATOM    RES  RESNAME  NAME  TYPE   At.#  LJ Radius    LJ Depth      Mass    Charge GB Radius GB Screen
+      1      1      ALA     N   NH3      7     1.8500      0.2000   14.0070   -0.3000    1.5500    0.7900
 """
 
 PRINT_BONDSC = """\
@@ -373,19 +373,19 @@ System density (g/mL): 0.916989
 PRINT_DETAILSA = """
 The mask :1-2 matches 12 atoms:
 
-   ATOM    RES  RESNAME  NAME  TYPE      Mass
-      1      1      ACE   CH3     C   12.0110
-      2      1      ACE     C     C   12.0110
-      3      1      ACE     O     O   15.9990
-      4      1      ACE  H31H     H    1.0080
-      5      1      ACE  H32H     H    1.0080
-      6      1      ACE  H33H     H    1.0080
-      7      2      NME     N     N   14.0070
-      8      2      NME   CH3     C   12.0110
-      9      2      NME     H    HN    1.0080
-     10      2      NME  H31H     H    1.0080
-     11      2      NME  H32H     H    1.0080
-     12      2      NME  H33H     H    1.0080
+   ATOM    RES  RESNAME  NAME  TYPE   At.#      Mass
+      1      1      ACE   CH3     C      6   12.0110
+      2      1      ACE     C     C      6   12.0110
+      3      1      ACE     O     O      8   15.9990
+      4      1      ACE  H31H     H      1    1.0080
+      5      1      ACE  H32H     H      1    1.0080
+      6      1      ACE  H33H     H      1    1.0080
+      7      2      NME     N     N      7   14.0070
+      8      2      NME   CH3     C      6   12.0110
+      9      2      NME     H    HN      1    1.0080
+     10      2      NME  H31H     H      1    1.0080
+     11      2      NME  H32H     H      1    1.0080
+     12      2      NME  H33H     H      1    1.0080
 """
 
 PRINT_BONDSA = """\
