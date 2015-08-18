@@ -2,19 +2,23 @@
 This module contains functionality needed to compute energies and forces with
 the sander-Python bindings
 """
-from __future__ import division
-import sys
-import warnings
-
+from __future__ import division, print_function
+import numpy as np
+from parmed.tools.exceptions import (SimulationError, SimulationWarning,
+               UnhandledArgumentWarning)
 try:
     import sander
 except ImportError:
     sander = None
-
-from parmed.tools.exceptions import (SimulationError, SimulationWarning,
-               UnhandledArgumentWarning)
+try:
+    from scipy import optimize
+except ImportError:
+    optimize = None
+import sys
+import warnings
 
 HAS_SANDER = sander is not None
+HAS_SCIPY = optimize is not None
 
 def energy(parm, args, output=sys.stdout):
     """
@@ -94,3 +98,38 @@ def energy(parm, args, output=sys.stdout):
         elif e.hbond != 0:
             output.write('     EHbond   = %20.7f' % e.hbond)
         output.write('\nTOTAL    = %20.7f\n' % e.tot)
+
+def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
+    """ Minimizes a snapshot. Use the existing System if it exists """
+    if not HAS_SANDER:
+        raise SimulationError('Could not import sander')
+    if not HAS_SCIPY:
+        raise SimulationError('Could not import scipy')
+
+    if parm.box is None:
+        if not igb in (0, 1, 2, 5, 6, 7, 8):
+            raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, '
+                                  '6, 7, or 8')
+        if cutoff is None: cutoff = 999.0
+        inp = sander.gas_input(igb)
+        inp.saltcon = saltcon
+        inp.cut = cutoff
+    else:
+        if cutoff is None: cutoff = 8.0
+        inp = sander.pme_input()
+        inp.cut = cutoff
+
+    # Define the objective function to minimize
+    def energy_function(xyz):
+        sander.set_positions(xyz)
+        e, f = sander.energy_forces()
+        return e.tot, np.array(f)
+    with sander.setup(parm, parm.coordinates, parm.box, inp):
+        results = optimize.minimize(energy_function, parm.coordinates,
+                                    method='BFGS', jac=True, tol=tol,
+                                    options=dict(maxiter=maxcyc, disp=True))
+        parm.coordinates = results.x
+    if not results.success:
+        print('Problem minimizing structure with scipy and sander:',
+              file=sys.stderr)
+        print('\t' + results.message)
