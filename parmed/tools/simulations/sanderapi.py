@@ -123,11 +123,12 @@ def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
     def energy_function(xyz):
         sander.set_positions(xyz)
         e, f = sander.energy_forces()
-        return e.tot, np.array(f)
+        return e.tot, -np.array(f)
     with sander.setup(parm, parm.coordinates, parm.box, inp):
+        options = dict(maxiter=maxcyc, disp=True, gtol=tol)
         results = optimize.minimize(energy_function, parm.coordinates,
-                                    method='BFGS', jac=True, tol=tol,
-                                    options=dict(maxiter=maxcyc, disp=True))
+                                    method='L-BFGS-B', jac=True,
+                                    options=options)
         parm.coordinates = results.x
     if not results.success:
         print('Problem minimizing structure with scipy and sander:',

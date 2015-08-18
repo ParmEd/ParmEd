@@ -472,6 +472,8 @@ class writeCoordinates(Action):
                 self.filetype)
 
     def execute(self):
+        if not Action.overwrite and os.path.exists(self.filename):
+            raise FileExists('%s exists; not overwriting' % self.filename)
         coordinates = []
         velocities = []
         for atom in self.parm.atoms:
