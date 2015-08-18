@@ -8,17 +8,20 @@ Date: April 20, 2014
 """
 from __future__ import division
 
+from contextlib import closing
+from copy import copy as _copy
+from math import sqrt
 from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
-                       Cmap, UreyBradley, NoUreyBradley, Structure, Atom)
+                    Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
+                    DihedralType, ImproperType, AngleType, ExtraPoint,
+                    DihedralTypeList)
+from parmed.constants import SMALL
 from parmed.exceptions import (CharmmError, MoleculeError, CharmmWarning,
         ParameterError)
 from parmed.structure import needs_openmm
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
 from parmed.utils.six.moves import zip, range
-from contextlib import closing
-from copy import copy
-import os
 import re
 import warnings
 
@@ -73,7 +76,7 @@ class CharmmPsfFile(Structure):
 
     Parameters
     ----------
-    psf_name : str
+    psf_name : str, optional
         Name of the PSF file (it must exist)
 
     Raises
@@ -166,13 +169,16 @@ class CharmmPsfFile(Structure):
     #===================================================
 
     @_catchindexerror
-    def __init__(self, psf_name):
+    def __init__(self, psf_name=None):
         """
         Opens and parses a PSF file, then instantiates a CharmmPsfFile
         instance from the data.
         """
         global _resre
         Structure.__init__(self)
+        # Bail out if we don't have a filename
+        if psf_name is None:
+            return
         conv = CharmmPsfFile._convert
         # Open the PSF and read the first line. It must start with "PSF"
         with closing(genopen(psf_name, 'r')) as psf:
@@ -333,6 +339,87 @@ class CharmmPsfFile(Structure):
 
     #===================================================
 
+    @classmethod
+    def from_structure(cls, struct, copy=False):
+        """
+        Instantiates a CharmmPsfFile from an input Structure instance. This
+        method makes sure all atom types have uppercase-only names
+
+        Parameters
+        ----------
+        struct : :class:`parmed.structure.Structure`
+            The input structure to convert to a CharmmPsfFile instance
+        copy : bool, optional
+            If True, a copy of all items are made. Otherwise, the resulting
+            CharmmPsfFile is a shallow copy
+
+        Returns
+        -------
+        psf : :class:`CharmmPsfFile`
+            CHARMM PSF file
+
+        Raises
+        ------
+        ValueError if the functional form is not recognized or cannot be
+        implemented through the PSF and parameter/stream files
+
+        Notes
+        -----
+        If copy is False, the original object may have its atom type names
+        changed if any of them have lower-case letters
+        """
+        if (struct.rb_torsions or struct.trigonal_angles or
+                struct.out_of_plane_bends or struct.pi_torsions or
+                struct.stretch_bends or struct.torsion_torsions or
+                struct.chiral_frames or struct.multipole_frames or
+                struct.nrexcl != 3):
+            raise ValueError('Unsupported functional form for CHARMM PSF')
+        if copy:
+            struct = _copy(struct)
+        psf = cls()
+        psf.atoms = struct.atoms
+        psf.bonds = struct.bonds
+        psf.angles = struct.angles
+        psf.urey_bradleys = struct.urey_bradleys
+        psf.dihedrals = struct.dihedrals
+        psf.impropers = struct.impropers
+        psf.acceptors = struct.acceptors
+        psf.donors = struct.donors
+        psf.groups = struct.groups
+        psf.cmaps = struct.cmaps
+
+        psf.bond_types = struct.bond_types
+        psf.angle_types = struct.angle_types
+        psf.urey_bradley_types = struct.urey_bradley_types
+        psf.dihedral_types = struct.dihedral_types
+        psf.improper_types = struct.improper_types
+        psf.cmap_types = struct.cmap_types
+
+        # Make all atom type names upper-case
+        def typeconv(name):
+            if name.upper() == name:
+                return name
+            # Lowercase letters present -- decorate the type name with LTU --
+            # Lower To Upper
+            return '%sLTU' % name.upper()
+        for atom in psf.atoms:
+            atom.type = typeconv(atom.type)
+            if atom.atom_type is not None:
+                atom.atom_type.name = typeconv(atom.atom_type.name)
+
+        # If no groups are defined, make the entire system one group
+        if not psf.groups:
+            if abs(sum(atom.charge for atom in psf.atoms)) < 1e-4:
+                group = Group(0, 1, 0)
+            else:
+                group = Group(0, 2, 0)
+            psf.groups.append(group)
+            psf.groups.nst2 = 0
+
+        return psf
+
+    #===================================================
+
     def __str__(self):
         return self.name
 
@@ -388,7 +475,7 @@ class CharmmPsfFile(Structure):
         ------
         ParameterError if any parameters cannot be found
         """
-        parmset = copy(parmset)
+        parmset = _copy(parmset)
         self.combining_rule = parmset.combining_rule
         # First load the atom types
         types_are_int = False
@@ -489,24 +576,52 @@ class CharmmPsfFile(Structure):
             a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
             at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
             key = tuple(sorted([at1, at2, at3, at4]))
-            if not key in parmset.improper_types:
-                # Check for wild-cards
+            # Check for exact harmonic or exact periodic
+            if key in parmset.improper_types:
+                imp.type = parmset.improper_types[key]
+            elif key in parmset.improper_periodic_types:
+                imp.type = parmset.improper_periodic_types[key]
+            else:
+                # Check for wild-card harmonic
                 for anchor in (at2, at3, at4):
                     key = tuple(sorted([at1, anchor, 'X', 'X']))
                     if key in parmset.improper_types:
-                        break # This is the right key
-            try:
-                imp.type = parmset.improper_types[key]
-            except KeyError:
-                raise ParameterError('No improper parameters found for %r' %
-                                       imp)
+                        imp.type = parmset.improper_types[key]
+                        break
+                # Check for wild-card periodic
+                if key not in parmset.improper_types:
+                    for anchor in (at2, at3, at4):
+                        key = tuple(sorted([at1, anchor, 'X', 'X']))
+                        if key in parmset.improper_periodic_types:
+                            imp.type = parmset.improper_periodic_types[key]
+                            break
+                    # Not found anywhere
+                    if key not in parmset.improper_periodic_types:
+                        raise ParameterError('No improper parameters found for'
+                                             '%r' % imp)
             imp.type.used = False
+        # prepare list of harmonic impropers present in system
         del self.improper_types[:]
         for improper in self.impropers:
             if improper.type.used: continue
             improper.type.used = True
-            self.improper_types.append(improper.type)
-            improper.type.list = self.improper_types
+            if isinstance(improper.type, ImproperType):
+                self.improper_types.append(improper.type)
+                improper.type.list = self.improper_types
+            elif isinstance(improper.type, DihedralType):
+                self.dihedral_types.append(improper.type)
+                improper.type.list = self.dihedral_types
+            else:
+                raise RuntimeError('Should not be here') # Avoid masking errors
+        # Look through the list of impropers -- if there are any periodic
+        # impropers, move them over to the dihedrals list
+        for i in reversed(range(len(self.impropers))):
+            if isinstance(self.impropers[i].type, DihedralType):
+                imp = self.impropers.pop(i)
+                dih = Dihedral(imp.atom1, imp.atom2, imp.atom3, imp.atom4,
+                               improper=True, ignore_end=True, type=imp.type)
+                imp.delete()
+                self.dihedrals.append(dih)
         # Now do the cmaps. These will not have wild-cards
         for cmap in self.cmaps:
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,

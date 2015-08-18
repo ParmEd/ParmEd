@@ -116,6 +116,208 @@ If you plan on creating your own models directly through the :class:`Structure`
 API, you are encouraged to use existing parsers as examples, such as those for
 the AMBER, GROMACS, and CHARMM topology files.
 
+Coordinate handling
+~~~~~~~~~~~~~~~~~~~
+
+It is often of interest to store (and use) a particular conformation of a
+molecule defined by the Cartesian coordinates of each atom. A :class:`Structure`
+need not have an assigned set of atomic positions (many files do not provide
+them by default, such as Amber prmtops, CHARMM PSF, and GROMACS topologies, just
+to name a few). Others *do* define them, such as PDB and PDBx/mmCIF files.
+
+ParmEd offers limited support for coordinate handling, and supports a handful of
+coordinate and trajectory file formats. However, it is *not* optimized for
+trajectory analysis, as there are far superior libraries for doing that (e.g.,
+`MDTraj <http://mdtraj.org>`_ and `pytraj <https://amber-md.github.io/pytraj>`_
+to name two). However, it is still often desirable to have access to atomic
+coordinates.
+
+In a :class:`Structure` instance, coordinates can be accessed as the ``xx``,
+``xy``, and ``xz`` attributes on each atom individually, *or* they can be
+accessed from the ``coordinates`` attribute on the :class:`Structure` instance
+itself. The ``coordinates`` attribute is a numpy array of shape ``(natom, 3)``.
+For example::
+
+    >>> import parmed as pmd
+    >>> pdb = pmd.download_PDB('2koc')
+    >>> pdb.atoms[0].xx, pdb.atoms[0].xy, pdb.atoms[0].xz
+    (-8.886, -5.163, 9.647)
+    >>> pdb.coordinates
+    array([[ -8.886,  -5.163,   9.647],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+
+The ``coordinates`` attribute is simply a copy of the position attributes on
+each atom (and is set to ``None`` if any of the atoms do not have defined
+positions). As such, if you modify individual positions in the ``coordinates``
+array, they will *not* actually change the locations of that atom. In fact, if
+you change the ``coordinates`` array, all of the cached coordinates will be
+discarded and replaced with a copy of the position attributes on each atom::
+
+    >>> pdb.coordinates[0] = [0, 0, 0]
+    >>> pdb.atoms[0].xx, pdb.atoms[0].xy, pdb.atoms[0].xz
+    (-8.886, -5.163, 9.647)
+    >>> pdb.coordinates
+    array([[ -8.886,  -5.163,   9.647],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+
+Note if you change the position of the first atom directly, that does get
+reflected in the coordinate array, but *not* in a reference to the old
+coordinates -- i.e., the ``coordinates`` array is a cache that may be discarded
+when it no longer matches the positions on each atom::
+
+    >>> coords = pdb.coordinates
+    >>> pdb.atoms[0].xx = 0; pdb.atoms[0].xy = 0; pdb.atoms[0].xz = 0
+    >>> coords # A reference to the original cache!
+    array([[ -8.886,  -5.163,   9.647],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+    >>> pdb.coordinates # A new cache is created
+    array([[  0.   ,   0.   ,   0.   ],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+
+This may seem surprising at first, but makes sense when you realize that
+``Structure.coordinates`` is simply a descriptor that reports on the positions
+of each atom.
+
+However, *assigning* to the ``coordinates`` attribute has special meaning.  You
+may assign any iterable of floating point numbers (must be reshape-able into a
+numpy array with the last two dimensions being ``(natom, 3)``), which will be
+automatically converted into a numpy array *and assigned to the individual
+atoms*. For example, using the ``coords`` reference we stored in our previous
+example and assigned to ``pdb.coordinates`` will reset the first atoms' position
+to its original value::
+
+    >>> pdb.coordinates = coords
+    >>> pdb.atoms[0].xx, pdb.atoms[0].xy, pdb.atoms[0].xz
+    (-8.8859999999999992, -5.1630000000000003, 9.6470000000000002)
+    >>> pdb.coordinates
+    array([[ -8.886,  -5.163,   9.647],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+
+This brings us to our last note about working with coordinates. Several file
+types, like PDB and PDBx/mmCIF, permit storing multiple *conformations* of the
+molecule. The ``coordinates`` attribute only returns the first one, and each
+atom only stores a single x-, y-, and z-coordinate. However, :class:`Structure`
+caches all of the conformations it reads (or is assigned). You can access all
+conformers using the :meth:`Structure.get_coordinates` method, passing either a
+conformer number or the word `'all'` to get all coordinates.
+
+As an example, consider the PDB 2KOC, which is an NMR structure with 20
+conformers::
+
+    >>> pdb = pmd.download_PDB('2KOC')
+    >>> pdb.get_coordinates(0)
+    array([[ -8.886,  -5.163,   9.647],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+    >>> pdb.get_coordinates(1)
+    array([[-10.637,  -4.586,  11.116],
+           [-11.86 ,  -5.331,  10.426],
+           [-13.048,  -4.453,  10.55 ],
+           ..., 
+           [ -9.703,   4.539,   3.584],
+           [-10.407,   5.725,   1.585],
+           [-11.594,   5.52 ,  -0.533]])
+    >>> pdb.get_coordinates(19)
+    array([[-10.439,  -4.998,   9.616],
+           [-11.992,  -4.669,   9.507],
+           [-12.19 ,  -3.251,   9.891],
+           ..., 
+           [-10.938,   4.441,   2.276],
+           [-11.359,   5.537,   0.158],
+           [-12.051,   5.205,  -2.146]])
+    >>> pdb.get_coordinates().shape # default is 'all'
+    (20, 451, 3)
+
+Be careful, though! Anything you do that makes the first conformer differ from
+the positions on each of the atoms will invalidate the cache and delete *all*
+conformers, as shown below::
+
+    >>> pdb.atoms[0].xx = 0 # Invalidates cached coordinates!
+    >>> pdb.coordinates
+    array([[  0.   ,  -5.163,   9.647],
+           [-10.305,  -4.745,  10.229],
+           [-10.282,  -3.296,  10.528],
+           ..., 
+           [ -9.693,   3.638,   2.337],
+           [-10.552,   4.682,   0.317],
+           [-11.877,   4.323,  -1.696]])
+    >>> pdb.get_coordinates().shape # only one frame now...
+    (1, 451, 3)
+
+**Performance note**
+
+The way that ParmEd ensures that ``Structure.coordinates`` is always correct is
+to generate a new numpy array from the positions each time the attribute is
+accessed. As a result, repeated access to ``Structure.coordinates`` can be
+*very* slow, and should be avoided. Iterating over the coordinates directly
+requires only a single access, as does storing a reference to it and accessing
+that instead. Below, I show some performance timings from IPython for a simple
+task of finding the lowest x-coordinate value among all atoms::
+
+    In [1]: import parmed as pmd
+    
+    In [2]: def slow_min_x(struct):
+       ...:     return min([struct.coordinates[i][0]
+       ...:                 for i in range(len(struct.atoms))])
+       ...: 
+    
+    In [3]: def iter_min_x(struct):
+       ...:     return min([x[0] for x in struct.coordinates])
+       ...: 
+    
+    In [4]: def ref_min_x(struct):
+       ...:     coords = struct.coordinates
+       ...:     return min([coords[i][0] for i in range(len(struct.atoms))])
+       ...: 
+    
+    In [5]: pmd.download_PDB('4lzt')
+    Out[5]: <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    
+    In [6]: struct = pmd.download_PDB('4lzt')
+    
+    In [7]: %timeit slow_min_x(struct)
+    1 loops, best of 3: 1.08 s per loop
+    
+    In [8]: %timeit iter_min_x(struct)
+    1000 loops, best of 3: 1.2 ms per loop
+    
+    In [9]: %timeit ref_min_x(struct)
+    1000 loops, best of 3: 1.29 ms per loop
+
+Notice -- the ``slow_min_x`` function is about 1000x slower than all of the
+others! This is a contrived example, but it shows the danger of repeatedly
+accessing elements of ``Structure.coordinates`` instead of iterating over it or
+working with a reference to the cached numpy array.
+
 Structure manipulation: slicing, combining, replicating, and splitting
 ----------------------------------------------------------------------
 
@@ -145,15 +347,31 @@ There are three many ways to select from a :class:`Structure
    atoms.
 
 When selecting from a :class:`Structure <parmed.structure.Structure>`
-instance, the return value can be one of three things:
+instance, the return value can be one of two things:
 
-1. ``None`` if no atoms match the selection criteria
-2. :class:`Atom <parmed.topologyobjects.Atom>` instance if the selection
-   matches only a single atom. This instance is a reference to the original
-   atom, it is *not* a copy.
-3. :class:`Structure <parmed.structure.Structure>` with all of the selected
+1. :class:`Atom <parmed.topologyobjects.Atom>` instance if the selection
+   specified only a single atom either by atom index, atom index *within* a
+   residue index, or an atom index *within* a residue index *within* a single
+   chain.
+2. :class:`Structure <parmed.structure.Structure>` with all of the selected
    atoms and all parameters that were present between the selected atoms. In
-   this case, a copy is made of all selected atoms.
+   this case, a copy is made of all selected atoms. If no atoms were selected,
+   the resulting structure is empty, and will evaluate to boolean ``False``.
+   Note that selections return the same type as the original object being
+   selected, so the resulting object may be a subclass of :class:`Structure
+   <parmed.structure.Structure>`.
+
+**NOTE**
+
+The return value of a selection---unless it is selecting a single atom---is a
+*copy* of the original structure, meaning that changes to the result of the
+slice will *not* change the structure from which you sliced.
+
+This is not always desirable. In cases where you want the resulting structure to
+contain the *same* atoms, residues, bonds, etc. as the original Structure so
+that you can simplify the process of modifying a subset of the structure, you
+want to use the ``view`` descriptor of :class:`Structure
+<parmed.structure.Structure>` instead.  This is described in more detail below.
 
 **Let's look at the simplest form of the selection syntax -- by atom index**::
 
@@ -283,6 +501,31 @@ we defined above::
 There is so much flexiblity in the Atom selection here that we can't possibly
 cover everything. You are encouraged to try things out!
 
+Structure views
+~~~~~~~~~~~~~~~
+
+In the previous section, we alluded to a way of applying the selection syntax to
+obtain a *view* of a structure, rather than a full copy of the subset of
+selected atoms. You still need to familiarize yourself with the selection
+syntax, as it is the same when you are trying to take a view.
+
+However, instead of selecting directly from the :class:`Structure
+<parmed.structure.Structure>` instance, you instead select from
+``Structure.view``, as demonstrated below on a downloaded PDB::
+
+    >>> import parmed as pmd
+    >>> pdb = pmd.download_PDB('4lzt')
+    >>> pdb.residues[0]
+    <Residue LYS[1]; chain=A>
+    >>> # Changing a slice does NOT change the original
+    ... pdb[:1,:].residues[0].name = 'MOL'
+    >>> pdb.residues[0]
+    <Residue LYS[1]; chain=A>
+    >>> # However, changing a view DOES change the original
+    ... pdb.view[:1,:].residues[0].name = 'MOL'
+    >>> pdb.residues[0]
+    <Residue MOL[1]; chain=A>
+
 Structure Combining
 ~~~~~~~~~~~~~~~~~~~
 
@@ -366,7 +609,7 @@ like with combination, replication can be done both in-place and not::
     <AmberParm 13 atoms; 1 residues; 13 bonds; parametrized>
     >>> phenol * 2
     <AmberParm 26 atoms; 2 residues; 26 bonds; parametrized>
-    >>> phenol * 100
+    >>> 100 * phenol # multiplication can commute
     <AmberParm 1300 atoms; 100 residues; 1300 bonds; parametrized>
     >>> # phenol still hasn't changed
     ... phenol
@@ -375,16 +618,6 @@ like with combination, replication can be done both in-place and not::
     ... phenol *= 10
     >>> phenol
     <AmberParm 130 atoms; 10 residues; 130 bonds; parametrized>
-
-A word of caution here -- the multiplication operator for integers is not
-implemented for :class:`Structure <parmed.structure.Structure>` instances as
-the other operand, so multiplying an integer by the structure will result in a
-``TypeError``::
-
-    >>> 20 * phenol
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    TypeError: unsupported operand type(s) for *: 'int' and 'AmberParm'
 
 One comment about the parameter *type* arrays (e.g., ``bond_type``) -- unlike
 structure combination, all replicates have the *same* parameters, so there is no

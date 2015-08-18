@@ -7,8 +7,9 @@ Author: Jason M. Swails
 """
 from __future__ import print_function, division
 
+from parmed.exceptions import ParameterError
 from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
-                AtomType)
+                AtomType, DihedralType)
 from parmed.utils.six.moves import range
 from parmed.utils.six import iteritems
 from collections import OrderedDict
@@ -136,7 +137,7 @@ class ParameterSet(object):
         return other
 
     @classmethod
-    def from_structure(cls, struct):
+    def from_structure(cls, struct, allow_unequal_duplicates=True):
         """ Extracts known parameters from a Structure instance
 
         Parameters
@@ -144,6 +145,10 @@ class ParameterSet(object):
         struct : :class:`parmed.structure.Structure`
             The parametrized ``Structure`` instance from which to extract
             parameters into a ParameterSet
+        allow_unequal_duplicates : bool, optional
+            If True, if two or more unequal parameter types are defined by the
+            same atom types, the last one encountered will be assigned. If
+            False, an exception will be raised. Default is True
 
         Returns
         -------
@@ -157,7 +162,8 @@ class ParameterSet(object):
         Furthermore, the *first* occurrence of each parameter will be used. If
         future ones differ, they will be silently ignored, since this is
         expected behavior in some instances (like with Gromacs topologies in the
-        ff99sb-ildn force field).
+        ff99sb-ildn force field) unless ``allow_unequal_duplicates`` is set to
+        ``False``
 
         Dihedrals are a little trickier. They can be multi-term, which can be
         represented either as a *single* entry in dihedrals with a type of
@@ -165,6 +171,14 @@ class ParameterSet(object):
         parameter type. In this case, the parameter is constructed from either
         the first DihedralTypeList found or the first DihedralType of each
         periodicity found if no matching DihedralTypeList is found.
+
+        Raises
+        ------
+        :class:`parmed.exceptions.ParameterError` if allow_unequal_duplicates is
+        False and 2+ unequal parameters are defined between the same atom types.
+
+        `NotImplementedError` if any AMOEBA potential terms are defined in the
+        input structure
         """
         params = cls()
         found_dihed_type_list = dict()
@@ -185,7 +199,12 @@ class ParameterSet(object):
                             atom_type
         for bond in struct.bonds:
             if bond.type is None: continue
-            if (bond.atom1.type, bond.atom2.type) in params.bond_types:
+            key = (bond.atom1.type, bond.atom2.type)
+            if key in params.bond_types:
+                if (not allow_unequal_duplicates and
+                        params.bond_types[key] != bond.type):
+                    raise ParameterError('Unequal bond types defined between '
+                                         '%s and %s' % key)
                 continue
             typ = copy(bond.type)
             key = (bond.atom1.type, bond.atom2.type)
@@ -193,8 +212,12 @@ class ParameterSet(object):
             params.bond_types[tuple(reversed(key))] = typ
         for angle in struct.angles:
             if angle.type is None: continue
-            if ((angle.atom1.type, angle.atom2.type, angle.atom3.type) in
-                    params.angle_types):
+            key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
+            if key in params.angle_types:
+                if (not allow_unequal_duplicates and
+                        params.angle_types[key] != angle.type):
+                    raise ParameterError('Unequal angle types defined between '
+                                         '%s, %s, and %s' % key)
                 continue
             typ = copy(angle.type)
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
@@ -209,15 +232,37 @@ class ParameterSet(object):
             key = (dihedral.atom1.type, dihedral.atom2.type,
                    dihedral.atom3.type, dihedral.atom4.type)
             if dihedral.improper:
-                if key in params.improper_periodic_types: continue
+                key = cls._periodic_improper_key(
+                        dihedral.atom1, dihedral.atom2,
+                        dihedral.atom3, dihedral.atom4,
+                )
+                if key in params.improper_periodic_types:
+                    if (not allow_unequal_duplicates and
+                            params.improper_periodic_types[key] != dihedral.type):
+                        raise ParameterError('Unequal dihedral types defined '
+                                        'between %s, %s, %s, and %s' % key)
+                    continue
                 typ = copy(dihedral.type)
                 params.improper_periodic_types[key] = typ
-                params.improper_periodic_types[tuple(reversed(key))] = typ
             else:
                 # Proper dihedral. Look out for multi-term forms
                 if (key in params.dihedral_types and
                         found_dihed_type_list[key]):
                     # Already found a multi-term dihedral type list
+                    if not allow_unequal_duplicates:
+                        if isinstance(dihedral.type, DihedralTypeList):
+                            if params.dihedral_types[key] != dihedral.type:
+                                raise ParameterError('Unequal dihedral types '
+                                        'defined between %s, %s, %s, and %s' %
+                                        key)
+                        elif isinstance(dihedral.type, DihedralType):
+                            for dt in params.dihedral_types[key]:
+                                if dt == dihedral.type:
+                                    break
+                            else:
+                                raise ParameterError('Unequal dihedral types '
+                                        'defined between %s, %s, %s, and %s' %
+                                        key)
                     continue
                 elif key in params.dihedral_types:
                     # We have one term of a potentially multi-term dihedral.
@@ -233,6 +278,11 @@ class ParameterSet(object):
                         # with its periodicity does not already exist
                         for t in params.dihedral_types[key]:
                             if t.per == dihedral.type.per:
+                                if (not allow_unequal_duplicates and
+                                        t != dihedral.type):
+                                    raise ParameterError('Unequal dihedral '
+                                            'types defined bewteen %s, %s, %s, '
+                                            'and %s' % key)
                                 break
                         else:
                             # If we got here, we did NOT find this periodicity.
@@ -261,13 +311,23 @@ class ParameterSet(object):
             if improper.type is None: continue
             key = (improper.atom1.type, improper.atom2.type,
                     improper.atom3.type, improper.atom4.type)
-            if key in params.improper_types: continue
+            if key in params.improper_types:
+                if (not allow_unequal_duplicates and
+                        params.improper_types[key] != improper.type):
+                    raise ParameterError('Unequal improper types defined '
+                            'between %s, %s, %s, and %s' % key)
+                continue
             params.improper_types[key] = copy(improper.type)
         for cmap in struct.cmaps:
             if cmap.type is None: continue
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
                     cmap.atom4.type, cmap.atom5.type)
-            if key in params.cmap_types: continue
+            if key in params.cmap_types:
+                if (not allow_unequal_duplicates and
+                        cmap.type != params.cmap_types[key]):
+                    raise ParameterError('Unequal CMAP types defined between '
+                            '%s, %s, %s, %s, and %s' % key)
+                continue
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
             params.cmap_types[tuple(reversed(key))] = typ
@@ -348,6 +408,35 @@ class ParameterSet(object):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]
+
+    @staticmethod
+    def _periodic_improper_key(atom1, atom2, atom3, atom4):
+        """
+        Controls how improper torsion keys are generated from Structures.
+        Different programs have different conventions as far as where the
+        "central" atom is placed. This function should be overridden for each
+        subclass
+
+        The default is to *always* put the central atom first, and assume it
+        comes first already if no central atom is detected. A central atom is
+        defined as one that is bonded to the other 3
+        """
+        all_atoms = set([atom1, atom2, atom3, atom4])
+        for atom in all_atoms:
+            for atom2 in all_atoms:
+                if atom2 is atom: continue
+                if not atom2 in atom.bond_partners:
+                    break
+            else:
+                # We found our central atom
+                others = sorted(all_atoms - set([atom]))
+                key = (atom.type, others[0].type, others[1].type,
+                       others[2].type)
+                break
+        else:
+            # No atom identified as "central". Just assume that the third is
+            key = (atom1.type, atom2.type, atom3.type, atom4.type)
+        return key
 
     @property
     def combining_rule(self):

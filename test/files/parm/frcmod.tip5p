@@ -1,0 +1,18 @@
+This is the additional/replacement parameter set for TIP5P
+MASS
+OW    16.0
+EP     0.0
+ 
+BOND
+OW-EP   553.000   0.700
+ 
+ANGLE
+HW-OW-EP    0.0       109.47
+
+DIHE
+X -HW-OW-X    2       0.0         0.0         1.0
+
+NONBON
+  OW       1.7510    0.1600
+  EP       1.0       0.0
+

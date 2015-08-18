@@ -1,0 +1,15 @@
+This is TIP3P (model F) of Price and Brooks, JCP 121:10096, 2004 
+MASS
+OW    16.0
+ 
+BOND
+OW-HW  553.0    0.9572      TIP3P water
+HW-HW  553.0    1.5136      TIP3P water
+ 
+ANGLE
+
+DIHE
+
+NONBON
+  OW       1.7926    0.098 
+

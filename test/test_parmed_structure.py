@@ -5,7 +5,7 @@ from __future__ import division
 
 import numpy as np
 import parmed as pmd
-from parmed.exceptions import CharmmWarning
+from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
@@ -16,7 +16,7 @@ import random
 import string
 import os
 import unittest
-from utils import create_random_structure, get_fn
+from utils import create_random_structure, get_fn, FileIOTestCase
 import warnings
 
 class TestStructureAPI(unittest.TestCase):
@@ -193,6 +193,50 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.coordinates.shape, (natom, 3))
         diff = (old_crds - s.coordinates).ravel()**2
         self.assertGreater(diff.sum(), 0.01)
+
+    def testCoordinateSetToEmptyList(self):
+        """ Tests behavior of setting coordinates to an empty iterable """
+        s = create_random_structure(parametrized=True)
+        xyz = np.random.random((len(s.atoms), 3))
+        s.coordinates = xyz
+        # Make sure that the x, y, and z attributes of atoms are equal to the
+        # given coordinates
+        for atom, pos in zip(s.atoms, xyz):
+            self.assertEqual(atom.xx, pos[0])
+            self.assertEqual(atom.xy, pos[1])
+            self.assertEqual(atom.xz, pos[2])
+        # Now set coordinates to an empty list
+        s.coordinates = []
+        self.assertIs(s.coordinates, None)
+        for atom in s.atoms:
+            self.assertFalse(hasattr(atom, 'xx'))
+            self.assertFalse(hasattr(atom, 'xy'))
+            self.assertFalse(hasattr(atom, 'xz'))
+
+    def testStrip(self):
+        """ Tests the Structure.strip method """
+        s = create_random_structure(parametrized=True)
+        nres = len(s.residues)
+        natom_per_res = [len(res) for res in s.residues]
+        s.strip(':1-5')
+        self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
+
+    def testStripWithCoords(self):
+        """ Tests the Structure.strip method when it has coordinates """
+        s = create_random_structure(parametrized=True)
+        coords = np.random.rand(10, len(s.atoms), 3)
+        s.coordinates = coords
+        nres = len(s.residues)
+        natom_per_res = [len(res) for res in s.residues]
+        s.strip(':1-5')
+        self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
+        self.assertEqual(s.get_coordinates().shape, (10, len(s.atoms), 3))
+        # No longer equal -- it's truncated
+        self.assertNotEqual(coords.shape, (10, len(s.atoms), 3))
+        # Check that the coordinates left are the same as the original
+        # coordinates corresponding to the ones that did *not* get stripped
+        n = sum(natom_per_res[:5])
+        self.assertTrue((coords[:,n:,:] == s.get_coordinates()).all())
 
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
@@ -568,6 +612,11 @@ class TestStructureAdd(unittest.TestCase):
         self.assertIsNot(s1, s2)
         self.assertEqual(len(s2.atoms), len(s1.atoms) * multfac)
         self._check_mult(s2, s1, multfac)
+        # Check commutativity
+        s3 = multfac * s1
+        self.assertIsNot(s1, s3)
+        self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
+        self._check_mult(s3, s1, multfac)
 
     def testMultiplyNotParametrized(self):
         """ Tests replicating a non-parametrized Structure instance """
@@ -577,6 +626,11 @@ class TestStructureAdd(unittest.TestCase):
         self.assertIsNot(s1, s2)
         self.assertEqual(len(s2.atoms), len(s1.atoms) * multfac)
         self._check_mult(s2, s1, multfac)
+        # Check commutativity
+        s3 = multfac * s1
+        self.assertIsNot(s1, s3)
+        self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
+        self._check_mult(s3, s1, multfac)
 
     def testMultNoValence(self):
         """ Tests addition of two minimal Structure instances """
@@ -618,7 +672,7 @@ class TestStructureAdd(unittest.TestCase):
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
 
-class TestStructureSave(unittest.TestCase):
+class TestStructureSave(FileIOTestCase):
     """ Tests the universal "save" function in Structure """
 
     def setUp(self):
@@ -635,19 +689,12 @@ class TestStructureSave(unittest.TestCase):
         self.sys2 = pmd.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         self.sys3 = pmd.load_file(get_fn(os.path.join('01.1water', 'topol.top')),
                                   xyz=get_fn(os.path.join('01.1water', 'conf.gro')))
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
+        super(TestStructureSave, self).setUp()
 
     def tearDown(self):
         warnings.filterwarnings('default', category=CharmmWarning)
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        warnings.filterwarnings('default', category=ParameterWarning)
+        super(TestStructureSave, self).tearDown()
 
     def testSavePDB(self):
         """ Test saving various Structure instances as a PDB """
@@ -749,6 +796,17 @@ class TestStructureSave(unittest.TestCase):
         x1 = pmd.charmm.CharmmPsfFile(get_fn('test.psf', written=True))
         x2 = pmd.charmm.CharmmPsfFile(get_fn('test2.psf', written=True))
         x3 = pmd.charmm.CharmmPsfFile(get_fn('test3.psf', written=True))
+        # PSF files save "improper periodic" torsions under the improper list,
+        # only moving them over to the dihedral list once parameters have been
+        # assigned and the fact that it's a periodic improper torsion becomes
+        # known. Since no parameters are assigned in this section, we need to
+        # have a way of making sure that we don't get a false positive based on
+        # this difference. Add methods to determine the numbers of proper and
+        # improper torsions
+        def _propers(struct):
+            return sum(1 for dih in struct.dihedrals if not dih.improper)
+        def _impropers(struct):
+            return sum(1 for dih in struct.dihedrals if dih.improper) + len(struct.impropers)
         # Check equivalence of topologies
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
@@ -759,18 +817,35 @@ class TestStructureSave(unittest.TestCase):
         self.assertEqual(len(self.sys1.angles), len(x1.angles))
         self.assertEqual(len(self.sys2.angles), len(x2.angles))
         self.assertEqual(len(self.sys3.angles), len(x3.angles))
-        self.assertEqual(len(self.sys1.dihedrals), len(x1.dihedrals))
-        self.assertEqual(len(self.sys2.dihedrals), len(x2.dihedrals))
-        self.assertEqual(len(self.sys3.dihedrals), len(x3.dihedrals))
-        self.assertEqual(len(self.sys1.impropers), len(x1.impropers))
-        self.assertEqual(len(self.sys2.impropers), len(x2.impropers))
-        self.assertEqual(len(self.sys3.impropers), len(x3.impropers))
+        self.assertEqual(_propers(self.sys1), len(x1.dihedrals))
+        self.assertEqual(_propers(self.sys2), len(x2.dihedrals))
+        self.assertEqual(_propers(self.sys3), len(x3.dihedrals))
+        self.assertEqual(_impropers(self.sys1), len(x1.impropers))
+        self.assertEqual(_impropers(self.sys2), len(x2.impropers))
+        self.assertEqual(_impropers(self.sys3), len(x3.impropers))
         self.assertEqual(len(self.sys1.cmaps), len(x1.cmaps))
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
+    def testSaveCharmmCrd(self):
+        """ Test saving various Structure instances as CHARMM coord files """
+        self.sys1.save(get_fn('test.crd', written=True))
+        self.sys2.save(get_fn('test2.crd', written=True))
+        self.sys3.save(get_fn('test3.crd', written=True))
+        x1 = pmd.charmm.CharmmCrdFile(get_fn('test.crd', written=True))
+        x2 = pmd.charmm.CharmmCrdFile(get_fn('test2.crd', written=True))
+        x3 = pmd.charmm.CharmmCrdFile(get_fn('test3.crd', written=True))
+
+        np.testing.assert_allclose(self.sys1.coordinates,
+                x1.coordinates.reshape(self.sys1.coordinates.shape))
+        np.testing.assert_allclose(self.sys2.coordinates,
+                x2.coordinates.reshape(self.sys2.coordinates.shape))
+        np.testing.assert_allclose(self.sys3.coordinates,
+                x3.coordinates.reshape(self.sys3.coordinates.shape))
+
     def testSaveGromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
+        warnings.filterwarnings('ignore', category=ParameterWarning)
         self.sys1.save(get_fn('test.top', written=True))
         self.sys2.save(get_fn('test2.top', written=True))
         self.sys3.save(get_fn('test3.top', written=True))

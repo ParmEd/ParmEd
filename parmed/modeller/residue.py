@@ -439,7 +439,7 @@ class ResidueTemplate(object):
         TypeError if the structure cannot be converted to the desired format for
         whatever reason
         """
-        from parmed.modeller.offlib import AmberOFFLibrary
+        from parmed.amber.offlib import AmberOFFLibrary
         from parmed.formats.mol2 import Mol2File
         extmap = {
                 '.mol2' : 'MOL2',
@@ -685,7 +685,7 @@ class ResidueTemplateContainer(list):
         contrast, ``Structure.save`` will save a single @<MOLECULE> mol2 file
         with multiple residues if the mol2 format is requested.
         """
-        from parmed.modeller.offlib import AmberOFFLibrary
+        from parmed.amber.offlib import AmberOFFLibrary
         from parmed.formats.mol2 import Mol2File
         extmap = {
                 '.mol2' : 'MOL2',

@@ -3,17 +3,18 @@ Tests for the parmed/charmm subpackage
 """
 from __future__ import division, print_function
 
-import utils
-from parmed.utils.six import iteritems
+import numpy as np
+from parmed.utils.six import iteritems, string_types
+from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
-from parmed import topologyobjects as to
-from parmed import exceptions
+from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
 import os
 import unittest
+import utils
 
 get_fn = utils.get_fn
 
-class TestCharmmCoords(unittest.TestCase):
+class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
     
     def testCharmmCrd(self):
@@ -28,6 +29,14 @@ class TestCharmmCoords(unittest.TestCase):
         self.assertEqual(len(crd.resid), crd.natom)
         self.assertEqual(len(crd.resname), crd.natom)
         self.assertEqual(len(crd.weighting), crd.natom)
+
+    def testWriteCrd(self):
+        """ Test CHARMM coordinate writing capabilities """
+        struct = load_file(get_fn('4lzt.pdb'))
+        charmmcrds.CharmmCrdFile.write(struct, get_fn('test.crd', written=True))
+        crd = charmmcrds.CharmmCrdFile(get_fn('test.crd', written=True))
+        np.testing.assert_allclose(struct.coordinates,
+                                   crd.coordinates.reshape((len(struct.atoms), 3)))
 
     def testCharmmRst(self):
         """ Test CHARMM restart file parser """
@@ -309,7 +318,53 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.cmaps), 447)
         self.assertEqual(cpsf.residues[281].insertion_code, 'A')
 
-class TestCharmmParameters(unittest.TestCase):
+    def testFromStructure(self):
+        """ Tests the CharmmPsfFile.from_structure constructor """
+        top1 = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
+        psf1 = psf.CharmmPsfFile.from_structure(top1)
+
+        top2 = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top'))
+        psf2 = psf.CharmmPsfFile.from_structure(top2)
+
+        self.assertEqual(len(psf1.atoms), len(top1.atoms))
+        self.assertEqual(len(psf2.atoms), len(top2.atoms))
+
+        self.assertEqual(len(psf1.bonds), len(top1.bonds))
+        self.assertEqual(len(psf2.bonds), len(top2.bonds))
+        self.assertEqual(len(psf1.angles), len(top1.angles))
+        self.assertEqual(len(psf2.angles), len(top2.angles))
+        self.assertEqual(len(psf1.urey_bradleys), len(top1.urey_bradleys))
+        self.assertEqual(len(psf2.urey_bradleys), len(top2.urey_bradleys))
+        self.assertEqual(len(psf1.dihedrals), len(top1.dihedrals))
+        self.assertEqual(len(psf2.dihedrals), len(top2.dihedrals))
+        self.assertEqual(len(psf1.impropers), len(top1.impropers))
+        self.assertEqual(len(psf2.impropers), len(top2.impropers))
+        self.assertEqual(len(psf1.cmaps), len(top1.cmaps))
+        self.assertEqual(len(psf2.cmaps), len(top2.cmaps))
+        self.assertEqual(len(psf1.acceptors), len(top1.acceptors))
+        self.assertEqual(len(psf2.acceptors), len(top2.acceptors))
+        self.assertEqual(len(psf1.donors), len(top1.donors))
+        self.assertEqual(len(psf2.donors), len(top2.donors))
+        self.assertEqual(len(psf1.groups), len(top1.groups))
+        self.assertEqual(len(psf2.groups), len(top2.groups))
+
+        self.assertEqual(len(psf1.bond_types), len(top1.bond_types))
+        self.assertEqual(len(psf2.bond_types), len(top2.bond_types))
+        self.assertEqual(len(psf1.angle_types), len(top1.angle_types))
+        self.assertEqual(len(psf2.angle_types), len(top2.angle_types))
+        self.assertEqual(len(psf1.dihedral_types), len(top1.dihedral_types))
+        self.assertEqual(len(psf2.dihedral_types), len(top2.dihedral_types))
+        self.assertEqual(len(psf1.urey_bradley_types), len(top1.urey_bradley_types))
+        self.assertEqual(len(psf2.urey_bradley_types), len(top2.urey_bradley_types))
+        self.assertEqual(len(psf1.improper_types), len(top1.improper_types))
+        self.assertEqual(len(psf2.improper_types), len(top2.improper_types))
+        self.assertEqual(len(psf1.cmap_types), len(top1.cmap_types))
+        self.assertEqual(len(psf2.cmap_types), len(top2.cmap_types))
+
+        for atom in psf1.atoms:
+            self.assertEqual(atom.type.upper(), atom.type)
+
+class TestCharmmParameters(utils.FileIOTestCase):
     """ Test CHARMM Parameter file parsing """
     
     def testSingleParameterset(self):
@@ -416,6 +471,26 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(uniques(p.nbfix_types), 6)
         self.assertEqual(uniques(p.urey_bradley_types), 45)
 
+    def testWriteParams(self):
+        """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
+        params = parameters.CharmmParameterSet(
+                                get_fn('top_all22_prot.inp'),
+                                get_fn('par_all22_prot.inp'),
+        )
+        params.write(top=get_fn('test.rtf', written=True),
+                     par=get_fn('test.par', written=True))
+        params.write(str=get_fn('test.str', written=True))
+
+        params2 = parameters.CharmmParameterSet(
+                                get_fn('test.rtf', written=True),
+                                get_fn('test.par', written=True)
+        )
+        params3 = parameters.CharmmParameterSet(get_fn('test.str', written=True))
+
+        # Check that all of the params are equal
+        self._compare_paramsets(params, params2, copy=True)
+        self._compare_paramsets(params, params3, copy=True)
+
     def testCGenFF(self):
         """ Test parsing stream files generated by CGenFF """
         p = parameters.CharmmParameterSet(get_fn('toppar_spin_label_dummy.str'))
@@ -475,6 +550,132 @@ class TestCharmmParameters(unittest.TestCase):
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
 
+    def testCharmmParameterSetConversion(self):
+        """ Tests CharmmParameterSet.from_parameterset and from_structure """
+        params1 = ParameterSet.from_structure(
+                load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
+        )
+        params2 = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top')).parameterset
+
+        chparams1 = parameters.CharmmParameterSet.from_parameterset(params1)
+        chparams2 = parameters.CharmmParameterSet.from_parameterset(params2, copy=True)
+        chparams3 = parameters.CharmmParameterSet.from_structure(
+                load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
+        )
+
+        self.assertIsInstance(chparams1, parameters.CharmmParameterSet)
+        self.assertIsInstance(chparams2, parameters.CharmmParameterSet)
+        self.assertIsInstance(chparams3, parameters.CharmmParameterSet)
+
+        self._compare_paramsets(chparams1, params1, copy=False)
+        self._compare_paramsets(chparams2, params2, copy=True)
+        self._compare_paramsets(chparams1, chparams3, copy=True)
+
+        self._check_uppercase_types(chparams1)
+        self._check_uppercase_types(chparams2)
+        self._check_uppercase_types(chparams3)
+
+        # GAFF atom types, as in the first parameter set, are all lower-case.
+        # Check that name decoration is the established pattern
+        for name in chparams1.atom_types:
+            self.assertTrue(name.endswith('LTU'))
+        for name in chparams3.atom_types:
+            self.assertTrue(name.endswith('LTU'))
+
+    def _check_uppercase_types(self, params):
+        for aname, atom_type in iteritems(params.atom_types):
+            self.assertEqual(aname, aname.upper())
+            self.assertEqual(atom_type.name, atom_type.name.upper())
+        for key in params.bond_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+        for key in params.angle_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+        for key in params.dihedral_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+        for key in params.cmap_types:
+            for k in key:
+                self.assertEqual(k.upper(), k)
+
+    def _compare_paramsets(self, set1, set2, copy):
+        def get_typeset(set1, set2):
+            ids1 = set()
+            ids2 = set()
+            for _, item in iteritems(set1):
+                ids1.add(id(item))
+            for _, item in iteritems(set2):
+                ids2.add(id(item))
+            return ids1, ids2
+        def typenames(key):
+            if isinstance(key, string_types):
+                if key != key.upper():
+                    return '%sLTU' % key.upper()
+                return key
+            return tuple(typenames(k) for k in key)
+        # Bonds
+        b1, b2 = get_typeset(set1.bond_types, set2.bond_types)
+        self.assertEqual(len(b1), len(b2))
+        if copy:
+            self.assertFalse(b1 & b2)
+        else:
+            self.assertEqual(b1, b2)
+        for key, item2 in iteritems(set2.bond_types):
+            self.assertEqual(set1.bond_types[typenames(key)], item2)
+        # Angles
+        a1, a2 = get_typeset(set1.angle_types, set2.angle_types)
+        self.assertEqual(len(a1), len(a2))
+        if copy:
+            self.assertFalse(a1 & a2)
+        else:
+            self.assertEqual(a1, a2)
+        for key, item2 in iteritems(set2.angle_types):
+            self.assertEqual(set1.angle_types[typenames(key)], item2)
+        # Dihedrals
+        d1, d2 = get_typeset(set1.dihedral_types, set2.dihedral_types)
+        self.assertEqual(len(d1), len(d2))
+        if copy:
+            self.assertFalse(d1 & d2)
+        else:
+            self.assertEqual(d1, d2)
+        for key, item2 in iteritems(set2.dihedral_types):
+            self.assertEqual(set1.dihedral_types[typenames(key)], item2)
+        # Impropers
+        d1, d2 = get_typeset(set1.improper_types, set2.improper_types)
+        self.assertEqual(len(d1), len(d2))
+        if copy:
+            self.assertFalse(d1 & d2)
+        else:
+            self.assertEqual(d1, d2)
+        for key, item2 in iteritems(set2.improper_types):
+            self.assertEqual(set1.improper_types[typenames(key)], item2)
+        # Periodic impropers
+        d1, d2 = get_typeset(set1.improper_periodic_types, set2.improper_periodic_types)
+        self.assertEqual(len(d1), len(d2))
+        if copy:
+            self.assertFalse(d1 & d2)
+        else:
+            self.assertEqual(d1, d2)
+        for key, item2 in iteritems(set2.improper_periodic_types):
+            self.assertEqual(set1.improper_periodic_types[typenames(key)], item2)
+        # CMAPs
+        d1, d2 = get_typeset(set1.cmap_types, set2.cmap_types)
+        self.assertEqual(len(d1), len(d2))
+        if copy:
+            self.assertFalse(d1 & d2)
+        else:
+            self.assertEqual(d1, d2)
+        for key, item2 in iteritems(set2.cmap_types):
+            self.assertEqual(set1.cmap_types[typenames(key)], item2)
+        # Atom types
+        a1, a2 = get_typeset(set1.atom_types, set2.atom_types)
+        self.assertEqual(len(a1), len(a2))
+        if copy:
+            self.assertFalse(a1 & a2)
+        else:
+            self.assertEqual(a1, a2)
+
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
 
@@ -488,7 +689,7 @@ class TestFileWriting(utils.FileIOTestCase):
             if attr.startswith('_'): continue
             # Skip descriptors
             if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name'):
+                        'velocities', 'name', 'view'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
@@ -516,7 +717,7 @@ class TestFileWriting(utils.FileIOTestCase):
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name'):
+                        'velocities', 'name', 'view'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):

@@ -388,7 +388,7 @@ class AmberFormat(object):
 
     #===================================================
 
-    def view(self, cls):
+    def view_as(self, cls):
         """
         Returns a view of the current object as another object.
 

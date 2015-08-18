@@ -1,13 +1,13 @@
 """
 This module contains classes for parsing and processing CHARMM parameter,
-topology, and stream files. It only extracts atom properties from the
-topology files and extracts all parameters from the parameter files
+topology, and stream files.
 
 Author: Jason M. Swails
 Contributors:
 Date: Apr. 13, 2015
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+from copy import copy as _copy
 from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
                     DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
@@ -16,7 +16,8 @@ from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
-from parmed.utils.six import iteritems
+from parmed.utils.io import genopen
+from parmed.utils.six import iteritems, string_types, integer_types
 from parmed.utils.six.moves import zip
 import os
 import re
@@ -82,6 +83,10 @@ class CharmmParameterSet(ParameterSet):
     improper_types : dict((str,str,str,str):ImproperType)
         Dictionary mapping the 4-element tuple of the names of the four atom
         types involved in the improper torsion to the ImproperType instances
+    improper_periodic_types : dict((str,str,str,str):DihedralType)
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the improper torsion (modeled as a Fourier series) to
+        the DihedralType instances
     cmap_types : dict((str,str,str,str,str):CmapType)
         Dictionary mapping the 5-element tuple of the names of the five atom
         types involved in the correction map to the CmapType instances
@@ -139,6 +144,131 @@ class CharmmParameterSet(ParameterSet):
         for top in tops: self.read_topology_file(top)
         for par in pars: self.read_parameter_file(par)
         for strf in strs: self.read_stream_file(strf)
+
+    @classmethod
+    def from_parameterset(cls, params, copy=False):
+        """
+        Instantiates a CharmmParameterSet from another ParameterSet (or
+        subclass). The main thing this feature is responsible for is converting
+        lower-case atom type names into all upper-case and decorating the name
+        to ensure each atom type name is unique.
+
+        Parameters
+        ----------
+        params : :class:`parmed.parameters.ParameterSet`
+            ParameterSet containing the list of parameters to be converted to a
+            CHARMM-compatible set
+        copy : bool, optional
+            If True, the returned parameter set is a deep copy of ``params``. If
+            False, the returned parameter set is a shallow copy, and the
+            original set may be modified if any lower-case atom type names are
+            present. Default is False.
+
+        Returns
+        -------
+        new_params : CharmmParameterSet
+            The parameter set whose atom type names are converted to all
+            upper-case
+        """
+        new_params = cls()
+        def typeconv(name):
+            if isinstance(name, integer_types):
+                return name
+            if name.upper() == name:
+                return name
+            # Lowercase letters present -- decorate the type name with LTU --
+            # Lower To Upper
+            return '%sLTU' % name.upper()
+        if copy:
+            do_copy = lambda x: _copy(x)
+        else:
+            do_copy = lambda x: x
+        # Convert all parameters
+        id_typemap = dict()
+        def copy_paramtype(key, typ, dict):
+            if isinstance(key, string_types):
+                key = typeconv(key)
+            elif isinstance(key, tuple):
+                key = tuple(typeconv(k) for k in key)
+            # NoUreyBradley should never be copied
+            if typ is NoUreyBradley:
+                dict[key] = NoUreyBradley
+            elif id(typ) in id_typemap:
+                dict[key] = id_typemap[id(typ)]
+            else:
+                newtype = do_copy(typ)
+                id_typemap[id(typ)] = newtype
+                dict[key] = newtype
+
+        for key, atom_type in iteritems(params.atom_types_tuple):
+            atom_type.name = typeconv(atom_type.name)
+            copy_paramtype(key, atom_type, new_params.atom_types_tuple)
+        for typename, atom_type in iteritems(params.atom_types):
+            atom_type.name = typeconv(atom_type.name)
+            copy_paramtype(typename, atom_type, new_params.atom_types)
+        for idx, atom_type in iteritems(params.atom_types_int):
+            atom_type.name = typeconv(atom_type.name)
+            copy_paramtype(idx, atom_type, new_params.atom_types_int)
+
+        for key, typ in iteritems(params.bond_types):
+            copy_paramtype(key, typ, new_params.bond_types)
+        for key, typ in iteritems(params.angle_types):
+            copy_paramtype(key, typ, new_params.angle_types)
+        for key, typ in iteritems(params.urey_bradley_types):
+            copy_paramtype(key, typ, new_params.urey_bradley_types)
+        for key, typ in iteritems(params.dihedral_types):
+            copy_paramtype(key, typ, new_params.dihedral_types)
+        for key, typ in iteritems(params.improper_periodic_types):
+            copy_paramtype(key, typ, new_params.improper_periodic_types)
+        for key, typ in iteritems(params.improper_types):
+            copy_paramtype(key, typ, new_params.improper_types)
+        for key, typ in iteritems(params.cmap_types):
+            if len(key) == 8:
+                copy_paramtype(key, typ, new_params.cmap_types)
+            elif len(key) == 5:
+                key = (key[0], key[1], key[2], key[3],
+                       key[1], key[2], key[3], key[4])
+                copy_paramtype(key, typ, new_params.cmap_types)
+        for key, typ in iteritems(params.nbfix_types):
+            copy_paramtype(key, typ, new_params.nbfix_types)
+
+        return new_params
+
+    @classmethod
+    def from_structure(cls, struct):
+        """ Extracts known parameters from a Structure instance
+
+        Parameters
+        ----------
+        struct : :class:`parmed.structure.Structure`
+            The parametrized ``Structure`` instance from which to extract
+            parameters into a ParameterSet
+
+        Returns
+        -------
+        params : :class:`ParameterSet`
+            The parameter set with all parameters defined in the Structure
+
+        Notes
+        -----
+        The parameters here are copies of the ones in the Structure, so
+        modifying the generated ParameterSet will have no effect on ``struct``.
+        Furthermore, the *first* occurrence of each parameter will be used. If
+        future ones differ, they will be silently ignored, since this is
+        expected behavior in some instances (like with Gromacs topologies in the
+        ff99sb-ildn force field).
+
+        Dihedrals are a little trickier. They can be multi-term, which can be
+        represented either as a *single* entry in dihedrals with a type of
+        DihedralTypeList or multiple entries in dihedrals with a DihedralType
+        parameter type. In this case, the parameter is constructed from either
+        the first DihedralTypeList found or the first DihedralType of each
+        periodicity found if no matching DihedralTypeList is found.
+        """
+        return cls.from_parameterset(
+                ParameterSet.from_structure(struct,
+                                            allow_unequal_duplicates=False)
+        )
 
     @classmethod
     def load_set(cls, tfile=None, pfile=None, sfiles=None):
@@ -234,16 +364,16 @@ class CharmmParameterSet(ParameterSet):
                 parameterset = line.strip()[1:78]
                 continue
             # Set section if this is a section header
-            if line.startswith('ATOMS'):
+            if line.startswith('ATOM'):
                 section = 'ATOMS'
                 continue
-            if line.startswith('BONDS'):
+            if line.startswith('BOND'):
                 section = 'BONDS'
                 continue
-            if line.startswith('ANGLES'):
+            if line.startswith('ANGLE'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRALS'):
+            if line.startswith('DIHEDRAL'):
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER'):
@@ -424,18 +554,28 @@ class CharmmParameterSet(ParameterSet):
                 except IndexError:
                     raise CharmmError('Could not parse dihedrals.')
                 # If we have a 7th column, that is the real psi0 (and the 6th
-                # is just a dummy 0)
+                # is the multiplicity, which will indicate this is a periodic
+                # improper torsion (so it needs to be added to the
+                # improper_periodic_types list)
                 try:
                     tmp = conv(words[6], float, 'improper equil. value')
-                    theteq = tmp
                 except IndexError:
-                    pass # Do nothing
-                # Improper types seem not to have the central atom defined in
-                # the first place, so just have the key a fully sorted list. We
-                # still depend on the PSF having properly ordered improper atoms
+                    per = 0
+                else:
+                    per = int(theteq)
+                    theteq = tmp
+                # Improper types seem not to always have the central atom
+                # defined in the first place, so just have the key a fully
+                # sorted list. We still depend on the PSF having properly
+                # ordered improper atoms
                 key = tuple(sorted([type1, type2, type3, type4]))
-                improp = ImproperType(k, theteq)
-                self.improper_types[key] = improp
+                if per == 0:
+                    improp = ImproperType(k, theteq)
+                    self.improper_types[key] = improp
+                else:
+                    improp = DihedralType(k, per, theteq)
+                    self.improper_periodic_types[key] = improp
+                    improp.improper = True
                 improp.penalty = penalty
                 continue
             if section == 'CMAP':
@@ -792,6 +932,197 @@ class CharmmParameterSet(ParameterSet):
                 # This is a Parameter file section
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
+
+    def write(self, top=None, par=None, str=None):
+        """ Write a CHARMM parameter set to a file
+
+        Parameters
+        ----------
+        top : str or file-like object, optional
+            If provided, the atom types will be written to this file in RTF
+            format.
+        par : str or file-like object, optional
+            If provided, the parameters will be written to this file in PAR
+            format. Either this or the ``str`` argument *must* be provided
+        str : str or file-like object, optional
+            If provided, the atom types and parameters will be written to this
+            file as separate RTF and PAR cards that can be read as a CHARMM
+            stream file. Either this or the ``par`` argument *must* be provided
+
+        Raises
+        ------
+        ValueError if both par and str are None
+        """
+        if par is None and str is None:
+            raise ValueError('Must specify either par *or* str')
+
+        if top is not None:
+            if isinstance(top, string_types):
+                f = genopen(top, 'w')
+                ownhandle = True
+            else:
+                f = top
+                ownhandle = False
+            f.write('*>>>> CHARMM Topology file generated by ParmEd <<<<\n')
+            f.write('*\n')
+            self._write_top_to(f, True)
+            if ownhandle: f.close()
+        if par is not None:
+            if isinstance(par, string_types):
+                f = genopen(par, 'w')
+                ownhandle = True
+            else:
+                f = par
+                ownhandle = False
+            f.write('*>>>> CHARMM Parameter file generated by ParmEd <<<<\n')
+            f.write('*\n\n')
+            self._write_par_to(f)
+            if ownhandle: f.close()
+        if str is not None:
+            if isinstance(str, string_types):
+                f = genopen(str, 'w')
+                ownhandle = True
+            else:
+                f = str
+                ownhandle = False
+            self._write_str_to(f)
+            if ownhandle: f.close()
+
+    def _write_str_to(self, f):
+        """ Private method to write stream items to open file object """
+        f.write('read rtf card @app\n* Topology generated by ParmEd\n*\n')
+        self._write_top_to(f, True)
+        f.write('\nread para card @app\n* Parameters generated by ParmEd\n*\n')
+        self._write_par_to(f)
+
+    def _write_top_to(self, f, write_version):
+        """ Private method to write topology items to open file object """
+        if write_version:
+            # This version is known to work
+            f.write('36   1\n')
+            f.write('\n')
+        for i, (_, atom) in enumerate(iteritems(self.atom_types)):
+            f.write('MASS %5d %-6s %9.5f\n' % (i+1, atom.name, atom.mass))
+        if write_version:
+            f.write('\nEND\n')
+
+    def _write_par_to(self, f):
+        """ Private method to write parameter items to open file object """
+        # Find out what the 1-4 electrostatic scaling factors and the 1-4
+        # van der Waals scaling factors are
+        scee, scnb = set(), set()
+        for _, typ in iteritems(self.dihedral_types):
+            if isinstance(typ, DihedralTypeList):
+                for t in typ:
+                    if t.scee: scee.add(t.scee)
+                    if t.scnb: scnb.add(t.scnb)
+            else:
+                if t.scee: scee.add(t.scee)
+                if t.scnb: scnb.add(t.scnb)
+        if len(scee) > 1 or len(scnb) > 1:
+            raise ValueError('Mixed 1-4 scaling not supported in CHARMM')
+        if scee:
+            scee = scee.pop()
+        else:
+            scee = 1.0
+        if scnb:
+            scnb = scnb.pop()
+        else:
+            scnb = 1.0
+
+        f.write('ATOMS\n')
+        self._write_top_to(f, False)
+        f.write('\nBONDS\n')
+        written = set()
+        for key, typ in iteritems(self.bond_types):
+            if key in written: continue
+            written.add(key); written.add(tuple(reversed(key)))
+            f.write('%-6s %-6s %7.2f %10.4f\n' %
+                    (key[0], key[1], typ.k, typ.req))
+        f.write('\nANGLES\n')
+        written = set()
+        for key, typ in iteritems(self.angle_types):
+            if key in written: continue
+            written.add(key); written.add(tuple(reversed(key)))
+            f.write('%-6s %-6s %-6s %7.2f %8.2f\n' %
+                    (key[0], key[1], key[2], typ.k, typ.theteq))
+        f.write('\nDIHEDRALS\n')
+        written = set()
+        for key, typ in iteritems(self.dihedral_types):
+            if key in written: continue
+            written.add(key); written.add(tuple(reversed(key)))
+            if isinstance(typ, DihedralTypeList):
+                for t in typ:
+                    f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                            (key[0], key[1], key[2], key[3], t.phi_k,
+                             int(t.per), t.phase))
+            else:
+                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                        (key[0], key[1], key[2], key[3], typ.phi_k,
+                         int(typ.per), typ.phase))
+        f.write('\nIMPROPERS\n')
+        written = set()
+        for key, typ in iteritems(self.improper_periodic_types):
+            sortkey = tuple(sorted(key))
+            if sortkey in written: continue
+            written.add(sortkey)
+            if isinstance(typ, DihedralTypeList):
+                for t in typ:
+                    if key[2] == 'X':
+                        key = (key[0], key[2], key[3], key[1])
+                    elif key[3] == 'X':
+                        key = (key[0], key[3], key[1], key[2])
+                    f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                            (key[0], key[1], key[2], key[3], t.phi_k,
+                             int(t.per), t.phase))
+            else:
+                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                        (key[0], key[1], key[2], key[3], typ.phi_k,
+                         int(typ.per), typ.phase))
+        for key, typ in iteritems(self.improper_types):
+            if key[2] == 'X':
+                key = (key[0], key[2], key[3], key[1])
+            elif key[3] == 'X':
+                key = (key[0], key[3], key[1], key[2])
+            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                    (key[0], key[1], key[2], key[3], typ.psi_k,
+                     0, typ.psi_eq))
+        if self.cmap_types:
+            f.write('\nCMAPS\n')
+            written = set()
+            for key, typ in iteritems(self.cmap_types):
+                if key in written: continue
+                written.add(key); written.add(tuple(reversed(key)))
+                f.write('%-6s %-6s %-6s %-6s %-6s %-6s %-6s %-6s %5d\n\n' %
+                        (key[0], key[1], key[2], key[3], key[4], key[5], key[6],
+                         key[7], typ.resolution))
+                resm1 = typ.resolution - 1
+                res = typ.resolution
+                i = 0
+                for val in typ.grid:
+                    if i:
+                        if i % 5 == 0:
+                            f.write('\n')
+                            if i % typ.resolution == 0:
+                                f.write('\n')
+                                i = 0
+                        elif i % typ.resolution == 0:
+                            f.write('\n\n')
+                            i = 0
+                    i += 1
+                    f.write(' %13.6f' % val)
+                f.write('\n\n\n')
+        f.write('NONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance '
+                'vfswitch -\ncutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 '
+                'e14fac %s wmin 1.5\n\n' % scee)
+        for key, typ in iteritems(self.atom_types):
+            f.write('%-6s %14.6f %10.6f %14.6f' % (key, 0.0, -abs(typ.epsilon),
+                    typ.rmin))
+            if typ.epsilon == typ.epsilon_14 and typ.rmin == typ.rmin_14:
+                f.write('%10.6f %14.6f\n' % (-abs(typ.epsilon)/scnb, typ.rmin))
+            else:
+                f.write('%10.6f %14.6f\n' % (-abs(typ.epsilon_14), typ.rmin_14))
+        f.write('\nEND\n')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

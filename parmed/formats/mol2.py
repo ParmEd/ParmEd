@@ -7,7 +7,7 @@ from __future__ import print_function, division, absolute_import
 import copy
 from parmed.exceptions import Mol2Error
 from parmed.formats.registry import FileFormatType
-from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
+from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond

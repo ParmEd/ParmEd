@@ -61,11 +61,11 @@ def LoadParm(parmname, xyz=None, box=None, rst7_name=None):
     from parmed.constants import IFBOX
     parm = AmberFormat(parmname)
     if 'CTITLE' in parm.flag_list:
-        parm = parm.view(ChamberParm)
+        parm = parm.view_as(ChamberParm)
     elif 'AMOEBA_FORCEFIELD' in parm.flag_list:
-        parm = parm.view(AmoebaParm)
+        parm = parm.view_as(AmoebaParm)
     else:
-        parm = parm.view(AmberParm)
+        parm = parm.view_as(AmberParm)
 
     # Now read the coordinate file if applicable
     if xyz is None and rst7_name is not None:

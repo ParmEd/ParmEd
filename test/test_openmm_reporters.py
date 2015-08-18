@@ -8,7 +8,6 @@ try:
     import simtk.openmm as mm
     from simtk.openmm import app
     has_openmm = True
-    Reference = mm.Platform.getPlatformByName('Reference')
     CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
     has_openmm = False
@@ -259,7 +258,7 @@ class TestTrajRestartReporter(utils.FileIOTestCase):
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_solv.topology, system, integrator, Reference)
+        sim = app.Simulation(amber_solv.topology, system, integrator, CPU)
         sim.context.setPositions(amber_solv.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj.nc', written=True), 1,
