@@ -106,6 +106,9 @@ class PDBFile(object):
                     'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL', 'MODEL ',
                     'TER   ', 'TER', 'JRNL  ', 'REMARK'):
                 continue
+            # Hack to support reduce-added flags
+            elif line[:6] == 'USER  ' and line[6:9] == 'MOD':
+                continue
             return False
         return True
 
