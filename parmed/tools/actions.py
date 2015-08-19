@@ -472,6 +472,8 @@ class writeCoordinates(Action):
                 self.filetype)
 
     def execute(self):
+        if not Action.overwrite and os.path.exists(self.filename):
+            raise FileExists('%s exists; not overwriting' % self.filename)
         coordinates = []
         velocities = []
         for atom in self.parm.atoms:
@@ -3870,18 +3872,15 @@ class chamber(Action):
 
 class minimize(Action):
     """
-    This action takes a structure and minimizes the energy using OpenMM.
+    This action takes a structure and minimizes the energy using either
+    scipy.optimize.minimize (with BFGS) and the sander API *or* OpenMM.
     Following this action, the coordinates stored in the topology will be the
     minimized structure
 
     General Options
     ---------------
+        - omm                 Use OpenMM instead of sander+scipy to minimize
         - cutoff <cutoff>     Nonbonded cutoff in Angstroms
-        - restrain <mask>     Selection of atoms to restrain
-        - weight <k>          Weight of positional restraints (kcal/mol/A^2)
-        - norun               Do not run the calculation
-        - script <script>     Name of the Python script to write to run this
-                              calculation
         - tol <tolerance>     The largest energy difference between successive
                               steps in the minimization allow the minimization
                               to stop (Default 0.001)
@@ -3895,16 +3894,33 @@ class minimize(Action):
                               Amber models)
         - saltcon <conc>      Salt concentration for GB in Molarity
 
+    OpenMM-specific options
+    -----------------------
+        - restrain <mask>     Selection of atoms to restrain
+        - weight <k>          Weight of positional restraints (kcal/mol/A^2)
+        - norun               Do not run the calculation
+        - script <script>     Name of the Python script to write to run this
+                              calculation
+        - platform <platform> Which compute platform to use. Options are CUDA,
+                              OpenCL, CPU, and Reference. Consult OpenMM docs
+                              for more information
+        - precision <precision_model> Which precision model to use. Can be
+                              "single", "double", or "mixed", and only has an
+                              effect on the CUDA and OpenCL platforms.
+
     The implicit solvent options will be ignored for systems with periodic
-    boundary conditions
+    boundary conditions. The precision option will be ignored for platforms that
+    do not support user-specified precision. The platform, precision, and script
+    arguments will be ignored unless ``omm`` is specified.
     """
     usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] [[restrain <mask>] '
              '[weight <k>]] [norun] [script <script_file.py>] [platform '
              '<platform>] [precision <precision model>] [tol <tolerance>] '
-             '[maxcyc <cycles>]')
+             '[maxcyc <cycles>] [omm]')
     not_supported = (AmoebaParm,)
 
     def init(self, arg_list):
+        self.use_openmm = arg_list.has_key('omm')
         self.cutoff = arg_list.get_key_float('cutoff', None)
         mask = arg_list.get_key_mask('restrain', None)
         self.igb = arg_list.get_key_int('igb', 0)
@@ -3928,6 +3944,8 @@ class minimize(Action):
             raise InputError('Salt concentration must be non-negative')
         if mask is not None:
             self.restrain = AmberMask(self.parm, mask)
+            if not self.use_openmm:
+                raise InputError('Restraints only permitted with omm option')
             if self.weight <= 0:
                 raise InputError('Restraints require a restraint stiffness '
                                  'larger than 0 kcal/mol/A^2')
@@ -3947,6 +3965,9 @@ class minimize(Action):
             raise InputError('tolerance must be positive')
         if self.tol == 0 and self.maxcyc is None:
             raise InputError('tolerance must be > 0 if maxcyc is not set.')
+        if self.norun and not self.use_openmm:
+            raise InputError('norun only makes sense with the script and omm '
+                             'options')
 
     def __str__(self):
         retstr = 'Minimizing %s ' % self.parm
@@ -3977,15 +3998,17 @@ class minimize(Action):
         return retstr.strip()
 
     def execute(self):
-        from parmed.tools.simulations.openmm import minimize, HAS_OPENMM
-        if not HAS_OPENMM:
-            raise SimulationError('OpenMM could not be imported. Skipping.')
-
+        from parmed.tools.simulations.openmm import minimize as omm_min
+        from parmed.tools.simulations.sanderapi import minimize as san_min
         if self.parm.coordinates is None:
             raise SimulationError('You must load coordinates before "minimize"')
-        minimize(self.parm, self.igb, self.saltcon, self.cutoff,
-                 self.restrain, self.weight, self.script, self.platform,
-                 self.precision, self.norun, self.tol, self.maxcyc)
+        if self.use_openmm:
+            omm_min(self.parm, self.igb, self.saltcon, self.cutoff,
+                    self.restrain, self.weight, self.script, self.platform,
+                    self.precision, self.norun, self.tol, self.maxcyc)
+        else:
+            san_min(self.parm, self.igb, self.saltcon, self.cutoff, self.tol,
+                    self.maxcyc)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
