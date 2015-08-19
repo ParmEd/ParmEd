@@ -884,5 +884,16 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
+    def testOverwrite(self):
+        """ Test overwrite option of Structure.save """
+        open(get_fn('test.pdb', written=True), 'w').close()
+        self.assertRaises(IOError, lambda:
+                self.sys1.save(get_fn('test.pdb', written=True))
+        )
+        # Should not raise
+        self.sys1.save(get_fn('test.pdb', written=True), overwrite=True)
+        pdb = pmd.load_file(get_fn('test.pdb', written=True))
+        self.assertEqual(len(pdb.atoms), len(self.sys1.atoms))
+
 if __name__ == '__main__':
     unittest.main()
