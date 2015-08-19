@@ -154,9 +154,14 @@ class TestFileLoader(unittest.TestCase):
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberMdcrd)
-        crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
-                                hasbox=True)
-        self.assertIsInstance(crd, amber.NetCDFTraj)
+        if amber.HAS_NETCDF:
+            crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
+                                    hasbox=True)
+            self.assertIsInstance(crd, amber.NetCDFTraj)
+        else:
+            crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
+                                    hasbox=True)
+            self.assertIsInstance(crd, amber.AmberParm)
 
 class TestChemistryPDBStructure(FileIOTestCase):
     
