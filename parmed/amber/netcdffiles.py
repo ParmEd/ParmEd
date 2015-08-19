@@ -63,7 +63,8 @@ except ImportError:
 
 try:
     from scipy.io.netcdf import netcdf_file as spNetCDFFile
-    spopen_netcdf = lambda name, mode: spNetCDFFile(name, mode)
+    spopen_netcdf = lambda name, mode: \
+            spNetCDFFile(name, mode, mmap=False, version=2)
     spget_int_dimension = lambda obj, name: obj.dimensions[name]
     spget_float = lambda obj, name: obj.variables[name].getValue()
     _HAS_SCIPY_NETCDF = True
