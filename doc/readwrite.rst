@@ -79,9 +79,13 @@ To facilitate the required conversion and file writing, the base
 :class:`Structure <parmed.structure.Structure>` class has a ``save`` method that
 will convert to the requested file format and write the output file. The desired
 format is specified either explicitly or by file name extension (with explicit
-format specifications taking precedence).  The supported file formats, along
-with their supported extra keyword arguments, are detailed in the following
-table.
+format specifications taking precedence).  Because :meth:`Structure.save
+<parmed.structure.Structure.save>` is a convenience method, it will protect
+against accidentally overwriting an existing file. The ``overwrite`` argument,
+when set to ``True``, will allow an existing file to be overwritten. If set to
+``False`` (or left at its default), ``IOError`` will be raised when attempting
+to overwrite an existing file. The supported file formats, along with their
+supported extra keyword arguments, are detailed in the following table.
 
 +--------------+-------------------------+----------------+--------------------------+
 | File type    | Recognized extension(s) | Format keyword | Supported arguments      |
@@ -104,6 +108,12 @@ table.
 | Mol2         | ``.mol2``               | ``mol2``       | ``split``                |
 +--------------+-------------------------+----------------+--------------------------+
 | Mol3         | ``.mol3``               | ``mol3``       | ``split``                |
++--------------+-------------------------+----------------+--------------------------+
+| Amber ASCII  | ``.rst7``, ``.inpcrd``, | ``rst7``       | ``title``, ``time``      |
+| coordinates  | ``.restrt``             |                |                          |
++--------------+-------------------------+----------------+--------------------------+
+| Amber NetCDF | ``.ncrst``              | ``ncrst``      | ``title``, ``time``      |
+| restart      |                         |                |                          |
 +--------------+-------------------------+----------------+--------------------------+
 \* PDB format only
 
@@ -150,6 +160,10 @@ Keywords
   mol3 entries in the same file (like the ZINC database, for example). If
   ``False``, all residues will be part of the same mol2 or mol3 entry. Default
   is ``False``.
+* ``title`` -- Purely cosmetic, it will specify the title that will be written
+  to the coordinate files
+* ``time`` -- Also cosmetic, this is the time corresponding to the snapshot that
+  will be written to the coordinate files
 
 Examples
 --------
