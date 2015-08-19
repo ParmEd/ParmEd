@@ -137,18 +137,32 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         f.close()
         # Look for natom
         try:
-            int(lines[1].split()[0])
+            natom = int(lines[1].split()[0])
         except (ValueError, IndexError):
             return False
-        # Next 3 lines, make sure we have %12.7f format
+        # Next 3 lines, make sure we have %12.7f format. This only works if we
+        # have at least 6 atoms. Any fewer than that means the restart file is
+        # shorter than that.
         try:
-            for i in range(3):
-                i += 2
-                for j in range(6):
+            if natom <= 0:
+                return False
+            i = 0
+            for line in lines[2:]:
+                i += 1
+                if i > natom: break
+                for j in range(3):
                     j12 = j * 12
-                    if lines[i][j12+4] != '.': return False
-                    float(lines[i][j12:j12+12])
-                    if lines[i][j12+11] not in '0123456789':
+                    if line[j12+4] != '.': return False
+                    float(line[j12:j12+12])
+                    if line[j12+11] not in '0123456789':
+                        return False
+                i += 1
+                if i > natom: break
+                for j in range(3):
+                    j12 = j * 12 + 36
+                    if line[j12+4] != '.': return False
+                    float(line[j12:j12+12])
+                    if line[j12+11] not in '0123456789':
                         return False
         except (IndexError, ValueError):
             return False
