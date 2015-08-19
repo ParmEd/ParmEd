@@ -895,19 +895,23 @@ class TestStructureSave(FileIOTestCase):
         self.sys3.save(f3)
         self.sys1.save(f4, format='rst7')
 
-        self.assertTrue(amber.AmberAsciiRestart.id_format(f1))
-        self.assertTrue(amber.AmberAsciiRestart.id_format(f2))
-        self.assertTrue(amber.AmberAsciiRestart.id_format(f3))
-        self.assertTrue(amber.AmberAsciiRestart.id_format(f4))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f1))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f2))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f3))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f4))
 
         np.testing.assert_allclose(self.sys1.coordinates,
-                                   pmd.load_file(f1).coordinates[0])
+                                   pmd.load_file(f1).coordinates[0],
+                                   atol=1e-6)
         np.testing.assert_allclose(self.sys2.coordinates,
-                                   pmd.load_file(f2).coordinates[0])
+                                   pmd.load_file(f2).coordinates[0],
+                                   atol=1e-6)
         np.testing.assert_allclose(self.sys3.coordinates,
-                                   pmd.load_file(f3).coordinates[0])
+                                   pmd.load_file(f3).coordinates[0],
+                                   atol=1e-6)
         np.testing.assert_allclose(self.sys1.coordinates,
-                                   pmd.load_file(f4).coordinates[0])
+                                   pmd.load_file(f4).coordinates[0],
+                                   atol=1e-6)
 
     def testSaveNCRst7(self):
         """ Test saving various Structure instances as Amber NetCDF restarts """
@@ -918,9 +922,9 @@ class TestStructureSave(FileIOTestCase):
         self.sys2.save(f2)
         self.sys3.save(f3, format='ncrst')
 
-        self.assertTrue(amber.NetCDFRestart.id_format(f1))
-        self.assertTrue(amber.NetCDFRestart.id_format(f2))
-        self.assertTrue(amber.NetCDFRestart.id_format(f3))
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(f1))
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(f2))
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(f3))
 
         np.testing.assert_allclose(self.sys1.coordinates,
                                    pmd.load_file(f1).coordinates[0])
@@ -928,8 +932,6 @@ class TestStructureSave(FileIOTestCase):
                                    pmd.load_file(f2).coordinates[0])
         np.testing.assert_allclose(self.sys3.coordinates,
                                    pmd.load_file(f3).coordinates[0])
-        np.testing.assert_allclose(self.sys1.coordinates,
-                                   pmd.load_file(f4).coordinates[0])
 
     def testOverwrite(self):
         """ Test overwrite option of Structure.save """
