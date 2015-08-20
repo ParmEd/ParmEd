@@ -2149,6 +2149,8 @@ class printLJMatrix(Action):
         return self.__repr__()
 
     def __repr__(self):
+        has_1264 = (hasattr(self.parm, 'parm_data') and
+                    'LENNARD_JONES_CCOEF' in self.parm.parm_data)
         ntypes = self.parm.ptr('NTYPES')
         ret_str = []
         if self.idx is not None:
@@ -2175,9 +2177,15 @@ class printLJMatrix(Action):
         for i, names in enumerate(typenames):
             typenames[i] = ','.join(sorted(list(names))) + ' [%d]' % (i+1)
             maxlen = max(maxlen, len(typenames[i]))
-        fmt = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
-        ret_str.append(fmt % ('Atom Type 1', 'Atom Type 2', 'A coefficient',
-                              'B coefficient', 'R i,j', 'Eps i,j'))
+        if has_1264:
+            fmt = '\n%%%ds %%%ds %%15s %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
+            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient',
+                    'B coefficient', 'C coefficient', 'R i,j', 'Eps i,j')
+        else:
+            fmt = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
+            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient',
+                    'B coefficient', 'R i,j', 'Eps i,j')
+        ret_str.append(fmt % args)
         ret_str.extend(['\n','-'*len(ret_str[-1]), '\n'])
         for ty in sel_types:
             for ty2 in range(1,ntypes+1):
@@ -2186,12 +2194,21 @@ class printLJMatrix(Action):
                             ntypes*(type1-1)+type2-1]
                 acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
                 bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
+                if has_1264:
+                    ccoef = self.parm.parm_data['LENNARD_JONES_CCOEF'][idx-1]
                 if bcoef == 0 or acoef == 0:
                     rij = eij = 0.0
                 else:
                     rij = (2 * acoef / bcoef) ** (1 / 6)
                     eij = (bcoef * bcoef / (4 * acoef))
-                ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
+                if has_1264:
+                    ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%15.6f %%10.6f %%10.6f\n' %
+                            (maxlen, maxlen) %
+                            (typenames[type1-1], typenames[type2-1],
+                             acoef, bcoef, ccoef, rij, eij)
+                )
+                else:
+                    ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
                             (maxlen, maxlen) %
                             (typenames[type1-1], typenames[type2-1],
                              acoef, bcoef, rij, eij)
