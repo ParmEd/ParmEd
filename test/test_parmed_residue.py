@@ -3,11 +3,8 @@ Tests the functionality in parmed.residue
 """
 
 import utils
-import parmed as pmd
 from parmed import residue
 import unittest
-
-get_fn = utils.get_fn
 
 class TestChemistryResidue(unittest.TestCase):
 
@@ -130,26 +127,6 @@ class TestNucleicAcidResidues(unittest.TestCase):
         self.assertTrue(residue.DNAResidue.has('DG5'))
         self.assertTrue(residue.DNAResidue.has('DG3'))
         self.assertFalse(residue.RNAResidue.has('G4'))
-
-class TestSlice(unittest.TestCase):
-
-    def testSliceFromArrayLike(self):
-        """ Tests slicing Residue by a tuple/list"""
-        residue = pmd.load_file(get_fn('aminont12.lib'))['NALA']
-
-        names = ['CA', 'CB', 'C', 'N']
-        for op in [list, tuple]:
-            atomlist = residue[op(names)]
-            self.assertTrue(len(names) == len(atomlist))
-            for atom in atomlist:
-                self.assertTrue(atom.name == residue[atom.name].name)
-
-        indices = [0, 4, 7, 3]
-        for op in [list, tuple]:
-            atomlist = residue[op(indices)]
-            self.assertTrue(len(indices) == len(atomlist))
-            for atom in atomlist:
-                self.assertTrue(atom.name == residue[atom.name].name)
 
 if __name__ == '__main__':
     unittest.main()

@@ -10,6 +10,7 @@ try:
 except ImportError:
     pd = None
 import os
+import parmed as pmd
 from parmed import Atom, read_PDB
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
@@ -1040,6 +1041,27 @@ quit
             self.assertEqual(set1, set2)
             # Check residue properties
             self.assertEqual(a1.residue.name, a2.residue.name)
+
+class TestSlice(unittest.TestCase):
+    '''Test slicing ResidueTemplate'''
+
+    def testSliceFromArrayLike(self):
+        """ Tests slicing by a tuple/list"""
+        residue = pmd.load_file(get_fn('aminont12.lib'))['NALA']
+
+        names = ['CA', 'CB', 'C', 'N']
+        for op in [list, tuple]:
+            atomlist = residue[op(names)]
+            self.assertTrue(len(names) == len(atomlist))
+            for atom in atomlist:
+                self.assertTrue(atom.name == residue[atom.name].name)
+
+        indices = [0, 4, 7, 3]
+        for op in [list, tuple]:
+            atomlist = residue[op(indices)]
+            self.assertTrue(len(indices) == len(atomlist))
+            for atom in atomlist:
+                self.assertTrue(atom.name == residue[atom.name].name)
 
 if __name__ == '__main__':
     unittest.main()
