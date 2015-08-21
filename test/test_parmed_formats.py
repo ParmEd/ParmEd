@@ -149,6 +149,20 @@ class TestFileLoader(unittest.TestCase):
         self.assertIsInstance(mol2, Structure)
         pdb = formats.load_file(get_fn('4lzt.pdb'), structure=True)
 
+    def testNatomHasboxKeyword(self):
+        """ Tests that the hasbox/natom arguments are special-cased in load_file """
+        crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
+                                hasbox=True)
+        self.assertIsInstance(crd, amber.AmberMdcrd)
+        if amber.HAS_NETCDF:
+            crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
+                                    hasbox=True)
+            self.assertIsInstance(crd, amber.NetCDFTraj)
+        else:
+            crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
+                                    hasbox=True)
+            self.assertIsInstance(crd, amber.AmberParm)
+
 class TestChemistryPDBStructure(FileIOTestCase):
     
     def setUp(self):

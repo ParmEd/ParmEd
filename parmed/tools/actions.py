@@ -472,6 +472,8 @@ class writeCoordinates(Action):
                 self.filetype)
 
     def execute(self):
+        if not Action.overwrite and os.path.exists(self.filename):
+            raise FileExists('%s exists; not overwriting' % self.filename)
         coordinates = []
         velocities = []
         for atom in self.parm.atoms:
@@ -2147,6 +2149,8 @@ class printLJMatrix(Action):
         return self.__repr__()
 
     def __repr__(self):
+        has_1264 = (hasattr(self.parm, 'parm_data') and
+                    'LENNARD_JONES_CCOEF' in self.parm.parm_data)
         ntypes = self.parm.ptr('NTYPES')
         ret_str = []
         if self.idx is not None:
@@ -2173,9 +2177,15 @@ class printLJMatrix(Action):
         for i, names in enumerate(typenames):
             typenames[i] = ','.join(sorted(list(names))) + ' [%d]' % (i+1)
             maxlen = max(maxlen, len(typenames[i]))
-        fmt = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
-        ret_str.append(fmt % ('Atom Type 1', 'Atom Type 2', 'A coefficient',
-                              'B coefficient', 'R i,j', 'Eps i,j'))
+        if has_1264:
+            fmt = '\n%%%ds %%%ds %%15s %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
+            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient',
+                    'B coefficient', 'C coefficient', 'R i,j', 'Eps i,j')
+        else:
+            fmt = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
+            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient',
+                    'B coefficient', 'R i,j', 'Eps i,j')
+        ret_str.append(fmt % args)
         ret_str.extend(['\n','-'*len(ret_str[-1]), '\n'])
         for ty in sel_types:
             for ty2 in range(1,ntypes+1):
@@ -2184,12 +2194,21 @@ class printLJMatrix(Action):
                             ntypes*(type1-1)+type2-1]
                 acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
                 bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
+                if has_1264:
+                    ccoef = self.parm.parm_data['LENNARD_JONES_CCOEF'][idx-1]
                 if bcoef == 0 or acoef == 0:
                     rij = eij = 0.0
                 else:
                     rij = (2 * acoef / bcoef) ** (1 / 6)
                     eij = (bcoef * bcoef / (4 * acoef))
-                ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
+                if has_1264:
+                    ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%15.6f %%10.6f %%10.6f\n' %
+                            (maxlen, maxlen) %
+                            (typenames[type1-1], typenames[type2-1],
+                             acoef, bcoef, ccoef, rij, eij)
+                )
+                else:
+                    ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
                             (maxlen, maxlen) %
                             (typenames[type1-1], typenames[type2-1],
                              acoef, bcoef, rij, eij)
@@ -3870,18 +3889,15 @@ class chamber(Action):
 
 class minimize(Action):
     """
-    This action takes a structure and minimizes the energy using OpenMM.
+    This action takes a structure and minimizes the energy using either
+    scipy.optimize.minimize (with BFGS) and the sander API *or* OpenMM.
     Following this action, the coordinates stored in the topology will be the
     minimized structure
 
     General Options
     ---------------
+        - omm                 Use OpenMM instead of sander+scipy to minimize
         - cutoff <cutoff>     Nonbonded cutoff in Angstroms
-        - restrain <mask>     Selection of atoms to restrain
-        - weight <k>          Weight of positional restraints (kcal/mol/A^2)
-        - norun               Do not run the calculation
-        - script <script>     Name of the Python script to write to run this
-                              calculation
         - tol <tolerance>     The largest energy difference between successive
                               steps in the minimization allow the minimization
                               to stop (Default 0.001)
@@ -3895,16 +3911,33 @@ class minimize(Action):
                               Amber models)
         - saltcon <conc>      Salt concentration for GB in Molarity
 
+    OpenMM-specific options
+    -----------------------
+        - restrain <mask>     Selection of atoms to restrain
+        - weight <k>          Weight of positional restraints (kcal/mol/A^2)
+        - norun               Do not run the calculation
+        - script <script>     Name of the Python script to write to run this
+                              calculation
+        - platform <platform> Which compute platform to use. Options are CUDA,
+                              OpenCL, CPU, and Reference. Consult OpenMM docs
+                              for more information
+        - precision <precision_model> Which precision model to use. Can be
+                              "single", "double", or "mixed", and only has an
+                              effect on the CUDA and OpenCL platforms.
+
     The implicit solvent options will be ignored for systems with periodic
-    boundary conditions
+    boundary conditions. The precision option will be ignored for platforms that
+    do not support user-specified precision. The platform, precision, and script
+    arguments will be ignored unless ``omm`` is specified.
     """
     usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] [[restrain <mask>] '
              '[weight <k>]] [norun] [script <script_file.py>] [platform '
              '<platform>] [precision <precision model>] [tol <tolerance>] '
-             '[maxcyc <cycles>]')
+             '[maxcyc <cycles>] [omm]')
     not_supported = (AmoebaParm,)
 
     def init(self, arg_list):
+        self.use_openmm = arg_list.has_key('omm')
         self.cutoff = arg_list.get_key_float('cutoff', None)
         mask = arg_list.get_key_mask('restrain', None)
         self.igb = arg_list.get_key_int('igb', 0)
@@ -3928,6 +3961,8 @@ class minimize(Action):
             raise InputError('Salt concentration must be non-negative')
         if mask is not None:
             self.restrain = AmberMask(self.parm, mask)
+            if not self.use_openmm:
+                raise InputError('Restraints only permitted with omm option')
             if self.weight <= 0:
                 raise InputError('Restraints require a restraint stiffness '
                                  'larger than 0 kcal/mol/A^2')
@@ -3947,6 +3982,9 @@ class minimize(Action):
             raise InputError('tolerance must be positive')
         if self.tol == 0 and self.maxcyc is None:
             raise InputError('tolerance must be > 0 if maxcyc is not set.')
+        if self.norun and not self.use_openmm:
+            raise InputError('norun only makes sense with the script and omm '
+                             'options')
 
     def __str__(self):
         retstr = 'Minimizing %s ' % self.parm
@@ -3977,15 +4015,17 @@ class minimize(Action):
         return retstr.strip()
 
     def execute(self):
-        from parmed.tools.simulations.openmm import minimize, HAS_OPENMM
-        if not HAS_OPENMM:
-            raise SimulationError('OpenMM could not be imported. Skipping.')
-
+        from parmed.tools.simulations.openmm import minimize as omm_min
+        from parmed.tools.simulations.sanderapi import minimize as san_min
         if self.parm.coordinates is None:
             raise SimulationError('You must load coordinates before "minimize"')
-        minimize(self.parm, self.igb, self.saltcon, self.cutoff,
-                 self.restrain, self.weight, self.script, self.platform,
-                 self.precision, self.norun, self.tol, self.maxcyc)
+        if self.use_openmm:
+            omm_min(self.parm, self.igb, self.saltcon, self.cutoff,
+                    self.restrain, self.weight, self.script, self.platform,
+                    self.precision, self.norun, self.tol, self.maxcyc)
+        else:
+            san_min(self.parm, self.igb, self.saltcon, self.cutoff, self.tol,
+                    self.maxcyc)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

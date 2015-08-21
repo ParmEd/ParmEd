@@ -884,5 +884,66 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
+    def testSaveRst7(self):
+        """ Test saving various Structure instances as Amber ASCII restarts """
+        f1 = get_fn('test.rst7', written=True)
+        f2 = get_fn('test1.restrt', written=True)
+        f3 = get_fn('test2.inpcrd', written=True)
+        f4 = get_fn('test3.amberrst', written=True)
+        self.sys1.save(f1)
+        self.sys2.save(f2)
+        self.sys3.save(f3)
+        self.sys1.save(f4, format='rst7')
+
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f1))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f2))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f3))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f4))
+
+        np.testing.assert_allclose(self.sys1.coordinates,
+                                   pmd.load_file(f1).coordinates[0],
+                                   atol=1e-6)
+        np.testing.assert_allclose(self.sys2.coordinates,
+                                   pmd.load_file(f2).coordinates[0],
+                                   atol=1e-6)
+        np.testing.assert_allclose(self.sys3.coordinates,
+                                   pmd.load_file(f3).coordinates[0],
+                                   atol=1e-6)
+        np.testing.assert_allclose(self.sys1.coordinates,
+                                   pmd.load_file(f4).coordinates[0],
+                                   atol=1e-6)
+
+    @unittest.skipIf(not pmd.amber.HAS_NETCDF, 'Cannot test without NetCDF package')
+    def testSaveNCRst7(self):
+        """ Test saving various Structure instances as Amber NetCDF restarts """
+        f1 = get_fn('test.ncrst', written=True)
+        f2 = get_fn('test1.ncrst', written=True)
+        f3 = get_fn('test2.ncrestart', written=True)
+        self.sys1.save(f1)
+        self.sys2.save(f2)
+        self.sys3.save(f3, format='ncrst')
+
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(f1))
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(f2))
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(f3))
+
+        np.testing.assert_allclose(self.sys1.coordinates,
+                                   pmd.load_file(f1).coordinates[0])
+        np.testing.assert_allclose(self.sys2.coordinates,
+                                   pmd.load_file(f2).coordinates[0])
+        np.testing.assert_allclose(self.sys3.coordinates,
+                                   pmd.load_file(f3).coordinates[0])
+
+    def testOverwrite(self):
+        """ Test overwrite option of Structure.save """
+        open(get_fn('test.pdb', written=True), 'w').close()
+        self.assertRaises(IOError, lambda:
+                self.sys1.save(get_fn('test.pdb', written=True))
+        )
+        # Should not raise
+        self.sys1.save(get_fn('test.pdb', written=True), overwrite=True)
+        pdb = pmd.load_file(get_fn('test.pdb', written=True))
+        self.assertEqual(len(pdb.atoms), len(self.sys1.atoms))
+
 if __name__ == '__main__':
     unittest.main()

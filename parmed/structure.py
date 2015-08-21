@@ -1352,7 +1352,7 @@ class Structure(object):
 
     #===================================================
 
-    def save(self, fname, format=None, **kwargs):
+    def save(self, fname, format=None, overwrite=False, **kwargs):
         """
         Saves the current Structure in the requested file format. Supported
         formats can be specified explicitly or determined by file-name
@@ -1368,6 +1368,8 @@ class Structure(object):
             - Gromacs GRO file (.gro, gro)
             - Mol2 file (.mol2, mol2)
             - Mol3 file (.mol3, mol3)
+            - Amber ASCII restart (.rst7/.inpcrd/.restrt, rst7)
+            - Amber NetCDF restart (.ncrst, ncrst)
 
         Parameters
         ----------
@@ -1379,6 +1381,9 @@ class Structure(object):
             The case-insensitive keyword specifying what type of file ``fname``
             should be saved as. If ``None`` (default), the file type will be
             determined from filename extension of ``fname``
+        overwrite : bool, optional
+            If True, allow the target file to be overwritten. Otherwise, an
+            IOError is raised if the file exists. Default is False
         kwargs : keyword-arguments
             Remaining arguments are passed on to the file writing routines that
             are called by this function
@@ -1388,6 +1393,9 @@ class Structure(object):
         ValueError if either filename extension or ``format`` are not recognized
         TypeError if the structure cannot be converted to the desired format for
         whatever reason
+        IOError if the file cannot be written either because it exists and
+        ``overwrite`` is ``False``, the filesystem is read-only, or write
+        permissions are not granted for the user
         """
         from parmed import amber, charmm, formats, gromacs
         extmap = {
@@ -1402,9 +1410,15 @@ class Structure(object):
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
                 '.crd' : 'CHARMMCRD',
+                '.rst7' : 'RST7',
+                '.inpcrd' : 'RST7',
+                '.restrt' : 'RST7',
+                '.ncrst' : 'NCRST',
         }
         # Basically everybody uses atom type names instead of type indexes. So
         # convert to atom type names and switch back if need be
+        if os.path.exists(fname) and not overwrite:
+            raise IOError('%s exists; not overwriting' % fname)
         all_ints = True
         for atom in self.atoms:
             if isinstance(atom.type, integer_types):
@@ -1459,6 +1473,11 @@ class Structure(object):
                         else:
                             raise
                     s.write_parm(fname, **kwargs)
+            elif format in ('RST7', 'NCRST'):
+                rst7 = amber.Rst7(natom=len(self.atoms), **kwargs)
+                rst7.coordinates = self.coordinates
+                rst7.box = self.box
+                rst7.write(fname, netcdf=(format == 'NCRST'))
             else:
                 raise ValueError('No file type matching %s' % format)
         finally:

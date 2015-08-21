@@ -72,6 +72,12 @@ def load_file(filename, *args, **kwargs):
         easy code, the ``structure`` keyword is always processed and only passed
         on to the correct file parser if that parser accepts the structure
         keyword. There is no default, as each parser has its own default.
+    natom : int, optional
+        This is needed for some coordinate file classes, but not others. This is
+        treated the same as ``structure``, above. It is the # of atoms expected
+    hasbox : bool, optional
+        Same as ``natom``, but indicates whether the coordinate file has unit
+        cell dimensions
     *args : other positional arguments
         Some formats accept positional arguments. These will be passed along
     **kwargs : other options
@@ -138,19 +144,27 @@ def load_file(filename, *args, **kwargs):
     # Pass on the "structure" keyword IFF the target function accepts a target
     # keyword. Otherwise, get rid of it.
     if hasattr(cls, 'parse'):
-        _prune_structure(cls.parse, kwargs)
+        _prune_argument(cls.parse, kwargs, 'structure')
+        _prune_argument(cls.parse, kwargs, 'natom')
+        _prune_argument(cls.parse, kwargs, 'hasbox')
         return cls.parse(filename, *args, **kwargs)
     elif hasattr(cls, 'open_old'):
-        _prune_structure(cls.open_old, kwargs)
+        _prune_argument(cls.open_old, kwargs, 'structure')
+        _prune_argument(cls.open_old, kwargs, 'natom')
+        _prune_argument(cls.open_old, kwargs, 'hasbox')
         return cls.open_old(filename, *args, **kwargs)
     elif hasattr(cls, 'open'):
-        _prune_structure(cls.open, kwargs)
+        _prune_argument(cls.open, kwargs, 'structure')
+        _prune_argument(cls.open, kwargs, 'natom')
+        _prune_argument(cls.open, kwargs, 'hasbox')
         return cls.open(filename, *args, **kwargs)
-    _prune_structure(cls.__init__, kwargs)
+    _prune_argument(cls.__init__, kwargs, 'structure')
+    _prune_argument(cls.__init__, kwargs, 'natom')
+    _prune_argument(cls.__init__, kwargs, 'hasbox')
     return cls(filename, *args, **kwargs)
 
-def _prune_structure(func, kwargs):
-    if 'structure' in kwargs:
-        if ('structure' not in
+def _prune_argument(func, kwargs, keyword):
+    if keyword in kwargs:
+        if (keyword not in
                 func.__code__.co_varnames[:func.__code__.co_argcount]):
-            kwargs.pop('structure')
+            kwargs.pop(keyword)
