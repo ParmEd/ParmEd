@@ -1046,7 +1046,7 @@ class TestSlice(unittest.TestCase):
     '''Test slicing ResidueTemplate'''
 
     def testSliceFromArrayLike(self):
-        """ Tests slicing by a tuple/list"""
+        """ Test slicing by a tuple/list"""
         residue = pmd.load_file(get_fn('aminont12.lib'))['NALA']
 
         names = ['CA', 'CB', 'C', 'N']
