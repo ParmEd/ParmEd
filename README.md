@@ -50,7 +50,6 @@ who helped improve this project either by providing feedback, bug reports, or
 other general comments!
 
 * Jason Swails (principal developer) | jason.swails@gmail.com
-
 * Carlos Hernandez
 * David L. Mobley
 * Lee-Ping Wang
