@@ -251,7 +251,10 @@ class ResidueTemplate(object):
                 if atom.name == idx:
                     return atom
             raise IndexError('Atom %s not found in %s' % (idx, self.name))
-        return self.atoms[idx]
+        elif isinstance(idx, (list, tuple)):
+            return [self[key] for key in  idx]
+        else:
+            return self.atoms[idx]
 
     def fix_charges(self, to=None, precision=4):
         """
