@@ -1485,6 +1485,18 @@ class Structure(object):
                 for atom in self.atoms:
                     atom.type = int(atom.atom_type)
 
+    @property
+    def charge(self):
+        '''return charge as 1D numpy array'''
+        return np.array([atom.charge for atom in self.atoms])
+
+    @charge.setter
+    def charge(self, values):
+        if len(values) != len(self.atoms):
+            raise ValueError('length of values must be equal to natom')
+        for input_charge, atom in zip(values, self.atoms):
+            atom.charge = input_charge
+
     #===================================================
 
     @property
@@ -3689,6 +3701,18 @@ class StructureView(object):
             return [Vec3(a.xx,a.xy,a.xz) for a in self.atoms] * u.angstroms
         except AttributeError:
             return None
+
+    @property
+    def charge(self):
+        '''return charge as 1D numpy array'''
+        return np.array([atom.charge for atom in self.atoms])
+
+    @charge.setter
+    def charge(self, values):
+        if len(values) != len(self.atoms):
+            raise ValueError('length of values must be equal to natom')
+        for input_charge, atom in zip(values, self.atoms):
+            atom.charge = input_charge
 
     def __bool__(self):
         return bool(self.atoms or self.residues or self.bonds or self.angles or

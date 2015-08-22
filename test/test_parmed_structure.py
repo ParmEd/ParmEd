@@ -945,5 +945,11 @@ class TestStructureSave(FileIOTestCase):
         pdb = pmd.load_file(get_fn('test.pdb', written=True))
         self.assertEqual(len(pdb.atoms), len(self.sys1.atoms))
 
+    def testChargeAssignment(self):
+        parm = pmd.load_file(get_fn('tripos1.mol2'), structure=True)
+        charges = [1., 2., 0.2]
+        parm.view[[0, 2, 3]].charge = charges
+        np.testing.assert_allclose(parm[[0, 2, 3]].charge, charges)
+
 if __name__ == '__main__':
     unittest.main()
