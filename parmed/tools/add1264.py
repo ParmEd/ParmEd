@@ -135,9 +135,9 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
                                     "ATOM_TYPE %s" % atomtypej )
 
             if (atomtypej=="OW"):
-                result[idx] = c4 
+                result[idx] += c4
             else:   
-                result[idx] = c4 / WATER_POL * pol * tunfactor 
+                result[idx] += c4 / WATER_POL * pol * tunfactor
                
             # for the situation i =< j 
         for j in range(typ, parm.ptr('ntypes')):
@@ -154,9 +154,9 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
                                     "ATOM_TYPE %s" % atomtypej)
 
             if (atomtypej=="OW"):
-                result[idx] = c4
+                result[idx] += c4
             else:
-                result[idx] = c4 / WATER_POL * pol * tunfactor
+                result[idx] += c4 / WATER_POL * pol * tunfactor
 #       print("***********************************************************")
     return result
 
