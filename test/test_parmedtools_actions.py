@@ -1103,6 +1103,17 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertTrue(diff_files(get_fn('abs_merged.inpcrd', written=True),
                                    get_saved_fn('abs_merged.inpcrd')))
 
+    def add1264(self):
+        """ Test the add12_6_4 action on AmberParm """
+        parm = AmberParm(get_fn('Mg_ti1_b.parm7'))
+        PT.addLJType(parm, '@14').execute()
+        PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
+        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW').execute()
+        parm.write_parm(get_fn('Mg_ti1_b_1264.parm7', written=True))
+        self.assertTrue(diff_files(get_fn('Mg_ti1_b_1264.parm7', written=True),
+                                   get_saved_fn('Mg_ti1_b_1264.parm7'))
+        )
+
 class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
     
