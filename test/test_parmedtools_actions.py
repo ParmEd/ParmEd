@@ -1114,6 +1114,17 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                                    get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
+    def add1264_2metals(self):
+        """ Test the add12_6_4 action on AmberParm with 2+ metals """
+        parm1 = AmberParm(get_fn('mg_na_cl.parm7'))
+        parm2 = AmberParm(get_fn('na_cl_mg.parm7'))
+        PT.add12_6_4(parm1, ':MG,NA,CL', watermodel='TIP3P').execute()
+        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P').execute()
+        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')),
+                         saved.PRINTLJMATRIX_MGNACL)
+        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
+                         saved.PRINTLJMATRIX_NACLMG)
+
 class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
     
