@@ -488,6 +488,7 @@ class Atom(_ListItem):
                   irotat=item.irotat, occupancy=item.occupancy,
                   bfactor=item.bfactor, altloc=item.altloc)
         new.atom_type = item.atom_type
+        new.anisou = copy(item.anisou)
         for key in item.other_locations:
             new.other_locations[key] = copy(item.other_locations[key])
         _safe_assigns(new, item, ('xx', 'xy', 'xz', 'vx', 'vy', 'vz',

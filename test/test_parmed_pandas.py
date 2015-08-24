@@ -1,22 +1,23 @@
 """
 Tests the pandas functionality of the parmed/structure module
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from utils import get_fn
 
 import parmed.structure as structure
 from parmed import load_file
 from parmed.topologyobjects import Atom
 from parmed.utils.six.moves import zip
+import numpy as np
 import os
 import unittest
+from utils import create_random_structure
 try:
     import pandas as pd
-    import numpy as np
 except ImportError:
-    pd = np = None
+    pd = None
 
-@unittest.skipIf(pd is None or np is None, "Cannot test without pandas")
+@unittest.skipIf(pd is None, "Cannot test without pandas")
 class TestStructureDataFrame(unittest.TestCase):
     """ Tests the conversion of parmed.Structure to a pd.DataFrame """
 
@@ -93,6 +94,46 @@ class TestStructureDataFrame(unittest.TestCase):
         self.assertNotIn('vx', df)
         self.assertNotIn('vy', df)
         self.assertNotIn('vz', df)
+        self.assertNotIn('type_idx', df)
+        self.assertNotIn('class_idx', df)
+        for key in df.keys():
+            self.assertFalse(key.startswith('multipole'))
+        self.assertNotIn('polarizability', df)
+        self.assertNotIn('vdw_parent', df)
+        self.assertNotIn('segid', df)
+
+    def testStructureViewPandas(self):
+        """ Tests creating a pandas DataFrame from a StructureView """
+        parm = load_file(get_fn('tip4p.parm7'))
+        parm.load_rst7(get_fn('tip4p.rst7'))
+        df = parm.view[:10,:].to_dataframe()
+        self.assertEqual(df.shape[0], sum(len(res) for res in parm.residues[:10]))
+        for i, r1 in df.iterrows():
+            self.assertEqual(r1.charge, parm.atoms[i].charge)
+            self.assertEqual(r1['name'], parm.atoms[i].name)
+            self.assertEqual(r1.radii, parm.atoms[i].radii)
+            self.assertEqual(r1.screen, parm.atoms[i].screen)
+            self.assertEqual(r1.type, parm.atoms[i].type)
+            self.assertEqual(r1.occupancy, parm.atoms[i].occupancy)
+            self.assertEqual(r1.bfactor, parm.atoms[i].bfactor)
+            self.assertEqual(r1.altloc, parm.atoms[i].altloc)
+            self.assertEqual(r1.rmin, parm.atoms[i].rmin)
+            self.assertEqual(r1.epsilon, parm.atoms[i].epsilon)
+            self.assertEqual(r1.rmin_14, parm.atoms[i].rmin_14)
+            self.assertEqual(r1.epsilon_14, parm.atoms[i].epsilon_14)
+            self.assertEqual(r1.resname, parm.atoms[i].residue.name)
+            self.assertEqual(r1.resid, parm.atoms[i].residue.idx)
+            self.assertEqual(r1.resnum, parm.atoms[i].residue.number)
+            self.assertEqual(r1.chain, parm.atoms[i].residue.chain)
+            self.assertEqual(r1.join, parm.atoms[i].join)
+            self.assertEqual(r1.nb_idx, parm.atoms[i].nb_idx)
+            self.assertEqual(r1.xx, parm.atoms[i].xx)
+            self.assertEqual(r1.xy, parm.atoms[i].xy)
+            self.assertEqual(r1.xz, parm.atoms[i].xz)
+            self.assertEqual(r1.vx, parm.atoms[i].vx)
+            self.assertEqual(r1.vy, parm.atoms[i].vy)
+            self.assertEqual(r1.vz, parm.atoms[i].vz)
+
         self.assertNotIn('type_idx', df)
         self.assertNotIn('class_idx', df)
         for key in df.keys():
@@ -222,6 +263,110 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertFalse(key.startswith('multipole'))
         self.assertNotIn('polarizability', df)
         self.assertNotIn('vdw_parent', df)
+
+    def testLoadDataFrameStructure(self):
+        """ Tests the load_dataframe method on Structure """
+        struct = create_random_structure(parametrized=True)
+        charges = [a.charge for a in struct.atoms]
+        self.assertTrue(not all(x == 0 for x in charges))
+        df = struct.to_dataframe()
+        # First zero-out all of the charges
+        struct.load_dataframe(dict(charge=[0 for a in struct.atoms]))
+        self.assertTrue(all(a.charge == 0 for a in struct.atoms))
+        # Now re-load the dataframe to restore the original charges
+        struct.load_dataframe(df)
+        self.assertTrue(all(a.charge == x for a, x in zip(struct.atoms, charges)))
+        # Change the first atomic properties of *everything* now to
+        # make sure that they all get updated
+        df_orig = df.copy()
+        df.loc[0, 'number'] = 1
+        df.loc[0, 'name'] = 'HAHA'
+        df.loc[0, 'type'] = 'FUNY'
+        df.loc[0, 'atomic_number'] = 92 # uranium
+        df.loc[0, 'charge'] *= 2
+        df.loc[0, 'mass'] *= 10
+        df.loc[0, 'nb_idx'] = 10
+        df.loc[0, 'radii'] *= 2
+        df.loc[0, 'screen'] = 0.5
+        df.loc[0, 'occupancy'] = 0.1
+        df.loc[0, 'bfactor'] = 0.5
+        df.loc[0, 'altloc'] = 'X'
+        df.loc[0, 'tree'] = 'BLU'
+        df.loc[0, 'join'] = 1.0
+        df.loc[0, 'irotat'] = 2.0
+        df.loc[0, 'rmin'] *= 2
+        df.loc[0, 'epsilon'] /= 2
+        struct.load_dataframe(df)
+        atom = struct.atoms[0]
+        self.assertEqual(atom.number, 1)
+        self.assertEqual(atom.name, 'HAHA')
+        self.assertEqual(atom.type, 'FUNY')
+        self.assertEqual(atom.atomic_number, 92)
+        self.assertEqual(atom.charge, charges[0]*2)
+        self.assertEqual(atom.mass, 10*df_orig.loc[0, 'mass'])
+        self.assertEqual(atom.nb_idx, 10)
+        self.assertEqual(atom.radii, 2*df_orig.loc[0, 'radii'])
+        self.assertEqual(atom.screen, 0.5)
+        self.assertEqual(atom.occupancy, 0.1)
+        self.assertEqual(atom.bfactor, 0.5)
+        self.assertEqual(atom.altloc, 'X')
+        self.assertEqual(atom.tree, 'BLU')
+        self.assertEqual(atom.join, 1.0)
+        self.assertEqual(atom.irotat, 2.0)
+        self.assertEqual(atom.rmin, 2*df_orig.loc[0, 'rmin'])
+        self.assertEqual(atom.epsilon, df_orig.loc[0, 'epsilon']/2)
+
+    def testLoadDataFrameStructureView(self):
+        """ Tests the load_dataframe method on StructureView """
+        struct = create_random_structure(parametrized=True).view[:10,:]
+        charges = [a.charge for a in struct.atoms]
+        self.assertTrue(not all(x == 0 for x in charges))
+        df = struct.to_dataframe()
+        # First zero-out all of the charges
+        struct.load_dataframe(dict(charge=[0 for a in struct.atoms]))
+        self.assertTrue(all(a.charge == 0 for a in struct.atoms))
+        # Now re-load the dataframe to restore the original charges
+        struct.load_dataframe(df)
+        self.assertTrue(all(a.charge == x for a, x in zip(struct.atoms, charges)))
+        # Change the first atomic properties of *everything* now to
+        # make sure that they all get updated
+        df_orig = df.copy()
+        df.loc[0, 'number'] = 1
+        df.loc[0, 'name'] = 'HAHA'
+        df.loc[0, 'type'] = 'FUNY'
+        df.loc[0, 'atomic_number'] = 92 # uranium
+        df.loc[0, 'charge'] *= 2
+        df.loc[0, 'mass'] *= 10
+        df.loc[0, 'nb_idx'] = 10
+        df.loc[0, 'radii'] *= 2
+        df.loc[0, 'screen'] = 0.5
+        df.loc[0, 'occupancy'] = 0.1
+        df.loc[0, 'bfactor'] = 0.5
+        df.loc[0, 'altloc'] = 'X'
+        df.loc[0, 'tree'] = 'BLU'
+        df.loc[0, 'join'] = 1.0
+        df.loc[0, 'irotat'] = 2.0
+        df.loc[0, 'rmin'] *= 2
+        df.loc[0, 'epsilon'] /= 2
+        struct.load_dataframe(df)
+        atom = struct.atoms[0]
+        self.assertEqual(atom.number, 1)
+        self.assertEqual(atom.name, 'HAHA')
+        self.assertEqual(atom.type, 'FUNY')
+        self.assertEqual(atom.atomic_number, 92)
+        self.assertEqual(atom.charge, charges[0]*2)
+        self.assertEqual(atom.mass, 10*df_orig.loc[0, 'mass'])
+        self.assertEqual(atom.nb_idx, 10)
+        self.assertEqual(atom.radii, 2*df_orig.loc[0, 'radii'])
+        self.assertEqual(atom.screen, 0.5)
+        self.assertEqual(atom.occupancy, 0.1)
+        self.assertEqual(atom.bfactor, 0.5)
+        self.assertEqual(atom.altloc, 'X')
+        self.assertEqual(atom.tree, 'BLU')
+        self.assertEqual(atom.join, 1.0)
+        self.assertEqual(atom.irotat, 2.0)
+        self.assertEqual(atom.rmin, 2*df_orig.loc[0, 'rmin'])
+        self.assertEqual(atom.epsilon, df_orig.loc[0, 'epsilon']/2)
 
 if __name__ == '__main__':
     unittest.main()
