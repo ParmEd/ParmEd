@@ -189,18 +189,32 @@
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="c"># Look for natom</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">natom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>
-        <span class="c"># Next 3 lines, make sure we have %12.7f format</span>
+        <span class="c"># Next 3 lines, make sure we have %12.7f format. This only works if we</span>
+        <span class="c"># have at least 6 atoms. Any fewer than that means the restart file is</span>
+        <span class="c"># shorter than that.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-                <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">natom</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">:]:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">natom</span><span class="p">:</span> <span class="k">break</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
                     <span class="n">j12</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">12</span>
-                    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="p">:</span><span class="n">j12</span><span class="o">+</span><span class="mi">12</span><span class="p">])</span>
-                    <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j12</span><span class="o">+</span><span class="mi">11</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;0123456789&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">j12</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j12</span><span class="p">:</span><span class="n">j12</span><span class="o">+</span><span class="mi">12</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">j12</span><span class="o">+</span><span class="mi">11</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;0123456789&#39;</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">natom</span><span class="p">:</span> <span class="k">break</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                    <span class="n">j12</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="mi">36</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">j12</span><span class="o">+</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;.&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">j12</span><span class="p">:</span><span class="n">j12</span><span class="o">+</span><span class="mi">12</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">j12</span><span class="o">+</span><span class="mi">11</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;0123456789&#39;</span><span class="p">:</span>
                         <span class="k">return</span> <span class="bp">False</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>

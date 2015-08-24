@@ -80,6 +80,9 @@
 <li class="toctree-l1"><a class="reference internal" href="parmed.formats.pdb.html">parmed.formats.pdb module</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.formats.pqr.html">parmed.formats.pqr module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.formats.psf.html">parmed.formats.psf module</a><ul class="simple">
 </ul>
 </li>
@@ -116,6 +119,16 @@ is not a Structure, but can be made to return a Structure if the
 easy code, the <tt class="docutils literal"><span class="pre">structure</span></tt> keyword is always processed and only passed
 on to the correct file parser if that parser accepts the structure
 keyword. There is no default, as each parser has its own default.</p>
+</div></blockquote>
+<p><strong>natom</strong> : int, optional</p>
+<blockquote>
+<div><p>This is needed for some coordinate file classes, but not others. This is
+treated the same as <tt class="docutils literal"><span class="pre">structure</span></tt>, above. It is the # of atoms expected</p>
+</div></blockquote>
+<p><strong>hasbox</strong> : bool, optional</p>
+<blockquote>
+<div><p>Same as <tt class="docutils literal"><span class="pre">natom</span></tt>, but indicates whether the coordinate file has unit
+cell dimensions</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
 <blockquote>
@@ -166,7 +179,7 @@ applies both to local and remote files. The following names are supported:</p>
 <dl class="class">
 <dt id="parmed.formats.PDBFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PDBFile</tt><a class="headerlink" href="#parmed.formats.PDBFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -213,11 +226,11 @@ Default is 10 seconds</p>
 file will be saved. If None (default), no PDB file will be written.
 This will be a verbatim copy of the downloaded PDB file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></tt></a></p>
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></tt></a></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDB</p>
 </div></blockquote>
@@ -276,8 +289,7 @@ file.pdb.bz2)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure</p>
-<p><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by
@@ -366,7 +378,7 @@ will be converted into the PDB-standard values. Default is False</p>
 <dl class="class">
 <dt id="parmed.formats.CIFFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">CIFFile</tt><a class="headerlink" href="#parmed.formats.CIFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Standard PDBx/mmCIF file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -413,11 +425,11 @@ Default is 10 seconds</p>
 file will be saved. If None (default), no CIF file will be written.
 This will be a verbatim copy of the downloaded CIF file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></tt></a></p>
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></tt></a></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDBx/mmCIF</p>
 </div></blockquote>
@@ -560,7 +572,7 @@ will be converted into the PDB-standard values. Default is False</p>
 <dl class="class">
 <dt id="parmed.formats.Mol2File">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">Mol2File</tt><a class="headerlink" href="#parmed.formats.Mol2File" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Class to read and write TRIPOS Mol2 files</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -689,7 +701,7 @@ with multiple residues, each residue is printed in a separate
 <dl class="class">
 <dt id="parmed.formats.PSFFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PSFFile</tt><a class="headerlink" href="#parmed.formats.PSFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>CHARMM- or XPLOR-style PSF file parser and writer. This class is
 specifically a holder for the writing functionality and a vessel for
 automatic file type detection. If you wish to instantiate a PSF file

@@ -218,7 +218,7 @@
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure">[docs]</a><span class="k">class</span> <span class="nc">Structure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A chemical structure composed of atoms, bonds, angles, torsions, and other</span>
 <span class="sd">    topological features</span>
@@ -393,7 +393,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure, adding a new residue to `residues` if</span>
 <span class="sd">        it has a different name or number as the last residue added and adding</span>
@@ -422,7 +422,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.add_atom_to_residue"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.add_atom_to_residue">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom_to_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the Structure at the end if the given residue</span>
 
@@ -460,7 +460,7 @@
 
     <span class="c">#===================================================</span>
 
-<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.copy"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a copy of the current structure as an instance of a specified</span>
 <span class="sd">        subclass</span>
@@ -682,187 +682,43 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Creates a pandas.DataFrame object from the current Structure</span>
+<div class="viewcode-block" id="Structure.to_dataframe"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generates a DataFrame from the current Structure&#39;s atomic properties</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dataframe : :class:`pandas.DataFrame`</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            DataFrame with all atomic properties</span>
 
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        The DataFrame will be over all atoms. The columns will be the attributes</span>
-<span class="sd">        of the atom (as well as its containing residue). Some columns will</span>
-<span class="sd">        *always* exist. Others will only exist if those attributes have been set</span>
-<span class="sd">        on the Atom instances (see the :class:`Atom` docs for possible</span>
-<span class="sd">        attributes and their meaning). The columns that will always be present</span>
-<span class="sd">        are:</span>
-
-<span class="sd">            - number : int</span>
-<span class="sd">            - name : str</span>
-<span class="sd">            - type : str</span>
-<span class="sd">            - atomic_number : int</span>
-<span class="sd">            - charge : float</span>
-<span class="sd">            - mass : float</span>
-<span class="sd">            - nb_idx : int</span>
-<span class="sd">            - radii : float</span>
-<span class="sd">            - screen : float</span>
-<span class="sd">            - occupancy : float</span>
-<span class="sd">            - bfactor : float</span>
-<span class="sd">            - altloc : str</span>
-<span class="sd">            - tree : str</span>
-<span class="sd">            - join : int</span>
-<span class="sd">            - irotat : int</span>
-<span class="sd">            - rmin : float</span>
-<span class="sd">            - epsilon : float</span>
-<span class="sd">            - rmin_14 : float</span>
-<span class="sd">            - epsilon_14 : float</span>
-<span class="sd">            - resname : str (name of the containing residue)</span>
-<span class="sd">            - resid : int (Sequential index of the containing residue)</span>
-<span class="sd">            - resnum : int (original residue number in the input structure)</span>
-<span class="sd">            - chain : str (chain ID that the containing residue belongs to)</span>
-
-<span class="sd">        The following attributes are optionally present if they were present in</span>
-<span class="sd">        the original file defining the structure:</span>
-
-<span class="sd">            - xx : float (x-coordinate position)</span>
-<span class="sd">            - xy : float (y-coordinate position)</span>
-<span class="sd">            - xz : float (z-coordinate position)</span>
-<span class="sd">            - vx : float (x-coordinate velocity)</span>
-<span class="sd">            - vy : float (y-coordinate velocity)</span>
-<span class="sd">            - vz : float (z-coordinate velocity)</span>
-<span class="sd">            - type_idx : int (integer type index for AMOEBA)</span>
-<span class="sd">            - class_idx : int (integer class type index for AMOEBA)</span>
-<span class="sd">            - multipole_111 : float (Monopole)</span>
-<span class="sd">            - multipole_211 : float (1,1 Dipole component)</span>
-<span class="sd">            - multipole_212 : float (1,2 Dipole component)</span>
-<span class="sd">            - multipole_222 : float (2,2 Dipole component)</span>
-<span class="sd">            - multipole_411 : float (1,1 Quadrupole component)</span>
-<span class="sd">            - multipole_412 : float (1,2 Quadrupole component)</span>
-<span class="sd">            - multipole_422 : float (2,2 Quadrupole component)</span>
-<span class="sd">            - multipole_413 : float (1,3 Quadrupole component)</span>
-<span class="sd">            - multipole_423 : float (2,3 Quadrupole component)</span>
-<span class="sd">            - multipole_433 : float (3,3 Quadrupole component)</span>
-<span class="sd">            - polarizability : float (dipole polarizability)</span>
-<span class="sd">            - vdw_parent : int (index of the vdW parent atom of this atom)</span>
-<span class="sd">            - segid : segment ID (similar to chain, but for CHARMM)</span>
-<span class="sd">            - U11 : float (U[1][1] of anisotropic b-factor tensor)</span>
-<span class="sd">            - U22 : float (U[2][2] of anisotropic b-factor tensor)</span>
-<span class="sd">            - U33 : float (U[3][3] of anisotropic b-factor tensor)</span>
-<span class="sd">            - U12 : float (U[1][2] of anisotropic b-factor tensor)</span>
-<span class="sd">            - U13 : float (U[1][3] of anisotropic b-factor tensor)</span>
-<span class="sd">            - U23 : float (U[2][3] of anisotropic b-factor tensor)</span>
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`parmed.utils.pandautils.create_dataframe` for full</span>
+<span class="sd">        documentation of the generated DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">pd</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;pandas is not available; cannot create a pandas &#39;</span>
-                              <span class="s">&#39;DataFrame from this Structure&#39;</span><span class="p">)</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;atomic_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;mass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;nb_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;radii&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">radii</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;screen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">screen</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;bfactor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">bfactor</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;altloc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">altloc</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;tree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">tree</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;join&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">join</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;irotat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">irotat</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;rmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;epsilon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;rmin_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;epsilon_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-
-        <span class="c"># Now for optional attributes</span>
-        <span class="c"># Coordinates</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">coords</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-                    <span class="p">[[</span><span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
-                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">,</span> <span class="s">&#39;xy&#39;</span><span class="p">,</span> <span class="s">&#39;xz&#39;</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-        <span class="c"># Velocities</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">vels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-                    <span class="p">[[</span><span class="n">atom</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vz</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
-                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;vx&#39;</span><span class="p">,</span> <span class="s">&#39;vy&#39;</span><span class="p">,</span> <span class="s">&#39;vz&#39;</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
-        <span class="c"># AMOEBA LJ type</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;type_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="c"># AMOEBA class type</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;class_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">class_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="c"># AMOEBA multipoles</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">multipoles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">multipoles</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
-                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;multipole_111&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_211&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_212&#39;</span><span class="p">,</span>
-                             <span class="s">&#39;multipole_222&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_411&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_412&#39;</span><span class="p">,</span>
-                             <span class="s">&#39;multipole_422&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_413&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_423&#39;</span><span class="p">,</span>
-                             <span class="s">&#39;multipole_433&#39;</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multipoles</span><span class="p">)</span>
-        <span class="c"># AMOEBA polarizabilities</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;polarizability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">polarizability</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="c"># AMOEBA vdw parent atom</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;vdw_parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="c"># SEGID (CHARMM)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">ret</span><span class="p">[</span><span class="s">&#39;segid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="c"># anisotropic b-factors</span>
-        <span class="n">none6</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
-        <span class="n">anisos</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aniso</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">anisos</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aniso</span><span class="p">,</span> <span class="s">&#39;tolist&#39;</span><span class="p">):</span>
-                <span class="n">anisos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aniso</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">all_nones</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aniso</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">anisos</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">aniso</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">anisos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">none6</span>
-            <span class="k">elif</span> <span class="n">all_nones</span><span class="p">:</span>
-                <span class="n">all_nones</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_nones</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">anisos</span><span class="p">,</span>
-                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;U11&#39;</span><span class="p">,</span> <span class="s">&#39;U22&#39;</span><span class="p">,</span> <span class="s">&#39;U33&#39;</span><span class="p">,</span> <span class="s">&#39;U12&#39;</span><span class="p">,</span> <span class="s">&#39;U13&#39;</span><span class="p">,</span> <span class="s">&#39;U23&#39;</span><span class="p">])</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">ret</span>
+        <span class="kn">from</span> <span class="nn">parmed.utils.pandautils</span> <span class="kn">import</span> <span class="n">create_dataframe</span>
+        <span class="k">return</span> <span class="n">create_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.load_dataframe"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.load_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Loads atomic properties from an input DataFrame</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            A pandas DataFrame with atomic properties that will be used to set</span>
+<span class="sd">            the properties on the current list of atoms</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`parmed.utils.pandautils.load_dataframe` for full documentation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">parmed.utils.pandautils</span> <span class="kn">import</span> <span class="n">load_dataframe</span>
+        <span class="k">return</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+</div>
+<div class="viewcode-block" id="Structure.is_changed"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.is_changed">[docs]</a>    <span class="k">def</span> <span class="nf">is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if any of the topology has changed for this structure &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigonal_angles</span><span class="o">.</span><span class="n">changed</span> <span class="ow">or</span>
@@ -886,7 +742,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.unchange"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.unchange">[docs]</a>    <span class="k">def</span> <span class="nf">unchange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Toggles all lists so that they do not indicate any changes &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
@@ -924,7 +780,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.prune_empty_terms"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.prune_empty_terms">[docs]</a>    <span class="k">def</span> <span class="nf">prune_empty_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Looks through all of the topological lists and gets rid of terms</span>
 <span class="sd">        in which at least one of the atoms is None or has an `idx` attribute set</span>
@@ -948,7 +804,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.update_dihedral_exclusions"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.update_dihedral_exclusions">[docs]</a>    <span class="k">def</span> <span class="nf">update_dihedral_exclusions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Nonbonded exclusions and exceptions have the following priority:</span>
 
@@ -983,7 +839,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.strip"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.strip">[docs]</a>    <span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes a subset of the atoms corresponding to an atom-based selection.</span>
 
@@ -1318,7 +1174,7 @@
     <span class="c">#===================================================</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Structure.view"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.view"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.view">[docs]</a>    <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an indexable object that can be indexed like a standard</span>
 <span class="sd">        Structure, but returns a *view* rather than a copy</span>
@@ -1331,7 +1187,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.split"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.split"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split the current Structure into separate Structure instances for each</span>
 <span class="sd">        unique molecule. A molecule is defined as all atoms connected by a graph</span>
@@ -1403,7 +1259,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.save"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.save"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves the current Structure in the requested file format. Supported</span>
 <span class="sd">        formats can be specified explicitly or determined by file-name</span>
@@ -1412,6 +1268,7 @@
 
 <span class="sd">            - PDB (.pdb, pdb)</span>
 <span class="sd">            - PDBx/mmCIF (.cif, cif)</span>
+<span class="sd">            - PQR (.pqr, pqr)</span>
 <span class="sd">            - Amber topology file (.prmtop/.parm7, amber)</span>
 <span class="sd">            - CHARMM PSF file (.psf, charmm)</span>
 <span class="sd">            - CHARMM coordinate file (.crd, charmmcrd)</span>
@@ -1419,6 +1276,8 @@
 <span class="sd">            - Gromacs GRO file (.gro, gro)</span>
 <span class="sd">            - Mol2 file (.mol2, mol2)</span>
 <span class="sd">            - Mol3 file (.mol3, mol3)</span>
+<span class="sd">            - Amber ASCII restart (.rst7/.inpcrd/.restrt, rst7)</span>
+<span class="sd">            - Amber NetCDF restart (.ncrst, ncrst)</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1430,6 +1289,9 @@
 <span class="sd">            The case-insensitive keyword specifying what type of file ``fname``</span>
 <span class="sd">            should be saved as. If ``None`` (default), the file type will be</span>
 <span class="sd">            determined from filename extension of ``fname``</span>
+<span class="sd">        overwrite : bool, optional</span>
+<span class="sd">            If True, allow the target file to be overwritten. Otherwise, an</span>
+<span class="sd">            IOError is raised if the file exists. Default is False</span>
 <span class="sd">        kwargs : keyword-arguments</span>
 <span class="sd">            Remaining arguments are passed on to the file writing routines that</span>
 <span class="sd">            are called by this function</span>
@@ -1439,10 +1301,14 @@
 <span class="sd">        ValueError if either filename extension or ``format`` are not recognized</span>
 <span class="sd">        TypeError if the structure cannot be converted to the desired format for</span>
 <span class="sd">        whatever reason</span>
+<span class="sd">        IOError if the file cannot be written either because it exists and</span>
+<span class="sd">        ``overwrite`` is ``False``, the filesystem is read-only, or write</span>
+<span class="sd">        permissions are not granted for the user</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">amber</span><span class="p">,</span> <span class="n">charmm</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">gromacs</span>
         <span class="n">extmap</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s">&#39;.pdb&#39;</span> <span class="p">:</span> <span class="s">&#39;PDB&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.pqr&#39;</span> <span class="p">:</span> <span class="s">&#39;PQR&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.cif&#39;</span> <span class="p">:</span> <span class="s">&#39;CIF&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.pdbx&#39;</span> <span class="p">:</span> <span class="s">&#39;CIF&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.parm7&#39;</span> <span class="p">:</span> <span class="s">&#39;AMBER&#39;</span><span class="p">,</span>
@@ -1453,9 +1319,15 @@
                 <span class="s">&#39;.mol2&#39;</span> <span class="p">:</span> <span class="s">&#39;MOL2&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s">&#39;MOL3&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.crd&#39;</span> <span class="p">:</span> <span class="s">&#39;CHARMMCRD&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.rst7&#39;</span> <span class="p">:</span> <span class="s">&#39;RST7&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.inpcrd&#39;</span> <span class="p">:</span> <span class="s">&#39;RST7&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.restrt&#39;</span> <span class="p">:</span> <span class="s">&#39;RST7&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.ncrst&#39;</span> <span class="p">:</span> <span class="s">&#39;NCRST&#39;</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="c"># Basically everybody uses atom type names instead of type indexes. So</span>
         <span class="c"># convert to atom type names and switch back if need be</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> exists; not overwriting&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
         <span class="n">all_ints</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
@@ -1478,6 +1350,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;CIF&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">write_cif</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;PQR&#39;</span><span class="p">:</span>
+                <span class="n">formats</span><span class="o">.</span><span class="n">PQRFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;PSF&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;GRO&#39;</span><span class="p">:</span>
@@ -1510,6 +1384,11 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="k">raise</span>
                     <span class="n">s</span><span class="o">.</span><span class="n">write_parm</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;RST7&#39;</span><span class="p">,</span> <span class="s">&#39;NCRST&#39;</span><span class="p">):</span>
+                <span class="n">rst7</span> <span class="o">=</span> <span class="n">amber</span><span class="o">.</span><span class="n">Rst7</span><span class="p">(</span><span class="n">natom</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">rst7</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span>
+                <span class="n">rst7</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span>
+                <span class="n">rst7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">netcdf</span><span class="o">=</span><span class="p">(</span><span class="n">format</span> <span class="o">==</span> <span class="s">&#39;NCRST&#39;</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;No file type matching </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">format</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
@@ -1533,7 +1412,7 @@
 </div>
     <span class="nd">@property</span>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.topology"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.topology">[docs]</a>    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.topology"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.topology">[docs]</a>    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The OpenMM Topology object. Cached when possible, but any changes to the</span>
 <span class="sd">        Structure instance results in the topology being deleted and rebuilt</span>
@@ -1605,7 +1484,7 @@
             <span class="k">return</span> <span class="bp">None</span>
 
     <span class="nd">@positions.setter</span>
-<div class="viewcode-block" id="Structure.positions"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.positions"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.positions">[docs]</a>    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A list of 3-element Quantity tuples of dimension length representing the</span>
 <span class="sd">        atomic positions for every atom in the system. If set with unitless</span>
@@ -1655,11 +1534,20 @@
             <span class="n">value</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
             <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="n">xyz</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">coords</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="n">xyz</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">coords</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># We set coordinates to an empty iterable. Wipe them out here</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">del</span> <span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="bp">None</span>
 </div>
-<div class="viewcode-block" id="Structure.get_coordinates"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.get_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.get_coordinates"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.get_coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In some cases, multiple conformations may be stored in the Structure.</span>
 <span class="sd">        This function retrieves a particular frame&#39;s coordinates</span>
@@ -1758,7 +1646,7 @@
             <span class="k">return</span> <span class="bp">None</span>
 
     <span class="nd">@velocities.setter</span>
-<div class="viewcode-block" id="Structure.velocities"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.velocities"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A list of 3-element Quantity tuples of dimension length representing the</span>
 <span class="sd">        atomic velocities for every atom in the system</span>
@@ -1778,7 +1666,7 @@
 
     <span class="c">#===================================================</span>
 </div>
-<div class="viewcode-block" id="Structure.has_NBFIX"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.has_NBFIX">[docs]</a>    <span class="k">def</span> <span class="nf">has_NBFIX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.has_NBFIX"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.has_NBFIX">[docs]</a>    <span class="k">def</span> <span class="nf">has_NBFIX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns whether or not any pairs of atom types have their LJ</span>
 <span class="sd">        interactions modified by an NBFIX definition</span>
@@ -1813,7 +1701,7 @@
         <span class="k">return</span> <span class="n">box_lengths_and_angles_to_vectors</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
 
     <span class="nd">@box_vectors.setter</span>
-<div class="viewcode-block" id="Structure.box_vectors"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.box_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.box_vectors"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.box_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">box_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        3, 3-element tuple of unit cell vectors that are Quantity objects of</span>
 <span class="sd">        dimension length</span>
@@ -1830,7 +1718,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.createSystem"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.createSystem">[docs]</a>    <span class="k">def</span> <span class="nf">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                      <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">switchDistance</span><span class="o">=</span><span class="mf">0.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                      <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -2008,7 +1896,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_add_constraints"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_add_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">omm_add_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">rigidWater</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds constraints to a given system</span>
 
 <span class="sd">        Parameters</span>
@@ -2063,7 +1951,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_set_virtual_sites"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_set_virtual_sites">[docs]</a>    <span class="k">def</span> <span class="nf">omm_set_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the virtual sites in a given OpenMM `System` object from the extra</span>
 <span class="sd">        points defined in this system</span>
@@ -2106,7 +1994,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_bond_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_bond_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_bond_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rigidWater</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                        <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</span>
@@ -2163,7 +2051,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_angle_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">flexibleConstraints</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</span>
 <span class="sd">        angles are for an Amoeba-parametrized system)</span>
@@ -2213,7 +2101,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_dihedral_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_dihedral_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_dihedral_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM PeriodicTorsionForce modeling dihedrals</span>
 
 <span class="sd">        Returns</span>
@@ -2244,7 +2132,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_rb_torsion_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_rb_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_rb_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_rb_torsion_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_rb_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_rb_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</span>
 
 <span class="sd">        Returns</span>
@@ -2268,7 +2156,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_urey_bradley_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_urey_bradley_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_urey_bradley_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM Urey-Bradley force</span>
 
 <span class="sd">        Returns</span>
@@ -2293,7 +2181,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_improper_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_improper_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_improper_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM improper torsion force (quadratic bias)</span>
 
 <span class="sd">        Returns</span>
@@ -2319,7 +2207,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_cmap_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_cmap_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_cmap_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the OpenMM CMAP torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -2358,7 +2246,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_nonbonded_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_nonbonded_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_nonbonded_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                             <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">8</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">switchDistance</span><span class="o">=</span><span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                             <span class="n">ewaldErrorTolerance</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
@@ -2756,7 +2644,7 @@
     <span class="c">#===================================================</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
+<div class="viewcode-block" id="Structure.omm_gbsa_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_gbsa_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_gbsa_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="p">,</span>
                        <span class="n">nonbondedMethod</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">30.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                        <span class="n">soluteDielectric</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -2873,7 +2761,7 @@
     <span class="c"># Amoeba-specific forces below</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_trigonal_angle_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_trigonal_angle_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_trigonal_angle_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba trigonal-angle force</span>
 
 <span class="sd">        Returns</span>
@@ -2905,7 +2793,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_out_of_plane_bend_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_out_of_plane_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_out_of_plane_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba out-of-plane bend force</span>
 
 <span class="sd">        Returns</span>
@@ -2936,7 +2824,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_pi_torsion_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_pi_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_pi_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates the Amoeba pi-torsion force</span>
 
 <span class="sd">        Returns</span>
@@ -2959,7 +2847,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_stretch_bend_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_stretch_bend_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_stretch_bend_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba stretch-bend force for this system</span>
 
 <span class="sd">        Returns</span>
@@ -2984,7 +2872,7 @@
     <span class="c">#===================================================</span>
 </div>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Structure.omm_torsion_torsion_force"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.Structure.omm_torsion_torsion_force">[docs]</a>    <span class="k">def</span> <span class="nf">omm_torsion_torsion_force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create the OpenMM Amoeba coupled-torsion (CMAP) force</span>
 
 <span class="sd">        Returns</span>
@@ -3699,6 +3587,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">acceptors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">donors</span> <span class="o">=</span> <span class="p">[]</span>
 
+<div class="viewcode-block" id="StructureView.to_dataframe"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.StructureView.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generates a DataFrame from the current Structure&#39;s atomic properties</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            DataFrame with all atomic properties</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`parmed.utils.pandautils.create_dataframe` for full</span>
+<span class="sd">        documentation of the generated DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">parmed.utils.pandautils</span> <span class="kn">import</span> <span class="n">create_dataframe</span>
+        <span class="k">return</span> <span class="n">create_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="StructureView.load_dataframe"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.StructureView.load_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Loads atomic properties from an input DataFrame</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            A pandas DataFrame with atomic properties that will be used to set</span>
+<span class="sd">            the properties on the current list of atoms</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`parmed.utils.pandautils.load_dataframe` for full documentation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">parmed.utils.pandautils</span> <span class="kn">import</span> <span class="n">load_dataframe</span>
+        <span class="k">return</span> <span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+</div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="StructureView.coordinates"><a class="viewcode-back" href="../../api/parmed/parmed.structure.html#parmed.structure.StructureView.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -3739,7 +3659,6 @@
     <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c"># For Python 2</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bool__</span><span class="p">()</span>
-
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span></div>
 </pre></div>

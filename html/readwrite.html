@@ -60,59 +60,121 @@ instantiated directly from a filename. On the other hand, <a class="reference in
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance directly rather than
 subclassing.</p>
 <div class="section" id="reading-files-with-load-file">
-<h2>Reading files with <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
+<h2>Reading files with <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
 </table>
 <p>To provide a single interface for parsing <em>any</em> type of file, the
-<a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a> function takes a filename
+<a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a> function takes a filename
 and any relevant arguments or keyword arguments for the supported file formats
 and calls the appropriate parsing function.  Supported file formats along with
-the extra supported keyword arguments (if applicable) are shown below:</p>
+the extra supported keyword arguments (if applicable) are shown in the table
+below (the filename argument is omitted):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">File type</th>
+<th class="head">Supported arguments</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Amber ASCII restart file</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>Amber prmtop</td>
+<td><tt class="docutils literal"><span class="pre">xyz</span></tt>, <tt class="docutils literal"><span class="pre">box</span></tt></td>
+</tr>
+<tr class="row-even"><td>Amber MDL (e.g., RISM)</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>Amber MDCRD trajectory</td>
+<td><tt class="docutils literal"><span class="pre">natom</span></tt>*, <tt class="docutils literal"><span class="pre">hasbox</span></tt>*</td>
+</tr>
+<tr class="row-even"><td>Amber OFF library</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>Amber frcmod/parm.dat</td>
+<td>list of filenames</td>
+</tr>
+<tr class="row-even"><td>PDBx/mmCIF file</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>CHARMM coordinate file</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>CHARMM restart file</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>Gromacs GRO file</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>Gromacs topology file</td>
+<td><tt class="docutils literal"><span class="pre">defines</span></tt>, <tt class="docutils literal"><span class="pre">parametrize</span></tt>
+<tt class="docutils literal"><span class="pre">xyz</span></tt>, <tt class="docutils literal"><span class="pre">box</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Mol2 and Mol3 files</td>
+<td><tt class="docutils literal"><span class="pre">structure</span></tt></td>
+</tr>
+<tr class="row-even"><td>NetCDF restart file</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>NetCDF trajectory file</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>PDB file</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>PQR file</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>PSF file</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>*These arguments are <em>required</em> when parsing the corresponding format file</p>
+<p>The optional keyword arguments are described below:</p>
 <ul class="simple">
-<li>Amber ASCII restart files</li>
-<li>Amber topology/MDL files (<tt class="docutils literal"><span class="pre">xyz=None</span></tt> is the coordinate file name or numpy
-array of coordinates, <tt class="docutils literal"><span class="pre">box=None</span></tt> is the array of unit cell lengths and
-angles)</li>
-<li>Amber ASCII trajectory (MDCRD) files (<tt class="docutils literal"><span class="pre">natom</span></tt> is the <em>required</em> number of
-atoms in the system, <tt class="docutils literal"><span class="pre">hasbox</span></tt> is the <em>required</em> boolean flag specifying
-whether or not unit cell dimensions are present in the mdcrd file)</li>
-<li>Amber NetCDF restart</li>
-<li>Amber NetCDF trajectory file</li>
-<li>Amber OFF residue template library files</li>
-<li>PDBx/mmCIF files</li>
-<li>CHARMM coordinate files</li>
-<li>CHARMM restart files</li>
-<li>Gromacs GRO files</li>
-<li>Gromacs topology files (<tt class="docutils literal"><span class="pre">defines=None</span></tt> is the (ordered) <tt class="docutils literal"><span class="pre">dict</span></tt> of
-preprocessor defines to apply to the processing of the topology file,
-<tt class="docutils literal"><span class="pre">parametrize=True</span></tt> is a flag to specify whether or not to apply parameters,
-<tt class="docutils literal"><span class="pre">xyz=None</span></tt> is the file name of a coordinate file or an array of coordinates,
-and <tt class="docutils literal"><span class="pre">box=None</span></tt> is the array of unit cell dimensions and angles)</li>
-<li>SYBYL mol2 files and the R.E.D. mol3 extension (<tt class="docutils literal"><span class="pre">structure=False</span></tt> is a flag
-that determines whether or not the returned object is a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> or <a class="reference internal" href="api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate" title="parmed.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a>/<a class="reference internal" href="api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplateContainer" title="parmed.modeller.residue.ResidueTemplateContainer"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></a> instance)</li>
-<li>PDB files</li>
-<li>CHARMM/XPLOR PSF files</li>
+<li><tt class="docutils literal"><span class="pre">xyz</span></tt> &#8211; Either a file name for a coordinate file or an array with the
+coordinates. If the unit cell information is stored in the coordinate file, it
+is used (unless an explicit <tt class="docutils literal"><span class="pre">box</span></tt> argument is given; see below). If the file
+is a trajectory file, the first frame is used for the coordinates.</li>
+<li><tt class="docutils literal"><span class="pre">box</span></tt> &#8211; The unit cell dimensions in Angstroms (and angles in degrees).</li>
+<li><tt class="docutils literal"><span class="pre">natom</span></tt> &#8211; The number of atoms from which the file was written</li>
+<li><tt class="docutils literal"><span class="pre">hasbox</span></tt> &#8211; Whether unit cell information is stored in this trajectory file</li>
+<li><tt class="docutils literal"><span class="pre">defines</span></tt> &#8211; <tt class="docutils literal"><span class="pre">dict</span></tt> of preprocessor defines (order is respected if given
+via an <tt class="docutils literal"><span class="pre">OrderedDict</span></tt>)</li>
+<li><tt class="docutils literal"><span class="pre">parametrize</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, parameters are assigned from the parameter
+database.  If <tt class="docutils literal"><span class="pre">False</span></tt>, they are not (default is <tt class="docutils literal"><span class="pre">True</span></tt>).</li>
+<li><tt class="docutils literal"><span class="pre">structure</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, return the Mol2/Mol3 file as a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance. Default is <tt class="docutils literal"><span class="pre">False</span></tt></li>
 </ul>
-<p><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> automatically inspects the contents of the file with the given
+<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
 Except in rare, pathological cases, the file format detection mechanism is
 fairly robust. If any files <em>fail</em> this detection, feel free to file an issue on
 the Github issue tracker to improve file type prediction.</p>
-<p><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> has a number of helpful features. For instance, files ending
+<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> has a number of helpful features. For instance, files ending
 with the <tt class="docutils literal"><span class="pre">.gz</span></tt> or <tt class="docutils literal"><span class="pre">.bz2</span></tt> suffix will automatically be decompressed in-memory
 using Gzip or Bzip2, respectively (except for some binary file formats, like
 NetCDF). Furthermore, URLs beginning with <tt class="docutils literal"><span class="pre">http://</span></tt>, <tt class="docutils literal"><span class="pre">https://</span></tt>, or
 <tt class="docutils literal"><span class="pre">ftp://</span></tt> are valid file names and will result in the remote file being
 downloaded and processed (again, in-memory).</p>
+<p>Finally, to make it so that you can always retrieve a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from file types that support returning
+one by passing the <tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword to <tt class="docutils literal"><span class="pre">load_file</span></tt>. If this argument
+is not supported by the resulting file type, it is simply ignored, as is the
+<tt class="docutils literal"><span class="pre">natom</span></tt> and <tt class="docutils literal"><span class="pre">hasbox</span></tt> keywords (which are required arguments for the Amber
+ASCII trajectory file).</p>
 </div>
 <div class="section" id="writing-files-with-structure-save">
 <h2>Writing files with <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
@@ -124,9 +186,12 @@ between these formats (e.g., Amber topology, PDB, CHARMM PSF file, etc.).</p>
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class has a <tt class="docutils literal"><span class="pre">save</span></tt> method that
 will convert to the requested file format and write the output file. The desired
 format is specified either explicitly or by file name extension (with explicit
-format specifications taking precedence).  The supported file formats, along
-with their supported extra keyword arguments, are detailed in the following
-table.</p>
+format specifications taking precedence).  Because <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a> is a convenience method, it will protect
+against accidentally overwriting an existing file. The <tt class="docutils literal"><span class="pre">overwrite</span></tt> argument,
+when set to <tt class="docutils literal"><span class="pre">True</span></tt>, will allow an existing file to be overwritten. If set to
+<tt class="docutils literal"><span class="pre">False</span></tt> (or left at its default), <tt class="docutils literal"><span class="pre">IOError</span></tt> will be raised when attempting
+to overwrite an existing file. The supported file formats, along with their
+supported extra keyword arguments, are detailed in the following table.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="17%" />
@@ -149,43 +214,64 @@ table.</p>
 <tt class="docutils literal"><span class="pre">renumber</span></tt>,
 <tt class="docutils literal"><span class="pre">coordinates</span></tt>,
 <tt class="docutils literal"><span class="pre">altlocs</span></tt>,
-<tt class="docutils literal"><span class="pre">write_anisou</span></tt></td>
+<tt class="docutils literal"><span class="pre">write_anisou</span></tt>,
+<tt class="docutils literal"><span class="pre">standard_resnames</span></tt></td>
 </tr>
 <tr class="row-odd"><td>PDBx/mmCIF</td>
 <td><tt class="docutils literal"><span class="pre">.cif</span></tt>, <tt class="docutils literal"><span class="pre">.pdbx</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">cif</span></tt></td>
 </tr>
-<tr class="row-even"><td>Amber prmtop</td>
+<tr class="row-even"><td>PQR</td>
+<td><tt class="docutils literal"><span class="pre">.pqr</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">pqr</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">renumber</span></tt>,
+<tt class="docutils literal"><span class="pre">coordinates</span></tt>,
+<tt class="docutils literal"><span class="pre">standard_resnames</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Amber prmtop</td>
 <td><tt class="docutils literal"><span class="pre">.parm7</span></tt>, <tt class="docutils literal"><span class="pre">.prmtop</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">amber</span></tt></td>
 <td>None</td>
 </tr>
-<tr class="row-odd"><td>CHARMM PSF</td>
+<tr class="row-even"><td>CHARMM PSF</td>
 <td><tt class="docutils literal"><span class="pre">.psf</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">charmm</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">vmd</span></tt></td>
 </tr>
-<tr class="row-even"><td>Gromacs
+<tr class="row-odd"><td>Gromacs
 topology</td>
 <td><tt class="docutils literal"><span class="pre">.top</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">gromacs</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">combine</span></tt>,
 <tt class="docutils literal"><span class="pre">parameters</span></tt></td>
 </tr>
-<tr class="row-odd"><td>Gromacs GRO</td>
+<tr class="row-even"><td>Gromacs GRO</td>
 <td><tt class="docutils literal"><span class="pre">.gro</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">gro</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">precision</span></tt>, <tt class="docutils literal"><span class="pre">nobox</span></tt></td>
 </tr>
-<tr class="row-even"><td>Mol2</td>
+<tr class="row-odd"><td>Mol2</td>
 <td><tt class="docutils literal"><span class="pre">.mol2</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">mol2</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">split</span></tt></td>
 </tr>
-<tr class="row-odd"><td>Mol3</td>
+<tr class="row-even"><td>Mol3</td>
 <td><tt class="docutils literal"><span class="pre">.mol3</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">mol3</span></tt></td>
 <td><tt class="docutils literal"><span class="pre">split</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Amber ASCII
+coordinates</td>
+<td><tt class="docutils literal"><span class="pre">.rst7</span></tt>, <tt class="docutils literal"><span class="pre">.inpcrd</span></tt>,
+<tt class="docutils literal"><span class="pre">.restrt</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">rst7</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">time</span></tt></td>
+</tr>
+<tr class="row-even"><td>Amber NetCDF
+restart</td>
+<td><tt class="docutils literal"><span class="pre">.ncrst</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">ncrst</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">time</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -212,6 +298,10 @@ all conformers), <tt class="docutils literal"><span class="pre">first</span></tt
 <li><tt class="docutils literal"><span class="pre">write_anisou</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, print anistropic B-factors for the various
 atoms (either as a separate CIF section or as <tt class="docutils literal"><span class="pre">ANISOU</span></tt> records in a PDB
 file). Default is <tt class="docutils literal"><span class="pre">False</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">standard_resnames</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, residue names will be regularlized from
+common alternatives back to the PDB standard. For example, ASH and GLH will be
+translated to ASP and GLU, respectively, as they often refer to different
+protomers of aspartate and glutamate.</li>
 <li><tt class="docutils literal"><span class="pre">vmd</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, write a VMD-style PSF file. This is very similar to
 XPLOR format PSF files. Default is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
 <li><tt class="docutils literal"><span class="pre">combine</span></tt> &#8211; Can be <tt class="docutils literal"><span class="pre">None</span></tt> to combine no molecules when writing a GROMACS
@@ -232,6 +322,10 @@ enclosing box (buffered by 5 angstroms) is written</li>
 mol3 entries in the same file (like the ZINC database, for example). If
 <tt class="docutils literal"><span class="pre">False</span></tt>, all residues will be part of the same mol2 or mol3 entry. Default
 is <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">title</span></tt> &#8211; Purely cosmetic, it will specify the title that will be written
+to the coordinate files</li>
+<li><tt class="docutils literal"><span class="pre">time</span></tt> &#8211; Also cosmetic, this is the time corresponding to the snapshot that
+will be written to the coordinate files</li>
 </ul>
 </div>
 </div>

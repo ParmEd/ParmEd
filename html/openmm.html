@@ -26,7 +26,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="next" title="parmed.openmm.StateDataReporter" href="openmmobj/parmed.openmm.StateDataReporter.html" />
-    <link rel="prev" title="The ParmEd API" href="parmed_api.html" /> 
+    <link rel="prev" title="The API for ParmEd Command-line Utilities" href="parmed_api.html" /> 
   </head>
   <body>
     <div class="related">
@@ -42,7 +42,7 @@
           <a href="openmmobj/parmed.openmm.StateDataReporter.html" title="parmed.openmm.StateDataReporter"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="parmed_api.html" title="The ParmEd API"
+          <a href="parmed_api.html" title="The API for ParmEd Command-line Utilities"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
@@ -137,19 +137,19 @@ that kernel.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></a>(f,&nbsp;reportInterval[,&nbsp;step,&nbsp;...])</td>
 <td>This class acts as a state data reporter for OpenMM simulations, but it is a little more generalized.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter" title="parmed.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter" title="parmed.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(file,&nbsp;reportInterval[,&nbsp;crds,&nbsp;...])</td>
 <td>NetCDFReporter prints a trajectory in NetCDF format</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter" title="parmed.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter" title="parmed.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(file,&nbsp;reportInterval[,&nbsp;crds,&nbsp;...])</td>
 <td>MdcrdReporter prints a trajectory in ASCII Amber format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter" title="parmed.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter" title="parmed.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(file,&nbsp;reportInterval[,&nbsp;...])</td>
 <td>Use a reporter to handle writing restarts at specified intervals.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(f,&nbsp;reportInterval,&nbsp;totalSteps)</td>
 <td>A class that prints out a progress report of how much MD (or minimization)</td>
 </tr>
 </tbody>
@@ -320,7 +320,7 @@ prevents ParmEd from recognizing the potential.</li>
           <a href="openmmobj/parmed.openmm.StateDataReporter.html" title="parmed.openmm.StateDataReporter"
              >next</a> |</li>
         <li class="right" >
-          <a href="parmed_api.html" title="The ParmEd API"
+          <a href="parmed_api.html" title="The API for ParmEd Command-line Utilities"
              >previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>

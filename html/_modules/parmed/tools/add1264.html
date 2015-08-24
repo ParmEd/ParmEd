@@ -186,9 +186,9 @@
                                     <span class="s">&quot;ATOM_TYPE </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">atomtypej</span> <span class="p">)</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">atomtypej</span><span class="o">==</span><span class="s">&quot;OW&quot;</span><span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c4</span> 
+                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span>
             <span class="k">else</span><span class="p">:</span>   
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span> 
+                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span>
                
             <span class="c"># for the situation i =&lt; j </span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)):</span>
@@ -205,9 +205,9 @@
                                     <span class="s">&quot;ATOM_TYPE </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">atomtypej</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">atomtypej</span><span class="o">==</span><span class="s">&quot;OW&quot;</span><span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c4</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span>
 <span class="c">#       print(&quot;***********************************************************&quot;)</span>
     <span class="k">return</span> <span class="n">result</span>
 

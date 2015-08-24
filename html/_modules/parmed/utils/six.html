@@ -578,14 +578,14 @@
 <div class="viewcode-block" id="get_unbound_function"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.get_unbound_function">[docs]</a>    <span class="k">def</span> <span class="nf">get_unbound_function</span><span class="p">(</span><span class="n">unbound</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">unbound</span><span class="o">.</span><span class="n">im_func</span>
 </div>
-<div class="viewcode-block" id="create_bound_method"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.create_bound_method">[docs]</a>    <span class="k">def</span> <span class="nf">create_bound_method</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_bound_method</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="Iterator"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Iterator">[docs]</a>    <span class="k">class</span> <span class="nc">Iterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-<div class="viewcode-block" id="Iterator.next"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.Iterator.next">[docs]</a>        <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Iterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</div></div>
+
     <span class="nb">callable</span> <span class="o">=</span> <span class="nb">callable</span>
 <span class="n">_add_doc</span><span class="p">(</span><span class="n">get_unbound_function</span><span class="p">,</span>
          <span class="sd">&quot;&quot;&quot;Get the function out of a possibly unbound function&quot;&quot;&quot;</span><span class="p">)</span>
@@ -673,10 +673,10 @@
         <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">r&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">r&#39;</span><span class="se">\\\\</span><span class="s">&#39;</span><span class="p">),</span> <span class="s">&quot;unicode_escape&quot;</span><span class="p">)</span></div>
     <span class="nb">unichr</span> <span class="o">=</span> <span class="nb">unichr</span>
     <span class="n">int2byte</span> <span class="o">=</span> <span class="nb">chr</span>
-<div class="viewcode-block" id="byte2int"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.byte2int">[docs]</a>    <span class="k">def</span> <span class="nf">byte2int</span><span class="p">(</span><span class="n">bs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">bs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
-<div class="viewcode-block" id="indexbytes"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.indexbytes">[docs]</a>    <span class="k">def</span> <span class="nf">indexbytes</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+    <span class="k">def</span> <span class="nf">byte2int</span><span class="p">(</span><span class="n">bs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">bs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">indexbytes</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="n">iterbytes</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">imap</span><span class="p">,</span> <span class="nb">ord</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">StringIO</span>
     <span class="n">StringIO</span> <span class="o">=</span> <span class="n">BytesIO</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span>
@@ -711,7 +711,7 @@
         <span class="k">raise</span> <span class="n">value</span>
 </div>
 <span class="k">else</span><span class="p">:</span>
-<div class="viewcode-block" id="exec_"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.exec_">[docs]</a>    <span class="k">def</span> <span class="nf">exec_</span><span class="p">(</span><span class="n">_code_</span><span class="p">,</span> <span class="n">_globs_</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">_locs_</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">exec_</span><span class="p">(</span><span class="n">_code_</span><span class="p">,</span> <span class="n">_globs_</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">_locs_</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Execute code in a namespace.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">_globs_</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -723,7 +723,7 @@
             <span class="n">_locs_</span> <span class="o">=</span> <span class="n">_globs_</span>
         <span class="k">exec</span><span class="p">(</span><span class="s">&quot;&quot;&quot;exec _code_ in _globs_, _locs_&quot;&quot;&quot;</span><span class="p">)</span>
 
-</div>
+
     <span class="n">exec_</span><span class="p">(</span><span class="s">&quot;&quot;&quot;def reraise(tp, value, tb=None):</span>
 <span class="s">    raise tp, value, tb</span>
 <span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
@@ -800,23 +800,23 @@
         <span class="n">write</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
     <span class="n">_print</span> <span class="o">=</span> <span class="n">print_</span>
-<div class="viewcode-block" id="print_"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">fp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;file&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
         <span class="n">flush</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;flush&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
         <span class="n">_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">flush</span> <span class="ow">and</span> <span class="n">fp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">fp</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-</div>
+
 <span class="n">_add_doc</span><span class="p">(</span><span class="n">reraise</span><span class="p">,</span> <span class="s">&quot;&quot;&quot;Reraise an exception.&quot;&quot;&quot;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
-<div class="viewcode-block" id="wraps"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.wraps">[docs]</a>    <span class="k">def</span> <span class="nf">wraps</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">assigned</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">WRAPPER_ASSIGNMENTS</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">wraps</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">assigned</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">WRAPPER_ASSIGNMENTS</span><span class="p">,</span>
               <span class="n">updated</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">WRAPPER_UPDATES</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">assigned</span><span class="p">,</span> <span class="n">updated</span><span class="p">)(</span><span class="n">f</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">wrapped</span>
             <span class="k">return</span> <span class="n">f</span>
-        <span class="k">return</span> <span class="n">wrapper</span></div>
+        <span class="k">return</span> <span class="n">wrapper</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">wraps</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">wraps</span>
 

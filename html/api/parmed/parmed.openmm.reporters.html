@@ -111,8 +111,8 @@ single-point energies.</p>
 
 <dl class="class">
 <dt id="parmed.openmm.reporters.MdcrdReporter">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">MdcrdReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">MdcrdReporter</tt><big>(</big><em>file</em>, <em>reportInterval</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will
 be significantly slower than binary file reporters (like DCDReporter or
 NetCDFReporter).</p>
@@ -215,8 +215,8 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.reporters.NetCDFReporter">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">NetCDFReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.NetCDFReporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">NetCDFReporter</tt><big>(</big><em>file</em>, <em>reportInterval</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.NetCDFReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>NetCDFReporter prints a trajectory in NetCDF format</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -294,7 +294,7 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.reporters.ProgressReporter">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">ProgressReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.ProgressReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">ProgressReporter</tt><big>(</big><em>f</em>, <em>reportInterval</em>, <em>totalSteps</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=False</em>, <em>volume=False</em>, <em>density=False</em>, <em>systemMass=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.ProgressReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#parmed.openmm.reporters.StateDataReporter" title="parmed.openmm.reporters.StateDataReporter"><tt class="xref py py-class docutils literal"><span class="pre">parmed.openmm.reporters.StateDataReporter</span></tt></a></p>
 <p>A class that prints out a progress report of how much MD (or minimization)
 has been done, how fast the simulation is running, and how much time is left
@@ -414,8 +414,8 @@ current/overall MD performance)</p>
 
 <dl class="class">
 <dt id="parmed.openmm.reporters.RestartReporter">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">RestartReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.RestartReporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">RestartReporter</tt><big>(</big><em>file</em>, <em>reportInterval</em>, <em>write_multiple=False</em>, <em>netcdf=False</em>, <em>write_velocities=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.RestartReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Use a reporter to handle writing restarts at specified intervals.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -524,8 +524,8 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.reporters.StateDataReporter">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">StateDataReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><tt class="descclassname">parmed.openmm.reporters.</tt><tt class="descname">StateDataReporter</tt><big>(</big><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0})</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>This class acts as a state data reporter for OpenMM simulations, but it is a
 little more generalized. Notable differences are:</p>
 <blockquote>

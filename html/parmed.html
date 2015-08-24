@@ -59,7 +59,7 @@
 primary front-end program using the <a class="reference internal" href="api/parmed/parmed.html#module-parmed" title="parmed"><tt class="xref py py-mod docutils literal"><span class="pre">parmed</span></tt></a> and <a class="reference internal" href="api/parmed/parmed.tools.html#module-parmed.tools" title="parmed.tools"><tt class="xref py py-mod docutils literal"><span class="pre">parmed.tools</span></tt></a>
 packages to provide a set of <em>Actions</em> by which you can modify a system topology
 and parameters (it currently only works for Amber topology files, although
-support for the entire <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
+support for the entire <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>
 hierarchy is planned).</p>
 <p>There are two ways in which ParmEd can be run&#8212;in batch reading from an input
 file or <em>script</em>, and with an interactive interpreter. A script can either be
@@ -433,18 +433,15 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 </div>
 <div class="section" id="minimize">
 <h3>minimize<a class="headerlink" href="#minimize" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre>minimize [cutoff &lt;cut&gt;] [[igb &lt;IGB&gt;] [saltcon &lt;conc&gt;]] [[restrain &lt;mask&gt;] [weight &lt;k&gt;]] [norun] [script &lt;script_file.py&gt;] [platform &lt;platform&gt;] [precision &lt;precision model&gt;] [tol &lt;tolerance&gt;] [maxcyc &lt;cycles&gt;]
+<div class="highlight-none"><div class="highlight"><pre>minimize [cutoff &lt;cut&gt;] [[igb &lt;IGB&gt;] [saltcon &lt;conc&gt;]] [[restrain &lt;mask&gt;] [weight &lt;k&gt;]] [norun] [script &lt;script_file.py&gt;] [platform &lt;platform&gt;] [precision &lt;precision model&gt;] [tol &lt;tolerance&gt;] [maxcyc &lt;cycles&gt;] [omm]
 </pre></div>
 </div>
-<p>This action takes a structure and minimizes the <a class="reference internal" href="#energy">energy</a> using <a class="reference internal" href="#openmm">OpenMM</a>. Following this action, the coordinates stored in the topology will be the minimized structure</p>
+<p>This action takes a structure and minimizes the <a class="reference internal" href="#energy">energy</a> using either scipy.optimize.minimize (with BFGS) and the sander API <em>or</em> <a class="reference internal" href="#openmm">OpenMM</a>. Following this action, the coordinates stored in the topology will be the minimized structure</p>
 <p>General Options</p>
 <blockquote>
 <div><ul class="simple">
+<li>omm Use <a class="reference internal" href="#openmm">OpenMM</a> instead of sander+scipy to minimize</li>
 <li>cutoff <tt class="docutils literal"><span class="pre">&lt;cutoff&gt;</span></tt> Nonbonded cutoff in Angstroms</li>
-<li>restrain <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> Selection of atoms to restrain</li>
-<li>weight <tt class="docutils literal"><span class="pre">&lt;k&gt;</span></tt> Weight of positional restraints (kcal/mol/A^2)</li>
-<li>norun Do not run the calculation</li>
-<li>script <tt class="docutils literal"><span class="pre">&lt;script&gt;</span></tt> Name of the Python script to write to run this calculation</li>
 <li>tol <tt class="docutils literal"><span class="pre">&lt;tolerance&gt;</span></tt> The largest <a class="reference internal" href="#energy">energy</a> difference between successive steps in the minimization allow the minimization to stop (Default 0.001)</li>
 <li>maxcyc <tt class="docutils literal"><span class="pre">&lt;cycles&gt;</span></tt> The maximum number of minimization cycles permitted. No limit by default (minimization stops when tolerance is satisfied)</li>
 </ul>
@@ -456,7 +453,18 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <li>saltcon <tt class="docutils literal"><span class="pre">&lt;conc&gt;</span></tt> Salt concentration for GB in Molarity</li>
 </ul>
 </div></blockquote>
-<p>The implicit solvent options will be ignored for systems with periodic boundary conditions</p>
+<p>OpenMM-specific options</p>
+<blockquote>
+<div><ul class="simple">
+<li>restrain <tt class="docutils literal"><span class="pre">&lt;mask&gt;</span></tt> Selection of atoms to restrain</li>
+<li>weight <tt class="docutils literal"><span class="pre">&lt;k&gt;</span></tt> Weight of positional restraints (kcal/mol/A^2)</li>
+<li>norun Do not run the calculation</li>
+<li>script <tt class="docutils literal"><span class="pre">&lt;script&gt;</span></tt> Name of the Python script to write to run this calculation</li>
+<li>platform <tt class="docutils literal"><span class="pre">&lt;platform&gt;</span></tt> Which compute platform to use. Options are CUDA, OpenCL, CPU, and Reference. Consult <a class="reference internal" href="#openmm">OpenMM</a> docs for more information</li>
+<li>precision <tt class="docutils literal"><span class="pre">&lt;precision_model&gt;</span></tt> Which precision model to use. Can be &#8220;single&#8221;, &#8220;double&#8221;, or &#8220;mixed&#8221;, and only has an effect on the CUDA and OpenCL platforms.</li>
+</ul>
+</div></blockquote>
+<p>The implicit solvent options will be ignored for systems with periodic boundary conditions. The precision option will be ignored for platforms that do not support user-specified precision. The platform, precision, and script arguments will be ignored unless <tt class="docutils literal"><span class="pre">omm</span></tt> is specified.</p>
 </div>
 <div class="section" id="netcharge">
 <h3>netCharge<a class="headerlink" href="#netcharge" title="Permalink to this headline">¶</a></h3>

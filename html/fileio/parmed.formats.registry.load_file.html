@@ -81,6 +81,16 @@ easy code, the <tt class="docutils literal"><span class="pre">structure</span></
 on to the correct file parser if that parser accepts the structure
 keyword. There is no default, as each parser has its own default.</p>
 </div></blockquote>
+<p><strong>natom</strong> : int, optional</p>
+<blockquote>
+<div><p>This is needed for some coordinate file classes, but not others. This is
+treated the same as <tt class="docutils literal"><span class="pre">structure</span></tt>, above. It is the # of atoms expected</p>
+</div></blockquote>
+<p><strong>hasbox</strong> : bool, optional</p>
+<blockquote>
+<div><p>Same as <tt class="docutils literal"><span class="pre">natom</span></tt>, but indicates whether the coordinate file has unit
+cell dimensions</p>
+</div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
 <blockquote>
 <div><p>Some formats accept positional arguments. These will be passed along</p>

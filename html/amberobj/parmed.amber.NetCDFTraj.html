@@ -51,7 +51,7 @@
 <h1>parmed.amber.NetCDFTraj<a class="headerlink" href="#parmed-amber-netcdftraj" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.amber.NetCDFTraj">
-<em class="property">class </em><tt class="descclassname">parmed.amber.</tt><tt class="descname">NetCDFTraj</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">parmed.amber.</tt><tt class="descname">NetCDFTraj</tt><big>(</big><em>fname</em>, <em>mode='r'</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to read or write NetCDF restart files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -155,17 +155,17 @@ the default constructor</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as an Amber NetCDF trajectory file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(fname,&nbsp;natom,&nbsp;box[,&nbsp;crds,&nbsp;vels,&nbsp;...])</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(fname)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>fname</em>, <em>mode='r'</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens a NetCDF File</p>
 </dd></dl>
 
@@ -176,7 +176,7 @@ the default constructor</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.__init__" title="parmed.amber.NetCDFTraj.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.__init__" title="parmed.amber.NetCDFTraj.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(fname[,&nbsp;mode])</td>
 <td>Opens a NetCDF File</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.add_box" title="parmed.amber.NetCDFTraj.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(lengths[,&nbsp;angles])</td>
@@ -224,10 +224,10 @@ the default constructor</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
 <td>Identifies the file type as an Amber NetCDF trajectory file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(fname,&nbsp;natom,&nbsp;box[,&nbsp;crds,&nbsp;vels,&nbsp;...])</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(fname)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></td>
@@ -469,7 +469,7 @@ constructor.</p>
 
 <dl class="classmethod">
 <dt id="parmed.amber.NetCDFTraj.open_new">
-<em class="property">classmethod </em><tt class="descname">open_new</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_new" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">open_new</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>box</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em>, <em>remd=None</em>, <em>remd_dimension=None</em>, <em>title=''</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_new" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens a new NetCDF file and sets the attributes</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -521,7 +521,7 @@ None if no REMD information is written</p>
 
 <dl class="classmethod">
 <dt id="parmed.amber.NetCDFTraj.open_old">
-<em class="property">classmethod </em><tt class="descname">open_old</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_old" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">open_old</tt><big>(</big><em>fname</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_old" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens the NetCDF file and sets the global attributes that the file sets</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

@@ -443,18 +443,15 @@ minimize
 
 .. code-block:: none
 
-    minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] [[restrain <mask>] [weight <k>]] [norun] [script <script_file.py>] [platform <platform>] [precision <precision model>] [tol <tolerance>] [maxcyc <cycles>]
+    minimize [cutoff <cut>] [[igb <IGB>] [saltcon <conc>]] [[restrain <mask>] [weight <k>]] [norun] [script <script_file.py>] [platform <platform>] [precision <precision model>] [tol <tolerance>] [maxcyc <cycles>] [omm]
 
-This action takes a structure and minimizes the energy_ using OpenMM_. Following this action, the coordinates stored in the topology will be the minimized structure
+This action takes a structure and minimizes the energy_ using either scipy.optimize.minimize (with BFGS) and the sander API *or* OpenMM_. Following this action, the coordinates stored in the topology will be the minimized structure
 
 General Options
 
 
+    - omm Use OpenMM_ instead of sander+scipy to minimize
     - cutoff ``<cutoff>`` Nonbonded cutoff in Angstroms
-    - restrain ``<mask>`` Selection of atoms to restrain
-    - weight ``<k>`` Weight of positional restraints (kcal/mol/A^2)
-    - norun Do not run the calculation
-    - script ``<script>`` Name of the Python script to write to run this calculation
     - tol ``<tolerance>`` The largest energy_ difference between successive steps in the minimization allow the minimization to stop (Default 0.001)
     - maxcyc ``<cycles>`` The maximum number of minimization cycles permitted. No limit by default (minimization stops when tolerance is satisfied)
 
@@ -464,7 +461,17 @@ Implicit Solvent options
     - igb ``<IGB>`` GB model to use (0=No GB, 1,2,5,7,8 correspond to Amber models)
     - saltcon ``<conc>`` Salt concentration for GB in Molarity
 
-The implicit solvent options will be ignored for systems with periodic boundary conditions
+OpenMM-specific options
+
+
+    - restrain ``<mask>`` Selection of atoms to restrain
+    - weight ``<k>`` Weight of positional restraints (kcal/mol/A^2)
+    - norun Do not run the calculation
+    - script ``<script>`` Name of the Python script to write to run this calculation
+    - platform ``<platform>`` Which compute platform to use. Options are CUDA, OpenCL, CPU, and Reference. Consult OpenMM_ docs for more information
+    - precision ``<precision_model>`` Which precision model to use. Can be "single", "double", or "mixed", and only has an effect on the CUDA and OpenCL platforms.
+
+The implicit solvent options will be ignored for systems with periodic boundary conditions. The precision option will be ignored for platforms that do not support user-specified precision. The platform, precision, and script arguments will be ignored unless ``omm`` is specified.
 
 netCharge
 ~~~~~~~~~

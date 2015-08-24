@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.formats.pqr &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed.formats" href="../formats.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../formats.html" accesskey="U">parmed.formats</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.formats.pqr</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for reading and writing PQR files</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">PDBError</span><span class="p">,</span> <span class="n">PDBWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.pdb</span> <span class="kn">import</span> <span class="n">_standardize_resname</span>
+<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
+<div class="viewcode-block" id="PQRFile"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.pqr.PQRFile">[docs]</a><span class="k">class</span> <span class="nc">PQRFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Standard PDB file format parser and writer &quot;&quot;&quot;</span>
+    <span class="c">#===================================================</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PQRFile.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.pqr.PQRFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Identifies the file type as a PDB file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to check format for</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_fmt : bool</span>
+<span class="sd">            True if it is a PQR file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;CRYST1&#39;</span><span class="p">,</span> <span class="s">&#39;END&#39;</span><span class="p">,</span> <span class="s">&#39;END&#39;</span><span class="p">,</span> <span class="s">&#39;HEADER&#39;</span><span class="p">,</span> <span class="s">&#39;NUMMDL&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;MASTER&#39;</span><span class="p">,</span> <span class="s">&#39;AUTHOR&#39;</span><span class="p">,</span> <span class="s">&#39;CAVEAT&#39;</span><span class="p">,</span> <span class="s">&#39;COMPND&#39;</span><span class="p">,</span> <span class="s">&#39;EXPDTA&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;MDLTYP&#39;</span><span class="p">,</span> <span class="s">&#39;KEYWDS&#39;</span><span class="p">,</span> <span class="s">&#39;OBSLTE&#39;</span><span class="p">,</span> <span class="s">&#39;SOURCE&#39;</span><span class="p">,</span> <span class="s">&#39;SPLIT&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;SPRSDE&#39;</span><span class="p">,</span> <span class="s">&#39;TITLE &#39;</span><span class="p">,</span> <span class="s">&#39;ANISOU&#39;</span><span class="p">,</span> <span class="s">&#39;CISPEP&#39;</span><span class="p">,</span> <span class="s">&#39;CONECT&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;DBREF &#39;</span><span class="p">,</span> <span class="s">&#39;HELIX &#39;</span><span class="p">,</span> <span class="s">&#39;HET&#39;</span><span class="p">,</span> <span class="s">&#39;LINK&#39;</span><span class="p">,</span> <span class="s">&#39;MODRES&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;REVDAT&#39;</span><span class="p">,</span> <span class="s">&#39;SEQADV&#39;</span><span class="p">,</span> <span class="s">&#39;SHEET&#39;</span><span class="p">,</span> <span class="s">&#39;SSBOND&#39;</span><span class="p">,</span> <span class="s">&#39;FORMUL&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;HETNAM&#39;</span><span class="p">,</span> <span class="s">&#39;HETSYN&#39;</span><span class="p">,</span> <span class="s">&#39;SEQRES&#39;</span><span class="p">,</span> <span class="s">&#39;SITE&#39;</span><span class="p">,</span> <span class="s">&#39;ENDMDL&#39;</span><span class="p">,</span> <span class="s">&#39;MODEL&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;JRNL&#39;</span><span class="p">,</span> <span class="s">&#39;REMARK&#39;</span><span class="p">,</span> <span class="s">&#39;TER&#39;</span><span class="p">,</span> <span class="s">&#39;USER&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;ORIGX&#39;</span><span class="p">,</span> <span class="s">&#39;SCALE&#39;</span><span class="p">,</span> <span class="s">&#39;MTRIX&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;123&#39;</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;ATOM&#39;</span><span class="p">,</span> <span class="s">&#39;HETATM&#39;</span><span class="p">):</span>
+                    <span class="c"># Format is:</span>
+                    <span class="c"># rec atnum atname resname [chain] resnum x y z chg radius</span>
+                    <span class="c"># Where the chain ID is optional. rec must be ATOM or HETATM</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
+                        <span class="n">offset</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="n">offset</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
+                        <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
+                        <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">7</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
+                        <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
+                        <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">9</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PQRFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.pqr.PQRFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read a PQR file and return a populated `Structure` class</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str or file-like</span>
+<span class="sd">            Name of the PQR file to read, or a file-like object that can iterate</span>
+<span class="sd">            over the lines of a PQR. Compressed file names can be specified and</span>
+<span class="sd">            are determined by file-name extension (e.g., file.pqr.gz,</span>
+<span class="sd">            file.pqr.bz2)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        structure : :class:`Structure`</span>
+<span class="sd">            The Structure object initialized with all of the information from</span>
+<span class="sd">            the PDB file.  No bonds or other topological features are added by</span>
+<span class="sd">            default.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
+
+        <span class="n">struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">()</span>
+        <span class="c"># Add metadata fields</span>
+        <span class="n">modelno</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># For PDB files with multiple MODELs</span>
+        <span class="n">atomno</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_coordinates</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c"># Support hexadecimal numbering like that printed by VMD</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="p">:</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;ATOM&#39;</span><span class="p">,</span> <span class="s">&#39;HETATM&#39;</span><span class="p">):</span>
+                    <span class="n">atomno</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">nam</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">resn</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">chg</span><span class="p">,</span> <span class="n">rad</span> <span class="o">=</span> <span class="n">words</span>
+                        <span class="n">chn</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">nam</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">chn</span><span class="p">,</span> <span class="n">resn</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">chg</span><span class="p">,</span> <span class="n">rad</span> <span class="o">=</span> <span class="n">words</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Illegal PQR record format: expected &#39;</span>
+                                         <span class="s">&#39;10 or 11 tokens on the atom line&#39;</span><span class="p">)</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                    <span class="n">chg</span><span class="p">,</span> <span class="n">rad</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">chg</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">rad</span><span class="p">)</span>
+                    <span class="n">elem</span> <span class="o">=</span> <span class="n">element_by_name</span><span class="p">(</span><span class="n">nam</span><span class="p">)</span> <span class="c"># Yuck</span>
+                    <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+                    <span class="n">mass</span> <span class="o">=</span> <span class="n">Mass</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">nam</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;EP&#39;</span><span class="p">,</span> <span class="s">&#39;LP&#39;</span><span class="p">):</span> <span class="c"># lone pair</span>
+                        <span class="n">atom</span> <span class="o">=</span> <span class="n">ExtraPoint</span><span class="p">(</span><span class="n">atomic_number</span><span class="o">=</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">nam</span><span class="p">,</span>
+                                          <span class="n">charge</span><span class="o">=</span><span class="n">chg</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">num</span><span class="p">,</span>
+                                          <span class="n">radii</span><span class="o">=</span><span class="n">rad</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">atomic_number</span><span class="o">=</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">nam</span><span class="p">,</span>
+                                    <span class="n">charge</span><span class="o">=</span><span class="n">chg</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">num</span><span class="p">,</span>
+                                    <span class="n">radii</span><span class="o">=</span><span class="n">rad</span><span class="p">)</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">modelno</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">resn</span><span class="p">,</span> <span class="n">chn</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">orig_atom</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atomno</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">PDBError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%d</span><span class="s"> differs in MODEL </span><span class="si">%d</span><span class="s"> [</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> &#39;</span>
+                                           <span class="s">&#39;vs. </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">modelno</span><span class="p">,</span>
+                                           <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                           <span class="n">res</span><span class="p">,</span> <span class="n">nam</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">orig_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">res</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                                <span class="ow">or</span> <span class="n">orig_atom</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">nam</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
+                            <span class="k">raise</span> <span class="n">PDBError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%d</span><span class="s"> differs in MODEL </span><span class="si">%d</span><span class="s"> [</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> &#39;</span>
+                                           <span class="s">&#39;vs. </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atomno</span><span class="p">,</span> <span class="n">modelno</span><span class="p">,</span>
+                                           <span class="n">orig_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                           <span class="n">orig_atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">nam</span><span class="p">))</span>
+                    <span class="n">coordinates</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;ENDMDL&#39;</span><span class="p">:</span>
+                    <span class="c"># End the current model</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">PDBError</span><span class="p">(</span><span class="s">&#39;MODEL ended before any atoms read in&#39;</span><span class="p">)</span>
+                    <span class="n">modelno</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="s">&#39;Inconsistent atom numbers in some PDB models&#39;</span><span class="p">)</span>
+                    <span class="n">all_coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+                    <span class="n">atomno</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;MODEL&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">modelno</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Inconsistent atom numbers in &#39;</span>
+                                             <span class="s">&#39;some PDB models&#39;</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;MODEL not explicitly ended&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
+                        <span class="n">all_coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+                        <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">modelno</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;CRYST1&#39;</span><span class="p">:</span>
+                    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">A</span> <span class="o">=</span> <span class="n">B</span> <span class="o">=</span> <span class="n">C</span> <span class="o">=</span> <span class="mf">90.0</span>
+                    <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">]</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">struct</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">coordinates</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;bad number of atoms in some PQR models&#39;</span><span class="p">)</span>
+            <span class="n">all_coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                        <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">struct</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PQRFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.pqr.PQRFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">standard_resnames</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write a PDB file from a Structure instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        struct : :class:`Structure`</span>
+<span class="sd">            The structure from which to write the PDB file</span>
+<span class="sd">        dest : str or file-like</span>
+<span class="sd">            Either a file name or a file-like object containing a `write`</span>
+<span class="sd">            method to which to write the PDB file. If it is a filename that</span>
+<span class="sd">            ends with .gz or .bz2, a compressed version will be written using</span>
+<span class="sd">            either gzip or bzip2, respectively.</span>
+<span class="sd">        renumber : bool, optional</span>
+<span class="sd">            If True, renumber the atoms and residues sequentially as they are</span>
+<span class="sd">            stored in the structure.  If False, use the original numbering if</span>
+<span class="sd">            it was assigned previously. Default is True</span>
+<span class="sd">        coordinates : array-like of float, optional</span>
+<span class="sd">            If provided, these coordinates will be written to the PDB file</span>
+<span class="sd">            instead of the coordinates stored in the structure. These</span>
+<span class="sd">            coordinates should line up with the atom order in the structure</span>
+<span class="sd">            (not necessarily the order of the &quot;original&quot; PDB file if they</span>
+<span class="sd">            differ)</span>
+<span class="sd">        standard_resnames : bool, optional</span>
+<span class="sd">            If True, common aliases for various amino and nucleic acid residues</span>
+<span class="sd">            will be converted into the PDB-standard values. Default is False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">atomrec</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;ATOM  </span><span class="si">%5d</span><span class="s"> </span><span class="si">%-3s</span><span class="s">  </span><span class="si">%-3s</span><span class="s"> </span><span class="si">%1s</span><span class="s"> </span><span class="si">%3d</span><span class="s">    </span><span class="si">%7.3f</span><span class="s"> </span><span class="si">%7.3f</span><span class="s"> </span><span class="si">%7.3f</span><span class="s"> </span><span class="si">%8.4f</span><span class="s"> &#39;</span>
+                   <span class="s">&#39;</span><span class="si">%8.4f</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;CRYST1 </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%6.2f</span><span class="s"> </span><span class="si">%6.2f</span><span class="s"> </span><span class="si">%6.2f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                    <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Coordinates has unexpected shape&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+        <span class="c"># Create a function to process each atom and return which one we want</span>
+        <span class="c"># to print, based on our alternate location choice</span>
+        <span class="k">if</span> <span class="n">standard_resnames</span><span class="p">:</span>
+            <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+        <span class="n">last_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">last_rnumber</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;MODEL      </span><span class="si">%5d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">renumber</span><span class="p">:</span>
+                    <span class="n">atoms</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">atoms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+                    <span class="c"># Figure out the serial numbers we want to print</span>
+                    <span class="k">if</span> <span class="n">renumber</span><span class="p">:</span>
+                        <span class="n">anum</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">rnum</span> <span class="o">=</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">anum</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span> <span class="ow">or</span> <span class="n">last_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">rnum</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="ow">or</span> <span class="n">last_rnumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">last_number</span> <span class="o">=</span> <span class="n">anum</span>
+                    <span class="n">last_rnumber</span> <span class="o">=</span> <span class="n">rnum</span>
+                    <span class="c"># Do any necessary name munging to respect the PDB spec</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="ow">and</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">Element</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
+                        <span class="n">aname</span> <span class="o">=</span> <span class="s">&#39; </span><span class="si">%-3s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">aname</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                                          <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">rnum</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span>
+                                          <span class="n">atom</span><span class="o">.</span><span class="n">xz</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">radii</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;ENDMDL</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%-80s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="s">&quot;END&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../formats.html" >parmed.formats</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

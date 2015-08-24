@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.pandautils module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-parmed.utils.pandautils">
+<span id="parmed-utils-pandautils-module"></span><h1>parmed.utils.pandautils module<a class="headerlink" href="#module-parmed.utils.pandautils" title="Permalink to this headline">¶</a></h1>
+<p>A collection of utilities for use with Pandas objects</p>
+<dl class="function">
+<dt id="parmed.utils.pandautils.create_dataframe">
+<tt class="descclassname">parmed.utils.pandautils.</tt><tt class="descname">create_dataframe</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#create_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.create_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a pandas.DataFrame object from the current instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The DataFrame will be over all atoms. The columns will be the attributes
+of the atom (as well as its containing residue). Some columns will
+<em>always</em> exist. Others will only exist if those attributes have been set
+on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+attributes and their meaning). The columns that will always be present
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number : int</li>
+<li>name : str</li>
+<li>type : str</li>
+<li>atomic_number : int</li>
+<li>charge : float</li>
+<li>mass : float</li>
+<li>nb_idx : int</li>
+<li>radii : float</li>
+<li>screen : float</li>
+<li>occupancy : float</li>
+<li>bfactor : float</li>
+<li>altloc : str</li>
+<li>tree : str</li>
+<li>join : int</li>
+<li>irotat : int</li>
+<li>rmin : float</li>
+<li>epsilon : float</li>
+<li>rmin_14 : float</li>
+<li>epsilon_14 : float</li>
+<li>resname : str (name of the containing residue)</li>
+<li>resid : int (Sequential index of the containing residue)</li>
+<li>resnum : int (original residue number in the input structure)</li>
+<li>chain : str (chain ID that the containing residue belongs to)</li>
+</ul>
+</div></blockquote>
+<p>The following attributes are optionally present if they were present in
+the original file defining the structure:</p>
+<blockquote>
+<div><ul class="simple">
+<li>xx : float (x-coordinate position)</li>
+<li>xy : float (y-coordinate position)</li>
+<li>xz : float (z-coordinate position)</li>
+<li>vx : float (x-coordinate velocity)</li>
+<li>vy : float (y-coordinate velocity)</li>
+<li>vz : float (z-coordinate velocity)</li>
+<li>type_idx : int (integer type index for AMOEBA)</li>
+<li>class_idx : int (integer class type index for AMOEBA)</li>
+<li>multipole_111 : float (Monopole)</li>
+<li>multipole_211 : float (1,1 Dipole component)</li>
+<li>multipole_212 : float (1,2 Dipole component)</li>
+<li>multipole_222 : float (2,2 Dipole component)</li>
+<li>multipole_411 : float (1,1 Quadrupole component)</li>
+<li>multipole_412 : float (1,2 Quadrupole component)</li>
+<li>multipole_422 : float (2,2 Quadrupole component)</li>
+<li>multipole_413 : float (1,3 Quadrupole component)</li>
+<li>multipole_423 : float (2,3 Quadrupole component)</li>
+<li>multipole_433 : float (3,3 Quadrupole component)</li>
+<li>polarizability : float (dipole polarizability)</li>
+<li>vdw_parent : int (index of the vdW parent atom of this atom)</li>
+<li>segid : segment ID (similar to chain, but for CHARMM)</li>
+<li>U11 : float (U[1][1] of anisotropic b-factor tensor)</li>
+<li>U22 : float (U[2][2] of anisotropic b-factor tensor)</li>
+<li>U33 : float (U[3][3] of anisotropic b-factor tensor)</li>
+<li>U12 : float (U[1][2] of anisotropic b-factor tensor)</li>
+<li>U13 : float (U[1][3] of anisotropic b-factor tensor)</li>
+<li>U23 : float (U[2][3] of anisotropic b-factor tensor)</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.utils.pandautils.load_dataframe">
+<tt class="descclassname">parmed.utils.pandautils.</tt><tt class="descname">load_dataframe</tt><big>(</big><em>obj</em>, <em>dataframe</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#load_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a DataFrame into the current object, setting atomic properties based
+on the entries of the DataFrame.  Supported atomic properties are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number : int</li>
+<li>name : str</li>
+<li>type : str</li>
+<li>atomic_number : int</li>
+<li>charge : float</li>
+<li>mass : float</li>
+<li>nb_idx : int</li>
+<li>radii : float</li>
+<li>screen : float</li>
+<li>occupancy : float</li>
+<li>bfactor : float</li>
+<li>altloc : str</li>
+<li>tree : str</li>
+<li>join : int</li>
+<li>irotat : int</li>
+<li>rmin : float</li>
+<li>epsilon : float</li>
+<li>rmin_14 : float</li>
+<li>epsilon_14 : float</li>
+<li>xx : float (x-coordinate position)</li>
+<li>xy : float (y-coordinate position)</li>
+<li>xz : float (z-coordinate position)</li>
+<li>vx : float (x-coordinate velocity)</li>
+<li>vy : float (y-coordinate velocity)</li>
+<li>vz : float (z-coordinate velocity)</li>
+<li>type_idx : int (integer type index for AMOEBA)</li>
+<li>class_idx : int (integer class type index for AMOEBA)</li>
+<li>multipole_111 : float (Monopole)</li>
+<li>multipole_211 : float (1,1 Dipole component)</li>
+<li>multipole_212 : float (1,2 Dipole component)</li>
+<li>multipole_222 : float (2,2 Dipole component)</li>
+<li>multipole_411 : float (1,1 Quadrupole component)</li>
+<li>multipole_412 : float (1,2 Quadrupole component)</li>
+<li>multipole_422 : float (2,2 Quadrupole component)</li>
+<li>multipole_413 : float (1,3 Quadrupole component)</li>
+<li>multipole_423 : float (2,3 Quadrupole component)</li>
+<li>multipole_433 : float (3,3 Quadrupole component)</li>
+<li>polarizability : float (dipole polarizability)</li>
+<li>vdw_parent : int (index of the vdW parent atom of this atom)</li>
+<li>segid : segment ID (similar to chain, but for CHARMM)</li>
+<li>U11 : float (U[1][1] of anisotropic b-factor tensor)</li>
+<li>U22 : float (U[2][2] of anisotropic b-factor tensor)</li>
+<li>U33 : float (U[3][3] of anisotropic b-factor tensor)</li>
+<li>U12 : float (U[1][2] of anisotropic b-factor tensor)</li>
+<li>U13 : float (U[1][3] of anisotropic b-factor tensor)</li>
+<li>U23 : float (U[2][3] of anisotropic b-factor tensor)</li>
+</ul>
+</div></blockquote>
+<p>The resname, resid, chain, and resnum attributes are ignored. Other
+attributes emit a ParameterWarning</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/parmed/parmed.utils.pandautils.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

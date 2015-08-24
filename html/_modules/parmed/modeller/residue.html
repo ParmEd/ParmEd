@@ -63,6 +63,7 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">pd</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">TrackedList</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -302,7 +303,10 @@
                 <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">atom</span>
             <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%s</span><span class="s"> not found in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>  <span class="n">idx</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
 <div class="viewcode-block" id="ResidueTemplate.fix_charges"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.fix_charges">[docs]</a>    <span class="k">def</span> <span class="nf">fix_charges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -459,16 +463,38 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
 </div>
-<div class="viewcode-block" id="ResidueTemplate.save"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplate.to_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.to_structure">[docs]</a>    <span class="k">def</span> <span class="nf">to_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a Structure instance with a single residue from this</span>
+<span class="sd">        ResidueTemplate</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        struct : :class:`parmed.structure.Structure`</span>
+<span class="sd">            The Structure with all of the bonds and connectivity of this</span>
+<span class="sd">            template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">],</span>
+                                     <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">struct</span>
+</div>
+<div class="viewcode-block" id="ResidueTemplate.save"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves the current ResidueTemplate in the requested file format.</span>
 <span class="sd">        Supported formats can be specified explicitly or determined by file-name</span>
 <span class="sd">        extension. The following formats are supported, with the recognized</span>
-<span class="sd">        suffix and ``format`` keyword shown in parentheses:</span>
+<span class="sd">        suffix shown in parentheses:</span>
 
 <span class="sd">            - MOL2 (.mol2)</span>
 <span class="sd">            - MOL3 (.mol3)</span>
 <span class="sd">            - OFF (.lib/.off)</span>
+<span class="sd">            - PDB (.pdb)</span>
+<span class="sd">            - PQR (.pqr)</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -480,6 +506,9 @@
 <span class="sd">            The case-insensitive keyword specifying what type of file ``fname``</span>
 <span class="sd">            should be saved as. If ``None`` (default), the file type will be</span>
 <span class="sd">            determined from filename extension of ``fname``</span>
+<span class="sd">        overwrite : bool, optional</span>
+<span class="sd">            If True, allow the target file to be overwritten. Otherwise, an</span>
+<span class="sd">            IOError is raised if the file exists. Default is False</span>
 <span class="sd">        kwargs : keyword-arguments</span>
 <span class="sd">            Remaining arguments are passed on to the file writing routines that</span>
 <span class="sd">            are called by this function</span>
@@ -497,6 +526,8 @@
                 <span class="s">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s">&#39;MOL3&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.off&#39;</span> <span class="p">:</span> <span class="s">&#39;OFFLIB&#39;</span><span class="p">,</span>
                 <span class="s">&#39;.lib&#39;</span> <span class="p">:</span> <span class="s">&#39;OFFLIB&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.pdb&#39;</span> <span class="p">:</span> <span class="s">&#39;PDB&#39;</span><span class="p">,</span>
+                <span class="s">&#39;.pqr&#39;</span> <span class="p">:</span> <span class="s">&#39;PQR&#39;</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">format</span> <span class="o">=</span> <span class="n">format</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
@@ -514,6 +545,9 @@
             <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;OFFLIB&#39;</span><span class="p">,</span> <span class="s">&#39;OFF&#39;</span><span class="p">):</span>
             <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">:</span> <span class="bp">self</span><span class="p">},</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;PDB&#39;</span><span class="p">,</span> <span class="s">&#39;PQR&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_structure</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">format</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Unrecognized format for ResidueTemplate save&#39;</span><span class="p">)</span>
 

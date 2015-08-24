@@ -53,19 +53,23 @@
 <span class="sd">This module contains functionality needed to compute energies and forces with</span>
 <span class="sd">the sander-Python bindings</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SimulationError</span><span class="p">,</span> <span class="n">SimulationWarning</span><span class="p">,</span>
+               <span class="n">UnhandledArgumentWarning</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">sander</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">sander</span> <span class="o">=</span> <span class="bp">None</span>
-
-<span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SimulationError</span><span class="p">,</span> <span class="n">SimulationWarning</span><span class="p">,</span>
-               <span class="n">UnhandledArgumentWarning</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">optimize</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="n">HAS_SANDER</span> <span class="o">=</span> <span class="n">sander</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+<span class="n">HAS_SCIPY</span> <span class="o">=</span> <span class="n">optimize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
 
 <div class="viewcode-block" id="energy"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.simulations.sanderapi.html#parmed.tools.simulations.sanderapi.energy">[docs]</a><span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -144,7 +148,43 @@
             <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;     Egb      = </span><span class="si">%20.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">gb</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;     EHbond   = </span><span class="si">%20.7f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span><span class="p">)</span>
-        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">TOTAL    = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">)</span></div>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">TOTAL    = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="minimize"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.simulations.sanderapi.html#parmed.tools.simulations.sanderapi.minimize">[docs]</a><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">igb</span><span class="p">,</span> <span class="n">saltcon</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">maxcyc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Minimizes a snapshot. Use the existing System if it exists &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_SANDER</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Could not import sander&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_SCIPY</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Could not import scipy&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">igb</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s">&#39;Bad igb value. Must be 0, 1, 2, 5, &#39;</span>
+                                  <span class="s">&#39;6, 7, or 8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="mf">999.0</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">sander</span><span class="o">.</span><span class="n">gas_input</span><span class="p">(</span><span class="n">igb</span><span class="p">)</span>
+        <span class="n">inp</span><span class="o">.</span><span class="n">saltcon</span> <span class="o">=</span> <span class="n">saltcon</span>
+        <span class="n">inp</span><span class="o">.</span><span class="n">cut</span> <span class="o">=</span> <span class="n">cutoff</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="mf">8.0</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">sander</span><span class="o">.</span><span class="n">pme_input</span><span class="p">()</span>
+        <span class="n">inp</span><span class="o">.</span><span class="n">cut</span> <span class="o">=</span> <span class="n">cutoff</span>
+
+    <span class="c"># Define the objective function to minimize</span>
+    <span class="k">def</span> <span class="nf">energy_function</span><span class="p">(</span><span class="n">xyz</span><span class="p">):</span>
+        <span class="n">sander</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+        <span class="n">e</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">sander</span><span class="o">.</span><span class="n">energy_forces</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">sander</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span><span class="p">,</span> <span class="n">inp</span><span class="p">):</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="n">maxcyc</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">energy_function</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span>
+                                    <span class="n">method</span><span class="o">=</span><span class="s">&#39;L-BFGS-B&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                    <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+        <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">x</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Problem minimizing structure with scipy and sander:&#39;</span><span class="p">,</span>
+              <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">results</span><span class="o">.</span><span class="n">message</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

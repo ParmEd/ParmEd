@@ -52,7 +52,7 @@ PDBx/mmCIF files.</p>
 <dl class="class">
 <dt id="parmed.formats.pdb.CIFFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.pdb.</tt><tt class="descname">CIFFile</tt><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Standard PDBx/mmCIF file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -99,11 +99,11 @@ Default is 10 seconds</p>
 file will be saved. If None (default), no CIF file will be written.
 This will be a verbatim copy of the downloaded CIF file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></tt></a></p>
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></tt></a></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDBx/mmCIF</p>
 </div></blockquote>
@@ -246,7 +246,7 @@ will be converted into the PDB-standard values. Default is False</p>
 <dl class="class">
 <dt id="parmed.formats.pdb.PDBFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.pdb.</tt><tt class="descname">PDBFile</tt><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -293,11 +293,11 @@ Default is 10 seconds</p>
 file will be saved. If None (default), no PDB file will be written.
 This will be a verbatim copy of the downloaded PDB file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></tt></a></p>
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></tt></a></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDB</p>
 </div></blockquote>
@@ -356,8 +356,7 @@ file.pdb.bz2)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure</p>
-<p><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by

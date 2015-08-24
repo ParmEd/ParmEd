@@ -15,6 +15,7 @@ Submodules
 
    parmed.formats.mol2
    parmed.formats.pdb
+   parmed.formats.pqr
    parmed.formats.psf
    parmed.formats.registry
 
