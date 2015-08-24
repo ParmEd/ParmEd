@@ -16,7 +16,7 @@ from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
                              PROTEIN, SOLVENT)
-from parmed.formats import Mol2File
+from parmed.formats import Mol2File, PDBFile
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
@@ -437,6 +437,25 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         x = Mol2File.parse(get_fn('test.mol2.bz2', written=True))
         self._check_templates(x, self.nme, preserve_headtail=False)
 
+    def testResidueTemplatePDBSave(self):
+        """ Tests ResidueTemplate.save() method for PDB file """
+        # Check saving pdb files by keyword
+        self.ace.save(get_fn('test', written=True), format='pdb')
+        self.assertTrue(PDBFile.id_format(get_fn('test', written=True)))
+        x = PDBFile.parse(get_fn('test', written=True))
+        self.assertEqual(len(x.atoms), len(self.ace.atoms))
+        for a1, a2 in zip(x.atoms, self.ace.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+
+        self.nme.save(get_fn('test.pdb', written=True))
+        self.assertTrue(PDBFile.id_format(get_fn('test', written=True)))
+        x = PDBFile.parse(get_fn('test.pdb', written=True))
+        self.assertEqual(len(x.atoms), len(self.nme.atoms))
+        for a1, a2 in zip(x.atoms, self.nme.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+
     def testResidueTemplateMol3Save(self):
         """ Tests ResidueTemplate.save() method for Mol3 file """
         # Check saving mol3 files by keyword
@@ -636,7 +655,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
                 self.assertIsNot(templ1.tail, None)
                 self.assertIsNot(templ2.tail, None)
                 self.assertEqual(templ1.tail.idx, templ2.tail.idx)
-        else:
+        elif preserve_headtail is not None:
             self.assertIs(templ1.head, None)
             self.assertIs(templ1.tail, None)
         bs1 = set()
