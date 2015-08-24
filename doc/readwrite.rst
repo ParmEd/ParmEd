@@ -25,34 +25,64 @@ To provide a single interface for parsing *any* type of file, the
 :func:`load_file <parmed.formats.registry.load_file>` function takes a filename
 and any relevant arguments or keyword arguments for the supported file formats
 and calls the appropriate parsing function.  Supported file formats along with
-the extra supported keyword arguments (if applicable) are shown below:
+the extra supported keyword arguments (if applicable) are shown in the table
+below (the filename argument is omitted):
 
-* Amber ASCII restart files
-* Amber topology/MDL files (``xyz=None`` is the coordinate file name or numpy
-  array of coordinates, ``box=None`` is the array of unit cell lengths and
-  angles)
-* Amber ASCII trajectory (MDCRD) files (``natom`` is the *required* number of
-  atoms in the system, ``hasbox`` is the *required* boolean flag specifying
-  whether or not unit cell dimensions are present in the mdcrd file)
-* Amber NetCDF restart
-* Amber NetCDF trajectory file
-* Amber OFF residue template library files
-* PDBx/mmCIF files
-* CHARMM coordinate files
-* CHARMM restart files
-* Gromacs GRO files
-* Gromacs topology files (``defines=None`` is the (ordered) ``dict`` of
-  preprocessor defines to apply to the processing of the topology file,
-  ``parametrize=True`` is a flag to specify whether or not to apply parameters,
-  ``xyz=None`` is the file name of a coordinate file or an array of coordinates,
-  and ``box=None`` is the array of unit cell dimensions and angles)
-* SYBYL mol2 files and the R.E.D. mol3 extension (``structure=False`` is a flag
-  that determines whether or not the returned object is a :class:`Structure
-  <parmed.structure.Structure>` or :class:`ResidueTemplate
-  <parmed.modeller.residue.ResidueTemplate>`/:class:`ResidueTemplateContainer
-  <parmed.modeller.residue.ResidueTemplateContainer>` instance)
-* PDB files
-* CHARMM/XPLOR PSF files
++--------------------------+--------------------------------+
+| File type                | Supported arguments            |
++==========================+================================+
+| Amber ASCII restart file | None                           |
++--------------------------+--------------------------------+
+| Amber prmtop             | ``xyz``, ``box``               |
++--------------------------+--------------------------------+
+| Amber MDL (e.g., RISM)   | None                           |
++--------------------------+--------------------------------+
+| Amber MDCRD trajectory   | ``natom``\*, ``hasbox``\*      |
++--------------------------+--------------------------------+
+| Amber OFF library        | None                           |
++--------------------------+--------------------------------+
+| Amber frcmod/parm.dat    | list of filenames              |
++--------------------------+--------------------------------+
+| PDBx/mmCIF file          | None                           |
++--------------------------+--------------------------------+
+| CHARMM coordinate file   | None                           |
++--------------------------+--------------------------------+
+| CHARMM restart file      | None                           |
++--------------------------+--------------------------------+
+| Gromacs GRO file         | None                           |
++--------------------------+--------------------------------+
+| Gromacs topology file    | ``defines``, ``parametrize``   |
+|                          | ``xyz``, ``box``               |
++--------------------------+--------------------------------+
+| Mol2 and Mol3 files      | ``structure``                  |
++--------------------------+--------------------------------+
+| NetCDF restart file      | None                           |
++--------------------------+--------------------------------+
+| NetCDF trajectory file   | None                           |
++--------------------------+--------------------------------+
+| PDB file                 | None                           |
++--------------------------+--------------------------------+
+| PQR file                 | None                           |
++--------------------------+--------------------------------+
+| PSF file                 | None                           |
++--------------------------+--------------------------------+
+\*These arguments are *required* when parsing the corresponding format file
+
+The optional keyword arguments are described below:
+
+* ``xyz`` -- Either a file name for a coordinate file or an array with the
+  coordinates. If the unit cell information is stored in the coordinate file, it
+  is used (unless an explicit ``box`` argument is given; see below). If the file
+  is a trajectory file, the first frame is used for the coordinates.
+* ``box`` -- The unit cell dimensions in Angstroms (and angles in degrees).
+* ``natom`` -- The number of atoms from which the file was written
+* ``hasbox`` -- Whether unit cell information is stored in this trajectory file
+* ``defines`` -- ``dict`` of preprocessor defines (order is respected if given
+  via an ``OrderedDict``)
+* ``parametrize`` -- If ``True``, parameters are assigned from the parameter
+  database.  If ``False``, they are not (default is ``True``).
+* ``structure`` -- If ``True``, return the Mol2/Mol3 file as a :class:`Structure
+  <parmed.structure.Structure>` instance. Default is ``False``
 
 :func:`load_file` automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
@@ -66,6 +96,13 @@ using Gzip or Bzip2, respectively (except for some binary file formats, like
 NetCDF). Furthermore, URLs beginning with ``http://``, ``https://``, or
 ``ftp://`` are valid file names and will result in the remote file being
 downloaded and processed (again, in-memory).
+
+Finally, to make it so that you can always retrieve a :class:`Structure
+<parmed.structure.Structure>` instance from file types that support returning
+one by passing the ``structure=True`` keyword to ``load_file``. If this argument
+is not supported by the resulting file type, it is simply ignored, as is the
+``natom`` and ``hasbox`` keywords (which are required arguments for the Amber
+ASCII trajectory file).
 
 Writing files with :meth:`Structure.save <parmed.structure.Structure.save>`
 ---------------------------------------------------------------------------
