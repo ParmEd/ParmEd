@@ -1217,6 +1217,7 @@ class Structure(object):
 
             - PDB (.pdb, pdb)
             - PDBx/mmCIF (.cif, cif)
+            - PQR (.pqr, pqr)
             - Amber topology file (.prmtop/.parm7, amber)
             - CHARMM PSF file (.psf, charmm)
             - CHARMM coordinate file (.crd, charmmcrd)
@@ -1256,6 +1257,7 @@ class Structure(object):
         from parmed import amber, charmm, formats, gromacs
         extmap = {
                 '.pdb' : 'PDB',
+                '.pqr' : 'PQR',
                 '.cif' : 'CIF',
                 '.pdbx' : 'CIF',
                 '.parm7' : 'AMBER',
@@ -1297,6 +1299,8 @@ class Structure(object):
                 self.write_pdb(fname, **kwargs)
             elif format == 'CIF':
                 self.write_cif(fname, **kwargs)
+            elif format == 'PQR':
+                formats.PQRFile.write(self, fname, **kwargs)
             elif format == 'PSF':
                 self.write_psf(fname, **kwargs)
             elif format == 'GRO':

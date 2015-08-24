@@ -934,6 +934,36 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(self.sys3.coordinates,
                                    pmd.load_file(f3).coordinates[0])
 
+    def testSavePQR(self):
+        """ Test saving various Structure instances as PQR files """
+        f1 = get_fn('test', written=True)
+        f2 = get_fn('test.pqr', written=True)
+        f3 = get_fn('test2.pqr', written=True)
+        self.sys1.save(f1, format='pqr')
+        self.sys2.save(f2)
+        self.sys3.save(f3)
+
+        self.assertTrue(pmd.formats.PQRFile.id_format(f1))
+        self.assertTrue(pmd.formats.PQRFile.id_format(f2))
+        self.assertTrue(pmd.formats.PQRFile.id_format(f3))
+
+        x1 = pmd.formats.PQRFile.parse(f1)
+        x2 = pmd.formats.PQRFile.parse(f2)
+        x3 = pmd.formats.PQRFile.parse(f3)
+
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+
+        np.testing.assert_allclose(np.array([a.charge for a in self.sys1.atoms]),
+                                   np.array([a.charge for a in x1.atoms]))
+
+        np.testing.assert_allclose(np.array([a.charge for a in self.sys2.atoms]),
+                                   np.array([a.charge for a in x2.atoms]))
+
+        np.testing.assert_allclose(np.array([a.charge for a in self.sys3.atoms]),
+                                   np.array([a.charge for a in x3.atoms]))
+
     def testOverwrite(self):
         """ Test overwrite option of Structure.save """
         open(get_fn('test.pdb', written=True), 'w').close()
