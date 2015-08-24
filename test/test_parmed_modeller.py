@@ -11,7 +11,7 @@ except ImportError:
     pd = None
 import os
 import parmed as pmd
-from parmed import Atom, read_PDB
+from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
@@ -55,6 +55,21 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.head, None)
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
+
+    def testToStructure(self):
+        """ Tests the ResidueTemplate.to_structure function """
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a3, a4)
+        self.templ.add_bond(a2, a5)
+        self.templ.add_bond(a5, a6)
+        struct = self.templ.to_structure()
+
+        self.assertIsInstance(struct, Structure)
+        self.assertEqual(len(struct.atoms), 6)
+        self.assertEqual(len(struct.residues), 1)
+        self.assertEqual(len(struct.bonds), 5)
 
     def testCopy(self):
         """ Tests ResidueTemplate __copy__ functionality """
@@ -1052,16 +1067,16 @@ class TestSlice(unittest.TestCase):
         names = ['CA', 'CB', 'C', 'N']
         for op in [list, tuple]:
             atomlist = residue[op(names)]
-            self.assertTrue(len(names) == len(atomlist))
+            self.assertEqual(len(names), len(atomlist))
             for atom in atomlist:
-                self.assertTrue(atom.name == residue[atom.name].name)
+                self.assertEqual(atom.name, residue[atom.name].name)
 
         indices = [0, 4, 7, 3]
         for op in [list, tuple]:
             atomlist = residue[op(indices)]
-            self.assertTrue(len(indices) == len(atomlist))
+            self.assertEqual(len(indices), len(atomlist))
             for atom in atomlist:
-                self.assertTrue(atom.name == residue[atom.name].name)
+                self.assertEqual(atom.name, residue[atom.name].name)
 
 if __name__ == '__main__':
     unittest.main()

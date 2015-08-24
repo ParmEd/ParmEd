@@ -12,6 +12,7 @@ try:
 except ImportError:
     pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 from parmed.utils.six import iteritems
 import warnings
@@ -410,6 +411,26 @@ class ResidueTemplate(object):
         else:
             ret = ret.join(vels)
         return ret
+
+    def to_structure(self):
+        """
+        Generates a Structure instance with a single residue from this
+        ResidueTemplate
+
+        Returns
+        -------
+        struct : :class:`parmed.structure.Structure`
+            The Structure with all of the bonds and connectivity of this
+            template
+        """
+        struct = Structure()
+        for atom in self:
+            struct.add_atom(_copy.copy(atom), self.name, 0)
+        for bond in self.bonds:
+            struct.bonds.append(Bond(struct.atoms[bond.atom1.idx],
+                                     struct.atoms[bond.atom2.idx])
+            )
+        return struct
 
     def save(self, fname, format=None, **kwargs):
         """
