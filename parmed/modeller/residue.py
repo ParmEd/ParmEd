@@ -437,12 +437,13 @@ class ResidueTemplate(object):
         Saves the current ResidueTemplate in the requested file format.
         Supported formats can be specified explicitly or determined by file-name
         extension. The following formats are supported, with the recognized
-        suffix and ``format`` keyword shown in parentheses:
+        suffix shown in parentheses:
 
             - MOL2 (.mol2)
             - MOL3 (.mol3)
             - OFF (.lib/.off)
             - PDB (.pdb)
+            - PQR (.pqr)
 
         Parameters
         ----------
@@ -475,6 +476,7 @@ class ResidueTemplate(object):
                 '.off' : 'OFFLIB',
                 '.lib' : 'OFFLIB',
                 '.pdb' : 'PDB',
+                '.pqr' : 'PQR',
         }
         if format is not None:
             format = format.upper()
@@ -492,8 +494,8 @@ class ResidueTemplate(object):
             Mol2File.write(self, fname, mol3=True, **kwargs)
         elif format in ('OFFLIB', 'OFF'):
             AmberOFFLibrary.write({self.name : self}, fname, **kwargs)
-        elif format == 'PDB':
-            self.to_structure().save(fname, format='PDB', overwrite=overwrite,
+        elif format in ('PDB', 'PQR'):
+            self.to_structure().save(fname, format=format, overwrite=overwrite,
                                      **kwargs)
         else:
             raise ValueError('Unrecognized format for ResidueTemplate save')
