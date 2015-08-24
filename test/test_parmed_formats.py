@@ -137,6 +137,21 @@ class TestFileLoader(unittest.TestCase):
         gro = formats.load_file(get_fn('1aki.ff99sbildn.gro'))
         self.assertIsInstance(gro, Structure)
 
+    def testLoadPQR(self):
+        """ Tests automatic loading of PQR files """
+        pqr = formats.load_file(get_fn('adk_open.pqr'))
+        self.assertIsInstance(pqr, Structure)
+        self.assertEqual(len(pqr.atoms), 3341)
+        self.assertEqual(len(pqr.residues), 214)
+        self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
+        self.assertEqual(pqr.atoms[0].charge, -0.30)
+        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].atomic_number, 7)
+        self.assertEqual(pqr.atoms[35].charge, -0.8)
+        self.assertEqual(pqr.atoms[-1].charge, -0.67)
+        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].atomic_number, 8)
+
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
         self.assertRaises(exceptions.FormatNotFound, lambda:
@@ -541,6 +556,38 @@ class TestChemistryPDBStructure(FileIOTestCase):
                 self.assertTrue(residue.ter)
             else:
                 self.assertFalse(residue.ter)
+
+class TestParmedPQRStructure(FileIOTestCase):
+    """ Tests the PQR parser and writer """
+
+    def testPQRParsing(self):
+        """ Tests parsing a PQR file """
+        pqr = formats.PQRFile.parse(get_fn('adk_open.pqr'))
+        self.assertIsInstance(pqr, Structure)
+        self.assertEqual(len(pqr.atoms), 3341)
+        self.assertEqual(len(pqr.residues), 214)
+        self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
+        self.assertEqual(pqr.atoms[0].charge, -0.30)
+        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].atomic_number, 7)
+        self.assertEqual(pqr.atoms[35].charge, -0.8)
+        self.assertEqual(pqr.atoms[-1].charge, -0.67)
+        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].atomic_number, 8)
+
+    def testPQRWriter(self):
+        """ Tests writing a PQR file with charges and radii """
+        parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        formats.PQRFile.write(parm, get_fn('test.pqr', written=True),
+                              renumber=True)
+        pqr = formats.PQRFile.parse(get_fn('test.pqr', written=True))
+        self.assertEqual(len(parm.atoms), len(pqr.atoms))
+        for a1, a2 in zip(parm.atoms, pqr.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+            self.assertAlmostEqual(a1.charge, a2.charge)
+            self.assertAlmostEqual(a1.radii, a2.radii)
 
 class TestChemistryCIFStructure(FileIOTestCase):
 
@@ -1024,3 +1071,5 @@ class TestFileDownloader(unittest.TestCase):
         """ Tests automatic loading of downloaded Gromacs GRO file """
         gro = formats.load_file(self.url + '1aki.ff99sbildn.gro')
         self.assertIsInstance(gro, Structure)
+
+del skip_big_tests # Avoid fake testing this method :)

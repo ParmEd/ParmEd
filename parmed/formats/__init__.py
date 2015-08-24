@@ -8,6 +8,7 @@ __all__ = ['load_file', 'PDBFile', 'CIFFile', 'Mol2File', 'PSFFile']
 from parmed.formats.registry import load_file
 from parmed.formats.mol2 import Mol2File
 from parmed.formats.pdb import PDBFile, CIFFile
+from parmed.formats.pqr import PQRFile
 from parmed.formats.psf import PSFFile
 
 # Now let's modify structure.Structure and add our write methods from our
