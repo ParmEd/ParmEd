@@ -10,12 +10,13 @@ try:
 except ImportError:
     pd = None
 import os
-from parmed import Atom, read_PDB
+import parmed as pmd
+from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
                              PROTEIN, SOLVENT)
-from parmed.formats import Mol2File
+from parmed.formats import Mol2File, PDBFile
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
@@ -54,6 +55,21 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.head, None)
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
+
+    def testToStructure(self):
+        """ Tests the ResidueTemplate.to_structure function """
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a3, a4)
+        self.templ.add_bond(a2, a5)
+        self.templ.add_bond(a5, a6)
+        struct = self.templ.to_structure()
+
+        self.assertIsInstance(struct, Structure)
+        self.assertEqual(len(struct.atoms), 6)
+        self.assertEqual(len(struct.residues), 1)
+        self.assertEqual(len(struct.bonds), 5)
 
     def testCopy(self):
         """ Tests ResidueTemplate __copy__ functionality """
@@ -421,6 +437,25 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         x = Mol2File.parse(get_fn('test.mol2.bz2', written=True))
         self._check_templates(x, self.nme, preserve_headtail=False)
 
+    def testResidueTemplatePDBSave(self):
+        """ Tests ResidueTemplate.save() method for PDB file """
+        # Check saving pdb files by keyword
+        self.ace.save(get_fn('test', written=True), format='pdb')
+        self.assertTrue(PDBFile.id_format(get_fn('test', written=True)))
+        x = PDBFile.parse(get_fn('test', written=True))
+        self.assertEqual(len(x.atoms), len(self.ace.atoms))
+        for a1, a2 in zip(x.atoms, self.ace.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+
+        self.nme.save(get_fn('test.pdb', written=True))
+        self.assertTrue(PDBFile.id_format(get_fn('test', written=True)))
+        x = PDBFile.parse(get_fn('test.pdb', written=True))
+        self.assertEqual(len(x.atoms), len(self.nme.atoms))
+        for a1, a2 in zip(x.atoms, self.nme.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+
     def testResidueTemplateMol3Save(self):
         """ Tests ResidueTemplate.save() method for Mol3 file """
         # Check saving mol3 files by keyword
@@ -620,7 +655,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
                 self.assertIsNot(templ1.tail, None)
                 self.assertIsNot(templ2.tail, None)
                 self.assertEqual(templ1.tail.idx, templ2.tail.idx)
-        else:
+        elif preserve_headtail is not None:
             self.assertIs(templ1.head, None)
             self.assertIs(templ1.tail, None)
         bs1 = set()
@@ -1040,6 +1075,27 @@ quit
             self.assertEqual(set1, set2)
             # Check residue properties
             self.assertEqual(a1.residue.name, a2.residue.name)
+
+class TestSlice(unittest.TestCase):
+    '''Test slicing ResidueTemplate'''
+
+    def testSliceFromArrayLike(self):
+        """ Test slicing by a tuple/list"""
+        residue = pmd.load_file(get_fn('aminont12.lib'))['NALA']
+
+        names = ['CA', 'CB', 'C', 'N']
+        for op in [list, tuple]:
+            atomlist = residue[op(names)]
+            self.assertEqual(len(names), len(atomlist))
+            for atom in atomlist:
+                self.assertEqual(atom.name, residue[atom.name].name)
+
+        indices = [0, 4, 7, 3]
+        for op in [list, tuple]:
+            atomlist = residue[op(indices)]
+            self.assertEqual(len(indices), len(atomlist))
+            for atom in atomlist:
+                self.assertEqual(atom.name, residue[atom.name].name)
 
 if __name__ == '__main__':
     unittest.main()
