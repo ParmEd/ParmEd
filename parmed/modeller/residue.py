@@ -12,6 +12,7 @@ try:
 except ImportError:
     pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 from parmed.utils.six import iteritems
 import warnings
@@ -411,7 +412,27 @@ class ResidueTemplate(object):
             ret = ret.join(vels)
         return ret
 
-    def save(self, fname, format=None, **kwargs):
+    def to_structure(self):
+        """
+        Generates a Structure instance with a single residue from this
+        ResidueTemplate
+
+        Returns
+        -------
+        struct : :class:`parmed.structure.Structure`
+            The Structure with all of the bonds and connectivity of this
+            template
+        """
+        struct = Structure()
+        for atom in self:
+            struct.add_atom(_copy.copy(atom), self.name, 0)
+        for bond in self.bonds:
+            struct.bonds.append(Bond(struct.atoms[bond.atom1.idx],
+                                     struct.atoms[bond.atom2.idx])
+            )
+        return struct
+
+    def save(self, fname, format=None, overwrite=False, **kwargs):
         """
         Saves the current ResidueTemplate in the requested file format.
         Supported formats can be specified explicitly or determined by file-name
@@ -421,6 +442,7 @@ class ResidueTemplate(object):
             - MOL2 (.mol2)
             - MOL3 (.mol3)
             - OFF (.lib/.off)
+            - PDB (.pdb)
 
         Parameters
         ----------
@@ -432,6 +454,9 @@ class ResidueTemplate(object):
             The case-insensitive keyword specifying what type of file ``fname``
             should be saved as. If ``None`` (default), the file type will be
             determined from filename extension of ``fname``
+        overwrite : bool, optional
+            If True, allow the target file to be overwritten. Otherwise, an
+            IOError is raised if the file exists. Default is False
         kwargs : keyword-arguments
             Remaining arguments are passed on to the file writing routines that
             are called by this function
@@ -449,6 +474,7 @@ class ResidueTemplate(object):
                 '.mol3' : 'MOL3',
                 '.off' : 'OFFLIB',
                 '.lib' : 'OFFLIB',
+                '.pdb' : 'PDB',
         }
         if format is not None:
             format = format.upper()
@@ -466,6 +492,9 @@ class ResidueTemplate(object):
             Mol2File.write(self, fname, mol3=True, **kwargs)
         elif format in ('OFFLIB', 'OFF'):
             AmberOFFLibrary.write({self.name : self}, fname, **kwargs)
+        elif format == 'PDB':
+            self.to_structure().save(fname, format='PDB', overwrite=overwrite,
+                                     **kwargs)
         else:
             raise ValueError('Unrecognized format for ResidueTemplate save')
 
