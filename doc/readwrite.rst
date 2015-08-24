@@ -131,7 +131,12 @@ supported extra keyword arguments, are detailed in the following table.
 |              |                         |                |  ``renumber``,           |
 +--------------+-------------------------+----------------+  ``coordinates``,        |
 | PDBx/mmCIF   | ``.cif``, ``.pdbx``     | ``cif``        |  ``altlocs``,            |
-|              |                         |                |  ``write_anisou``        |
+|              |                         |                |  ``write_anisou``,       |
+|              |                         |                |  ``standard_resnames``   |
++--------------+-------------------------+----------------+--------------------------+
+| PQR          | ``.pqr``                | ``pqr``        | ``renumber``,            |
+|              |                         |                | ``coordinates``,         |
+|              |                         |                | ``standard_resnames``    |
 +--------------+-------------------------+----------------+--------------------------+
 | Amber prmtop | ``.parm7``, ``.prmtop`` | ``amber``      |  None                    |
 +--------------+-------------------------+----------------+--------------------------+
@@ -177,6 +182,10 @@ Keywords
 * ``write_anisou`` -- If ``True``, print anistropic B-factors for the various
   atoms (either as a separate CIF section or as ``ANISOU`` records in a PDB
   file). Default is ``False``
+* ``standard_resnames`` -- If ``True``, residue names will be regularlized from
+  common alternatives back to the PDB standard. For example, ASH and GLH will be
+  translated to ASP and GLU, respectively, as they often refer to different
+  protomers of aspartate and glutamate.
 * ``vmd`` -- If ``True``, write a VMD-style PSF file. This is very similar to
   XPLOR format PSF files. Default is ``False``.
 * ``combine`` -- Can be ``None`` to combine no molecules when writing a GROMACS
