@@ -120,3 +120,16 @@ them -- like the test for the Amber optimized reader -- will fail).
 ParmEd utilizes the Travis continuous integration server to perform automatic
 tests of all pull requests. Tests generally must pass these tests before being
 considered for merge into the master branch.
+
+Documentation
+-------------
+
+Just as important as the code is *documenting* the code so that users can learn
+how to use it. Documentation is tracked as reStructuredText (``.rst``), and
+`Sphinx <http://sphinx-doc.org/>`_ is used to render the documentation. Changes
+to the documentation can be made part of the pull request adding new
+functionality, or it can be its own pull request dedicated entirely to
+documentation improvements.
+
+The actual web docs are generated periodically and pushed directly to the
+``gh-pages`` branch. This process is not handled by PRs.
