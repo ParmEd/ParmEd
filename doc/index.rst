@@ -176,6 +176,17 @@ Program and API Reference
 
 Click the "modules" link at the top of the page for a full API reference.
 
+Contributing
+------------
+
+If you would like to contribute, please head over to the Github repository at
+`https://github.com/ParmEd/ParmEd`_ and feel free to jump right in! New issues
+and pull requests are always welcome.
+
+If you want to start contributing to the code base, please check out `the
+developer's documentation <devdoc>` for general information about style guides
+and the like.
+
 Search
 ------
 
