@@ -13,6 +13,7 @@ from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
 from parmed.utils.io import genopen
 from parmed.utils.six import string_types, add_metaclass
+from parmed.utils.six.moves import range
 import warnings
 
 @add_metaclass(FileFormatType)
@@ -56,12 +57,16 @@ class PQRFile(object):
                     # Format is:
                     # rec atnum atname resname [chain] resnum x y z chg radius
                     # Where the chain ID is optional. rec must be ATOM or HETATM
-                    if len(words) not in (10, 11):
+                    if len(words) < 10:
                         return False
                     elif len(words) == 10:
                         offset = 0
-                    elif len(words) == 11:
+                    elif len(words) >= 11:
                         offset = 1
+                        try:
+                            float(words[10])
+                        except ValueError:
+                            offset = 0
                     if not words[1].isdigit(): return False
                     if words[2].isdigit(): return False
                     if words[3].isdigit(): return False
@@ -122,8 +127,17 @@ class PQRFile(object):
                     if len(words) == 10:
                         _, num, nam, res, resn, x, y, z, chg, rad = words
                         chn = ''
-                    elif len(words) == 11:
-                        _, num, nam, res, chn, resn, x, y, z, chg, rad = words
+                    elif len(words) >= 11:
+                        _, num, nam, res, chn, resn, x, y, z, chg, rad = (
+                                words[i] for i in range(11))
+                        # If the radius is not a float (but rather a letter,
+                        # like the element or something), then the chain might
+                        # be missing. In this case, shift all tokens "back" one
+                        # and empty the chn string
+                        try:
+                            float(rad)
+                        except ValueError:
+                            resn, x, y, z, chg, rad = chn, resn, x, y, z, chg
                     else:
                         raise ValueError('Illegal PQR record format: expected '
                                          '10 or 11 tokens on the atom line')

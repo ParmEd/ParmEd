@@ -596,7 +596,7 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(len(pqr.atoms), 458)
         self.assertEqual(len(pqr.residues), 14)
         self.assertEqual(pqr.atoms[0].charge, -0.9526)
-        self.assertEqual(pqr.atoms[-1].radius, 0.8)
+        self.assertEqual(pqr.atoms[-1].radii, 0.8)
 
 class TestChemistryCIFStructure(FileIOTestCase):
 
