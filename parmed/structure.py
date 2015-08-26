@@ -1870,7 +1870,7 @@ class Structure(object):
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
                 if (bond.atom1.residue.name in SOLVENT_NAMES or
-                        bond.atom2.residue.name in SOLVENTNAMES):
+                        bond.atom2.residue.name in SOLVENT_NAMES):
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,
                                          bond.type.req*length_conv)
             return
