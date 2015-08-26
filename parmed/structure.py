@@ -36,7 +36,7 @@ from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
-from parmed.residue import WATER_NAMES
+from parmed.residue import SOLVENT_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, DihedralType, ImproperType, Bond, Angle, Dihedral,
         UreyBradley, Improper, Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion,
@@ -1869,8 +1869,8 @@ class Structure(object):
                 # Skip all extra points... don't constrain those
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
-                if (bond.atom1.residue.name in WATER_NAMES or
-                        bond.atom2.residue.name in WATER_NAMES):
+                if (bond.atom1.residue.name in SOLVENT_NAMES or
+                        bond.atom2.residue.name in SOLVENTNAMES):
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,
                                          bond.type.req*length_conv)
             return

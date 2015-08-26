@@ -791,10 +791,11 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
 
     def testDefineSolvent(self):
         """ Test defineSolvent on AmberParm """
+        import parmed.residue as residue
         PT.defineSolvent(gasparm, 'WAT,HOH,Na+,Cl-').execute()
-        self.assertEqual(gasparm.solvent_residues, 'WAT HOH Na+ Cl-'.split())
+        self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH Na+ Cl-'.split())
         PT.defineSolvent(gasparm, 'WAT,HOH').execute()
-        self.assertEqual(gasparm.solvent_residues, 'WAT HOH'.split())
+        self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH'.split())
 
     def testAddExclusions(self):
         """ Test addExclusions on AmberParm """
@@ -1639,10 +1640,11 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 
     def testDefineSolvent(self):
         """ Test defineSolvent for ChamberParm """
+        import parmed.residue as residue
         PT.defineSolvent(gascham, 'WAT,HOH,Na+,Cl-').execute()
-        self.assertEqual(gascham.solvent_residues, 'WAT HOH Na+ Cl-'.split())
+        self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH Na+ Cl-'.split())
         PT.defineSolvent(gascham, 'WAT,HOH').execute()
-        self.assertEqual(gascham.solvent_residues, 'WAT HOH'.split())
+        self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH'.split())
 
     def testAddExclusions(self):
         """ Test addExclusions for ChamberParm """
@@ -2173,10 +2175,11 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 
     def testDefineSolvent(self):
         """ Test defineSolvent for AmoebaParm """
+        import parmed.residue as residue
         PT.defineSolvent(amoebaparm, 'WAT,HOH,Na+,Cl-').execute()
-        self.assertEqual(amoebaparm.solvent_residues, 'WAT HOH Na+ Cl-'.split())
+        self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH Na+ Cl-'.split())
         PT.defineSolvent(amoebaparm, 'WAT,HOH').execute()
-        self.assertEqual(amoebaparm.solvent_residues, 'WAT HOH'.split())
+        self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH'.split())
 
     def testAddExclusions(self):
         """ Check that addExclusions fails for AmoebaParm """
@@ -2379,6 +2382,14 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
                 PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
+
+class TestOtherParm(unittest.TestCase):
+    """ Tests the use of other parms as the main parm """
+
+    def testSummary(self):
+        """ Tests the use of a PDB file with the summary action """
+        parm = load_file(get_fn('4lzt.pdb'))
+        self.assertEqual(str(PT.summary(parm)), saved.PDB_SUMMARY)
 
 if __name__ == '__main__':
     unittest.main()

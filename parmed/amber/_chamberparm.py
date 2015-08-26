@@ -92,9 +92,6 @@ class ChamberParm(AmberParm):
     instances
     """
 
-    solvent_residues = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC',
-                        'SOL')
-
     #===================================================
 
     def initialize_topology(self, xyz=None, box=None):

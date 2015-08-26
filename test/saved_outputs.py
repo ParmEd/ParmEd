@@ -540,3 +540,18 @@ Mg2+ [10] Mg2+ [10]     7170.637930       25.448794        4.417729   2.874000  
 Mg2+ [10]   OW [11]    68897.634400      127.063907      132.900000   3.205300   0.058584
 Mg2+ [10]   HW [12]        0.000000        0.000000        0.000000   0.000000   0.000000
 """
+
+PDB_SUMMARY = """\
+Amino Acid Residues:   128
+Nucleic Acid Residues: 0
+Number of cations:     0
+Number of anions:      0
+Num. of solvent mols:  139
+Num. of unknown atoms: 7
+Total charge (e-):     0.0000
+Total mass (amu):      15942.3372
+Number of atoms:       1164
+Number of residues:    274
+System volume (ang^3): 25998.98
+System density (g/mL): 1.018244
+"""

@@ -150,8 +150,6 @@ class AmoebaParm(AmberParm):
         topologies)
     """
 
-    solvent_residues = ['WAT', 'HOH']
-
     #=============================================
 
     def initialize_topology(self, xyz=None, box=None):
