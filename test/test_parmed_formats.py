@@ -589,6 +589,15 @@ class TestParmedPQRStructure(FileIOTestCase):
             self.assertAlmostEqual(a1.charge, a2.charge)
             self.assertAlmostEqual(a1.radii, a2.radii)
 
+    def testPQRWithElement(self):
+        """ Tests reading a PQR file that has an element column """
+        self.assertTrue(formats.PQRFile.id_format(get_fn('elem.pqr')))
+        pqr = formats.PQRFile.parse(get_fn('elem.pqr'))
+        self.assertEqual(len(pqr.atoms), 458)
+        self.assertEqual(len(pqr.residues), 14)
+        self.assertEqual(pqr.atoms[0].charge, -0.9526)
+        self.assertEqual(pqr.atoms[-1].radii, 0.8)
+
 class TestChemistryCIFStructure(FileIOTestCase):
 
     def setUp(self):
