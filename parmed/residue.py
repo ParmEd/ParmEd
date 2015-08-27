@@ -6,7 +6,7 @@ residues in typical biopolymers.
 __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
            'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET',
            'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT', 'DG',
-           'DC', 'A', 'U', 'G', 'C', 'WATER_NAMES', 'EXTRA_POINT_NAMES']
+           'DC', 'A', 'U', 'G', 'C', 'SOLVENT_NAMES', 'EXTRA_POINT_NAMES']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -269,5 +269,5 @@ C = RNAResidue('Cytosine', 'C', ['CYT', 'RC'])
 A = RNAResidue('Adenine', 'A', ['ADE', 'RA'])
 U = RNAResidue('Uracil', 'U', ['URA', 'RU'])
 
-WATER_NAMES = ['WAT', 'HOH', 'TIP3']
+SOLVENT_NAMES = ['WAT', 'HOH', 'TIP3', 'SOL', 'TIP4', 'TIP5', 'SPCE', 'SPC']
 EXTRA_POINT_NAMES = ['EP', 'LP']

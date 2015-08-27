@@ -22,6 +22,7 @@ from parmed.exceptions import ParmedError, FormatNotFound
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
+from parmed.residue import SOLVENT_NAMES
 from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
@@ -1437,13 +1438,14 @@ class defineSolvent(Action):
     usage = '<residue_list>'
     supported_subclasses = (AmberParm,)
     def init(self, arg_list):
+        from parmed import residue
         res_list = arg_list.get_next_string()
         res_list.replace(' ', '')
         if res_list.endswith(','):
             self.res_list = res_list[:len(res_list)-1]
         else:
             self.res_list = res_list
-        self.parm.solvent_residues = res_list.split(',')
+        residue.SOLVENT_NAMES = res_list.split(',')
 
     def __str__(self):
         return "Residues %s are now considered to be solvent" % self.res_list
@@ -2915,7 +2917,7 @@ class summary(Action):
                 nnuc += 1
             elif res.name in summary.amino:
                 namin += 1
-            elif res.name in self.parm.solvent_residues:
+            elif res.name in SOLVENT_NAMES:
                 nwat += 1
             elif res.name in summary.anions:
                 naion += 1
@@ -2924,8 +2926,8 @@ class summary(Action):
             else:
                 nunk += 1
       
-        tmass = sum(self.parm.parm_data['MASS'])
-        tchg = sum(self.parm.parm_data['CHARGE'])
+        tmass = sum(atom.mass for atom in self.parm.atoms)
+        tchg = sum(atom.charge for atom in self.parm.atoms)
 
         retval = ('Amino Acid Residues:   %d\n'
                   'Nucleic Acid Residues: %d\n'
@@ -2947,7 +2949,7 @@ class summary(Action):
             # Get the total volume (and density) of orthorhombic box
             retval += ('System volume (ang^3): %.2f\n' 
                        'System density (g/mL): %f\n' %
-                       (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
+                       (v, tmass / (v * 0.602204))
             )
         elif self.parm.box is not None:
             # General triclinic cell
@@ -2960,7 +2962,7 @@ class summary(Action):
                                       2 * cosa*cosb*cosg)
             retval += ('System volume (ang^3): %.2f\n' 
                        'System density (g/mL): %f\n' %
-                       (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
+                       (v, tmass / (v * 0.602204))
             )
         return retval
 
@@ -3309,7 +3311,7 @@ class HMassRepartition(Action):
     def execute(self):
         # Back up the masses in case something goes wrong
         original_masses = [atom.mass for atom in self.parm.atoms]
-        water = self.parm.solvent_residues
+        water = SOLVENT_NAMES
         for i, atom in enumerate(self.parm.atoms):
             if atom.atomic_number != 1: continue
             if not self.changewater and atom.residue.name in water:
