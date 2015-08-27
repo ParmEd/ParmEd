@@ -15,6 +15,7 @@ try:
         SUPPORTED_VERSION = True
 except ImportError:
     HAS_OPENMM = False
+del mm, app, unitcell
 
 def needs_openmm(fcn):
     global HAS_OPENMM

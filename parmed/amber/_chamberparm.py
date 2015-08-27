@@ -23,12 +23,10 @@ Boston, MA 02111-1307, USA.
 from __future__ import division, print_function
 
 from parmed.amber._amberparm import AmberParm
-from parmed.constants import (NTYPES, NPHIH, MPHIA, NPHIA, NATYP, IFBOX, TINY,
-            NATOM, SMALL)
+from parmed.constants import NTYPES, NATYP, IFBOX, TINY, NATOM, SMALL
 from parmed.exceptions import AmberError, AmberWarning
 from parmed.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
-                                    DihedralType, ImproperType, CmapType,
-                                    ExtraPoint)
+                                    ImproperType, CmapType, ExtraPoint)
 from parmed.utils.six.moves import zip, range
 import copy
 from math import sqrt

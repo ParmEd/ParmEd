@@ -10,6 +10,8 @@ __version__ = "V0.01"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __email__ = "jwest@rcsb.rutgers.edu <or> jason.swails@gmail.com"
 
+__all__ = ['PdbxReader', 'PdbxWriter', 'containers']
+
 from parmed.formats.pdbx.PdbxReader import PdbxReader
 from parmed.formats.pdbx.PdbxWriter import PdbxWriter
 from parmed.formats.pdbx import PdbxContainers as containers

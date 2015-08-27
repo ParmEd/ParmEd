@@ -4707,7 +4707,7 @@ class Group(object):
         self.move = move
 
     def __copy__(self):
-        other = type(self)(self.bs, self.type, self.move)
+        return type(self)(self.bs, self.type, self.move)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

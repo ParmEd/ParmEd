@@ -27,7 +27,6 @@ except ImportError:
     np = None
     def create_array(array):
         return array
-import os
 try:
     import simtk.openmm as mm
 except ImportError:

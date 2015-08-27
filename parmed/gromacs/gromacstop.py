@@ -1110,7 +1110,6 @@ class GromacsTopologyFile(Structure):
             The topology file defined by the given struct
         """
         from copy import copy as _copy
-        from parmed.charmm import CharmmPsfFile
         gmxtop = cls()
         if copy:
             struct = _copy(struct)

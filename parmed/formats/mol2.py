@@ -242,7 +242,7 @@ class Mol2File(object):
                     #   space group -- number of space group (ignored)
                     #   space group setting -- ignored
                     words = line.split()
-                    box = [float(x) for x in words[:6]]
+                    box = [float(w) for w in words[:6]]
                     if len(box) != 6:
                         raise ValueError('%d box dimensions found; needed 6' %
                                          len(box))
