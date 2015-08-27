@@ -143,6 +143,7 @@ class PQRFile(object):
                                          '10 or 11 tokens on the atom line')
                     x, y, z = float(x), float(y), float(z)
                     chg, rad = float(chg), float(rad)
+                    resn, num = int(resn), int(num)
                     elem = element_by_name(nam) # Yuck
                     atomic_number = AtomicNum[elem]
                     mass = Mass[elem]
