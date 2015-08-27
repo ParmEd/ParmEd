@@ -36,14 +36,13 @@ from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
-from parmed.residue import WATER_NAMES
+from parmed.residue import SOLVENT_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
-        DihedralTypeList, DihedralType, ImproperType, Bond, Angle, Dihedral,
-        UreyBradley, Improper, Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion,
-        StretchBend, TorsionTorsion, NonbondedException, AcceptorDonor, Group,
-        Atom, ExtraPoint, TwoParticleExtraPointFrame, ChiralFrame,
-        MultipoleFrame, NoUreyBradley, ThreeParticleExtraPointFrame,
-        OutOfPlaneExtraPointFrame)
+        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
+        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
+        NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
+        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules
 from parmed.utils.decorators import needs_openmm
@@ -1217,6 +1216,7 @@ class Structure(object):
 
             - PDB (.pdb, pdb)
             - PDBx/mmCIF (.cif, cif)
+            - PQR (.pqr, pqr)
             - Amber topology file (.prmtop/.parm7, amber)
             - CHARMM PSF file (.psf, charmm)
             - CHARMM coordinate file (.crd, charmmcrd)
@@ -1256,6 +1256,7 @@ class Structure(object):
         from parmed import amber, charmm, formats, gromacs
         extmap = {
                 '.pdb' : 'PDB',
+                '.pqr' : 'PQR',
                 '.cif' : 'CIF',
                 '.pdbx' : 'CIF',
                 '.parm7' : 'AMBER',
@@ -1297,6 +1298,8 @@ class Structure(object):
                 self.write_pdb(fname, **kwargs)
             elif format == 'CIF':
                 self.write_cif(fname, **kwargs)
+            elif format == 'PQR':
+                formats.PQRFile.write(self, fname, **kwargs)
             elif format == 'PSF':
                 self.write_psf(fname, **kwargs)
             elif format == 'GRO':
@@ -1865,8 +1868,8 @@ class Structure(object):
                 # Skip all extra points... don't constrain those
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
-                if (bond.atom1.residue.name in WATER_NAMES or
-                        bond.atom2.residue.name in WATER_NAMES):
+                if (bond.atom1.residue.name in SOLVENT_NAMES or
+                        bond.atom2.residue.name in SOLVENT_NAMES):
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,
                                          bond.type.req*length_conv)
             return

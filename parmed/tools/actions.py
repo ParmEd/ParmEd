@@ -4,13 +4,12 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 from __future__ import division, print_function
 
 from collections import OrderedDict
-from contextlib import closing
 import copy
 import math
 import numpy as np
 import os
 from parmed.topologyobjects import (Bond, BondType, Angle, AngleType, Dihedral,
-                                    DihedralType)
+        DihedralType)
 from parmed.structure import Structure
 from parmed.formats.registry import load_file
 import parmed.gromacs as gromacs
@@ -18,24 +17,24 @@ from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
         HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
 from parmed.charmm import CharmmPsfFile, CharmmParameterSet
-from parmed.exceptions import ParmedError, FormatNotFound
+from parmed.exceptions import ParmedError
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
-from parmed.utils.io import genopen
+from parmed.residue import (SOLVENT_NAMES, CATION_NAMES, ANION_NAMES,
+        AminoAcidResidue, RNAResidue, DNAResidue)
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
 from parmed.tools.argumentlist import ArgumentList
 from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
-              ChangeStateError, ChangeLJPairError, ParmedChangeError,
-              SetParamError, DeleteDihedralError, NoArgument, NonexistentParm,
-              AmbiguousParmError, IncompatibleParmsError, ArgumentError,
-              AddPDBError, AddPDBWarning, HMassRepartitionError,
-              SimulationError, UnhandledArgumentWarning, SeriousParmWarning,
-              FileExists, NonexistentParmWarning, LJ12_6_4Error, ChamberError,
-              FileDoesNotExist, InputError, TiMergeError,
-#             CoarseGrainError,
+        ChangeStateError, ChangeLJPairError, ParmedChangeError, SetParamError,
+        DeleteDihedralError, NoArgument, NonexistentParm, AmbiguousParmError,
+        IncompatibleParmsError, ArgumentError, AddPDBError, AddPDBWarning,
+        HMassRepartitionError, SimulationError, UnhandledArgumentWarning,
+        SeriousParmWarning, FileExists, NonexistentParmWarning, LJ12_6_4Error,
+        ChamberError, FileDoesNotExist, InputError, TiMergeError,
+#       CoarseGrainError,
 )
 from parmed.tools.parmlist import ParmList
 import sys
@@ -1437,13 +1436,14 @@ class defineSolvent(Action):
     usage = '<residue_list>'
     supported_subclasses = (AmberParm,)
     def init(self, arg_list):
+        from parmed import residue
         res_list = arg_list.get_next_string()
         res_list.replace(' ', '')
         if res_list.endswith(','):
             self.res_list = res_list[:len(res_list)-1]
         else:
             self.res_list = res_list
-        self.parm.solvent_residues = res_list.split(',')
+        residue.SOLVENT_NAMES = res_list.split(',')
 
     def __str__(self):
         return "Residues %s are now considered to be solvent" % self.res_list
@@ -2368,7 +2368,6 @@ class tiMerge(Action):
             atm_i = mol1common[i]
             for j in range(len(mol2common)):
                 atm_j = mol2common[j]
-                diff_count = 0
                 diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
                 if (np.abs(diff) < self.tol).sum() == 3:
                     mol2common_sort.append(atm_j)
@@ -2888,19 +2887,6 @@ class summary(Action):
     Prints out a summary of prmtop contents
     """
 
-    nucleic = ['A', 'G', 'C', 'U', 'DA', 'DG', 'DC', 'DT', 'AP', 'CP', 'DAP',
-               'DCP', 'AE', 'CE', 'DCE', 'DAE', 'GE', 'DGE', 'DTE', 'UE']
-
-    amino = ['ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'AS4', 'CYM', 'CYS', 'CYX',
-             'GLH', 'GLN', 'GLU', 'GLY', 'GL4', 'HID', 'HIE', 'HIP', 'HYP',
-             'ILE', 'LEU', 'LYN', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR',
-             'TRP', 'TYR', 'VAL']
-
-    anions = ['Cl-', 'Br-', 'F-', 'I-', 'CLA']
-
-    cations = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG',
-               'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2']
-
     def init(self, arg_list):
         pass
 
@@ -2911,28 +2897,28 @@ class summary(Action):
         """ Collect statistics """
         nnuc = namin = ncion = naion = nwat = nunk = 0
         for res in self.parm.residues:
-            if res.name in summary.nucleic:
+            if RNAResidue.has(res.name) or DNAResidue.has(res.name):
                 nnuc += 1
-            elif res.name in summary.amino:
+            elif AminoAcidResidue.has(res.name):
                 namin += 1
-            elif res.name in self.parm.solvent_residues:
+            elif res.name in SOLVENT_NAMES:
                 nwat += 1
-            elif res.name in summary.anions:
+            elif res.name in ANION_NAMES:
                 naion += 1
-            elif res.name in summary.cations:
+            elif res.name in CATION_NAMES:
                 ncion += 1
             else:
                 nunk += 1
       
-        tmass = sum(self.parm.parm_data['MASS'])
-        tchg = sum(self.parm.parm_data['CHARGE'])
+        tmass = sum(atom.mass for atom in self.parm.atoms)
+        tchg = sum(atom.charge for atom in self.parm.atoms)
 
         retval = ('Amino Acid Residues:   %d\n'
                   'Nucleic Acid Residues: %d\n'
                   'Number of cations:     %d\n'
                   'Number of anions:      %d\n'
                   'Num. of solvent mols:  %d\n' 
-                  'Num. of unknown atoms: %d\n'
+                  'Num. of unknown res:   %d\n'
                   'Total charge (e-):     %.4f\n'
                   'Total mass (amu):      %.4f\n'
                   'Number of atoms:       %d\n'
@@ -2947,7 +2933,7 @@ class summary(Action):
             # Get the total volume (and density) of orthorhombic box
             retval += ('System volume (ang^3): %.2f\n' 
                        'System density (g/mL): %f\n' %
-                       (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
+                       (v, tmass / (v * 0.602204))
             )
         elif self.parm.box is not None:
             # General triclinic cell
@@ -2960,7 +2946,7 @@ class summary(Action):
                                       2 * cosa*cosb*cosg)
             retval += ('System volume (ang^3): %.2f\n' 
                        'System density (g/mL): %f\n' %
-                       (v, sum(self.parm.parm_data['MASS']) / (v * 0.602204))
+                       (v, tmass / (v * 0.602204))
             )
         return retval
 
@@ -3309,7 +3295,7 @@ class HMassRepartition(Action):
     def execute(self):
         # Back up the masses in case something goes wrong
         original_masses = [atom.mass for atom in self.parm.atoms]
-        water = self.parm.solvent_residues
+        water = SOLVENT_NAMES
         for i, atom in enumerate(self.parm.atoms):
             if atom.atomic_number != 1: continue
             if not self.changewater and atom.residue.name in water:
@@ -3786,7 +3772,6 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-        from parmed.charmm import CharmmPsfFile, CharmmParameterSet
         # We're not using chamber, do the conversion in-house
         try:
             parmset = CharmmParameterSet()

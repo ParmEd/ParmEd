@@ -33,6 +33,7 @@ from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
 from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
 from parmed.geometry import box_lengths_and_angles_to_vectors
 from parmed.periodic_table import AtomicNum, element_by_mass
+from parmed.residue import SOLVENT_NAMES
 from parmed.structure import Structure, needs_openmm
 from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
@@ -154,8 +155,6 @@ class AmberParm(AmberFormat, Structure):
         topologies)
     """
     #===================================================
-
-    solvent_residues = ('WAT', 'HOH', 'SOL')
 
     def __init__(self, prm_name=None, xyz=None, box=None, rst7_name=None):
         """
@@ -694,7 +693,7 @@ class AmberParm(AmberFormat, Structure):
                 'CIO','MG2', 'SOD', 'CLA', 'POT', 'CAL']
         indices = []
         for res in self.residues:
-            if res.name in type(self).solvent_residues:
+            if res.name in SOLVENT_NAMES:
                 indices.append(res.idx)
                 break
         # Add ions to list of solvent if necessary

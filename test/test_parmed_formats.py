@@ -11,6 +11,7 @@ from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, StringIO
+import random
 import os
 import unittest
 from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
@@ -136,6 +137,23 @@ class TestFileLoader(unittest.TestCase):
         """ Tests automatic loading of Gromacs GRO file """
         gro = formats.load_file(get_fn('1aki.ff99sbildn.gro'))
         self.assertIsInstance(gro, Structure)
+
+    def testLoadPQR(self):
+        """ Tests automatic loading of PQR files """
+        pqr = formats.load_file(get_fn('adk_open.pqr'))
+        self.assertIsInstance(pqr, Structure)
+        self.assertEqual(len(pqr.atoms), 3341)
+        self.assertEqual(len(pqr.residues), 214)
+        self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
+        self.assertEqual(pqr.atoms[0].charge, -0.30)
+        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].atomic_number, 7)
+        self.assertEqual(pqr.atoms[35].charge, -0.8)
+        self.assertEqual(pqr.atoms[-1].charge, -0.67)
+        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].atomic_number, 8)
+        self.assertIsInstance(random.choice(pqr.residues).number, int)
+        self.assertIsInstance(random.choice(pqr.atoms).number, int)
 
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
@@ -541,6 +559,47 @@ class TestChemistryPDBStructure(FileIOTestCase):
                 self.assertTrue(residue.ter)
             else:
                 self.assertFalse(residue.ter)
+
+class TestParmedPQRStructure(FileIOTestCase):
+    """ Tests the PQR parser and writer """
+
+    def testPQRParsing(self):
+        """ Tests parsing a PQR file """
+        pqr = formats.PQRFile.parse(get_fn('adk_open.pqr'))
+        self.assertIsInstance(pqr, Structure)
+        self.assertEqual(len(pqr.atoms), 3341)
+        self.assertEqual(len(pqr.residues), 214)
+        self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
+        self.assertEqual(pqr.atoms[0].charge, -0.30)
+        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].atomic_number, 7)
+        self.assertEqual(pqr.atoms[35].charge, -0.8)
+        self.assertEqual(pqr.atoms[-1].charge, -0.67)
+        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].atomic_number, 8)
+
+    def testPQRWriter(self):
+        """ Tests writing a PQR file with charges and radii """
+        parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        formats.PQRFile.write(parm, get_fn('test.pqr', written=True),
+                              renumber=True)
+        pqr = formats.PQRFile.parse(get_fn('test.pqr', written=True))
+        self.assertEqual(len(parm.atoms), len(pqr.atoms))
+        for a1, a2 in zip(parm.atoms, pqr.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+            self.assertEqual(a1.residue.idx, a2.residue.idx)
+            self.assertAlmostEqual(a1.charge, a2.charge)
+            self.assertAlmostEqual(a1.radii, a2.radii)
+
+    def testPQRWithElement(self):
+        """ Tests reading a PQR file that has an element column """
+        self.assertTrue(formats.PQRFile.id_format(get_fn('elem.pqr')))
+        pqr = formats.PQRFile.parse(get_fn('elem.pqr'))
+        self.assertEqual(len(pqr.atoms), 458)
+        self.assertEqual(len(pqr.residues), 14)
+        self.assertEqual(pqr.atoms[0].charge, -0.9526)
+        self.assertEqual(pqr.atoms[-1].radii, 0.8)
 
 class TestChemistryCIFStructure(FileIOTestCase):
 
@@ -1024,3 +1083,5 @@ class TestFileDownloader(unittest.TestCase):
         """ Tests automatic loading of downloaded Gromacs GRO file """
         gro = formats.load_file(self.url + '1aki.ff99sbildn.gro')
         self.assertIsInstance(gro, Structure)
+
+del skip_big_tests # Avoid fake testing this method :)

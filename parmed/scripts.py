@@ -209,9 +209,8 @@ def guiapp():
     from parmed.utils.six.moves import tkinter as tk
     from parmed.utils.six.moves.tkinter_messagebox import showerror
     from optparse import OptionParser
-    from os.path import exists, split
+    from os.path import split
     from parmed.tools.exceptions import ParmError
-    from parmed import __version__
     from parmed.tools.gui.guitools import ParmedApp
     from parmed.tools.gui.guifiletools import file_chooser
     from parmed.tools.logos import Logo

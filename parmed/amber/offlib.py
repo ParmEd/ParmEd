@@ -252,12 +252,12 @@ class AmberOFFLibrary(object):
         if head > 0 and nres == 1:
             templ.head = templ[head-1]
         elif head > 0 and nres > 1:
-            if head < sum([len(r) for r in container]):
+            if head < sum((len(r) for r in container)):
                 raise RuntimeError('HEAD on multi-residue unit not supported')
         if tail > 0 and nres == 1:
             templ.tail = templ[tail-1]
         elif tail > 0 and nres > 1:
-            if tail < sum([len(r) for r in container]):
+            if tail < sum((len(r) for r in container)):
                 warnings.warn('TAIL on multi-residue unit not supported (%s). '
                               'Ignored...' % name, AmberWarning)
         # Get the connectivity array to set bonds
@@ -326,7 +326,7 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Found residue %s while processing residue %s' %
                                (rematch.groups()[0], name))
         for i in range(nres):
-            c1,c2,c3,c4,c5,c6 = [int(x) for x in fileobj.readline().split()]
+            c1,c2,c3,c4,c5,c6 = (int(x) for x in fileobj.readline().split())
             if templ.head is not None and templ.head is not templ[c1-1]:
                 warnings.warn('HEAD atom is not connect0')
             if templ.tail is not None and templ.tail is not templ[c2-1]:
@@ -400,7 +400,7 @@ class AmberOFFLibrary(object):
                                (rematch.groups()[0], name))
         for res in container:
             for atom in res:
-                vx, vy, vz = [float(x) for x in fileobj.readline().split()]
+                vx, vy, vz = (float(x) for x in fileobj.readline().split())
                 atom.vx, atom.vy, atom.vz = vx, vy, vz
 
         if nres > 1:

@@ -18,7 +18,6 @@ from parmed import unit as u
 from parmed.utils.six import add_metaclass, string_types
 from parmed.utils.six.moves import range
 from parmed.vec3 import Vec3
-import sys
 
 charmlen = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
@@ -203,6 +202,8 @@ class CharmmCrdFile(object):
                        '%-8s%20.10f\n' % (i+1, atom.residue.idx+1,
                        atom.residue.name, atom.name, atom.xx, atom.xy, atom.xz,
                        segid, atom.residue.number, 0))
+        if own_handle:
+            dest.close()
 
 @add_metaclass(FileFormatType)
 class CharmmRstFile(object):

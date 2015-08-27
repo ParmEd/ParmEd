@@ -1096,8 +1096,6 @@ class CharmmParameterSet(ParameterSet):
                 f.write('%-6s %-6s %-6s %-6s %-6s %-6s %-6s %-6s %5d\n\n' %
                         (key[0], key[1], key[2], key[3], key[4], key[5], key[6],
                          key[7], typ.resolution))
-                resm1 = typ.resolution - 1
-                res = typ.resolution
                 i = 0
                 for val in typ.grid:
                     if i:

@@ -1,4 +1,20 @@
 """ Exceptions used in parmed script """
+__all__ = ['ParmedError', 'ParmedWarning', 'InputError', 'ParmError',
+           'ParmWarning', 'SeriousParmWarning', 'ChangeRadiiError',
+           'WriteOFFError', 'ParmedUtilsError', 'ParmedChangeError',
+           'ParmedAddLJTypeError', 'ChangeLJPairError', 'LJ_TypeError',
+           'ParmedMoleculeError', 'CoarseGrainError', 'ChangeStateError',
+           'DeleteDihedralError', 'ArgumentError', 'NoArgument',
+           'InterpreterError', 'AmberIncompatibleWarning', 'BadParmWarning',
+           'FixableParmWarning', 'NonfatalWarning', 'NonUniversalWarning',
+           'MissingDisulfide', 'LongBondWarning', 'NonexistentParm',
+           'NonexistentParmWarning', 'DuplicateParm', 'AmbiguousParmError',
+           'IncompatibleParmsError', 'AddPDBWarning', 'AddPDBError',
+           'LJ12_6_4Error', 'DuplicateParamWarning', 'HMassRepartitionError',
+           'SimulationError', 'SimulationWarning', 'UnhandledArgumentWarning',
+           'ParmIndexError', 'FileExists', 'FileDoesNotExist', 'ChamberError',
+           'TiMergeError', 'WarningList']
+
 from sys import stderr
 from parmed.exceptions import ParmedError, ParmedWarning, InputError
 import warnings

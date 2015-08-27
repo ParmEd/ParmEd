@@ -25,12 +25,13 @@ from __future__ import division, print_function, absolute_import
 from parmed.amber._amberparm import AmberParm
 from parmed.amber.amberformat import AmberFormat
 from parmed.constants import NATOM, NRES, IFBOX, RAD_TO_DEG, DEG_TO_RAD
-from parmed import (Bond, BondType, PiTorsion, AngleType, OutOfPlaneBendType,
-                DihedralType, UreyBradley, Angle, TrigonalAngle, OutOfPlaneBend,
-                Dihedral, StretchBend, TorsionTorsion, ChiralFrame,
-                MultipoleFrame, NonbondedException, StretchBendType,
-                TorsionTorsionType)
-from parmed import AmoebaNonbondedExceptionType as NonbondedExceptionType
+from parmed.formats.registry import load_file
+from parmed.topologyobjects import (Bond, BondType, PiTorsion, AngleType,
+                OutOfPlaneBendType, DihedralType, UreyBradley, Angle,
+                TrigonalAngle, OutOfPlaneBend, Dihedral, StretchBend,
+                TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
+                StretchBendType, TorsionTorsionType,
+                AmoebaNonbondedExceptionType as NonbondedExceptionType)
 from parmed.exceptions import AmberError
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import range, zip
@@ -149,8 +150,6 @@ class AmoebaParm(AmberParm):
         not have correction maps (unique to CHARMM force field and chamber
         topologies)
     """
-
-    solvent_residues = ['WAT', 'HOH']
 
     #=============================================
 

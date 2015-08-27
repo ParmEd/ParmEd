@@ -4,9 +4,10 @@ residues in typical biopolymers.
 """
 
 __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
-           'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET',
-           'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT', 'DG',
-           'DC', 'A', 'U', 'G', 'C', 'WATER_NAMES', 'EXTRA_POINT_NAMES']
+           'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'HYP', 'ILE', 'LEU', 'LYS',
+           'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT',
+           'DG', 'DC', 'A', 'U', 'G', 'C', 'SOLVENT_NAMES', 'EXTRA_POINT_NAMES',
+           'CATION_NAMES', 'ANION_NAMES']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -85,7 +86,8 @@ class AminoAcidResidue(BiomolecularResidue):
         self.symbol = symbol
         type(self)._all_residues_by_name[name.upper()] = self
         type(self)._all_residues_by_abbr[abbr.upper()] = self
-        type(self)._all_residues_by_symbol[symbol.upper()] = self
+        if symbol is not None:
+            type(self)._all_residues_by_symbol[symbol.upper()] = self
         type(self).all_residues.append(self)
         if aliases is not None:
             for alias in aliases:
@@ -137,6 +139,7 @@ GLU = AminoAcidResidue('Glutamate', 'GLU', 'E', ['GLH', 'GL4'])
 GLN = AminoAcidResidue('Glutamine', 'GLN', 'Q')
 GLY = AminoAcidResidue('Glycine', 'GLY', 'G')
 HIS = AminoAcidResidue('Histidine', 'HIS', 'H', ['HIP', 'HIE', 'HID'])
+HYP = AminoAcidResidue('Hydroxyproline', 'HYP', None)
 ILE = AminoAcidResidue('Isoleucine', 'ILE', 'I')
 LEU = AminoAcidResidue('Leucine', 'LEU', 'L')
 LYS = AminoAcidResidue('Lysine', 'LYS', 'K', ['LYN'])
@@ -260,14 +263,21 @@ class RNAResidue(DNAResidue):
         except KeyError:
             return cls._all_residues_by_name[key.upper()]
 
-DG = DNAResidue('Guanine', 'DG', ['GUA'])
-DC = DNAResidue('Cytosine', 'DC', ['CYT'])
-DA = DNAResidue('Adenine', 'DA', ['ADE'])
-DT = DNAResidue('Thymine', 'DT', ['THY'])
-G = RNAResidue('Guanine', 'G', ['GUA', 'RG'])
-C = RNAResidue('Cytosine', 'C', ['CYT', 'RC'])
-A = RNAResidue('Adenine', 'A', ['ADE', 'RA'])
-U = RNAResidue('Uracil', 'U', ['URA', 'RU'])
+DG = DNAResidue('Guanine', 'DG', ['GUA', 'DG5', 'DG3', 'DGN'])
+DC = DNAResidue('Cytosine', 'DC', ['CYT', 'DC5', 'DC3', 'DCN', 'DCP'])
+DA = DNAResidue('Adenine', 'DA', ['ADE', 'DA5', 'DA3', 'DAN', 'DAP'])
+DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3'])
+G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN',
+                                'RG', 'RG3', 'RG5', 'RGN'])
+C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN',
+                                 'RC', 'RC5', 'RC3', 'RCN'])
+A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN',
+                                'RA', 'RA3', 'RA5'])
+U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN',
+                               'RU', 'RU3', 'RU5', 'RUN'])
 
-WATER_NAMES = ['WAT', 'HOH', 'TIP3']
+SOLVENT_NAMES = ['WAT', 'HOH', 'TIP3', 'SOL', 'TIP4', 'TIP5', 'SPCE', 'SPC']
 EXTRA_POINT_NAMES = ['EP', 'LP']
+CATION_NAMES = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG',
+                'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2']
+ANION_NAMES = ['Cl-', 'Br-', 'F-', 'I-', 'CLA']

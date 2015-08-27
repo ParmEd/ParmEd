@@ -23,7 +23,6 @@ from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
 import re
-import socket
 import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -94,23 +93,58 @@ class PDBFile(object):
             True if it is a PDB file
         """
         with closing(genopen(filename, 'r')) as f:
-            lines = [f.readline() for i in range(3)]
-
-        for line in lines:
-            if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
-                    'MASTER', 'ORIGXn', 'SCALEn', 'AUTHOR', 'CAVEAT', 'COMPND',
-                    'EXPDTA', 'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
-                    'SPRSDE', 'TITLE ', 'ANISOU', 'ATOM  ', 'CISPEP', 'CONECT',
-                    'DBREF ', 'HELIX ', 'HET   ', 'HETATM', 'LINK  ', 'MODRES',
-                    'MTRIXn', 'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL',
-                    'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL', 'MODEL ',
-                    'TER   ', 'TER', 'JRNL  ', 'REMARK'):
-                continue
-            # Hack to support reduce-added flags
-            elif line[:6] == 'USER  ' and line[6:9] == 'MOD':
-                continue
-            return False
-        return True
+            for line in f:
+                if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
+                        'MASTER', 'AUTHOR', 'CAVEAT', 'COMPND', 'EXPDTA',
+                        'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
+                        'SPRSDE', 'TITLE ', 'ANISOU', 'CISPEP', 'CONECT',
+                        'DBREF ', 'HELIX ', 'HET   ', 'LINK  ', 'MODRES',
+                        'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL',
+                        'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL',
+                        'MODEL ', 'TER   ', 'JRNL  ', 'REMARK', 'TER'):
+                    continue
+                # Hack to support reduce-added flags
+                elif line[:6] == 'USER  ' and line[6:9] == 'MOD':
+                    continue
+                elif line[:5] in ('ORIGX', 'SCALE', 'MTRIX'):
+                    if line[5] not in '123':
+                        return False
+                    continue
+                elif line[:6] in ('ATOM  ', 'HETATM'):
+                    atnum, atname = line[6:11], line[12:16]
+                    resname, resid = line[17:21], line[22:26]
+                    x, y, z = line[30:38], line[38:46], line[46:54]
+                    occupancy, bfactor = line[54:60], line[60:66]
+                    elem = line[76:78]
+                    # Check for various attributes. This is the first atom, so
+                    # we can assume we haven't gotten into the regime of "weird"
+                    # yet, like hexadecimal atom/residue indices.
+                    if not atnum.strip().isdigit(): return False
+                    if atname.strip().isdigit(): return False
+                    if not resname.strip(): return False
+                    if not resid.strip().isdigit(): return False
+                    try:
+                        float(x), float(y), float(z)
+                    except ValueError:
+                        return False
+                    if occupancy.strip():
+                        try:
+                            float(occupancy)
+                        except ValueError:
+                            return False
+                    if bfactor.strip():
+                        try:
+                            float(bfactor)
+                        except ValueError:
+                            return False
+                    if elem.strip():
+                        if len(elem) > 2:
+                            return False
+                        if any(x.isdigit() for x in elem):
+                            return False
+                    return True
+                return False
+            return True
 
     #===================================================
 
@@ -230,8 +264,6 @@ class PDBFile(object):
     
         Returns
         -------
-        structure
-        
         structure : :class:`Structure`
             The Structure object initialized with all of the information from
             the PDB file.  No bonds or other topological features are added by
@@ -1423,6 +1455,3 @@ class CIFFile(object):
             dest.close()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Structure.write_pdb = PDBFile.write
-Structure.write_cif = CIFFile.write

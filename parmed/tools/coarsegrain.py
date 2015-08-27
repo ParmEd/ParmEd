@@ -112,7 +112,6 @@ class Dihedral(object):
 
 def addCoarseGrain(parm, param_file):
     from parmed.tools.exceptions import CoarseGrainError
-    from sys import stderr
     """ Adds coarse graining sections to the prmtop """
     # Angles and Dihedrals dictionaries for storing parameters parsed from
     # parameter file

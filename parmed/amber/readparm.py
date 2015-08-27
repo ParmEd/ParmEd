@@ -29,6 +29,9 @@ from parmed.amber._tinkerparm import AmoebaParm, BeemanRestart
 from parmed.utils.six import string_types
 from warnings import warn as _warn
 
+# Silence pyflakes warnings for deprecated/unused classes
+assert BeemanRestart and ConvertFromPSF
+
 # Define importables via *
 __all__ = ['AmberFormat', 'AmberParm', 'ChamberParm', 'LoadParm', 'Rst7']
 

@@ -6,7 +6,6 @@ This sets up the command interpreter for textual ParmEd (parmed).
 import cmd
 from glob import glob
 import os
-from parmed.amber.readparm import AmberParm
 from parmed.exceptions import ParmedError, ParmedWarning
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range
@@ -266,19 +265,19 @@ class ParmedCmd(cmd.Cmd):
             raise InterpreterError("Interpreter not enabled! Use '-e' "
                                    "to enable")
         line = str(line)
-        amber_prmtop = self.parm
         if line.strip() == '!':
             self._python_shell()
         else:
+            globals_ = dict(amber_prmtop=self.parm)
+            globals_.update(globals())
             try:
-                exec(line.strip())
+                exec(line.strip(), globals_)
             except Exception as err:
                 self.stdout.write("%s: %s\n" % (type(err).__name__, err))
 
     def completedefault(self, text, line, begidx, endidx):
         partial = line[:endidx]
         idx = max(partial.rfind(' '), partial.rfind('\t')) + 1
-        full_token = partial[idx:]
         beg_token = partial[idx:begidx]
         return [s.replace(beg_token, '', 1) for s in glob(partial[idx:] + '*')]
 
@@ -291,8 +290,9 @@ class ParmedCmd(cmd.Cmd):
         if not self.prompt: python_interpreter.prompt = ''
         python_interpreter.cmdloop()
         try:
-            amber_prmtop = self.parm
-            exec(python_interpreter.command_string)
+            globals_ = dict(amber_prmtop=self.parm, actions=actions)
+            globals_.update(globals())
+            exec(python_interpreter.command_string, globals_)
         except Exception as err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
       
