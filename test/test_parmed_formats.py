@@ -11,6 +11,7 @@ from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, StringIO
+import random
 import os
 import unittest
 from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
@@ -151,6 +152,8 @@ class TestFileLoader(unittest.TestCase):
         self.assertEqual(pqr.atoms[-1].charge, -0.67)
         self.assertEqual(pqr.atoms[-1].radii, 1.7)
         self.assertEqual(pqr.atoms[-1].atomic_number, 8)
+        self.assertIsInstance(random.choice(pqr.residues).number, int)
+        self.assertIsInstance(random.choice(pqr.atoms).number, int)
 
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
