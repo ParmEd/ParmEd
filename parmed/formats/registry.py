@@ -115,9 +115,9 @@ def load_file(filename, *args, **kwargs):
     # Check that the file actually exists and that we can read it
     if filename.startswith('http://') or filename.startswith('https://')\
             or filename.startswith('ftp://'):
-        # This raises IOError if it does not exist
+        # This raises IOError if it does not exist; assert silences linters
         with closing(genopen(filename)) as f:
-            pass
+            assert f
     elif not os.path.exists(filename):
         raise IOError('%s does not exist' % filename)
     elif not os.access(filename, os.R_OK):

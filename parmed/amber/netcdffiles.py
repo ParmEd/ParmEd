@@ -18,7 +18,6 @@ from __future__ import division, print_function, absolute_import
 from parmed.formats.registry import FileFormatType
 from parmed import unit as u
 from parmed.utils.six import wraps, add_metaclass
-import warnings
 # This determines which NetCDF package we're going to use...
 NETCDF_PACKAGE = None
 

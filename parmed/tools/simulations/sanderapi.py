@@ -4,8 +4,7 @@ the sander-Python bindings
 """
 from __future__ import division, print_function
 import numpy as np
-from parmed.tools.exceptions import (SimulationError, SimulationWarning,
-               UnhandledArgumentWarning)
+from parmed.tools.exceptions import SimulationError, UnhandledArgumentWarning
 try:
     import sander
 except ImportError:
@@ -42,7 +41,6 @@ def energy(parm, args, output=sys.stdout):
         warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds),
                       UnhandledArgumentWarning)
 
-    gbmeth, kappa = None, 0.0
     if parm.ptr('ifbox') == 0:
         if not igb in (0, 1, 2, 5, 6, 7, 8):
             raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, '

@@ -2,8 +2,9 @@
 Contains classes for parsing GROMACS topology and parameter files
 """
 import os as _os
-
 from parmed.utils import which as _which
+
+__all__ = ['GROMACS_TOPDIR', 'GromacsTopologyFile', 'GromacsGroFile']
 
 GROMACS_TOPDIR = None
 
@@ -36,9 +37,10 @@ else:
     GROMACS_TOPDIR = '/usr/local/gromacs/share/gromacs/top'
 
 try:
-    del _testdir, _os, _which
-except NameError: #_testdir is only defined under certain scenarios so it may not be defined here
-    del _os, _which
+    del _testdir
+except NameError:
+    pass
+del _os, _which
 
 from parmed.gromacs.gromacstop import GromacsTopologyFile
 from parmed.gromacs.gromacsgro import GromacsGroFile

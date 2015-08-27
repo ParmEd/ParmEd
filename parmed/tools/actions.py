@@ -4,13 +4,12 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 from __future__ import division, print_function
 
 from collections import OrderedDict
-from contextlib import closing
 import copy
 import math
 import numpy as np
 import os
 from parmed.topologyobjects import (Bond, BondType, Angle, AngleType, Dihedral,
-                                    DihedralType)
+        DihedralType)
 from parmed.structure import Structure
 from parmed.formats.registry import load_file
 import parmed.gromacs as gromacs
@@ -18,25 +17,23 @@ from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
         HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
 from parmed.charmm import CharmmPsfFile, CharmmParameterSet
-from parmed.exceptions import ParmedError, FormatNotFound
+from parmed.exceptions import ParmedError
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
 from parmed.residue import SOLVENT_NAMES
-from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
 from parmed.tools.argumentlist import ArgumentList
 from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
-              ChangeStateError, ChangeLJPairError, ParmedChangeError,
-              SetParamError, DeleteDihedralError, NoArgument, NonexistentParm,
-              AmbiguousParmError, IncompatibleParmsError, ArgumentError,
-              AddPDBError, AddPDBWarning, HMassRepartitionError,
-              SimulationError, UnhandledArgumentWarning, SeriousParmWarning,
-              FileExists, NonexistentParmWarning, LJ12_6_4Error, ChamberError,
-              FileDoesNotExist, InputError, TiMergeError,
-#             CoarseGrainError,
+        ChangeStateError, ChangeLJPairError, ParmedChangeError, SetParamError,
+        DeleteDihedralError, NoArgument, NonexistentParm, AmbiguousParmError,
+        IncompatibleParmsError, ArgumentError, AddPDBError, AddPDBWarning,
+        HMassRepartitionError, SimulationError, UnhandledArgumentWarning,
+        SeriousParmWarning, FileExists, NonexistentParmWarning, LJ12_6_4Error,
+        ChamberError, FileDoesNotExist, InputError, TiMergeError,
+#       CoarseGrainError,
 )
 from parmed.tools.parmlist import ParmList
 import sys
@@ -2370,7 +2367,6 @@ class tiMerge(Action):
             atm_i = mol1common[i]
             for j in range(len(mol2common)):
                 atm_j = mol2common[j]
-                diff_count = 0
                 diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
                 if (np.abs(diff) < self.tol).sum() == 3:
                     mol2common_sort.append(atm_j)
@@ -3788,7 +3784,6 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-        from parmed.charmm import CharmmPsfFile, CharmmParameterSet
         # We're not using chamber, do the conversion in-house
         try:
             parmset = CharmmParameterSet()

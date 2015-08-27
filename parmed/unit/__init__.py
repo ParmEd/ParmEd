@@ -49,4 +49,3 @@ akma_unit_system = UnitSystem([
         kelvin_base_unit,
         mole_base_unit,
         radian_base_unit])
-

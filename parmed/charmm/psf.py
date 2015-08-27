@@ -10,12 +10,9 @@ from __future__ import division
 
 from contextlib import closing
 from copy import copy as _copy
-from math import sqrt
 from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                     Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
-                    DihedralType, ImproperType, AngleType, ExtraPoint,
-                    DihedralTypeList)
-from parmed.constants import SMALL
+                    DihedralType, ImproperType)
 from parmed.exceptions import (CharmmError, MoleculeError, CharmmWarning,
         ParameterError)
 from parmed.structure import needs_openmm

@@ -4,7 +4,7 @@ parameters defined in an input file for sander and pmemd.
 """
 from __future__ import division, print_function
 
-from parmed.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7, AmberParm
+from parmed.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7
 from parmed.amber.mdin import mdin as Mdin
 from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
@@ -860,7 +860,7 @@ def energy(parm, args, output=sys.stdout):
         warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds),
                       UnhandledArgumentWarning)
    
-    gbmeth, kappa = None, 0.0
+    gbmeth = None
     if parm.ptr('ifbox') == 0:
         if cutoff is None or cutoff >= 500:
             nbmeth = ff.NoCutoff

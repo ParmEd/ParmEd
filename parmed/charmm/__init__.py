@@ -21,13 +21,10 @@ simulation with CHARMM; specifically PSF, PAR, RTF, and STR files
             field parameter files
 """
 
-__all__ = ['psf', 'parameters', 'charmmcrds']
 __authors__ = 'Jason Swails'
-__contributors__ = ''
-__date__ = 'Apr. 20, 2014'
-
-
-__private__ = ['_charmmfile']
+__contributors__ = 'Jason Deckman'
+__all__ = ['psf', 'parameters', 'charmmcrds', 'CharmmPsfFile',
+           'CharmmParameterSet', 'CharmmCrdFile', 'CharmmRstFile']
 
 from parmed.charmm.psf import CharmmPsfFile
 from parmed.charmm.parameters import CharmmParameterSet

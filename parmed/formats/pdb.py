@@ -23,7 +23,6 @@ from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
 import re
-import socket
 import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -112,12 +111,11 @@ class PDBFile(object):
                         return False
                     continue
                 elif line[:6] in ('ATOM  ', 'HETATM'):
-                    atnum, atname, altloc = line[6:11], line[12:16], line[16]
-                    resname, chain = line[17:21], line[21]
-                    resid, inscode = line[22:26], line[26]
+                    atnum, atname = line[6:11], line[12:16]
+                    resname, resid = line[17:21], line[22:26]
                     x, y, z = line[30:38], line[38:46], line[46:54]
                     occupancy, bfactor = line[54:60], line[60:66]
-                    elem, chg = line[76:78], line[78:80]
+                    elem = line[76:78]
                     # Check for various attributes. This is the first atom, so
                     # we can assume we haven't gotten into the regime of "weird"
                     # yet, like hexadecimal atom/residue indices.
@@ -1457,6 +1455,3 @@ class CIFFile(object):
             dest.close()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Structure.write_pdb = PDBFile.write
-Structure.write_cif = CIFFile.write

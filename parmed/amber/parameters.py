@@ -453,7 +453,6 @@ class AmberParameterSet(ParameterSet):
             rawline = next(fiter)
         # Process the dihedrals
         rawline = next(fiter)
-        dihed_type = None
         while rawline:
             line = rawline.strip()
             if not line:
@@ -539,7 +538,6 @@ class AmberParameterSet(ParameterSet):
         if words[0] in self.atom_types:
             self.atom_types[words[0]].mass = mass
         else:
-            n_types = len(self.atom_types) + 1
             atype = AtomType(words[0], len(self.atom_types)+1, mass,
                              AtomicNum[element_by_mass(mass)])
             self.atom_types[words[0]] = atype
