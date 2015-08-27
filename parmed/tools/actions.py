@@ -21,7 +21,8 @@ from parmed.exceptions import ParmedError
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
-from parmed.residue import SOLVENT_NAMES
+from parmed.residue import (SOLVENT_NAMES, CATION_NAMES, ANION_NAMES,
+        AminoAcidResidue, RNAResidue, DNAResidue)
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
@@ -2886,19 +2887,6 @@ class summary(Action):
     Prints out a summary of prmtop contents
     """
 
-    nucleic = ['A', 'G', 'C', 'U', 'DA', 'DG', 'DC', 'DT', 'AP', 'CP', 'DAP',
-               'DCP', 'AE', 'CE', 'DCE', 'DAE', 'GE', 'DGE', 'DTE', 'UE']
-
-    amino = ['ALA', 'ARG', 'ASH', 'ASN', 'ASP', 'AS4', 'CYM', 'CYS', 'CYX',
-             'GLH', 'GLN', 'GLU', 'GLY', 'GL4', 'HID', 'HIE', 'HIP', 'HYP',
-             'ILE', 'LEU', 'LYN', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR',
-             'TRP', 'TYR', 'VAL']
-
-    anions = ['Cl-', 'Br-', 'F-', 'I-', 'CLA']
-
-    cations = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG',
-               'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2']
-
     def init(self, arg_list):
         pass
 
@@ -2909,15 +2897,15 @@ class summary(Action):
         """ Collect statistics """
         nnuc = namin = ncion = naion = nwat = nunk = 0
         for res in self.parm.residues:
-            if res.name in summary.nucleic:
+            if RNAResidue.has(res.name) or DNAResidue.has(res.name):
                 nnuc += 1
-            elif res.name in summary.amino:
+            elif AminoAcidResidue.has(res.name):
                 namin += 1
             elif res.name in SOLVENT_NAMES:
                 nwat += 1
-            elif res.name in summary.anions:
+            elif res.name in ANION_NAMES:
                 naion += 1
-            elif res.name in summary.cations:
+            elif res.name in CATION_NAMES:
                 ncion += 1
             else:
                 nunk += 1
@@ -2930,7 +2918,7 @@ class summary(Action):
                   'Number of cations:     %d\n'
                   'Number of anions:      %d\n'
                   'Num. of solvent mols:  %d\n' 
-                  'Num. of unknown atoms: %d\n'
+                  'Num. of unknown res:   %d\n'
                   'Total charge (e-):     %.4f\n'
                   'Total mass (amu):      %.4f\n'
                   'Number of atoms:       %d\n'

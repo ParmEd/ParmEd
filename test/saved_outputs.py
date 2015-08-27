@@ -238,7 +238,7 @@ Nucleic Acid Residues: 0
 Number of cations:     10
 Number of anions:      10
 Num. of solvent mols:  696
-Num. of unknown atoms: 6
+Num. of unknown res:   6
 Total charge (e-):     -0.0000
 Total mass (amu):      13618.1680
 Number of atoms:       2174
@@ -361,7 +361,7 @@ Nucleic Acid Residues: 0
 Number of cations:     0
 Number of anions:      0
 Num. of solvent mols:  17856
-Num. of unknown atoms: 5
+Num. of unknown res:   5
 Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
@@ -427,7 +427,7 @@ Nucleic Acid Residues: 0
 Number of cations:     0
 Number of anions:      0
 Num. of solvent mols:  818
-Num. of unknown atoms: 2
+Num. of unknown res:   2
 Total charge (e-):     0.0000
 Total mass (amu):      14809.3650
 Number of atoms:       2466
@@ -442,7 +442,7 @@ Nucleic Acid Residues: 0
 Number of cations:     0
 Number of anions:      0
 Num. of solvent mols:  818
-Num. of unknown atoms: 2
+Num. of unknown res:   2
 Total charge (e-):     0.0000
 Total mass (amu):      14809.3650
 Number of atoms:       2466
@@ -542,12 +542,12 @@ Mg2+ [10]   HW [12]        0.000000        0.000000        0.000000   0.000000  
 """
 
 PDB_SUMMARY = """\
-Amino Acid Residues:   128
+Amino Acid Residues:   129
 Nucleic Acid Residues: 0
 Number of cations:     0
 Number of anions:      0
 Num. of solvent mols:  139
-Num. of unknown atoms: 7
+Num. of unknown res:   6
 Total charge (e-):     0.0000
 Total mass (amu):      15942.3372
 Number of atoms:       1164
