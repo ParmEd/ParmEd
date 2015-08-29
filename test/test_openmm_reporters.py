@@ -250,7 +250,7 @@ class TestTrajRestartReporter(utils.FileIOTestCase):
         f = AmberAsciiRestart(get_fn('restart.rst7', written=True), 'r')
         # Compare to ncrst and make sure it's the same data
         np.testing.assert_allclose(ncrst.coordinates, f.coordinates, rtol=1e-4)
-        np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-4)
+        np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-3)
 
     def testReportersPBC(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (w/ PBC) """
