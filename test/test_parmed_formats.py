@@ -601,7 +601,6 @@ class TestParmedPQRStructure(FileIOTestCase):
 
     def testPQRWithElement(self):
         """ Tests reading a PQR file that has an element column """
-        self.assertTrue(formats.PQRFile.id_format(get_fn('elem.pqr')))
         pqr = formats.PQRFile.parse(get_fn('elem.pqr'))
         self.assertEqual(len(pqr.atoms), 458)
         self.assertEqual(len(pqr.residues), 14)

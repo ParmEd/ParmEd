@@ -57,16 +57,12 @@ class PQRFile(object):
                     # Format is:
                     # rec atnum atname resname [chain] resnum x y z chg radius
                     # Where the chain ID is optional. rec must be ATOM or HETATM
-                    if len(words) < 10:
+                    if len(words) not in (10, 11):
                         return False
                     elif len(words) == 10:
                         offset = 0
-                    elif len(words) >= 11:
+                    elif len(words) == 11:
                         offset = 1
-                        try:
-                            float(words[10])
-                        except ValueError:
-                            offset = 0
                     if not words[1].isdigit(): return False
                     if words[2].isdigit(): return False
                     if words[3].isdigit(): return False
