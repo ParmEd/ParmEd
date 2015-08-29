@@ -28,7 +28,7 @@ from parmed.exceptions import AmberError, AmberWarning
 from parmed.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                     ImproperType, CmapType, ExtraPoint)
 from parmed.utils.six.moves import zip, range
-import copy
+import copy as _copy
 from math import sqrt
 import warnings
 
@@ -140,7 +140,7 @@ class ChamberParm(AmberParm):
     #===================================================
 
     @classmethod
-    def from_structure(cls, struct):
+    def from_structure(cls, struct, copy=False):
         """
         Take a Structure instance and initialize a ChamberParm instance from
         that data.
@@ -149,7 +149,26 @@ class ChamberParm(AmberParm):
         ----------
         struct : Structure
             The input structure from which to construct a ChamberParm instance
+        copy : bool
+            If True, the input struct is deep-copied to make sure it does not
+            share any objects with the original ``struct``. Default is False
+
+        Returns
+        -------
+        inst : :class:`ChamberParm`
+            The ChamberParm instance derived from the input structure
+
+        Notes
+        -----
+        Due to the nature of the prmtop file, struct almost *always* returns a
+        deep copy. The one exception is when struct is already of type
+        :class:`ChamberParm`, in which case the original object is returned
+        unless ``copy`` is ``True``.
         """
+        if isinstance(struct, cls):
+            if copy:
+                return _copy.copy(struct)
+            return struct
         if (struct.rb_torsions or struct.trigonal_angles or struct.pi_torsions
                 or struct.out_of_plane_bends or struct.stretch_bends
                 or struct.torsion_torsions or struct.multipole_frames):
@@ -181,7 +200,7 @@ class ChamberParm(AmberParm):
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
-        inst.box = copy.copy(struct.box)
+        inst.box = _copy.copy(struct.box)
         if struct.box is None:
             inst.parm_data['POINTERS'][IFBOX] = 0
             inst.pointers['IFBOX'] = 0
