@@ -682,6 +682,16 @@ class TestWriteFiles(FileIOTestCase):
             f1.close()
             f2.close()
 
+    def testSaveAmberParm(self):
+        """ Test writing AmberParm file with AmberParm.save """
+        parm = readparm.AmberParm(get_fn('trx.prmtop'))
+        parm.add_flag('NEW_FLAG', '10I6', num_items=parm.ptr('nres'))
+        self.assertIn('NEW_FLAG', parm.parm_data)
+        self.assertIn('NEW_FLAG', parm.flag_list)
+        parm.save(get_fn('trx.prmtop', written=True))
+        parm2 = readparm.AmberParm(get_fn('trx.prmtop', written=True))
+        self.assertIn('NEW_FLAG', parm2.parm_data)
+
     def testAmberRestart(self):
         """ Test writing an ASCII Amber restart file """
         Restart = asciicrd.AmberAsciiRestart
@@ -1063,6 +1073,5 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(d1.improper, d2.improper)
             self.assertEqual(d1.type, d2.type)
 
-del TestReadParm, TestCoordinateFiles, TestAmberParmSlice, TestObjectAPIs, TestWriteFiles, TestAmberMask
 if __name__ == '__main__':
     unittest.main()
