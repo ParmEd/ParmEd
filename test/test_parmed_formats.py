@@ -23,7 +23,7 @@ def reset_stringio(io):
     io.truncate()
     return io
 
-class TestFileLoader(unittest.TestCase):
+class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
 
     def testLoadOFF(self):
@@ -154,6 +154,13 @@ class TestFileLoader(unittest.TestCase):
         self.assertEqual(pqr.atoms[-1].atomic_number, 8)
         self.assertIsInstance(random.choice(pqr.residues).number, int)
         self.assertIsInstance(random.choice(pqr.atoms).number, int)
+
+    def testMisdetectPQR(self):
+        """ Check that PQR autodetection does not identify a PDB file """
+        pdb = formats.PDBFile.download('3p4a')
+        fname = get_fn('3p4a_chainA.pdb', written=True)
+        pdb['A',:,:].save(fname)
+        self.assertFalse(formats.PQRFile.id_format(fname))
 
     def testBadLoads(self):
         """ Test exception handling when non-recognized files are loaded """
