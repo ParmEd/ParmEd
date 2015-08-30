@@ -276,8 +276,9 @@ A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN',
 U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN',
                                'RU', 'RU3', 'RU5', 'RUN'])
 
-SOLVENT_NAMES = ['WAT', 'HOH', 'TIP3', 'SOL', 'TIP4', 'TIP5', 'SPCE', 'SPC']
-EXTRA_POINT_NAMES = ['EP', 'LP']
-CATION_NAMES = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG',
-                'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2']
-ANION_NAMES = ['Cl-', 'Br-', 'F-', 'I-', 'CLA']
+SOLVENT_NAMES = set(['WAT', 'HOH', 'TIP3', 'SOL',
+                     'TIP4', 'TIP5', 'SPCE', 'SPC'])
+EXTRA_POINT_NAMES = set(['EP', 'LP'])
+CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
+                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2'])
+ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA'])
