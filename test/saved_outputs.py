@@ -552,6 +552,8 @@ Total charge (e-):     0.0000
 Total mass (amu):      15942.3372
 Number of atoms:       1164
 Number of residues:    274
+Residue set:           {'ALA', 'NME', 'Cl-', 'CYX', 'ACE', 'WAT', 'Na+'}
+Residue count:         'WAT': 696, 'Cl-': 10, 'Na+': 10, 'ACE': 3, 'NME': 3, 'CYX': 2, 'ALA': 1
 System volume (ang^3): 25998.98
 System density (g/mL): 1.018244
 """

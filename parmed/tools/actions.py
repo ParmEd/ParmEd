@@ -2928,9 +2928,14 @@ class summary(Action):
         )
 
         _rset = set(res.name for res in self.parm.residues).__str__() + '\n'
+        _rcount = Counter(res.name for res in self.parm.residues).__str__() + '\n'
+        _rcount = _rcount.replace('Counter({', '')
+        _rcount = _rcount.replace('})', '')
         residue_set = (
                  'Residue set:           ' + _rset)
-        retval += residue_set
+        residue_count = (
+                 'Residue count:         ' + _rcount)
+        retval += residue_set + residue_count
 
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
