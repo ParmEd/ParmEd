@@ -3,7 +3,7 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division, print_function
 
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 import copy
 import math
 import numpy as np
@@ -2926,6 +2926,11 @@ class summary(Action):
                   (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
                    len(self.parm.atoms), len(self.parm.residues))
         )
+
+        _rset = set(res.name for res in self.parm.residues).__str__() + '\n'
+        residue_set = (
+                 'Residue set:           ' + _rset)
+        retval += residue_set
 
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
