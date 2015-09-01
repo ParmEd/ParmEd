@@ -270,7 +270,7 @@ DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3'])
 G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN',
                                 'RG', 'RG3', 'RG5', 'RGN',
                                 'GF2', 'M2G', 'YYG', '7MG', 'OMG',
-                                '2MG', 'MG',])
+                                '2MG',])
 C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN',
                                  'RC', 'RC5', 'RC3', 'RCN',
                                  'CFZ', '5MC', 'OMC',])
