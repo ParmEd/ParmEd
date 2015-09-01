@@ -3,7 +3,9 @@ Tests the functionality in parmed.residue
 """
 
 import utils
+import parmed as pmd
 from parmed import residue
+from parmed.residue import RNAResidue, DNAResidue
 import unittest
 
 class TestChemistryResidue(unittest.TestCase):
@@ -127,6 +129,21 @@ class TestNucleicAcidResidues(unittest.TestCase):
         self.assertTrue(residue.DNAResidue.has('DG5'))
         self.assertTrue(residue.DNAResidue.has('DG3'))
         self.assertFalse(residue.RNAResidue.has('G4'))
+
+    def testModifiedDNARNA(self):
+        """ Tests that modified DNA/RNA residue names are properly recognized"""
+        def count_nures(parm):
+            nnuc = 0
+            for res in parm.residues:
+                if RNAResidue.has(res.name) or DNAResidue.has(res.name):
+                    nnuc += 1
+            return nnuc
+
+        pdb_with_nnures = [('1EHZ', 76), ]
+        for pdbid, correct_nres in pdb_with_nnures:
+            pdb = pmd.download_PDB(pdbid)
+            nres = count_nures(pdb)
+            self.assertEqual(correct_nres, nres)
 
 if __name__ == '__main__':
     unittest.main()
