@@ -268,13 +268,17 @@ DC = DNAResidue('Cytosine', 'DC', ['CYT', 'DC5', 'DC3', 'DCN', 'DCP'])
 DA = DNAResidue('Adenine', 'DA', ['ADE', 'DA5', 'DA3', 'DAN', 'DAP'])
 DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3'])
 G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN',
-                                'RG', 'RG3', 'RG5', 'RGN'])
+                                'RG', 'RG3', 'RG5', 'RGN',
+                                'GF2',])
 C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN',
-                                 'RC', 'RC5', 'RC3', 'RCN'])
+                                 'RC', 'RC5', 'RC3', 'RCN',
+                                 'CFZ',])
 A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN',
-                                'RA', 'RA3', 'RA5'])
+                                'RA', 'RA3', 'RA5',
+                                'AF2',])
 U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN',
-                               'RU', 'RU3', 'RU5', 'RUN'])
+                               'RU', 'RU3', 'RU5', 'RUN',
+                               'UFT',])
 
 SOLVENT_NAMES = set(['WAT', 'HOH', 'TIP3', 'SOL',
                      'TIP4', 'TIP5', 'SPCE', 'SPC'])
