@@ -2927,10 +2927,11 @@ class summary(Action):
                    len(self.parm.atoms), len(self.parm.residues))
         )
 
-        _rset = str(set(res.name for res in self.parm.residues)) +  '\n'
-        _rcount = str(Counter(res.name for res in self.parm.residues)) +  '\n'
-        _rcount = _rcount.replace('Counter({', '')
-        _rcount = _rcount.replace('})', '')
+        _rset = str(sorted(set(res.name for res in self.parm.residues))) +  '\n'
+        _rcount = str(Counter(res.name for res in self.parm.residues))
+        _rcount = _rcount.replace('Counter({', '').replace('})', '')
+        _rcount = ','.join((sorted(_rcount.split(',')))) + '\n'
+
         residue_set = (
                  'Residue set:           ' + _rset)
         residue_count = (
