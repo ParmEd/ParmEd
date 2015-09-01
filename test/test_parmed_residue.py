@@ -143,7 +143,7 @@ class TestNucleicAcidResidues(unittest.TestCase):
         for pdbid, correct_nres in pdb_with_nnures:
             pdb = pmd.download_PDB(pdbid)
             nres = count_nures(pdb)
-            self.assertTrue(correct_nres == nres)
+            self.assertEqual(correct_nres, nres)
 
 if __name__ == '__main__':
     unittest.main()
