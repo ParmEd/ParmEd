@@ -139,11 +139,11 @@ class TestNucleicAcidResidues(unittest.TestCase):
                     nnuc += 1
             return nnuc
 
-        pdb_with_nnures = [('1EHZ', 76), ('3p4a', 8), ('3p4b', 8),
-                           ('3p4c', 8), ('3p4d', 8)]
-        for pdbid, nres in pdb_with_nnures:
+        pdb_with_nnures = [('1EHZ', 76), ]
+        for pdbid, correct_nres in pdb_with_nnures:
             pdb = pmd.download_PDB(pdbid)
-            self.assertTrue(count_nures(pdb), nres)
+            nres = count_nures(pdb)
+            self.assertTrue(correct_nres == nres)
 
 if __name__ == '__main__':
     unittest.main()
