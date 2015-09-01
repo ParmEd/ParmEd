@@ -368,6 +368,8 @@ Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
+Residue set:           {'HSD', 'ILE', 'SER', 'VAL', 'ASP', 'GLY', 'TYR', 'MET', 'PHE', 'LEU', 'ALA', 'TRP', 'THR', 'GLN', 'PRO', 'LYS', 'ARG', 'ASN', 'CYS', 'TIP3', 'GLU'}
+Residue count:         'TIP3': 17856, 'ASP': 14, 'ALA': 13, 'ILE': 12, 'GLU': 12, 'VAL': 11, 'LEU': 11, 'GLY': 10, 'PRO': 10, 'SER': 9, 'ARG': 9, 'PHE': 6, 'THR': 6, 'LYS': 6, 'HSD': 5, 'TRP': 5, 'MET': 5, 'ASN': 5, 'GLN': 4, 'TYR': 4, 'CYS': 2
 System volume (ang^3): 615109.34
 System density (g/mL): 0.916989
 """
@@ -556,6 +558,8 @@ Total charge (e-):     0.0000
 Total mass (amu):      15942.3372
 Number of atoms:       1164
 Number of residues:    274
+Residue set:           {'ILE', 'TYR', 'PRO', 'SER', 'MET', 'LEU', 'TRP', 'GLN', 'LYS', 'ARG', 'ASP', 'PHE', 'ASN', 'CYS', 'HOH', 'VAL', 'GLY', 'NO3', 'ALA', 'THR', 'HIS', 'GLU'}
+Residue count:         'HOH': 139, 'ASN': 14, 'GLY': 12, 'ALA': 12, 'ARG': 11, 'SER': 10, 'CYS': 8, 'LEU': 8, 'ASP': 7, 'THR': 7, 'ILE': 6, 'TRP': 6, 'VAL': 6, 'NO3': 6, 'LYS': 6, 'TYR': 3, 'PHE': 3, 'GLN': 3, 'PRO': 2, 'GLU': 2, 'MET': 2, 'HIS': 1
 System volume (ang^3): 25998.98
 System density (g/mL): 1.018244
 """
