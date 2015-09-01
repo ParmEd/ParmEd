@@ -2927,8 +2927,8 @@ class summary(Action):
                    len(self.parm.atoms), len(self.parm.residues))
         )
 
-        _rset = set(res.name for res in self.parm.residues).__str__() + '\n'
-        _rcount = Counter(res.name for res in self.parm.residues).__str__() + '\n'
+        _rset = str(set(res.name for res in self.parm.residues)) +  '\n'
+        _rcount = str(Counter(res.name for res in self.parm.residues)) +  '\n'
         _rcount = _rcount.replace('Counter({', '')
         _rcount = _rcount.replace('})', '')
         residue_set = (
