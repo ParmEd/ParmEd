@@ -2689,8 +2689,8 @@ class Structure(object):
         else:
             raise ValueError('Unexpected implicit solvent model... '
                              'should not be here')
-        for i, atom in enumerate(self.atoms):
-            force.addParticle([atom.charge] + list(gb_parms[i]))
+        for atom, parms in zip(self.atoms, gb_parms):
+            force.addParticle([atom.charge] + list(parms))
         # Set cutoff method
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomGBForce.NoCutoff)
