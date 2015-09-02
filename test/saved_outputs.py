@@ -1,3 +1,4 @@
+
 """
 This module simply contains a repository of saved outputs so it doesn't flood
 the actual test scripts
@@ -243,6 +244,8 @@ Total charge (e-):     -0.0000
 Total mass (amu):      13618.1680
 Number of atoms:       2174
 Number of residues:    725
+Residue set:           ACE, ALA, CYX, Cl-, NME, Na+, WAT
+Residue count:         ACE: 3, ALA: 1, CYX: 2, Cl-: 10, NME: 3, Na+: 10, WAT: 696
 System volume (ang^3): 26461.48
 System density (g/mL): 0.854596
 """
@@ -366,6 +369,12 @@ Total charge (e-):     -11.0000
 Total mass (amu):      339672.2974
 Number of atoms:       56057
 Number of residues:    18015
+Residue set:           ALA, ARG, ASN, ASP, CYS, GLN, GLU
+                       GLY, HSD, ILE, LEU, LYS, MET, PHE
+                       PRO, SER, THR, TIP3, TRP, TYR, VAL
+Residue count:         ALA: 13, ARG: 9, ASN: 5, ASP: 14, CYS: 2, GLN: 4, GLU: 12
+                       GLY: 10, HSD: 5, ILE: 12, LEU: 11, LYS: 6, MET: 5, PHE: 6
+                       PRO: 10, SER: 9, THR: 6, TIP3: 17856, TRP: 5, TYR: 4, VAL: 11
 System volume (ang^3): 615109.34
 System density (g/mL): 0.916989
 """
@@ -432,6 +441,8 @@ Total charge (e-):     0.0000
 Total mass (amu):      14809.3650
 Number of atoms:       2466
 Number of residues:    820
+Residue set:           ACE, NME, WAT
+Residue count:         ACE: 1, NME: 1, WAT: 818
 System volume (ang^3): 1.00
 System density (g/mL): 24591.940605
 """
@@ -447,6 +458,8 @@ Total charge (e-):     0.0000
 Total mass (amu):      14809.3650
 Number of atoms:       2466
 Number of residues:    820
+Residue set:           ACE, NME, WAT
+Residue count:         ACE: 1, NME: 1, WAT: 818
 System volume (ang^3): 27031.52
 System density (g/mL): 0.909751
 """
@@ -552,6 +565,14 @@ Total charge (e-):     0.0000
 Total mass (amu):      15942.3372
 Number of atoms:       1164
 Number of residues:    274
+Residue set:           ALA, ARG, ASN, ASP, CYS, GLN, GLU
+                       GLY, HIS, HOH, ILE, LEU, LYS, MET
+                       NO3, PHE, PRO, SER, THR, TRP, TYR
+                       VAL
+Residue count:         ALA: 12, ARG: 11, ASN: 14, ASP: 7, CYS: 8, GLN: 3, GLU: 2
+                       GLY: 12, HIS: 1, HOH: 139, ILE: 6, LEU: 8, LYS: 6, MET: 2
+                       NO3: 6, PHE: 3, PRO: 2, SER: 10, THR: 7, TRP: 6, TYR: 3
+                       VAL: 6
 System volume (ang^3): 25998.98
 System density (g/mL): 1.018244
 """
