@@ -607,8 +607,8 @@ class TestParmedPQRStructure(FileIOTestCase):
             self.assertAlmostEqual(a1.charge, a2.charge)
             self.assertAlmostEqual(a1.radii, a2.radii)
         self.assertEqual(pqr.get_coordinates().shape[0], 3)
-        np.testing.assert_allclose(pqr.get_coordinates(),
-                                   parm.get_coordinates(), atol=2e-3)
+        np.testing.assert_allclose(pqr.get_coordinates(0),
+                                   parm.get_coordinates(0), atol=2e-3)
 
     def testPQRWithElement(self):
         """ Tests reading a PQR file that has an element column """
