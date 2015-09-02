@@ -296,9 +296,10 @@ class PQRFile(object):
                         aname = ' %-3s' % atom.name
                     else:
                         aname = atom.name
+                    xyz = coord[atom.idx]
                     dest.write(atomrec % (anum, aname, standardize(res.name),
-                                          res.chain, rnum, atom.xx, atom.xy,
-                                          atom.xz, atom.charge, atom.radii))
+                                          res.chain, rnum, xyz[0], xyz[1],
+                                          xyz[2], atom.charge, atom.radii))
             if coords.shape[0] > 1:
                 dest.write('ENDMDL\n')
 

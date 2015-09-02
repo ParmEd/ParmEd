@@ -722,7 +722,7 @@ class PDBFile(object):
                 else:
                     atoms = sorted(res.atoms, key=lambda atom: atom.number)
                 for atom in atoms:
-                    pa, others, (x, y, z) = print_atoms(atom, coords[0])
+                    pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
                     if renumber:
                         anum = (atom.idx + 1 + nmore)
