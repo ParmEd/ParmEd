@@ -279,6 +279,8 @@ class TestChemistryPDBStructure(FileIOTestCase):
         pdbfile2 = read_PDB(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
         self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
+        np.testing.assert_allclose(pdbfile2.get_coordinates('all'),
+                                   pdbfile.get_coordinates('all'))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
     def testPdbBigCoordinates(self):
