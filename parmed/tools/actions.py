@@ -2963,10 +2963,9 @@ class summary(Action):
         _rcount = ','.join((sorted(_rcount.split(',')))) + '\n'
 
         residue_set = _reformat_long_sentence(_rset, 'Residue set:           ',
-                offset=None,
-                n_words=7)
+                                              offset=None, n_words=7)
         residue_count = _reformat_long_sentence(_rcount, 'Residue count:         ',
-                offset=-1, n_words=7)
+                                                offset=-1, n_words=7)
         retval += residue_set + residue_count
 
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
