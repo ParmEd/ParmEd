@@ -590,6 +590,12 @@ class TestParmedPQRStructure(FileIOTestCase):
     def testPQRWriter(self):
         """ Tests writing a PQR file with charges and radii """
         parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        # Create multiple models
+        coords = []
+        coords.append(parm.coordinates)
+        coords.append(parm.coordinates + 1)
+        coords.append(parm.coordinates + 2)
+        parm.coordinates = np.vstack(coords)
         formats.PQRFile.write(parm, get_fn('test.pqr', written=True),
                               renumber=True)
         pqr = formats.PQRFile.parse(get_fn('test.pqr', written=True))
@@ -600,6 +606,9 @@ class TestParmedPQRStructure(FileIOTestCase):
             self.assertEqual(a1.residue.idx, a2.residue.idx)
             self.assertAlmostEqual(a1.charge, a2.charge)
             self.assertAlmostEqual(a1.radii, a2.radii)
+        self.assertEqual(pqr.get_coordinates().shape[0], 3)
+        np.testing.assert_allclose(pqr.get_coordinates(),
+                                   parm.get_coordinates(), atol=2e-3)
 
     def testPQRWithElement(self):
         """ Tests reading a PQR file that has an element column """
@@ -714,6 +723,8 @@ class TestChemistryCIFStructure(FileIOTestCase):
         pdbfile2 = read_CIF(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
         self.assertEqual(pdbfile2.get_coordinates('all').shape, (20, 451, 3))
+        np.testing.assert_allclose(pdbfile2.get_coordinates('all'),
+                                   cif.get_coordinates('all'))
 
     def testCIFWriteStandardNames(self):
         """ Test PDBx/mmCIF file writing converting to standard names """
