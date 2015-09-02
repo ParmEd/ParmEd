@@ -2881,6 +2881,36 @@ class interpolate(Action):
         parm1.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+def _split_range(chunksize, start, stop):
+    '''split a given range to n_chunks. taken from pytraj.
+
+    Examples
+    --------
+    [(0, 3), (3, 6), (6, 10)]
+    '''
+    n_chunks = (stop - start)//chunksize
+
+    if ((stop - start) % chunksize ) != 0:
+        n_chunks += 1
+
+    for i in range(n_chunks):
+        if i < n_chunks - 1:
+            _stop = start + (i + 1) * chunksize
+        else:
+            _stop = stop
+        yield start + i * chunksize, _stop
+
+def _reformat_long_sentence(long_sentence, title, n_words=6, offset=None):
+    words = long_sentence.split(', ')
+    empty = "\n" + " " * len(title)
+    lines = [words[slice(*idx)] for idx in _split_range(n_words, 0, len(words))]
+    sentences = [', '.join(line) for line in lines]
+
+    if offset is None:
+        sentences[0] = title[:] + sentences[0]
+    else:
+        sentences[0] = title[:offset] + sentences[0]
+    return empty.join(sentences)
 
 class summary(Action):
     """
@@ -2927,15 +2957,16 @@ class summary(Action):
                    len(self.parm.atoms), len(self.parm.residues))
         )
 
-        _rset = str(sorted(set(res.name for res in self.parm.residues))) +  '\n'
+        _rset = ", ".join(sorted(set(res.name for res in self.parm.residues))) +  '\n'
         _rcount = str(Counter(res.name for res in self.parm.residues))
-        _rcount = _rcount.replace('Counter({', '').replace('})', '')
+        _rcount = _rcount.replace('Counter({', ' ').replace('})', '').replace("'", "")
         _rcount = ','.join((sorted(_rcount.split(',')))) + '\n'
 
-        residue_set = (
-                 'Residue set:           ' + _rset)
-        residue_count = (
-                 'Residue count:         ' + _rcount)
+        residue_set = _reformat_long_sentence(_rset, 'Residue set:           ',
+                offset=None,
+                n_words=7)
+        residue_count = _reformat_long_sentence(_rcount, 'Residue count:         ',
+                offset=-1, n_words=7)
         retval += residue_set + residue_count
 
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
