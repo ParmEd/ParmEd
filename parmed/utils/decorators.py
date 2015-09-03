@@ -10,6 +10,7 @@ try:
     try:
         from simtk.openmm.app.internal import unitcell
     except ImportError:
+        unitcell = None
         SUPPORTED_VERSION = False
     else:
         SUPPORTED_VERSION = True
