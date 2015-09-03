@@ -1104,7 +1104,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertTrue(diff_files(get_fn('abs_merged.inpcrd', written=True),
                                    get_saved_fn('abs_merged.inpcrd')))
 
-    def add1264(self):
+    def testAdd1264(self):
         """ Test the add12_6_4 action on AmberParm """
         parm = AmberParm(get_fn('Mg_ti1_b.parm7'))
         PT.addLJType(parm, '@14').execute()
@@ -1115,7 +1115,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                                    get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
-    def add1264_2metals(self):
+    def testAdd1264_2metals(self):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
         parm1 = AmberParm(get_fn('mg_na_cl.parm7'))
         parm2 = AmberParm(get_fn('na_cl_mg.parm7'))
