@@ -3260,14 +3260,13 @@ class add12_6_4(Action):
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
 
     def init(self, arg_list):
-        import os
         self.mask = AmberMask(self.parm,
                         arg_list.get_next_mask(optional=True, default=':ZN'))
         self.c4file = arg_list.get_key_string('c4file', None)
         self.watermodel = arg_list.get_key_string('watermodel', None)
         self.polfile = arg_list.get_key_string('polfile',
-                            os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
-                            'parm', 'lj_1264_pol.dat'))
+                            os.path.join(os.getenv('AMBERHOME') or '', 'dat',
+                            'leap', 'parm', 'lj_1264_pol.dat'))
         self.tunfactor = arg_list.get_key_float('tunfactor', 1.0)
 
         if self.c4file is None:
