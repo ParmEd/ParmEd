@@ -1,6 +1,7 @@
 from ._input import input as _input
 from ._parser import parser as _parser
 from ._lexer import lexer as _lexer
+from ._exceptions import InvalidFormat
 
 class FortranRecordReader(object):
     '''
@@ -37,7 +38,7 @@ class FortranRecordReader(object):
     def match(self, record):
         try:
             self.read(record)
-        except RecordError:
+        except InvalidFormat:
             return False
         else:
             return True
