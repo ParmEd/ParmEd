@@ -78,88 +78,87 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 
     print("***********************************************************")
     # Determine which atom type was treated as the center metal ion
-    typelist = dict()
+    mettypdict = dict()
     for i in mask.Selected():
-        typeidx = parm.parm_data['ATOM_TYPE_INDEX'][i]
-        chgi = parm.parm_data['CHARGE'][i]
-        if typeidx in typelist: continue
-        typelist[typeidx] = (parm.atoms[i].atomic_number, int(chgi))
-        print("The selected metal ion is",
-              pt.Element[parm.atoms[i].atomic_number])
-    types = typelist.keys()
-    types.sort()
+        mettypind = parm.parm_data['ATOM_TYPE_INDEX'][i]
+        metchg = parm.parm_data['CHARGE'][i]
+        if mettypind in mettypdict: continue
+        mettypdict[mettypind] = (parm.atoms[i].atomic_number, int(metchg))
+        print "The selected metal ion is", \
+                pt.Element[parm.atoms[i].atomic_number]
+    mettypinds = mettypdict.keys()
+    mettypinds.sort()
 
-    # Determine the C4 term between the atom type of center metal ion 
-    # and every atom type in the prmtop file 
-
-    # 1. Get the list of AMBER_ATOM_TYPE and ATOM_TYPE_INDEX for all 
+    # 1. Get the dict between AMBER_ATOM_TYPE and ATOM_TYPE_INDEX for all 
     # the atoms in prmtop file
 
-    amberatomtypelist1 = parm.parm_data['AMBER_ATOM_TYPE']
-    atomtypeindexlist1 = parm.parm_data['ATOM_TYPE_INDEX']
-
-    # 2. Have the representative AMBER_ATOM_TYPE for the each certain
-    # ATOM_TYPE_INDEX
-
-    amberatomtypelist2 = []
-    atomtypeindexlist2 = []
-    for i in range(parm.pointers['NATOM']):
-        if not atomtypeindexlist1[i] in atomtypeindexlist2:
-            amberatomtypelist2.append(amberatomtypelist1[i])
-            atomtypeindexlist2.append(atomtypeindexlist1[i])
-
-    #3.Generate the C4 term for each atom type
-    result = [0.0 for i in range(len(parm.parm_data['LENNARD_JONES_ACOEF']))]
-
- 
     ntypes = parm.pointers['NTYPES']
-    for typ in types:
-#       print("The biggest ATOM_TYPE_INDEX = %d" % ntypes)
-#       print("The selected +2 metal ion has the ATOM_TYPE_INDEX = %d" % typ)
-        i = typ - 1
+    typs = parm.parm_data['AMBER_ATOM_TYPE']
+    typinds = parm.parm_data['ATOM_TYPE_INDEX']
 
-#       print("***********************************************************")
-#       print("Here are the atom types which have been added C4 term:")
-        # for the situation j < i
-        for j in range(typ):
-            atomtypej = amberatomtypelist2[j]
-            jj = atomtypeindexlist2[j] - 1
-            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*jj+i]-1
-            try:
-                c4 = c4list[ pt.Element[typelist[typ][0]] + str(typelist[typ][1]) ]
-                pol = pollist[atomtypej]
-#               print ('ATOM_TYPE_INDEX = %d; AMBER_ATOM_TYPE=%s; '
-#                      'Polarizability=%s' %(jj+1, atomtypej, pol))
-            except KeyError:
-                raise LJ12_6_4Error("Could not find parameters for "
-                                    "ATOM_TYPE %s" % atomtypej )
+    typdict = {}
+    for i in range(0, len(typinds)):
+        if typinds[i] not in list(typdict.keys()):
+            typdict[typinds[i]] = [typs[i]]
+        elif typs[i] in typdict[typinds[i]]:
+            continue
+        else:
+            typdict[typinds[i]].append(typs[i])
 
-            if (atomtypej=="OW"):
-                result[idx] += c4
-            else:   
-                result[idx] += c4 / WATER_POL * pol * tunfactor
-               
-            # for the situation i =< j 
-        for j in range(typ, parm.ptr('ntypes')):
-            atomtypej = amberatomtypelist2[j]
-            jj = atomtypeindexlist2[j] - 1
-            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+jj] - 1
-            try:
-                c4 = c4list[ pt.Element[typelist[typ][0]] + str(typelist[typ][1]) ]
-                pol = pollist[atomtypej]
-#               print ('ATOM_TYPE_INDEX = %d; AMBER_ATOM_TYPE= %s; '
-#                      'Polarizability=%s' %(jj+1, atomtypej, pol))
-            except KeyError:
-                raise LJ12_6_4Error("Could not find parameters for "
-                                    "ATOM_TYPE %s" % atomtypej)
+    for i in range(1, ntypes+1):
+        if i not in typinds:
+            typdict[i] = []
 
-            if (atomtypej=="OW"):
-                result[idx] += c4
-            else:
-                result[idx] += c4 / WATER_POL * pol * tunfactor
-#       print("***********************************************************")
+    # 2.Generate the C4 term for each atom type pair
+    result = [0.0 for i in range(0, len(parm.parm_data['LENNARD_JONES_ACOEF']))]
+
+    for mettypind in mettypinds:
+        # Obtain the C4 parameters
+        c4 = c4list[ pt.Element[mettypdict[mettypind][0]] + str(mettypdict[mettypind][1]) ]
+        i = mettypind - 1
+        for j in range(1, ntypes+1):
+            jj = j - 1
+            attypjs = typdict[j]
+            if len(attypjs) >= 1:
+                # Get polarizability
+                for k in range(0, len(attypjs)):
+                    if k == 0:
+                        try:
+                            pol = pollist[attypjs[k]]
+                        except KeyError:
+                            raise LJ12_6_4Error("Could not find parameters for "
+                                                "ATOM_TYPE %s" % attypjs[k] )
+                    else:
+                        try:
+                            anthpol = pollist[attypjs[k]]
+                            if anthpol != pol:
+                                raise LJ12_6_4Error('Polarizability parameter '
+                                                    'of AMBER_ATOM_TYPE %s is '
+                                                    'not the same as that of '
+                                                    'AMBER_ATOM_TYPE %s, but '
+                                                    'their VDW parameters are '
+                                                    'the same. '
+                                                    %(attypjs[0], attypjs[k]))
+                        except KeyError:
+                            raise LJ12_6_4Error("Could not find parameters for "
+                                                "ATOM_TYPE %s" % attypjs[k] )
+                # Get index
+                if jj < i:
+                    idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*jj+i]-1
+                else:
+                    idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+jj]-1
+
+                # Caculate C4 terms
+                if attypjs == ['OW']:
+                    # There is only one C4 term exist between water and a
+                    # certain ion
+                    result[idx] = c4
+                    print c4
+                else:
+                    # There are two C4 terms need to add together between two
+                    # different ions
+                    result[idx] += c4 / WATER_POL * pol * tunfactor
     return result
-
 
 def _get_params(fname):
     params = dict()
