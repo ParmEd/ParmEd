@@ -1109,7 +1109,8 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = AmberParm(get_fn('Mg_ti1_b.parm7'))
         PT.addLJType(parm, '@14').execute()
         PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
-        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW').execute()
+        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW',
+                     polfile=get_fn('lj_1264_pol.dat')).execute()
         parm.write_parm(get_fn('Mg_ti1_b_1264.parm7', written=True))
         self.assertTrue(diff_files(get_fn('Mg_ti1_b_1264.parm7', written=True),
                                    get_saved_fn('Mg_ti1_b_1264.parm7'))
@@ -1119,8 +1120,10 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
         parm1 = AmberParm(get_fn('mg_na_cl.parm7'))
         parm2 = AmberParm(get_fn('na_cl_mg.parm7'))
-        PT.add12_6_4(parm1, ':MG,NA,CL', watermodel='TIP3P').execute()
-        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P').execute()
+        PT.add12_6_4(parm1, ':MG,NA,CL', watermodel='TIP3P',
+                     polfile=get_fn('lj_1264_pol.dat')).execute()
+        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P',
+                     polfile=get_fn('lj_1264_pol.dat')).execute()
         self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')),
                          saved.PRINTLJMATRIX_MGNACL)
         self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
