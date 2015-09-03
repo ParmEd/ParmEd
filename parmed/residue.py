@@ -285,5 +285,5 @@ SOLVENT_NAMES = set(['WAT', 'HOH', 'TIP3', 'SOL',
                      'TIP4', 'TIP5', 'SPCE', 'SPC'])
 EXTRA_POINT_NAMES = set(['EP', 'LP'])
 CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
-                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2'])
-ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA'])
+                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K'])
+ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR'])
