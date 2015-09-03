@@ -4,7 +4,7 @@ topology file given a list of atomic polarizabilities
 """
 from __future__ import division, print_function
 
-from parmed.utils.six.moves import range
+from parmed.utils.six.moves import range, zip
 from parmed.tools.exceptions import LJ12_6_4Error, DuplicateParamWarning
 import warnings
 
@@ -84,10 +84,9 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
         metchg = parm.parm_data['CHARGE'][i]
         if mettypind in mettypdict: continue
         mettypdict[mettypind] = (parm.atoms[i].atomic_number, int(metchg))
-        print "The selected metal ion is", \
-                pt.Element[parm.atoms[i].atomic_number]
-    mettypinds = mettypdict.keys()
-    mettypinds.sort()
+        print("The selected metal ion is %s" %
+              pt.Element[parm.atoms[i].atomic_number])
+    mettypinds = sorted(mettypdict.keys())
 
     # 1. Get the dict between AMBER_ATOM_TYPE and ATOM_TYPE_INDEX for all 
     # the atoms in prmtop file
@@ -97,51 +96,52 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
     typinds = parm.parm_data['ATOM_TYPE_INDEX']
 
     typdict = {}
-    for i in range(0, len(typinds)):
-        if typinds[i] not in list(typdict.keys()):
-            typdict[typinds[i]] = [typs[i]]
-        elif typs[i] in typdict[typinds[i]]:
+    for ty, ind in zip(typs, typinds):
+        if ind not in typdict:
+            typdict[ind] = [ty]
+        elif ty in typdict[ind]:
             continue
         else:
-            typdict[typinds[i]].append(typs[i])
+            typdict[ind].append(ty)
 
     for i in range(1, ntypes+1):
         if i not in typinds:
             typdict[i] = []
 
     # 2.Generate the C4 term for each atom type pair
-    result = [0.0 for i in range(0, len(parm.parm_data['LENNARD_JONES_ACOEF']))]
+    result = [0.0 for i in parm.parm_data['LENNARD_JONES_ACOEF']]
 
     for mettypind in mettypinds:
         # Obtain the C4 parameters
-        c4 = c4list[ pt.Element[mettypdict[mettypind][0]] + str(mettypdict[mettypind][1]) ]
+        c4 = c4list[pt.Element[mettypdict[mettypind][0]] +
+                    str(mettypdict[mettypind][1])]
         i = mettypind - 1
         for j in range(1, ntypes+1):
             jj = j - 1
             attypjs = typdict[j]
             if len(attypjs) >= 1:
                 # Get polarizability
-                for k in range(0, len(attypjs)):
+                for k, typjs in enumerate(attypjs):
                     if k == 0:
                         try:
-                            pol = pollist[attypjs[k]]
+                            pol = pollist[typjs]
                         except KeyError:
                             raise LJ12_6_4Error("Could not find parameters for "
-                                                "ATOM_TYPE %s" % attypjs[k] )
+                                                "ATOM_TYPE %s" % typjs )
                     else:
                         try:
-                            anthpol = pollist[attypjs[k]]
+                            anthpol = pollist[typjs]
                             if anthpol != pol:
-                                raise LJ12_6_4Error('Polarizability parameter '
-                                                    'of AMBER_ATOM_TYPE %s is '
-                                                    'not the same as that of '
-                                                    'AMBER_ATOM_TYPE %s, but '
-                                                    'their VDW parameters are '
-                                                    'the same. '
-                                                    %(attypjs[0], attypjs[k]))
+                                raise LJ12_6_4Error(
+                                        'Polarizability parameter of '
+                                        'AMBER_ATOM_TYPE %s is not the same '
+                                        'as that of AMBER_ATOM_TYPE %s, but '
+                                        'their VDW parameters are the same. ' %
+                                        (attypjs[0], typjs)
+                                )
                         except KeyError:
                             raise LJ12_6_4Error("Could not find parameters for "
-                                                "ATOM_TYPE %s" % attypjs[k] )
+                                                "ATOM_TYPE %s" % typjs)
                 # Get index
                 if jj < i:
                     idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*jj+i]-1
@@ -153,7 +153,6 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
                     # There is only one C4 term exist between water and a
                     # certain ion
                     result[idx] = c4
-                    print c4
                 else:
                     # There are two C4 terms need to add together between two
                     # different ions
