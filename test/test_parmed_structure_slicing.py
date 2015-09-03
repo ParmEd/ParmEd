@@ -325,6 +325,10 @@ class TestStructureViewSlicing(unittest.TestCase):
         for atom in sl33.atoms:
             self.assertIs(atom, pdb2.atoms[atom.idx])
 
+        # Check that iterations over views go over the atoms
+        for atom in sl11:
+            self.assertIs(atom, parm.atoms[atom.idx])
+
     def testMaskArray(self):
         """ Tests Structure selection using a mask array (view) """
         mask = [a.name in ('CA', 'CB') for a in parm.atoms]

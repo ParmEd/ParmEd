@@ -3608,4 +3608,7 @@ class StructureView(object):
         # For Python 2
         return self.__bool__()
 
+    def __iter__(self):
+        return iter(self.atoms)
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -7,7 +7,7 @@ __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
            'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'HYP', 'ILE', 'LEU', 'LYS',
            'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT',
            'DG', 'DC', 'A', 'U', 'G', 'C', 'SOLVENT_NAMES', 'EXTRA_POINT_NAMES',
-           'CATION_NAMES', 'ANION_NAMES']
+           'CATION_NAMES', 'ANION_NAMES', 'ALLION_NAMES']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -285,5 +285,6 @@ SOLVENT_NAMES = set(['WAT', 'HOH', 'TIP3', 'SOL',
                      'TIP4', 'TIP5', 'SPCE', 'SPC'])
 EXTRA_POINT_NAMES = set(['EP', 'LP'])
 CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
-                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2'])
-ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA'])
+                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K'])
+ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR'])
+ALLION_NAMES = CATION_NAMES | ANION_NAMES
