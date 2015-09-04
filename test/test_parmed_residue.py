@@ -139,7 +139,7 @@ class TestNucleicAcidResidues(unittest.TestCase):
                     nnuc += 1
             return nnuc
 
-        pdb_with_nnures = [('1EHZ', 76), ]
+        pdb_with_nnures = [('1EHZ', 76), ('3p4a', 48), ('3p4b', 48), ('3p4d', 16)]
         for pdbid, correct_nres in pdb_with_nnures:
             pdb = pmd.download_PDB(pdbid)
             nres = count_nures(pdb)
