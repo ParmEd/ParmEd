@@ -49,6 +49,7 @@ from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
+import pickle
 import re
 # Try to import the OpenMM modules
 try:
@@ -3365,6 +3366,112 @@ class Structure(object):
                 system.addForce(f)
             return
         system.addForce(force)
+
+    #===================================================
+
+    def __getstate__(self):
+        """ Serializes a structure """
+        retdict = dict(residues=self.residues,
+                       bond_types=self.bond_types,
+                       angle_types=self.angle_types,
+                       dihedral_types=self.dihedral_types,
+                       urey_bradley_types=self.urey_bradley_types,
+                       improper_types=self.improper_types,
+                       rb_torsion_types=self.rb_torsion_types,
+                       cmap_types=self.cmap_types,
+                       trigonal_angle_types=self.trigonal_angle_types,
+                       out_of_plane_bend_types=self.out_of_plane_bend_types,
+                       pi_torsion_types=self.pi_torsion_types,
+                       stretch_bend_types=self.stretch_bend_types,
+                       torsion_torsion_types=self.torsion_torsion_types,
+                       adjust_types=self.adjust_types,
+        )
+        def idx(thing):
+            if thing is None: return None
+            return thing.idx
+        retdict['bonds'] = [(b.atom1.idx, b.atom2.idx, idx(b.type))
+                            for b in self.bonds]
+        retdict['angles'] = [(a.atom1.idx, a.atom2.idx, a.atom3.idx,
+                              idx(a.type)) for a in self.angles]
+        retdict['dihedrals'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                 d.atom4.idx, idx(d.type))
+                                for d in self.dihedrals]
+        retdict['impropers'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                 d.atom4.idx, idx(d.type))
+                                for d in self.impropers]
+        retdict['rb_torsions'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                   d.atom4.idx, idx(d.type))
+                                  for d in self.rb_torsions]
+        retdict['urey_bradleys'] = [(u.atom1.idx, u.atom2.idx, idx(u.type))
+                                    for u in self.urey_bradleys]
+        retdict['cmaps'] = [(c.atom1.idx, c.atom2.idx, c.atom3.idx,
+                             c.atom4.idx, c.atom5.idx, c.type.idx)
+                            for c in self.cmaps]
+        retdict['trigonal_angles'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
+                                       t.atom4.idx, idx(t.type))
+                                      for t in self.trigonal_angles]
+        retdict['out_of_plane_bends'] = [(o.atom1.idx, o.atom2.idx, o.atom3.idx,
+                                          o.atom4.idx, idx(o.type))
+                                         for o in self.out_of_plane_bends]
+        retdict['pi_torsions'] = [(p.atom1.idx, p.atom2.idx, p.atom3.idx,
+                                   p.atom4.idx, p.atom5.idx, p.atom6.idx,
+                                   idx(p.type)) for p in self.pi_torsions]
+        retdict['stretch_bends'] = [(s.atom1.idx, s.atom2.idx, s.atom3.idx,
+                                     idx(s.type)) for s in self.stretch_bends]
+        retdict['torsion_torsions'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
+                                        t.atom4.idx, t.atom5.idx, idx(t.type))
+                                       for t in self.torsion_torsions]
+        retdict['chiral_frames'] = [(c.atom1.idx, c.atom2.idx, c.chirality)
+                                    for c in self.chiral_frames]
+        retdict['multipole_frames'] = [(f.atom.idx, f.frame_pt_num, f.vectail,
+                                        f.vechead, f.nvec)
+                                       for f in self.multipole_frames]
+        retdict['adjusts'] = [(e.atom1.idx, e.atom2.idx, idx(e.type))
+                              for e in self.adjusts]
+
+        # Now the metadata stuff, if applicable
+        for key in ('experimental', 'journal authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries'):
+            try:
+                retdict[key] = getattr(self, key)
+            except AttributeError:
+                continue
+
+        return retdict
+
+    def __setstate__(self, d):
+        # Assign the type lists we need to just copy over, and make sure the
+        # attributes are claimed.
+        for attr in ('residues', 'bond_types', 'angle_types', 'dihedral_types',
+                     'urey_bradley_types', 'improper_types', 'rb_torsion_types',
+                     'cmap_types', 'trigonal_angle_types', 'adjust_types',
+                     'out_of_plane_bend_types', 'pi_torsion_types',
+                     'stretch_bend_types', 'torsion_torsion_types'):
+            setattr(self, attr, d[attr])
+            getattr(self, attr).claim()
+        # Assign the possible metadata
+        for key in ('experimental', 'journal authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries'):
+            if key in d:
+                setattr(self, key, d[key])
+
+        self.atoms = AtomList()
+        for r in self.residues: self.atoms.extend(r.atoms)
+
+        # Set the topology arrays
+        self.bonds = TrackedList(
+                Bond(self.atoms[it[0]], self.atoms[it[1]],
+                     type=self.bond_types[it[2]])
+                for it in d['bonds']
+        )
+
+        self.angles = TrackedList(
+                Angle(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
+                      type=self.angle_types[it[3]])
+                for it in d['angles']
+        )
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
