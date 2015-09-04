@@ -2881,6 +2881,7 @@ class interpolate(Action):
         parm1.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 def _split_range(chunksize, start, stop):
     '''split a given range to n_chunks. taken from pytraj.
 
@@ -2943,38 +2944,42 @@ class summary(Action):
         tmass = sum(atom.mass for atom in self.parm.atoms)
         tchg = sum(atom.charge for atom in self.parm.atoms)
 
-        retval = ('Amino Acid Residues:   %d\n'
-                  'Nucleic Acid Residues: %d\n'
-                  'Number of cations:     %d\n'
-                  'Number of anions:      %d\n'
-                  'Num. of solvent mols:  %d\n' 
-                  'Num. of unknown res:   %d\n'
-                  'Total charge (e-):     %.4f\n'
-                  'Total mass (amu):      %.4f\n'
-                  'Number of atoms:       %d\n'
-                  'Number of residues:    %d\n' %
-                  (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
-                   len(self.parm.atoms), len(self.parm.residues))
+        retval = [('Amino Acid Residues:   %d\n'
+                   'Nucleic Acid Residues: %d\n'
+                   'Number of cations:     %d\n'
+                   'Number of anions:      %d\n'
+                   'Num. of solvent mols:  %d\n'
+                   'Num. of unknown res:   %d\n'
+                   'Total charge (e-):     %.4f\n'
+                   'Total mass (amu):      %.4f\n'
+                   'Number of atoms:       %d\n'
+                   'Number of residues:    %d' %
+                   (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
+                    len(self.parm.atoms), len(self.parm.residues))
+        )]
+
+        rset = ", ".join(sorted(set(res.name for res in self.parm.residues)))
+        retval.append(
+                _reformat_long_sentence(rset, 'Residue set:           ',
+                                        offset=None, n_words=7)
         )
-
-        _rset = ", ".join(sorted(set(res.name for res in self.parm.residues))) +  '\n'
-        _rcount = str(Counter(res.name for res in self.parm.residues))
-        _rcount = _rcount.replace('Counter({', ' ').replace('})', '').replace("'", "")
-        _rcount = ','.join((sorted(_rcount.split(',')))) + '\n'
-
-        residue_set = _reformat_long_sentence(_rset, 'Residue set:           ',
-                                              offset=None, n_words=7)
-        residue_count = _reformat_long_sentence(_rcount, 'Residue count:         ',
-                                                offset=-1, n_words=7)
-        retval += residue_set + residue_count
-
+        rcount = ','.join('%s: %d' % (x, y)
+                           for x, y in iteritems(
+                               Counter(res.name for res in self.parm.residues)
+                           )
+        )
+        retval.append(
+                _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
+                                        'Residue count:         ',
+                                        offset=None, n_words=7)
+        )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
             v = a * b * c
             # Get the total volume (and density) of orthorhombic box
-            retval += ('System volume (ang^3): %.2f\n' 
-                       'System density (g/mL): %f\n' %
-                       (v, tmass / (v * 0.602204))
+            retval.append('System volume (ang^3): %.2f\n'
+                          'System density (g/mL): %f' %
+                          (v, tmass / (v * 0.602204))
             )
         elif self.parm.box is not None:
             # General triclinic cell
@@ -2985,11 +2990,11 @@ class summary(Action):
             cosg = math.cos(gamma * math.pi / 180)
             v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg +
                                       2 * cosa*cosb*cosg)
-            retval += ('System volume (ang^3): %.2f\n' 
-                       'System density (g/mL): %f\n' %
-                       (v, tmass / (v * 0.602204))
+            retval.append('System volume (ang^3): %.2f\n'
+                          'System density (g/mL): %f' %
+                          (v, tmass / (v * 0.602204))
             )
-        return retval
+        return '%s\n' % '\n'.join(retval)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
