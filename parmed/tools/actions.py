@@ -2930,7 +2930,7 @@ class summary(Action):
         for res in self.parm.residues:
             if RNAResidue.has(res.name) or DNAResidue.has(res.name):
                 nnuc += 1
-            elif AminoAcidResidue.has(res.name):
+            elif res.name in AminoAcidResidue._all_residues_by_abbr:
                 namin += 1
             elif res.name in SOLVENT_NAMES:
                 nwat += 1
