@@ -42,7 +42,7 @@ from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
 from collections import defaultdict
-import copy
+import copy as _copy
 import numpy as np
 from math import sqrt
 try:
@@ -257,11 +257,11 @@ class AmberParm(AmberFormat, Structure):
         # See if the rawdata has any kind of structural attributes, like
         # coordinates and an atom list with positions and/or velocities
         if hasattr(rawdata, 'coordinates'):
-            inst.coordinates = copy.copy(rawdata.coordinates)
+            inst.coordinates = _copy.copy(rawdata.coordinates)
         if hasattr(rawdata, 'velocities'):
-            inst.velocities = copy.copy(rawdata.velocities)
+            inst.velocities = _copy.copy(rawdata.velocities)
         if hasattr(rawdata, 'box'):
-            inst.box = copy.copy(rawdata.box)
+            inst.box = _copy.copy(rawdata.box)
         inst.hasbox = inst.box is not None
         inst.hasvels = inst.velocities is not None
         return inst
@@ -274,7 +274,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     @classmethod
-    def from_structure(cls, struct):
+    def from_structure(cls, struct, copy=False):
         """
         Take a Structure instance and initialize an AmberParm instance from that
         data.
@@ -283,13 +283,32 @@ class AmberParm(AmberFormat, Structure):
         ----------
         struct : :class:`Structure`
             The input structure from which to construct an AmberParm instance
+        copy : bool
+            If True, the input struct is deep-copied to make sure it does not
+            share any objects with the original ``struct``. Default is False
+
+        Returns
+        -------
+        inst : :class:`AmberParm`
+            The AmberParm instance derived from the input structure
 
         Raises
         ------
         TypeError
             If the structure has parameters not supported by the standard Amber
             force field (i.e., standard bond, angle, and dihedral types)
+
+        Notes
+        -----
+        Due to the nature of the prmtop file, struct almost *always* returns a
+        deep copy. The one exception is when struct is already of type
+        :class:`AmberParm`, in which case the original object is returned unless
+        ``copy`` is ``True``.
         """
+        if isinstance(struct, cls):
+            if copy:
+                return _copy.copy(struct)
+            return struct
         if struct.unknown_functional:
             raise TypeError('Cannot instantiate an AmberParm from unknown '
                             'functional')
@@ -328,7 +347,7 @@ class AmberParm(AmberFormat, Structure):
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
-        inst.box = copy.copy(struct.box)
+        inst.box = _copy.copy(struct.box)
         if struct.box is None:
             inst.parm_data['POINTERS'][IFBOX] = 0
             inst.pointers['IFBOX'] = 0
@@ -387,8 +406,8 @@ class AmberParm(AmberFormat, Structure):
             return other
         other.pointers = {}
         other.LJ_types = self.LJ_types.copy()
-        other.LJ_radius = copy.copy(self.LJ_radius)
-        other.LJ_depth = copy.copy(self.LJ_depth)
+        other.LJ_radius = _copy.copy(self.LJ_radius)
+        other.LJ_depth = _copy.copy(self.LJ_depth)
         for atom in other.atoms:
             other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
             other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
@@ -604,7 +623,7 @@ class AmberParm(AmberFormat, Structure):
                 rst7.vels[i3+1] = at.vy
                 rst7.vels[i3+2] = at.vz
 
-        rst7.box = copy.copy(self.box)
+        rst7.box = _copy.copy(self.box)
         # Now write the restart file
         rst7.write(name, netcdf)
 
@@ -928,7 +947,7 @@ class AmberParm(AmberFormat, Structure):
             rst7 = Rst7.open(rst7)
         self.coordinates = rst7.coordinates
         self.hasvels = rst7.hasvels
-        self.box = copy.copy(rst7.box)
+        self.box = _copy.copy(rst7.box)
         self.hasbox = self.box is not None
         if self.hasvels:
             self.velocities = rst7.vels
@@ -1974,7 +1993,7 @@ class AmberParm(AmberFormat, Structure):
                         continue
                 else:
                     scee = scnb = 1e10
-                newtype = copy.copy(dihedral.type)
+                newtype = _copy.copy(dihedral.type)
                 newtype.scee = scee
                 newtype.scnb = scnb
                 dihedral.type = newtype
@@ -2174,8 +2193,8 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        if hasattr(thing, 'vels'): inst.vels = copy.deepcopy(thing.vels)
-        if hasattr(thing, 'box'): inst.box = copy.deepcopy(thing.box)
+        if hasattr(thing, 'vels'): inst.vels = _copy.deepcopy(thing.vels)
+        if hasattr(thing, 'box'): inst.box = _copy.deepcopy(thing.box)
         inst.time = thing.time
 
         return inst

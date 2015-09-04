@@ -7,7 +7,7 @@ __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
            'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'HYP', 'ILE', 'LEU', 'LYS',
            'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT',
            'DG', 'DC', 'A', 'U', 'G', 'C', 'SOLVENT_NAMES', 'EXTRA_POINT_NAMES',
-           'CATION_NAMES', 'ANION_NAMES']
+           'CATION_NAMES', 'ANION_NAMES', 'ALLION_NAMES']
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -268,16 +268,23 @@ DC = DNAResidue('Cytosine', 'DC', ['CYT', 'DC5', 'DC3', 'DCN', 'DCP'])
 DA = DNAResidue('Adenine', 'DA', ['ADE', 'DA5', 'DA3', 'DAN', 'DAP'])
 DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3'])
 G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN',
-                                'RG', 'RG3', 'RG5', 'RGN'])
+                                'RG', 'RG3', 'RG5', 'RGN',
+                                'GF2', 'M2G', 'YYG', '7MG', 'OMG',
+                                '2MG',])
 C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN',
-                                 'RC', 'RC5', 'RC3', 'RCN'])
+                                 'RC', 'RC5', 'RC3', 'RCN',
+                                 'CFZ', '5MC', 'OMC',])
 A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN',
-                                'RA', 'RA3', 'RA5'])
+                                'RA', 'RA3', 'RA5',
+                                'AF2', '1MA'])
 U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN',
-                               'RU', 'RU3', 'RU5', 'RUN'])
+                               'RU', 'RU3', 'RU5', 'RUN',
+                               'UFT', '5MU', 'H2U', 'PSU',])
 
-SOLVENT_NAMES = ['WAT', 'HOH', 'TIP3', 'SOL', 'TIP4', 'TIP5', 'SPCE', 'SPC']
-EXTRA_POINT_NAMES = ['EP', 'LP']
-CATION_NAMES = ['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG',
-                'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2']
-ANION_NAMES = ['Cl-', 'Br-', 'F-', 'I-', 'CLA']
+SOLVENT_NAMES = set(['WAT', 'HOH', 'TIP3', 'SOL',
+                     'TIP4', 'TIP5', 'SPCE', 'SPC'])
+EXTRA_POINT_NAMES = set(['EP', 'LP'])
+CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
+                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K'])
+ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR'])
+ALLION_NAMES = CATION_NAMES | ANION_NAMES

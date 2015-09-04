@@ -858,6 +858,11 @@ class AmberFormat(object):
             If provided, the added flag will be added after the one with the
             name given to `after`. If this flag does not exist, IndexError will
             be raised
+
+        Raises
+        ------
+        AmberError if flag already exists
+        IndexError if the ``after`` flag does not exist
         """
         if flag_name in self.parm_data:
             raise AmberError('%s already exists' % (flag_name))

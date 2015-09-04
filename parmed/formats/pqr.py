@@ -7,7 +7,7 @@ from contextlib import closing
 import numpy as np
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.registry import FileFormatType
-from parmed.formats.pdb import _standardize_resname
+from parmed.formats.pdb import _standardize_resname, PDBFile
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
@@ -59,7 +59,10 @@ class PQRFile(object):
                     # Where the chain ID is optional. rec must be ATOM or HETATM
                     if len(words) < 10:
                         return False
-                    elif len(words) == 10:
+                    elif PDBFile.id_format(filename):
+                        return False # It is a PDB file
+
+                    if len(words) == 10:
                         offset = 0
                     elif len(words) >= 11:
                         offset = 1
@@ -293,9 +296,10 @@ class PQRFile(object):
                         aname = ' %-3s' % atom.name
                     else:
                         aname = atom.name
+                    xyz = coord[atom.idx]
                     dest.write(atomrec % (anum, aname, standardize(res.name),
-                                          res.chain, rnum, atom.xx, atom.xy,
-                                          atom.xz, atom.charge, atom.radii))
+                                          res.chain, rnum, xyz[0], xyz[1],
+                                          xyz[2], atom.charge, atom.radii))
             if coords.shape[0] > 1:
                 dest.write('ENDMDL\n')
 

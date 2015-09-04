@@ -3,7 +3,7 @@ All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 from __future__ import division, print_function
 
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 import copy
 import math
 import numpy as np
@@ -2881,6 +2881,36 @@ class interpolate(Action):
         parm1.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+def _split_range(chunksize, start, stop):
+    '''split a given range to n_chunks. taken from pytraj.
+
+    Examples
+    --------
+    [(0, 3), (3, 6), (6, 10)]
+    '''
+    n_chunks = (stop - start)//chunksize
+
+    if ((stop - start) % chunksize ) != 0:
+        n_chunks += 1
+
+    for i in range(n_chunks):
+        if i < n_chunks - 1:
+            _stop = start + (i + 1) * chunksize
+        else:
+            _stop = stop
+        yield start + i * chunksize, _stop
+
+def _reformat_long_sentence(long_sentence, title, n_words=6, offset=None):
+    words = long_sentence.split(', ')
+    empty = "\n" + " " * len(title)
+    lines = [words[slice(*idx)] for idx in _split_range(n_words, 0, len(words))]
+    sentences = [', '.join(line) for line in lines]
+
+    if offset is None:
+        sentences[0] = title[:] + sentences[0]
+    else:
+        sentences[0] = title[:offset] + sentences[0]
+    return empty.join(sentences)
 
 class summary(Action):
     """
@@ -2926,6 +2956,17 @@ class summary(Action):
                   (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
                    len(self.parm.atoms), len(self.parm.residues))
         )
+
+        _rset = ", ".join(sorted(set(res.name for res in self.parm.residues))) +  '\n'
+        _rcount = str(Counter(res.name for res in self.parm.residues))
+        _rcount = _rcount.replace('Counter({', ' ').replace('})', '').replace("'", "")
+        _rcount = ','.join((sorted(_rcount.split(',')))) + '\n'
+
+        residue_set = _reformat_long_sentence(_rset, 'Residue set:           ',
+                                              offset=None, n_words=7)
+        residue_count = _reformat_long_sentence(_rcount, 'Residue count:         ',
+                                                offset=-1, n_words=7)
+        retval += residue_set + residue_count
 
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
@@ -3219,14 +3260,13 @@ class add12_6_4(Action):
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
 
     def init(self, arg_list):
-        import os
         self.mask = AmberMask(self.parm,
                         arg_list.get_next_mask(optional=True, default=':ZN'))
         self.c4file = arg_list.get_key_string('c4file', None)
         self.watermodel = arg_list.get_key_string('watermodel', None)
         self.polfile = arg_list.get_key_string('polfile',
-                            os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
-                            'parm', 'lj_1264_pol.dat'))
+                            os.path.join(os.getenv('AMBERHOME') or '', 'dat',
+                            'leap', 'parm', 'lj_1264_pol.dat'))
         self.tunfactor = arg_list.get_key_float('tunfactor', 1.0)
 
         if self.c4file is None:
