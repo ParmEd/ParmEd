@@ -120,9 +120,26 @@ class TestParmedSerialization(unittest.TestCase):
             self._equal_atoms(a1, a2)
 
     def _compare_structures(self, unpickled, structure):
+
+        self.assertEqual(len(unpickled.residues), len(structure.residues))
+        for r1, r2 in zip(unpickled.residues, structure.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.idx, r2.idx)
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
+
         for a1, a2 in zip(unpickled, structure):
             self._equal_atoms(a1, a2)
             self.assertEqual(a1.idx, a2.idx)
+            self.assertEqual(len(a1.bonds), len(a2.bonds))
+            self.assertEqual(len(a1.angles), len(a2.angles))
+            self.assertEqual(len(a1.dihedrals), len(a2.dihedrals))
+            self.assertEqual(len(a1.impropers), len(a2.impropers))
+            self.assertEqual(len(a1.bond_partners), len(a2.bond_partners))
+            self.assertEqual(len(a1.angle_partners), len(a2.angle_partners))
+            self.assertEqual(len(a1.dihedral_partners), len(a2.dihedral_partners))
+            self.assertEqual(len(a1.tortor_partners), len(a2.tortor_partners))
+            self.assertEqual(len(a1.exclusion_partners), len(a2.exclusion_partners))
 
         # Make sure all of the type arrays are equivalent
         def cmp_type_arrays(arr1, arr2):
@@ -178,17 +195,12 @@ class TestParmedSerialization(unittest.TestCase):
     def test_structure_serialization(self):
         """ Tests serialization/pickleability of Structure """
         structure = utils.create_random_structure(parametrized=True)
+        structure.atoms[0].exclude(structure.atoms[10])
         fobj = BytesIO()
         pickle.dump(structure, fobj)
         fobj.seek(0)
         unpickled = pickle.load(fobj)
 
-        self.assertEqual(len(unpickled.residues), len(structure.residues))
-        for r1, r2 in zip(unpickled.residues, structure.residues):
-            self.assertEqual(len(r1), len(r2))
-            self.assertEqual(r1.idx, r2.idx)
-            for a1, a2 in zip(r1, r2):
-                self._equal_atoms(a1, a2)
         self._compare_structures(unpickled, structure)
 
     def test_fortran_format_serialization(self):
