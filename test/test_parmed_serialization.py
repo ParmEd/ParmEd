@@ -271,6 +271,9 @@ class TestParmedSerialization(unittest.TestCase):
         )
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
+        self.assertEqual(structure.defaults, unpickled.defaults)
+        self._compare_parametersets(structure.parameterset,
+                                    unpickled.parameterset)
 
     def test_charmmpsf_serialization(self):
         """ Tests the serialization of a CHARMM PSF file """
@@ -379,3 +382,23 @@ class TestParmedSerialization(unittest.TestCase):
         cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
         cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
         cmp_top_arrays(structure.adjusts, unpickled.adjusts)
+
+    def _compare_parametersets(self, set1, set2):
+
+        def cmp_lists(l1, l2):
+            self.assertEqual(len(l1), len(l2))
+            self.assertEqual(set(l1.keys()), set(l2.keys()))
+            for k in l1:
+                self.assertEqual(l1[k], l2[k])
+
+        # Now compare all of the parameter lists
+        cmp_lists(set1.bond_types, set2.bond_types)
+        cmp_lists(set1.angle_types, set2.angle_types)
+        cmp_lists(set1.dihedral_types, set2.dihedral_types)
+        cmp_lists(set1.improper_types, set2.improper_types)
+        cmp_lists(set1.improper_periodic_types, set2.improper_periodic_types)
+        cmp_lists(set1.cmap_types, set2.cmap_types)
+        cmp_lists(set1.atom_types, set2.atom_types)
+        cmp_lists(set1.urey_bradley_types, set2.urey_bradley_types)
+        cmp_lists(set1.nbfix_types, set2.nbfix_types)
+        self.assertEqual(set1.combining_rule, set2.combining_rule)
