@@ -251,6 +251,25 @@ class FortranFormat(object):
     def _write_ffwriter(self, items, dest):
         dest.write('%s\n' % self._writer.write(items))
 
+    #===================================================
+
+    def __eq__(self, other):
+        return (self.format == other.format and
+                self.strip_strings == other.strip_strings)
+
+    #===================================================
+
+    def __hash__(self):
+        return hash((self.format, self.strip_strings))
+
+    #===================================================
+
+    def __getstate__(self):
+        return dict(format=self.format, strip_strings=self.strip_strings)
+
+    def __setstate__(self, d):
+        self.__init__(d['format'], d['strip_strings'])
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 @add_metaclass(FileFormatType)
@@ -906,6 +925,17 @@ class AmberFormat(object):
         del self.parm_comments[flag_name]
         del self.formats[flag_name]
         del self.parm_data[flag_name]
+
+    #===================================================
+
+    def __getstate__(self):
+        return dict(parm_data=self.parm_data, flag_list=self.flag_list,
+                    formats=self.formats, parm_comments=self.parm_comments,
+                    charge_flag=self.charge_flag, version=self.version,
+                    name=self.name)
+
+    def __setstate__(self, d):
+        self.__dict__ = d
 
     #===================================================
 

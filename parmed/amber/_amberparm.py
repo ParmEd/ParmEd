@@ -2095,6 +2095,17 @@ class AmberParm(AmberFormat, Structure):
                      AmberWarning)
         return n13, n14
 
+    #===================================================
+
+    def __getstate__(self):
+        d = Structure.__getstate__(self)
+        d.update(AmberFormat.__getstate__(self))
+        return d
+
+    def __setstate__(self, d):
+        AmberFormat.__setstate__(self, d)
+        Structure.__setstate__(self, d)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Rst7(object):

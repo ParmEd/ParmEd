@@ -183,7 +183,7 @@ class Structure(object):
         List of all angles in the structure
     dihedrals : :class:`TrackedList` (:class:`Dihedral`)
         List of all dihedrals in the structure
-    rb_torsions : :class:`TrackedList` (:class:`RBTorsion`)
+    rb_torsions : :class:`TrackedList` (:class:`Dihedral`)
         List of all Ryckaert-Bellemans torsions in the structure
     urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)
         List of all Urey-Bradley angle bends in the structure
@@ -3365,6 +3365,205 @@ class Structure(object):
                 system.addForce(f)
             return
         system.addForce(force)
+
+    #===================================================
+
+    def __getstate__(self):
+        """ Serializes a structure """
+        retdict = dict(residues=self.residues,
+                       bond_types=self.bond_types,
+                       angle_types=self.angle_types,
+                       dihedral_types=self.dihedral_types,
+                       urey_bradley_types=self.urey_bradley_types,
+                       improper_types=self.improper_types,
+                       rb_torsion_types=self.rb_torsion_types,
+                       cmap_types=self.cmap_types,
+                       trigonal_angle_types=self.trigonal_angle_types,
+                       out_of_plane_bend_types=self.out_of_plane_bend_types,
+                       pi_torsion_types=self.pi_torsion_types,
+                       stretch_bend_types=self.stretch_bend_types,
+                       torsion_torsion_types=self.torsion_torsion_types,
+                       adjust_types=self.adjust_types,
+                       groups=self.groups,
+                       _coordinates=self._coordinates,
+                       _box=self._box,
+                       nrexcl=self.nrexcl,
+                       _combining_rule=self._combining_rule,
+        )
+        def idx(thing):
+            if thing is None: return None
+            return thing.idx
+        retdict['bonds'] = [(b.atom1.idx, b.atom2.idx, idx(b.type))
+                            for b in self.bonds]
+        retdict['angles'] = [(a.atom1.idx, a.atom2.idx, a.atom3.idx,
+                              idx(a.type)) for a in self.angles]
+        retdict['dihedrals'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                 d.atom4.idx, d.improper, d.ignore_end,
+                                 idx(d.type)) for d in self.dihedrals]
+        retdict['impropers'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                 d.atom4.idx, idx(d.type))
+                                for d in self.impropers]
+        retdict['rb_torsions'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                   d.atom4.idx, idx(d.type))
+                                  for d in self.rb_torsions]
+        retdict['urey_bradleys'] = [(u.atom1.idx, u.atom2.idx, idx(u.type))
+                                    for u in self.urey_bradleys]
+        retdict['cmaps'] = [(c.atom1.idx, c.atom2.idx, c.atom3.idx,
+                             c.atom4.idx, c.atom5.idx, idx(c.type))
+                            for c in self.cmaps]
+        retdict['trigonal_angles'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
+                                       t.atom4.idx, idx(t.type))
+                                      for t in self.trigonal_angles]
+        retdict['out_of_plane_bends'] = [(o.atom1.idx, o.atom2.idx, o.atom3.idx,
+                                          o.atom4.idx, idx(o.type))
+                                         for o in self.out_of_plane_bends]
+        retdict['pi_torsions'] = [(p.atom1.idx, p.atom2.idx, p.atom3.idx,
+                                   p.atom4.idx, p.atom5.idx, p.atom6.idx,
+                                   idx(p.type)) for p in self.pi_torsions]
+        retdict['stretch_bends'] = [(s.atom1.idx, s.atom2.idx, s.atom3.idx,
+                                     idx(s.type)) for s in self.stretch_bends]
+        retdict['torsion_torsions'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
+                                        t.atom4.idx, t.atom5.idx, idx(t.type))
+                                       for t in self.torsion_torsions]
+        retdict['chiral_frames'] = [(c.atom1.idx, c.atom2.idx, c.chirality)
+                                    for c in self.chiral_frames]
+        retdict['multipole_frames'] = [(f.atom.idx, f.frame_pt_num, f.vectail,
+                                        f.vechead, f.nvec)
+                                       for f in self.multipole_frames]
+        retdict['adjusts'] = [(e.atom1.idx, e.atom2.idx, idx(e.type))
+                              for e in self.adjusts]
+        retdict['acceptors'] = [(a.atom1.idx, a.atom2.idx)
+                                for a in self.acceptors]
+        retdict['donors'] = [(d.atom1.idx, d.atom2.idx) for d in self.donors]
+        retdict['exclusions'] = [tuple(e.idx for e in a._exclusion_partners)
+                                 for a in self.atoms]
+
+        # Now the metadata stuff, if applicable
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries'):
+            try:
+                retdict[key] = getattr(self, key)
+            except AttributeError:
+                continue
+
+        return retdict
+
+    def __setstate__(self, d):
+        # Assign the type lists we need to just copy over, and make sure the
+        # attributes are claimed.
+        for attr in ('residues', 'bond_types', 'angle_types', 'dihedral_types',
+                     'urey_bradley_types', 'improper_types', 'rb_torsion_types',
+                     'cmap_types', 'trigonal_angle_types', 'adjust_types',
+                     'out_of_plane_bend_types', 'pi_torsion_types', 'groups',
+                     'stretch_bend_types', 'torsion_torsion_types'):
+            setattr(self, attr, d[attr])
+            getattr(self, attr).claim()
+        # Assign the possible metadata
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries', '_coordinates', '_box',
+                    'nrexcl', '_combining_rule'):
+            if key in d:
+                setattr(self, key, d[key])
+
+        self.atoms = AtomList()
+        for r in self.residues: self.atoms.extend(r.atoms)
+
+        def assign_type(typelist, idx):
+            if idx is None:
+                return None
+            return typelist[idx]
+
+        # Set the topology arrays
+        self.bonds = TrackedList(
+                Bond(self.atoms[it[0]], self.atoms[it[1]],
+                     type=assign_type(self.bond_types, it[2]))
+                for it in d['bonds']
+        )
+        self.angles = TrackedList(
+                Angle(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
+                      type=assign_type(self.angle_types, it[3]))
+                for it in d['angles']
+        )
+        self.dihedrals = TrackedList(
+                Dihedral(self.atoms[it[0]], self.atoms[it[1]],
+                         self.atoms[it[2]], self.atoms[it[3]], improper=it[4],
+                         ignore_end=it[5],
+                         type=assign_type(self.dihedral_types, it[6]))
+                for it in d['dihedrals']
+        )
+        self.impropers = TrackedList(
+                Improper(self.atoms[it[0]], self.atoms[it[1]],
+                         self.atoms[it[2]], self.atoms[it[3]],
+                         type=assign_type(self.improper_types, it[4]))
+                for it in d['impropers']
+        )
+        self.urey_bradleys = TrackedList(
+                UreyBradley(self.atoms[it[0]], self.atoms[it[1]],
+                            type=assign_type(self.urey_bradley_types, it[2]))
+                for it in d['urey_bradleys']
+        )
+        self.rb_torsions = TrackedList(
+                Dihedral(self.atoms[it[0]], self.atoms[it[1]],
+                         self.atoms[it[2]], self.atoms[it[3]],
+                         type=assign_type(self.rb_torsion_types, it[4]))
+                for it in d['rb_torsions']
+        )
+        self.cmaps = TrackedList(
+                Cmap(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
+                     self.atoms[it[3]], self.atoms[it[4]],
+                     type=assign_type(self.cmap_types, it[5]))
+                for it in d['cmaps']
+        )
+        self.trigonal_angles = TrackedList(
+                TrigonalAngle(self.atoms[it[0]], self.atoms[it[1]],
+                              self.atoms[it[2]], self.atoms[it[3]],
+                              type=assign_type(self.trigonal_angle_types, it[4]))
+                for it in d['trigonal_angles']
+        )
+        self.out_of_plane_bends = TrackedList(
+                OutOfPlaneBend(self.atoms[it[0]], self.atoms[it[1]],
+                    self.atoms[it[2]], self.atoms[it[3]],
+                    type=assign_type(self.out_of_plane_bend_types, it[4]))
+                for it in d['out_of_plane_bends']
+        )
+        self.pi_torsions = TrackedList(
+                PiTorsion(self.atoms[it[0]], self.atoms[it[1]],
+                          self.atoms[it[2]], self.atoms[it[3]],
+                          self.atoms[it[4]], self.atoms[it[5]],
+                          type=assign_type(self.pi_torsion_types, it[6]))
+                for it in d['pi_torsions']
+        )
+        self.stretch_bends = TrackedList(
+                StretchBend(self.atoms[it[0]], self.atoms[it[1]],
+                            self.atoms[it[2]],
+                            type=assign_type(self.stretch_bend_types, it[3]))
+                for it in d['stretch_bends']
+        )
+        self.torsion_torsions = TrackedList(
+                TorsionTorsion(self.atoms[it[0]], self.atoms[it[1]],
+                        self.atoms[it[2]], self.atoms[it[3]], self.atoms[it[4]],
+                        type=assign_type(self.torsion_torsion_types, it[5]))
+                for it in d['torsion_torsions']
+        )
+        self.chiral_frames = TrackedList(
+                ChiralFrame(self.atoms[it[0]], self.atoms[it[1]], it[2])
+                for it in d['chiral_frames']
+        )
+        self.multipole_frames = TrackedList(
+                MultipoleFrame(self.atoms[it[0]], *it[1:])
+                for it in d['multipole_frames']
+        )
+        self.adjusts = TrackedList(
+                NonbondedException(self.atoms[it[0]], self.atoms[it[1]],
+                                   assign_type(self.adjust_types, it[2]))
+                for it in d['adjusts']
+        )
+        # Transfer the exclusions
+        for atom, excl in zip(self.atoms, d['exclusions']):
+            for idx in excl:
+                atom.exclude(self.atoms[idx])
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

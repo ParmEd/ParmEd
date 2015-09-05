@@ -9,7 +9,7 @@ from __future__ import division, print_function, absolute_import
 from parmed.exceptions import MoleculeError, ParameterError
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 import parmed.unit as u
-from parmed.utils.six import string_types
+from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import zip, range
 from copy import copy
 import math
@@ -54,6 +54,27 @@ def _strip_units(value, unit=None):
         else:
             return value.value_in_unit(unit)
     return value
+
+def _getstate_with_exclusions(exclusions=None):
+    """ Serializes based on all attributes except requested exclusions
+
+    Parameters
+    ----------
+    exclusions : list of str, optional
+        List of all attributes to exclude from serialization (should be
+        descriptors and 'list'). Default is None
+
+    Notes
+    -----
+    If exclusions is None, it defaults to excluding 'list'. If this is not
+    desired, set exclusions to the empty list.
+    """
+    if exclusions is None:
+        exclusions = ['list']
+    def __getstate__(self):
+        return {key : val for (key, val) in iteritems(self.__dict__)
+                    if key not in exclusions}
+    return __getstate__
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -468,7 +489,7 @@ class Atom(_ListItem):
         self.urey_bradleys, self.impropers, self.cmaps = [], [], []
         self.tortors = []
         self.other_locations = {} # A dict of Atom instances
-        self.atom_type = _UnassignedAtomType
+        self.atom_type = UnassignedAtomType
         self.number = number
         self.anisou = None
         self._rmin = rmin
@@ -606,7 +627,7 @@ class Atom(_ListItem):
     def rmin(self):
         """ Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius) """
         if self._rmin is None:
-            if (self.atom_type is _UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin is None):
                 return 0.0
             return self.atom_type.rmin
@@ -634,7 +655,7 @@ class Atom(_ListItem):
     def epsilon(self):
         """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
         if self._epsilon is None:
-            if (self.atom_type is _UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.epsilon is None):
                 return 0.0
             return self.atom_type.epsilon
@@ -649,7 +670,7 @@ class Atom(_ListItem):
     def rmin_14(self):
         """ The 1-4 Lennard-Jones Rmin/2 parameter """
         if self._rmin14 is None:
-            if (self.atom_type is _UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin_14 is None):
                 return self.rmin
             return self.atom_type.rmin_14
@@ -664,7 +685,7 @@ class Atom(_ListItem):
     def sigma_14(self):
         """ Lennard-Jones sigma parameter -- directly related to Rmin """
         if self._rmin14 is None:
-            if (self.atom_type is _UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin_14 is None):
                 return self.sigma
             return self.atom_type.rmin_14 * 2**(-1/6) * 2
@@ -678,7 +699,7 @@ class Atom(_ListItem):
     def epsilon_14(self):
         """ The 1-4 Lennard-Jones epsilon parameter """
         if self._epsilon14 is None:
-            if (self.atom_type is _UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.epsilon_14 is None):
                 return self.epsilon
             return self.atom_type.epsilon_14
@@ -933,6 +954,45 @@ class Atom(_ListItem):
         elif self.residue is not None:
             return start + '; In %s>' % self.residue.name
         return start + '>'
+
+    #===================================================
+
+    # For pickleability
+
+    def __getstate__(self):
+        retval = dict(name=self.name, type=self.type, atom_type=self.atom_type,
+                      charge=self.charge, mass=self.mass, nb_idx=self.nb_idx,
+                      radii=self.radii, screen=self.screen, tree=self.tree,
+                      join=self.join, irotat=self.irotat, bfactor=self.bfactor,
+                      altloc=self.altloc, occupancy=self.occupancy,
+                      number=self.number, anisou=self.anisou, _rmin=self._rmin,
+                      _epsilon=self._epsilon, _rmin14=self._rmin14,
+                      _epsilon14=self._epsilon14, children=self.children,
+                      atomic_number=self.atomic_number,
+        )
+        for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles',
+                    'type_idx', 'class_idx', 'polarizability', 'vdw_weight',
+                    'segid', 'weights', '_frame_type'):
+            try:
+                retval[key] = getattr(self, key)
+            except AttributeError:
+                continue
+
+        return retval
+
+    def __setstate__(self, d):
+        self._bond_partners = []
+        self._angle_partners = []
+        self._dihedral_partners = []
+        self._tortor_partners = []
+        self._exclusion_partners = []
+        self.residue = None
+        self.marked = 0
+        self.bonds, self.angles, self.dihedrals = [], [], []
+        self.urey_bradleys, self.impropers, self.cmaps = [], [], []
+        self.tortors = []
+        self.other_locations = {}
+        self.__dict__.update(d)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1741,6 +1801,17 @@ class BondType(_ListItem, _ParameterType):
             return self
         return BondType(self.k, self.req)
 
+    __getstate__ = _getstate_with_exclusions()
+
+    def __reduce__(self):
+        """
+        Special-case NoUreyBradley, which should be a singleton. So if it's
+        NoUreyBradley, return the same object. Otherwise, create a new one
+        """
+        if self is NoUreyBradley:
+            return 'NoUreyBradley'
+        return super(BondType, self).__reduce__()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Angle(object):
@@ -1891,6 +1962,8 @@ class AngleType(_ListItem, _ParameterType):
 
     def __copy__(self):
         return AngleType(self.k, self.theteq)
+
+    __getstate__ = _getstate_with_exclusions()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2185,6 +2258,8 @@ class DihedralType(_ListItem, _ParameterType):
         return DihedralType(self.phi_k, self.per, self.phase, self.scee,
                             self.scnb)
 
+    __getstate__ = _getstate_with_exclusions()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class RBTorsionType(_ListItem, _ParameterType):
@@ -2277,6 +2352,8 @@ class RBTorsionType(_ListItem, _ParameterType):
                 (self.c0, self.c1, self.c2, self.c3, self.c4, self.c5,
                  self.scee, self.scnb))
 
+    __getstate__ = _getstate_with_exclusions()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class DihedralTypeList(list, _ListItem):
@@ -2358,6 +2435,8 @@ class DihedralTypeList(list, _ListItem):
 
     def __copy__(self):
         return DihedralTypeList([copy(x) for x in self])
+
+    __getstate__ = _getstate_with_exclusions(['list', 'penalty'])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2637,6 +2716,8 @@ class ImproperType(_ListItem, _ParameterType):
     def __copy__(self):
         return ImproperType(self.psi_k, self.psi_eq)
 
+    __getstate__ = _getstate_with_exclusions()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Cmap(object):
@@ -2886,6 +2967,8 @@ class CmapType(_ListItem, _ParameterType):
     def __copy__(self):
         return CmapType(self.resolution, copy(self.grid._data),
                         self.comments[:])
+
+    __getstate__ = _getstate_with_exclusions()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3176,6 +3259,8 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
     def __copy__(self):
         return OutOfPlaneBendType(self.k)
 
+    __getstate__ = _getstate_with_exclusions()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PiTorsion(object):
@@ -3381,6 +3466,8 @@ class StretchBendType(_ListItem, _ParameterType):
     def __copy__(self):
         return StretchBendType(self.k1, self.k2, self.req1, self.req2,
                                self.theteq)
+
+    __getstate__ = _getstate_with_exclusions()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3664,6 +3751,8 @@ class TorsionTorsionType(_ListItem, _ParameterType):
         return TorsionTorsionType(self.dims, self.ang1, self.ang2, f, dfda1,
                                   dfda2, d2fda1da2)
 
+    __getstate__ = _getstate_with_exclusions()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ChiralFrame(object):
@@ -3878,6 +3967,8 @@ class Residue(_ListItem):
         if self.insertion_code:
             rep += '; insertion_code=%s' % self.insertion_code
         return rep + '>'
+
+    __getstate__ = _getstate_with_exclusions()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4388,6 +4479,12 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
                 type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
+    def __eq__(self, other):
+        return (self.rmin == other.rmin and self.epsilon == other.epsilon and
+                self.chgscale == other.chgscale)
+
+    __getstate__ = _getstate_with_exclusions()
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmoebaNonbondedExceptionType(NonbondedExceptionType):
@@ -4436,6 +4533,8 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
         return AmoebaNonbondedExceptionType(self.vdw_weight,
                 self.multipole_weight, self.direct_weight, self.polar_weight,
                 self.mutual_weight)
+
+    __getstate__ = _getstate_with_exclusions()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4646,6 +4745,12 @@ class _UnassignedAtomType(object):
     This raises the appropriate exceptions (ParameterError) when you try to
     access its properties
     """
+    _OBJ = None
+
+    def __new__(cls):
+        if cls._OBJ is None:
+            cls._OBJ = super(_UnassignedAtomType, cls).__new__(cls)
+        return cls._OBJ
 
     def __int__(self):
         raise ParameterError('Atom type is not defined')
@@ -4653,7 +4758,15 @@ class _UnassignedAtomType(object):
     def __str__(self):
         raise ParameterError('Atom type is not defined')
 
-_UnassignedAtomType = _UnassignedAtomType() # Make it a singleton
+    def __eq__(self, other):
+        return isinstance(other, _UnassignedAtomType) # Behave like a singleton
+
+    def __reduce__(self):
+        return 'UnassignedAtomType'
+
+UnassignedAtomType = _UnassignedAtomType()
+# Make sure it's a singleton
+assert UnassignedAtomType is _UnassignedAtomType(), "Not a singleton"
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4708,6 +4821,10 @@ class Group(object):
 
     def __copy__(self):
         return type(self)(self.bs, self.type, self.move)
+
+    def __eq__(self, other):
+        return (self.bs == other.bs and self.type == other.type and
+                self.move == other.move)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
