@@ -128,6 +128,11 @@ class TestParmedSerialization(unittest.TestCase):
             for a1, a2 in zip(r1, r2):
                 self._equal_atoms(a1, a2)
 
+        def cmp_alists(alist1, alist2):
+            self.assertEqual(len(alist1), len(alist2))
+            for a1, a2 in zip(alist1, alist2):
+                self._equal_atoms(a1, a2)
+
         for a1, a2 in zip(unpickled, structure):
             self._equal_atoms(a1, a2)
             self.assertEqual(a1.idx, a2.idx)
@@ -135,11 +140,11 @@ class TestParmedSerialization(unittest.TestCase):
             self.assertEqual(len(a1.angles), len(a2.angles))
             self.assertEqual(len(a1.dihedrals), len(a2.dihedrals))
             self.assertEqual(len(a1.impropers), len(a2.impropers))
-            self.assertEqual(len(a1.bond_partners), len(a2.bond_partners))
-            self.assertEqual(len(a1.angle_partners), len(a2.angle_partners))
-            self.assertEqual(len(a1.dihedral_partners), len(a2.dihedral_partners))
-            self.assertEqual(len(a1.tortor_partners), len(a2.tortor_partners))
-            self.assertEqual(len(a1.exclusion_partners), len(a2.exclusion_partners))
+            cmp_alists(a1.bond_partners, a2.bond_partners)
+            cmp_alists(a1.angle_partners, a2.angle_partners)
+            cmp_alists(a1.dihedral_partners, a2.dihedral_partners)
+            cmp_alists(a1.tortor_partners, a2.tortor_partners)
+            cmp_alists(a1.exclusion_partners, a2.exclusion_partners)
 
         # Make sure all of the type arrays are equivalent
         def cmp_type_arrays(arr1, arr2):
@@ -195,6 +200,7 @@ class TestParmedSerialization(unittest.TestCase):
     def test_structure_serialization(self):
         """ Tests serialization/pickleability of Structure """
         structure = utils.create_random_structure(parametrized=True)
+        # Make sure we copy over exclusions
         structure.atoms[0].exclude(structure.atoms[10])
         fobj = BytesIO()
         pickle.dump(structure, fobj)
@@ -297,3 +303,16 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(structure.version, unpickled.version)
         self.assertEqual(structure.name, unpickled.name)
         self.assertIs(pmd.amber.AmoebaParm, type(unpickled))
+
+    def test_pdb_serialization(self):
+        """ Tests the serialization/pickleability of a parsed PDB file """
+        structure = pmd.load_file(utils.get_fn('4lzt.pdb'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+
+        self._compare_structures(unpickled, structure)
+
+        # Check metadata
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries'):
+            self.assertEqual(getattr(structure, key), getattr(unpickled, key))

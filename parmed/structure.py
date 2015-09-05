@@ -3432,9 +3432,11 @@ class Structure(object):
         retdict['acceptors'] = [(a.atom1.idx, a.atom2.idx)
                                 for a in self.acceptors]
         retdict['donors'] = [(d.atom1.idx, d.atom2.idx) for d in self.donors]
+        retdict['exclusions'] = [tuple(e.idx for e in a._exclusion_partners)
+                                 for a in self.atoms]
 
         # Now the metadata stuff, if applicable
-        for key in ('experimental', 'journal authors', 'keywords', 'doi',
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
                     'resolution', 'related_entries'):
             try:
@@ -3455,7 +3457,7 @@ class Structure(object):
             setattr(self, attr, d[attr])
             getattr(self, attr).claim()
         # Assign the possible metadata
-        for key in ('experimental', 'journal authors', 'keywords', 'doi',
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
                     'resolution', 'related_entries'):
             if key in d:
@@ -3554,6 +3556,10 @@ class Structure(object):
                                    assign_type(self.adjust_types, it[2]))
                 for it in d['adjusts']
         )
+        # Transfer the exclusions
+        for atom, excl in zip(self.atoms, d['exclusions']):
+            for idx in excl:
+                atom.exclude(self.atoms[idx])
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
