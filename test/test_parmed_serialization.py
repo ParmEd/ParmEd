@@ -146,6 +146,12 @@ class TestParmedSerialization(unittest.TestCase):
             cmp_alists(a1.tortor_partners, a2.tortor_partners)
             cmp_alists(a1.exclusion_partners, a2.exclusion_partners)
 
+        # Check coordinates
+        if structure.get_coordinates() is None:
+            self.assertIs(unpickled.get_coordinates(), None)
+        else:
+            np.testing.assert_equal(structure.get_coordinates(),
+                                    unpickled.get_coordinates())
         # Make sure all of the type arrays are equivalent
         def cmp_type_arrays(arr1, arr2):
             self.assertEqual(len(arr1), len(arr2))
@@ -316,3 +322,18 @@ class TestParmedSerialization(unittest.TestCase):
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
                     'resolution', 'related_entries'):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
+
+    def test_pdbtraj_serialization(self):
+        """ Tests the serialization/pickleability of a Structure w/ traj """
+        structure = pmd.load_file(utils.get_fn('2koc.pdb'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+
+        self._compare_structures(unpickled, structure)
+
+        # Check metadata
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries'):
+            self.assertEqual(getattr(structure, key), getattr(unpickled, key))
+
+        self.assertGreater(structure.get_coordinates().shape[0], 1)
