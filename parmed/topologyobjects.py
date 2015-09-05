@@ -627,7 +627,7 @@ class Atom(_ListItem):
     def rmin(self):
         """ Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius) """
         if self._rmin is None:
-            if (self.atom_type == UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin is None):
                 return 0.0
             return self.atom_type.rmin
@@ -655,7 +655,7 @@ class Atom(_ListItem):
     def epsilon(self):
         """ Lennard-Jones epsilon parameter (the Lennard-Jones well depth) """
         if self._epsilon is None:
-            if (self.atom_type == UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.epsilon is None):
                 return 0.0
             return self.atom_type.epsilon
@@ -670,7 +670,7 @@ class Atom(_ListItem):
     def rmin_14(self):
         """ The 1-4 Lennard-Jones Rmin/2 parameter """
         if self._rmin14 is None:
-            if (self.atom_type == UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin_14 is None):
                 return self.rmin
             return self.atom_type.rmin_14
@@ -685,7 +685,7 @@ class Atom(_ListItem):
     def sigma_14(self):
         """ Lennard-Jones sigma parameter -- directly related to Rmin """
         if self._rmin14 is None:
-            if (self.atom_type == UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin_14 is None):
                 return self.sigma
             return self.atom_type.rmin_14 * 2**(-1/6) * 2
@@ -699,7 +699,7 @@ class Atom(_ListItem):
     def epsilon_14(self):
         """ The 1-4 Lennard-Jones epsilon parameter """
         if self._epsilon14 is None:
-            if (self.atom_type == UnassignedAtomType or
+            if (self.atom_type is UnassignedAtomType or
                     self.atom_type.epsilon_14 is None):
                 return self.epsilon
             return self.atom_type.epsilon_14
@@ -1802,6 +1802,15 @@ class BondType(_ListItem, _ParameterType):
         return BondType(self.k, self.req)
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __reduce__(self):
+        """
+        Special-case NoUreyBradley, which should be a singleton. So if it's
+        NoUreyBradley, return the same object. Otherwise, create a new one
+        """
+        if self is NoUreyBradley:
+            return 'NoUreyBradley'
+        return super(BondType, self).__reduce__()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4752,7 +4761,12 @@ class _UnassignedAtomType(object):
     def __eq__(self, other):
         return isinstance(other, _UnassignedAtomType) # Behave like a singleton
 
+    def __reduce__(self):
+        return 'UnassignedAtomType'
+
 UnassignedAtomType = _UnassignedAtomType()
+# Make sure it's a singleton
+assert UnassignedAtomType is _UnassignedAtomType(), "Not a singleton"
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

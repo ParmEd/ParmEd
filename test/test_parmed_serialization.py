@@ -56,7 +56,7 @@ class TestParmedSerialization(unittest.TestCase):
                 self.assertFalse(hasattr(a1, key))
 
     def test_atom_serialization(self):
-        """ Tests serialization of Atom """
+        """ Tests the serialization of Atom """
         atom = pmd.Atom(atomic_number=random.randint(1, 100),
                         name=random.choice(uppercase)+random.choice(uppercase),
                         type=random.choice(uppercase)+random.choice(uppercase),
@@ -82,7 +82,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._equal_atoms(unpickled, atom)
 
     def test_bond_serialization(self):
-        """ Tests serialization of Bond """
+        """ Tests the serialization of Bond """
         struct = utils.create_random_structure(True)
         bond = struct.bonds[0]
         fobj = BytesIO()
@@ -93,7 +93,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIsInstance(bond, pmd.Bond)
 
     def test_bondtype_serialization(self):
-        """ Tests serialization of BondType """
+        """ Tests the serialization of BondType """
         struct = utils.create_random_structure(True)
         bt = struct.bond_types[0]
 
@@ -107,7 +107,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIsNot(unpickled, bt)
 
     def test_residue_serialization(self):
-        """ Tests serialization of Residue """
+        """ Tests the serialization of Residue """
         struct = utils.create_random_structure(parametrized=True)
         res = struct.residues[0]
 
@@ -121,7 +121,7 @@ class TestParmedSerialization(unittest.TestCase):
             self._equal_atoms(a1, a2)
 
     def test_structure_serialization(self):
-        """ Tests serialization of Structure """
+        """ Tests the serialization of Structure """
         structure = utils.create_random_structure(parametrized=True)
         # Make sure we copy over exclusions
         structure.atoms[0].exclude(structure.atoms[10])
@@ -145,7 +145,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(fmt.fmt, unpickled.fmt)
 
     def test_amberformat_serialization(self):
-        """ Tests serialization of AmberFormat """
+        """ Tests the serialization of AmberFormat """
         amber = pmd.load_file(utils.get_fn('cSPCE.mdl'))
         unpickled = pickle.loads(pickle.dumps(amber))
 
@@ -275,6 +275,15 @@ class TestParmedSerialization(unittest.TestCase):
         self._compare_parametersets(structure.parameterset,
                                     unpickled.parameterset)
 
+    def test_gromacscharmm_serialization(self):
+        """ Tests the serialization of a CHARMM FF Gromacs topology """
+        structure = pmd.load_file(utils.get_fn('1aki.charmm27.solv.top'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+        self._compare_structures(unpickled, structure)
+        self.assertEqual(structure.defaults, unpickled.defaults)
+        self._compare_parametersets(structure.parameterset,
+                                    unpickled.parameterset)
+
     def test_charmmpsf_serialization(self):
         """ Tests the serialization of a CHARMM PSF file """
         structure = pmd.load_file(utils.get_fn('ala_ala_ala.psf'))
@@ -391,6 +400,10 @@ class TestParmedSerialization(unittest.TestCase):
             for k in l1:
                 self.assertEqual(l1[k], l2[k])
                 if reversible:
+                    if (pmd.NoUreyBradley is l1[k] or
+                            pmd.NoUreyBradley is l2[k]):
+                        self.assertIs(l1[k], pmd.NoUreyBradley)
+                        self.assertIs(l2[k], pmd.NoUreyBradley)
                     self.assertIs(l1[k], l1[tuple(reversed(k))])
                     self.assertIs(l2[k], l2[tuple(reversed(k))])
 
