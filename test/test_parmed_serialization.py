@@ -385,20 +385,23 @@ class TestParmedSerialization(unittest.TestCase):
 
     def _compare_parametersets(self, set1, set2):
 
-        def cmp_lists(l1, l2):
+        def cmp_lists(l1, l2, reversible=False):
             self.assertEqual(len(l1), len(l2))
             self.assertEqual(set(l1.keys()), set(l2.keys()))
             for k in l1:
                 self.assertEqual(l1[k], l2[k])
+                if reversible:
+                    self.assertIs(l1[k], l1[tuple(reversed(k))])
+                    self.assertIs(l2[k], l2[tuple(reversed(k))])
 
         # Now compare all of the parameter lists
-        cmp_lists(set1.bond_types, set2.bond_types)
-        cmp_lists(set1.angle_types, set2.angle_types)
-        cmp_lists(set1.dihedral_types, set2.dihedral_types)
+        cmp_lists(set1.bond_types, set2.bond_types, True)
+        cmp_lists(set1.angle_types, set2.angle_types, True)
+        cmp_lists(set1.dihedral_types, set2.dihedral_types, True)
         cmp_lists(set1.improper_types, set2.improper_types)
         cmp_lists(set1.improper_periodic_types, set2.improper_periodic_types)
-        cmp_lists(set1.cmap_types, set2.cmap_types)
+        cmp_lists(set1.cmap_types, set2.cmap_types, True)
         cmp_lists(set1.atom_types, set2.atom_types)
-        cmp_lists(set1.urey_bradley_types, set2.urey_bradley_types)
+        cmp_lists(set1.urey_bradley_types, set2.urey_bradley_types, True)
         cmp_lists(set1.nbfix_types, set2.nbfix_types)
         self.assertEqual(set1.combining_rule, set2.combining_rule)
