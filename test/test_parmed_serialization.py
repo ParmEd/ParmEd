@@ -119,98 +119,6 @@ class TestParmedSerialization(unittest.TestCase):
         for a1, a2 in zip(res, unpickled):
             self._equal_atoms(a1, a2)
 
-    def _compare_structures(self, unpickled, structure):
-
-        self.assertEqual(len(unpickled.residues), len(structure.residues))
-        for r1, r2 in zip(unpickled.residues, structure.residues):
-            self.assertEqual(len(r1), len(r2))
-            self.assertEqual(r1.idx, r2.idx)
-            for a1, a2 in zip(r1, r2):
-                self._equal_atoms(a1, a2)
-
-        def cmp_alists(alist1, alist2):
-            self.assertEqual(len(alist1), len(alist2))
-            for a1, a2 in zip(alist1, alist2):
-                self._equal_atoms(a1, a2)
-
-        for a1, a2 in zip(unpickled, structure):
-            self._equal_atoms(a1, a2)
-            self.assertEqual(a1.idx, a2.idx)
-            self.assertEqual(len(a1.bonds), len(a2.bonds))
-            self.assertEqual(len(a1.angles), len(a2.angles))
-            self.assertEqual(len(a1.dihedrals), len(a2.dihedrals))
-            self.assertEqual(len(a1.impropers), len(a2.impropers))
-            cmp_alists(a1.bond_partners, a2.bond_partners)
-            cmp_alists(a1.angle_partners, a2.angle_partners)
-            cmp_alists(a1.dihedral_partners, a2.dihedral_partners)
-            cmp_alists(a1.tortor_partners, a2.tortor_partners)
-            cmp_alists(a1.exclusion_partners, a2.exclusion_partners)
-
-        # Check coordinates
-        if structure.get_coordinates() is None:
-            self.assertIs(unpickled.get_coordinates(), None)
-        else:
-            np.testing.assert_equal(structure.get_coordinates(),
-                                    unpickled.get_coordinates())
-        # Check unit cell
-        if structure.box is None:
-            self.assertIs(unpickled.box, None)
-            self.assertIs(unpickled.box_vectors, None)
-        else:
-            np.testing.assert_equal(structure.box, unpickled.box)
-            self.assertEqual(structure.box_vectors, unpickled.box_vectors)
-
-        # Make sure all of the type arrays are equivalent
-        def cmp_type_arrays(arr1, arr2):
-            self.assertEqual(len(arr1), len(arr2))
-            for x1, x2 in zip(arr1, arr2):
-                self.assertEqual(x1, x2)
-
-        cmp_type_arrays(structure.bond_types, unpickled.bond_types)
-        cmp_type_arrays(structure.angle_types, unpickled.angle_types)
-        cmp_type_arrays(structure.dihedral_types, unpickled.dihedral_types)
-        cmp_type_arrays(structure.improper_types, unpickled.improper_types)
-        cmp_type_arrays(structure.urey_bradley_types, unpickled.urey_bradley_types)
-        cmp_type_arrays(structure.rb_torsion_types, unpickled.rb_torsion_types)
-        cmp_type_arrays(structure.cmap_types, unpickled.cmap_types)
-        cmp_type_arrays(structure.trigonal_angle_types,
-                        unpickled.trigonal_angle_types)
-        cmp_type_arrays(structure.out_of_plane_bend_types,
-                        unpickled.out_of_plane_bend_types)
-        cmp_type_arrays(structure.stretch_bend_types, unpickled.stretch_bend_types)
-        cmp_type_arrays(structure.torsion_torsion_types,
-                        unpickled.torsion_torsion_types)
-        cmp_type_arrays(structure.pi_torsion_types, unpickled.pi_torsion_types)
-        cmp_type_arrays(structure.adjust_types, unpickled.adjust_types)
-        cmp_type_arrays(structure.groups, unpickled.groups)
-
-        # Make sure all of the connectivity arrays are equivalent
-        def cmp_top_arrays(arr1, arr2):
-            self.assertEqual(len(arr1), len(arr2))
-            for t1, t2 in zip(arr1, arr2):
-                self.assertIs(type(t1), type(t2))
-                atoms = [attr for attr in dir(t1) if attr.startswith('atom')]
-                for a in atoms:
-                    self._equal_atoms(getattr(t1, a), getattr(t2, a))
-                if hasattr(t1, 'type'):
-                    self.assertEqual(t1.type, t2.type)
-
-        cmp_top_arrays(structure.bonds, unpickled.bonds)
-        cmp_top_arrays(structure.angles, unpickled.angles)
-        cmp_top_arrays(structure.dihedrals, unpickled.dihedrals)
-        cmp_top_arrays(structure.impropers, unpickled.impropers)
-        cmp_top_arrays(structure.urey_bradleys, unpickled.urey_bradleys)
-        cmp_top_arrays(structure.rb_torsions, unpickled.rb_torsions)
-        cmp_top_arrays(structure.cmaps, unpickled.cmaps)
-        cmp_top_arrays(structure.trigonal_angles, unpickled.trigonal_angles)
-        cmp_top_arrays(structure.out_of_plane_bends, unpickled.out_of_plane_bends)
-        cmp_top_arrays(structure.pi_torsions, unpickled.pi_torsions)
-        cmp_top_arrays(structure.stretch_bends, unpickled.stretch_bends)
-        cmp_top_arrays(structure.torsion_torsions, unpickled.torsion_torsions)
-        cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
-        cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
-        cmp_top_arrays(structure.adjusts, unpickled.adjusts)
-
     def test_structure_serialization(self):
         """ Tests serialization/pickleability of Structure """
         structure = utils.create_random_structure(parametrized=True)
@@ -345,3 +253,112 @@ class TestParmedSerialization(unittest.TestCase):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
         self.assertGreater(structure.get_coordinates().shape[0], 1)
+
+    def test_parm_velocities_serialization(self):
+        """ Tests the serialization/pickleability of a Structure w/ vels """
+        structure = pmd.load_file(utils.get_fn('tip4p.parm7'),
+                                  utils.get_fn('tip4p.rst7'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+        self._compare_structures(unpickled, structure)
+
+    def _compare_structures(self, unpickled, structure):
+
+        self.assertEqual(len(unpickled.residues), len(structure.residues))
+        for r1, r2 in zip(unpickled.residues, structure.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.idx, r2.idx)
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
+
+        def cmp_alists(alist1, alist2):
+            self.assertEqual(len(alist1), len(alist2))
+            for a1, a2 in zip(alist1, alist2):
+                self._equal_atoms(a1, a2)
+
+        for a1, a2 in zip(unpickled, structure):
+            self._equal_atoms(a1, a2)
+            self.assertEqual(a1.idx, a2.idx)
+            self.assertEqual(len(a1.bonds), len(a2.bonds))
+            self.assertEqual(len(a1.angles), len(a2.angles))
+            self.assertEqual(len(a1.dihedrals), len(a2.dihedrals))
+            self.assertEqual(len(a1.impropers), len(a2.impropers))
+            cmp_alists(a1.bond_partners, a2.bond_partners)
+            cmp_alists(a1.angle_partners, a2.angle_partners)
+            cmp_alists(a1.dihedral_partners, a2.dihedral_partners)
+            cmp_alists(a1.tortor_partners, a2.tortor_partners)
+            cmp_alists(a1.exclusion_partners, a2.exclusion_partners)
+
+        # Check coordinates
+        if structure.get_coordinates() is None:
+            self.assertIs(unpickled.get_coordinates(), None)
+        else:
+            np.testing.assert_equal(structure.get_coordinates(),
+                                    unpickled.get_coordinates())
+        # Check unit cell
+        if structure.box is None:
+            self.assertIs(unpickled.box, None)
+            self.assertIs(unpickled.box_vectors, None)
+        else:
+            np.testing.assert_equal(structure.box, unpickled.box)
+            self.assertEqual(structure.box_vectors, unpickled.box_vectors)
+
+        # Check velocities
+        if structure.velocities is None:
+            self.assertIs(unpickled.velocities, None)
+        else:
+            np.testing.assert_equal(structure.velocities, unpickled.velocities)
+
+        # Check nrexcl and combining_rule
+        self.assertEqual(structure.nrexcl, unpickled.nrexcl)
+        self.assertEqual(structure.combining_rule, unpickled.combining_rule)
+
+        # Make sure all of the type arrays are equivalent
+        def cmp_type_arrays(arr1, arr2):
+            self.assertEqual(len(arr1), len(arr2))
+            for x1, x2 in zip(arr1, arr2):
+                self.assertEqual(x1, x2)
+
+        cmp_type_arrays(structure.bond_types, unpickled.bond_types)
+        cmp_type_arrays(structure.angle_types, unpickled.angle_types)
+        cmp_type_arrays(structure.dihedral_types, unpickled.dihedral_types)
+        cmp_type_arrays(structure.improper_types, unpickled.improper_types)
+        cmp_type_arrays(structure.urey_bradley_types, unpickled.urey_bradley_types)
+        cmp_type_arrays(structure.rb_torsion_types, unpickled.rb_torsion_types)
+        cmp_type_arrays(structure.cmap_types, unpickled.cmap_types)
+        cmp_type_arrays(structure.trigonal_angle_types,
+                        unpickled.trigonal_angle_types)
+        cmp_type_arrays(structure.out_of_plane_bend_types,
+                        unpickled.out_of_plane_bend_types)
+        cmp_type_arrays(structure.stretch_bend_types, unpickled.stretch_bend_types)
+        cmp_type_arrays(structure.torsion_torsion_types,
+                        unpickled.torsion_torsion_types)
+        cmp_type_arrays(structure.pi_torsion_types, unpickled.pi_torsion_types)
+        cmp_type_arrays(structure.adjust_types, unpickled.adjust_types)
+        cmp_type_arrays(structure.groups, unpickled.groups)
+
+        # Make sure all of the connectivity arrays are equivalent
+        def cmp_top_arrays(arr1, arr2):
+            self.assertEqual(len(arr1), len(arr2))
+            for t1, t2 in zip(arr1, arr2):
+                self.assertIs(type(t1), type(t2))
+                atoms = [attr for attr in dir(t1) if attr.startswith('atom')]
+                for a in atoms:
+                    self._equal_atoms(getattr(t1, a), getattr(t2, a))
+                if hasattr(t1, 'type'):
+                    self.assertEqual(t1.type, t2.type)
+
+        cmp_top_arrays(structure.bonds, unpickled.bonds)
+        cmp_top_arrays(structure.angles, unpickled.angles)
+        cmp_top_arrays(structure.dihedrals, unpickled.dihedrals)
+        cmp_top_arrays(structure.impropers, unpickled.impropers)
+        cmp_top_arrays(structure.urey_bradleys, unpickled.urey_bradleys)
+        cmp_top_arrays(structure.rb_torsions, unpickled.rb_torsions)
+        cmp_top_arrays(structure.cmaps, unpickled.cmaps)
+        cmp_top_arrays(structure.trigonal_angles, unpickled.trigonal_angles)
+        cmp_top_arrays(structure.out_of_plane_bends, unpickled.out_of_plane_bends)
+        cmp_top_arrays(structure.pi_torsions, unpickled.pi_torsions)
+        cmp_top_arrays(structure.stretch_bends, unpickled.stretch_bends)
+        cmp_top_arrays(structure.torsion_torsions, unpickled.torsion_torsions)
+        cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
+        cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
+        cmp_top_arrays(structure.adjusts, unpickled.adjusts)

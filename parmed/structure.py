@@ -3387,6 +3387,8 @@ class Structure(object):
                        groups=self.groups,
                        _coordinates=self._coordinates,
                        _box=self._box,
+                       nrexcl=self.nrexcl,
+                       _combining_rule=self._combining_rule,
         )
         def idx(thing):
             if thing is None: return None
@@ -3460,7 +3462,8 @@ class Structure(object):
         # Assign the possible metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
-                    'resolution', 'related_entries', '_coordinates', '_box'):
+                    'resolution', 'related_entries', '_coordinates', '_box',
+                    'nrexcl', '_combining_rule'):
             if key in d:
                 setattr(self, key, d[key])
 
