@@ -3386,6 +3386,7 @@ class Structure(object):
                        adjust_types=self.adjust_types,
                        groups=self.groups,
                        _coordinates=self._coordinates,
+                       _box=self._box,
         )
         def idx(thing):
             if thing is None: return None
@@ -3459,7 +3460,7 @@ class Structure(object):
         # Assign the possible metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
-                    'resolution', 'related_entries', '_coordinates'):
+                    'resolution', 'related_entries', '_coordinates', '_box'):
             if key in d:
                 setattr(self, key, d[key])
 

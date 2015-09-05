@@ -152,6 +152,14 @@ class TestParmedSerialization(unittest.TestCase):
         else:
             np.testing.assert_equal(structure.get_coordinates(),
                                     unpickled.get_coordinates())
+        # Check unit cell
+        if structure.box is None:
+            self.assertIs(unpickled.box, None)
+            self.assertIs(unpickled.box_vectors, None)
+        else:
+            np.testing.assert_equal(structure.box, unpickled.box)
+            self.assertEqual(structure.box_vectors, unpickled.box_vectors)
+
         # Make sure all of the type arrays are equivalent
         def cmp_type_arrays(arr1, arr2):
             self.assertEqual(len(arr1), len(arr2))
