@@ -8,7 +8,6 @@ import numpy as np
 import parmed as pmd
 from parmed.utils.six.moves import range, zip
 try:
-    raise ImportError()
     import cPickle as pickle
 except ImportError:
     import pickle
@@ -264,3 +263,25 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(structure.version, unpickled.version)
         self.assertEqual(structure.name, unpickled.name)
         self.assertIs(pmd.amber.ChamberParm, type(unpickled))
+
+    def test_amoebaparm_serialization(self):
+        """ Tests the serialization/pickleability of AmoebaParm """
+        structure = pmd.load_file(utils.get_fn('nma.parm7'),
+                                  utils.get_fn('nma.rst7'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+
+        self._compare_structures(unpickled, structure)
+
+        self.assertEqual(set(structure.parm_data.keys()),
+                         set(unpickled.parm_data.keys()))
+        self.assertEqual(structure.flag_list, unpickled.flag_list)
+        self.assertEqual(set(structure.formats.keys()),
+                         set(unpickled.formats.keys()))
+        for k1 in structure.parm_data.keys():
+            self.assertEqual(structure.parm_data[k1], unpickled.parm_data[k1])
+            self.assertEqual(structure.formats[k1], unpickled.formats[k1])
+
+        self.assertEqual(structure.charge_flag, unpickled.charge_flag)
+        self.assertEqual(structure.version, unpickled.version)
+        self.assertEqual(structure.name, unpickled.name)
+        self.assertIs(pmd.amber.AmoebaParm, type(unpickled))
