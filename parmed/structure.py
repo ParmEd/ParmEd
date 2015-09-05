@@ -49,7 +49,6 @@ from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
-import pickle
 import re
 # Try to import the OpenMM modules
 try:
