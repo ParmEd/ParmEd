@@ -161,6 +161,7 @@ class TestParmedSerialization(unittest.TestCase):
                         unpickled.torsion_torsion_types)
         cmp_type_arrays(structure.pi_torsion_types, unpickled.pi_torsion_types)
         cmp_type_arrays(structure.adjust_types, unpickled.adjust_types)
+        cmp_type_arrays(structure.groups, unpickled.groups)
 
         # Make sure all of the connectivity arrays are equivalent
         def cmp_top_arrays(arr1, arr2):
@@ -175,3 +176,16 @@ class TestParmedSerialization(unittest.TestCase):
 
         cmp_top_arrays(structure.bonds, unpickled.bonds)
         cmp_top_arrays(structure.angles, unpickled.angles)
+        cmp_top_arrays(structure.dihedrals, unpickled.dihedrals)
+        cmp_top_arrays(structure.impropers, unpickled.impropers)
+        cmp_top_arrays(structure.urey_bradleys, unpickled.urey_bradleys)
+        cmp_top_arrays(structure.rb_torsions, unpickled.rb_torsions)
+        cmp_top_arrays(structure.cmaps, unpickled.cmaps)
+        cmp_top_arrays(structure.trigonal_angles, unpickled.trigonal_angles)
+        cmp_top_arrays(structure.out_of_plane_bends, unpickled.out_of_plane_bends)
+        cmp_top_arrays(structure.pi_torsions, unpickled.pi_torsions)
+        cmp_top_arrays(structure.stretch_bends, unpickled.stretch_bends)
+        cmp_top_arrays(structure.torsion_torsions, unpickled.torsion_torsions)
+        cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
+        cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
+        cmp_top_arrays(structure.adjusts, unpickled.adjusts)

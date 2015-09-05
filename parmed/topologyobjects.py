@@ -4804,6 +4804,10 @@ class Group(object):
     def __copy__(self):
         return type(self)(self.bs, self.type, self.move)
 
+    def __eq__(self, other):
+        return (self.bs == other.bs and self.type == other.type and
+                self.move == other.move)
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 NoUreyBradley = BondType(0.0, 0.0) # singleton representing lack of a U-B term
