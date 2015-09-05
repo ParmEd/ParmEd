@@ -3409,7 +3409,7 @@ class Structure(object):
         retdict['urey_bradleys'] = [(u.atom1.idx, u.atom2.idx, idx(u.type))
                                     for u in self.urey_bradleys]
         retdict['cmaps'] = [(c.atom1.idx, c.atom2.idx, c.atom3.idx,
-                             c.atom4.idx, c.atom5.idx, c.type.idx)
+                             c.atom4.idx, c.atom5.idx, idx(c.type))
                             for c in self.cmaps]
         retdict['trigonal_angles'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
                                        t.atom4.idx, idx(t.type))

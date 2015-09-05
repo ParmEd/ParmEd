@@ -5,6 +5,7 @@ from __future__ import division
 
 from io import BytesIO
 import numpy as np
+import os
 import parmed as pmd
 from parmed.utils.six.moves import range, zip
 try:
@@ -55,7 +56,7 @@ class TestParmedSerialization(unittest.TestCase):
                 self.assertFalse(hasattr(a1, key))
 
     def test_atom_serialization(self):
-        """ Tests serialization/pickleability of Atom """
+        """ Tests serialization of Atom """
         atom = pmd.Atom(atomic_number=random.randint(1, 100),
                         name=random.choice(uppercase)+random.choice(uppercase),
                         type=random.choice(uppercase)+random.choice(uppercase),
@@ -81,7 +82,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._equal_atoms(unpickled, atom)
 
     def test_bond_serialization(self):
-        """ Tests serialization/pickleability of Bond """
+        """ Tests serialization of Bond """
         struct = utils.create_random_structure(True)
         bond = struct.bonds[0]
         fobj = BytesIO()
@@ -92,7 +93,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIsInstance(bond, pmd.Bond)
 
     def test_bondtype_serialization(self):
-        """ Tests serialization/pickleability of BondType """
+        """ Tests serialization of BondType """
         struct = utils.create_random_structure(True)
         bt = struct.bond_types[0]
 
@@ -106,7 +107,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIsNot(unpickled, bt)
 
     def test_residue_serialization(self):
-        """ Tests serialization/pickleability of Residue """
+        """ Tests serialization of Residue """
         struct = utils.create_random_structure(parametrized=True)
         res = struct.residues[0]
 
@@ -120,7 +121,7 @@ class TestParmedSerialization(unittest.TestCase):
             self._equal_atoms(a1, a2)
 
     def test_structure_serialization(self):
-        """ Tests serialization/pickleability of Structure """
+        """ Tests serialization of Structure """
         structure = utils.create_random_structure(parametrized=True)
         # Make sure we copy over exclusions
         structure.atoms[0].exclude(structure.atoms[10])
@@ -132,7 +133,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._compare_structures(unpickled, structure)
 
     def test_fortran_format_serialization(self):
-        """ Tests the serialization/pickleability of FortranFormat """
+        """ Tests the serialization of FortranFormat """
         fmt = pmd.amber.FortranFormat('8I10')
         unpickled = pickle.loads(pickle.dumps(fmt))
 
@@ -144,7 +145,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(fmt.fmt, unpickled.fmt)
 
     def test_amberformat_serialization(self):
-        """ Tests serialization/pickleability of AmberFormat """
+        """ Tests serialization of AmberFormat """
         amber = pmd.load_file(utils.get_fn('cSPCE.mdl'))
         unpickled = pickle.loads(pickle.dumps(amber))
 
@@ -162,7 +163,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(amber.name, unpickled.name)
 
     def test_amberparm_serialization(self):
-        """ Tests the serialization/pickleability of AmberParm """
+        """ Tests the serialization of AmberParm """
         structure = pmd.load_file(utils.get_fn('ash.parm7'))
         unpickled = pickle.loads(pickle.dumps(structure))
 
@@ -183,7 +184,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIs(pmd.amber.AmberParm, type(unpickled))
 
     def test_chamberparm_serialization(self):
-        """ Tests the serialization/pickleability of ChamberParm """
+        """ Tests the serialization of ChamberParm """
         structure = pmd.load_file(utils.get_fn('ala_ala_ala.parm7'),
                                   utils.get_fn('ala_ala_ala.rst7'))
         unpickled = pickle.loads(pickle.dumps(structure))
@@ -205,7 +206,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIs(pmd.amber.ChamberParm, type(unpickled))
 
     def test_amoebaparm_serialization(self):
-        """ Tests the serialization/pickleability of AmoebaParm """
+        """ Tests the serialization of AmoebaParm """
         structure = pmd.load_file(utils.get_fn('nma.parm7'),
                                   utils.get_fn('nma.rst7'))
         unpickled = pickle.loads(pickle.dumps(structure))
@@ -227,7 +228,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertIs(pmd.amber.AmoebaParm, type(unpickled))
 
     def test_pdb_serialization(self):
-        """ Tests the serialization/pickleability of a parsed PDB file """
+        """ Tests the serialization of a parsed PDB file """
         structure = pmd.load_file(utils.get_fn('4lzt.pdb'))
         unpickled = pickle.loads(pickle.dumps(structure))
 
@@ -240,7 +241,7 @@ class TestParmedSerialization(unittest.TestCase):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
     def test_pdbtraj_serialization(self):
-        """ Tests the serialization/pickleability of a Structure w/ traj """
+        """ Tests the serialization of a Structure with trajectory """
         structure = pmd.load_file(utils.get_fn('2koc.pdb'))
         unpickled = pickle.loads(pickle.dumps(structure))
 
@@ -255,9 +256,25 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertGreater(structure.get_coordinates().shape[0], 1)
 
     def test_parm_velocities_serialization(self):
-        """ Tests the serialization/pickleability of a Structure w/ vels """
+        """ Tests the serialization of a Structure with velocities """
         structure = pmd.load_file(utils.get_fn('tip4p.parm7'),
                                   utils.get_fn('tip4p.rst7'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+        self._compare_structures(unpickled, structure)
+
+    def test_gromacstop_serialization(self):
+        """ Tests the serialization of a GromacsTopologyFile """
+        structure = pmd.load_file(os.path.join(utils.get_fn('03.AlaGlu'),
+                                               'topol.top'),
+                                  xyz=os.path.join(utils.get_fn('03.AlaGlu'),
+                                                   'conf.gro'),
+        )
+        unpickled = pickle.loads(pickle.dumps(structure))
+        self._compare_structures(unpickled, structure)
+
+    def test_charmmpsf_serialization(self):
+        """ Tests the serialization of a CHARMM PSF file """
+        structure = pmd.load_file(utils.get_fn('ala_ala_ala.psf'))
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
 

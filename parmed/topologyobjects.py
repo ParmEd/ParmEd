@@ -4470,6 +4470,10 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
                 type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
+    def __eq__(self, other):
+        return (self.rmin == other.rmin and self.epsilon == other.epsilon and
+                self.chgscale == other.chgscale)
+
     __getstate__ = _getstate_with_exclusions()
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
