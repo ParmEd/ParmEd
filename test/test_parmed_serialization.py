@@ -120,21 +120,7 @@ class TestParmedSerialization(unittest.TestCase):
         for a1, a2 in zip(res, unpickled):
             self._equal_atoms(a1, a2)
 
-    def test_structure_serialization(self):
-        """ Tests serialization/pickleability of Structure """
-        structure = utils.create_random_structure(parametrized=True)
-        fobj = BytesIO()
-        pickle.dump(structure, fobj)
-        fobj.seek(0)
-        unpickled = pickle.load(fobj)
-
-        self.assertEqual(len(unpickled.residues), len(structure.residues))
-        for r1, r2 in zip(unpickled.residues, structure.residues):
-            self.assertEqual(len(r1), len(r2))
-            self.assertEqual(r1.idx, r2.idx)
-            for a1, a2 in zip(r1, r2):
-                self._equal_atoms(a1, a2)
-
+    def _compare_structures(self, unpickled, structure):
         for a1, a2 in zip(unpickled, structure):
             self._equal_atoms(a1, a2)
             self.assertEqual(a1.idx, a2.idx)
@@ -189,3 +175,92 @@ class TestParmedSerialization(unittest.TestCase):
         cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
         cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
         cmp_top_arrays(structure.adjusts, unpickled.adjusts)
+
+    def test_structure_serialization(self):
+        """ Tests serialization/pickleability of Structure """
+        structure = utils.create_random_structure(parametrized=True)
+        fobj = BytesIO()
+        pickle.dump(structure, fobj)
+        fobj.seek(0)
+        unpickled = pickle.load(fobj)
+
+        self.assertEqual(len(unpickled.residues), len(structure.residues))
+        for r1, r2 in zip(unpickled.residues, structure.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.idx, r2.idx)
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
+        self._compare_structures(unpickled, structure)
+
+    def test_fortran_format_serialization(self):
+        """ Tests the serialization/pickleability of FortranFormat """
+        fmt = pmd.amber.FortranFormat('8I10')
+        unpickled = pickle.loads(pickle.dumps(fmt))
+
+        self.assertEqual(fmt.format, unpickled.format)
+        self.assertEqual(fmt.strip_strings, unpickled.strip_strings)
+        self.assertIs(fmt.type, unpickled.type)
+        self.assertEqual(fmt.nitems, unpickled.nitems)
+        self.assertEqual(fmt.itemlen, unpickled.itemlen)
+        self.assertEqual(fmt.fmt, unpickled.fmt)
+
+    def test_amberformat_serialization(self):
+        """ Tests serialization/pickleability of AmberFormat """
+        amber = pmd.load_file(utils.get_fn('cSPCE.mdl'))
+        unpickled = pickle.loads(pickle.dumps(amber))
+
+        self.assertEqual(set(amber.parm_data.keys()),
+                         set(unpickled.parm_data.keys()))
+        self.assertEqual(amber.flag_list, unpickled.flag_list)
+        self.assertEqual(set(amber.formats.keys()),
+                         set(unpickled.formats.keys()))
+        for k1 in amber.parm_data.keys():
+            self.assertEqual(amber.parm_data[k1], unpickled.parm_data[k1])
+            self.assertEqual(amber.formats[k1], unpickled.formats[k1])
+
+        self.assertEqual(amber.charge_flag, unpickled.charge_flag)
+        self.assertEqual(amber.version, unpickled.version)
+        self.assertEqual(amber.name, unpickled.name)
+
+    def test_amberparm_serialization(self):
+        """ Tests the serialization/pickleability of AmberParm """
+        structure = pmd.load_file(utils.get_fn('ash.parm7'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+
+        self._compare_structures(unpickled, structure)
+
+        self.assertEqual(set(structure.parm_data.keys()),
+                         set(unpickled.parm_data.keys()))
+        self.assertEqual(structure.flag_list, unpickled.flag_list)
+        self.assertEqual(set(structure.formats.keys()),
+                         set(unpickled.formats.keys()))
+        for k1 in structure.parm_data.keys():
+            self.assertEqual(structure.parm_data[k1], unpickled.parm_data[k1])
+            self.assertEqual(structure.formats[k1], unpickled.formats[k1])
+
+        self.assertEqual(structure.charge_flag, unpickled.charge_flag)
+        self.assertEqual(structure.version, unpickled.version)
+        self.assertEqual(structure.name, unpickled.name)
+        self.assertIs(pmd.amber.AmberParm, type(unpickled))
+
+    def test_chamberparm_serialization(self):
+        """ Tests the serialization/pickleability of ChamberParm """
+        structure = pmd.load_file(utils.get_fn('ala_ala_ala.parm7'),
+                                  utils.get_fn('ala_ala_ala.rst7'))
+        unpickled = pickle.loads(pickle.dumps(structure))
+
+        self._compare_structures(unpickled, structure)
+
+        self.assertEqual(set(structure.parm_data.keys()),
+                         set(unpickled.parm_data.keys()))
+        self.assertEqual(structure.flag_list, unpickled.flag_list)
+        self.assertEqual(set(structure.formats.keys()),
+                         set(unpickled.formats.keys()))
+        for k1 in structure.parm_data.keys():
+            self.assertEqual(structure.parm_data[k1], unpickled.parm_data[k1])
+            self.assertEqual(structure.formats[k1], unpickled.formats[k1])
+
+        self.assertEqual(structure.charge_flag, unpickled.charge_flag)
+        self.assertEqual(structure.version, unpickled.version)
+        self.assertEqual(structure.name, unpickled.name)
+        self.assertIs(pmd.amber.ChamberParm, type(unpickled))
