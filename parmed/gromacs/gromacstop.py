@@ -114,6 +114,13 @@ class _Defaults(object):
         if idx == 4: return self.fudgeQQ
         raise IndexError('Index %d out of range' % idx)
 
+    def __eq__(self, other):
+        return (self.nbfunc == other.nbfunc and
+                self.comb_rule == other.comb_rule and
+                self.gen_pairs == other.gen_pairs and
+                self.fudgeLJ == other.fudgeLJ and
+                self.fudgeQQ == other.fudgeQQ)
+
     def __setitem__(self, idx, value):
         if idx < 0: idx += 5
         if idx == 0:
@@ -1761,6 +1768,19 @@ class GromacsTopologyFile(Structure):
                     dest.write('  %d' % (a.idx+1))
                 dest.write('\n')
             dest.write('\n')
+
+    #===================================================
+
+    def __getstate__(self):
+        d = Structure.__getstate__(self)
+        d['parameterset'] = self.parameterset
+        d['defaults'] = self.defaults
+        return d
+
+    def __setstate__(self, d):
+        Structure.__setstate__(self, d)
+        self.parameterset = d['parameterset']
+        self.defaults = d['defaults']
 
 def _any_atoms_farther_than(structure, limit=3):
     """
