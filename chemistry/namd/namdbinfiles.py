@@ -5,7 +5,10 @@ analysis.
 """
 from struct import unpack, pack
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 
 class NamdBinFile(object):
@@ -34,7 +37,7 @@ class NamdBinFile(object):
     @classmethod
     def read(cls, fname):
         """Return an object from the values in a NAMD binary file."""
-        infile = open(fname,'r')
+        infile = open(fname,'rb')
         natoms = int(unpack('i',infile.read(4))[0])
         values = [unpack('d',infile.read(8))[0] for n in range(3*natoms)]
         infile.close()
@@ -42,7 +45,7 @@ class NamdBinFile(object):
 
     def write(self, fname):
         """Write the current attributes to a file."""
-        outfile = open(fname,'w')
+        outfile = open(fname,'wb')
         outfile.write(pack('i',self.natom))
         for n in range(3*self.natom):
             outfile.write(pack('d',self.values[n]))
