@@ -1,4 +1,4 @@
-The :mod:`chemistry.charmm` package
+The :mod:`parmed.charmm` package
 ===================================
 
 The :mod:`charmm` package contains classes that can parse a variety of CHARMM
@@ -25,13 +25,13 @@ The :class:`CharmmPsfFile` class is capable of parsing all PSF file formats that
 I have encountered (excluding those with virtual sites and Drude particles,
 currently).
 
-.. currentmodule:: chemistry.charmm
+.. currentmodule:: parmed.charmm
 .. autosummary::
     :toctree: charmmobj/
 
     CharmmPsfFile
 
-This class is a subclass of :class:`Structure <chemistry.structure.Structure>`,
+This class is a subclass of :class:`Structure <parmed.structure.Structure>`,
 and as such contains the corresponding topology arrays :attr:`atoms
 <CharmmPsfFile.atoms>`, :attr:`bonds <CharmmPsfFile.bonds>`, ... etc. An example
 demonstrating the use of :class:`CharmmPsfFile` to parse ``dhfr_cmap_pbc.psf``
@@ -55,7 +55,7 @@ topology files* (RTF), *Parameter files* (PAR), and *stream files* (STR). A
 :class:`CharmmParameterSet` (described briefly below) will build a parameter
 database from collections of all three of these files.
 
-.. currentmodule:: chemistry.charmm
+.. currentmodule:: parmed.charmm
 .. autosummary::
     :toctree: charmmobj/
 
@@ -87,7 +87,7 @@ rename your file or use alternate ways to read in each file (see
 An example is shown processing the sample CHARMM 22 force field files provided
 in the ParmEd unit test files::
 
-    >>> from chemistry.charmm import CharmmParameterSet
+    >>> from parmed.charmm import CharmmParameterSet
     >>> params = CharmmParameterSet('par_all22_prot.inp', 'top_all22_prot.inp')
     >>> params.bond_types[('CE1', 'CE1')]
     <BondType; k=440.000, Req=1.340>
@@ -102,7 +102,7 @@ in the ParmEd unit test files::
 Notice that the dictionaries have keys matching all permutations of the atom
 types defining a parameter. In the example above, the angle type keys ``('H',
 'NH2', 'CT1')`` and ``('CT1', 'NH2', 'H')`` both point to the same
-:class:`AngleType <chemistry.topologyobjects.AngleType>`. In fact, they point to
+:class:`AngleType <parmed.topologyobjects.AngleType>`. In fact, they point to
 the exact same *object*, so that if you modify that angle type, it is changed
 for both keys::
 
@@ -182,7 +182,7 @@ CHARMM coordinate files
 ParmEd provides classes to parse two kinds of CHARMM coordinate files---standard
 coordinate files and restart files, summarized below.
 
-.. currentmodule:: chemistry.charmm
+.. currentmodule:: parmed.charmm
 .. autosummary::
     :toctree: charmmobj/
 

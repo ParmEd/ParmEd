@@ -1,0 +1,7 @@
+#include "tip3p.itp"
+
+[ system ]
+Gas-Phase Water
+
+[ molecules ]
+SOL 1

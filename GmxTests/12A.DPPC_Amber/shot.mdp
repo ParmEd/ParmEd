@@ -1,0 +1,30 @@
+integrator = md
+nsteps = 500  
+dt = 0.002
+
+nstxout = 0   
+nstenergy = 0   
+nstlog = 0
+nstvout = 0
+nstxtcout = 0
+
+ns_type = grid
+nstlist = 1
+rlist = .8
+rcoulomb = .8
+rvdw = .8
+coulombtype = PME
+pme_order = 5
+fourierspacing = 0.05
+
+nstcomm = 1
+comm-mode = linear
+comm-grps = Water non-Water
+
+pbc = xyz
+DispCorr = EnerPres
+
+constraint_algorithm = lincs
+constraints = all-bonds
+lincs_iter = 1
+lincs_order = 4

@@ -1,34 +1,32 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+import utils
 
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
     has_openmm = True
 except ImportError:
-    from chemistry.amber.readparm import AmberParm, ChamberParm, Rst7
+    from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
     has_openmm = False
 
-from chemistry.amber import AmberParm, ChamberParm, Rst7
-import chemistry.unit as u
+from parmed.amber import AmberParm, ChamberParm, Rst7
+from parmed.openmm import load_topology
+import parmed.unit as u
+from parmed.utils.six.moves import range, zip
 from copy import copy
 from math import sqrt
-import ParmedTools as PT
+import os
+import parmed.tools as PT
+import sys
 import unittest
-import utils
-    
+
 get_fn = utils.get_fn
 
 if has_openmm:
-    # Make sure all precisions are double
-    for i in range(mm.Platform.getNumPlatforms()):
-        plat = mm.Platform.getPlatform(i)
-        if plat.getName() == 'CUDA':
-            plat.setPropertyDefaultValue('CudaPrecision', 'double')
-        if plat.getName() == 'OpenCL':
-            plat.setPropertyDefaultValue('OpenCLPrecision', 'double')
+    CPU = mm.Platform.getPlatformByName('CPU')
 
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
@@ -75,18 +73,19 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
         energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
 
-class TestAmberParm(utils.TestCaseRelative):
+class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
 
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
         parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    constraints=app.HBonds,
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 # Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
@@ -116,20 +115,64 @@ class TestAmberParm(utils.TestCaseRelative):
             for x1, x2 in zip(p, s):
                 # Compare large forces relatively and small ones absolutely
                 if abs(x1) > 1 or abs(x2) > 1:
-                    self.assertRelativeEqual(x1, x2, places=3)
+                    self.assertRelativeEqual(x1, x2, places=2)
                 else:
-                    self.assertAlmostEqual(x1, x2, delta=5e-4)
+                    self.assertAlmostEqual(x1, x2, delta=2e-2)
+
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping long tests")
+    def testRoundTripEP(self):
+        """ Test ParmEd -> OpenMM round trip with Amber EPs and PME """
+        parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   constraints=app.HBonds,
+                                   rigidWater=True,
+                                   flexibleConstraints=True)
+        system2 = load_topology(parm.topology, system).createSystem(
+                                    nonbondedMethod=app.PME,
+                                    nonbondedCutoff=8*u.angstroms,
+                                    constraints=app.HBonds,
+                                    rigidWater=True,
+                                    flexibleConstraints=True)
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
+        e1 = decomposed_energy(con1, parm)
+        e2 = decomposed_energy(con2, parm)
+        self.assertAlmostEqual(e1['bond'], e2['bond'])
+        self.assertAlmostEqual(e1['angle'], e2['angle'])
+        self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
+        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'], places=5)
+        # Check that we have the correct number of virtual sites
+        nvirt1 = nvirt2 = 0
+        for i in range(system.getNumParticles()):
+            nvirt1 += system.isVirtualSite(i)
+            nvirt2 += system2.isVirtualSite(i)
+        self.assertEqual(nvirt1, nvirt2)
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        state1 = con1.getState(getForces=True)
+        state2 = con2.getState(getForces=True)
+        f1 = state1.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        f2 = state2.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+
+        for p, s in zip(f1, f2):
+            for x1, x2 in zip(p, s):
+                self.assertAlmostEqual(x1, x2, places=3)
 
     def testEPEnergy2(self):
         """ Tests AmberParm handling of extra points in TIP5P water """
         parm = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    constraints=app.HBonds,
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0)
@@ -166,9 +209,10 @@ class TestAmberParm(utils.TestCaseRelative):
     def testGasEnergy(self):
         """ Compare Amber and OpenMM gas phase energies """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -182,12 +226,50 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
         self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
 
+    def testRoundTrip(self):
+        """ Test ParmEd -> OpenMM round trip with Amber gas phase """
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        system = parm.createSystem()
+        system2 = load_topology(parm.topology, system).createSystem()
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
+        e1 = decomposed_energy(con1, parm)
+        e2 = decomposed_energy(con2, parm)
+        self.assertAlmostEqual(e1['bond'], e2['bond'])
+        self.assertAlmostEqual(e1['angle'], e2['angle'])
+        self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
+        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'])
+
+    def testRoundTripXML(self):
+        """ Test ParmEd -> OpenMM round trip with Amber gas phase via XML """
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        system = parm.createSystem()
+        fname = get_fn('ash.xml', written=True)
+        with open(fname, 'w') as f:
+            f.write(mm.XmlSerializer.serialize(system))
+        system2 = load_topology(parm.topology, fname).createSystem()
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(parm.positions)
+        e1 = decomposed_energy(con1, parm)
+        e2 = decomposed_energy(con2, parm)
+        self.assertAlmostEqual(e1['bond'], e2['bond'])
+        self.assertAlmostEqual(e1['angle'], e2['angle'])
+        self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
+        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'])
+
     def testGB1Energy(self): # HCT (igb=1)
         """ Compare Amber and OpenMM GB (igb=1) energies (w/ and w/out salt) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -202,7 +284,7 @@ class TestAmberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -218,9 +300,10 @@ class TestAmberParm(utils.TestCaseRelative):
     def testGB2Energy(self): # OBC1 (igb=2)
         """ Compare Amber and OpenMM GB (igb=2) energies (w/ and w/out salt) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -235,7 +318,7 @@ class TestAmberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.OBC1,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -251,9 +334,10 @@ class TestAmberParm(utils.TestCaseRelative):
     def testGB5Energy(self): # OBC2 (igb=5)
         """ Compare Amber and OpenMM GB (igb=5) energies (w/ and w/out salt) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -268,7 +352,7 @@ class TestAmberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.OBC2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -284,11 +368,12 @@ class TestAmberParm(utils.TestCaseRelative):
     def testGB7Energy(self): # GBn (igb=7)
         """ Compare Amber and OpenMM GB (igb=7) energies (w/ and w/out salt) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
         system = parm.createSystem(implicitSolvent=app.GBn)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -303,7 +388,7 @@ class TestAmberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -319,11 +404,12 @@ class TestAmberParm(utils.TestCaseRelative):
     def testGB8Energy(self): # GBn2 (igb=8)
         """ Compare Amber and OpenMM GB (igb=8) energies (w/ and w/out salt) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
         system = parm.createSystem(implicitSolvent=app.GBn2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -338,7 +424,7 @@ class TestAmberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.GBn2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -354,9 +440,10 @@ class TestAmberParm(utils.TestCaseRelative):
     def testRst7(self):
         """ Test loading coordinates via the OpenMMRst7 class """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(Rst7.open(get_fn('ash.rst7')).positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -370,14 +457,16 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
         self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
 
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping long tests")
     def testEwald(self):
         """ Compare Amber and OpenMM Ewald energies """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.Ewald,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -394,11 +483,12 @@ class TestAmberParm(utils.TestCaseRelative):
     def testPME(self):
         """ Compare Amber and OpenMM PME energies """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -415,6 +505,8 @@ class TestAmberParm(utils.TestCaseRelative):
     def testDispersionCorrection(self):
         """ Compare Amber and OpenMM PME energies w/out vdW correction """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        sys.stdout.flush()
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -422,7 +514,7 @@ class TestAmberParm(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -439,13 +531,14 @@ class TestAmberParm(utils.TestCaseRelative):
     def testSHAKE(self):
         """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5,
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -458,6 +551,7 @@ class TestAmberParm(utils.TestCaseRelative):
         """ Compare Amber and OpenMM PME energies with NBFIX modifications """
         # For now, long-range correction is not available
         parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         PT.change(parm, 'CHARGE', ':*', 0).execute() # only check LJ energies
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
@@ -471,7 +565,7 @@ class TestAmberParm(utils.TestCaseRelative):
                 self.assertTrue(force.getUseLongRangeCorrection())
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =   193.6
@@ -489,13 +583,14 @@ class TestAmberParm(utils.TestCaseRelative):
     def test1264(self):
         """ Testing the 12-6-4 LJ potential in OpenMM """
         parm = AmberParm(get_fn('znf_1264.prmtop'), get_fn('znf.rst'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff)
         for force in system.getForces():
             if isinstance(force, mm.CustomNonbondedForce):
                 self.assertTrue(force.getUseLongRangeCorrection())
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 26.3947079, places=3)
@@ -506,13 +601,14 @@ class TestAmberParm(utils.TestCaseRelative):
     def test1012(self):
         """ Testing the 10-12 LJ H-bond potential in OpenMM """
         parm = AmberParm(get_fn('ff91.parm7'), get_fn('ff91.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
         for force in system.getForces():
             if isinstance(force, mm.CustomNonbondedForce):
                 self.assertTrue(force.getUseLongRangeCorrection())
         integrator = mm.VerletIntegrator(1*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0.9675961, places=3)
@@ -526,6 +622,7 @@ class TestAmberParm(utils.TestCaseRelative):
         # Constrain just bonds. Make sure 1000 angles remain, and we have 2000
         # constraints
         parm = AmberParm(get_fn('gaffwat.parm7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
                                    constraints=app.HBonds, rigidWater=False,
@@ -559,8 +656,9 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertEqual(system.getNumConstraints(), 3000)
 
     def testInterfacePBC(self):
-        """ Testing all OpenMMAmberParm.createSystem options (periodic) """
+        """ Testing all AmberParm.createSystem options (periodic) """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
                                    constraints=None, rigidWater=False,
@@ -661,8 +759,9 @@ class TestAmberParm(utils.TestCaseRelative):
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
     def testInterfaceNoPBC(self):
-        """ Testing all OpenMMAmberParm.createSystem options (non-periodic) """
+        """ Testing all AmberParm.createSystem options (non-periodic) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
                                    implicitSolvent=app.HCT,
@@ -767,9 +866,10 @@ class TestChamberParm(utils.TestCaseRelative):
         """ Compare OpenMM and CHAMBER gas phase energies """
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -791,9 +891,10 @@ class TestChamberParm(utils.TestCaseRelative):
         """Compare OpenMM and CHAMBER GB (igb=1) energies (w/ and w/out salt)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -812,7 +913,7 @@ class TestChamberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -833,9 +934,10 @@ class TestChamberParm(utils.TestCaseRelative):
         """Compare OpenMM and CHAMBER GB (igb=2) energies (w/ and w/out salt)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -854,7 +956,7 @@ class TestChamberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.OBC1,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -875,9 +977,10 @@ class TestChamberParm(utils.TestCaseRelative):
         """Compare OpenMM and CHAMBER GB (igb=5) energies (w/ and w/out salt)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -896,7 +999,7 @@ class TestChamberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.OBC2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -917,11 +1020,12 @@ class TestChamberParm(utils.TestCaseRelative):
         """Compare OpenMM and CHAMBER GB (igb=7) energies (w/ and w/out salt)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         system = parm.createSystem(implicitSolvent=app.GBn)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -940,7 +1044,7 @@ class TestChamberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -961,11 +1065,12 @@ class TestChamberParm(utils.TestCaseRelative):
         """Compare OpenMM and CHAMBER GB (igb=8) energies (w/ and w/out salt)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         system = parm.createSystem(implicitSolvent=app.GBn2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -984,7 +1089,7 @@ class TestChamberParm(utils.TestCaseRelative):
         system = parm.createSystem(implicitSolvent=app.GBn2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1005,9 +1110,10 @@ class TestChamberParm(utils.TestCaseRelative):
         """ Test using OpenMMRst7 to provide coordinates (CHAMBER) """
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         rst = Rst7.open(get_fn('ala_ala_ala.rst7')).positions
         sim.context.setPositions(rst)
         energies = decomposed_energy(sim.context, parm)
@@ -1026,19 +1132,95 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
 
-# Ewald is WAYYY to slow for a ~60K atom system. So just do PME and assume the
-# testInterfacePBC method below makes sure that Ewald is appropriately set when
-# requested
-
     def testPME(self):
         """ Compare OpenMM and CHAMBER PME energies """
-        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                           get_fn('dhfr_cmap_pbc.rst7'))
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+#Bond         =            1.1324222     Angle        =            1.0688008
+#Dihedral     =            7.8114302     Urey-Bradley =            0.0614241
+#Improper     =            0.0000000     CMAP         =            0.1267899
+#Nonbond      =         6514.4460318
+#TOTAL        =         6524.6468990
+        self.assertAlmostEqual(energies['bond'], 1.1324, delta=5e-3)
+        self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 7.8114, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 0)
+        self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
+        self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
+
+    def testDispersionCorrection(self):
+        """ Compare OpenMM and CHAMBER energies without vdW correction """
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   ewaldErrorTolerance=1e-5)
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce):
+                force.setUseDispersionCorrection(False)
+            elif isinstance(force, mm.CustomNonbondedForce):
+                force.setUseLongRangeCorrection(False)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim.context.setPositions(parm.positions)
+        energies = decomposed_energy(sim.context, parm)
+#Bond         =            1.1324222     Angle        =            1.0688008
+#Dihedral     =            7.8114302     Urey-Bradley =            0.0614241
+#Improper     =            0.0000000     CMAP         =            0.1267899
+#Nonbond      =         6584.1603528
+#TOTAL        =         6594.3612201
+        self.assertAlmostEqual(energies['bond'], 1.13242, delta=5e-5)
+        self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
+        self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
+        self.assertRelativeEqual(energies['nonbond'], 6584.1604, delta=5e-4)
+
+    def testSHAKE(self):
+        """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   ewaldErrorTolerance=1e-5,
+                                   flexibleConstraints=False,
+                                   constraints=app.HBonds)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim.context.setPositions(parm.positions)
+        # The only thing that changes here compared to the other periodic tests
+        # is the bond energy, which should be slightly smaller than before
+        state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
+                                     groups=2**parm.BOND_FORCE_GROUP)
+        energies = decomposed_energy(sim.context, parm)
+        self.assertAlmostEqual(energies['bond'], 1.13236, delta=5e-5)
+        self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
+        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
+        self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
+        self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
+        self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
+
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    def testBigPME(self):
+        """ Compare OpenMM and CHAMBER PME energies on big system """
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
+                           get_fn('dhfr_cmap_pbc.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   ewaldErrorTolerance=1e-5)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1056,10 +1238,12 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
 
-    def testDispersionCorrection(self):
-        """ Compare OpenMM and CHAMBER energies without vdW correction """
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    def testBigDispersionCorrection(self):
+        """ Compare OpenMM and CHAMBER w/out vdW corr on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                            get_fn('dhfr_cmap_pbc.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
@@ -1067,7 +1251,7 @@ class TestChamberParm(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1085,17 +1269,19 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
 
-    def testSHAKE(self):
-        """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
+    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    def testBigSHAKE(self):
+        """ Compare OpenMM and CHAMBER PME excluding SHAKEn bonds (big) """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
                            get_fn('dhfr_cmap_pbc.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5,
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -1103,11 +1289,12 @@ class TestChamberParm(utils.TestCaseRelative):
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
         self.assertAlmostEqual(bond, 139.2453, delta=5e-4)
-        
+
     def testInterfacePBC(self):
         """ Testing all OpenMMChamberParm.createSystem options (periodic) """
-        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                           get_fn('dhfr_cmap_pbc.rst7'))
+        parm = ChamberParm(get_fn('ala3_solv.parm7'),
+                           get_fn('ala3_solv.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
                                    constraints=None, rigidWater=False,
@@ -1228,6 +1415,7 @@ class TestChamberParm(utils.TestCaseRelative):
         """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
+        self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
                                    implicitSolvent=app.HCT,

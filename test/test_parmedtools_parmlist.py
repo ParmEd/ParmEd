@@ -1,11 +1,12 @@
 """
 Tests the ParmList class
 """
-from chemistry.amber import AmberParm, ChamberParm, AmoebaParm
-from chemistry.charmm import CharmmPsfFile
-from ParmedTools import ParmList
-import unittest
 from utils import get_fn
+from parmed import Structure
+from parmed.amber import AmberParm, ChamberParm, AmoebaParm
+from parmed.charmm import CharmmPsfFile
+from parmed.tools import ParmList
+import unittest
 
 class TestParmList(unittest.TestCase):
 
@@ -125,3 +126,10 @@ class TestParmList(unittest.TestCase):
         self.assertIs(parms.parm, ala3)
         parms.set_new_active(get_fn('ala_ala_ala.psf'))
         self.assertIs(parms.parm, aaa)
+
+    def testAddMol2(self):
+        """ Test adding Mol2 file to ParmList """
+        parms = ParmList()
+        parms.add_parm(get_fn('tripos9.mol2'))
+        self.assertEqual(len(parms), 1)
+        self.assertIsInstance(parms[0], Structure)
