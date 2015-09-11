@@ -10,6 +10,7 @@ import parmed.namd as namd
 class TestNamdBin(unittest.TestCase):
     """Test the NamdBinCoor class."""
     def testRead(self):
+        """ Test reading NamdBinCoor file """
         coor = namd.NamdBinCoor.read(get_fn('ala_ala_ala.coor'))
         self.assertEqual(coor.natom,33)
 
