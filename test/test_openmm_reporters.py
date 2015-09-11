@@ -1,25 +1,25 @@
 """
-This module tests the various reporters included in the chemistry package
+This module tests the various reporters included in the parmed package
 """
+from __future__ import division, print_function
+import utils
 
 try:
     import simtk.openmm as mm
     from simtk.openmm import app
-    import simtk.unit as u
-    from chemistry.openmm.reporters import (NetCDFReporter, MdcrdReporter,
-                    ProgressReporter, RestartReporter, AmberStateDataReporter,
-                    EnergyMinimizerReporter)
-    from chemistry.amber.openmmloader import OpenMMAmberParm as AmberParm
     has_openmm = True
+    CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
-    from chemistry.amber.readparm import AmberParm
     has_openmm = False
-
-from chemistry.amber import HAS_NETCDF
-from chemistry.amber.asciicrd import AmberMdcrd, AmberAsciiRestart
-from chemistry.amber.netcdffiles import NetCDFTraj, NetCDFRestart
+import numpy as np
 import os
-import utils
+from parmed import unit as u
+from parmed.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
+                AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
+from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
+                ProgressReporter, RestartReporter, StateDataReporter,
+                EnergyMinimizerReporter)
+from parmed.utils.six.moves import range, zip
 import unittest
 
 get_fn = utils.get_fn
@@ -27,42 +27,32 @@ get_fn = utils.get_fn
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
 
-class TestStateDataReporter(unittest.TestCase):
-
-    def setUp(self):
-        if not os.path.isdir(get_fn('writes')):
-            os.makedirs(get_fn('writes'))
-
-    def tearDown(self):
-        for f in os.listdir(get_fn('writes')):
-            os.unlink(get_fn(f, written=True))
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+class TestStateDataReporter(utils.FileIOTestCase):
 
     def testStateDataReporter(self):
-        """ Test AmberStateDataReporter with various options """
+        """ Test StateDataReporter with various options """
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=CPU)
         sim.context.setPositions(amber_gas.positions)
         f = open(get_fn('akma5.dat', written=True), 'w')
         sim.reporters.extend([
-            AmberStateDataReporter(get_fn('akma1.dat', written=True), 10),
-            AmberStateDataReporter(get_fn('akma2.dat', written=True), 10,
-                                   time=False, potentialEnergy=False,
-                                   kineticEnergy=False, totalEnergy=False,
-                                   temperature=False),
-            AmberStateDataReporter(get_fn('akma3.dat', written=True), 10,
-                                   volume=True, density=True),
-            AmberStateDataReporter(get_fn('akma4.dat', written=True), 10,
-                                   separator='\t'),
-            AmberStateDataReporter(get_fn('units.dat', written=True), 10,
-                                   volume=True, density=True,
-                                   energyUnit=u.kilojoules_per_mole,
-                                   temperatureUnit=u.kelvin,
-                                   volumeUnit=u.milliliters,
-                                   densityUnit=u.kilograms/u.item/u.meter**3,
-                                   timeUnit=u.femtoseconds),
-            AmberStateDataReporter(f, 10)
+            StateDataReporter(get_fn('akma1.dat', written=True), 10),
+            StateDataReporter(get_fn('akma2.dat', written=True), 10,
+                              time=False, potentialEnergy=False,
+                              kineticEnergy=False, totalEnergy=False,
+                              temperature=False),
+            StateDataReporter(get_fn('akma3.dat', written=True), 10,
+                              volume=True, density=True),
+            StateDataReporter(get_fn('akma4.dat', written=True), 10,
+                              separator='\t'),
+            StateDataReporter(get_fn('units.dat', written=True), 10,
+                              volume=True, density=True,
+                              energyUnit=u.kilojoules_per_mole,
+                              volumeUnit=u.nanometers**3),
+            StateDataReporter(f, 10)
         ])
         sim.step(500)
         f.close()
@@ -132,11 +122,8 @@ class TestStateDataReporter(unittest.TestCase):
         akma5.close()
         # UNITS -- compare other units
         ene = u.kilojoule_per_mole.conversion_factor_to(u.kilocalorie_per_mole)
-        time = u.femtoseconds.conversion_factor_to(u.picoseconds)
-        volume = u.milliliters.conversion_factor_to(u.angstroms**3)
-        density = 1/(u.grams/u.milliliter).conversion_factor_to(
-                        u.kilograms/u.meter**3)
-        conversions = [1, time, ene, ene, ene, 1, volume, density]
+        volume = u.nanometers.conversion_factor_to(u.angstroms)**3
+        conversions = [1, 1, ene, ene, ene, 1, volume, 1]
         headers = units.readline().strip()[1:].split(',')
         self.assertEqual(len(headers), 8)
         for i, line in enumerate(units):
@@ -153,16 +140,14 @@ class TestStateDataReporter(unittest.TestCase):
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=CPU)
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.append(
             ProgressReporter(get_fn('progress_reporter.dat', written=True), 10,
                              500, step=True, time=True, potentialEnergy=True,
                              kineticEnergy=True, totalEnergy=True,
                              temperature=True, volume=True, density=True,
-                             systemMass=None,
-                             energyUnit=u.kilocalories_per_mole,
-                             volumeUnit=u.angstroms**3)
+                             systemMass=None)
         )
         sim.step(500)
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
@@ -173,22 +158,15 @@ class TestStateDataReporter(unittest.TestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
-class TestTrajRestartReporter(unittest.TestCase):
-
-    def setUp(self):
-        if not os.path.isdir(get_fn('writes')):
-            os.makedirs(get_fn('writes'))
-
-    def tearDown(self):
-        for f in os.listdir(get_fn('writes')):
-            os.unlink(get_fn(f, written=True))
+@unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
+class TestTrajRestartReporter(utils.FileIOTestCase):
 
     def testReporters(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (no PBC) """
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_gas.topology, system, integrator)
+        sim = app.Simulation(amber_gas.topology, system, integrator, platform=CPU)
         sim.context.setPositions(amber_gas.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj1.nc', written=True), 10),
@@ -262,24 +240,17 @@ class TestTrajRestartReporter(unittest.TestCase):
         fn = get_fn('restart.ncrst.%d', written=True)
         for i, j in enumerate(range(10, 501, 10)):
             ncrst = NetCDFRestart.open_old(fn % j)
-            self.assertEqual(ncrst.coordinates.shape, (75,))
-            self.assertEqual(ncrst.velocities.shape, (75,))
-            flatcrdr = ncrst.coordinates
-            flatvelr = ncrst.velocities
-            flatcrdt = ntraj[1].coordinates(i)
-            flatvelt = ntraj[1].velocities(i)
-            for x1, x2 in zip(flatcrdr, flatcrdt):
-                self.assertAlmostEqual(x1, x2, places=6)
-            for v1, v2 in zip(flatvelr, flatvelt):
-                # Lose a place of precision due to scaling/rescaling
-                self.assertAlmostEqual(v1, v2, places=5)
+            self.assertEqual(ncrst.coordinates.shape, (1, 25, 3))
+            self.assertEqual(ncrst.velocities.shape, (1, 25, 3))
+            np.testing.assert_allclose(ncrst.coordinates[0],
+                                       ntraj[1].coordinates[i])
+            np.testing.assert_allclose(ncrst.velocities[0],
+                                       ntraj[1].velocities[i], rtol=1e-6)
         # Now test the ASCII restart file
         f = AmberAsciiRestart(get_fn('restart.rst7', written=True), 'r')
         # Compare to ncrst and make sure it's the same data
-        for x1, x2 in zip(flatcrdr, f.coordinates):
-            self.assertAlmostEqual(x1, x2, places=4) # limited ASCII precision
-        for v1, v2 in zip(flatvelr, f.velocities):
-            self.assertAlmostEqual(v1, v2, places=4) # limited ASCII precision
+        np.testing.assert_allclose(ncrst.coordinates, f.coordinates, rtol=1e-4)
+        np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-3)
 
     def testReportersPBC(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (w/ PBC) """
@@ -287,7 +258,7 @@ class TestTrajRestartReporter(unittest.TestCase):
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_solv.topology, system, integrator)
+        sim = app.Simulation(amber_solv.topology, system, integrator, CPU)
         sim.context.setPositions(amber_solv.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj.nc', written=True), 1,
@@ -309,16 +280,10 @@ class TestTrajRestartReporter(unittest.TestCase):
         self.assertTrue(ntraj.hasvels)
         self.assertTrue(ntraj.hasfrcs)
         for i in range(ntraj.frame):
-            self.assertAlmostEqual
-            for x1, x2 in zip(ntraj.box(i), atraj.box(i)):
+            for x1, x2 in zip(ntraj.box[i], atraj.box[i]):
                 self.assertAlmostEqual(x1, x2, places=3)
         self.assertEqual(len(nrst.box), 6)
         self.assertEqual(len(arst.box), 6)
-
-if not has_openmm:
-    del TestStateDataReporter, TestTrajRestartReporter
-elif not HAS_NETCDF:
-    del TestTrajReporter.TestNetCDFReporter
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,11 +1,19 @@
 language: python
 
+sudo: false
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++
+            - gromacs
+
 env:
     matrix:
-        - PYTHON_VERSION=2.7 
-        - PYTHON_VERSION=2.7 NO_NUMPY=yes
-        - PYTHON_VERSION=3.3 
-        - PYTHON_VERSION=3.4 
+        - PYTHON_VERSION=2.7
+        - PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes
+        - PYTHON_VERSION=3.4
 
 install:
     - source devtools/travis-ci/install.sh
@@ -13,6 +21,12 @@ install:
     - python setup.py install
 
 script:
+    # Skip tests that use a lot of memory so Travis doesn't sporadically kill
+    # them. Also fix the number of running threads to 1.
+    - export PARMED_SKIP_BIG_TESTS=1
+    - export OPENMM_CPU_THREADS=1
+    - echo "Checking parmed source with pyflakes linter"
+    - devtools/travis-ci/pyflakes_check.sh
     - cd test
     - echo "Using `which python` (`python -V`)::"
     - nosetests -vs .

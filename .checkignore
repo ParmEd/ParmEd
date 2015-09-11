@@ -1,0 +1,6 @@
+GmxTests/
+parmed/utils/six.py
+parmed/utils/fortranformat
+parmed/unit
+test/
+parmed/formats/pdbx/

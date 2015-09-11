@@ -1,4 +1,4 @@
-Dimensional Analysis (working with :mod:`chemistry.unit`)
+Dimensional Analysis (working with :mod:`parmed.unit`)
 =========================================================
 
 The :mod:`unit` package was originally developed by Christopher M. Bruns at
@@ -24,14 +24,14 @@ units. Not doing so can result in `a very costly mistake
 In all of the examples below, I will assume that the :mod:`unit` package has
 been imported as follows::
 
-    from chemistry import unit as u
+    from parmed import unit as u
 
-What does :mod:`chemistry.unit` do?
+What does :mod:`parmed.unit` do?
 -----------------------------------
 
 The main classes in the :mod:`unit` module are shown below:
 
-.. currentmodule:: chemistry.unit
+.. currentmodule:: parmed.unit
 .. autosummary::
     :toctree: unitobj/
     
@@ -84,7 +84,7 @@ There may be times when you want to see if a Python object is a
 :class:`Quantity` instance, or if it is just a raw number. Many functions in
 ParmEd do this when taking user input, converting to its internal AKMA unit
 system (see below). Checking that an object is a :class:`Quantity` is done using
-the :func:`is_quantity` function in the ``chemistry.unit`` namespace::
+the :func:`is_quantity` function in the ``parmed.unit`` namespace::
 
     >>> x = 1
     >>> y = 1 * u.nanometers
@@ -113,11 +113,7 @@ You can create a unit in one of two ways:
            Quantity(value=1, unit=/(meter**3))
 
 Seems easy enough, and I usually use method 2 when turning a ``float``, ``int``,
-``list``, or ``tuple`` into a :class:`Quantity`. However, this does *not* work
-for numpy arrays, since numpy arrays overload all of the multiplication
-operators (``__mul__``, ``__imul__``, ... etc.), which is the mechanism by which
-unit multiplication creates a :class:`Quantity`. As a result, you *must* use
-method #1 when converting a ``numpy.ndarray`` into a :class:`Quantity`.
+``list``, or ``tuple`` into a :class:`Quantity`.
 
 Converting to another unit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -229,7 +225,7 @@ Available :class:`UnitSystem` options
 -------------------------------------
 
 The :mod:`unit` module contains a number of :class:`UnitSystem` instances
-available in the ``chemistry.unit`` namespace. They are summarized in the table
+available in the ``parmed.unit`` namespace. They are summarized in the table
 below, along with the units defining them (the energy unit is a composite of the
 mass unit times the square of the ratio of the length-to-time units):
 

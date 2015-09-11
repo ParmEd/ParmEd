@@ -1,0 +1,25 @@
+integrator	= md
+dt		= 0.001
+nsteps		= 0		; Maximum number of (minimization) steps to perform
+nstxout 	= 0
+nstfout		= 1		; Forces (important)
+nstenergy	= 1		; Write energies to disk every nstenergy steps
+nstxtcout	= 0		; Write coordinates to disk every nstxtcout steps
+xtc_grps	= System	; Which coordinate group(s) to write to disk
+energygrps	= System	; Which energy group(s) to write to disk
+
+nstlist		= 1
+ns_type		= simple
+rlist		= 0.9
+vdwtype		= cut-off
+cutoff-scheme   = Verlet
+coulombtype	= pme
+pme-order       = 5
+fourier-nx      = 152
+fourier-ny      = 152
+fourier-nz      = 152
+rcoulomb	= 0.9
+rvdw		= 0.9
+constraints	= h-bonds
+pbc		= xyz
+dispcorr        = EnerPres

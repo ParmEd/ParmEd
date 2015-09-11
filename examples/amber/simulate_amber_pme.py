@@ -8,14 +8,12 @@ import simtk.openmm as mm
 import simtk.openmm.app as app
 
 # ParmEd Imports
-from chemistry.amber.openmmloader import AmberParm
-from chemistry.charmm.parameters import CharmmParameterSet
-from chemistry.openmm.reporters import StateDataReporter, NetCDFReporter
-from chemistry import unit as u
+from parmed import load_file, unit as u
+from parmed.openmm import StateDataReporter, NetCDFReporter
 
 # Load the Amber files
 print('Loading AMBER files...')
-ala2_solv = AmberParm('ala2_solv.parm7', 'ala2_solv.rst7')
+ala2_solv = load_file('ala2_solv.parm7', 'ala2_solv.rst7')
 
 # Create the OpenMM system
 print('Creating OpenMM System')

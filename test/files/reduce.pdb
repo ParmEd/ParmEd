@@ -1,0 +1,60 @@
+USER  MOD reduce.3.24.130724 H: found=0, std=0, add=22, rem=0, adj=3
+USER  MOD -----------------------------------------------------------------
+USER  MOD scores for adjustable sidechains, with "set" totals for H,N and Q
+USER  MOD "o" means original, "f" means flipped, "180deg" is methyl default
+USER  MOD "!" flags a clash with an overlap of 0.40A or greater
+USER  MOD flip categories: "K"=keep, "C"=clashes, "X"=uncertain, "F"=flip
+USER  MOD Single : A   1 SAM CE  :methyl  153:sc=  -0.439   (180deg=-1.86!)
+USER  MOD Single : A   1 SAM O2' :   rot  -10:sc=   0.447
+USER  MOD Single : A   1 SAM O3' :   rot  180:sc=   0.342
+USER  MOD -----------------------------------------------------------------
+ATOM      1  N   SAM A   1      13.442  -4.519  10.723  1.00 38.99           N
+ATOM      2  CA  SAM A   1      14.054  -5.503  11.618  1.00 39.75           C
+ATOM      3  C   SAM A   1      15.378  -5.083  12.261  1.00 41.05           C
+ATOM      4  O   SAM A   1      15.787  -5.709  13.238  1.00 37.10           O
+ATOM      5  OXT SAM A   1      16.055  -4.138  11.847  1.00 42.17           O
+ATOM      6  CB  SAM A   1      14.199  -6.849  10.928  1.00 32.71           C
+ATOM      7  CG  SAM A   1      12.851  -7.410  10.509  1.00 34.13           C
+ATOM      8  SD  SAM A   1      13.035  -9.068   9.829  1.00 38.63           S
+ATOM      9  CE  SAM A   1      13.965  -9.852  11.163  1.00 29.15           C
+ATOM     10  C5' SAM A   1      14.376  -8.793   8.648  1.00 36.75           C
+ATOM     11  C4' SAM A   1      13.836  -8.282   7.325  1.00 40.53           C
+ATOM     12  O4' SAM A   1      13.221  -7.025   7.492  1.00 37.35           O
+ATOM     13  C3' SAM A   1      14.925  -8.055   6.295  1.00 43.26           C
+ATOM     14  O3' SAM A   1      15.053  -9.221   5.521  1.00 46.35           O
+ATOM     15  C2' SAM A   1      14.393  -6.905   5.464  1.00 41.83           C
+ATOM     16  O2' SAM A   1      13.843  -7.455   4.288  1.00 44.78           O
+ATOM     17  C1' SAM A   1      13.305  -6.244   6.313  1.00 37.67           C
+ATOM     18  N9  SAM A   1      13.739  -4.897   6.734  1.00 34.43           N
+ATOM     19  C8  SAM A   1      12.975  -3.756   6.730  1.00 36.79           C
+ATOM     20  N7  SAM A   1      13.713  -2.730   7.213  1.00 39.34           N
+ATOM     21  C5  SAM A   1      14.947  -3.204   7.524  1.00 40.88           C
+ATOM     22  C6  SAM A   1      16.089  -2.601   8.047  1.00 38.30           C
+ATOM     23  N6  SAM A   1      16.108  -1.300   8.338  1.00 32.91           N
+ATOM     24  N1  SAM A   1      17.220  -3.361   8.257  1.00 36.94           N
+ATOM     25  C2  SAM A   1      17.228  -4.702   7.959  1.00 33.31           C
+ATOM     26  N3  SAM A   1      16.088  -5.286   7.452  1.00 36.20           N
+ATOM     27  C4  SAM A   1      14.966  -4.562   7.241  1.00 36.62           C
+ATOM      0 HO3' SAM A   1      15.653  -9.110   4.944  1.00 46.35           H   new
+ATOM      0 HO2' SAM A   1      14.049  -8.268   4.235  1.00 44.78           H   new
+ATOM      0 HN62 SAM A   1      16.820  -0.942   8.660  1.00 32.91           H   new
+ATOM      0 HN61 SAM A   1      15.408  -0.819   8.203  1.00 32.91           H   new
+ATOM      0 H5'2 SAM A   1      15.007  -8.153   9.013  1.00 36.75           H   new
+ATOM      0 H5'1 SAM A   1      14.861  -9.621   8.506  1.00 36.75           H   new
+ATOM      0  HN2 SAM A   1      12.697  -4.698  10.332  1.00 38.99           H   new
+ATOM      0  HN1 SAM A   1      13.827  -3.762  10.588  1.00 38.99           H   new
+ATOM      0  HG2 SAM A   1      12.254  -7.433  11.273  1.00 34.13           H   new
+ATOM      0  HG1 SAM A   1      12.444  -6.828   9.848  1.00 34.13           H   new
+ATOM      0  HE3 SAM A   1      13.787 -10.805  11.165  1.00 29.15           H   new
+ATOM      0  HE2 SAM A   1      14.914  -9.701  11.028  1.00 29.15           H   new
+ATOM      0  HE1 SAM A   1      13.695  -9.471  12.013  1.00 29.15           H   new
+ATOM      0  HB2 SAM A   1      14.768  -6.754  10.148  1.00 32.71           H   new
+ATOM      0  HB1 SAM A   1      14.639  -7.474  11.525  1.00 32.71           H   new
+ATOM      0  HA  SAM A   1      13.431  -5.573  12.359  1.00 39.75           H   new
+ATOM      0  H8  SAM A   1      12.055  -3.695   6.429  1.00 36.79           H   new
+ATOM      0  H4' SAM A   1      13.217  -8.966   7.024  1.00 40.53           H   new
+ATOM      0  H3' SAM A   1      15.798  -7.858   6.670  1.00 43.26           H   new
+ATOM      0  H2' SAM A   1      15.072  -6.256   5.220  1.00 41.83           H   new
+ATOM      0  H2  SAM A   1      18.028  -5.232   8.104  1.00 33.31           H   new
+ATOM      0  H1' SAM A   1      12.473  -6.182   5.818  1.00 37.67           H   new
+END

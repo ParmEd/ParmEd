@@ -1,0 +1,7 @@
+glycosdic bond torsion modifications to parm99-bsc0 from Chen and Garcia (PNAS, 2013, 110, 16820)
+
+DIHE
+OS-CT-N*-CK    1       0.760994   50.0         1.0
+OS-CT-N*-CM    1       0.760994   50.0        -1.0
+OS-CT-N*-CM    1       0.505314   74.0         2.0
+

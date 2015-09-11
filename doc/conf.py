@@ -18,11 +18,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-
-cwd = os.path.abspath(os.path.split(sys.argv[0])[0])
-
-sys.path.insert(0, os.path.abspath(os.path.join(cwd, '..')))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -278,7 +274,7 @@ texinfo_documents = [
 # Create the .rst file for the ParmEd reference automatically from the
 # docstrings
 
-from ParmedTools import ParmedActions as act
+from parmed.tools import actions as act
 
 help_args = []
 
@@ -365,11 +361,11 @@ def _process_docstring(doc, currcmd):
     return '\n'.join(lines)
 
 keylist = sorted(act.COMMANDMAP.keys())
-# Construct the docs from ParmedActions
+# Construct the docs from parmed.tools.actions 
 for action in keylist:
     usage = act.Usages[action.lower()]
     actname = act.COMMANDMAP[action].__name__
-    # Some actions are part of the interpreter, NOT members of ParmedTools.
+    # Some actions are part of the interpreter, NOT members of parmed.tools.
     # Special-case those here
     if action == 'help':
         help_args.append("""
@@ -408,7 +404,7 @@ quit
 
     %s
 
-Quits ``parmed.py`` *without* running any final parmout_ command.
+Quits ``parmed`` *without* running any final parmout_ command.
 
 """ % usage)
         continue
@@ -424,25 +420,25 @@ with open('parmed.rst', 'w') as f:
     f.write(r""".. Do NOT modify this file directly. conf.py creates it.
 .. modify conf.py instead
 
-Using ``parmed.py``
-===================
+Using ``parmed``
+================
 
 This page details using the command-line version of ParmEd, which is the
-primary front-end program using the :mod:`chemistry` and :mod:`ParmedTools`
+primary front-end program using the :mod:`parmed` and :mod:`parmed.tools`
 packages to provide a set of *Actions* by which you can modify a system topology
 and parameters (it currently only works for Amber topology files, although
-support for the entire :class:`Structure <chemistry.structure.Structure>`
+support for the entire :class:`Structure <parmed.structure.Structure>`
 hierarchy is planned).
 
 There are two ways in which ParmEd can be run---in batch reading from an input
 file or *script*, and with an interactive interpreter. A script can either be
-given to ``parmed.py`` on the command-line, or fed via pipes through standard
+given to ``parmed`` on the command-line, or fed via pipes through standard
 input. You can provide an input file using the ``-i/--input`` flag.
 
 Command syntax
 --------------
 
-All actions should be specified on the ``parmed.py`` command-line in the
+All actions should be specified on the ``parmed`` command-line in the
 following format:
 
 .. code-block:: none
@@ -462,7 +458,7 @@ Available commands
 ------------------
 
 The following ``Action`` commands are available in ParmEd. The information here
-is available via the help_ command in the ``parmed.py`` interpreter.
+is available via the help_ command in the ``parmed`` interpreter.
 
 %s
 
@@ -576,16 +572,16 @@ confusing, so I will try to walk through it carefully.
 Limited Embedded Python Interpreter
 -----------------------------------
 
-``parmed.py`` also comes equipped with a fully-fledged Python interpreter under
+``parmed`` also comes equipped with a fully-fledged Python interpreter under
 the hood.  You can run individual Python commands by starting the command with a
-bang (``!``).  A double-bang (``!!``) indicates to ``parmed.py`` that a
+bang (``!``).  A double-bang (``!!``) indicates to ``parmed`` that a
 multi-line Python code segment follows, and to interpret everything that comes
 afterwards as Python code until another double-bang line (``!!``) appears. If
 you are typing at the prompt inside the interpreter, the prompt changes to
 ``py >>>`` to indicate you are in the Python interpreter.
 
 Note that running Python code can be insecure if the source of that code is
-untrusted.  As a result, ``parmed.py`` will refuse to execute raw Python code
+untrusted.  As a result, ``parmed`` will refuse to execute raw Python code
 unless you explicitly give the interpreter permission to do so with the ``-e``
 command-line flag.
 
@@ -594,7 +590,7 @@ A simple example is shown below (input follows the prompts ``>`` and ``py
 
 .. code-block:: none
 
-    $ parmed.py -e
+    $ parmed -e
     
                                       /^^^/           /]
                                      /   ]           / ]
@@ -646,7 +642,7 @@ wince.
 Perhaps of the most importance, however, is that the topology file list is made
 available to you in the Python interpreter namespace as the name
 ``amber_prmtop``, which is an instance of :class:`ParmList
-<ParmedTools.parmlist.ParmList>`. So ``amber_prmtop.parm`` is the currently
+<parmed.tools.parmlist.ParmList>`. So ``amber_prmtop.parm`` is the currently
 active parameter-topology object.
 
 Let's have a look at how we might be able to use that:
@@ -689,7 +685,7 @@ Python interpreter is ``amber_prmtop`` (and ``type(self)``, but only in Python
 ``cmd.Cmd``).
 
 So you can attach your function to the :class:`ParmList
-<ParmedTools.parmlist.ParmList>` object ``amber_prmtop`` and retrieve it from
+<parmed.tools.parmlist.ParmList>` object ``amber_prmtop`` and retrieve it from
 there later.  Be careful not to clobber a critical attribute of that class,
 though!  This trick is demonstrated continuing from the interpreter session from
 above:
@@ -724,15 +720,15 @@ that this alternative also worked:
 So it seemed rather fruitless to prohibit behavior that was so easy to work
 around!
 
-Using ``xparmed.py``
+Using ``xparmed``
 ====================
 
-An alternative to running the command-line-based ``parmed.py`` program is to use
-the *Tkinter*\ -based GUI front-end, ``xparmed.py``.  Note that not all actions
-have been implemented in ``xparmed.py``---if the one you need gives a message to
-this effect, you will need to use ``parmed.py`` instead.
+An alternative to running the command-line-based ``parmed`` program is to use
+the *Tkinter*\ -based GUI front-end, ``xparmed``.  Note that not all actions
+have been implemented in ``xparmed``---if the one you need gives a message to
+this effect, you will need to use ``parmed`` instead.
 
-``xparmed.py`` is significantly more limited.  It cannot be scripted, and it
+``xparmed`` is significantly more limited.  It cannot be scripted, and it
 cannot process multiple topology files in the same session.  It may, however,
 help you learn ParmEd better as well as lessen the learning curve for performing
 basic tasks.
