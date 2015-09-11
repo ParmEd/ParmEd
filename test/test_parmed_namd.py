@@ -1,11 +1,11 @@
 """
-Tests the chemistry/namd module
+Tests the parmed/namd module
 """
 import unittest
 import os
 
 from utils import get_fn, has_numpy
-import chemistry.namd as namd
+import parmed.namd as namd
 
 class TestNamdBin(unittest.TestCase):
     """Test the NamdBinCoor class."""

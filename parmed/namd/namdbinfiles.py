@@ -7,6 +7,7 @@ from struct import unpack, pack
 
 import numpy as np
 
+
 class NamdBinFile(object):
     """From the NAMD manual:
 
