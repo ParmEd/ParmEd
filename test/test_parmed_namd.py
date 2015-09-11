@@ -8,18 +8,16 @@ from utils import get_fn, has_numpy
 import parmed.namd as namd
 
 class TestNamdBin(unittest.TestCase):
-    """Test the NamdBinCoor class."""
-    def testRead(self):
+    """Test the NamdBinFile classes."""
+    def testCoorRead(self):
         """ Test reading NamdBinCoor file """
         coor = namd.NamdBinCoor.read(get_fn('ala_ala_ala.coor'))
         self.assertEqual(coor.natom,33)
 
-class TestNamdVel(unittest.TestCase):
-     """Test the NamdBinVel class."""
-     def testRead(self):
+    def testVelRead(self):
+        """ Test reading NamdBinVel file """
         vel = namd.NamdBinVel.read(get_fn('ala_ala_ala.vel'))
         self.assertEqual(vel.natom,33)
-        vel.write('test.vel')
 
 if __name__ == '__main__':
     unittest.main()

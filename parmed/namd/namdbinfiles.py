@@ -27,7 +27,7 @@ class NamdBinFile(object):
     See NamdBinCoor and NamdBinVel.
     """
     SCALE_FACTOR = 1.0
-    def __init__(self, values):
+    def __init__(self, values=[]):
         self._values = np.asarray(values,np.float64) * self.SCALE_FACTOR
 
     @property
