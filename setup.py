@@ -14,7 +14,7 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
-            'parmed.utils', 'parmed.gromacs', 'parmed.tools',
+            'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm
