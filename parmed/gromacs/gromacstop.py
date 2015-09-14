@@ -1295,7 +1295,7 @@ class GromacsTopologyFile(Structure):
                 parfile.write('bond_type ')
             if print_atnum:
                 parfile.write('at.num    ')
-            parfile.write('mass    charge ptype  sigma      espilon\n')
+            parfile.write('mass    charge ptype  sigma      epsilon\n')
             econv = u.kilocalories.conversion_factor_to(u.kilojoules)
             for key, atom_type in iteritems(params.atom_types):
                 parfile.write('%-7s ' % atom_type)
