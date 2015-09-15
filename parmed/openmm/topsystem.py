@@ -6,6 +6,7 @@ from __future__ import division, print_function, absolute_import
 
 __all__ = ['load_topology']
 
+from parmed.constants import OPENMM_ELECTROSTATIC, PARMED_ELECTROSTATIC
 from parmed.exceptions import OpenMMWarning
 from parmed.geometry import box_vectors_to_lengths_and_angles
 from parmed.periodic_table import Element
@@ -351,6 +352,7 @@ def _process_nonbonded(struct, force):
     typemap = dict()
     element_typemap = defaultdict(int)
     assert force.getNumParticles() == len(struct.atoms), "Atom # mismatch"
+    chg_scale = OPENMM_ELECTROSTATIC / PARMED_ELECTROSTATIC
     for i in range(force.getNumParticles()):
         atom = struct.atoms[i]
         chg, sig, eps = force.getParticleParameters(i)

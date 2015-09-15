@@ -8,14 +8,15 @@ Date: Apr. 13, 2015
 """
 from __future__ import division, print_function, absolute_import
 from copy import copy as _copy
-from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
-                    DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
-from parmed.constants import TINY
+from parmed.constants import TINY, CHARMM_ELECTROSTATIC, PARMED_ELECTROSTATIC
 from parmed.exceptions import CharmmError
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
+from parmed.topologyobjects import (Atom, AtomType, BondType, AngleType,
+                    DihedralType, DihedralTypeList, ImproperType, CmapType,
+                    NoUreyBradley)
 from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, integer_types
 from parmed.utils.six.moves import zip
@@ -805,6 +806,7 @@ class CharmmParameterSet(ParameterSet):
                     line = next(f)
                     group = []
                     ictable = []
+                    chg_scale = CHARMM_ELECTROSTATIC / PARMED_ELECTROSTATIC
                     while line:
                         line = line.lstrip()
                         if line[:5].upper() == 'GROUP':
@@ -815,7 +817,7 @@ class CharmmParameterSet(ParameterSet):
                             words = line.split()
                             name = words[1].upper()
                             type = words[2].upper()
-                            charge = float(words[3])
+                            charge = float(words[3]) * chg_scale
                             atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)

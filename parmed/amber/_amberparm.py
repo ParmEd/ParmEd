@@ -91,8 +91,8 @@ class AmberParm(AmberFormat, Structure):
         `flag_list` is a key to those 3 dicts and no other keys exist
     charge_flag : str='CHARGE'
         The name of the name of the FLAG that describes partial atomic charge
-        data. If this flag is found, then its data are multiplied by the
-        ELECTROSTATIC_CONSTANT to convert back to fractions of electrons
+        data. If this flag is found, then its data are multiplied by
+        ELECTROSTATIC to convert back to fractions of electrons
     version : str
         The VERSION string from the Amber file
     name : str

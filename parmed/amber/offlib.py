@@ -7,13 +7,14 @@ from __future__ import print_function
 from collections import OrderedDict
 from contextlib import closing
 import numpy as np
-from parmed import Atom
-from parmed.constants import RAD_TO_DEG
+from parmed import periodic_table as pt
+from parmed.constants import (RAD_TO_DEG, AMBER_ELECTROSTATIC,
+        PARMED_ELECTROSTATIC)
 from parmed.exceptions import AmberWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from parmed.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
-from parmed import periodic_table as pt
+from parmed.topologyobjects import Atom, ExtraPoint
 from parmed.utils.io import genopen
 from parmed.utils.six import string_types, add_metaclass
 from parmed.utils.six.moves import range
@@ -164,6 +165,7 @@ class AmberOFFLibrary(object):
         nres = 1
         templ = ResidueTemplate(name)
         line = fileobj.readline()
+        chg_scale = AMBER_ELECTROSTATIC / PARMED_ELECTROSTATIC
         while line[0] != '!':
             nam, typ, typx, resx, flags, seq, elmnt, chg = line.split()
             nam = _strip_enveloping_quotes(nam)
@@ -174,7 +176,14 @@ class AmberOFFLibrary(object):
             seq = int(seq)
             elmnt = int(elmnt)
             chg = float(chg)
-            atom = Atom(atomic_number=elmnt, type=typ, name=nam, charge=chg)
+            if elmnt > 0:
+                atom = Atom(atomic_number=elmnt, type=typ, name=nam,
+                            charge=chg*chg_scale)
+            elif elmnt == 0:
+                atom = ExtraPoint(atomic_number=elmnt, type=typ, name=nam,
+                                  charge=chg*chg_scale)
+            else:
+                assert False, 'Cannot have negative atomic number'
             if resx == nres + 1:
                 container.append(templ)
                 nres += 1
@@ -453,6 +462,7 @@ class AmberOFFLibrary(object):
             tmp = ResidueTemplateContainer(res.name)
             tmp.append(res)
             res = tmp
+        chg_scale = PARMED_ELECTROSTATIC / AMBER_ELECTROSTATIC
         dest.write('!entry.%s.unit.atoms table  str name  str type  int typex  '
                    'int resx  int flags  int seq  int elmnt  dbl chg\n' %
                    res.name)
@@ -460,7 +470,7 @@ class AmberOFFLibrary(object):
             for atom in r:
                 dest.write(' "%s" "%s" 0 %d 131072 %d %d %.6f\n' % (atom.name,
                            atom.type, i+1, atom.idx+1, atom.atomic_number,
-                           atom.charge))
+                           atom.charge*chg_scale))
         dest.write('!entry.%s.unit.atomspertinfo table  str pname  str ptype  '
                    'int ptypex  int pelmnt  dbl pchg\n' % res.name)
         for r in res:
@@ -581,7 +591,6 @@ def _imaging_atom(res):
     COM of the residue
     """
     from parmed.geometry import center_of_mass
-    #TODO implement the docstring
     found_heavy = False
     heavy_idx = -1
     for i, atom in enumerate(res):

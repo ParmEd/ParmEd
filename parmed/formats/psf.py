@@ -5,6 +5,7 @@ files
 from parmed.charmm import CharmmPsfFile
 # TODO -- move this functionality to a more centralized location
 from parmed.charmm.psf import set_molecules
+from parmed.constants import CHARMM_ELECTROSTATIC, PARMED_ELECTROSTATIC
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
@@ -121,6 +122,7 @@ class PSFFile(object):
         dest.write(intfmt % len(struct.atoms) + ' !NATOM\n')
         # atmfmt1 is for CHARMM format (i.e., atom types are integers)
         # atmfmt is for XPLOR format (i.e., atom types are strings)
+        chg_scale = PARMED_ELECTROSTATIC / CHARMM_ELECTROSTATIC
         for i, atom in enumerate(struct.atoms):
             typ = atom.type
             if isinstance(atom.type, str):
@@ -134,7 +136,7 @@ class PSFFile(object):
                 segid = 'SYS'
             atmstr = fmt % (i+1, segid, atom.residue.number,
                             atom.residue.name, atom.name, typ,
-                            atom.charge, atom.mass)
+                            atom.charge*chg_scale, atom.mass)
             if hasattr(atom, 'props'):
                 dest.write(atmstr + '   '.join(atom.props) + '\n')
             else:

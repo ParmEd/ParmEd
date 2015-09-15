@@ -6,7 +6,7 @@ from __future__ import division, print_function
 
 from parmed.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
             NEXT, NRES, NBONA, NTHETA, NPHIA, NUMBND, NUMANG, NPTRA, NATYP,
-            NPHB, IFBOX, IFCAP, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC)
+            NPHB, IFBOX, IFCAP, ELECTROSTATIC)
 from parmed.exceptions import AmberError
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
@@ -478,13 +478,9 @@ class AmberFormat(object):
                 self.parm_data[flag] = []
                 for line in rawdata:
                     self.parm_data[flag].extend(self.formats[flag].read(line))
-            if 'CTITLE' in self.parm_data:
-                CHARGE_SCALE = CHARMM_ELECTROSTATIC
-            else:
-                CHARGE_SCALE = AMBER_ELECTROSTATIC
             try:
                 for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                    self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
+                    self.parm_data[self.charge_flag][i] = chg / ELECROSTATIC
             except KeyError:
                 pass
 
@@ -526,13 +522,9 @@ class AmberFormat(object):
                 self.parm_data[current_flag].extend(fmt.read(line))
 
         # convert charges to fraction-electrons
-        if 'CTITLE' in self.parm_data:
-            CHARGE_SCALE = CHARMM_ELECTROSTATIC
-        else:
-            CHARGE_SCALE = AMBER_ELECTROSTATIC
         if self.charge_flag in self.parm_data:
             for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] = chg / ELECTROSTATIC
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
             with closing(genopen(self.name, 'r')) as f:
@@ -649,7 +641,7 @@ class AmberFormat(object):
         # Next read the charges
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, natom)
         # Divide by the electrostatic constant
-        tmp_data = [x / AMBER_ELECTROSTATIC for x in tmp_data]
+        tmp_data = [x / ELECTROSTATIC for x in tmp_data]
         self.add_flag('CHARGE', '5E16.8', data=tmp_data)
 
         # Next read the masses
@@ -819,14 +811,9 @@ class AmberFormat(object):
             # get current time to put into new prmtop file if we had a %VERSION
             self.set_version()
             # convert charges back to amber charges...
-            if 'CTITLE' in self.parm_data:
-                CHARGE_SCALE = CHARMM_ELECTROSTATIC
-            else:
-                CHARGE_SCALE = AMBER_ELECTROSTATIC
-
             if self.charge_flag in self.parm_data.keys():
                 for i in range(len(self.parm_data[self.charge_flag])):
-                    self.parm_data[self.charge_flag][i] *= CHARGE_SCALE
+                    self.parm_data[self.charge_flag][i] *= ELECTROSTATIC
             # write version to top of prmtop file
             new_prm.write('%s\n' % self.version)
 
