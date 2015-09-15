@@ -1493,8 +1493,8 @@ class GromacsTopologyFile(Structure):
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
         dest.write('%s          %d\n\n' % (title, struct.nrexcl))
         dest.write('[ atoms ]\n')
-        dest.write(';   nr       type  resnr residue  atom   cgnr    '
-                   'charge       mass  typeB    chargeB      massB\n')
+        dest.write(';   nr       type  resnr residue  atom   cgnr            '
+                   '  charge       mass  typeB    chargeB      massB\n')
         chg_scale = PARMED_ELECTROSTATIC / GROMACS_ELECTROSTATIC
         runchg = 0
         for residue in struct.residues:
@@ -1504,7 +1504,7 @@ class GromacsTopologyFile(Structure):
             for atom in residue:
                 chg = atom.charge * chg_scale
                 runchg += chg
-                dest.write('%5d %10s %6d %6s %6s %6d %10.6f %10.4f   ; '
+                dest.write('%5d %10s %6d %6s %6s %6d %20.16f %10.4f   ; '
                            'qtot %.4f\n' % (atom.idx+1, atom.type,
                             residue.idx+1, residue.name, atom.name,
                             atom.idx+1, chg, atom.mass, runchg))
