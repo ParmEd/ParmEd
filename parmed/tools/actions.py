@@ -8,8 +8,6 @@ import copy
 import math
 import numpy as np
 import os
-from parmed.topologyobjects import (Bond, BondType, Angle, AngleType, Dihedral,
-        DihedralType)
 from parmed.structure import Structure
 from parmed.formats.registry import load_file
 import parmed.gromacs as gromacs
@@ -17,12 +15,16 @@ from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
         HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
 from parmed.charmm import CharmmPsfFile, CharmmParameterSet
+from parmed.constants import (PARMED_ELECTROSTATIC, AMBER_ELECTROSTATIC,
+        CHARMM_ELECTROSTATIC, GROMACS_ELECTROSTATIC)
 from parmed.exceptions import ParmedError
 from parmed.formats import PDBFile, CIFFile, Mol2File
 from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
 from parmed.residue import (SOLVENT_NAMES, CATION_NAMES, ANION_NAMES,
         AminoAcidResidue, RNAResidue, DNAResidue)
+from parmed.topologyobjects import (Bond, BondType, Angle, AngleType, Dihedral,
+        DihedralType)
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
@@ -788,6 +790,17 @@ class change(Action):
             prop = 'type'
         elif self.prop == 'TREE_CHAIN_CLASSIFICATION':
             prop = 'tree'
+        elif self.prop == 'CHARGE':
+            prop = 'charge'
+            # Scale the input charge to the parent program of the input file
+            # type
+            if (isinstance(self.parm, ChamberParm) or
+                    isinstance(self.parm, CharmmPsfFile)):
+                self.new_val *= CHARMM_ELECTROSTATIC / PARMED_ELECTROSTATIC
+            elif isinstance(self.parm, AmberParm):
+                self.new_val *= AMBER_ELECTROSTATIC / PARMED_ELECTROSTATIC
+            elif isinstance(self.parm, GromacsTopologyFile):
+                self.new_val *= GROMACS_ELECTROSTATIC / PARMED_ELECTROSTATIC
         else:
             prop = self.prop.lower()
         for i, atom in enumerate(self.parm.atoms):

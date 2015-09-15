@@ -4,7 +4,8 @@ and building a Structure from it
 """
 from __future__ import print_function, division, absolute_import
 
-from parmed.constants import TINY, DEG_TO_RAD
+from parmed.constants import (TINY, DEG_TO_RAD, GROMACS_ELECTROSTATIC,
+            PARMED_ELECTROSTATIC)
 from parmed.exceptions import GromacsError, GromacsWarning, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
@@ -267,6 +268,7 @@ class GromacsTopologyFile(Structure):
         with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
                                  defines=defines)) as f:
             current_section = None
+            chg_scale = GROMACS_ELECTROSTATIC / PARMED_ELECTROSTATIC
             for line in f:
                 line = line.strip()
                 if not line: continue
@@ -309,7 +311,7 @@ class GromacsTopologyFile(Structure):
                     if len(words) < 7:
                         charge = None
                     else:
-                        charge = float(words[6])
+                        charge = float(words[6]) * chg_scale
                     if atomic_number == 0:
                         atom = ExtraPoint(name=words[4], type=words[1],
                                           charge=charge)
@@ -1491,19 +1493,21 @@ class GromacsTopologyFile(Structure):
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
         dest.write('%s          %d\n\n' % (title, struct.nrexcl))
         dest.write('[ atoms ]\n')
-        dest.write(';   nr       type  resnr residue  atom   cgnr    '
-                   'charge       mass  typeB    chargeB      massB\n')
+        dest.write(';   nr       type  resnr residue  atom   cgnr            '
+                   '  charge       mass  typeB    chargeB      massB\n')
+        chg_scale = PARMED_ELECTROSTATIC / GROMACS_ELECTROSTATIC
         runchg = 0
         for residue in struct.residues:
             dest.write('; residue %4d %s rtp %s q %.1f\n' %
                        (residue.idx+1, residue.name, residue.name,
-                        sum(a.charge for a in residue)))
+                        sum(a.charge for a in residue)*chg_scale))
             for atom in residue:
-                runchg += atom.charge
-                dest.write('%5d %10s %6d %6s %6s %6d %10.6f %10.4f   ; '
+                chg = atom.charge * chg_scale
+                runchg += chg
+                dest.write('%5d %10s %6d %6s %6s %6d %20.16f %10.4f   ; '
                            'qtot %.4f\n' % (atom.idx+1, atom.type,
                             residue.idx+1, residue.name, atom.name,
-                            atom.idx+1, atom.charge, atom.mass, runchg))
+                            atom.idx+1, chg, atom.mass, runchg))
         dest.write('\n')
         # Do valence terms now
         EPs = [a for a in struct.atoms if isinstance(a, ExtraPoint)]

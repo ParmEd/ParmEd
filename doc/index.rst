@@ -165,6 +165,7 @@ Program and API Reference
    Core classes used to represent topologies <topologyobjects>
    The core Structure class <structure>
    Working with units <dimensional_analysis>
+   Internal units and constants in ParmEd <units_constants>
    Reading and writing files <readwrite>
    The Amber file classes <amber>
    The CHARMM file classes <charmm>

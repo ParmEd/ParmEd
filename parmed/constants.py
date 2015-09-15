@@ -4,18 +4,39 @@ List of all pointers and constants used in the Amber topology file.
 Can be used like:
    from parmed.constants import *
 """
-from __future__ import division
+from __future__ import division, absolute_import
 from math import pi as _pi, sqrt as _sqrt
+import parmed.unit as u
 
 __all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH',
            'MBONA', 'NTHETH', 'MTHETA', 'NPHIH', 'MPHIA', 'NHPARM', 'NPARM',
            'NEXT', 'NRES', 'NBONA', 'NTHETA', 'NPHIA', 'NUMBND', 'NUMANG',
            'NPTRA', 'NATYP', 'NPHB', 'IFPERT', 'NBPER', 'NGPER', 'NDPER',
            'MBPER', 'MGPER', 'MDPER', 'IFBOX', 'NMXRS', 'IFCAP', 'NUMEXTRA',
-           'NCOPY', 'NNB', 'RAD_TO_DEG', 'DEG_TO_RAD']
+           'NCOPY', 'NNB', 'RAD_TO_DEG', 'DEG_TO_RAD', 'CHARMM_ELECTROSTATIC',
+           'GROMACS_ELECTROSTATIC', 'OPENMM_ELECTROSTATIC', 'ELECTROSTATIC',
+           'PARMED_ELECTROSTATIC']
 
+# Taken from CRC, 77th edition, Table 1 of physical constants (1986 CODATA)
+# Calculated from c, mu0, and NA, then converted to kcal*AA/mol/electron**2
+ELECTROSTATIC = PARMED_ELECTROSTATIC = _sqrt(332.0634322112194)
+# Taken from tleap source code
 AMBER_ELECTROSTATIC = 18.2223
+# Taken from CHAMBER source code, which was itself validated against CHARMM
 CHARMM_ELECTROSTATIC = _sqrt(332.0716)
+# Taken from src/gromacs/math/units.h in the GROMACS distribution
+eps0 = 8.854187817e-12 * 1e-9 * 1e3 / (1.602176565e-19**2 * 6.02214129e23)
+ex = 1.0/(4*_pi*eps0) * u.kilojoule_per_mole*u.nanometer/u.elementary_charge**2
+GROMACS_ELECTROSTATIC = _sqrt(ex.value_in_unit(
+                                u.kilocalorie_per_mole*u.angstrom/
+                                u.elementary_charge**2)
+)
+# Taken from platforms/reference/include/SimTKOpenMMRealType.h in OpenMM source
+ex = 138.935456*u.kilojoule_per_mole*u.nanometer/u.elementary_charge**2
+OPENMM_ELECTROSTATIC = _sqrt(ex.value_in_unit(
+                                u.kilocalorie_per_mole*u.angstrom/
+                                u.elementary_charge**2)
+)
 
 AMBER_POINTERS = """
 NATOM  : total number of atoms 
@@ -71,3 +92,5 @@ DEG_TO_RAD = _pi / 180.0
 # For use in floating point comparisons
 TINY = 1.0e-8
 SMALL = 1.0e-4
+
+del ex, u, eps0

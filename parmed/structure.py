@@ -32,7 +32,8 @@ try:
     import pandas as pd
 except ImportError:
     pd = None
-from parmed.constants import DEG_TO_RAD, SMALL
+from parmed.constants import (DEG_TO_RAD, SMALL, PARMED_ELECTROSTATIC,
+        OPENMM_ELECTROSTATIC)
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
@@ -2276,8 +2277,9 @@ class Structure(object):
         force.setReactionFieldDielectric(reactionFieldDielectric)
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
+        chg_scale = PARMED_ELECTROSTATIC / OPENMM_ELECTROSTATIC
         for atom in self.atoms:
-            force.addParticle(atom.charge, atom.sigma*length_conv,
+            force.addParticle(atom.charge*chg_scale, atom.sigma*length_conv,
                               abs(atom.epsilon*ene_conv))
         # Add exclusions from the bond graph out to nrexcl-1 bonds away (atoms
         # nrexcl bonds away will be exceptions defined later)
@@ -2337,7 +2339,7 @@ class Structure(object):
                 else:
                     epsprod = wdij14 * ene_conv / scnb
                     sigprod = rij14 * length_conv * sigma_scale
-                chgprod = dih.atom1.charge * dih.atom4.charge / scee
+                chgprod = dih.atom1.charge*dih.atom4.charge*chg_scale**2/scee
                 force.addException(dih.atom1.idx, dih.atom4.idx, chgprod,
                                    sigprod, epsprod, True)
                 for child in dih.atom1.children:
@@ -2345,7 +2347,7 @@ class Structure(object):
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
                     sigprod = comb_sig(child.sigma_14, dih.atom4.sigma_14)
                     sigprod *= length_conv
-                    chgprod = (child.charge * dih.atom4.charge) / scee
+                    chgprod = (child.charge*dih.atom4.charge*chg_scale**2)/scee
                     force.addException(child.idx, dih.atom4.idx, chgprod,
                                        sigprod, epsprod, True)
                 for child in dih.atom4.children:
@@ -2353,7 +2355,7 @@ class Structure(object):
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
                     sigprod = comb_sig(child.sigma_14, dih.atom1.sigma_14)
                     sigprod *= length_conv
-                    chgprod = child.charge * dih.atom1.charge / scee
+                    chgprod = child.charge*dih.atom1.charge*chg_scale**2/scee
                     force.addException(child.idx, dih.atom1.idx, chgprod,
                                        sigprod, epsprod, True)
                 for c1 in dih.atom1.children:
@@ -2362,13 +2364,14 @@ class Structure(object):
                         epsprod = math.sqrt(epsprod) * ene_conv / scnb
                         sigprod = comb_sig(c1.sigma_14, c2.sigma_14)
                         sigprod *= length_conv
-                        chgprod = c1.charge * c2.charge / scee
+                        chgprod = c1.charge*c2.charge*chg_scale**2/scee
                         force.addException(c1.idx, c2.idx, chgprod, sigprod,
                                            epsprod, True)
         # Allow our specific exceptions (in adjusts) to override anything that
         # came before
         for pair in self.adjusts:
-            chgprod = pair.atom1.charge * pair.atom2.charge * pair.type.chgscale
+            chgprod = (pair.atom1.charge*pair.atom2.charge*pair.type.chgscale*
+                        chg_scale**2)
             force.addException(pair.atom1.idx, pair.atom2.idx, chgprod,
                                pair.type.sigma*length_conv,
                                pair.type.epsilon*ene_conv, True)
@@ -2689,8 +2692,9 @@ class Structure(object):
         else:
             raise ValueError('Unexpected implicit solvent model... '
                              'should not be here')
+        chg_scale = PARMED_ELECTROSTATIC / OPENMM_ELECTROSTATIC
         for atom, parms in zip(self.atoms, gb_parms):
-            force.addParticle([atom.charge] + list(parms))
+            force.addParticle([atom.charge*chg_scale] + list(parms))
         # Set cutoff method
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomGBForce.NoCutoff)

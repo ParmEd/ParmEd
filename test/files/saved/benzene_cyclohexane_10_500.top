@@ -1,17 +1,17 @@
 ;
-;   File saved/benzene_cyclohexane_10_500.top was generated
+;   File /Users/swails/src/ParmEd/test/files/writes/benzene_cyclohexane_10_500.top was generated
 ;   By user: swails (501)
 ;   On host: Jasons-MBP
-;   At date: Mon. June  1 10:32:34 2015
+;   At date: Tue. September  2 13:15:18 2015
 ;
 ;   This is a standalone topology file
 ;
 ;   Created by:
-;   ParmEd:       , VERSION 15.1
-;   Executable:   
+;   ParmEd:       nosetests, VERSION 2.0
+;   Executable:   nosetests
 ;   Library dir:  /usr/local/share/gromacs/top
 ;   Command line:
-;
+;     /Users/swails/miniconda/envs/py27/bin/nosetests -vs . --pdb
 ;
 
 [ defaults ]
@@ -31,20 +31,20 @@ hc             1    0.00000    1.008000  A      0.264953     0.0656888
 ZFH          3
 
 [ atoms ]
-;   nr       type  resnr residue  atom   cgnr    charge       mass  typeB    chargeB      massB
+;   nr       type  resnr residue  atom   cgnr              charge       mass  typeB    chargeB      massB
 ; residue    1 ZFH rtp ZFH q -0.0
-    1         ca      1    ZFH     C1      1  -0.130200    12.0100   ; qtot -0.1302
-    2         ca      1    ZFH     C2      2  -0.130100    12.0100   ; qtot -0.2603
-    3         ca      1    ZFH     C3      3  -0.130100    12.0100   ; qtot -0.3904
-    4         ca      1    ZFH     C4      4  -0.130100    12.0100   ; qtot -0.5205
-    5         ca      1    ZFH     C5      5  -0.130100    12.0100   ; qtot -0.6506
-    6         ca      1    ZFH     C6      6  -0.130100    12.0100   ; qtot -0.7807
-    7         ha      1    ZFH     H1      7   0.130100     1.0080   ; qtot -0.6506
-    8         ha      1    ZFH     H2      8   0.130100     1.0080   ; qtot -0.5205
-    9         ha      1    ZFH     H3      9   0.130100     1.0080   ; qtot -0.3904
-   10         ha      1    ZFH     H4     10   0.130100     1.0080   ; qtot -0.2603
-   11         ha      1    ZFH     H5     11   0.130100     1.0080   ; qtot -0.1302
-   12         ha      1    ZFH     H6     12   0.130100     1.0080   ; qtot -0.0001
+    1         ca      1    ZFH     C1      1  -0.1301977461344326    12.0100   ; qtot -0.1302
+    2         ca      1    ZFH     C2      2  -0.1300977478655121    12.0100   ; qtot -0.2603
+    3         ca      1    ZFH     C3      3  -0.1300977478655121    12.0100   ; qtot -0.3904
+    4         ca      1    ZFH     C4      4  -0.1300977478655121    12.0100   ; qtot -0.5205
+    5         ca      1    ZFH     C5      5  -0.1300977478655121    12.0100   ; qtot -0.6506
+    6         ca      1    ZFH     C6      6  -0.1300977478655121    12.0100   ; qtot -0.7807
+    7         ha      1    ZFH     H1      7   0.1300977478655121     1.0080   ; qtot -0.6506
+    8         ha      1    ZFH     H2      8   0.1300977478655121     1.0080   ; qtot -0.5205
+    9         ha      1    ZFH     H3      9   0.1300977478655121     1.0080   ; qtot -0.3904
+   10         ha      1    ZFH     H4     10   0.1300977478655121     1.0080   ; qtot -0.2603
+   11         ha      1    ZFH     H5     11   0.1300977478655121     1.0080   ; qtot -0.1302
+   12         ha      1    ZFH     H6     12   0.1300977478655121     1.0080   ; qtot -0.0001
 
 [ bonds ]
 ;    ai     aj funct         c0         c1         c2         c3
@@ -145,26 +145,26 @@ ZFH          3
 ZWL          3
 
 [ atoms ]
-;   nr       type  resnr residue  atom   cgnr    charge       mass  typeB    chargeB      massB
+;   nr       type  resnr residue  atom   cgnr              charge       mass  typeB    chargeB      massB
 ; residue    1 ZWL rtp ZWL q 0.0
-    1         c3      1    ZWL     C1      1  -0.075600    12.0100   ; qtot -0.0756
-    2         c3      1    ZWL     C2      2  -0.075500    12.0100   ; qtot -0.1511
-    3         c3      1    ZWL     C3      3  -0.075500    12.0100   ; qtot -0.2266
-    4         c3      1    ZWL     C4      4  -0.075500    12.0100   ; qtot -0.3021
-    5         c3      1    ZWL     C5      5  -0.075500    12.0100   ; qtot -0.3776
-    6         c3      1    ZWL     C6      6  -0.075500    12.0100   ; qtot -0.4531
-    7         hc      1    ZWL     H1      7   0.037800     1.0080   ; qtot -0.4153
-    8         hc      1    ZWL     H2      8   0.037800     1.0080   ; qtot -0.3775
-    9         hc      1    ZWL     H3      9   0.037800     1.0080   ; qtot -0.3397
-   10         hc      1    ZWL     H4     10   0.037800     1.0080   ; qtot -0.3019
-   11         hc      1    ZWL     H5     11   0.037800     1.0080   ; qtot -0.2641
-   12         hc      1    ZWL     H6     12   0.037800     1.0080   ; qtot -0.2263
-   13         hc      1    ZWL     H7     13   0.037800     1.0080   ; qtot -0.1885
-   14         hc      1    ZWL     H8     14   0.037800     1.0080   ; qtot -0.1507
-   15         hc      1    ZWL     H9     15   0.037800     1.0080   ; qtot -0.1129
-   16         hc      1    ZWL    H10     16   0.037800     1.0080   ; qtot -0.0751
-   17         hc      1    ZWL    H11     17   0.037800     1.0080   ; qtot -0.0373
-   18         hc      1    ZWL    H12     18   0.037800     1.0080   ; qtot 0.0005
+    1         c3      1    ZWL     C1      1  -0.0755986913038641    12.0100   ; qtot -0.0756
+    2         c3      1    ZWL     C2      2  -0.0754986930349436    12.0100   ; qtot -0.1511
+    3         c3      1    ZWL     C3      3  -0.0754986930349436    12.0100   ; qtot -0.2266
+    4         c3      1    ZWL     C4      4  -0.0754986930349436    12.0100   ; qtot -0.3021
+    5         c3      1    ZWL     C5      5  -0.0754986930349436    12.0100   ; qtot -0.3776
+    6         c3      1    ZWL     C6      6  -0.0754986930349436    12.0100   ; qtot -0.4531
+    7         hc      1    ZWL     H1      7   0.0377993456519320     1.0080   ; qtot -0.4153
+    8         hc      1    ZWL     H2      8   0.0377993456519320     1.0080   ; qtot -0.3775
+    9         hc      1    ZWL     H3      9   0.0377993456519320     1.0080   ; qtot -0.3397
+   10         hc      1    ZWL     H4     10   0.0377993456519320     1.0080   ; qtot -0.3019
+   11         hc      1    ZWL     H5     11   0.0377993456519320     1.0080   ; qtot -0.2641
+   12         hc      1    ZWL     H6     12   0.0377993456519320     1.0080   ; qtot -0.2263
+   13         hc      1    ZWL     H7     13   0.0377993456519320     1.0080   ; qtot -0.1885
+   14         hc      1    ZWL     H8     14   0.0377993456519320     1.0080   ; qtot -0.1507
+   15         hc      1    ZWL     H9     15   0.0377993456519320     1.0080   ; qtot -0.1129
+   16         hc      1    ZWL    H10     16   0.0377993456519320     1.0080   ; qtot -0.0751
+   17         hc      1    ZWL    H11     17   0.0377993456519320     1.0080   ; qtot -0.0373
+   18         hc      1    ZWL    H12     18   0.0377993456519320     1.0080   ; qtot 0.0005
 
 [ bonds ]
 ;    ai     aj funct         c0         c1         c2         c3

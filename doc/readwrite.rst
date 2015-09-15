@@ -54,7 +54,7 @@ below (the filename argument is omitted):
 | Gromacs topology file    | ``defines``, ``parametrize``   |
 |                          | ``xyz``, ``box``               |
 +--------------------------+--------------------------------+
-| Mol2 and Mol3 files      | ``structure``                  |
+| Mol2 and Mol3 files      | ``structure``, ``program``     |
 +--------------------------+--------------------------------+
 | NetCDF restart file      | None                           |
 +--------------------------+--------------------------------+
@@ -83,6 +83,10 @@ The optional keyword arguments are described below:
   database.  If ``False``, they are not (default is ``True``).
 * ``structure`` -- If ``True``, return the Mol2/Mol3 file as a :class:`Structure
   <parmed.structure.Structure>` instance. Default is ``False``
+* ``program`` -- This is used to define the value of electrostatic constant that
+  will be used to define the electrostatic interactions. Allowed values are
+  ``'amber'``, ``'gromacs'``, ``'openmm'``, ``'charmm'`` and ``None``. See `the
+  discussion about units and constants <units_constants>`_ for more information.
 
 :func:`load_file` automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
@@ -147,9 +151,9 @@ supported extra keyword arguments, are detailed in the following table.
 +--------------+-------------------------+----------------+--------------------------+
 | Gromacs GRO  | ``.gro``                | ``gro``        | ``precision``, ``nobox`` |
 +--------------+-------------------------+----------------+--------------------------+
-| Mol2         | ``.mol2``               | ``mol2``       | ``split``                |
+| Mol2         | ``.mol2``               | ``mol2``       | ``split``, ``program``   |
 +--------------+-------------------------+----------------+--------------------------+
-| Mol3         | ``.mol3``               | ``mol3``       | ``split``                |
+| Mol3         | ``.mol3``               | ``mol3``       | ``split``, ``program``   |
 +--------------+-------------------------+----------------+--------------------------+
 | Amber ASCII  | ``.rst7``, ``.inpcrd``, | ``rst7``       | ``title``, ``time``      |
 | coordinates  | ``.restrt``             |                |                          |
@@ -206,6 +210,11 @@ Keywords
   mol3 entries in the same file (like the ZINC database, for example). If
   ``False``, all residues will be part of the same mol2 or mol3 entry. Default
   is ``False``.
+* ``program`` -- This is used to define the value of electrostatic constant that
+  will be used to define the electrostatic interactions. Allowed values are
+  ``'amber'``, ``'gromacs'``, ``'openmm'``, ``'charmm'`` and ``None``. See `the
+  discussion about units and constants <units_constants.html>`_ for more
+  information.
 * ``title`` -- Purely cosmetic, it will specify the title that will be written
   to the coordinate files
 * ``time`` -- Also cosmetic, this is the time corresponding to the snapshot that

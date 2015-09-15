@@ -10,12 +10,13 @@ from __future__ import division
 
 from contextlib import closing
 from copy import copy as _copy
-from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
-                    Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
-                    DihedralType, ImproperType)
+from parmed.constants import CHARMM_ELECTROSTATIC, PARMED_ELECTROSTATIC
 from parmed.exceptions import (CharmmError, MoleculeError, CharmmWarning,
-        ParameterError)
-from parmed.structure import needs_openmm
+                    ParameterError)
+from parmed.structure import needs_openmm, Structure
+from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
+                    AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
+                    Atom, DihedralType, ImproperType)
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
 from parmed.utils.six.moves import zip, range
@@ -201,6 +202,7 @@ class CharmmPsfFile(Structure):
             # Next is the number of atoms
             natom = conv(psfsections['NATOM'][0], int, 'natom')
             # Parse all of the atoms
+            chg_scale = CHARMM_ELECTROSTATIC / PARMED_ELECTROSTATIC
             for i in range(natom):
                 words = psfsections['NATOM'][1][i].split()
                 atid = int(words[0])
@@ -221,7 +223,7 @@ class CharmmPsfFile(Structure):
                     attype = int(attype)
                 except ValueError:
                     pass
-                charge = conv(words[6], float, 'partial charge')
+                charge = conv(words[6], float, 'partial charge') * chg_scale
                 mass = conv(words[7], float, 'atomic mass')
                 props = words[8:]
                 atom = Atom(name=name, type=attype, charge=charge, mass=mass)
