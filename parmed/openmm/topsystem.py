@@ -365,7 +365,7 @@ def _process_nonbonded(struct, force):
             atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
             atom_type = AtomType(atype_name, None, atom.mass,
                                  atom.atomic_number)
-        atom.charge = chg.value_in_unit(u.elementary_charge)
+        atom.charge = chg.value_in_unit(u.elementary_charge) * chg_scale
         rmin = sig.value_in_unit(u.angstroms) * 2**(1/6) / 2 # to rmin/2
         eps = eps.value_in_unit(u.kilocalories_per_mole)
         atom_type.set_lj_params(eps, rmin)

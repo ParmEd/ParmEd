@@ -480,7 +480,7 @@ class AmberFormat(object):
                     self.parm_data[flag].extend(self.formats[flag].read(line))
             try:
                 for i, chg in enumerate(self.parm_data[self.charge_flag]):
-                    self.parm_data[self.charge_flag][i] = chg / ELECROSTATIC
+                    self.parm_data[self.charge_flag][i] = chg / ELECTROSTATIC
             except KeyError:
                 pass
 
@@ -834,7 +834,7 @@ class AmberFormat(object):
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
             for i in range(len(self.parm_data[self.charge_flag])):
-                self.parm_data[self.charge_flag][i] /= CHARGE_SCALE
+                self.parm_data[self.charge_flag][i] /= ELECTROSTATIC
 
     #===================================================
 
