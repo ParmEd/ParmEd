@@ -1,7 +1,7 @@
 os:
     - linux
     - osx
-language: python
+language: generic
 
 sudo: false
 addons:
