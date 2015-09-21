@@ -501,8 +501,8 @@ class writeCoordinates(Action):
             PDBFile.write(self.parm, self.filename, renumber=True)
         elif self.filetype == 'CIF':
             CIFFile.write(self.parm, self.filename, renumber=True)
-        elif self.filetype == 'Mol2':
-            Mol2File(self.parm, self.filename)
+        elif self.filetype == 'MOL2':
+            Mol2File.write(self.parm, self.filename)
         elif self.filetype == 'MDCRD':
             traj = AmberMdcrd(self.filename, natom=len(self.parm.atoms),
                               hasbox=self.parm.box is not None, mode='w')
