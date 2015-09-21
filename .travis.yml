@@ -12,12 +12,11 @@ addons:
             - g++
             - gromacs
 
-env:
-    matrix:
-        - os: linux, PYTHON_VERSION=2.7
-        - os: linux, PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes
-        - os: linux, PYTHON_VERSION=3.4
-        - os: osx, PYTHON_VERSION=3.4
+matrix:
+    - os: linux, env: PYTHON_VERSION=2.7
+    - os: linux, env: PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes
+    - os: linux, env: PYTHON_VERSION=3.4
+    - os: osx, env: PYTHON_VERSION=3.4
 
 install:
     - source devtools/travis-ci/install.sh
