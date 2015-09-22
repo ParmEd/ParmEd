@@ -11,11 +11,12 @@ try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
     CPU = mm.Platform.getPlatformByName('CPU')
-    has_openmm = True
+    HAS_OPENMM = True
 except ImportError:
-    has_openmm = False
+    HAS_OPENMM = False
 import unittest
-from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative, FileIOTestCase
+from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
+                   FileIOTestCase, HAS_GROMACS)
 import warnings
 
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
@@ -58,6 +59,7 @@ class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
         np.testing.assert_allclose(gro.box, parm.box)
         np.testing.assert_allclose(top.box, parm.box)
 
+@unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
 class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
     """ Tests converting Gromacs top/gro files to Amber """
 
@@ -114,7 +116,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                                    get_saved_fn('opls.parm7'))
         )
 
-    @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+    @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
     def testGeometricCombiningRuleEnergy(self):
         """ Tests converting geom. comb. rule energy from Gromacs to Amber """
         top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
@@ -137,7 +139,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         
         self._check_energies(top, cong, parm, cona)
 
-    @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+    @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
     def testEnergySimple(self):
         """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
         top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
@@ -157,7 +159,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
 
         self._check_energies(top, cong, parm, cona)
 
-    @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+    @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
     def testEnergyComplicated(self):
         """ Check equal energies for Gmx -> Amber conversion of complex FF """
         top = load_file(get_fn(os.path.join('12.DPPC', 'topol2.top')))
@@ -213,7 +215,7 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
                 )
         )
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
 class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
@@ -250,7 +252,7 @@ class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
 class TestOpenMMToGromacs(FileIOTestCase, TestCaseRelative):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
