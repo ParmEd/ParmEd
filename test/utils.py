@@ -1,6 +1,7 @@
 """
 Useful functions for the test cases
 """
+from parmed import gromacs
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import zip
 import os
@@ -23,6 +24,8 @@ except ImportError:
 
 def skip_big_tests():
     return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+
+HAS_GROMACS = os.path.isdir(gromacs.GROMACS_TOPDIR)
 
 class TestCaseRelative(unittest.TestCase):
 

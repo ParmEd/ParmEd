@@ -9,10 +9,10 @@ from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
+from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
 import warnings
 
-@unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
+@unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 

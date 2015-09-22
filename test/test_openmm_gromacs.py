@@ -7,11 +7,11 @@ import utils
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    has_openmm = True
+    HAS_OPENMM = True
     CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
     from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
-    has_openmm = False
+    HAS_OPENMM = False
 
 from parmed import load_file, ExtraPoint, openmm, gromacs
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
@@ -57,7 +57,8 @@ def zero_ep_frc(frc, struct):
         if isinstance(atom, ExtraPoint):
             frc[i] = vec0
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+@unittest.skipIf(not utils.HAS_GROMACS, "Cannot test without GROMACS")
 class TestGromacsTop(utils.TestCaseRelative):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
