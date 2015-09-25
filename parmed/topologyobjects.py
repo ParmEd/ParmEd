@@ -790,6 +790,7 @@ class Atom(_ListItem):
     def segid(self):
         return self.residue.segid
     @segid.setter
+    @deprecated
     def segid(self, value):
         self.residue.segid = value
 
