@@ -43,8 +43,7 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(a1.rmin_14, a2.rmin_14)
         self.assertEqual(a1.epsilon_14, a2.epsilon_14)
         for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles',
-                    'type_idx', 'class_idx', 'polarizability', 'vdw_weight',
-                    'segid'):
+                    'type_idx', 'class_idx', 'polarizability', 'vdw_weight'):
             if hasattr(a2, key):
                 if isinstance(getattr(a2, key), np.ndarray):
                     np.testing.assert_equal(

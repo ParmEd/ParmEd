@@ -192,12 +192,8 @@ class CharmmCrdFile(object):
         dest.write('*\n')
         dest.write('%10d  EXT\n' % len(struct.atoms))
         for i, atom in enumerate(struct.atoms):
-            try:
-                segid = atom.segid
-            except AttributeError:
-                segid = atom.residue.chain.strip() or 'SYS'
-            else:
-                segid = segid.strip() or atom.residue.chain.strip() or 'SYS'
+            res = atom.residue
+            segid = res.segid.strip() or res.chain.strip() or 'SYS'
             dest.write('%10d%10d  %-8s  %-8s%20.10f%20.10f%20.10f  %-8s  '
                        '%-8s%20.10f\n' % (i+1, atom.residue.idx+1,
                        atom.residue.name, atom.name, atom.xx, atom.xy, atom.xz,

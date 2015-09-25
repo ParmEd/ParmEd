@@ -9,6 +9,7 @@ from __future__ import division, print_function, absolute_import
 from parmed.exceptions import MoleculeError, ParameterError
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 import parmed.unit as u
+from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import zip, range
 from copy import copy
@@ -412,10 +413,6 @@ class Atom(_ListItem):
     vdw_weight : ``float``
         In the AMOEBA force field, this is the weight of the van der Waals
         interaction on the parent atom
-    segid : ``str``
-        In CHARMM PDB and PSF files, the SEGID behaves similarly to the residue
-        chain ID and is used to separate the total system into representative
-        parts. This will only be set if read in from the input structure.
 
     Notes
     -----
@@ -788,6 +785,16 @@ class Atom(_ListItem):
 
     #===================================================
 
+    @property
+    @deprecated
+    def segid(self):
+        return self.residue.segid
+    @segid.setter
+    def segid(self, value):
+        self.residue.segid = value
+
+    #===================================================
+
     def bond_to(self, other):
         """
         Log this atom as bonded to another atom.
@@ -972,7 +979,7 @@ class Atom(_ListItem):
         )
         for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles',
                     'type_idx', 'class_idx', 'polarizability', 'vdw_weight',
-                    'segid', 'weights', '_frame_type'):
+                    'weights', '_frame_type'):
             try:
                 retval[key] = getattr(self, key)
             except AttributeError:
@@ -3844,12 +3851,16 @@ class Residue(_ListItem):
     name : ``str``
         Name of the residue. Typical convention is to choose a name that is 4
         characters or shorter
-    number : ``int``
-        Residue number assigned in the input structure
-    chain : ``str``
-        The 1-letter chain identifier for this residue
-    insertion_code : ``str``
-        The insertion code (used in PDB files) for this residue
+    number : ``int``, optional
+        Residue number assigned in the input structure. Default is -1
+    chain : ``str``, optional
+        The 1-letter chain identifier for this residue. Default is empty string
+    insertion_code : ``str``, optional
+        The insertion code (used in PDB files) for this residue. Default is
+        empty string
+    segid : ``str``, optional
+        The segment identifier, used by CHARMM in a way similar to chain. Dfault
+        is empty string
     list : :class:`TrackedList`
         List of residues in which this residue is a member
 
@@ -3882,7 +3893,8 @@ class Residue(_ListItem):
     - `len()` returns the number of atoms in this residue
     """
 
-    def __init__(self, name, number=-1, chain='', insertion_code='', list=None):
+    def __init__(self, name, number=-1, chain='', insertion_code='',
+                 segid='', list=None):
         self.name = name.strip()
         self.number = number
         self.chain = chain.strip()
@@ -3891,6 +3903,7 @@ class Residue(_ListItem):
         self._idx = -1
         self.atoms = []
         self.ter = False
+        self.segid = segid
 
     def add_atom(self, atom):
         """ Adds an atom to this residue
@@ -4138,7 +4151,7 @@ class TrackedList(list):
 class ResidueList(TrackedList):
     """ Array of `Residue` instances """
 
-    def add_atom(self, atom, resname, resnum, chain='', inscode=''):
+    def add_atom(self, atom, resname, resnum, chain='', inscode='', segid=''):
         """
         Adds a new atom to the ResidueList, adding a new residue to this list if
         it has a different name or number as the last residue
@@ -4155,6 +4168,8 @@ class ResidueList(TrackedList):
             The chain ID character for this residue
         inscode : ``str``
             The insertion code ID character for this residue (it is stripped)
+        segid : ``str``
+            The segment identifier for this residue (it is stripped)
 
         Notes
         -----
@@ -4162,18 +4177,21 @@ class ResidueList(TrackedList):
         list, a new residue is added and the atom is added to that residue
         """
         inscode = inscode.strip()
+        segid = segid.strip()
         try:
             last = self[-1]
         except IndexError:
             # Empty list -- add our first residue
-            new_res = Residue(resname, resnum, chain, inscode, list=self)
+            new_res = Residue(resname, resnum, chain, inscode, segid, list=self)
             new_res.add_atom(atom)
             self.append(new_res)
         else:
             if (last.number != resnum or last.name != resname.strip() or
                 last.chain != chain.strip() or
+                last.segid != segid.strip() or
                 last.insertion_code != inscode.strip()):
-                new_res = Residue(resname, resnum, chain, inscode, list=self)
+                new_res = Residue(resname, resnum, chain, inscode,
+                                  segid, list=self)
                 new_res.add_atom(atom)
                 self.append(new_res)
             else:
