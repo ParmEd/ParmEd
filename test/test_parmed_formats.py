@@ -250,7 +250,7 @@ class TestChemistryPDBStructure(FileIOTestCase):
         """ Test PDB file where atom number goes to ***** after 99999 """
         pdbfile = read_PDB(self.overflow2)
         self.assertEqual(len(pdbfile.atoms), 114277)
-        self.assertEqual(len(pdbfile.residues), 25042)
+        self.assertEqual(len(pdbfile.residues), 25044)
         for i, atom in enumerate(pdbfile.atoms):
             self.assertEqual(atom.number, i+1)
             self.assertEqual(atom.idx, i)

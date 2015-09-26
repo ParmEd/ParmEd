@@ -11,10 +11,15 @@ import warnings
 warnings.filterwarnings('error', category=DeprecationWarning)
 
 try:
-    from simtk import openmm
-    openmm_version = tuple([int(x) for x in openmm.__version__.split('.')])
+    from simtk import openmm as mm
+    from simtk.openmm import app
+    openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
+    CPU = mm.Platform.getPlatformByName('CPU')
+    Reference = mm.Platform.getPlatformByName('Reference')
+    has_openmm = True
 except ImportError:
-    openmm_version = None
+    has_openmm = False
+    app = openmm_version = CPU = Reference = mm = None
 
 try:
     from string import uppercase
