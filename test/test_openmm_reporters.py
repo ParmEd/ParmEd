@@ -2,15 +2,7 @@
 This module tests the various reporters included in the parmed package
 """
 from __future__ import division, print_function
-import utils
 
-try:
-    import simtk.openmm as mm
-    from simtk.openmm import app
-    has_openmm = True
-    CPU = mm.Platform.getPlatformByName('CPU')
-except ImportError:
-    has_openmm = False
 import numpy as np
 import os
 from parmed import unit as u
@@ -21,14 +13,13 @@ from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 EnergyMinimizerReporter)
 from parmed.utils.six.moves import range, zip
 import unittest
-
-get_fn = utils.get_fn
+from utils import get_fn, mm, app, has_openmm, CPU, Reference, FileIOTestCase
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
-class TestStateDataReporter(utils.FileIOTestCase):
+class TestStateDataReporter(FileIOTestCase):
 
     def testStateDataReporter(self):
         """ Test StateDataReporter with various options """
@@ -159,7 +150,7 @@ class TestStateDataReporter(utils.FileIOTestCase):
         self.assertTrue('Temperature' in text)
 
 @unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
-class TestTrajRestartReporter(utils.FileIOTestCase):
+class TestTrajRestartReporter(FileIOTestCase):
 
     def testReporters(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (no PBC) """
@@ -258,7 +249,7 @@ class TestTrajRestartReporter(utils.FileIOTestCase):
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_solv.topology, system, integrator, CPU)
+        sim = app.Simulation(amber_solv.topology, system, integrator, Reference)
         sim.context.setPositions(amber_solv.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj.nc', written=True), 1,

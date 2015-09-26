@@ -77,7 +77,6 @@ def create_dataframe(obj):
         - multipole_433 : float (3,3 Quadrupole component)
         - polarizability : float (dipole polarizability)
         - vdw_parent : int (index of the vdW parent atom of this atom)
-        - segid : segment ID (similar to chain, but for CHARMM)
         - U11 : float (U[1][1] of anisotropic b-factor tensor)
         - U22 : float (U[2][2] of anisotropic b-factor tensor)
         - U33 : float (U[3][3] of anisotropic b-factor tensor)
@@ -115,6 +114,7 @@ def create_dataframe(obj):
     ret['resid'] = [atom.residue.idx for atom in atoms]
     ret['resnum'] = [atom.residue.number for atom in atoms]
     ret['chain'] = [atom.residue.chain for atom in atoms]
+    ret['segid'] = [atom.residue.segid for atom in atoms]
 
     # Now for optional attributes
     # Coordinates
@@ -168,11 +168,6 @@ def create_dataframe(obj):
     # AMOEBA vdw parent atom
     try:
         ret['vdw_parent'] = [atom.vdw_parent.idx for atom in atoms]
-    except AttributeError:
-        pass
-    # SEGID (CHARMM)
-    try:
-        ret['segid'] = [atom.segid for atom in atoms]
     except AttributeError:
         pass
     # anisotropic b-factors
@@ -257,6 +252,11 @@ def load_dataframe(obj, dataframe):
             raise ValueError('Data does not match length of atoms list')
         for atom, x in zip(atoms, data):
             setattr(atom, attr, x)
+    def set_residue_attr(attr, data):
+        if len(data) != len(atoms):
+            raise ValueError('Data does not match length of atoms list')
+        for atom, x in zip(atoms, data):
+            setattr(atom.residue, attr, x)
 
     multipoles = [None for i in range(10)]
     anisous = [None for i in range(6)]
@@ -322,8 +322,6 @@ def load_dataframe(obj, dataframe):
                 atom.vdw_parent = atoms[parent]
         elif key == 'polarizability':
             set_attribute('polarizability', data)
-        elif key == 'segid':
-            set_attribute('segid', data)
         elif key == 'multipole_111':
             multipoles[0] = data
         elif key == 'multipole_211':
@@ -356,7 +354,8 @@ def load_dataframe(obj, dataframe):
             anisous[4] = data
         elif key == 'U23':
             anisous[5] = data
-        elif key in ('resname', 'resid', 'resnum', 'chain'):
+        elif key in ('resname', 'resid', 'resnum', 'chain', 'segid'):
+            set_residue_attr(key, data)
             continue
         else:
             warnings.warn('Atomic property %s not recognized' % key,
