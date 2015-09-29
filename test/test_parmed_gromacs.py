@@ -9,6 +9,7 @@ from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
+import utils
 from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
 import warnings
 
@@ -244,6 +245,26 @@ class TestGromacsTop(FileIOTestCase):
             for a1, a2 in zip(r1.atoms, r2.atoms):
                 self.assertEqual(a1.name, a2.name)
                 self.assertEqual(a1.type, a2.type)
+
+    def testMoleculeCombine(self):
+        """ Tests selective molecule combination in Gromacs topology files """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
+        fname = get_fn('combined.top', written=True)
+        parm.write(fname, combine=[[3, 4], [126, 127, 128, 129, 130]])
+        with open(fname, 'r') as f:
+            for line in f:
+                if line.startswith('[ molecules ]'):
+                    break
+            molecule_list = []
+            for line in f:
+                if line[0] == ';': continue
+                words = line.split()
+                molecule_list.append((words[0], int(words[1])))
+        self.assertEqual(molecule_list, [('DPPC', 3), ('system1', 1),
+                         ('SOL', 121), ('system2', 1), ('SOL', 121)])
+
+    _equal_atoms = utils.equal_atoms
 
 class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
