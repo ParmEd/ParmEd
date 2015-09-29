@@ -17,7 +17,7 @@ notfound() {
 
 test -d parmed || notfound
 
-pyflakes parmed | \
+pyflakes parmed 2>&1 | \
     grep -v -e "from parmed.topologyobjects import \*" \
             -e "from parmed.modeller.residue import \*" \
             -e "from parmed.tools.actions import \*" \
