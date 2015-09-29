@@ -94,6 +94,9 @@ How does ParmEd enhance OpenMM?
     MdcrdReporter
     RestartReporter
     ProgressReporter
+    XmlFile
+    load_topology
+    energy_decomposition
 
 ParmEd provides a common framework for constructing and representing fully
 parametrized force field models for various systems instantiated from a wide
@@ -129,6 +132,51 @@ classes in addition to the small number provided by ParmEd:
     * :class:`ProgressReporter` -- This prints a file during the course of the
       simulation tracking the runtime speed of the calculation and predicting
       the amount of time remaining.
+
+The :func:`energy_decomposition` function takes as input a :class:`Structure
+<parmed.structure.Structure>` instance, OpenMM ``Context``, and an optional
+energy unit (``nrg``) and returns a dictionary of all energy components for the
+different force groups. This permits an form of energy decomposition that allows
+energy components to be compared between programs more effectively. For
+example::
+
+    >>> import parmed as pmd
+    >>> from simtk.openmm import app
+    >>> from simtk import openmm as mm
+    >>> # Instantiate the parm and create the system
+    ... parm = pmd.load_file('tip4p.parm7', 'tip4p.rst7')
+    >>> system = parm.createSystem(nonbondedMethod=app.PME,
+    ...                            nonbondedCutoff=8*pmd.unit.angstrom)
+    >>> # Make the context and set the positions
+    ... context = mm.Context(system, mm.VerletIntegrator(0.001))
+    >>> context.setPositions(parm.positions)
+    >>> # Find the energy decomposition
+    ... pmd.openmm.energy_decomposition(parm, context)
+    {'total': -2133.295388974015, 'nonbonded': -2133.2953890231834, 'bond': 1.0126508125518531e-07}
+
+Loading OpenMM Objects
+----------------------
+
+The OpenMM ``Topology`` object and ``System`` object contain the information
+stored in :class:`Structure <parmed.structure.Structure>`. You can use
+:func:`load_topology` to load an OpenMM ``Topology`` and create a
+:class:`Structure <parmed.structure.Structure>` instance from it. If you provide
+either a file containing a serialized ``System`` in XML format or a ``System``
+object directly, parameters will be extracted from the various forces and added
+to the generated :class:`Structure <parmed.structure.Structure>`. You can also
+pass coordinates (or any coordinate file, including an OpenMM XML-serialized
+State file) with the ``xyz`` argument and unit cell dimensions with the ``box``
+argument (which will override any unit cell information contained in the input
+``Topology``, ``System`` or coordinate file if applicable).
+
+The :class:`XmlFile` class can parse and return a deserialized object from an
+OpenMM-generated XML file. Supported XML files are:
+
+    - Serialized ``System`` (returns an OpenMM :class:`System` instance)
+    - Serialized ``State`` (returns a container object with attributes
+      ``coordinates``, ``velocities``, ``forces``, ``energy``, and ``time``)
+    - Serialized ``Integrator`` (returns an OpenMM :class:`Integrator` subclass)
+    - XML ``ForceField`` file (returns an OpenMM :class:`ForceField` instance)
 
 Examples
 --------
