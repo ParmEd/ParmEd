@@ -251,6 +251,15 @@ class TestGromacsTop(FileIOTestCase):
         warnings.filterwarnings('ignore', category=GromacsWarning)
         parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
         fname = get_fn('combined.top', written=True)
+        # Make sure that combining non-adjacent molecules fails
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine=[[1, 3]]))
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine='joey'))
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine=[1, 2, 3]))
+        self.assertRaises(TypeError, lambda:
+                parm.write(fname, combine=1))
         parm.write(fname, combine=[[3, 4], [126, 127, 128, 129, 130]])
         with open(fname, 'r') as f:
             for line in f:
