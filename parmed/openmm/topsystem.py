@@ -6,7 +6,10 @@ from __future__ import division, print_function, absolute_import
 
 __all__ = ['load_topology']
 
+from collections import defaultdict
+import numpy as np
 from parmed.exceptions import OpenMMWarning
+from parmed.formats import load_file
 from parmed.geometry import box_vectors_to_lengths_and_angles
 from parmed.periodic_table import Element
 from parmed.structure import Structure
@@ -18,23 +21,14 @@ from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import range
-from collections import defaultdict
-try:
-    import numpy as np
-    def create_array(array):
-        return np.asarray(array)
-except ImportError:
-    np = None
-    def create_array(array):
-        return array
 try:
     import simtk.openmm as mm
 except ImportError:
-    pass
+    mm = None
 import warnings
 
 @needs_openmm
-def load_topology(topology, system=None):
+def load_topology(topology, system=None, xyz=None, box=None):
     """
     Creates a :class:`parmed.structure.Structure` instance from an OpenMM
     Topology, optionally filling in parameters from a System
@@ -48,6 +42,12 @@ def load_topology(topology, system=None):
         Structure. If a string is given, it will be interpreted as the file name
         of an XML-serialized System, and it will be deserialized into a System
         before used to supply parameters
+    xyz : str or array of float
+        Name of a file containing coordinate information or an array of
+        coordinates. If file has unit cell information, it also uses that
+        information unless ``box`` (below) is also specified
+    box : array of 6 floats
+        Unit cell dimensions
 
     Returns
     -------
@@ -101,15 +101,35 @@ def load_topology(topology, system=None):
         ang = ang.value_in_unit(u.degrees)
         struct.box = [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
 
+    loaded_box = False
+
+    if xyz is not None:
+        if isinstance(xyz, string_types):
+            xyz = load_file(xyz)
+            struct.coordinates = xyz.coordinates
+            if struct.box is not None:
+                if xyz.box is not None:
+                    loaded_box = True
+                    struct.box = xyz.box
+        else:
+            struct.coordinates = xyz
+
+    if box is not None:
+        loaded_box = True
+        struct.box = box
+
     if struct.box is not None:
-        struct.box = create_array(struct.box)
+        struct.box = np.asarray(struct.box)
 
     if system is None:
         return struct
 
     if isinstance(system, string_types):
-        with open(system, 'r') as f:
-            system = mm.XmlSerializer.deserialize(f.read())
+        system = load_file(system)
+
+    if not isinstance(system, mm.System):
+        raise TypeError('system must be an OpenMM System object or serialized '
+                        'XML of an OpenMM System object')
 
     # We have a system, try to extract parameters from it
     if len(struct.atoms) != system.getNumParticles():
@@ -123,13 +143,14 @@ def load_topology(topology, system=None):
                       mm.GBSAOBCForce, mm.CustomGBForce)
 
     if system.usesPeriodicBoundaryConditions():
-        vectors = system.getDefaultPeriodicBoxVectors()
-        leng, ang = box_vectors_to_lengths_and_angles(*vectors)
-        leng = leng.value_in_unit(u.angstroms)
-        ang = ang.value_in_unit(u.degrees)
-        struct.box = create_array(
-                [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
-        )
+        if not loaded_box:
+            vectors = system.getDefaultPeriodicBoxVectors()
+            leng, ang = box_vectors_to_lengths_and_angles(*vectors)
+            leng = leng.value_in_unit(u.angstroms)
+            ang = ang.value_in_unit(u.degrees)
+            struct.box = np.asarray(
+                    [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
+            )
     else:
         struct.box = None
 
