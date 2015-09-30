@@ -1499,7 +1499,7 @@ class GromacsTopologyFile(Structure):
                 dest.write('%-15s %6d\n' % ('system', 1))
             else:
                 molecules = self.split()
-                nmols = nmols_orig = sum(len(m[1]) for m in molecules)
+                nmols = sum(len(m[1]) for m in molecules)
                 moleculedict = dict()
                 # Hash our molecules by indices
                 for m, num in molecules:
