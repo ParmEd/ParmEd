@@ -1499,7 +1499,7 @@ class GromacsTopologyFile(Structure):
                 dest.write('%-15s %6d\n' % ('system', 1))
             else:
                 molecules = self.split()
-                nmols = sum(len(m[1]) for m in molecules)
+                nmols = nmols_orig = sum(len(m[1]) for m in molecules)
                 moleculedict = dict()
                 # Hash our molecules by indices
                 for m, num in molecules:
@@ -1529,7 +1529,7 @@ class GromacsTopologyFile(Structure):
                         else:
                             combmol += mol
                     combined_molecules.append((combmol, cl[0], len(cl)))
-                    nmols -= len(cl)
+                    nmols -= (len(cl) - 1)
                 # combined_molecules now contains a list of tuples, and that
                 # tuple stores the combined molecule, first molecule index of
                 # the pre-combined molecule, and how many molecules were
@@ -1583,10 +1583,10 @@ class GromacsTopologyFile(Structure):
                 dest.write('\n\n')
                 # Molecules
                 dest.write('[ molecules ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in molecules)
+                total_mols = sum(len(m[1]) for m in new_molecules)
                 i = 0
                 while i < total_mols:
-                    for j, (molecule, lst) in enumerate(molecules):
+                    for j, (molecule, lst) in enumerate(new_molecules):
                         if i in lst:
                             break
                     else:

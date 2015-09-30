@@ -270,8 +270,17 @@ class TestGromacsTop(FileIOTestCase):
                 if line[0] == ';': continue
                 words = line.split()
                 molecule_list.append((words[0], int(words[1])))
+        parm2 = load_file(fname)
         self.assertEqual(molecule_list, [('DPPC', 3), ('system1', 1),
                          ('SOL', 121), ('system2', 1), ('SOL', 121)])
+        self.assertEqual(len(parm2.atoms), len(parm.atoms))
+        self.assertEqual(len(parm2.residues), len(parm2.residues))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self._equal_atoms(a1, a2)
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
 
     _equal_atoms = utils.equal_atoms
 
