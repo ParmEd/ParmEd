@@ -118,6 +118,8 @@ longer match that from the coordinate file! An annotated example may help
 demonstrate this. Consider the following topology file (it is actually the
 ``topol3.top`` file from the ``12.DPPC/`` directory in the test suite):
 
+::
+
     #include "DPPC_2.itp"
     
     ; System specifications
@@ -153,6 +155,8 @@ this would be molecules 3 and 4), as well as the five residues 127 through 131
 
 If we look at the bottom of the ``test.top`` file we generated, we should see
 this:
+
+::
 
     [ molecules ]
     ; Compound       #mols
