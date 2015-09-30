@@ -23,36 +23,7 @@ import utils
 class TestParmedSerialization(unittest.TestCase):
     """ Tests ParmEd serialization """
 
-    def _equal_atoms(self, a1, a2):
-        self.assertEqual(a1.atomic_number, a2.atomic_number)
-        self.assertEqual(a1.screen, a2.screen)
-        self.assertEqual(a1.name, a2.name)
-        self.assertEqual(a1.type, a2.type)
-        self.assertEqual(a1.atom_type, a2.atom_type)
-        self.assertEqual(a1.charge, a2.charge)
-        self.assertEqual(a1.mass, a2.mass)
-        self.assertEqual(a1.nb_idx, a2.nb_idx)
-        self.assertEqual(a1.radii, a2.radii)
-        self.assertEqual(a1.tree, a2.tree)
-        self.assertEqual(a1.join, a2.join)
-        self.assertEqual(a1.irotat, a2.irotat)
-        self.assertEqual(a1.occupancy, a2.occupancy)
-        self.assertEqual(a1.bfactor, a2.bfactor)
-        self.assertEqual(a1.rmin, a2.rmin)
-        self.assertEqual(a1.epsilon, a2.epsilon)
-        self.assertEqual(a1.rmin_14, a2.rmin_14)
-        self.assertEqual(a1.epsilon_14, a2.epsilon_14)
-        for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles',
-                    'type_idx', 'class_idx', 'polarizability', 'vdw_weight'):
-            if hasattr(a2, key):
-                if isinstance(getattr(a2, key), np.ndarray):
-                    np.testing.assert_equal(
-                            getattr(a1, key), getattr(a2, key)
-                    )
-                else:
-                    self.assertEqual(getattr(a1, key), getattr(a2, key))
-            else:
-                self.assertFalse(hasattr(a1, key))
+    _equal_atoms = utils.equal_atoms
 
     def test_atom_serialization(self):
         """ Tests the serialization of Atom """
