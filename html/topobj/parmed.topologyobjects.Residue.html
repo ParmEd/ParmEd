@@ -51,7 +51,7 @@
 <h1>parmed.topologyobjects.Residue<a class="headerlink" href="#parmed-topologyobjects-residue" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.topologyobjects.Residue">
-<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Residue</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Residue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Residue</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>segid=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>A single residue that is composed of a small number of atoms</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -62,17 +62,23 @@
 <div><p>Name of the residue. Typical convention is to choose a name that is 4
 characters or shorter</p>
 </div></blockquote>
-<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt>, optional</p>
 <blockquote>
-<div><p>Residue number assigned in the input structure</p>
+<div><p>Residue number assigned in the input structure. Default is -1</p>
 </div></blockquote>
-<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
 <blockquote>
-<div><p>The 1-letter chain identifier for this residue</p>
+<div><p>The 1-letter chain identifier for this residue. Default is empty string</p>
 </div></blockquote>
-<p><strong>insertion_code</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>insertion_code</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
 <blockquote>
-<div><p>The insertion code (used in PDB files) for this residue</p>
+<div><p>The insertion code (used in PDB files) for this residue. Default is
+empty string</p>
+</div></blockquote>
+<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
+<blockquote>
+<div><p>The segment identifier, used by CHARMM in a way similar to chain. Dfault
+is empty string</p>
 </div></blockquote>
 <p><strong>list</strong> : <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a></p>
 <blockquote class="last">
@@ -145,7 +151,7 @@ equivalent to iterating over the <cite>atoms</cite> attribute</li>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.Residue.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Residue.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Residue.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>segid=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Residue.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Residue.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>

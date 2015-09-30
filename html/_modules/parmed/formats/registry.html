@@ -167,9 +167,9 @@
     <span class="c"># Check that the file actually exists and that we can read it</span>
     <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>\
             <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">):</span>
-        <span class="c"># This raises IOError if it does not exist</span>
+        <span class="c"># This raises IOError if it does not exist; assert silences linters</span>
         <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="k">assert</span> <span class="n">f</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not exist&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>

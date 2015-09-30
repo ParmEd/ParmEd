@@ -303,6 +303,25 @@
     <span class="k">def</span> <span class="nf">_write_ffwriter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
 
+    <span class="c">#===================================================</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">format</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">strip_strings</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">strip_strings</span><span class="p">)</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strip_strings</span><span class="p">))</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">strip_strings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">strip_strings</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;strip_strings&#39;</span><span class="p">])</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
@@ -910,6 +929,11 @@
 <span class="sd">            If provided, the added flag will be added after the one with the</span>
 <span class="sd">            name given to `after`. If this flag does not exist, IndexError will</span>
 <span class="sd">            be raised</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AmberError if flag already exists</span>
+<span class="sd">        IndexError if the ``after`` flag does not exist</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">flag_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">AmberError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> already exists&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">flag_name</span><span class="p">))</span>
@@ -955,9 +979,20 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">flag_name</span><span class="p">]</span>
 
     <span class="c">#===================================================</span>
+</div>
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parm_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">,</span> <span class="n">flag_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="p">,</span>
+                    <span class="n">formats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">formats</span><span class="p">,</span> <span class="n">parm_comments</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">,</span>
+                    <span class="n">charge_flag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_flag</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">=</span> <span class="n">d</span>
+
+    <span class="c">#===================================================</span>
 
     <span class="c"># For backwards-compatibility, but warn of deprecation</span>
-</div>
+
     <span class="n">addFlag</span> <span class="o">=</span> <span class="n">_deprecated</span><span class="p">(</span><span class="s">&#39;addFlag&#39;</span><span class="p">,</span> <span class="s">&#39;add_flag&#39;</span><span class="p">)(</span><span class="n">add_flag</span><span class="p">)</span>
     <span class="n">deleteFlag</span> <span class="o">=</span> <span class="n">_deprecated</span><span class="p">(</span><span class="s">&#39;deleteFlag&#39;</span><span class="p">,</span> <span class="s">&#39;delete_flag&#39;</span><span class="p">)(</span><span class="n">delete_flag</span><span class="p">)</span>
 

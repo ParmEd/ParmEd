@@ -55,7 +55,7 @@
 <h1>parmed.openmm.StateDataReporter<a class="headerlink" href="#parmed-openmm-statedatareporter" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.openmm.StateDataReporter">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.</tt><tt class="descname">StateDataReporter</tt><big>(</big><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0})</em><big>)</big><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">parmed.openmm.</tt><tt class="descname">StateDataReporter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class acts as a state data reporter for OpenMM simulations, but it is a
 little more generalized. Notable differences are:</p>
 <blockquote>
@@ -166,7 +166,7 @@ unit.grams/unit.item/unit.milliliter)</p>
 </table>
 <dl class="method">
 <dt id="parmed.openmm.StateDataReporter.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0})</em><big>)</big><a class="headerlink" href="#parmed.openmm.StateDataReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.openmm.StateDataReporter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -176,7 +176,7 @@ unit.grams/unit.item/unit.milliliter)</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.StateDataReporter.__init__" title="parmed.openmm.StateDataReporter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(f,&nbsp;reportInterval[,&nbsp;step,&nbsp;time,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.StateDataReporter.__init__" title="parmed.openmm.StateDataReporter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.StateDataReporter.describeNextReport" title="parmed.openmm.StateDataReporter.describeNextReport"><tt class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></tt></a>(simulation)</td>

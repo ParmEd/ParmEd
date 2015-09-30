@@ -51,7 +51,7 @@
 <h1>parmed.charmm.CharmmPsfFile<a class="headerlink" href="#parmed-charmm-charmmpsffile" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.charmm.CharmmPsfFile">
-<em class="property">class </em><tt class="descclassname">parmed.charmm.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>psf_name=None</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">parmed.charmm.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>A chemical <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instantiated from CHARMM files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -76,16 +76,16 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.box" title="parmed.charmm.CharmmPsfFile.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.box_vectors" title="parmed.charmm.CharmmPsfFile.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
 <td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.combining_rule" title="parmed.charmm.CharmmPsfFile.combining_rule"><tt class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.coordinates" title="parmed.charmm.CharmmPsfFile.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.positions" title="parmed.charmm.CharmmPsfFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
@@ -109,7 +109,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom" title="parmed.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom" title="parmed.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom_to_residue" title="parmed.charmm.CharmmPsfFile.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
@@ -121,7 +121,7 @@
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.copy" title="parmed.charmm.CharmmPsfFile.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.createSystem" title="parmed.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>([params])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.createSystem" title="parmed.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM System object from the CHARMM PSF file.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.from_structure" title="parmed.charmm.CharmmPsfFile.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct[,&nbsp;copy])</td>
@@ -142,52 +142,52 @@
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.load_parameters" title="parmed.charmm.CharmmPsfFile.load_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameters</span></tt></a>(parmset)</td>
 <td>Loads parameters from a parameter set that was loaded via CHARMM RTF, PAR, and STR files.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="parmed.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(system,&nbsp;constraints,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="parmed.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="parmed.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>([constraints,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="parmed.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="parmed.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>([constraints,&nbsp;rigidWater,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="parmed.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="parmed.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="parmed.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="parmed.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="parmed.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="parmed.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(implicitSolvent[,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="parmed.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="parmed.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="parmed.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="parmed.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>([nonbondedMethod,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="parmed.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM NonbondedForce instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(system)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.prune_empty_terms" title="parmed.charmm.CharmmPsfFile.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
@@ -224,7 +224,7 @@
 </table>
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>psf_name=None</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens and parses a PSF file, then instantiates a CharmmPsfFile
 instance from the data.</p>
 </dd></dl>
@@ -236,10 +236,10 @@ instance from the data.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.__init__" title="parmed.charmm.CharmmPsfFile.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>([psf_name])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.__init__" title="parmed.charmm.CharmmPsfFile.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Opens and parses a PSF file, then instantiates a CharmmPsfFile instance from the data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom" title="parmed.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom" title="parmed.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom_to_residue" title="parmed.charmm.CharmmPsfFile.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
@@ -251,7 +251,7 @@ instance from the data.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.copy" title="parmed.charmm.CharmmPsfFile.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.createSystem" title="parmed.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>([params])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.createSystem" title="parmed.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM System object from the CHARMM PSF file.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.has_NBFIX" title="parmed.charmm.CharmmPsfFile.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
@@ -263,52 +263,52 @@ instance from the data.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.load_parameters" title="parmed.charmm.CharmmPsfFile.load_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameters</span></tt></a>(parmset)</td>
 <td>Loads parameters from a parameter set that was loaded via CHARMM RTF, PAR, and STR files.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="parmed.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(system,&nbsp;constraints,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="parmed.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="parmed.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>([constraints,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="parmed.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="parmed.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>([constraints,&nbsp;rigidWater,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="parmed.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="parmed.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="parmed.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="parmed.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="parmed.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="parmed.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(implicitSolvent[,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="parmed.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="parmed.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="parmed.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="parmed.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>([nonbondedMethod,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="parmed.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM NonbondedForce instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(system)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.prune_empty_terms" title="parmed.charmm.CharmmPsfFile.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
@@ -347,43 +347,43 @@ instance from the data.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">ANGLE_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.ANGLE_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.ANGLE_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">ANGLE_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">BOND_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.BOND_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.BOND_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">BOND_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">CMAP_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.CMAP_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.CMAP_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">CMAP_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">DIHEDRAL_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.DIHEDRAL_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.DIHEDRAL_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">DIHEDRAL_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">IMPROPER_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.IMPROPER_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.IMPROPER_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">IMPROPER_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">NONBONDED_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.NONBONDED_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.NONBONDED_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">NONBONDED_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">OUT_OF_PLANE_BEND_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.OUT_OF_PLANE_BEND_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.OUT_OF_PLANE_BEND_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">OUT_OF_PLANE_BEND_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">PI_TORSION_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.PI_TORSION_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.PI_TORSION_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">PI_TORSION_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">RB_TORSION_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.RB_TORSION_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.RB_TORSION_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">RB_TORSION_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">STRETCH_BEND_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.STRETCH_BEND_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.STRETCH_BEND_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">STRETCH_BEND_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">TORSION_TORSION_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.TORSION_TORSION_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.TORSION_TORSION_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">TORSION_TORSION_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">TRIGONAL_ANGLE_FORCE_GROUP</span></tt></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.TRIGONAL_ANGLE_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.TRIGONAL_ANGLE_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">TRIGONAL_ANGLE_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">UREY_BRADLEY_FORCE_GROUP</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmPsfFile.UREY_BRADLEY_FORCE_GROUP" title="parmed.charmm.CharmmPsfFile.UREY_BRADLEY_FORCE_GROUP"><tt class="xref py py-obj docutils literal"><span class="pre">UREY_BRADLEY_FORCE_GROUP</span></tt></a></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.box_vectors" title="parmed.charmm.CharmmPsfFile.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
@@ -402,7 +402,7 @@ instance from the data.</p>
 </table>
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.add_atom" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
 it has a different name or number as the last residue added and adding
 it to the <cite>atoms</cite> list.</p>
@@ -427,8 +427,12 @@ it to the <cite>atoms</cite> list.</p>
 <div><p>The chain ID character for this residue</p>
 </div></blockquote>
 <p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The insertion code ID character for this residue (it is stripped)</p>
+</div></blockquote>
+<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote class="last">
+<div><p>The segment identifier for this residue (it is stripped)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -514,7 +518,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.createSystem">
-<tt class="descname">createSystem</tt><big>(</big><em>params=None</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM System object from the CHARMM PSF file. This is a
 shortcut for calling <cite>load_parameters</cite> followed by
 Structure.createSystem. If params is not None, <cite>load_parameters</cite> will be
@@ -692,7 +696,7 @@ expansion</li>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_add_constraints">
-<tt class="descname">omm_add_constraints</tt><big>(</big><em>system</em>, <em>constraints</em>, <em>rigidWater</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -719,7 +723,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_angle_force">
-<tt class="descname">omm_angle_force</tt><big>(</big><em>constraints=None</em>, <em>flexibleConstraints=True</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -752,7 +756,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_bond_force">
-<tt class="descname">omm_bond_force</tt><big>(</big><em>constraints=None</em>, <em>rigidWater=True</em>, <em>flexibleConstraints=True</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -789,7 +793,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_cmap_force">
-<tt class="descname">omm_cmap_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -807,7 +811,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_dihedral_force">
-<tt class="descname">omm_dihedral_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -825,7 +829,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_gbsa_force">
-<tt class="descname">omm_gbsa_force</tt><big>(</big><em>implicitSolvent</em>, <em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=30.0</em>, <em>unit=angstrom)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>useSASA=True</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -880,7 +884,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_improper_force">
-<tt class="descname">omm_improper_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -898,7 +902,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_nonbonded_force">
-<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0</em>, <em>unit=angstrom)</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>reactionFieldDielectric=78.5</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -962,7 +966,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force">
-<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -980,7 +984,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force">
-<tt class="descname">omm_pi_torsion_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -998,7 +1002,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force">
-<tt class="descname">omm_rb_torsion_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_rb_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1016,7 +1020,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites">
-<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>system</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1037,7 +1041,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force">
-<tt class="descname">omm_stretch_bend_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1055,7 +1059,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force">
-<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1074,7 +1078,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force">
-<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1092,7 +1096,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force">
-<tt class="descname">omm_urey_bradley_force</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

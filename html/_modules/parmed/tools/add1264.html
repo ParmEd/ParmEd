@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed" href="../../parmed.html" /> 
+    <link rel="up" title="parmed.tools" href="../tools.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" accesskey="U">parmed.tools</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -55,7 +56,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="n">LJ12_6_4Error</span><span class="p">,</span> <span class="n">DuplicateParamWarning</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -129,88 +130,86 @@
 
     <span class="k">print</span><span class="p">(</span><span class="s">&quot;***********************************************************&quot;</span><span class="p">)</span>
     <span class="c"># Determine which atom type was treated as the center metal ion</span>
-    <span class="n">typelist</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">mettypdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mask</span><span class="o">.</span><span class="n">Selected</span><span class="p">():</span>
-        <span class="n">typeidx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_TYPE_INDEX&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">chgi</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;CHARGE&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">typeidx</span> <span class="ow">in</span> <span class="n">typelist</span><span class="p">:</span> <span class="k">continue</span>
-        <span class="n">typelist</span><span class="p">[</span><span class="n">typeidx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">chgi</span><span class="p">))</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;The selected metal ion is&quot;</span><span class="p">,</span>
+        <span class="n">mettypind</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_TYPE_INDEX&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">metchg</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;CHARGE&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mettypind</span> <span class="ow">in</span> <span class="n">mettypdict</span><span class="p">:</span> <span class="k">continue</span>
+        <span class="n">mettypdict</span><span class="p">[</span><span class="n">mettypind</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">metchg</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;The selected metal ion is </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
               <span class="n">pt</span><span class="o">.</span><span class="n">Element</span><span class="p">[</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">])</span>
-    <span class="n">types</span> <span class="o">=</span> <span class="n">typelist</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    <span class="n">types</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">mettypinds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mettypdict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
-    <span class="c"># Determine the C4 term between the atom type of center metal ion </span>
-    <span class="c"># and every atom type in the prmtop file </span>
-
-    <span class="c"># 1. Get the list of AMBER_ATOM_TYPE and ATOM_TYPE_INDEX for all </span>
+    <span class="c"># 1. Get the dict between AMBER_ATOM_TYPE and ATOM_TYPE_INDEX for all </span>
     <span class="c"># the atoms in prmtop file</span>
 
-    <span class="n">amberatomtypelist1</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;AMBER_ATOM_TYPE&#39;</span><span class="p">]</span>
-    <span class="n">atomtypeindexlist1</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_TYPE_INDEX&#39;</span><span class="p">]</span>
-
-    <span class="c"># 2. Have the representative AMBER_ATOM_TYPE for the each certain</span>
-    <span class="c"># ATOM_TYPE_INDEX</span>
-
-    <span class="n">amberatomtypelist2</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">atomtypeindexlist2</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;NATOM&#39;</span><span class="p">]):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">atomtypeindexlist1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">atomtypeindexlist2</span><span class="p">:</span>
-            <span class="n">amberatomtypelist2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amberatomtypelist1</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="n">atomtypeindexlist2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atomtypeindexlist1</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-    <span class="c">#3.Generate the C4 term for each atom type</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_ACOEF&#39;</span><span class="p">]))]</span>
-
- 
     <span class="n">ntypes</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s">&#39;NTYPES&#39;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
-<span class="c">#       print(&quot;The biggest ATOM_TYPE_INDEX = %d&quot; % ntypes)</span>
-<span class="c">#       print(&quot;The selected +2 metal ion has the ATOM_TYPE_INDEX = %d&quot; % typ)</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="n">typ</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">typs</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;AMBER_ATOM_TYPE&#39;</span><span class="p">]</span>
+    <span class="n">typinds</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;ATOM_TYPE_INDEX&#39;</span><span class="p">]</span>
 
-<span class="c">#       print(&quot;***********************************************************&quot;)</span>
-<span class="c">#       print(&quot;Here are the atom types which have been added C4 term:&quot;)</span>
-        <span class="c"># for the situation j &lt; i</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">typ</span><span class="p">):</span>
-            <span class="n">atomtypej</span> <span class="o">=</span> <span class="n">amberatomtypelist2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-            <span class="n">jj</span> <span class="o">=</span> <span class="n">atomtypeindexlist2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="n">idx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">ntypes</span><span class="o">*</span><span class="n">jj</span><span class="o">+</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">c4</span> <span class="o">=</span> <span class="n">c4list</span><span class="p">[</span> <span class="n">pt</span><span class="o">.</span><span class="n">Element</span><span class="p">[</span><span class="n">typelist</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">typelist</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="p">]</span>
-                <span class="n">pol</span> <span class="o">=</span> <span class="n">pollist</span><span class="p">[</span><span class="n">atomtypej</span><span class="p">]</span>
-<span class="c">#               print (&#39;ATOM_TYPE_INDEX = %d; AMBER_ATOM_TYPE=%s; &#39;</span>
-<span class="c">#                      &#39;Polarizability=%s&#39; %(jj+1, atomtypej, pol))</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">LJ12_6_4Error</span><span class="p">(</span><span class="s">&quot;Could not find parameters for &quot;</span>
-                                    <span class="s">&quot;ATOM_TYPE </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">atomtypej</span> <span class="p">)</span>
+    <span class="n">typdict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ty</span><span class="p">,</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">typs</span><span class="p">,</span> <span class="n">typinds</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">typdict</span><span class="p">:</span>
+            <span class="n">typdict</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ty</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">ty</span> <span class="ow">in</span> <span class="n">typdict</span><span class="p">[</span><span class="n">ind</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">typdict</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ty</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">atomtypej</span><span class="o">==</span><span class="s">&quot;OW&quot;</span><span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span>
-            <span class="k">else</span><span class="p">:</span>   
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span>
-               
-            <span class="c"># for the situation i =&lt; j </span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ntypes&#39;</span><span class="p">)):</span>
-            <span class="n">atomtypej</span> <span class="o">=</span> <span class="n">amberatomtypelist2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-            <span class="n">jj</span> <span class="o">=</span> <span class="n">atomtypeindexlist2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="n">idx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">ntypes</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">jj</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">c4</span> <span class="o">=</span> <span class="n">c4list</span><span class="p">[</span> <span class="n">pt</span><span class="o">.</span><span class="n">Element</span><span class="p">[</span><span class="n">typelist</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">typelist</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="p">]</span>
-                <span class="n">pol</span> <span class="o">=</span> <span class="n">pollist</span><span class="p">[</span><span class="n">atomtypej</span><span class="p">]</span>
-<span class="c">#               print (&#39;ATOM_TYPE_INDEX = %d; AMBER_ATOM_TYPE= %s; &#39;</span>
-<span class="c">#                      &#39;Polarizability=%s&#39; %(jj+1, atomtypej, pol))</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">LJ12_6_4Error</span><span class="p">(</span><span class="s">&quot;Could not find parameters for &quot;</span>
-                                    <span class="s">&quot;ATOM_TYPE </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">atomtypej</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntypes</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">typinds</span><span class="p">:</span>
+            <span class="n">typdict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">atomtypej</span><span class="o">==</span><span class="s">&quot;OW&quot;</span><span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span>
-<span class="c">#       print(&quot;***********************************************************&quot;)</span>
+    <span class="c"># 2.Generate the C4 term for each atom type pair</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;LENNARD_JONES_ACOEF&#39;</span><span class="p">]]</span>
+
+    <span class="k">for</span> <span class="n">mettypind</span> <span class="ow">in</span> <span class="n">mettypinds</span><span class="p">:</span>
+        <span class="c"># Obtain the C4 parameters</span>
+        <span class="n">c4</span> <span class="o">=</span> <span class="n">c4list</span><span class="p">[</span><span class="n">pt</span><span class="o">.</span><span class="n">Element</span><span class="p">[</span><span class="n">mettypdict</span><span class="p">[</span><span class="n">mettypind</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">mettypdict</span><span class="p">[</span><span class="n">mettypind</span><span class="p">][</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">mettypind</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntypes</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">jj</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">attypjs</span> <span class="o">=</span> <span class="n">typdict</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">attypjs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c"># Get polarizability</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">typjs</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">attypjs</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">pol</span> <span class="o">=</span> <span class="n">pollist</span><span class="p">[</span><span class="n">typjs</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">LJ12_6_4Error</span><span class="p">(</span><span class="s">&quot;Could not find parameters for &quot;</span>
+                                                <span class="s">&quot;ATOM_TYPE </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">typjs</span> <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">anthpol</span> <span class="o">=</span> <span class="n">pollist</span><span class="p">[</span><span class="n">typjs</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">anthpol</span> <span class="o">!=</span> <span class="n">pol</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">LJ12_6_4Error</span><span class="p">(</span>
+                                        <span class="s">&#39;Polarizability parameter of &#39;</span>
+                                        <span class="s">&#39;AMBER_ATOM_TYPE </span><span class="si">%s</span><span class="s"> is not the same &#39;</span>
+                                        <span class="s">&#39;as that of AMBER_ATOM_TYPE </span><span class="si">%s</span><span class="s">, but &#39;</span>
+                                        <span class="s">&#39;their VDW parameters are the same. &#39;</span> <span class="o">%</span>
+                                        <span class="p">(</span><span class="n">attypjs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">typjs</span><span class="p">)</span>
+                                <span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">LJ12_6_4Error</span><span class="p">(</span><span class="s">&quot;Could not find parameters for &quot;</span>
+                                                <span class="s">&quot;ATOM_TYPE </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">typjs</span><span class="p">)</span>
+                <span class="c"># Get index</span>
+                <span class="k">if</span> <span class="n">jj</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">ntypes</span><span class="o">*</span><span class="n">jj</span><span class="o">+</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">ntypes</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">jj</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+
+                <span class="c"># Caculate C4 terms</span>
+                <span class="k">if</span> <span class="n">attypjs</span> <span class="o">==</span> <span class="p">[</span><span class="s">&#39;OW&#39;</span><span class="p">]:</span>
+                    <span class="c"># There is only one C4 term exist between water and a</span>
+                    <span class="c"># certain ion</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c4</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># There are two C4 terms need to add together between two</span>
+                    <span class="c"># different ions</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c4</span> <span class="o">/</span> <span class="n">WATER_POL</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">*</span> <span class="n">tunfactor</span>
     <span class="k">return</span> <span class="n">result</span>
-
 </div>
 <span class="k">def</span> <span class="nf">_get_params</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
     <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -259,7 +258,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" >parmed.tools</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

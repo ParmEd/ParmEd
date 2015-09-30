@@ -81,9 +81,121 @@ is shown below::
     >>> top
     <GromacsTopologyFile 1960 atoms; 129 residues; 1984 bonds; parametrized>
     
-
 You can manipulate the ``top`` instance any way you can a :class:`Structure
 <parmed.structure.Structure>` instance.
+
+Writing GROMACS Topology Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Molecule type definitions**
+
+The GROMACS topology is constructed by piecing together *fragments* of a system,
+where each fragment is, by standard convention, an individual *molecule*
+(meaning that you can "reach" every atom in a molecule from every other atom in
+that molecule by traversing some number of bonds -- i.e., it is a connected
+graph).
+
+These "molecules" are defined in separate ``[ moleculetype ]`` sections of the
+topology file, and then the ``[ molecules ]`` section gives the order, and
+number, of each molecule *type* in the system.
+
+GROMACS can make use of the definitions of a molecule *type*, and this
+distinction is particularly important for free energy calculations. For this
+reason, the ``combine`` keyword in :meth:`GromacsTopologyFile.write` allows
+fine-grained control over how ``[ moleculetype ]`` sections are defined. By
+default, (when ``combine`` is assigned ``None``), the structure is split into
+molecules and written as separate ``[ moleculetype ]`` sections. When
+``combine`` is assigned the string ``all``, the entire structure is considered
+to be a single molecule and is stored as a single ``[ moleculetype ]`` section.
+
+The last allowable mode is to assign lists of lists of molecule indices for
+``combine``, telling :class:`GromacsTopologyFile` exactly which molecules to
+"combine" into larger ``[ moleculetype ]`` sections. There is one major
+restriction here: combined molecules *must* be contiguously ordered in the
+original atom sequence of the structure! The reason for this is that if the
+original order of the atoms is changed, then the topology atom order will no
+longer match that from the coordinate file! An annotated example may help
+demonstrate this. Consider the following topology file (it is actually the
+``topol3.top`` file from the ``12.DPPC/`` directory in the test suite):
+
+::
+
+    #include "DPPC_2.itp"
+    
+    ; System specifications
+    [ system ]
+    DPPC Bilayer
+    
+    [ molecules ]
+    ; molecule name nr.
+    DPPC 4
+    SOL	122
+    DPPC 4
+    SOL 122
+    
+The DPPC and SOL molecule types are defined in the ``DPPC_2.itp`` include
+topology file. When this topology is read in, there will be 252 residues -- 8
+DPPC residues and 244 SOL residues::
+
+    >>> import parmed as pmd
+    >>> # You can safely ignore the warning printed here
+    ... system = pmd.load_file('topol3.top')
+    >>> system
+    <GromacsTopologyFile 1132 atoms; 252 residues; 880 bonds; parametrized>
+
+Now suppose that we want to do something special with a DPPC-solvent pair, and
+then something special with all of the DPPC residues in the second set (possibly
+a second "leaflet" in a bilayer system) again with a single solvent.  So what we
+want to do is combine the 4th and 5th molecules (since indices start from 0,
+this would be molecules 3 and 4), as well as the five residues 127 through 131
+(indices 126, 127, 128, 129, and 130). Our ``combine`` would then look like
+``[[3,4],[126,127,128,129,130]]``::
+
+    >>> system.write('test.top', combine=[[3, 4], [126, 127, 128, 129, 130]])
+
+If we look at the bottom of the ``test.top`` file we generated, we should see
+this:
+
+::
+
+    [ molecules ]
+    ; Compound       #mols
+    DPPC                 3
+    system1              1
+    SOL                121
+    system2              1
+    SOL                121
+    
+If we think about it, this is exactly what we want.  We left our first 3 DPPC
+residues alone, then combined DPPC and SOL into a single molecule (since the
+molecule is defined by more than 1 residue, it is given a generic name
+``system#``, where ``#`` increments for each multi-residue molecule that is
+encountered. We left the last 121 of 122 SOL residues alone, then combined all 4
+DPPC residues and the first of the second set of 122 SOL residues into a single
+molecule type. Leaving us with ``system2`` and 121 ``SOL`` left to define our
+original system.
+
+Note, if you read a GROMACS topology file that combines multiple molecules into
+individual molecule types, writing a copy back to a different topology file will
+*not* preserve the original ``[ moleculetype ]`` definitions (since the ParmEd
+``Structure`` object carries no memory of such decompositions and always
+flattens the list of atoms and residues).  For the most part, you should not
+bother with this added complication unless you *know* it is necessary.
+
+**Parameters**
+
+There are 3 ways that parameters can be specified in GROMACS topologies --
+either through include topology files, as separate ``[ <parameter>type ]``
+sections in the main topology file, or in-line with the actual topologies
+themselves.
+
+You can specify where the parameters are placed using the ``parameters`` keyword
+in :meth:`GromacsTopologyFile.write`. The allowed values are ``inline``, a
+string representing the name of a file, or an open file object. If the file name
+is the same as the file name of the topology file itself, then the parameter
+sections will be written to the beginning of the topology file. If it is a
+different file, the name of the file will be included in the generated topology
+file. The default value is ``inline``.
 
 The GRO coordinate
 ------------------

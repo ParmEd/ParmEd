@@ -101,6 +101,1969 @@ field parameter files</p>
 </li>
 </ul>
 </div></blockquote>
+<dl class="class">
+<dt id="parmed.charmm.CharmmPsfFile">
+<em class="property">class </em><tt class="descclassname">parmed.charmm.</tt><tt class="descname">CharmmPsfFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<p>A chemical <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instantiated from CHARMM files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>psf_name</strong> : str, optional</p>
+<blockquote>
+<div><p>Name of the PSF file (it must exist)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong> : If file <tt class="docutils literal"><span class="pre">psf_name</span></tt> does not exist</p>
+<p class="last"><strong>CharmmPsfError</strong> : If any parsing errors are encountered</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.box" title="parmed.charmm.CharmmPsfFile.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.box_vectors" title="parmed.charmm.CharmmPsfFile.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
+<td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.combining_rule" title="parmed.charmm.CharmmPsfFile.combining_rule"><tt class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.coordinates" title="parmed.charmm.CharmmPsfFile.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.positions" title="parmed.charmm.CharmmPsfFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.topology" title="parmed.charmm.CharmmPsfFile.topology"><tt class="xref py py-obj docutils literal"><span class="pre">topology</span></tt></a></td>
+<td>The OpenMM Topology object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.velocities" title="parmed.charmm.CharmmPsfFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<td>A (natom, 3)-shape numpy array with atomic velocities for every atom in</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.view" title="parmed.charmm.CharmmPsfFile.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a></td>
+<td>Returns an indexable object that can be indexed like a standard</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom" title="parmed.charmm.CharmmPsfFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
+<td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.add_atom_to_residue" title="parmed.charmm.CharmmPsfFile.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
+<td>Adds a new atom to the Structure at the end if the given residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.clear_cmap" title="parmed.charmm.CharmmPsfFile.clear_cmap"><tt class="xref py py-obj docutils literal"><span class="pre">clear_cmap</span></tt></a>()</td>
+<td>Clear the cmap list to prevent any CMAP parameters from being used</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.copy" title="parmed.charmm.CharmmPsfFile.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
+<td>Makes a copy of the current structure as an instance of a specified</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.createSystem" title="parmed.charmm.CharmmPsfFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM System object from the CHARMM PSF file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.from_structure" title="parmed.charmm.CharmmPsfFile.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct[,&nbsp;copy])</td>
+<td>Instantiates a CharmmPsfFile from an input Structure instance.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.get_coordinates" title="parmed.charmm.CharmmPsfFile.get_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></tt></a>([frame])</td>
+<td>In some cases, multiple conformations may be stored in the Structure.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.has_NBFIX" title="parmed.charmm.CharmmPsfFile.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<td>Returns whether or not any pairs of atom types have their LJ</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.is_changed" title="parmed.charmm.CharmmPsfFile.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
+<td>Determines if any of the topology has changed for this structure</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.load_dataframe" title="parmed.charmm.CharmmPsfFile.load_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></tt></a>(df)</td>
+<td>Loads atomic properties from an input DataFrame</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.load_parameters" title="parmed.charmm.CharmmPsfFile.load_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameters</span></tt></a>(parmset)</td>
+<td>Loads parameters from a parameter set that was loaded via CHARMM RTF, PAR, and STR files.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="parmed.charmm.CharmmPsfFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds constraints to a given system</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="parmed.charmm.CharmmPsfFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="parmed.charmm.CharmmPsfFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="parmed.charmm.CharmmPsfFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM CMAP torsion force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="parmed.charmm.CharmmPsfFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="parmed.charmm.CharmmPsfFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates a Generalized Born force for running implicit solvent</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="parmed.charmm.CharmmPsfFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM improper torsion force (quadratic bias)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="parmed.charmm.CharmmPsfFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM NonbondedForce instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba out-of-plane bend force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba pi-torsion force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba stretch-bend force for this system</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba trigonal-angle force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM Urey-Bradley force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.prune_empty_terms" title="parmed.charmm.CharmmPsfFile.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
+<td>Looks through all of the topological lists and gets rid of terms</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.save" title="parmed.charmm.CharmmPsfFile.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<td>Saves the current Structure in the requested file format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.split" title="parmed.charmm.CharmmPsfFile.split"><tt class="xref py py-obj docutils literal"><span class="pre">split</span></tt></a>()</td>
+<td>Split the current Structure into separate Structure instances for each unique molecule.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.strip" title="parmed.charmm.CharmmPsfFile.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
+<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.to_dataframe" title="parmed.charmm.CharmmPsfFile.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.unchange" title="parmed.charmm.CharmmPsfFile.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<td>Toggles all lists so that they do not indicate any changes</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.update_dihedral_exclusions" title="parmed.charmm.CharmmPsfFile.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<td>Nonbonded exclusions and exceptions have the following priority:</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_cif" title="parmed.charmm.CharmmPsfFile.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from the current Structure instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_pdb" title="parmed.charmm.CharmmPsfFile.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_psf" title="parmed.charmm.CharmmPsfFile.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.ANGLE_FORCE_GROUP">
+<tt class="descname">ANGLE_FORCE_GROUP</tt><em class="property"> = 1</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.BOND_FORCE_GROUP">
+<tt class="descname">BOND_FORCE_GROUP</tt><em class="property"> = 0</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.BOND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.CMAP_FORCE_GROUP">
+<tt class="descname">CMAP_FORCE_GROUP</tt><em class="property"> = 5</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.CMAP_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.DIHEDRAL_FORCE_GROUP">
+<tt class="descname">DIHEDRAL_FORCE_GROUP</tt><em class="property"> = 2</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.DIHEDRAL_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.IMPROPER_FORCE_GROUP">
+<tt class="descname">IMPROPER_FORCE_GROUP</tt><em class="property"> = 4</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.IMPROPER_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.NONBONDED_FORCE_GROUP">
+<tt class="descname">NONBONDED_FORCE_GROUP</tt><em class="property"> = 11</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.NONBONDED_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.OUT_OF_PLANE_BEND_FORCE_GROUP">
+<tt class="descname">OUT_OF_PLANE_BEND_FORCE_GROUP</tt><em class="property"> = 7</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.OUT_OF_PLANE_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.PI_TORSION_FORCE_GROUP">
+<tt class="descname">PI_TORSION_FORCE_GROUP</tt><em class="property"> = 8</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.PI_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.RB_TORSION_FORCE_GROUP">
+<tt class="descname">RB_TORSION_FORCE_GROUP</tt><em class="property"> = 12</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.RB_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.STRETCH_BEND_FORCE_GROUP">
+<tt class="descname">STRETCH_BEND_FORCE_GROUP</tt><em class="property"> = 9</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.STRETCH_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.TORSION_TORSION_FORCE_GROUP">
+<tt class="descname">TORSION_TORSION_FORCE_GROUP</tt><em class="property"> = 10</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.TORSION_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.TRIGONAL_ANGLE_FORCE_GROUP">
+<tt class="descname">TRIGONAL_ANGLE_FORCE_GROUP</tt><em class="property"> = 6</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.TRIGONAL_ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.UREY_BRADLEY_FORCE_GROUP">
+<tt class="descname">UREY_BRADLEY_FORCE_GROUP</tt><em class="property"> = 3</em><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.UREY_BRADLEY_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.add_atom">
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
+it has a different name or number as the last residue added and adding
+it to the <cite>atoms</cite> list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to this residue list</p>
+</div></blockquote>
+<p><strong>resname</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The name of the residue this atom belongs to</p>
+</div></blockquote>
+<p><strong>resnum</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<blockquote>
+<div><p>The number of the residue this atom belongs to</p>
+</div></blockquote>
+<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The chain ID character for this residue</p>
+</div></blockquote>
+<p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The insertion code ID character for this residue (it is stripped)</p>
+</div></blockquote>
+<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote class="last">
+<div><p>The segment identifier for this residue (it is stripped)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If the residue name and number differ from the last residue in this
+list, a new residue is added and the atom is added to that residue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.add_atom_to_residue">
+<tt class="descname">add_atom_to_residue</tt><big>(</big><em>atom</em>, <em>residue</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new atom to the Structure at the end if the given residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to the system</p>
+</div></blockquote>
+<p><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<blockquote class="last">
+<div><p>The residue to which to add this atom. It MUST be part of this
+Structure instance already or a ValueError is raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This atom is added at the end of the residue and is inserted into the
+<cite>atoms</cite> list in such a way that all residues are composed of atoms
+contiguous in the atoms list. For large systems, this may be a
+relatively expensive operation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.box">
+<tt class="descname">box</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.box_vectors">
+<tt class="descname">box_vectors</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.box_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>3, 3-element tuple of unit cell vectors that are Quantity objects of
+dimension length</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.clear_cmap">
+<tt class="descname">clear_cmap</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.clear_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the cmap list to prevent any CMAP parameters from being used</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.combining_rule">
+<tt class="descname">combining_rule</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.combining_rule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.coordinates">
+<tt class="descname">coordinates</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.copy">
+<tt class="descname">copy</tt><big>(</big><em>cls</em>, <em>split_dihedrals=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a copy of the current structure as an instance of a specified
+subclass</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cls</strong> : Structure subclass</p>
+<blockquote>
+<div><p>The returned object is a copy of this structure as a <cite>cls</cite> instance</p>
+</div></blockquote>
+<p><strong>split_dihedrals</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote>
+<div><p>If True, then the Dihedral entries will be split up so that each one
+is paired with a single DihedralType (rather than a
+DihedralTypeList)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>cls</em> instance</p>
+<blockquote class="last">
+<div><p>The instance of the Structure subclass <cite>cls</cite> with a copy of the
+current Structure&#8217;s topology information</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.createSystem">
+<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM System object from the CHARMM PSF file. This is a
+shortcut for calling <cite>load_parameters</cite> followed by
+Structure.createSystem. If params is not None, <cite>load_parameters</cite> will be
+called on that parameter set, and Structure.createSystem will be called
+with the remaining args and kwargs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>params</strong> : CharmmParameterSet=None</p>
+<blockquote class="last">
+<div><p>If not None, this parameter set will be loaded</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.structure.Structure.createSystem()</span></tt></a></dt>
+<dd>In addition to <cite>params</cite>, this method also takes all arguments for <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.createSystem" title="parmed.structure.Structure.createSystem"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.structure.Structure.createSystem()</span></tt></a></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.charmm.CharmmPsfFile.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em>, <em>copy=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a CharmmPsfFile from an input Structure instance. This
+method makes sure all atom types have uppercase-only names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The input structure to convert to a CharmmPsfFile instance</p>
+</div></blockquote>
+<p><strong>copy</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, a copy of all items are made. Otherwise, the resulting
+CharmmPsfFile is a shallow copy</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>psf</strong> : <a class="reference internal" href="#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></a></p>
+<blockquote>
+<div><p>CHARMM PSF file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if the functional form is not recognized or cannot be</strong></p>
+<p class="last"><strong>implemented through the PSF and parameter/stream files</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If copy is False, the original object may have its atom type names
+changed if any of them have lower-case letters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.get_coordinates">
+<tt class="descname">get_coordinates</tt><big>(</big><em>frame='all'</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>In some cases, multiple conformations may be stored in the Structure.
+This function retrieves a particular frame&#8217;s coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
+<blockquote>
+<div><p>The frame number whose coordinates should be retrieved. Default is
+&#8216;all&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>coords</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<blockquote>
+<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
+(#, natom, 3). Otherwise the requested frame is returned with shape
+(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError if there are fewer than ``frame`` coordinates</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.has_NBFIX">
+<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether or not any pairs of atom types have their LJ
+interactions modified by an NBFIX definition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>has_nbfix</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, at least two atom types have NBFIX mod definitions</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.is_changed">
+<tt class="descname">is_changed</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.is_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if any of the topology has changed for this structure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.load_dataframe">
+<tt class="descname">load_dataframe</tt><big>(</big><em>df</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads atomic properties from an input DataFrame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>df</strong> : pandas.DataFrame</p>
+<blockquote class="last">
+<div><p>A pandas DataFrame with atomic properties that will be used to set
+the properties on the current list of atoms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.load_dataframe" title="parmed.utils.pandautils.load_dataframe"><tt class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.load_dataframe()</span></tt></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.load_parameters">
+<tt class="descname">load_parameters</tt><big>(</big><em>parmset</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.load_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads parameters from a parameter set that was loaded via CHARMM RTF,
+PAR, and STR files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parmset</strong> : <a class="reference internal" href="#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></tt></a></p>
+<blockquote>
+<div><p>List of all parameters</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ParameterError if any parameters cannot be found</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>If any dihedral or improper parameters cannot be found, I will try
+inserting wildcards (at either end for dihedrals and as the two
+central atoms in impropers) and see if that matches.  Wild-cards will
+apply ONLY if specific parameters cannot be found.</li>
+<li>This method will expand the dihedrals attribute by adding a separate
+Dihedral object for each term for types that have a multi-term
+expansion</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_add_constraints">
+<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds constraints to a given system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>system</strong> : mm.System</p>
+<blockquote>
+<div><p>The OpenMM system for which constraints should be added</p>
+</div></blockquote>
+<p><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>Which kind of constraints should be used</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, water bonds are constrained regardless of whether
+constrains is None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_angle_force">
+<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
+angles are for an Amoeba-parametrized system)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>The types of constraints that are on the system. If
+flexibleConstraints is False, then the constrained bonds will not be
+added to the resulting Force</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, all bonds are added to the force regardless of
+<cite>constraints</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force</p>
+<blockquote class="last">
+<div><p>HarmonicAngleForce (or AmoebaAngleForce if this is an Amoeba
+system), or None if there are no angles to add</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_bond_force">
+<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
+for an Amoeba-parametrized system)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>The types of constraints that are on the system. If
+flexibleConstraints is False, then the constrained bonds will not be
+added to the resulting Force</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool=True</p>
+<blockquote>
+<div><p>Should water-H bonds be constrained regardless of <cite>constraints</cite>?</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, all bonds are added to the force regardless of
+<cite>constraints</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force</p>
+<blockquote class="last">
+<div><p>HarmonicBondForce (or AmoebaBondForce if this is an Amoeba system),
+or None if there are no bonds to add</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_cmap_force">
+<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM CMAP torsion force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CMAPTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None, if no CMAP terms are present</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_dihedral_force">
+<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">PeriodicTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_gbsa_force">
+<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Generalized Born force for running implicit solvent
+calculations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>implicitSolvent</strong> : app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2</p>
+<blockquote>
+<div><p>The Generalized Born implicit solvent model to use.</p>
+</div></blockquote>
+<p><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace. Default is NoCutoff</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating opint number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff</p>
+</div></blockquote>
+<p><strong>implicitSolventKappa</strong> : float or 1/distance Quantity = None</p>
+<blockquote>
+<div><p>This is the Debye kappa property related to modeling saltwater
+conditions in GB. It should have units of 1/distance (1/nanometers
+is assumed if no units present). A value of None means that kappa
+will be calculated from implicitSolventSaltConc (below)</p>
+</div></blockquote>
+<p><strong>implicitSolventSaltConc</strong> : float or amount/volume Quantity=0 moles/liter</p>
+<blockquote>
+<div><p>If implicitSolventKappa is None, the kappa will be computed from the
+salt concentration. It should have units compatible with mol/L</p>
+</div></blockquote>
+<p><strong>temperature</strong> : float or temperature Quantity = 298.15 kelvin</p>
+<blockquote>
+<div><p>This is only used to compute kappa from implicitSolventSaltConc</p>
+</div></blockquote>
+<p><strong>soluteDielectric</strong> : float=1.0</p>
+<blockquote>
+<div><p>The dielectric constant of the protein interior used in GB</p>
+</div></blockquote>
+<p><strong>solventDielectric</strong> : float=78.5</p>
+<blockquote class="last">
+<div><p>The dielectric constant of the water used in GB</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_improper_force">
+<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CustomTorsionForce</p>
+<blockquote class="last">
+<div><p>With the formula k*(phi-phi0)^2, or None if there are no impropers</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_nonbonded_force">
+<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM NonbondedForce instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating point number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff.</p>
+</div></blockquote>
+<p><strong>switchDistance</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The distance at which the switching function is turned on for van
+der Waals interactions. This is ignored when no cutoff is used, and
+no switch is used if switchDistance is 0, negative, or greater than
+the cutoff</p>
+</div></blockquote>
+<p><strong>ewaldErrorTolerance</strong> : float=0.0005</p>
+<blockquote>
+<div><p>When using PME or Ewald, the Ewald parameters will be calculated
+from this value</p>
+</div></blockquote>
+<p><strong>reactionFieldDielectric</strong> : float=78.5</p>
+<blockquote>
+<div><p>If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
+region beyond the cutoff is treated using a reaction field method
+with this dielectric constant. It should be set to 1 if another
+implicit solvent model is being used (e.g., GB)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">NonbondedForce</p>
+<blockquote class="last">
+<div><p>This just implements the very basic NonbondedForce with the typical
+charge-charge and 12-6 Lennard-Jones interactions with the
+Lorentz-Berthelot combining rules.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method calls update_dihedral_exclusions, which might alter the
+<tt class="docutils literal"><span class="pre">ignore_end</span></tt> attribute of some
+<a class="reference internal" href="parmed.topologyobjects.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Dihedral</span></tt></a> instances based on any
+changes that might have been made to the bonds and angles since the last
+time it was called.</p>
+<p>Subclasses of Structure for which this nonbonded treatment is inadequate
+should override this method to implement what is needed.</p>
+<p>If nrexcl is set to 3 and no exception parameters are stored in the
+adjusts list, the 1-4 interactions are determined from the list of
+dihedrals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force">
+<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba out-of-plane bend force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaOutOfPlaneBendForce</p>
+<blockquote class="last">
+<div><p>The out-of-plane bend Angle force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_pi_torsion_force">
+<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba pi-torsion force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaPiTorsionForce</p>
+<blockquote class="last">
+<div><p>The pi-torsion force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_rb_torsion_force">
+<tt class="descname">omm_rb_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">RBTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_set_virtual_sites">
+<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
+points defined in this system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>system</strong> : mm.System</p>
+<blockquote class="last">
+<div><p>The system for which the virtual sites will be set. All particles
+must have already been added to this System before calling this
+method</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_stretch_bend_force">
+<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaStretchBendForce</p>
+<blockquote class="last">
+<div><p>The stretch-bend force containing all terms in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force">
+<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaTorsionTorsionForce</p>
+<blockquote class="last">
+<div><p>The torsion-torsion (CMAP) force with all coupled-torsion parameters
+for this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force">
+<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba trigonal-angle force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaInPlaneAngleForce</p>
+<blockquote class="last">
+<div><p>The trigonal in-plane Angle force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.omm_urey_bradley_force">
+<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM Urey-Bradley force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">HarmonicBondForce</p>
+<blockquote class="last">
+<div><p>Or None, if no urey-bradleys are present</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.positions">
+<tt class="descname">positions</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of 3-element Quantity tuples of dimension length representing the
+atomic positions for every atom in the system. If set with unitless
+numbers, those numbers are assumed to be in angstroms. If any atoms do
+not have coordinates, this is simply <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.prune_empty_terms">
+<tt class="descname">prune_empty_terms</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks through all of the topological lists and gets rid of terms
+in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
+to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.save">
+<tt class="descname">save</tt><big>(</big><em>fname</em>, <em>format=None</em>, <em>overwrite=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current Structure in the requested file format. Supported
+formats can be specified explicitly or determined by file-name
+extension. The following formats are supported, with the recognized
+suffix and <tt class="docutils literal"><span class="pre">format</span></tt> keyword shown in parentheses:</p>
+<blockquote>
+<div><ul class="simple">
+<li>PDB (.pdb, pdb)</li>
+<li>PDBx/mmCIF (.cif, cif)</li>
+<li>PQR (.pqr, pqr)</li>
+<li>Amber topology file (.prmtop/.parm7, amber)</li>
+<li>CHARMM PSF file (.psf, charmm)</li>
+<li>CHARMM coordinate file (.crd, charmmcrd)</li>
+<li>Gromacs topology file (.top, gromacs)</li>
+<li>Gromacs GRO file (.gro, gro)</li>
+<li>Mol2 file (.mol2, mol2)</li>
+<li>Mol3 file (.mol3, mol3)</li>
+<li>Amber ASCII restart (.rst7/.inpcrd/.restrt, rst7)</li>
+<li>Amber NetCDF restart (.ncrst, ncrst)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to save. If <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (see below), the
+file type will be determined based on the filename extension. If the
+type cannot be determined, a ValueError is raised.</p>
+</div></blockquote>
+<p><strong>format</strong> : str, optional</p>
+<blockquote>
+<div><p>The case-insensitive keyword specifying what type of file <tt class="docutils literal"><span class="pre">fname</span></tt>
+should be saved as. If <tt class="docutils literal"><span class="pre">None</span></tt> (default), the file type will be
+determined from filename extension of <tt class="docutils literal"><span class="pre">fname</span></tt></p>
+</div></blockquote>
+<p><strong>overwrite</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, allow the target file to be overwritten. Otherwise, an
+IOError is raised if the file exists. Default is False</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword-arguments</p>
+<blockquote>
+<div><p>Remaining arguments are passed on to the file writing routines that
+are called by this function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if either filename extension or ``format`` are not recognized</strong></p>
+<p><strong>TypeError if the structure cannot be converted to the desired format for</strong></p>
+<p><strong>whatever reason</strong></p>
+<p><strong>IOError if the file cannot be written either because it exists and</strong></p>
+<p><strong>``overwrite`` is ``False``, the filesystem is read-only, or write</strong></p>
+<p class="last"><strong>permissions are not granted for the user</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.split">
+<tt class="descname">split</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the current Structure into separate Structure instances for each
+unique molecule. A molecule is defined as all atoms connected by a graph
+of covalent bonds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>, list) tuples</p>
+<blockquote class="last">
+<div><p>List of all molecules in the order that they appear first in the
+parent structure accompanied by the list of the molecule numbers
+in which that molecule appears in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.strip">
+<tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.strip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : <tt class="xref py py-class docutils literal"><span class="pre">AmberMask</span></tt>, <tt class="docutils literal"><span class="pre">str</span></tt>, or <tt class="docutils literal"><span class="pre">iterable</span></tt></p>
+<blockquote class="last">
+<div><p>This is the selection of atoms that will be deleted from this
+structure. If it is a string, it will be interpreted as an
+AmberMask. If it is an AmberMask, it will be converted to a
+selection of atoms. If it is an iterable, it must be the same length
+as the <cite>atoms</cite> list.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.to_dataframe">
+<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a DataFrame from the current Structure&#8217;s atomic properties</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df</strong> : DataFrame</p>
+<blockquote class="last">
+<div><p>DataFrame with all atomic properties</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.create_dataframe" title="parmed.utils.pandautils.create_dataframe"><tt class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.create_dataframe()</span></tt></a>, <tt class="xref py py-obj docutils literal"><span class="pre">documentation</span></tt></p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.topology">
+<tt class="descname">topology</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
+Structure instance results in the topology being deleted and rebuilt</p>
+<p class="rubric">Notes</p>
+<p>This function calls <tt class="docutils literal"><span class="pre">prune_empty_terms</span></tt> if any topology lists have
+changed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.unchange">
+<tt class="descname">unchange</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.unchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles all lists so that they do not indicate any changes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.update_dihedral_exclusions">
+<tt class="descname">update_dihedral_exclusions</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nonbonded exclusions and exceptions have the following priority:</p>
+<p>bond -&gt; angle -&gt; dihedral</p>
+<p>Since bonds and angles are completely excluded, any ring systems in
+which two atoms are attached by a bond or angle as well as a dihedral
+should be completely excluded as the bond and angle exclusion rules take
+precedence.  If a Bond or Angle was _added_ to the structure between a
+pair of atoms previously connected only by a dihedral term, it&#8217;s
+possible that those two atoms have both an exclusion <em>and</em> an exception
+defined. The result of this scenario is that sander and pmemd will
+happily compute an energy, _including_ the 1-4 nonbonded terms between
+atoms now connected by a bond or an Angle.  OpenMM, on the other hand,
+will complain about an exception specified multiple times. This method
+scans through all of the dihedrals in which <cite>ignore_end</cite> is <cite>False</cite> and
+turns it to <cite>True</cite> if the two end atoms are in the bond or angle
+partners arrays</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.velocities">
+<tt class="descname">velocities</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p>A (natom, 3)-shape numpy array with atomic velocities for every atom in
+the system (in units of angstrom/picosecond), or None if there are no
+velocities</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmPsfFile.view">
+<tt class="descname">view</tt><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an indexable object that can be indexed like a standard
+Structure, but returns a <em>view</em> rather than a copy</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></tt></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.write_cif">
+<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from the current Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDBx/mmCIF file</p>
+</div></blockquote>
+<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>Keyword controlling which alternate locations are printed to the
+resulting PDB file. Allowable options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;first&#8217; : print only the first alternate locations</li>
+<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+conformers have the same occupancy, the first one to occur is
+printed</li>
+</ul>
+</div></blockquote>
+<p>Input is case-insensitive, and partial strings are permitted as long
+as it is a substring of one of the above options that uniquely
+identifies the choice.</p>
+</div></blockquote>
+<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<blockquote>
+<div><p>If True, an ANISOU record is written for every atom that has one. If
+False, ANISOU records are not written</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.write_pdb">
+<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously. Default is True</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>altlocs</strong> : str, optional</p>
+<blockquote>
+<div><p>Keyword controlling which alternate locations are printed to the
+resulting PDB file. Allowable options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;first&#8217; : print only the first alternate locations</li>
+<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+conformers have the same occupancy, the first one to occur is
+printed</li>
+</ul>
+</div></blockquote>
+<p>Input is case-insensitive, and partial strings are permitted as long
+as it is a substring of one of the above options that uniquely
+identifies the choice.</p>
+</div></blockquote>
+<p><strong>write_anisou</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, an ANISOU record is written for every atom that has one. If
+False, ANISOU records are not written. Default is False</p>
+</div></blockquote>
+<p><strong>charmm</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
+in the typical CHARMM-style PDB output. This will be omitted for any
+atom that does not contain a SEGID identifier. Default is False</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmPsfFile.write_psf">
+<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmPsfFile.write_psf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a PSF file from the stored molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
+attribute, it will be used to print the PSF file. Otherwise, it will
+be treated like a string and a file will be opened, printed, then
+closed</p>
+</div></blockquote>
+<p><strong>vmd</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, it will write out a PSF in the format that VMD prints it in
+(i.e., no NUMLP/NUMLPH or MOLNT sections)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.charmm.CharmmParameterSet">
+<em class="property">class </em><tt class="descclassname">parmed.charmm.</tt><tt class="descname">CharmmParameterSet</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></tt></a></p>
+<p>Stores a parameter set defined by CHARMM files. It stores the equivalent of
+the information found in the MASS section of the CHARMM topology file
+(TOP/RTF) and all of the information in the parameter files (PAR)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filenames</strong> : list of str</p>
+<blockquote class="last">
+<div><p>The list of topology, parameter, and stream files to load into the
+parameter set. The following file type suffixes are recognized:</p>
+<blockquote>
+<div><p>.rtf, .top &#8211; Residue topology file
+.par, .prm &#8211; Parameter file
+.str &#8211; Stream file
+.inp &#8211; If &#8220;par&#8221; is in the file name, it is a parameter file. If</p>
+<blockquote>
+<div><p>&#8220;top&#8221; is in the file name, it is a topology file.
+Otherwise, ValueError is raised.</p>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>atom_types</td>
+<td>(dict(str:AtomType)) Dictionary mapping the names of the atom types to the corresponding AtomType instances</td>
+</tr>
+<tr class="row-even"><td>atom_types_str</td>
+<td>(dict(str:AtomType)) alias for atom_types</td>
+</tr>
+<tr class="row-odd"><td>atom_types_int</td>
+<td>(dict(int:AtomType)) Dictionary mapping the serial indexes of the atom types to the corresponding AtomType instances</td>
+</tr>
+<tr class="row-even"><td>atom_types_tuple</td>
+<td>(dict((str,int):AtomType)) Dictionary mapping the (name,number) tuple of the atom types to the corresponding AtomType instances</td>
+</tr>
+<tr class="row-odd"><td>bond_types</td>
+<td>(dict((str,str):AtomType)) Dictionary mapping the 2-element tuple of the names of the two atom types involved in the bond to the BondType instances</td>
+</tr>
+<tr class="row-even"><td>angle_types</td>
+<td>(dict((str,str,str):AngleType)) Dictionary mapping the 3-element tuple of the names of the three atom types involved in the angle to the AngleType instances</td>
+</tr>
+<tr class="row-odd"><td>urey_bradley_types</td>
+<td>(dict((str,str,str):BondType)) Dictionary mapping the 3-element tuple of the names of the three atom types involved in the angle to the BondType instances of the Urey-Bradley terms</td>
+</tr>
+<tr class="row-even"><td>dihedral_types</td>
+<td>(dict((str,str,str,str):list(DihedralType))) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the dihedral to the DihedralType instances. Since each torsion term can be a multiterm expansion, each item corresponding to a key in this dict is a list of <a href="#id1"><span class="problematic" id="id2">`</span></a>DihedralType`s for each term in the expansion</td>
+</tr>
+<tr class="row-odd"><td>improper_types</td>
+<td>(dict((str,str,str,str):ImproperType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion to the ImproperType instances</td>
+</tr>
+<tr class="row-even"><td>improper_periodic_types</td>
+<td>(dict((str,str,str,str):DihedralType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion (modeled as a Fourier series) to the DihedralType instances</td>
+</tr>
+<tr class="row-odd"><td>cmap_types</td>
+<td>(dict((str,str,str,str,str):CmapType)) Dictionary mapping the 5-element tuple of the names of the five atom types involved in the correction map to the CmapType instances</td>
+</tr>
+<tr class="row-even"><td>nbfix_types</td>
+<td>(dict((str,str):(float,float))) Dictionary mapping the 2-element tuple of the names of the two atom types whose LJ terms are modified to the tuple of the (epsilon,rmin) terms for that off-diagonal term</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.condense" title="parmed.charmm.CharmmParameterSet.condense"><tt class="xref py py-obj docutils literal"><span class="pre">condense</span></tt></a>([do_dihedrals])</td>
+<td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="parmed.charmm.CharmmParameterSet.from_parameterset"><tt class="xref py py-obj docutils literal"><span class="pre">from_parameterset</span></tt></a>(params[,&nbsp;copy])</td>
+<td>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct)</td>
+<td>Extracts known parameters from a Structure instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><tt class="xref py py-obj docutils literal"><span class="pre">load_set</span></tt></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
+<td>Instantiates a CharmmParameterSet from a Topology file and a Parameter</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></tt></a>(pfile[,&nbsp;comments])</td>
+<td>Reads all of the parameters from a parameter file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></tt></a>(sfile)</td>
+<td>Reads RTF and PAR sections from a stream file and dispatches the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></tt></a>(tfile)</td>
+<td>Reads _only_ the atom type definitions from a topology file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.write" title="parmed.charmm.CharmmParameterSet.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>([top,&nbsp;par,&nbsp;str])</td>
+<td>Write a CHARMM parameter set to a file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmParameterSet.combining_rule">
+<tt class="descname">combining_rule</tt><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.combining_rule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmParameterSet.condense">
+<tt class="descname">condense</tt><big>(</big><em>do_dihedrals=True</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.condense" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function goes through each of the parameter type dicts and
+eliminates duplicate types. After calling this function, every unique
+bond, angle, dihedral, improper, or cmap type will pair with EVERY key
+in the type mapping dictionaries that points to the equivalent type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>do_dihedrals</strong> : bool=True</p>
+<blockquote>
+<div><p>Dihedrals can take the longest time to compress since testing their
+equality takes the longest (this is complicated by the existence of
+multi-term torsions). This flag will allow you to <em>skip</em> condensing
+the dihedral parameter types (for large parameter sets, this can cut
+the compression time in half)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">self</p>
+<blockquote class="last">
+<div><p>The instance that is being condensed</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The return value allows you to condense the types at construction time.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.charmm.CharmmParameterSet.from_parameterset">
+<em class="property">classmethod </em><tt class="descname">from_parameterset</tt><big>(</big><em>params</em>, <em>copy=False</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a CharmmParameterSet from another ParameterSet (or
+subclass). The main thing this feature is responsible for is converting
+lower-case atom type names into all upper-case and decorating the name
+to ensure each atom type name is unique.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>params</strong> : <a class="reference internal" href="parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></tt></a></p>
+<blockquote>
+<div><p>ParameterSet containing the list of parameters to be converted to a
+CHARMM-compatible set</p>
+</div></blockquote>
+<p><strong>copy</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, the returned parameter set is a deep copy of <tt class="docutils literal"><span class="pre">params</span></tt>. If
+False, the returned parameter set is a shallow copy, and the
+original set may be modified if any lower-case atom type names are
+present. Default is False.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>new_params</strong> : CharmmParameterSet</p>
+<blockquote class="last">
+<div><p>The parameter set whose atom type names are converted to all
+upper-case</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.charmm.CharmmParameterSet.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts known parameters from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The parametrized <tt class="docutils literal"><span class="pre">Structure</span></tt> instance from which to extract
+parameters into a ParameterSet</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : <tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt></p>
+<blockquote class="last">
+<div><p>The parameter set with all parameters defined in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The parameters here are copies of the ones in the Structure, so
+modifying the generated ParameterSet will have no effect on <tt class="docutils literal"><span class="pre">struct</span></tt>.
+Furthermore, the <em>first</em> occurrence of each parameter will be used. If
+future ones differ, they will be silently ignored, since this is
+expected behavior in some instances (like with Gromacs topologies in the
+ff99sb-ildn force field).</p>
+<p>Dihedrals are a little trickier. They can be multi-term, which can be
+represented either as a <em>single</em> entry in dihedrals with a type of
+DihedralTypeList or multiple entries in dihedrals with a DihedralType
+parameter type. In this case, the parameter is constructed from either
+the first DihedralTypeList found or the first DihedralType of each
+periodicity found if no matching DihedralTypeList is found.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.charmm.CharmmParameterSet.load_set">
+<em class="property">classmethod </em><tt class="descname">load_set</tt><big>(</big><em>tfile=None</em>, <em>pfile=None</em>, <em>sfiles=None</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.load_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a CharmmParameterSet from a Topology file and a Parameter
+file (or just a Parameter file if it has all information)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tfile</strong> : str</p>
+<blockquote>
+<div><p>The name of the Topology (RTF/TOP) file to parse</p>
+</div></blockquote>
+<p><strong>pfile</strong> : str</p>
+<blockquote>
+<div><p>The name of the Parameter (PAR/PRM) file to parse</p>
+</div></blockquote>
+<p><strong>sfiles</strong> : list(str)</p>
+<blockquote>
+<div><p>Iterable of stream (STR) file names</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New CharmmParameterSet populated with parameters found in the provided</p>
+<p class="last">files</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The RTF file is read first (if provided), followed by the PAR file,
+followed by the list of stream files (in the order they are provided).
+Parameters in each stream file will overwrite those that came before (or
+simply append to the existing set if they are different)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmParameterSet.read_parameter_file">
+<tt class="descname">read_parameter_file</tt><big>(</big><em>pfile</em>, <em>comments=None</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads all of the parameters from a parameter file. Versions 36 and
+later of the CHARMM force field files have an ATOMS section defining
+all of the atom types.  Older versions need to load this information
+from the RTF/TOP files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pfile</strong> : str or list of lines</p>
+<blockquote>
+<div><p>Name of the CHARMM parameter file to read or list of lines to parse
+as a file</p>
+</div></blockquote>
+<p><strong>comments</strong> : list of str, optional</p>
+<blockquote class="last">
+<div><p>List of comments on each of the pfile lines (if pfile is a list of
+lines)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The atom types must all be loaded by the end of this routine.  Either
+supply a PAR file with atom definitions in them or read in a RTF/TOP
+file first. Failure to do so will result in a raised RuntimeError.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmParameterSet.read_stream_file">
+<tt class="descname">read_stream_file</tt><big>(</big><em>sfile</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads RTF and PAR sections from a stream file and dispatches the
+sections to read_topology_file or read_parameter_file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sfile</strong> : str or CharmmStreamFile</p>
+<blockquote class="last">
+<div><p>Stream file to parse</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmParameterSet.read_topology_file">
+<tt class="descname">read_topology_file</tt><big>(</big><em>tfile</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads _only_ the atom type definitions from a topology file. This is
+unnecessary for versions 36 and later of the CHARMM force field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tfile</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of the CHARMM topology file to read</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmParameterSet.write">
+<tt class="descname">write</tt><big>(</big><em>top=None</em>, <em>par=None</em>, <em>str=None</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a CHARMM parameter set to a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>top</strong> : str or file-like object, optional</p>
+<blockquote>
+<div><p>If provided, the atom types will be written to this file in RTF
+format.</p>
+</div></blockquote>
+<p><strong>par</strong> : str or file-like object, optional</p>
+<blockquote>
+<div><p>If provided, the parameters will be written to this file in PAR
+format. Either this or the <tt class="docutils literal"><span class="pre">str</span></tt> argument <em>must</em> be provided</p>
+</div></blockquote>
+<p><strong>str</strong> : str or file-like object, optional</p>
+<blockquote>
+<div><p>If provided, the atom types and parameters will be written to this
+file as separate RTF and PAR cards that can be read as a CHARMM
+stream file. Either this or the <tt class="docutils literal"><span class="pre">par</span></tt> argument <em>must</em> be provided</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if both par and str are None</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.charmm.CharmmCrdFile">
+<em class="property">class </em><tt class="descclassname">parmed.charmm.</tt><tt class="descname">CharmmCrdFile</tt><big>(</big><em>fname</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmCrdFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Reads and parses a CHARMM coordinate file (.crd) into its components,
+namely the coordinates, CHARMM atom types, resid, resname, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of the restart file to parse</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmCrdFile.positions" title="parmed.charmm.CharmmCrdFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<td>Atomic coordinates with units attached to them with the shape (natom, 3)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="87%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>natom</td>
+<td>(int) Number of atoms in the system</td>
+</tr>
+<tr class="row-even"><td>resname</td>
+<td>(list of str) List of all residue names in the system</td>
+</tr>
+<tr class="row-odd"><td>coordinates</td>
+<td>(np.ndarray with shape (1, natom, 3)) Atomic coordinates in a numpy array</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmCrdFile.id_format" title="parmed.charmm.CharmmCrdFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as a CHARMM coordinate file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmCrdFile.write" title="parmed.charmm.CharmmCrdFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest)</td>
+<td>Writes a CHARMM coordinate file from a structure</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmCrdFile.box">
+<tt class="descname">box</tt><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmCrdFile.coordinates">
+<tt class="descname">coordinates</tt><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.charmm.CharmmCrdFile.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as a CHARMM coordinate file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a CHARMM coordinate file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmCrdFile.positions">
+<tt class="descname">positions</tt><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic coordinates with units attached to them with the shape (natom, 3)</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.charmm.CharmmCrdFile.write">
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmCrdFile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a CHARMM coordinate file from a structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The input structure to write the CHARMM coordinate file from</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like object</p>
+<blockquote class="last">
+<div><p>The file name or file object to write the coordinate file to</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.charmm.CharmmRstFile">
+<em class="property">class </em><tt class="descclassname">parmed.charmm.</tt><tt class="descname">CharmmRstFile</tt><big>(</big><em>fname</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmRstFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Reads and parses data, velocities and coordinates from a CHARMM restart
+file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of the restart file to parse</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.velocities" title="parmed.charmm.CharmmRstFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<td>Atomic velocities in Angstroms/picoseconds</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.positions" title="parmed.charmm.CharmmRstFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<td>Atomic positions with units</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.positionsold" title="parmed.charmm.CharmmRstFile.positionsold"><tt class="xref py py-obj docutils literal"><span class="pre">positionsold</span></tt></a></td>
+<td>Old atomic positions with units</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>natom</td>
+<td>(int) Number of atoms in the system</td>
+</tr>
+<tr class="row-even"><td>resname</td>
+<td>(list of str) Names of all residues in the system</td>
+</tr>
+<tr class="row-odd"><td>coordinates</td>
+<td>(np.ndarray shape(1, natom, 3)) List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
+</tr>
+<tr class="row-even"><td>coordinatesold</td>
+<td>(np.ndarray shape(1, natom, 3)) List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.id_format" title="parmed.charmm.CharmmRstFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as a CHARMM restart file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.scan" title="parmed.charmm.CharmmRstFile.scan"><tt class="xref py py-obj docutils literal"><span class="pre">scan</span></tt></a>(handle,&nbsp;str[,&nbsp;r])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmRstFile.box">
+<tt class="descname">box</tt><a class="headerlink" href="#parmed.charmm.CharmmRstFile.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmRstFile.coordinates">
+<tt class="descname">coordinates</tt><a class="headerlink" href="#parmed.charmm.CharmmRstFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmRstFile.coordinatesold">
+<tt class="descname">coordinatesold</tt><a class="headerlink" href="#parmed.charmm.CharmmRstFile.coordinatesold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.charmm.CharmmRstFile.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmRstFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as a CHARMM restart file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a CHARMM restart file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmRstFile.positions">
+<tt class="descname">positions</tt><a class="headerlink" href="#parmed.charmm.CharmmRstFile.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic positions with units</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmRstFile.positionsold">
+<tt class="descname">positionsold</tt><a class="headerlink" href="#parmed.charmm.CharmmRstFile.positionsold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Old atomic positions with units</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.charmm.CharmmRstFile.scan">
+<tt class="descname">scan</tt><big>(</big><em>handle</em>, <em>str</em>, <em>r=0</em><big>)</big><a class="headerlink" href="#parmed.charmm.CharmmRstFile.scan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.charmm.CharmmRstFile.velocities">
+<tt class="descname">velocities</tt><a class="headerlink" href="#parmed.charmm.CharmmRstFile.velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic velocities in Angstroms/picoseconds</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -114,7 +2077,9 @@ field parameter files</p>
   <ul>
 <li><a class="reference internal" href="#">parmed.charmm package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-parmed.charmm">Module contents</a></li>
+<li><a class="reference internal" href="#module-parmed.charmm">Module contents</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

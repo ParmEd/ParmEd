@@ -61,6 +61,1110 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-parmed.modeller" title="Permalink to this headline">¶</a></h2>
 <p>This package contains functionality necessary to carry out basic molecular
 modelling tasks.</p>
+<dl class="class">
+<dt id="parmed.modeller.AmberOFFLibrary">
+<em class="property">class </em><tt class="descclassname">parmed.modeller.</tt><tt class="descname">AmberOFFLibrary</tt><a class="headerlink" href="#parmed.modeller.AmberOFFLibrary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class containing static methods responsible for parsing and writing OFF
+libraries</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.AmberOFFLibrary.id_format" title="parmed.modeller.AmberOFFLibrary.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Sees if an open file is an OFF library file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.AmberOFFLibrary.parse" title="parmed.modeller.AmberOFFLibrary.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<td>Parses an Amber OFF library</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.AmberOFFLibrary.write" title="parmed.modeller.AmberOFFLibrary.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(lib,&nbsp;dest)</td>
+<td>Writes a dictionary of ResidueTemplate units to a file in OFF format</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="parmed.modeller.AmberOFFLibrary.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.modeller.AmberOFFLibrary.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sees if an open file is an OFF library file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>The name of the file to see if it is an OFF file format</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is recognized as OFF, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.modeller.AmberOFFLibrary.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.modeller.AmberOFFLibrary.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses an Amber OFF library</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like iterable</p>
+<blockquote>
+<div><p>The file name or file object to parse. If it is an iterable, it will
+be exhausted</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residues</strong> : OrderedDict {str</p>
+<blockquote>
+<div><p>Dictionary pairing residue names with their <a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a>
+objects</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if the first line does not match the file format. This line</strong></p>
+<p><strong>will be consumed</strong></p>
+<p><strong>IOError if filename is the name of a file that does not exist</strong></p>
+<p><strong>RuntimeError if EOF is reached prematurely or other formatting issues</strong></p>
+<p class="last"><strong>found</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.modeller.AmberOFFLibrary.write">
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>lib</em>, <em>dest</em><big>)</big><a class="headerlink" href="#parmed.modeller.AmberOFFLibrary.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a dictionary of ResidueTemplate units to a file in OFF format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lib</strong> : dict {str</p>
+<blockquote>
+<div><p>Items can be either <a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> or
+<a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer" title="parmed.modeller.ResidueTemplateContainer"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></a> instances</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote class="last">
+<div><p>Either a file name or a file-like object to write the file to</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.modeller.ResidueTemplate">
+<em class="property">class </em><tt class="descclassname">parmed.modeller.</tt><tt class="descname">ResidueTemplate</tt><big>(</big><em>name=''</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>This is a residue template, which contains a listing of the atoms in the
+residue template as well as a mapping of which atoms are bonded to other
+atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>If provided, this is the name of the residue</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.coordinates" title="parmed.modeller.ResidueTemplate.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<td>Atomic coordinates, in Angstroms, of all atoms in the template</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>atoms</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">AtomList</span></tt>) List of atoms in this residue</td>
+</tr>
+<tr class="row-even"><td>bonds</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt>) List of the bonds between the atoms in this residue</td>
+</tr>
+<tr class="row-odd"><td>connections</td>
+<td>(list of <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt>) A list of all atoms that should form connections with atoms of another residue <em>besides</em> the head and tail atoms</td>
+</tr>
+<tr class="row-even"><td>head</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or None) The atom that is connected to the residue that comes before this one</td>
+</tr>
+<tr class="row-odd"><td>tail</td>
+<td>(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or None) The atom that is connected to the <em>next</em> residue after this one</td>
+</tr>
+<tr class="row-even"><td>first_patch</td>
+<td>(<a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> or None) If it is not None, this is the patch whose tail is added to the head atom of this residue when this residue is the first in a chain</td>
+</tr>
+<tr class="row-odd"><td>last_patch</td>
+<td>(<a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> or None) If it is not None, this is the patch whose head is added to the tail atom of this residue when this residue is the last in a chain</td>
+</tr>
+<tr class="row-even"><td>groups</td>
+<td>(list of list(<tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt>)) If set, each group is a list of Atom instances making up each group</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.add_atom" title="parmed.modeller.ResidueTemplate.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom)</td>
+<td>Adds an atom to this residue template</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.add_bond" title="parmed.modeller.ResidueTemplate.add_bond"><tt class="xref py py-obj docutils literal"><span class="pre">add_bond</span></tt></a>(atom1,&nbsp;atom2)</td>
+<td>Adds a bond between the two provided atoms in the residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.fix_charges" title="parmed.modeller.ResidueTemplate.fix_charges"><tt class="xref py py-obj docutils literal"><span class="pre">fix_charges</span></tt></a>([to,&nbsp;precision])</td>
+<td>Adjusts the partial charge of all atoms in the residue to match the requested target charge.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.from_residue" title="parmed.modeller.ResidueTemplate.from_residue"><tt class="xref py py-obj docutils literal"><span class="pre">from_residue</span></tt></a>(residue)</td>
+<td>This constructor creates a ResidueTemplate from a particular Residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.save" title="parmed.modeller.ResidueTemplate.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<td>Saves the current ResidueTemplate in the requested file format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.to_dataframe" title="parmed.modeller.ResidueTemplate.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<td>Create a pandas dataframe from the atom information</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplate.to_structure" title="parmed.modeller.ResidueTemplate.to_structure"><tt class="xref py py-obj docutils literal"><span class="pre">to_structure</span></tt></a>()</td>
+<td>Generates a Structure instance with a single residue from this</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplate.add_atom">
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an atom to this residue template</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to this residue</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if ``atom`` has the same name as another atom in this</strong></p>
+<p class="last"><strong>residue already</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplate.add_bond">
+<tt class="descname">add_bond</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a bond between the two provided atoms in the residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
+<blockquote>
+<div><p>One of the atoms in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of
+this ResidueTemplate. It can also be the atom index (index from 0)
+of the atom in the bond.</p>
+</div></blockquote>
+<p><strong>atom2</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
+<blockquote>
+<div><p>The other atom in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of this
+ResidueTemplate. It can also be the atom index (index from 0) of the
+atom in the bond.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError if atom1 or atom2 are integers that are out of range of the</strong></p>
+<p><strong>number of atoms already in this template</strong></p>
+<p><strong>RuntimeError if atom1 or atom2 are :class:`Atom` instances but they are</strong></p>
+<p class="last"><strong>*not* in the atoms list of this ResidueTemplate</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If atom1 and atom2 are already bonded, this routine does nothing. If
+atom1 or atom2 are strings, then they will match the first instance of
+the atom name that is the same as the atom name passed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.modeller.ResidueTemplate.coordinates">
+<tt class="descname">coordinates</tt><a class="headerlink" href="#parmed.modeller.ResidueTemplate.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic coordinates, in Angstroms, of all atoms in the template</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplate.fix_charges">
+<tt class="descname">fix_charges</tt><big>(</big><em>to=None</em>, <em>precision=4</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.fix_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the partial charge of all atoms in the residue to match the
+requested target charge. The default target charge is the closest
+integer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>to</strong> : float, optional</p>
+<blockquote>
+<div><p>The desired net charge of this residue template. Default is the
+closest integer charge</p>
+</div></blockquote>
+<p><strong>precision</strong> : int, optional</p>
+<blockquote>
+<div><p>The number of decimal places that each charge should be rounded to.
+Default is 4</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>self</strong> : <a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a></p>
+<blockquote>
+<div><p>The current residue template whose charges are being modified</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote class="last">
+<div><p>If you try to call fix_charges on a residue template with no atoms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method modifies the atomic charges of this residue template
+in-place. Any residual charge (which is accumulated roundoff beyond the
+requested precision) is added to the first atom of the residue. This
+will typically be 10^-precision in magnitude, and should almost never be
+higher than 2*10^-precision. As long as a reasonable precision is chosen
+(no fewer than 3 or 4 decimal places), this will have only a negligible
+impact on a force field.</p>
+<p>If provided, &#8220;to&#8221; will be rounded to the <tt class="docutils literal"><span class="pre">precision</span></tt>&#8216;th decimal place
+to make sure that the sum of the charges come out as close as possible
+to the target charge while still obeying the requested precision.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.modeller.ResidueTemplate.from_residue">
+<em class="property">classmethod </em><tt class="descname">from_residue</tt><big>(</big><em>residue</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.from_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>This constructor creates a ResidueTemplate from a particular Residue
+object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<blockquote class="last">
+<div><p>The residue from which to create a template</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplate.save">
+<tt class="descname">save</tt><big>(</big><em>fname</em>, <em>format=None</em>, <em>overwrite=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current ResidueTemplate in the requested file format.
+Supported formats can be specified explicitly or determined by file-name
+extension. The following formats are supported, with the recognized
+suffix shown in parentheses:</p>
+<blockquote>
+<div><ul class="simple">
+<li>MOL2 (.mol2)</li>
+<li>MOL3 (.mol3)</li>
+<li>OFF (.lib/.off)</li>
+<li>PDB (.pdb)</li>
+<li>PQR (.pqr)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to save. If <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (see below), the
+file type will be determined based on the filename extension. If the
+type cannot be determined, a ValueError is raised.</p>
+</div></blockquote>
+<p><strong>format</strong> : str, optional</p>
+<blockquote>
+<div><p>The case-insensitive keyword specifying what type of file <tt class="docutils literal"><span class="pre">fname</span></tt>
+should be saved as. If <tt class="docutils literal"><span class="pre">None</span></tt> (default), the file type will be
+determined from filename extension of <tt class="docutils literal"><span class="pre">fname</span></tt></p>
+</div></blockquote>
+<p><strong>overwrite</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, allow the target file to be overwritten. Otherwise, an
+IOError is raised if the file exists. Default is False</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword-arguments</p>
+<blockquote>
+<div><p>Remaining arguments are passed on to the file writing routines that
+are called by this function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if either filename extension or ``format`` are not recognized</strong></p>
+<p><strong>TypeError if the structure cannot be converted to the desired format for</strong></p>
+<p class="last"><strong>whatever reason</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplate.to_dataframe">
+<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a pandas dataframe from the atom information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></p>
+<blockquote class="last">
+<div><p>The pandas DataFrame with all of the atomic properties</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The DataFrame will be over all atoms. The columns will be the attributes
+of the atom (as well as its containing residue). Some columns will
+<em>always</em> exist. Others will only exist if those attributes have been set
+on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+attributes and their meaning). The columns that will always be present
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number : int</li>
+<li>name : str</li>
+<li>type : str</li>
+<li>atomic_number : int</li>
+<li>charge : float</li>
+<li>mass : float</li>
+<li>nb_idx : int</li>
+<li>radii : float</li>
+<li>screen : float</li>
+<li>occupancy : float</li>
+<li>bfactor : float</li>
+<li>altloc : str</li>
+<li>tree : str</li>
+<li>join : int</li>
+<li>irotat : int</li>
+<li>rmin : float</li>
+<li>epsilon : float</li>
+<li>rmin_14 : float</li>
+<li>epsilon_14 : float</li>
+</ul>
+</div></blockquote>
+<p>The following attributes are optionally present if they were present in
+the original file defining the structure:</p>
+<blockquote>
+<div><ul class="simple">
+<li>xx : float (x-coordinate position)</li>
+<li>xy : float (y-coordinate position)</li>
+<li>xz : float (z-coordinate position)</li>
+<li>vx : float (x-coordinate velocity)</li>
+<li>vy : float (y-coordinate velocity)</li>
+<li>vz : float (z-coordinate velocity)</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplate.to_structure">
+<tt class="descname">to_structure</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplate.to_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a Structure instance with a single residue from this
+ResidueTemplate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote class="last">
+<div><p>The Structure with all of the bonds and connectivity of this
+template</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.modeller.ResidueTemplateContainer">
+<em class="property">class </em><tt class="descclassname">parmed.modeller.</tt><tt class="descname">ResidueTemplateContainer</tt><big>(</big><em>name=''</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p>A container of ResidueTemplate objects representing a unit with multiple
+residues</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>The name of the residue container</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.append" title="parmed.modeller.ResidueTemplateContainer.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<td>L.append(object) &#8211; append object to end</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.count" title="parmed.modeller.ResidueTemplateContainer.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.extend" title="parmed.modeller.ResidueTemplateContainer.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.fix_charges" title="parmed.modeller.ResidueTemplateContainer.fix_charges"><tt class="xref py py-obj docutils literal"><span class="pre">fix_charges</span></tt></a>([precision])</td>
+<td>Adjusts the net charge of all residues in this ResidueContainer to match</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.from_library" title="parmed.modeller.ResidueTemplateContainer.from_library"><tt class="xref py py-obj docutils literal"><span class="pre">from_library</span></tt></a>(library[,&nbsp;copy])</td>
+<td>Converts a dictionary of ResidueTemplate items into a ResidueTemplateContainer.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.from_structure" title="parmed.modeller.ResidueTemplateContainer.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct[,&nbsp;term_decorate])</td>
+<td>Instantiates a ResidueTemplateContainer from a Structure instance filled</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.index" title="parmed.modeller.ResidueTemplateContainer.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.insert" title="parmed.modeller.ResidueTemplateContainer.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a></td>
+<td>L.insert(index, object) &#8211; insert object before index</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.pop" title="parmed.modeller.ResidueTemplateContainer.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
+<td>Raises IndexError if list is empty or index is out of range.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.remove" title="parmed.modeller.ResidueTemplateContainer.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.reverse" title="parmed.modeller.ResidueTemplateContainer.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.save" title="parmed.modeller.ResidueTemplateContainer.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>(fname[,&nbsp;format])</td>
+<td>Saves the current ResidueTemplateContainer in the requested file format.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.sort" title="parmed.modeller.ResidueTemplateContainer.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer.to_library" title="parmed.modeller.ResidueTemplateContainer.to_library"><tt class="xref py py-obj docutils literal"><span class="pre">to_library</span></tt></a>()</td>
+<td>Converts the ResidueTemplateContainer instance to a library of unique <a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> instances.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.append">
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.append(object) &#8211; append object to end</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.count">
+<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.extend">
+<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.fix_charges">
+<tt class="descname">fix_charges</tt><big>(</big><em>precision=4</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.fix_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the net charge of all residues in this ResidueContainer to match
+the closest integer charge</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>precision</strong> : int, optional</p>
+<blockquote>
+<div><p>The number of decimal places that each charge should be rounded to.
+Default is 4</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>self</strong> : <a class="reference internal" href="#parmed.modeller.ResidueTemplateContainer" title="parmed.modeller.ResidueTemplateContainer"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></a></p>
+<blockquote>
+<div><p>The current residue template container whose ResidueTemplates are
+being modified</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote class="last">
+<div><p>If you try to call fix_charges on a container with no templates</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method modifies everything in-place.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.modeller.ResidueTemplateContainer.from_library">
+<em class="property">classmethod </em><tt class="descname">from_library</tt><big>(</big><em>library</em>, <em>copy=False</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.from_library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a dictionary of ResidueTemplate items into a
+ResidueTemplateContainer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>library</strong> : dict or OrderedDict</p>
+<blockquote>
+<div><p>The library of ResidueTemplate objects to add to this container</p>
+</div></blockquote>
+<p><strong>copy</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, copies of each ResidueTemplate in library is added to the
+ResidueTemplateContainer. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cont</strong> : ResidueTemplateContainer</p>
+<blockquote>
+<div><p>A ResidueTemplateContainer containing all of the residues defined in
+<tt class="docutils literal"><span class="pre">library</span></tt></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError if any of the items in the input library is not a</strong></p>
+<p class="last"><strong>ResidueTemplate instance (or an instance of a subclass)</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If the library is ordered, that order is maintained</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.modeller.ResidueTemplateContainer.from_structure">
+<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em>, <em>term_decorate=True</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a ResidueTemplateContainer from a Structure instance filled
+with residues</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote>
+<div><p>The structure from which to generate the ResidueTemplateContainer
+from</p>
+</div></blockquote>
+<p><strong>term_decorate</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, terminal amino and nucleic acid residues will be adorned as
+follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li>N-prepended if it is an N-terminal amino acid</li>
+<li>C-prepended if it is a C-terminal amino acid</li>
+<li>5-appended if it is a 5&#8217;-terminal nucleic acid</li>
+<li>3-appended if it is a 3&#8217;-terminal nucleic acid</li>
+</ul>
+</div></blockquote>
+<p>For example, an N-terminal GLY will become NGLY, while a 5&#8217;-terminal
+DA will become DA5. Default is True</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.index">
+<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.insert">
+<tt class="descname">insert</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.insert(index, object) &#8211; insert object before index</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.pop">
+<tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>index</em><span class="optional">]</span><big>)</big> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises IndexError if list is empty or index is out of range.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.remove">
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.save">
+<tt class="descname">save</tt><big>(</big><em>fname</em>, <em>format=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current ResidueTemplateContainer in the requested file format.
+Supported formats can be specified explicitly or determined by file-name
+extension. The following formats are supported, with the recognized
+suffix and <tt class="docutils literal"><span class="pre">format</span></tt> keyword shown in parentheses:</p>
+<blockquote>
+<div><ul class="simple">
+<li>MOL2 (.mol2)</li>
+<li>MOL3 (.mol3)</li>
+<li>OFF (.lib/.off)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to save. If <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (see below), the
+file type will be determined based on the filename extension. If the
+type cannot be determined, a ValueError is raised.</p>
+</div></blockquote>
+<p><strong>format</strong> : str, optional</p>
+<blockquote>
+<div><p>The case-insensitive keyword specifying what type of file <tt class="docutils literal"><span class="pre">fname</span></tt>
+should be saved as. If <tt class="docutils literal"><span class="pre">None</span></tt> (default), the file type will be
+determined from filename extension of <tt class="docutils literal"><span class="pre">fname</span></tt></p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword-arguments</p>
+<blockquote>
+<div><p>Remaining arguments are passed on to the file writing routines that
+are called by this function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if either filename extension or ``format`` are not recognized</strong></p>
+<p><strong>TypeError if the structure cannot be converted to the desired format for</strong></p>
+<p class="last"><strong>whatever reason</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Mol2 and Mol3 files are saved as concatenated multiple &#64;&lt;MOLECULE&gt;s. By
+contrast, <tt class="docutils literal"><span class="pre">Structure.save</span></tt> will save a single &#64;&lt;MOLECULE&gt; mol2 file
+with multiple residues if the mol2 format is requested.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.sort">
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.ResidueTemplateContainer.to_library">
+<tt class="descname">to_library</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.ResidueTemplateContainer.to_library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the ResidueTemplateContainer instance to a library of unique
+<a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a> instances. The first of each kind of residue is
+taken</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>residues</strong> : dict {str</p>
+<blockquote class="last">
+<div><p>The residue library with all residues from this residue collection</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.modeller.PatchTemplate">
+<em class="property">class </em><tt class="descclassname">parmed.modeller.</tt><tt class="descname">PatchTemplate</tt><big>(</big><em>name=''</em><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parmed.modeller.residue.html#parmed.modeller.residue.ResidueTemplate" title="parmed.modeller.residue.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">parmed.modeller.residue.ResidueTemplate</span></tt></a></p>
+<p>A residue patch (typically used for CHARMM) that is used to modify existing
+residues in some way (e.g., terminal patches, disulfide bridges, etc.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>If provided, this is the name of the residue</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>This class basically just provides an additional list of atoms that need to
+be deleted when applying this patch &#8211; something that does not apply to
+standard Residues</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>delete</td>
+<td>(list of str) List of atoms that need to be deleted in applying the patch</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.add_atom" title="parmed.modeller.PatchTemplate.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom)</td>
+<td>Adds an atom to this residue template</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.add_bond" title="parmed.modeller.PatchTemplate.add_bond"><tt class="xref py py-obj docutils literal"><span class="pre">add_bond</span></tt></a>(atom1,&nbsp;atom2)</td>
+<td>Adds a bond between the two provided atoms in the residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.fix_charges" title="parmed.modeller.PatchTemplate.fix_charges"><tt class="xref py py-obj docutils literal"><span class="pre">fix_charges</span></tt></a>([to,&nbsp;precision])</td>
+<td>Adjusts the partial charge of all atoms in the residue to match the requested target charge.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.from_residue" title="parmed.modeller.PatchTemplate.from_residue"><tt class="xref py py-obj docutils literal"><span class="pre">from_residue</span></tt></a>(residue)</td>
+<td>This constructor creates a ResidueTemplate from a particular Residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.save" title="parmed.modeller.PatchTemplate.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<td>Saves the current ResidueTemplate in the requested file format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.to_dataframe" title="parmed.modeller.PatchTemplate.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<td>Create a pandas dataframe from the atom information</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.PatchTemplate.to_structure" title="parmed.modeller.PatchTemplate.to_structure"><tt class="xref py py-obj docutils literal"><span class="pre">to_structure</span></tt></a>()</td>
+<td>Generates a Structure instance with a single residue from this</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.modeller.PatchTemplate.add_atom">
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an atom to this residue template</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<blockquote>
+<div><p>The atom to add to this residue</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if ``atom`` has the same name as another atom in this</strong></p>
+<p class="last"><strong>residue already</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.PatchTemplate.add_bond">
+<tt class="descname">add_bond</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a bond between the two provided atoms in the residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
+<blockquote>
+<div><p>One of the atoms in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of
+this ResidueTemplate. It can also be the atom index (index from 0)
+of the atom in the bond.</p>
+</div></blockquote>
+<p><strong>atom2</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> or int or str</p>
+<blockquote>
+<div><p>The other atom in the bond. It must be in the <tt class="docutils literal"><span class="pre">atoms</span></tt> list of this
+ResidueTemplate. It can also be the atom index (index from 0) of the
+atom in the bond.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IndexError if atom1 or atom2 are integers that are out of range of the</strong></p>
+<p><strong>number of atoms already in this template</strong></p>
+<p><strong>RuntimeError if atom1 or atom2 are :class:`Atom` instances but they are</strong></p>
+<p class="last"><strong>*not* in the atoms list of this ResidueTemplate</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If atom1 and atom2 are already bonded, this routine does nothing. If
+atom1 or atom2 are strings, then they will match the first instance of
+the atom name that is the same as the atom name passed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.modeller.PatchTemplate.coordinates">
+<tt class="descname">coordinates</tt><a class="headerlink" href="#parmed.modeller.PatchTemplate.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomic coordinates, in Angstroms, of all atoms in the template</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.PatchTemplate.fix_charges">
+<tt class="descname">fix_charges</tt><big>(</big><em>to=None</em>, <em>precision=4</em><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.fix_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the partial charge of all atoms in the residue to match the
+requested target charge. The default target charge is the closest
+integer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>to</strong> : float, optional</p>
+<blockquote>
+<div><p>The desired net charge of this residue template. Default is the
+closest integer charge</p>
+</div></blockquote>
+<p><strong>precision</strong> : int, optional</p>
+<blockquote>
+<div><p>The number of decimal places that each charge should be rounded to.
+Default is 4</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>self</strong> : <a class="reference internal" href="#parmed.modeller.ResidueTemplate" title="parmed.modeller.ResidueTemplate"><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt></a></p>
+<blockquote>
+<div><p>The current residue template whose charges are being modified</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote class="last">
+<div><p>If you try to call fix_charges on a residue template with no atoms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method modifies the atomic charges of this residue template
+in-place. Any residual charge (which is accumulated roundoff beyond the
+requested precision) is added to the first atom of the residue. This
+will typically be 10^-precision in magnitude, and should almost never be
+higher than 2*10^-precision. As long as a reasonable precision is chosen
+(no fewer than 3 or 4 decimal places), this will have only a negligible
+impact on a force field.</p>
+<p>If provided, &#8220;to&#8221; will be rounded to the <tt class="docutils literal"><span class="pre">precision</span></tt>&#8216;th decimal place
+to make sure that the sum of the charges come out as close as possible
+to the target charge while still obeying the requested precision.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.modeller.PatchTemplate.from_residue">
+<em class="property">classmethod </em><tt class="descname">from_residue</tt><big>(</big><em>residue</em><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.from_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>This constructor creates a ResidueTemplate from a particular Residue
+object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<blockquote class="last">
+<div><p>The residue from which to create a template</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.PatchTemplate.save">
+<tt class="descname">save</tt><big>(</big><em>fname</em>, <em>format=None</em>, <em>overwrite=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current ResidueTemplate in the requested file format.
+Supported formats can be specified explicitly or determined by file-name
+extension. The following formats are supported, with the recognized
+suffix shown in parentheses:</p>
+<blockquote>
+<div><ul class="simple">
+<li>MOL2 (.mol2)</li>
+<li>MOL3 (.mol3)</li>
+<li>OFF (.lib/.off)</li>
+<li>PDB (.pdb)</li>
+<li>PQR (.pqr)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to save. If <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (see below), the
+file type will be determined based on the filename extension. If the
+type cannot be determined, a ValueError is raised.</p>
+</div></blockquote>
+<p><strong>format</strong> : str, optional</p>
+<blockquote>
+<div><p>The case-insensitive keyword specifying what type of file <tt class="docutils literal"><span class="pre">fname</span></tt>
+should be saved as. If <tt class="docutils literal"><span class="pre">None</span></tt> (default), the file type will be
+determined from filename extension of <tt class="docutils literal"><span class="pre">fname</span></tt></p>
+</div></blockquote>
+<p><strong>overwrite</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, allow the target file to be overwritten. Otherwise, an
+IOError is raised if the file exists. Default is False</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword-arguments</p>
+<blockquote>
+<div><p>Remaining arguments are passed on to the file writing routines that
+are called by this function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if either filename extension or ``format`` are not recognized</strong></p>
+<p><strong>TypeError if the structure cannot be converted to the desired format for</strong></p>
+<p class="last"><strong>whatever reason</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.PatchTemplate.to_dataframe">
+<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a pandas dataframe from the atom information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></p>
+<blockquote class="last">
+<div><p>The pandas DataFrame with all of the atomic properties</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The DataFrame will be over all atoms. The columns will be the attributes
+of the atom (as well as its containing residue). Some columns will
+<em>always</em> exist. Others will only exist if those attributes have been set
+on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+attributes and their meaning). The columns that will always be present
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>number : int</li>
+<li>name : str</li>
+<li>type : str</li>
+<li>atomic_number : int</li>
+<li>charge : float</li>
+<li>mass : float</li>
+<li>nb_idx : int</li>
+<li>radii : float</li>
+<li>screen : float</li>
+<li>occupancy : float</li>
+<li>bfactor : float</li>
+<li>altloc : str</li>
+<li>tree : str</li>
+<li>join : int</li>
+<li>irotat : int</li>
+<li>rmin : float</li>
+<li>epsilon : float</li>
+<li>rmin_14 : float</li>
+<li>epsilon_14 : float</li>
+</ul>
+</div></blockquote>
+<p>The following attributes are optionally present if they were present in
+the original file defining the structure:</p>
+<blockquote>
+<div><ul class="simple">
+<li>xx : float (x-coordinate position)</li>
+<li>xy : float (y-coordinate position)</li>
+<li>xz : float (z-coordinate position)</li>
+<li>vx : float (x-coordinate velocity)</li>
+<li>vy : float (y-coordinate velocity)</li>
+<li>vz : float (z-coordinate velocity)</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.modeller.PatchTemplate.to_structure">
+<tt class="descname">to_structure</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.modeller.PatchTemplate.to_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a Structure instance with a single residue from this
+ResidueTemplate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<blockquote class="last">
+<div><p>The Structure with all of the bonds and connectivity of this
+template</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -74,7 +1178,9 @@ modelling tasks.</p>
   <ul>
 <li><a class="reference internal" href="#">parmed.modeller package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-parmed.modeller">Module contents</a></li>
+<li><a class="reference internal" href="#module-parmed.modeller">Module contents</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

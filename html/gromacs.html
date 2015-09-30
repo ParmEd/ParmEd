@@ -106,17 +106,17 @@ format is detailed in the Gromacs User&#8217;s manual.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
 <td>Class providing a parser and writer for a GROMACS topology file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
 <td>Parses and writes Gromacs GRO files</td>
 </tr>
 </tbody>
 </table>
 <div class="section" id="the-gromacstopologyfile-class">
-<h3>The <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> class<a class="headerlink" href="#the-gromacstopologyfile-class" title="Permalink to this headline">¶</a></h3>
-<p>This class inherits from the base class <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, adding the attributes <tt class="docutils literal"><span class="pre">parameterset</span></tt> (a
+<h3>The <a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> class<a class="headerlink" href="#the-gromacstopologyfile-class" title="Permalink to this headline">¶</a></h3>
+<p>This class inherits from the base class <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, adding the attributes <tt class="docutils literal"><span class="pre">parameterset</span></tt> (a
 <a class="reference internal" href="api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><tt class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></tt></a> object with all
 parameters parsed from the include topology files) and <tt class="docutils literal"><span class="pre">itps</span></tt> (a list of all
 include topology files that were included and parsed while processing the
@@ -128,18 +128,118 @@ is shown below:</p>
 <span class="go">&lt;GromacsTopologyFile 1960 atoms; 129 residues; 1984 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
-<p>You can manipulate the <tt class="docutils literal"><span class="pre">top</span></tt> instance any way you can a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+<p>You can manipulate the <tt class="docutils literal"><span class="pre">top</span></tt> instance any way you can a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+</div>
+<div class="section" id="writing-gromacs-topology-files">
+<h3>Writing GROMACS Topology Files<a class="headerlink" href="#writing-gromacs-topology-files" title="Permalink to this headline">¶</a></h3>
+<p><strong>Molecule type definitions</strong></p>
+<p>The GROMACS topology is constructed by piecing together <em>fragments</em> of a system,
+where each fragment is, by standard convention, an individual <em>molecule</em>
+(meaning that you can &#8220;reach&#8221; every atom in a molecule from every other atom in
+that molecule by traversing some number of bonds &#8211; i.e., it is a connected
+graph).</p>
+<p>These &#8220;molecules&#8221; are defined in separate <tt class="docutils literal"><span class="pre">[</span> <span class="pre">moleculetype</span> <span class="pre">]</span></tt> sections of the
+topology file, and then the <tt class="docutils literal"><span class="pre">[</span> <span class="pre">molecules</span> <span class="pre">]</span></tt> section gives the order, and
+number, of each molecule <em>type</em> in the system.</p>
+<p>GROMACS can make use of the definitions of a molecule <em>type</em>, and this
+distinction is particularly important for free energy calculations. For this
+reason, the <tt class="docutils literal"><span class="pre">combine</span></tt> keyword in <a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile.write" title="parmed.gromacs.GromacsTopologyFile.write"><tt class="xref py py-meth docutils literal"><span class="pre">GromacsTopologyFile.write()</span></tt></a> allows
+fine-grained control over how <tt class="docutils literal"><span class="pre">[</span> <span class="pre">moleculetype</span> <span class="pre">]</span></tt> sections are defined. By
+default, (when <tt class="docutils literal"><span class="pre">combine</span></tt> is assigned <tt class="docutils literal"><span class="pre">None</span></tt>), the structure is split into
+molecules and written as separate <tt class="docutils literal"><span class="pre">[</span> <span class="pre">moleculetype</span> <span class="pre">]</span></tt> sections. When
+<tt class="docutils literal"><span class="pre">combine</span></tt> is assigned the string <tt class="docutils literal"><span class="pre">all</span></tt>, the entire structure is considered
+to be a single molecule and is stored as a single <tt class="docutils literal"><span class="pre">[</span> <span class="pre">moleculetype</span> <span class="pre">]</span></tt> section.</p>
+<p>The last allowable mode is to assign lists of lists of molecule indices for
+<tt class="docutils literal"><span class="pre">combine</span></tt>, telling <a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> exactly which molecules to
+&#8220;combine&#8221; into larger <tt class="docutils literal"><span class="pre">[</span> <span class="pre">moleculetype</span> <span class="pre">]</span></tt> sections. There is one major
+restriction here: combined molecules <em>must</em> be contiguously ordered in the
+original atom sequence of the structure! The reason for this is that if the
+original order of the atoms is changed, then the topology atom order will no
+longer match that from the coordinate file! An annotated example may help
+demonstrate this. Consider the following topology file (it is actually the
+<tt class="docutils literal"><span class="pre">topol3.top</span></tt> file from the <tt class="docutils literal"><span class="pre">12.DPPC/</span></tt> directory in the test suite):</p>
+<div class="highlight-python"><div class="highlight"><pre>#include &quot;DPPC_2.itp&quot;
+
+; System specifications
+[ system ]
+DPPC Bilayer
+
+[ molecules ]
+; molecule name nr.
+DPPC 4
+SOL 122
+DPPC 4
+SOL 122
+</pre></div>
+</div>
+<p>The DPPC and SOL molecule types are defined in the <tt class="docutils literal"><span class="pre">DPPC_2.itp</span></tt> include
+topology file. When this topology is read in, there will be 252 residues &#8211; 8
+DPPC residues and 244 SOL residues:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># You can safely ignore the warning printed here</span>
+<span class="gp">... </span><span class="n">system</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;topol3.top&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span>
+<span class="go">&lt;GromacsTopologyFile 1132 atoms; 252 residues; 880 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Now suppose that we want to do something special with a DPPC-solvent pair, and
+then something special with all of the DPPC residues in the second set (possibly
+a second &#8220;leaflet&#8221; in a bilayer system) again with a single solvent.  So what we
+want to do is combine the 4th and 5th molecules (since indices start from 0,
+this would be molecules 3 and 4), as well as the five residues 127 through 131
+(indices 126, 127, 128, 129, and 130). Our <tt class="docutils literal"><span class="pre">combine</span></tt> would then look like
+<tt class="docutils literal"><span class="pre">[[3,4],[126,127,128,129,130]]</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">system</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;test.top&#39;</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">126</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">129</span><span class="p">,</span> <span class="mi">130</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>If we look at the bottom of the <tt class="docutils literal"><span class="pre">test.top</span></tt> file we generated, we should see
+this:</p>
+<div class="highlight-python"><div class="highlight"><pre>[ molecules ]
+; Compound       #mols
+DPPC                 3
+system1              1
+SOL                121
+system2              1
+SOL                121
+</pre></div>
+</div>
+<p>If we think about it, this is exactly what we want.  We left our first 3 DPPC
+residues alone, then combined DPPC and SOL into a single molecule (since the
+molecule is defined by more than 1 residue, it is given a generic name
+<tt class="docutils literal"><span class="pre">system#</span></tt>, where <tt class="docutils literal"><span class="pre">#</span></tt> increments for each multi-residue molecule that is
+encountered. We left the last 121 of 122 SOL residues alone, then combined all 4
+DPPC residues and the first of the second set of 122 SOL residues into a single
+molecule type. Leaving us with <tt class="docutils literal"><span class="pre">system2</span></tt> and 121 <tt class="docutils literal"><span class="pre">SOL</span></tt> left to define our
+original system.</p>
+<p>Note, if you read a GROMACS topology file that combines multiple molecules into
+individual molecule types, writing a copy back to a different topology file will
+<em>not</em> preserve the original <tt class="docutils literal"><span class="pre">[</span> <span class="pre">moleculetype</span> <span class="pre">]</span></tt> definitions (since the ParmEd
+<tt class="docutils literal"><span class="pre">Structure</span></tt> object carries no memory of such decompositions and always
+flattens the list of atoms and residues).  For the most part, you should not
+bother with this added complication unless you <em>know</em> it is necessary.</p>
+<p><strong>Parameters</strong></p>
+<p>There are 3 ways that parameters can be specified in GROMACS topologies &#8211;
+either through include topology files, as separate <tt class="docutils literal"><span class="pre">[</span> <span class="pre">&lt;parameter&gt;type</span> <span class="pre">]</span></tt>
+sections in the main topology file, or in-line with the actual topologies
+themselves.</p>
+<p>You can specify where the parameters are placed using the <tt class="docutils literal"><span class="pre">parameters</span></tt> keyword
+in <a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile.write" title="parmed.gromacs.GromacsTopologyFile.write"><tt class="xref py py-meth docutils literal"><span class="pre">GromacsTopologyFile.write()</span></tt></a>. The allowed values are <tt class="docutils literal"><span class="pre">inline</span></tt>, a
+string representing the name of a file, or an open file object. If the file name
+is the same as the file name of the topology file itself, then the parameter
+sections will be written to the beginning of the topology file. If it is a
+different file, the name of the file will be included in the generated topology
+file. The default value is <tt class="docutils literal"><span class="pre">inline</span></tt>.</p>
 </div>
 </div>
 <div class="section" id="the-gro-coordinate">
 <h2>The GRO coordinate<a class="headerlink" href="#the-gro-coordinate" title="Permalink to this headline">¶</a></h2>
 <p>ParmEd also supplies classes for parsing the various variants of the GROMACS GRO
-file. Because the GRO file resembles a PDB file, the <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a> has a <tt class="docutils literal"><span class="pre">parse</span></tt> method that will parse a GRO
-file and instantiate a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>.</p>
+file. Because the GRO file resembles a PDB file, the <a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a> has a <tt class="docutils literal"><span class="pre">parse</span></tt> method that will parse a GRO
+file and instantiate a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>.</p>
 <p>The coordinates can be extracted from the <tt class="docutils literal"><span class="pre">xx</span></tt>, <tt class="docutils literal"><span class="pre">xy</span></tt>, and <tt class="docutils literal"><span class="pre">xz</span></tt> attributes
-on each <a class="reference internal" href="topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance in the
+on each <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> instance in the
 Structure.</p>
-<p>The GRO file is automatically detected by <tt class="xref py py-meth docutils literal"><span class="pre">parmed.load_file()</span></tt>, and this
+<p>The GRO file is automatically detected by <a class="reference internal" href="api/parmed/parmed.html#parmed.load_file" title="parmed.load_file"><tt class="xref py py-meth docutils literal"><span class="pre">parmed.load_file()</span></tt></a>, and this
 is the recommended way to parse these files.</p>
 <p>The corresponding classes are:</p>
 <table border="1" class="longtable docutils">
@@ -148,10 +248,10 @@ is the recommended way to parse these files.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a>([fname,&nbsp;defines,&nbsp;...])</td>
 <td>Class providing a parser and writer for a GROMACS topology file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-obj docutils literal"><span class="pre">GromacsGroFile</span></tt></a></td>
 <td>Parses and writes Gromacs GRO files</td>
 </tr>
 </tbody>
@@ -159,8 +259,8 @@ is the recommended way to parse these files.</p>
 </div>
 <div class="section" id="example-usage">
 <h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
-<p>Many exciting possibilities are available with <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> and
-<a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a>.  For example, ParmEd is the first software package to
+<p>Many exciting possibilities are available with <a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> and
+<a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></tt></a>.  For example, ParmEd is the first software package to
 enable conversion of Gromacs simulation input files to AMBER format in just a
 few lines of code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span><span class="p">,</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
@@ -177,7 +277,7 @@ few lines of code:</p>
 </pre></div>
 </div>
 <p>Furthermore, you may check the correctness of topology loading by using the
-<a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object to calculate an OpenMM potential energy and
+<a class="reference internal" href="api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a> object to calculate an OpenMM potential energy and
 force, then comparing that result with your own output from Gromacs:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
@@ -215,6 +315,7 @@ simulation results.</p>
 <li><a class="reference internal" href="#setting-up-gromacs">Setting up Gromacs</a></li>
 <li><a class="reference internal" href="#the-topology-file">The topology file</a><ul>
 <li><a class="reference internal" href="#the-gromacstopologyfile-class">The <tt class="docutils literal"><span class="pre">GromacsTopologyFile</span></tt> class</a></li>
+<li><a class="reference internal" href="#writing-gromacs-topology-files">Writing GROMACS Topology Files</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#the-gro-coordinate">The GRO coordinate</a></li>

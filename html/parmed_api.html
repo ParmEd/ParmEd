@@ -75,9 +75,9 @@ in the <tt class="docutils literal"><span class="pre">parmed</span></tt> page. E
 <p>Each of the actions described on the previous page can be invoked either on a
 parm list (a few, like <tt class="xref doc docutils literal"><span class="pre">interpolate</span></tt>, actually <em>require</em> a parm list with
 multiple topologies), or a raw <tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt>
-object. Note that some actions do not support all <a class="reference internal" href="amberobj/parmed.amber.AmberParm.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> subclasses (like those for the CHARMM or Amoeba
+object. Note that some actions do not support all <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> subclasses (like those for the CHARMM or Amoeba
 force fields).</p>
-<p>The first step is to instantiate the action with the <a class="reference internal" href="amberobj/parmed.amber.AmberParm.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> instance as the first argument. The arguments that
+<p>The first step is to instantiate the action with the <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> instance as the first argument. The arguments that
 each action requires in the ParmEd interpreter can then be given as separate
 arguments to the constructor or all as a single string in the second argument.
 Keyword arguments can optionally be given as keyword arguments to the action
@@ -106,10 +106,10 @@ above):</p>
 </div>
 <p>The informational message printed to the ParmEd output are available by casting
 the action to a string:</p>
-<div class="highlight-python"><div class="highlight"><pre>print str(action)
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
 
-# Equivalent:
-print &#39;%s&#39; % action
+<span class="c"># Equivalent:</span>
+<span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">action</span>
 </pre></div>
 </div>
 </div>

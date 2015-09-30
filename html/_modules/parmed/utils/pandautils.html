@@ -129,7 +129,6 @@
 <span class="sd">        - multipole_433 : float (3,3 Quadrupole component)</span>
 <span class="sd">        - polarizability : float (dipole polarizability)</span>
 <span class="sd">        - vdw_parent : int (index of the vdW parent atom of this atom)</span>
-<span class="sd">        - segid : segment ID (similar to chain, but for CHARMM)</span>
 <span class="sd">        - U11 : float (U[1][1] of anisotropic b-factor tensor)</span>
 <span class="sd">        - U22 : float (U[2][2] of anisotropic b-factor tensor)</span>
 <span class="sd">        - U33 : float (U[3][3] of anisotropic b-factor tensor)</span>
@@ -167,6 +166,7 @@
     <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="n">ret</span><span class="p">[</span><span class="s">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;segid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
 
     <span class="c"># Now for optional attributes</span>
     <span class="c"># Coordinates</span>
@@ -220,11 +220,6 @@
     <span class="c"># AMOEBA vdw parent atom</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ret</span><span class="p">[</span><span class="s">&#39;vdw_parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="c"># SEGID (CHARMM)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;segid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="c"># anisotropic b-factors</span>
@@ -309,6 +304,11 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Data does not match length of atoms list&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_residue_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Data does not match length of atoms list&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
     <span class="n">multipoles</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
     <span class="n">anisous</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)]</span>
@@ -374,8 +374,6 @@
                 <span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;polarizability&#39;</span><span class="p">:</span>
             <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;polarizability&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;segid&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;segid&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_111&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_211&#39;</span><span class="p">:</span>
@@ -408,7 +406,8 @@
             <span class="n">anisous</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U23&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;resname&#39;</span><span class="p">,</span> <span class="s">&#39;resid&#39;</span><span class="p">,</span> <span class="s">&#39;resnum&#39;</span><span class="p">,</span> <span class="s">&#39;chain&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;resname&#39;</span><span class="p">,</span> <span class="s">&#39;resid&#39;</span><span class="p">,</span> <span class="s">&#39;resnum&#39;</span><span class="p">,</span> <span class="s">&#39;chain&#39;</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
+            <span class="n">set_residue_attr</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Atomic property </span><span class="si">%s</span><span class="s"> not recognized&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">,</span>

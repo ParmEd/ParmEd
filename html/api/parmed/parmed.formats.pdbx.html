@@ -68,6 +68,73 @@
 <p>The PDBx package here was taken from the wwPDB website written by John Westbook
 (and modified slightly to fix issues with Python 3 support as well as unified
 exception handling)</p>
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxReader">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.</tt><tt class="descname">PdbxReader</tt><big>(</big><em>ifh</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>PDBx reader for data files and dictionaries.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxReader.read" title="parmed.formats.pdbx.PdbxReader.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxReader.read">
+<tt class="descname">read</tt><big>(</big><em>containerList</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxReader.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends to the input list of definition and data containers.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.pdbx.PdbxWriter">
+<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.</tt><tt class="descname">PdbxWriter</tt><big>(</big><em>ofh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Write PDBx data files or dictionaries using the input container
+or container list.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.setRowPartition" title="parmed.formats.pdbx.PdbxWriter.setRowPartition"><tt class="xref py py-obj docutils literal"><span class="pre">setRowPartition</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.write" title="parmed.formats.pdbx.PdbxWriter.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.writeContainer" title="parmed.formats.pdbx.PdbxWriter.writeContainer"><tt class="xref py py-obj docutils literal"><span class="pre">writeContainer</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxWriter.setRowPartition">
+<tt class="descname">setRowPartition</tt><big>(</big><em>numRows</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.setRowPartition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum number of rows checked for value length and format</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxWriter.write">
+<tt class="descname">write</tt><big>(</big><em>containerList</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.formats.pdbx.PdbxWriter.writeContainer">
+<tt class="descname">writeContainer</tt><big>(</big><em>container</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.writeContainer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -81,7 +148,9 @@ exception handling)</p>
   <ul>
 <li><a class="reference internal" href="#">parmed.formats.pdbx package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-parmed.formats.pdbx">Module contents</a></li>
+<li><a class="reference internal" href="#module-parmed.formats.pdbx">Module contents</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

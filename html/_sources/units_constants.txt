@@ -1,0 +1,40 @@
+Units and Physical Constants in ParmEd
+======================================
+
+This page details the unit system used by ParmEd to store information
+internally, as well as some relevant values of physical constants that it uses
+for representing electrostatic interactions.
+
+Units
+-----
+
+As discussed `in the section on dimensional analysis
+<dimensional_analysis.html>`_, different programs use different sets of internal
+units for different reasons. The default set of units that ParmEd uses to store
+quantities internally is the *AKMA* unit system, with the exception that angles
+are stored in degrees (rather than radians), and time quantities are stored in
+picoseconds (this is also true for quantities with a simple inclusion of "time",
+like velocities which are stored in Angstroms per picosecond).
+
+If you are at all unsure, you may assign or initialize attributes or objects
+using numbers that bear units, and the conversion to the internal unit set used
+by ParmEd will be performed automatically. By default, reading files from
+specific formats will result in the unit system associated with the parent
+program being applied to the parsed information (see the table at the bottom of
+`this page <dimensional_analysis.html>`_.
+
+Physical Constants
+------------------
+
+The most problematic physical constant that complicates the reproducibility of
+interconverted files between different programs is the value chosen for the
+electrostatic scaling constant. The *exact* value used for the different
+supported programs are shown below:
+
++--------------+-------------------------+---------------------------------------------+
+| Program      | Electrostatic constant  | Units                                       |
++==============+=========================+=============================================+
+| AMBER        | :math:`18.2223^2`       | :math:`kcal\AA/(mol\ elementary\ charge^2)` |
++--------------+-------------------------+---------------------------------------------+
+| CHARMM       | :math:`332.0716`        | :math:`kcal\AA/(mol\ elementary\ charge^2)` |
++--------------+-------------------------+---------------------------------------------+

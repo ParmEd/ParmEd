@@ -62,11 +62,15 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">simtk.openmm.app.internal</span> <span class="kn">import</span> <span class="n">unitcell</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">unitcell</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">SUPPORTED_VERSION</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">SUPPORTED_VERSION</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">HAS_OPENMM</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">del</span> <span class="n">mm</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">unitcell</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <div class="viewcode-block" id="needs_openmm"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.decorators.html#parmed.utils.decorators.needs_openmm">[docs]</a><span class="k">def</span> <span class="nf">needs_openmm</span><span class="p">(</span><span class="n">fcn</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">HAS_OPENMM</span>
@@ -79,7 +83,15 @@
         <span class="k">return</span> <span class="n">fcn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">new_fcn</span>
-</pre></div></div>
+</div>
+<span class="k">def</span> <span class="nf">deprecated</span><span class="p">(</span><span class="n">fcn</span><span class="p">):</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fcn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">new_fcn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> is deprecated and will be removed in the future&#39;</span> <span class="o">%</span>
+                      <span class="n">fcn</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fcn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_fcn</span>
+</pre></div>
 
           </div>
         </div>

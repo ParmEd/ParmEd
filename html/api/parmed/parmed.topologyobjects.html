@@ -53,7 +53,7 @@ as atoms, residues, bonds, angles, etc.</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.Angle">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Angle</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A valence angle between 3 atoms separated by two covalent bonds.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -382,16 +382,19 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.rmin_14" title="parmed.topologyobjects.Atom.rmin_14"><tt class="xref py py-obj docutils literal"><span class="pre">rmin_14</span></tt></a></td>
 <td>The 1-4 Lennard-Jones Rmin/2 parameter</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma" title="parmed.topologyobjects.Atom.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
-<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma_14" title="parmed.topologyobjects.Atom.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
-<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.starting_index" title="parmed.topologyobjects.Atom.starting_index"><tt class="xref py py-obj docutils literal"><span class="pre">starting_index</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.segid" title="parmed.topologyobjects.Atom.segid"><tt class="xref py py-obj docutils literal"><span class="pre">segid</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.tortor_partners" title="parmed.topologyobjects.Atom.tortor_partners"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_partners</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma" title="parmed.topologyobjects.Atom.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.sigma_14" title="parmed.topologyobjects.Atom.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.starting_index" title="parmed.topologyobjects.Atom.starting_index"><tt class="xref py py-obj docutils literal"><span class="pre">starting_index</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Atom.tortor_partners" title="parmed.topologyobjects.Atom.tortor_partners"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_partners</span></tt></a></td>
 <td>List of all 1-5 partners that are NOT in angle or bond partners.</td>
 </tr>
 </tbody>
@@ -656,6 +659,11 @@ up again with updated data.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="parmed.topologyobjects.Atom.segid">
+<tt class="descname">segid</tt><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Atom.segid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.segid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="parmed.topologyobjects.Atom.sigma">
 <tt class="descname">sigma</tt><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Atom.sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Atom.sigma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lennard-Jones sigma parameter &#8211; directly related to Rmin</p>
@@ -726,12 +734,6 @@ it belongs to.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.claim" title="parmed.topologyobjects.AtomList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.clear" title="parmed.topologyobjects.AtomList.clear"><tt class="xref py py-obj docutils literal"><span class="pre">clear</span></tt></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.copy" title="parmed.topologyobjects.AtomList.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
-</tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.count" title="parmed.topologyobjects.AtomList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
 <td></td>
 </tr>
@@ -762,8 +764,8 @@ it belongs to.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.reverse" title="parmed.topologyobjects.AtomList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.sort" title="parmed.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.sort" title="parmed.topologyobjects.AtomList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.AtomList.unmark" title="parmed.topologyobjects.AtomList.unmark"><tt class="xref py py-obj docutils literal"><span class="pre">unmark</span></tt></a>()</td>
 <td>Unmark all atoms in this list</td>
@@ -803,16 +805,6 @@ alterations are defined for the type with that given that index
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.AtomList.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.AtomList.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.AtomList.copy">
-<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.AtomList.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.AtomList.count">
@@ -899,8 +891,10 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.AtomList.sort">
-<tt class="descname">sort</tt><big>(</big><em>key=None</em>, <em>reverse=False</em><big>)</big> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.AtomList.unmark">
@@ -913,7 +907,7 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 <dl class="class">
 <dt id="parmed.topologyobjects.Bond">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Bond</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A covalent bond connecting two atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1057,7 +1051,7 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.ChiralFrame">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">ChiralFrame</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>chirality</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#ChiralFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ChiralFrame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A chiral frame as defined in the AMOEBA force field. It defines the frame of
 reference for a chiral center</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1088,7 +1082,7 @@ different value is provided</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.Cmap">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Cmap</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Cmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Cmap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A coupled-torsion correction map term defined between 5 atoms connected by
 four covalent bonds. This is a coupled-torsion potential in which the
 torsions are consecutive.</p>
@@ -1567,7 +1561,7 @@ iterable</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.DihedralTypeList">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">DihedralTypeList</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.list</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></tt></p>
 <p>Dihedral types are a Fourier expansion of terms. In some cases, they are
 stored in a list like this one inside another TrackedList. In other cases,
 each term is a separate entry in the <a class="reference internal" href="#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a>.</p>
@@ -1620,17 +1614,11 @@ keyword-only argument. Default is <tt class="docutils literal"><span class="pre"
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.append" title="parmed.topologyobjects.DihedralTypeList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(other)</td>
 <td>Adds a DihedralType to the DihedralTypeList</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.clear" title="parmed.topologyobjects.DihedralTypeList.clear"><tt class="xref py py-obj docutils literal"><span class="pre">clear</span></tt></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.copy" title="parmed.topologyobjects.DihedralTypeList.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
-</tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.count" title="parmed.topologyobjects.DihedralTypeList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(...)</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.index" title="parmed.topologyobjects.DihedralTypeList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
@@ -1641,14 +1629,14 @@ keyword-only argument. Default is <tt class="docutils literal"><span class="pre"
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.pop" title="parmed.topologyobjects.DihedralTypeList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.reverse" title="parmed.topologyobjects.DihedralTypeList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
@@ -1677,24 +1665,15 @@ same periodicity as any other DihedralType in the list</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.copy">
-<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.count">
 <tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.extend">
-<tt class="descname">extend</tt><big>(</big><em>iterable</em><big>)</big> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.topologyobjects.DihedralTypeList.idx">
@@ -1726,8 +1705,9 @@ same periodicity as any other DihedralType in the list</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.remove">
-<tt class="descname">remove</tt><big>(</big><em>value</em><big>)</big> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1738,8 +1718,10 @@ same periodicity as any other DihedralType in the list</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.sort">
-<tt class="descname">sort</tt><big>(</big><em>key=None</em>, <em>reverse=False</em><big>)</big> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1918,7 +1900,7 @@ equal</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.MultipoleFrame">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">MultipoleFrame</tt><big>(</big><em>atom</em>, <em>frame_pt_num</em>, <em>vectail</em>, <em>vechead</em>, <em>nvec</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#MultipoleFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.MultipoleFrame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This defines the frame of reference for computing multipole interactions in
 the AMOEBA force field.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2042,7 +2024,7 @@ same as <a class="reference internal" href="#parmed.topologyobjects.TrigonalAngl
 <dl class="class">
 <dt id="parmed.topologyobjects.PiTorsion">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">PiTorsion</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#PiTorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.PiTorsion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Defines a pi-torsion term in the AMOEBA force field. The Pi-torsion is
 defined around a sp2-hybridized pi-delocalized orbital (like an amide) by 6
 atoms, as shown in the schematic below.</p>
@@ -2145,7 +2127,7 @@ bonded to 3 other atoms.</p>
 
 <dl class="class">
 <dt id="parmed.topologyobjects.Residue">
-<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Residue</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Residue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Residue</tt><big>(</big><em>name</em>, <em>number=-1</em>, <em>chain=''</em>, <em>insertion_code=''</em>, <em>segid=''</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></tt></p>
 <p>A single residue that is composed of a small number of atoms</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2157,17 +2139,23 @@ bonded to 3 other atoms.</p>
 <div><p>Name of the residue. Typical convention is to choose a name that is 4
 characters or shorter</p>
 </div></blockquote>
-<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>number</strong> : <tt class="docutils literal"><span class="pre">int</span></tt>, optional</p>
 <blockquote>
-<div><p>Residue number assigned in the input structure</p>
+<div><p>Residue number assigned in the input structure. Default is -1</p>
 </div></blockquote>
-<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
 <blockquote>
-<div><p>The 1-letter chain identifier for this residue</p>
+<div><p>The 1-letter chain identifier for this residue. Default is empty string</p>
 </div></blockquote>
-<p><strong>insertion_code</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>insertion_code</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
 <blockquote>
-<div><p>The insertion code (used in PDB files) for this residue</p>
+<div><p>The insertion code (used in PDB files) for this residue. Default is
+empty string</p>
+</div></blockquote>
+<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt>, optional</p>
+<blockquote>
+<div><p>The segment identifier, used by CHARMM in a way similar to chain. Dfault
+is empty string</p>
 </div></blockquote>
 <p><strong>list</strong> : <a class="reference internal" href="#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a></p>
 <blockquote class="last">
@@ -2308,7 +2296,7 @@ atoms. No change if an atom is not present in this residue.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.add_atom" title="parmed.topologyobjects.ResidueList.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;inscode])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.add_atom" title="parmed.topologyobjects.ResidueList.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the ResidueList, adding a new residue to this list if</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.append" title="parmed.topologyobjects.ResidueList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(*args,&nbsp;**kwargs)</td>
@@ -2316,12 +2304,6 @@ atoms. No change if an atom is not present in this residue.</p>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.claim" title="parmed.topologyobjects.ResidueList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.clear" title="parmed.topologyobjects.ResidueList.clear"><tt class="xref py py-obj docutils literal"><span class="pre">clear</span></tt></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.copy" title="parmed.topologyobjects.ResidueList.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.count" title="parmed.topologyobjects.ResidueList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
 <td></td>
@@ -2353,14 +2335,14 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.reverse" title="parmed.topologyobjects.ResidueList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#ResidueList.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList.add_atom" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#ResidueList.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the ResidueList, adding a new residue to this list if
 it has a different name or number as the last residue</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2384,8 +2366,12 @@ it has a different name or number as the last residue</p>
 <div><p>The chain ID character for this residue</p>
 </div></blockquote>
 <p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The insertion code ID character for this residue (it is stripped)</p>
+</div></blockquote>
+<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote class="last">
+<div><p>The segment identifier for this residue (it is stripped)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -2407,16 +2393,6 @@ list, a new residue is added and the atom is added to that residue</p>
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.ResidueList.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.ResidueList.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.ResidueList.copy">
-<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.ResidueList.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.count">
@@ -2480,15 +2456,17 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.sort">
-<tt class="descname">sort</tt><big>(</big><em>key=None</em>, <em>reverse=False</em><big>)</big> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.ResidueList.sort" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.topologyobjects.StretchBend">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">StretchBend</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#StretchBend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.StretchBend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This term models the stretching and bending of a standard valence angle, and
 is used in the AMOEBA force field</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2734,9 +2712,9 @@ atom3, atom4, and atom5, and removes each atom from the others&#8217;
 tortor_partners list.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="classmethod">
 <dt id="parmed.topologyobjects.TorsionTorsion.extended">
-<tt class="descname">extended</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion.extended" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">extended</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>atom5</em>, <em>atom6</em>, <em>atom7</em>, <em>atom8</em>, <em>type=None</em><big>)</big><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsion.extended" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alternative constructor for correction maps defined with 8 atoms (each
 torsion being separately specified). Correction maps are, to the best of
 my knowledge, used to parametrized &#8220;consecutive&#8221; torsions (i.e., atoms
@@ -2978,7 +2956,7 @@ the one shown below</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.TrackedList">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">TrackedList</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#TrackedList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.TrackedList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.list</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
 <p>This creates a list type that allows you to see if anything has changed</p>
 <p class="rubric">Examples</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span> <span class="o">=</span> <span class="n">TrackedList</span><span class="p">()</span>
@@ -3023,12 +3001,6 @@ the one shown below</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.claim" title="parmed.topologyobjects.TrackedList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.clear" title="parmed.topologyobjects.TrackedList.clear"><tt class="xref py py-obj docutils literal"><span class="pre">clear</span></tt></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.copy" title="parmed.topologyobjects.TrackedList.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
-</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.count" title="parmed.topologyobjects.TrackedList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
 <td></td>
 </tr>
@@ -3056,8 +3028,8 @@ the one shown below</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.reverse" title="parmed.topologyobjects.TrackedList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.sort" title="parmed.topologyobjects.TrackedList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.sort" title="parmed.topologyobjects.TrackedList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
@@ -3072,16 +3044,6 @@ the one shown below</p>
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.TrackedList.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.TrackedList.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.TrackedList.copy">
-<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.TrackedList.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.TrackedList.count">
@@ -3136,15 +3098,17 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.TrackedList.sort">
-<tt class="descname">sort</tt><big>(</big><em>key=None</em>, <em>reverse=False</em><big>)</big> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.TrackedList.sort" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.TrackedList.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.topologyobjects.UreyBradley">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">UreyBradley</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>A Urey-Bradley angle type with a set of parameters. It has the same
 functional form as a bond, but it is defined between two atoms forming a
 valence angle separated by two bonds.</p>
@@ -3290,7 +3254,7 @@ atom2.</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.NonbondedException">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">NonbondedException</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#NonbondedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.NonbondedException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>The AMOEBA force field has complex exclusion and exception rules (referred
 to as &#8220;adjustments&#8221; in the Amber-converted files). This class stores
 per-particle exceptions.</p>
@@ -3449,7 +3413,7 @@ particular pair of atoms is scaled in the AMOEBA force field</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.AcceptorDonor">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">AcceptorDonor</tt><big>(</big><em>atom1</em>, <em>atom2</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#AcceptorDonor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AcceptorDonor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Just a holder for donors and acceptors in CHARMM speak</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3472,7 +3436,7 @@ particular pair of atoms is scaled in the AMOEBA force field</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.Group">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Group</tt><big>(</big><em>bs</em>, <em>type</em>, <em>move</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Group" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>An &#8216;interacting&#8217; group defined by CHARMM PSF files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3504,7 +3468,7 @@ variables: <a class="reference external" href="https://github.com/ParmEd/ParmEd/
 <dl class="class">
 <dt id="parmed.topologyobjects.AtomType">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">AtomType</tt><big>(</big><em>name</em>, <em>number</em>, <em>mass</em>, <em>atomic_number</em>, <em>bond_type=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#AtomType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AtomType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Atom types can either be compared by indexes or names. Can be assigned with
 a string, integer, (string is not automatically cast) or with both.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3725,16 +3689,19 @@ information.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.rmin_14" title="parmed.topologyobjects.ExtraPoint.rmin_14"><tt class="xref py py-obj docutils literal"><span class="pre">rmin_14</span></tt></a></td>
 <td>The 1-4 Lennard-Jones Rmin/2 parameter</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.sigma" title="parmed.topologyobjects.ExtraPoint.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
-<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.sigma_14" title="parmed.topologyobjects.ExtraPoint.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
-<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.starting_index" title="parmed.topologyobjects.ExtraPoint.starting_index"><tt class="xref py py-obj docutils literal"><span class="pre">starting_index</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.segid" title="parmed.topologyobjects.ExtraPoint.segid"><tt class="xref py py-obj docutils literal"><span class="pre">segid</span></tt></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.tortor_partners" title="parmed.topologyobjects.ExtraPoint.tortor_partners"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_partners</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.sigma" title="parmed.topologyobjects.ExtraPoint.sigma"><tt class="xref py py-obj docutils literal"><span class="pre">sigma</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.sigma_14" title="parmed.topologyobjects.ExtraPoint.sigma_14"><tt class="xref py py-obj docutils literal"><span class="pre">sigma_14</span></tt></a></td>
+<td>Lennard-Jones sigma parameter &#8211; directly related to Rmin</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.starting_index" title="parmed.topologyobjects.ExtraPoint.starting_index"><tt class="xref py py-obj docutils literal"><span class="pre">starting_index</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ExtraPoint.tortor_partners" title="parmed.topologyobjects.ExtraPoint.tortor_partners"><tt class="xref py py-obj docutils literal"><span class="pre">tortor_partners</span></tt></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -4013,6 +3980,11 @@ up again with updated data.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="parmed.topologyobjects.ExtraPoint.segid">
+<tt class="descname">segid</tt><a class="headerlink" href="#parmed.topologyobjects.ExtraPoint.segid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="parmed.topologyobjects.ExtraPoint.sigma">
 <tt class="descname">sigma</tt><a class="headerlink" href="#parmed.topologyobjects.ExtraPoint.sigma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lennard-Jones sigma parameter &#8211; directly related to Rmin</p>
@@ -4060,7 +4032,7 @@ up again with updated data.</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.TwoParticleExtraPointFrame">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">TwoParticleExtraPointFrame</tt><big>(</big><em>ep</em>, <em>inside=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#TwoParticleExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.TwoParticleExtraPointFrame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This class defines a frame of reference for a given extra point with a frame
 of reference defined by 2 particles</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -4139,7 +4111,7 @@ weight of particle 2 (the atom bonded to the parent atom)</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.ThreeParticleExtraPointFrame">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">ThreeParticleExtraPointFrame</tt><big>(</big><em>ep</em>, <em>inside=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#ThreeParticleExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ThreeParticleExtraPointFrame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This class defines a frame of reference for a given extra point with a frame
 of reference defined by 3 particles</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -4298,7 +4270,7 @@ parent atom)</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.OutOfPlaneExtraPointFrame">
 <em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">OutOfPlaneExtraPointFrame</tt><big>(</big><em>ep</em>, <em>angle=54.735</em><big>)</big><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#OutOfPlaneExtraPointFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.OutOfPlaneExtraPointFrame" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>This class defines a frame of reference for a given extra point with a frame
 of reference defined by 3 particles, but with the virtual site out of the
 plane of those 3 particles. For example, TIP5P</p>

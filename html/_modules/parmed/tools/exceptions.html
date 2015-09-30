@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed" href="../../parmed.html" /> 
+    <link rel="up" title="parmed.tools" href="../tools.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" accesskey="U">parmed.tools</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -50,6 +51,22 @@
             
   <h1>Source code for parmed.tools.exceptions</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot; Exceptions used in parmed script &quot;&quot;&quot;</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ParmedError&#39;</span><span class="p">,</span> <span class="s">&#39;ParmedWarning&#39;</span><span class="p">,</span> <span class="s">&#39;InputError&#39;</span><span class="p">,</span> <span class="s">&#39;ParmError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;ParmWarning&#39;</span><span class="p">,</span> <span class="s">&#39;SeriousParmWarning&#39;</span><span class="p">,</span> <span class="s">&#39;ChangeRadiiError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;WriteOFFError&#39;</span><span class="p">,</span> <span class="s">&#39;ParmedUtilsError&#39;</span><span class="p">,</span> <span class="s">&#39;ParmedChangeError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;ParmedAddLJTypeError&#39;</span><span class="p">,</span> <span class="s">&#39;ChangeLJPairError&#39;</span><span class="p">,</span> <span class="s">&#39;LJ_TypeError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;ParmedMoleculeError&#39;</span><span class="p">,</span> <span class="s">&#39;CoarseGrainError&#39;</span><span class="p">,</span> <span class="s">&#39;ChangeStateError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;DeleteDihedralError&#39;</span><span class="p">,</span> <span class="s">&#39;ArgumentError&#39;</span><span class="p">,</span> <span class="s">&#39;NoArgument&#39;</span><span class="p">,</span>
+           <span class="s">&#39;InterpreterError&#39;</span><span class="p">,</span> <span class="s">&#39;AmberIncompatibleWarning&#39;</span><span class="p">,</span> <span class="s">&#39;BadParmWarning&#39;</span><span class="p">,</span>
+           <span class="s">&#39;FixableParmWarning&#39;</span><span class="p">,</span> <span class="s">&#39;NonfatalWarning&#39;</span><span class="p">,</span> <span class="s">&#39;NonUniversalWarning&#39;</span><span class="p">,</span>
+           <span class="s">&#39;MissingDisulfide&#39;</span><span class="p">,</span> <span class="s">&#39;LongBondWarning&#39;</span><span class="p">,</span> <span class="s">&#39;NonexistentParm&#39;</span><span class="p">,</span>
+           <span class="s">&#39;NonexistentParmWarning&#39;</span><span class="p">,</span> <span class="s">&#39;DuplicateParm&#39;</span><span class="p">,</span> <span class="s">&#39;AmbiguousParmError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;IncompatibleParmsError&#39;</span><span class="p">,</span> <span class="s">&#39;AddPDBWarning&#39;</span><span class="p">,</span> <span class="s">&#39;AddPDBError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;LJ12_6_4Error&#39;</span><span class="p">,</span> <span class="s">&#39;DuplicateParamWarning&#39;</span><span class="p">,</span> <span class="s">&#39;HMassRepartitionError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;SimulationError&#39;</span><span class="p">,</span> <span class="s">&#39;SimulationWarning&#39;</span><span class="p">,</span> <span class="s">&#39;UnhandledArgumentWarning&#39;</span><span class="p">,</span>
+           <span class="s">&#39;ParmIndexError&#39;</span><span class="p">,</span> <span class="s">&#39;FileExists&#39;</span><span class="p">,</span> <span class="s">&#39;FileDoesNotExist&#39;</span><span class="p">,</span> <span class="s">&#39;ChamberError&#39;</span><span class="p">,</span>
+           <span class="s">&#39;TiMergeError&#39;</span><span class="p">,</span> <span class="s">&#39;WarningList&#39;</span><span class="p">]</span>
+
 <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span><span class="p">,</span> <span class="n">InputError</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -104,9 +121,9 @@
 <div class="viewcode-block" id="ChangeStateError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.ChangeStateError">[docs]</a><span class="k">class</span> <span class="nc">ChangeStateError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="SetParamError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.SetParamError">[docs]</a><span class="k">class</span> <span class="nc">SetParamError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SetParamError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
-</div>
+
 <div class="viewcode-block" id="DeleteDihedralError"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.exceptions.html#parmed.tools.exceptions.DeleteDihedralError">[docs]</a><span class="k">class</span> <span class="nc">DeleteDihedralError</span><span class="p">(</span><span class="n">ParmError</span><span class="p">):</span>
     <span class="k">pass</span>
 </div>
@@ -268,7 +285,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" >parmed.tools</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

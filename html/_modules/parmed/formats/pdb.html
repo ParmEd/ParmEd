@@ -75,12 +75,11 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<span class="k">def</span> <span class="nf">_compare_atoms</span><span class="p">(</span><span class="n">old_atom</span><span class="p">,</span> <span class="n">new_atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_compare_atoms</span><span class="p">(</span><span class="n">old_atom</span><span class="p">,</span> <span class="n">new_atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">segid</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compares two atom instances, along with the residue name, number, and chain</span>
 <span class="sd">    identifier, to determine if two atoms are actually the *same* atom, but</span>
@@ -98,6 +97,8 @@
 <span class="sd">        The number of the residue that the new atom would belong to</span>
 <span class="sd">    chain : ``str``</span>
 <span class="sd">        The chain identifier that the new atom would belong to</span>
+<span class="sd">    segid : ``str``</span>
+<span class="sd">        The segment identifier for the molecule</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -107,6 +108,7 @@
     <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">resname</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
     <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="o">!=</span> <span class="n">resid</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
     <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chain</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="o">!=</span> <span class="n">segid</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
     <span class="k">return</span> <span class="bp">True</span>
 
 <span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -164,12 +166,11 @@
                         <span class="k">return</span> <span class="bp">False</span>
                     <span class="k">continue</span>
                 <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;ATOM  &#39;</span><span class="p">,</span> <span class="s">&#39;HETATM&#39;</span><span class="p">):</span>
-                    <span class="n">atnum</span><span class="p">,</span> <span class="n">atname</span><span class="p">,</span> <span class="n">altloc</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span>
-                    <span class="n">resname</span><span class="p">,</span> <span class="n">chain</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">21</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span>
-                    <span class="n">resid</span><span class="p">,</span> <span class="n">inscode</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">26</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span>
+                    <span class="n">atnum</span><span class="p">,</span> <span class="n">atname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span>
+                    <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">21</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">26</span><span class="p">]</span>
                     <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">]</span>
                     <span class="n">occupancy</span><span class="p">,</span> <span class="n">bfactor</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">54</span><span class="p">:</span><span class="mi">60</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>
-                    <span class="n">elem</span><span class="p">,</span> <span class="n">chg</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">76</span><span class="p">:</span><span class="mi">78</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">78</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span>
+                    <span class="n">elem</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">76</span><span class="p">:</span><span class="mi">78</span><span class="p">]</span>
                     <span class="c"># Check for various attributes. This is the first atom, so</span>
                     <span class="c"># we can assume we haven&#39;t gotten into the regime of &quot;weird&quot;</span>
                     <span class="c"># yet, like hexadecimal atom/residue indices.</span>
@@ -475,16 +476,16 @@
                                 <span class="n">charge</span><span class="o">=</span><span class="n">chg</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="n">occupancy</span><span class="p">,</span>
                                 <span class="n">bfactor</span><span class="o">=</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">altloc</span><span class="o">=</span><span class="n">altloc</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">)</span>
                     <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">segid</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">segid</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
-                            <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
+                                       <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">segid</span><span class="p">)</span> <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
                         <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span>
                         <span class="n">last_atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">[</span><span class="n">altloc</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
                         <span class="n">last_atom_added</span> <span class="o">=</span> <span class="n">atom</span>
                         <span class="k">continue</span>
                     <span class="n">last_atom</span> <span class="o">=</span> <span class="n">last_atom_added</span> <span class="o">=</span> <span class="n">atom</span>
                     <span class="k">if</span> <span class="n">modelno</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">inscode</span><span class="p">)</span>
+                        <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span>
+                                        <span class="n">inscode</span><span class="p">,</span> <span class="n">segid</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="n">orig_atom</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atomno</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -775,8 +776,12 @@
                     <span class="n">atoms</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">atoms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">charmm</span><span class="p">:</span>
+                    <span class="n">segid</span> <span class="o">=</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">segid</span> <span class="ow">or</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">)[:</span><span class="mi">4</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">segid</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
                 <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
-                    <span class="n">pa</span><span class="p">,</span> <span class="n">others</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">print_atoms</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">pa</span><span class="p">,</span> <span class="n">others</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">print_atoms</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">coord</span><span class="p">)</span>
                     <span class="c"># Figure out the serial numbers we want to print</span>
                     <span class="k">if</span> <span class="n">renumber</span><span class="p">:</span>
                         <span class="n">anum</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">nmore</span><span class="p">)</span>
@@ -793,10 +798,6 @@
                         <span class="n">aname</span> <span class="o">=</span> <span class="s">&#39; </span><span class="si">%-3s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pa</span><span class="o">.</span><span class="n">name</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">aname</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">charmm</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
-                        <span class="n">segid</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">segid</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">segid</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
                     <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span> <span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span>
                                <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
                                <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span>
@@ -824,10 +825,6 @@
                             <span class="n">aname</span> <span class="o">=</span> <span class="s">&#39; </span><span class="si">%-3s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">aname</span> <span class="o">=</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">charmm</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">oatom</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
-                            <span class="n">segid</span> <span class="o">=</span> <span class="n">oatom</span><span class="o">.</span><span class="n">segid</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">segid</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
                         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span>
                                    <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
                                    <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
@@ -1199,7 +1196,8 @@
                                 <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="n">occup</span><span class="p">,</span>
                                 <span class="n">bfactor</span><span class="o">=</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">altloc</span><span class="o">=</span><span class="n">altloc</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">)</span>
                 <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span>
+                                   <span class="n">chain</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
                         <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
                     <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span>
                     <span class="n">last_atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">[</span><span class="n">altloc</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
@@ -1508,10 +1506,7 @@
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
-</div></div>
-<span class="n">Structure</span><span class="o">.</span><span class="n">write_pdb</span> <span class="o">=</span> <span class="n">PDBFile</span><span class="o">.</span><span class="n">write</span>
-<span class="n">Structure</span><span class="o">.</span><span class="n">write_cif</span> <span class="o">=</span> <span class="n">CIFFile</span><span class="o">.</span><span class="n">write</span>
+<span class="c">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span></div></div>
 </pre></div>
 
           </div>

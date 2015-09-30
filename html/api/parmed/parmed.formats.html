@@ -64,7 +64,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="parmed.formats.pdbx.html#module-parmed.formats.pdbx">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.formats.pdbx.html#module-parmed.formats.pdbx">Module contents</a><ul class="simple">
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -179,7 +181,7 @@ applies both to local and remote files. The following names are supported:</p>
 <dl class="class">
 <dt id="parmed.formats.PDBFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PDBFile</tt><a class="headerlink" href="#parmed.formats.PDBFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -378,7 +380,7 @@ will be converted into the PDB-standard values. Default is False</p>
 <dl class="class">
 <dt id="parmed.formats.CIFFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">CIFFile</tt><a class="headerlink" href="#parmed.formats.CIFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Standard PDBx/mmCIF file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -572,7 +574,7 @@ will be converted into the PDB-standard values. Default is False</p>
 <dl class="class">
 <dt id="parmed.formats.Mol2File">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">Mol2File</tt><a class="headerlink" href="#parmed.formats.Mol2File" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Class to read and write TRIPOS Mol2 files</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -701,11 +703,11 @@ with multiple residues, each residue is printed in a separate
 <dl class="class">
 <dt id="parmed.formats.PSFFile">
 <em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PSFFile</tt><a class="headerlink" href="#parmed.formats.PSFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>CHARMM- or XPLOR-style PSF file parser and writer. This class is
 specifically a holder for the writing functionality and a vessel for
 automatic file type detection. If you wish to instantiate a PSF file
-directly, use <a class="reference internal" href="../../charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">parmed.charmm.CharmmPsfFile</span></tt></a> or the
+directly, use <a class="reference internal" href="parmed.charmm.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">parmed.charmm.CharmmPsfFile</span></tt></a> or the
 <a class="reference internal" href="#parmed.formats.load_file" title="parmed.formats.load_file"><tt class="xref py py-func docutils literal"><span class="pre">parmed.formats.load_file()</span></tt></a> function instead.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -806,6 +808,128 @@ closed</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="parmed.formats.PQRFile">
+<em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PQRFile</tt><a class="headerlink" href="#parmed.formats.PQRFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Standard PDB file format parser and writer</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.id_format" title="parmed.formats.PQRFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<td>Identifies the file type as a PDB file</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PQRFile.parse" title="parmed.formats.PQRFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<td>Read a PQR file and return a populated <cite>Structure</cite> class</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.write" title="parmed.formats.PQRFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="parmed.formats.PQRFile.id_format">
+<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PQRFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as a PDB file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a PQR file</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.formats.PQRFile.parse">
+<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a PQR file and return a populated <cite>Structure</cite> class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
+<blockquote>
+<div><p>Name of the PQR file to read, or a file-like object that can iterate
+over the lines of a PQR. Compressed file names can be specified and
+are determined by file-name extension (e.g., file.pqr.gz,
+file.pqr.bz2)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote class="last">
+<div><p>The Structure object initialized with all of the information from
+the PDB file.  No bonds or other topological features are added by
+default.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.formats.PQRFile.write">
+<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.formats.PQRFile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously. Default is True</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

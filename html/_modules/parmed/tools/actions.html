@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed" href="../../parmed.html" /> 
+    <link rel="up" title="parmed.tools" href="../tools.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" accesskey="U">parmed.tools</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,14 +55,13 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">Counter</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span>
-                                    <span class="n">DihedralType</span><span class="p">)</span>
+        <span class="n">DihedralType</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="kn">import</span> <span class="nn">parmed.gromacs</span> <span class="kn">as</span> <span class="nn">gromacs</span>
@@ -69,24 +69,24 @@
         <span class="n">HAS_NETCDF</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">NetCDFRestart</span><span class="p">,</span> <span class="n">AmberMdcrd</span><span class="p">,</span> <span class="n">AmberAsciiRestart</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.amber._chamberparm</span> <span class="kn">import</span> <span class="n">ConvertFromPSF</span>
 <span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">FormatNotFound</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span>
 <span class="kn">from</span> <span class="nn">parmed.formats</span> <span class="kn">import</span> <span class="n">PDBFile</span><span class="p">,</span> <span class="n">CIFFile</span><span class="p">,</span> <span class="n">Mol2File</span>
 <span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">ResidueTemplateContainer</span><span class="p">,</span> <span class="n">AmberOFFLibrary</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span> <span class="k">as</span> <span class="n">_Element</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SOLVENT_NAMES</span><span class="p">,</span> <span class="n">CATION_NAMES</span><span class="p">,</span> <span class="n">ANION_NAMES</span><span class="p">,</span>
+        <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.argumentlist</span> <span class="kn">import</span> <span class="n">ArgumentList</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">WriteOFFError</span><span class="p">,</span> <span class="n">ParmError</span><span class="p">,</span> <span class="n">ParmWarning</span><span class="p">,</span>
-              <span class="n">ChangeStateError</span><span class="p">,</span> <span class="n">ChangeLJPairError</span><span class="p">,</span> <span class="n">ParmedChangeError</span><span class="p">,</span>
-              <span class="n">SetParamError</span><span class="p">,</span> <span class="n">DeleteDihedralError</span><span class="p">,</span> <span class="n">NoArgument</span><span class="p">,</span> <span class="n">NonexistentParm</span><span class="p">,</span>
-              <span class="n">AmbiguousParmError</span><span class="p">,</span> <span class="n">IncompatibleParmsError</span><span class="p">,</span> <span class="n">ArgumentError</span><span class="p">,</span>
-              <span class="n">AddPDBError</span><span class="p">,</span> <span class="n">AddPDBWarning</span><span class="p">,</span> <span class="n">HMassRepartitionError</span><span class="p">,</span>
-              <span class="n">SimulationError</span><span class="p">,</span> <span class="n">UnhandledArgumentWarning</span><span class="p">,</span> <span class="n">SeriousParmWarning</span><span class="p">,</span>
-              <span class="n">FileExists</span><span class="p">,</span> <span class="n">NonexistentParmWarning</span><span class="p">,</span> <span class="n">LJ12_6_4Error</span><span class="p">,</span> <span class="n">ChamberError</span><span class="p">,</span>
-              <span class="n">FileDoesNotExist</span><span class="p">,</span> <span class="n">InputError</span><span class="p">,</span> <span class="n">TiMergeError</span><span class="p">,</span>
-<span class="c">#             CoarseGrainError,</span>
+        <span class="n">ChangeStateError</span><span class="p">,</span> <span class="n">ChangeLJPairError</span><span class="p">,</span> <span class="n">ParmedChangeError</span><span class="p">,</span> <span class="n">SetParamError</span><span class="p">,</span>
+        <span class="n">DeleteDihedralError</span><span class="p">,</span> <span class="n">NoArgument</span><span class="p">,</span> <span class="n">NonexistentParm</span><span class="p">,</span> <span class="n">AmbiguousParmError</span><span class="p">,</span>
+        <span class="n">IncompatibleParmsError</span><span class="p">,</span> <span class="n">ArgumentError</span><span class="p">,</span> <span class="n">AddPDBError</span><span class="p">,</span> <span class="n">AddPDBWarning</span><span class="p">,</span>
+        <span class="n">HMassRepartitionError</span><span class="p">,</span> <span class="n">SimulationError</span><span class="p">,</span> <span class="n">UnhandledArgumentWarning</span><span class="p">,</span>
+        <span class="n">SeriousParmWarning</span><span class="p">,</span> <span class="n">FileExists</span><span class="p">,</span> <span class="n">NonexistentParmWarning</span><span class="p">,</span> <span class="n">LJ12_6_4Error</span><span class="p">,</span>
+        <span class="n">ChamberError</span><span class="p">,</span> <span class="n">FileDoesNotExist</span><span class="p">,</span> <span class="n">InputError</span><span class="p">,</span> <span class="n">TiMergeError</span><span class="p">,</span>
+<span class="c">#       CoarseGrainError,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.tools.parmlist</span> <span class="kn">import</span> <span class="n">ParmList</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -553,8 +553,8 @@
             <span class="n">PDBFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">==</span> <span class="s">&#39;CIF&#39;</span><span class="p">:</span>
             <span class="n">CIFFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">==</span> <span class="s">&#39;Mol2&#39;</span><span class="p">:</span>
-            <span class="n">Mol2File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">==</span> <span class="s">&#39;MOL2&#39;</span><span class="p">:</span>
+            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">==</span> <span class="s">&#39;MDCRD&#39;</span><span class="p">:</span>
             <span class="n">traj</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span>
                               <span class="n">hasbox</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
@@ -1488,13 +1488,14 @@
     <span class="n">usage</span> <span class="o">=</span> <span class="s">&#39;&lt;residue_list&gt;&#39;</span>
     <span class="n">supported_subclasses</span> <span class="o">=</span> <span class="p">(</span><span class="n">AmberParm</span><span class="p">,)</span>
 <div class="viewcode-block" id="defineSolvent.init"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.defineSolvent.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">residue</span>
         <span class="n">res_list</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_string</span><span class="p">()</span>
         <span class="n">res_list</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res_list</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">res_list</span> <span class="o">=</span> <span class="n">res_list</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">res_list</span> <span class="o">=</span> <span class="n">res_list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">solvent_residues</span> <span class="o">=</span> <span class="n">res_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">residue</span><span class="o">.</span><span class="n">SOLVENT_NAMES</span> <span class="o">=</span> <span class="n">res_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
 </div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s">&quot;Residues </span><span class="si">%s</span><span class="s"> are now considered to be solvent&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_list</span>
@@ -2419,7 +2420,6 @@
             <span class="n">atm_i</span> <span class="o">=</span> <span class="n">mol1common</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol2common</span><span class="p">)):</span>
                 <span class="n">atm_j</span> <span class="o">=</span> <span class="n">mol2common</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-                <span class="n">diff_count</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">atm_i</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">atm_j</span><span class="p">]</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">mol2common_sort</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atm_j</span><span class="p">)</span>
@@ -2934,23 +2934,41 @@
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </div></div>
+<span class="k">def</span> <span class="nf">_split_range</span><span class="p">(</span><span class="n">chunksize</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;split a given range to n_chunks. taken from pytraj.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    [(0, 3), (3, 6), (6, 10)]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">n_chunks</span> <span class="o">=</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">//</span><span class="n">chunksize</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">%</span> <span class="n">chunksize</span> <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">n_chunks</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chunks</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_chunks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_stop</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunksize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_stop</span> <span class="o">=</span> <span class="n">stop</span>
+        <span class="k">yield</span> <span class="n">start</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">chunksize</span><span class="p">,</span> <span class="n">_stop</span>
+
+<span class="k">def</span> <span class="nf">_reformat_long_sentence</span><span class="p">(</span><span class="n">long_sentence</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">n_words</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">long_sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;, &#39;</span><span class="p">)</span>
+    <span class="n">empty</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="n">idx</span><span class="p">)]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">_split_range</span><span class="p">(</span><span class="n">n_words</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))]</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="p">[:]</span> <span class="o">+</span> <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span><span class="p">[:</span><span class="n">offset</span><span class="p">]</span> <span class="o">+</span> <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">empty</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+
 <div class="viewcode-block" id="summary"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.summary">[docs]</a><span class="k">class</span> <span class="nc">summary</span><span class="p">(</span><span class="n">Action</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prints out a summary of prmtop contents</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">nucleic</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;U&#39;</span><span class="p">,</span> <span class="s">&#39;DA&#39;</span><span class="p">,</span> <span class="s">&#39;DG&#39;</span><span class="p">,</span> <span class="s">&#39;DC&#39;</span><span class="p">,</span> <span class="s">&#39;DT&#39;</span><span class="p">,</span> <span class="s">&#39;AP&#39;</span><span class="p">,</span> <span class="s">&#39;CP&#39;</span><span class="p">,</span> <span class="s">&#39;DAP&#39;</span><span class="p">,</span>
-               <span class="s">&#39;DCP&#39;</span><span class="p">,</span> <span class="s">&#39;AE&#39;</span><span class="p">,</span> <span class="s">&#39;CE&#39;</span><span class="p">,</span> <span class="s">&#39;DCE&#39;</span><span class="p">,</span> <span class="s">&#39;DAE&#39;</span><span class="p">,</span> <span class="s">&#39;GE&#39;</span><span class="p">,</span> <span class="s">&#39;DGE&#39;</span><span class="p">,</span> <span class="s">&#39;DTE&#39;</span><span class="p">,</span> <span class="s">&#39;UE&#39;</span><span class="p">]</span>
-
-    <span class="n">amino</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ALA&#39;</span><span class="p">,</span> <span class="s">&#39;ARG&#39;</span><span class="p">,</span> <span class="s">&#39;ASH&#39;</span><span class="p">,</span> <span class="s">&#39;ASN&#39;</span><span class="p">,</span> <span class="s">&#39;ASP&#39;</span><span class="p">,</span> <span class="s">&#39;AS4&#39;</span><span class="p">,</span> <span class="s">&#39;CYM&#39;</span><span class="p">,</span> <span class="s">&#39;CYS&#39;</span><span class="p">,</span> <span class="s">&#39;CYX&#39;</span><span class="p">,</span>
-             <span class="s">&#39;GLH&#39;</span><span class="p">,</span> <span class="s">&#39;GLN&#39;</span><span class="p">,</span> <span class="s">&#39;GLU&#39;</span><span class="p">,</span> <span class="s">&#39;GLY&#39;</span><span class="p">,</span> <span class="s">&#39;GL4&#39;</span><span class="p">,</span> <span class="s">&#39;HID&#39;</span><span class="p">,</span> <span class="s">&#39;HIE&#39;</span><span class="p">,</span> <span class="s">&#39;HIP&#39;</span><span class="p">,</span> <span class="s">&#39;HYP&#39;</span><span class="p">,</span>
-             <span class="s">&#39;ILE&#39;</span><span class="p">,</span> <span class="s">&#39;LEU&#39;</span><span class="p">,</span> <span class="s">&#39;LYN&#39;</span><span class="p">,</span> <span class="s">&#39;LYS&#39;</span><span class="p">,</span> <span class="s">&#39;MET&#39;</span><span class="p">,</span> <span class="s">&#39;PHE&#39;</span><span class="p">,</span> <span class="s">&#39;PRO&#39;</span><span class="p">,</span> <span class="s">&#39;SER&#39;</span><span class="p">,</span> <span class="s">&#39;THR&#39;</span><span class="p">,</span>
-             <span class="s">&#39;TRP&#39;</span><span class="p">,</span> <span class="s">&#39;TYR&#39;</span><span class="p">,</span> <span class="s">&#39;VAL&#39;</span><span class="p">]</span>
-
-    <span class="n">anions</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Cl-&#39;</span><span class="p">,</span> <span class="s">&#39;Br-&#39;</span><span class="p">,</span> <span class="s">&#39;F-&#39;</span><span class="p">,</span> <span class="s">&#39;I-&#39;</span><span class="p">,</span> <span class="s">&#39;CLA&#39;</span><span class="p">]</span>
-
-    <span class="n">cations</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Na+&#39;</span><span class="p">,</span> <span class="s">&#39;Li+&#39;</span><span class="p">,</span> <span class="s">&#39;Mg+&#39;</span><span class="p">,</span> <span class="s">&#39;Rb+&#39;</span><span class="p">,</span> <span class="s">&#39;MG&#39;</span><span class="p">,</span> <span class="s">&#39;Cs+&#39;</span><span class="p">,</span> <span class="s">&#39;POT&#39;</span><span class="p">,</span> <span class="s">&#39;SOD&#39;</span><span class="p">,</span> <span class="s">&#39;MG&#39;</span><span class="p">,</span>
-               <span class="s">&#39;MG2&#39;</span><span class="p">,</span> <span class="s">&#39;CAL&#39;</span><span class="p">,</span> <span class="s">&#39;RUB&#39;</span><span class="p">,</span> <span class="s">&#39;LIT&#39;</span><span class="p">,</span> <span class="s">&#39;ZN2&#39;</span><span class="p">,</span> <span class="s">&#39;CD2&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="summary.init"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.summary.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -2962,43 +2980,58 @@
         <span class="sd">&quot;&quot;&quot; Collect statistics &quot;&quot;&quot;</span>
         <span class="n">nnuc</span> <span class="o">=</span> <span class="n">namin</span> <span class="o">=</span> <span class="n">ncion</span> <span class="o">=</span> <span class="n">naion</span> <span class="o">=</span> <span class="n">nwat</span> <span class="o">=</span> <span class="n">nunk</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">nucleic</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
                 <span class="n">nnuc</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">amino</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">:</span>
                 <span class="n">namin</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">solvent_residues</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">SOLVENT_NAMES</span><span class="p">:</span>
                 <span class="n">nwat</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">anions</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">ANION_NAMES</span><span class="p">:</span>
                 <span class="n">naion</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">cations</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">CATION_NAMES</span><span class="p">:</span>
                 <span class="n">ncion</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">nunk</span> <span class="o">+=</span> <span class="mi">1</span>
       
-        <span class="n">tmass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;MASS&#39;</span><span class="p">])</span>
-        <span class="n">tchg</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;CHARGE&#39;</span><span class="p">])</span>
+        <span class="n">tmass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">tchg</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 
-        <span class="n">retval</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;Amino Acid Residues:   </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Nucleic Acid Residues: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Number of cations:     </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Number of anions:      </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Num. of solvent mols:  </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> 
-                  <span class="s">&#39;Num. of unknown atoms: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Total charge (e-):     </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Total mass (amu):      </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Number of atoms:       </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
-                  <span class="s">&#39;Number of residues:    </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
-                  <span class="p">(</span><span class="n">namin</span><span class="p">,</span> <span class="n">nnuc</span><span class="p">,</span> <span class="n">ncion</span><span class="p">,</span> <span class="n">naion</span><span class="p">,</span> <span class="n">nwat</span><span class="p">,</span> <span class="n">nunk</span><span class="p">,</span> <span class="n">tchg</span><span class="p">,</span> <span class="n">tmass</span><span class="p">,</span>
-                   <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">))</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;Amino Acid Residues:   </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Nucleic Acid Residues: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Number of cations:     </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Number of anions:      </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Num. of solvent mols:  </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Num. of unknown res:   </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Total charge (e-):     </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Total mass (amu):      </span><span class="si">%.4f</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Number of atoms:       </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span>
+                   <span class="s">&#39;Number of residues:    </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span>
+                   <span class="p">(</span><span class="n">namin</span><span class="p">,</span> <span class="n">nnuc</span><span class="p">,</span> <span class="n">ncion</span><span class="p">,</span> <span class="n">naion</span><span class="p">,</span> <span class="n">nwat</span><span class="p">,</span> <span class="n">nunk</span><span class="p">,</span> <span class="n">tchg</span><span class="p">,</span> <span class="n">tmass</span><span class="p">,</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">))</span>
+        <span class="p">)]</span>
+
+        <span class="n">rset</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">)))</span>
+        <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">_reformat_long_sentence</span><span class="p">(</span><span class="n">rset</span><span class="p">,</span> <span class="s">&#39;Residue set:           &#39;</span><span class="p">,</span>
+                                        <span class="n">offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_words</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
         <span class="p">)</span>
-
+        <span class="n">rcount</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">: </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span>
+                               <span class="n">Counter</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+                           <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">_reformat_long_sentence</span><span class="p">(</span><span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">sorted</span><span class="p">(</span><span class="n">rcount</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)))),</span>
+                                        <span class="s">&#39;Residue count:         &#39;</span><span class="p">,</span>
+                                        <span class="n">offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_words</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span> <span class="o">==</span> <span class="nb">set</span><span class="p">([</span><span class="mi">90</span><span class="p">]):</span>
             <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">box</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span>
             <span class="c"># Get the total volume (and density) of orthorhombic box</span>
-            <span class="n">retval</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;System volume (ang^3): </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">&#39;</span> 
-                       <span class="s">&#39;System density (g/mL): </span><span class="si">%f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
-                       <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;MASS&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="mf">0.602204</span><span class="p">))</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;System volume (ang^3): </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">&#39;</span>
+                          <span class="s">&#39;System density (g/mL): </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span>
+                          <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tmass</span> <span class="o">/</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="mf">0.602204</span><span class="p">))</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="c"># General triclinic cell</span>
@@ -3009,11 +3042,11 @@
             <span class="n">cosg</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">cosa</span><span class="o">*</span><span class="n">cosa</span> <span class="o">-</span> <span class="n">cosb</span><span class="o">*</span><span class="n">cosb</span> <span class="o">-</span> <span class="n">cosg</span><span class="o">*</span><span class="n">cosg</span> <span class="o">+</span>
                                       <span class="mi">2</span> <span class="o">*</span> <span class="n">cosa</span><span class="o">*</span><span class="n">cosb</span><span class="o">*</span><span class="n">cosg</span><span class="p">)</span>
-            <span class="n">retval</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;System volume (ang^3): </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">&#39;</span> 
-                       <span class="s">&#39;System density (g/mL): </span><span class="si">%f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
-                       <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s">&#39;MASS&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="mf">0.602204</span><span class="p">))</span>
+            <span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;System volume (ang^3): </span><span class="si">%.2f</span><span class="se">\n</span><span class="s">&#39;</span>
+                          <span class="s">&#39;System density (g/mL): </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span>
+                          <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tmass</span> <span class="o">/</span> <span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="mf">0.602204</span><span class="p">))</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">retval</span>
+        <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span>
 
 <span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </div>
@@ -3284,14 +3317,13 @@
     <span class="n">_supported_wms</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;TIP3P&#39;</span><span class="p">,</span> <span class="s">&#39;TIP4PEW&#39;</span><span class="p">,</span> <span class="s">&#39;SPCE&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="add12_6_4.init"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.add12_6_4.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">os</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">AmberMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span>
                         <span class="n">arg_list</span><span class="o">.</span><span class="n">get_next_mask</span><span class="p">(</span><span class="n">optional</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;:ZN&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">c4file</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_string</span><span class="p">(</span><span class="s">&#39;c4file&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">watermodel</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_string</span><span class="p">(</span><span class="s">&#39;watermodel&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polfile</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_string</span><span class="p">(</span><span class="s">&#39;polfile&#39;</span><span class="p">,</span>
-                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;AMBERHOME&#39;</span><span class="p">),</span> <span class="s">&#39;dat&#39;</span><span class="p">,</span> <span class="s">&#39;leap&#39;</span><span class="p">,</span>
-                            <span class="s">&#39;parm&#39;</span><span class="p">,</span> <span class="s">&#39;lj_1264_pol.dat&#39;</span><span class="p">))</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;AMBERHOME&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;dat&#39;</span><span class="p">,</span>
+                            <span class="s">&#39;leap&#39;</span><span class="p">,</span> <span class="s">&#39;parm&#39;</span><span class="p">,</span> <span class="s">&#39;lj_1264_pol.dat&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tunfactor</span> <span class="o">=</span> <span class="n">arg_list</span><span class="o">.</span><span class="n">get_key_float</span><span class="p">(</span><span class="s">&#39;tunfactor&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">c4file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -3360,7 +3392,7 @@
 <div class="viewcode-block" id="HMassRepartition.execute"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.HMassRepartition.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c"># Back up the masses in case something goes wrong</span>
         <span class="n">original_masses</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-        <span class="n">water</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">solvent_residues</span>
+        <span class="n">water</span> <span class="o">=</span> <span class="n">SOLVENT_NAMES</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span> <span class="k">continue</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">changewater</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">water</span><span class="p">:</span>
@@ -3837,7 +3869,6 @@
         <span class="k">return</span> <span class="n">retstr</span>
 
 <div class="viewcode-block" id="chamber.execute"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.actions.html#parmed.tools.actions.chamber.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
         <span class="c"># We&#39;re not using chamber, do the conversion in-house</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">parmset</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="p">()</span>
@@ -4345,7 +4376,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" >parmed.tools</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

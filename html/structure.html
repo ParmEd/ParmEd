@@ -72,7 +72,7 @@ populated through the PDB and mmCIF parsing routines.</p>
 </tbody>
 </table>
 <p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class may be instantiated directly, but is more often
-created by one of the parsers (see below for <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a>) or extended to
+created by one of the parsers (see below for <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a>) or extended to
 support the structure files of various computational parmed programs.</p>
 <div class="section" id="attributes-of-structure-instances">
 <h3>Attributes of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instances<a class="headerlink" href="#attributes-of-structure-instances" title="Permalink to this headline">¶</a></h3>
@@ -394,7 +394,7 @@ intuitive (although accomplishing all of these is a challenge!).</p>
 <p>There are three many ways to select from a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance:</p>
 <ol class="arabic simple">
 <li>By atom index</li>
-<li>By Amber selection mask (see <a class="reference internal" href="amberobj/parmed.amber.AmberMask.html#parmed.amber.AmberMask" title="parmed.amber.AmberMask"><tt class="xref py py-class docutils literal"><span class="pre">AmberMask</span></tt></a>)</li>
+<li>By Amber selection mask (see <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMask" title="parmed.amber.AmberMask"><tt class="xref py py-class docutils literal"><span class="pre">AmberMask</span></tt></a>)</li>
 <li>By selection arrays, mask arrays, or slices of chains, residues, and/or
 atoms.</li>
 </ol>
@@ -689,19 +689,19 @@ biphenyl examples from earlier:</p>
 </div>
 </div>
 <div class="section" id="load-file">
-<h2><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
+<p>The <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> function automatically determines the format of the file
 whose name is passed as an argument. The following formats are currently
 recognized and result in the instantiation of either a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. or one of its subclasses:</p>
 <ol class="arabic simple">

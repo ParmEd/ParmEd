@@ -505,7 +505,6 @@
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="c"># Process the dihedrals</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="n">dihed_type</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
@@ -591,7 +590,6 @@
         <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">n_types</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">atype</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span>
                              <span class="n">AtomicNum</span><span class="p">[</span><span class="n">element_by_mass</span><span class="p">(</span><span class="n">mass</span><span class="p">)])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">atype</span>

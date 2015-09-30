@@ -60,7 +60,8 @@
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">MoleculeError</span><span class="p">,</span> <span class="n">ParameterError</span>
 <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">TINY</span><span class="p">,</span> <span class="n">DEG_TO_RAD</span><span class="p">,</span> <span class="n">RAD_TO_DEG</span>
 <span class="kn">import</span> <span class="nn">parmed.unit</span> <span class="kn">as</span> <span class="nn">u</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
 <span class="kn">import</span> <span class="nn">math</span>
@@ -105,6 +106,27 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span>
+
+<span class="k">def</span> <span class="nf">_getstate_with_exclusions</span><span class="p">(</span><span class="n">exclusions</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Serializes based on all attributes except requested exclusions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    exclusions : list of str, optional</span>
+<span class="sd">        List of all attributes to exclude from serialization (should be</span>
+<span class="sd">        descriptors and &#39;list&#39;). Default is None</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If exclusions is None, it defaults to excluding &#39;list&#39;. If this is not</span>
+<span class="sd">    desired, set exclusions to the empty list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">exclusions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">exclusions</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;list&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span> <span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclusions</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">__getstate__</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -442,10 +464,6 @@
 <span class="sd">    vdw_weight : ``float``</span>
 <span class="sd">        In the AMOEBA force field, this is the weight of the van der Waals</span>
 <span class="sd">        interaction on the parent atom</span>
-<span class="sd">    segid : ``str``</span>
-<span class="sd">        In CHARMM PDB and PSF files, the SEGID behaves similarly to the residue</span>
-<span class="sd">        chain ID and is used to separate the total system into representative</span>
-<span class="sd">        parts. This will only be set if read in from the input structure.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -519,7 +537,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tortors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">other_locations</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># A dict of Atom instances</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="o">=</span> <span class="n">_UnassignedAtomType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="o">=</span> <span class="n">UnassignedAtomType</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">anisou</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="o">=</span> <span class="n">rmin</span>
@@ -657,7 +675,7 @@
     <span class="k">def</span> <span class="nf">rmin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Lennard-Jones Rmin/2 parameter (the to Lennard-Jones radius) &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">_UnassignedAtomType</span> <span class="ow">or</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">UnassignedAtomType</span> <span class="ow">or</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="mf">0.0</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin</span>
@@ -685,7 +703,7 @@
     <span class="k">def</span> <span class="nf">epsilon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Lennard-Jones epsilon parameter (the Lennard-Jones well depth) &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">_UnassignedAtomType</span> <span class="ow">or</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">UnassignedAtomType</span> <span class="ow">or</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="mf">0.0</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon</span>
@@ -700,7 +718,7 @@
     <span class="k">def</span> <span class="nf">rmin_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The 1-4 Lennard-Jones Rmin/2 parameter &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">_UnassignedAtomType</span> <span class="ow">or</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">UnassignedAtomType</span> <span class="ow">or</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin_14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmin</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin_14</span>
@@ -715,7 +733,7 @@
     <span class="k">def</span> <span class="nf">sigma_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Lennard-Jones sigma parameter -- directly related to Rmin &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">_UnassignedAtomType</span> <span class="ow">or</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">UnassignedAtomType</span> <span class="ow">or</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin_14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin_14</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
@@ -729,7 +747,7 @@
     <span class="k">def</span> <span class="nf">epsilon_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The 1-4 Lennard-Jones epsilon parameter &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">_UnassignedAtomType</span> <span class="ow">or</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span> <span class="ow">is</span> <span class="n">UnassignedAtomType</span> <span class="ow">or</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon_14</span>
@@ -815,6 +833,17 @@
     <span class="nd">@element.setter</span>
 <div class="viewcode-block" id="Atom.element"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.element">[docs]</a>    <span class="k">def</span> <span class="nf">element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c">#===================================================</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="nd">@deprecated</span>
+    <span class="k">def</span> <span class="nf">segid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span>
+    <span class="nd">@segid.setter</span>
+    <span class="nd">@deprecated</span>
+<div class="viewcode-block" id="Atom.segid"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Atom.segid">[docs]</a>    <span class="k">def</span> <span class="nf">segid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c">#===================================================</span>
 </div>
@@ -984,6 +1013,45 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="s">&#39;; In </span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="s">&#39;&gt;&#39;</span>
+
+    <span class="c">#===================================================</span>
+
+    <span class="c"># For pickleability</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_type</span><span class="p">,</span>
+                      <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="n">nb_idx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_idx</span><span class="p">,</span>
+                      <span class="n">radii</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radii</span><span class="p">,</span> <span class="n">screen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="n">tree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span>
+                      <span class="n">join</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">,</span> <span class="n">irotat</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">irotat</span><span class="p">,</span> <span class="n">bfactor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span>
+                      <span class="n">altloc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span>
+                      <span class="n">number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">anisou</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anisou</span><span class="p">,</span> <span class="n">_rmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rmin</span><span class="p">,</span>
+                      <span class="n">_epsilon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span><span class="p">,</span> <span class="n">_rmin14</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rmin14</span><span class="p">,</span>
+                      <span class="n">_epsilon14</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epsilon14</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">,</span>
+                      <span class="n">atomic_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;xx&#39;</span><span class="p">,</span> <span class="s">&#39;xy&#39;</span><span class="p">,</span> <span class="s">&#39;xz&#39;</span><span class="p">,</span> <span class="s">&#39;vx&#39;</span><span class="p">,</span> <span class="s">&#39;vy&#39;</span><span class="p">,</span> <span class="s">&#39;vz&#39;</span><span class="p">,</span> <span class="s">&#39;multipoles&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;type_idx&#39;</span><span class="p">,</span> <span class="s">&#39;class_idx&#39;</span><span class="p">,</span> <span class="s">&#39;polarizability&#39;</span><span class="p">,</span> <span class="s">&#39;vdw_weight&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;weights&#39;</span><span class="p">,</span> <span class="s">&#39;_frame_type&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">retval</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bond_partners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_angle_partners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dihedral_partners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tortor_partners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exclusion_partners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tortors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_locations</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -1792,6 +1860,17 @@
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">return</span> <span class="n">BondType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req</span><span class="p">)</span>
 
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Special-case NoUreyBradley, which should be a singleton. So if it&#39;s</span>
+<span class="sd">        NoUreyBradley, return the same object. Otherwise, create a new one</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">NoUreyBradley</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;NoUreyBradley&#39;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BondType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="Angle"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Angle">[docs]</a><span class="k">class</span> <span class="nc">Angle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1942,6 +2021,8 @@
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">AngleType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">)</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -2236,6 +2317,8 @@
         <span class="k">return</span> <span class="n">DihedralType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
 
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="RBTorsionType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.RBTorsionType">[docs]</a><span class="k">class</span> <span class="nc">RBTorsionType</span><span class="p">(</span><span class="n">_ListItem</span><span class="p">,</span> <span class="n">_ParameterType</span><span class="p">):</span>
@@ -2328,6 +2411,8 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c5</span><span class="p">,</span>
                  <span class="bp">self</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
 
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="DihedralTypeList"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList">[docs]</a><span class="k">class</span> <span class="nc">DihedralTypeList</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">_ListItem</span><span class="p">):</span>
@@ -2409,6 +2494,8 @@
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DihedralTypeList</span><span class="p">([</span><span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">([</span><span class="s">&#39;list&#39;</span><span class="p">,</span> <span class="s">&#39;penalty&#39;</span><span class="p">])</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -2688,6 +2775,8 @@
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ImproperType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psi_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi_eq</span><span class="p">)</span>
 
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="Cmap"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Cmap">[docs]</a><span class="k">class</span> <span class="nc">Cmap</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -2937,6 +3026,8 @@
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">CmapType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="p">),</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">comments</span><span class="p">[:])</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -3227,6 +3318,8 @@
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
 
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="PiTorsion"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.PiTorsion">[docs]</a><span class="k">class</span> <span class="nc">PiTorsion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -3432,6 +3525,8 @@
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">StretchBendType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">req2</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">theteq</span><span class="p">)</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -3715,6 +3810,8 @@
         <span class="k">return</span> <span class="n">TorsionTorsionType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ang1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ang2</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">dfda1</span><span class="p">,</span>
                                   <span class="n">dfda2</span><span class="p">,</span> <span class="n">d2fda1da2</span><span class="p">)</span>
 
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="ChiralFrame"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ChiralFrame">[docs]</a><span class="k">class</span> <span class="nc">ChiralFrame</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -3806,12 +3903,16 @@
 <span class="sd">    name : ``str``</span>
 <span class="sd">        Name of the residue. Typical convention is to choose a name that is 4</span>
 <span class="sd">        characters or shorter</span>
-<span class="sd">    number : ``int``</span>
-<span class="sd">        Residue number assigned in the input structure</span>
-<span class="sd">    chain : ``str``</span>
-<span class="sd">        The 1-letter chain identifier for this residue</span>
-<span class="sd">    insertion_code : ``str``</span>
-<span class="sd">        The insertion code (used in PDB files) for this residue</span>
+<span class="sd">    number : ``int``, optional</span>
+<span class="sd">        Residue number assigned in the input structure. Default is -1</span>
+<span class="sd">    chain : ``str``, optional</span>
+<span class="sd">        The 1-letter chain identifier for this residue. Default is empty string</span>
+<span class="sd">    insertion_code : ``str``, optional</span>
+<span class="sd">        The insertion code (used in PDB files) for this residue. Default is</span>
+<span class="sd">        empty string</span>
+<span class="sd">    segid : ``str``, optional</span>
+<span class="sd">        The segment identifier, used by CHARMM in a way similar to chain. Dfault</span>
+<span class="sd">        is empty string</span>
 <span class="sd">    list : :class:`TrackedList`</span>
 <span class="sd">        List of residues in which this residue is a member</span>
 
@@ -3844,7 +3945,8 @@
 <span class="sd">    - `len()` returns the number of atoms in this residue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Residue.__init__"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">insertion_code</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Residue.__init__"><a class="viewcode-back" href="../../topobj/parmed.topologyobjects.Residue.html#parmed.topologyobjects.Residue.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">insertion_code</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">segid</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -3853,6 +3955,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ter</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">segid</span>
 </div>
 <div class="viewcode-block" id="Residue.add_atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Residue.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds an atom to this residue</span>
@@ -3929,6 +4032,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">:</span>
             <span class="n">rep</span> <span class="o">+=</span> <span class="s">&#39;; insertion_code=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertion_code</span>
         <span class="k">return</span> <span class="n">rep</span> <span class="o">+</span> <span class="s">&#39;&gt;&#39;</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -4098,7 +4203,7 @@
 <div class="viewcode-block" id="ResidueList"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList">[docs]</a><span class="k">class</span> <span class="nc">ResidueList</span><span class="p">(</span><span class="n">TrackedList</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Array of `Residue` instances &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ResidueList.add_atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueList.add_atom"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">segid</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new atom to the ResidueList, adding a new residue to this list if</span>
 <span class="sd">        it has a different name or number as the last residue</span>
@@ -4115,6 +4220,8 @@
 <span class="sd">            The chain ID character for this residue</span>
 <span class="sd">        inscode : ``str``</span>
 <span class="sd">            The insertion code ID character for this residue (it is stripped)</span>
+<span class="sd">        segid : ``str``</span>
+<span class="sd">            The segment identifier for this residue (it is stripped)</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -4122,18 +4229,21 @@
 <span class="sd">        list, a new residue is added and the atom is added to that residue</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">inscode</span> <span class="o">=</span> <span class="n">inscode</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">segid</span> <span class="o">=</span> <span class="n">segid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">last</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="c"># Empty list -- add our first residue</span>
-            <span class="n">new_res</span> <span class="o">=</span> <span class="n">Residue</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">inscode</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">new_res</span> <span class="o">=</span> <span class="n">Residue</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">inscode</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
             <span class="n">new_res</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_res</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">number</span> <span class="o">!=</span> <span class="n">resnum</span> <span class="ow">or</span> <span class="n">last</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">resname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span>
                 <span class="n">last</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chain</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span>
+                <span class="n">last</span><span class="o">.</span><span class="n">segid</span> <span class="o">!=</span> <span class="n">segid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span>
                 <span class="n">last</span><span class="o">.</span><span class="n">insertion_code</span> <span class="o">!=</span> <span class="n">inscode</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
-                <span class="n">new_res</span> <span class="o">=</span> <span class="n">Residue</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">inscode</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">new_res</span> <span class="o">=</span> <span class="n">Residue</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">inscode</span><span class="p">,</span>
+                                  <span class="n">segid</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                 <span class="n">new_res</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_res</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -4439,6 +4549,12 @@
         <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">; rmin=</span><span class="si">%.4f</span><span class="s">, epsilon=</span><span class="si">%.4f</span><span class="s">, chgscale=</span><span class="si">%.4f</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chgscale</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rmin</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">rmin</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chgscale</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">chgscale</span><span class="p">)</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
+
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
 <div class="viewcode-block" id="AmoebaNonbondedExceptionType"><a class="viewcode-back" href="../../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.AmoebaNonbondedExceptionType">[docs]</a><span class="k">class</span> <span class="nc">AmoebaNonbondedExceptionType</span><span class="p">(</span><span class="n">NonbondedExceptionType</span><span class="p">):</span>
@@ -4487,6 +4603,8 @@
         <span class="k">return</span> <span class="n">AmoebaNonbondedExceptionType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vdw_weight</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">multipole_weight</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direct_weight</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">polar_weight</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mutual_weight</span><span class="p">)</span>
+
+    <span class="n">__getstate__</span> <span class="o">=</span> <span class="n">_getstate_with_exclusions</span><span class="p">()</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>
@@ -4697,6 +4815,12 @@
 <span class="sd">    This raises the appropriate exceptions (ParameterError) when you try to</span>
 <span class="sd">    access its properties</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_OBJ</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">_OBJ</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">_OBJ</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">_UnassignedAtomType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_OBJ</span>
 
     <span class="k">def</span> <span class="nf">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Atom type is not defined&#39;</span><span class="p">)</span>
@@ -4704,7 +4828,15 @@
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Atom type is not defined&#39;</span><span class="p">)</span>
 
-<span class="n">_UnassignedAtomType</span> <span class="o">=</span> <span class="n">_UnassignedAtomType</span><span class="p">()</span> <span class="c"># Make it a singleton</span>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">_UnassignedAtomType</span><span class="p">)</span> <span class="c"># Behave like a singleton</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;UnassignedAtomType&#39;</span>
+
+<span class="n">UnassignedAtomType</span> <span class="o">=</span> <span class="n">_UnassignedAtomType</span><span class="p">()</span>
+<span class="c"># Make sure it&#39;s a singleton</span>
+<span class="k">assert</span> <span class="n">UnassignedAtomType</span> <span class="ow">is</span> <span class="n">_UnassignedAtomType</span><span class="p">(),</span> <span class="s">&quot;Not a singleton&quot;</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -4758,7 +4890,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">=</span> <span class="n">move</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">other</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">move</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">bs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">move</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bs</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">bs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">move</span><span class="p">)</span>
 
 <span class="c"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 </div>

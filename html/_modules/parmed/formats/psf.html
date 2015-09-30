@@ -180,10 +180,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">:</span> <span class="n">typ</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">fmt</span> <span class="o">=</span> <span class="n">atmfmt1</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
-                <span class="n">segid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">segid</span> <span class="o">=</span> <span class="s">&#39;SYS&#39;</span>
+            <span class="n">segid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="ow">or</span> <span class="s">&#39;SYS&#39;</span>
             <span class="n">atmstr</span> <span class="o">=</span> <span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span><span class="p">,</span>
                             <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span>
                             <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>

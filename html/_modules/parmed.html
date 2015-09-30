@@ -53,14 +53,20 @@
 <span class="sd">between standard and amber file formats, manipulate structures, etc.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;2.0beta3&#39;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;2.0.1&#39;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;Jason Swails&#39;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;exceptions&#39;</span><span class="p">,</span> <span class="s">&#39;periodic_table&#39;</span><span class="p">,</span> <span class="s">&#39;residue&#39;</span><span class="p">,</span> <span class="s">&#39;unit&#39;</span><span class="p">,</span> <span class="s">&#39;utils&#39;</span><span class="p">,</span>
+           <span class="s">&#39;Structure&#39;</span><span class="p">,</span> <span class="s">&#39;StructureView&#39;</span><span class="p">,</span> <span class="s">&#39;amber&#39;</span><span class="p">,</span> <span class="s">&#39;charmm&#39;</span><span class="p">,</span> <span class="s">&#39;namd&#39;</span><span class="p">,</span> <span class="s">&#39;gromacs&#39;</span><span class="p">,</span> 
+           <span class="s">&#39;tinker&#39;</span><span class="p">,</span> <span class="s">&#39;openmm&#39;</span><span class="p">,</span> <span class="s">&#39;rosetta&#39;</span><span class="p">,</span> <span class="s">&#39;formats&#39;</span><span class="p">,</span> <span class="s">&#39;Vec3&#39;</span><span class="p">,</span> <span class="s">&#39;ParameterSet&#39;</span><span class="p">,</span> 
+           <span class="s">&#39;load_file&#39;</span><span class="p">,</span> <span class="s">&#39;read_PDB&#39;</span><span class="p">,</span> <span class="s">&#39;read_CIF&#39;</span><span class="p">,</span> <span class="s">&#39;write_PDB&#39;</span><span class="p">,</span> <span class="s">&#39;write_CIF&#39;</span><span class="p">,</span> 
+           <span class="s">&#39;load_rosetta&#39;</span><span class="p">,</span> <span class="s">&#39;download_PDB&#39;</span><span class="p">,</span> <span class="s">&#39;download_CIF&#39;</span><span class="p">,</span> <span class="s">&#39;tools&#39;</span><span class="p">]</span>
 
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">periodic_table</span><span class="p">,</span> <span class="n">residue</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span><span class="p">,</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">StructureView</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">amber</span><span class="p">,</span> <span class="n">charmm</span><span class="p">,</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">tinker</span><span class="p">,</span> <span class="n">openmm</span><span class="p">,</span> <span class="n">rosetta</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">amber</span><span class="p">,</span> <span class="n">charmm</span><span class="p">,</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">namd</span><span class="p">,</span> <span class="n">openmm</span><span class="p">,</span> <span class="n">rosetta</span><span class="p">,</span> <span class="n">tinker</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">formats</span>
 <span class="kn">from</span> <span class="nn">parmed.vec3</span> <span class="kn">import</span> <span class="n">Vec3</span>
 <span class="kn">from</span> <span class="nn">parmed.parameters</span> <span class="kn">import</span> <span class="n">ParameterSet</span>
@@ -77,6 +83,9 @@
 <span class="c"># The tools package depends on *everything*, so import this at the end to avoid</span>
 <span class="c"># circular imports.</span>
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">tools</span>
+
+<span class="c"># Add all of the objects from parmed.topologyobjects to the top-level namespace</span>
+<span class="n">__all__</span> <span class="o">+=</span> <span class="n">topologyobjects</span><span class="o">.</span><span class="n">__all__</span>
 </pre></div>
 
           </div>

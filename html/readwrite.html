@@ -60,20 +60,20 @@ instantiated directly from a filename. On the other hand, <a class="reference in
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance directly rather than
 subclassing.</p>
 <div class="section" id="reading-files-with-load-file">
-<h2>Reading files with <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
+<h2>Reading files with <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_file</span></tt></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
 </table>
 <p>To provide a single interface for parsing <em>any</em> type of file, the
-<a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a> function takes a filename
+<a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a> function takes a filename
 and any relevant arguments or keyword arguments for the supported file formats
 and calls the appropriate parsing function.  Supported file formats along with
 the extra supported keyword arguments (if applicable) are shown in the table
@@ -159,12 +159,12 @@ via an <tt class="docutils literal"><span class="pre">OrderedDict</span></tt>)</
 database.  If <tt class="docutils literal"><span class="pre">False</span></tt>, they are not (default is <tt class="docutils literal"><span class="pre">True</span></tt>).</li>
 <li><tt class="docutils literal"><span class="pre">structure</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, return the Mol2/Mol3 file as a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance. Default is <tt class="docutils literal"><span class="pre">False</span></tt></li>
 </ul>
-<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> automatically inspects the contents of the file with the given
+<p><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
 Except in rare, pathological cases, the file format detection mechanism is
 fairly robust. If any files <em>fail</em> this detection, feel free to file an issue on
 the Github issue tracker to improve file type prediction.</p>
-<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> has a number of helpful features. For instance, files ending
+<p><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> has a number of helpful features. For instance, files ending
 with the <tt class="docutils literal"><span class="pre">.gz</span></tt> or <tt class="docutils literal"><span class="pre">.bz2</span></tt> suffix will automatically be decompressed in-memory
 using Gzip or Bzip2, respectively (except for some binary file formats, like
 NetCDF). Furthermore, URLs beginning with <tt class="docutils literal"><span class="pre">http://</span></tt>, <tt class="docutils literal"><span class="pre">https://</span></tt>, or

@@ -1,0 +1,17 @@
+parmed.namd package
+===================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.namd.namdbinfiles
+
+Module contents
+---------------
+
+.. automodule:: parmed.namd
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -51,7 +51,7 @@
 <dl class="class">
 <dt id="parmed.tools.arraytools.NumberArray">
 <em class="property">class </em><tt class="descclassname">parmed.tools.arraytools.</tt><tt class="descname">NumberArray</tt><big>(</big><em>stuff=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/arraytools.html#NumberArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.arraytools.NumberArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.list</span></tt></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -59,20 +59,14 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.append" title="parmed.tools.arraytools.NumberArray.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>((object)&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;append&nbsp;object&nbsp;to&nbsp;end)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.clear" title="parmed.tools.arraytools.NumberArray.clear"><tt class="xref py py-obj docutils literal"><span class="pre">clear</span></tt></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.copy" title="parmed.tools.arraytools.NumberArray.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.append" title="parmed.tools.arraytools.NumberArray.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a></td>
+<td>L.append(object) &#8211; append object to end</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.count" title="parmed.tools.arraytools.NumberArray.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.extend" title="parmed.tools.arraytools.NumberArray.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(...)</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.extend" title="parmed.tools.arraytools.NumberArray.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a></td>
+<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.index" title="parmed.tools.arraytools.NumberArray.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
@@ -83,31 +77,22 @@
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.pop" title="parmed.tools.arraytools.NumberArray.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.remove" title="parmed.tools.arraytools.NumberArray.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.remove" title="parmed.tools.arraytools.NumberArray.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a></td>
+<td>L.remove(value) &#8211; remove first occurrence of value.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.reverse" title="parmed.tools.arraytools.NumberArray.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.sort" title="parmed.tools.arraytools.NumberArray.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.arraytools.NumberArray.sort" title="parmed.tools.arraytools.NumberArray.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.tools.arraytools.NumberArray.append">
-<tt class="descname">append</tt><big>(</big><em>object</em><big>)</big> &rarr; None -- append object to end<a class="headerlink" href="#parmed.tools.arraytools.NumberArray.append" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.arraytools.NumberArray.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tools.arraytools.NumberArray.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.arraytools.NumberArray.copy">
-<tt class="descname">copy</tt><big>(</big><big>)</big> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tools.arraytools.NumberArray.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">append</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.arraytools.NumberArray.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.append(object) &#8211; append object to end</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.arraytools.NumberArray.count">
@@ -116,8 +101,9 @@
 
 <dl class="method">
 <dt id="parmed.tools.arraytools.NumberArray.extend">
-<tt class="descname">extend</tt><big>(</big><em>iterable</em><big>)</big> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.tools.arraytools.NumberArray.extend" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">extend</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.arraytools.NumberArray.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.arraytools.NumberArray.index">
@@ -139,8 +125,9 @@
 
 <dl class="method">
 <dt id="parmed.tools.arraytools.NumberArray.remove">
-<tt class="descname">remove</tt><big>(</big><em>value</em><big>)</big> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tools.arraytools.NumberArray.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
+<tt class="descname">remove</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.arraytools.NumberArray.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.remove(value) &#8211; remove first occurrence of value.
+Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -151,8 +138,10 @@
 
 <dl class="method">
 <dt id="parmed.tools.arraytools.NumberArray.sort">
-<tt class="descname">sort</tt><big>(</big><em>key=None</em>, <em>reverse=False</em><big>)</big> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tools.arraytools.NumberArray.sort" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.arraytools.NumberArray.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
+cmp(x, y) -&gt; -1, 0, 1</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../../index.html" />
-    <link rel="up" title="parmed" href="../../../parmed.html" /> 
+    <link rel="up" title="parmed.tools" href="../../tools.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,8 @@
              >modules</a> |</li>
         <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../../tools.html" accesskey="U">parmed.tools</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -55,7 +56,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span><span class="p">,</span> <span class="n">AmberMask</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">Rst7</span><span class="p">,</span> <span class="n">AmberParm</span>
+<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span><span class="p">,</span> <span class="n">AmberMask</span><span class="p">,</span> <span class="n">NetCDFTraj</span><span class="p">,</span> <span class="n">Rst7</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.mdin</span> <span class="kn">import</span> <span class="n">mdin</span> <span class="k">as</span> <span class="n">Mdin</span>
 <span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="kn">import</span> <span class="p">(</span><span class="n">StateDataReporter</span><span class="p">,</span> <span class="n">NetCDFReporter</span><span class="p">,</span> <span class="n">MdcrdReporter</span><span class="p">,</span>
         <span class="n">RestartReporter</span><span class="p">,</span> <span class="n">ProgressReporter</span><span class="p">,</span> <span class="n">EnergyMinimizerReporter</span><span class="p">)</span>
@@ -911,7 +912,7 @@
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Un-handled arguments: &quot;</span> <span class="o">+</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unmarked_cmds</span><span class="p">),</span>
                       <span class="n">UnhandledArgumentWarning</span><span class="p">)</span>
    
-    <span class="n">gbmeth</span><span class="p">,</span> <span class="n">kappa</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="mf">0.0</span>
+    <span class="n">gbmeth</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;ifbox&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">cutoff</span> <span class="o">&gt;=</span> <span class="mi">500</span><span class="p">:</span>
             <span class="n">nbmeth</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">NoCutoff</span>
@@ -1250,7 +1251,8 @@
              >modules</a> |</li>
         <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li> 
+          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../../tools.html" >parmed.tools</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

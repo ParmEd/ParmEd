@@ -53,8 +53,9 @@
 <span class="sd">Contains classes for parsing GROMACS topology and parameter files</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="kn">as</span> <span class="nn">_os</span>
-
 <span class="kn">from</span> <span class="nn">parmed.utils</span> <span class="kn">import</span> <span class="n">which</span> <span class="k">as</span> <span class="n">_which</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;GROMACS_TOPDIR&#39;</span><span class="p">,</span> <span class="s">&#39;GromacsTopologyFile&#39;</span><span class="p">,</span> <span class="s">&#39;GromacsGroFile&#39;</span><span class="p">]</span>
 
 <span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -87,9 +88,10 @@
     <span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s">&#39;/usr/local/gromacs/share/gromacs/top&#39;</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="k">del</span> <span class="n">_testdir</span><span class="p">,</span> <span class="n">_os</span><span class="p">,</span> <span class="n">_which</span>
-<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span> <span class="c">#_testdir is only defined under certain scenarios so it may not be defined here</span>
-    <span class="k">del</span> <span class="n">_os</span><span class="p">,</span> <span class="n">_which</span>
+    <span class="k">del</span> <span class="n">_testdir</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">del</span> <span class="n">_os</span><span class="p">,</span> <span class="n">_which</span>
 
 <span class="kn">from</span> <span class="nn">parmed.gromacs.gromacstop</span> <span class="kn">import</span> <span class="n">GromacsTopologyFile</span>
 <span class="kn">from</span> <span class="nn">parmed.gromacs.gromacsgro</span> <span class="kn">import</span> <span class="n">GromacsGroFile</span>

@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed" href="../../parmed.html" /> 
+    <link rel="up" title="parmed.tools" href="../tools.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" accesskey="U">parmed.tools</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -57,7 +58,6 @@
 <span class="kn">import</span> <span class="nn">cmd</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.readparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span><span class="p">,</span> <span class="n">ParmedWarning</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
@@ -317,19 +317,19 @@
             <span class="k">raise</span> <span class="n">InterpreterError</span><span class="p">(</span><span class="s">&quot;Interpreter not enabled! Use &#39;-e&#39; &quot;</span>
                                    <span class="s">&quot;to enable&quot;</span><span class="p">)</span>
         <span class="n">line</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-        <span class="n">amber_prmtop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_python_shell</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">globals_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">amber_prmtop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">)</span>
+            <span class="n">globals_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">exec</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">exec</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">globals_</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="ParmedCmd.completedefault"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.parmed_cmd.html#parmed.tools.parmed_cmd.ParmedCmd.completedefault">[docs]</a>    <span class="k">def</span> <span class="nf">completedefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">begidx</span><span class="p">,</span> <span class="n">endidx</span><span class="p">):</span>
         <span class="n">partial</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="n">endidx</span><span class="p">]</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">partial</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">),</span> <span class="n">partial</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">full_token</span> <span class="o">=</span> <span class="n">partial</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
         <span class="n">beg_token</span> <span class="o">=</span> <span class="n">partial</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">begidx</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">beg_token</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="n">partial</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span> <span class="o">+</span> <span class="s">&#39;*&#39;</span><span class="p">)]</span>
 </div>
@@ -342,8 +342,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">:</span> <span class="n">python_interpreter</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="n">python_interpreter</span><span class="o">.</span><span class="n">cmdloop</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">amber_prmtop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span>
-            <span class="k">exec</span><span class="p">(</span><span class="n">python_interpreter</span><span class="o">.</span><span class="n">command_string</span><span class="p">)</span>
+            <span class="n">globals_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">amber_prmtop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="n">actions</span><span class="p">)</span>
+            <span class="n">globals_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
+            <span class="k">exec</span><span class="p">(</span><span class="n">python_interpreter</span><span class="o">.</span><span class="n">command_string</span><span class="p">,</span> <span class="n">globals_</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
       
@@ -552,7 +553,8 @@
              >modules</a> |</li>
         <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li> 
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../tools.html" >parmed.tools</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

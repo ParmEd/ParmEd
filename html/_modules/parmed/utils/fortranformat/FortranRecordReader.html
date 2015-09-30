@@ -53,6 +53,7 @@
 <span class="kn">from</span> <span class="nn">._input</span> <span class="kn">import</span> <span class="nb">input</span> <span class="k">as</span> <span class="n">_input</span>
 <span class="kn">from</span> <span class="nn">._parser</span> <span class="kn">import</span> <span class="n">parser</span> <span class="k">as</span> <span class="n">_parser</span>
 <span class="kn">from</span> <span class="nn">._lexer</span> <span class="kn">import</span> <span class="n">lexer</span> <span class="k">as</span> <span class="n">_lexer</span>
+<span class="kn">from</span> <span class="nn">._exceptions</span> <span class="kn">import</span> <span class="n">InvalidFormat</span>
 
 <div class="viewcode-block" id="FortranRecordReader"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader">[docs]</a><span class="k">class</span> <span class="nc">FortranRecordReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
@@ -89,7 +90,7 @@
 <div class="viewcode-block" id="FortranRecordReader.match"><a class="viewcode-back" href="../../../../api/parmed/parmed.utils.fortranformat.FortranRecordReader.html#parmed.utils.fortranformat.FortranRecordReader.FortranRecordReader.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">RecordError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">InvalidFormat</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">True</span>

@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.namd.namdbinfiles &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed.namd" href="../namd.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../namd.html" accesskey="U">parmed.namd</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for parmed.namd.namdbinfiles</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains classes for reading and writing (single frame) NAMD binary</span>
+<span class="sd">files.  The main functionality is currently aimed at manipulation rather than</span>
+<span class="sd">analysis.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="n">unpack</span><span class="p">,</span> <span class="n">pack</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="NamdBinFile"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile">[docs]</a><span class="k">class</span> <span class="nc">NamdBinFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;From the NAMD manual:</span>
+
+<span class="sd">        NAMD uses a trivial double-precision binary file format for </span>
+<span class="sd">        coordinates, velocities, and forces ... The file consists of the atom </span>
+<span class="sd">        count as a 32-bit integer followed by all three position or velocity </span>
+<span class="sd">        components for each atom as 64-bit double-precision floating point ...</span>
+
+<span class="sd">    The main attributes are the number of atom entries (natom) and a (flat)</span>
+<span class="sd">    numpy array of size 3*natom (values).  The meaning of &quot;values&quot; is</span>
+<span class="sd">    effectively arbitrary, but for convenience derived classes are provided</span>
+<span class="sd">    which alias the values to more descriptive names (e.g. &quot;coordinates&quot;).</span>
+
+<span class="sd">    See NamdBinCoor and NamdBinVel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="NamdBinFile.natom"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile.natom">[docs]</a>    <span class="k">def</span> <span class="nf">natom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The current number of atom entries.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NamdBinFile.read"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an object from the values in a NAMD binary file.&quot;&quot;&quot;</span>
+        <span class="n">infile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="n">natoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;i&#39;</span><span class="p">,</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NamdBinFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the current attributes to a file.&quot;&quot;&quot;</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;i&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">:</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="NamdBinFile.delatoms"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile.delatoms">[docs]</a>    <span class="k">def</span> <span class="nf">delatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete entries corresponding to the given atom indices.&quot;&quot;&quot;</span>
+        <span class="n">del_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">))</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">del_indices</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">newvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">-</span> <span class="n">del_indices</span><span class="o">.</span><span class="n">size</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">newvalues</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span><span class="mi">3</span><span class="p">))[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">newvalues</span>
+</div>
+<div class="viewcode-block" id="NamdBinFile.insertatoms"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile.insertatoms">[docs]</a>    <span class="k">def</span> <span class="nf">insertatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_index</span><span class="p">,</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert space for natom entries beginning at start_index. If </span>
+<span class="sd">        specified, give them the provided values, otherwise set them to zero.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">values</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">3</span><span class="o">*</span><span class="n">natoms</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">natoms</span><span class="p">)</span>
+        <span class="n">hinge</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">start_index</span>
+        <span class="n">newvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[:</span><span class="n">hinge</span><span class="p">],</span><span class="n">values</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">hinge</span><span class="p">:])</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">newvalues</span>
+</div>
+<div class="viewcode-block" id="NamdBinFile.copyatoms"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile.copyatoms">[docs]</a>    <span class="k">def</span> <span class="nf">copyatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_index</span><span class="p">,</span> <span class="n">natoms</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convenience function, same as insertatoms() but set &#39;values&#39; to</span>
+<span class="sd">        be the same as the previous natoms&#39; values (i.e. make a copy of them).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">start_index</span><span class="o">-</span><span class="n">natoms</span><span class="p">):</span><span class="mi">3</span><span class="o">*</span><span class="n">start_index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertatoms</span><span class="p">(</span><span class="n">start_index</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">values</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="NamdBinCoor"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinCoor">[docs]</a><span class="k">class</span> <span class="nc">NamdBinCoor</span><span class="p">(</span><span class="n">NamdBinFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to read or write NAMD &quot;bincoordinates&quot; files.&quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="nd">@coordinates.setter</span>
+<div class="viewcode-block" id="NamdBinCoor.coordinates"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinCoor.coordinates">[docs]</a>    <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+</div></div>
+<div class="viewcode-block" id="NamdBinVel"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinVel">[docs]</a><span class="k">class</span> <span class="nc">NamdBinVel</span><span class="p">(</span><span class="n">NamdBinFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to read or write NAMD &quot;binvelocities&quot; files.</span>
+
+<span class="sd">    NAMD internal units are assumed. These can be converted to </span>
+<span class="sd">    Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mf">20.45482706</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="nd">@velocities.setter</span>
+<div class="viewcode-block" id="NamdBinVel.velocities"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinVel.velocities">[docs]</a>    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
+          <li><a href="../namd.html" >parmed.namd</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

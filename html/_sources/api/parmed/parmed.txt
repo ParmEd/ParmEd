@@ -11,6 +11,7 @@ Subpackages
     parmed.formats
     parmed.gromacs
     parmed.modeller
+    parmed.namd
     parmed.openmm
     parmed.rosetta
     parmed.tinker
