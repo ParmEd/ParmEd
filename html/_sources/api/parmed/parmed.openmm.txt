@@ -9,6 +9,7 @@ Submodules
    parmed.openmm.reporters
    parmed.openmm.topsystem
    parmed.openmm.utils
+   parmed.openmm.xmlfile
 
 Module contents
 ---------------

@@ -137,20 +137,29 @@ that kernel.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><tt class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>This class acts as a state data reporter for OpenMM simulations, but it is a little more generalized.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.NetCDFReporter" title="parmed.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter" title="parmed.openmm.NetCDFReporter"><tt class="xref py py-obj docutils literal"><span class="pre">NetCDFReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>NetCDFReporter prints a trajectory in NetCDF format</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter" title="parmed.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter" title="parmed.openmm.MdcrdReporter"><tt class="xref py py-obj docutils literal"><span class="pre">MdcrdReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>MdcrdReporter prints a trajectory in ASCII Amber format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.RestartReporter" title="parmed.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter" title="parmed.openmm.RestartReporter"><tt class="xref py py-obj docutils literal"><span class="pre">RestartReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>Use a reporter to handle writing restarts at specified intervals.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><tt class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></tt></a>(*args,&nbsp;**kwargs)</td>
 <td>A class that prints out a progress report of how much MD (or minimization)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile" title="parmed.openmm.XmlFile"><tt class="xref py py-obj docutils literal"><span class="pre">XmlFile</span></tt></a></td>
+<td>Wrapper for parsing OpenMM-serialized objects.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="openmmobj/parmed.openmm.load_topology.html#parmed.openmm.load_topology" title="parmed.openmm.load_topology"><tt class="xref py py-obj docutils literal"><span class="pre">load_topology</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a> instance from an OpenMM</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="openmmobj/parmed.openmm.energy_decomposition.html#parmed.openmm.energy_decomposition" title="parmed.openmm.energy_decomposition"><tt class="xref py py-obj docutils literal"><span class="pre">energy_decomposition</span></tt></a>(structure,&nbsp;context[,&nbsp;nrg])</td>
+<td>This computes the energy of every force group in the given structure and computes the energy for each force group for the given Context.</td>
 </tr>
 </tbody>
 </table>
@@ -177,19 +186,64 @@ in ParmEd does.</p>
 classes in addition to the small number provided by ParmEd:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt></a> &#8211; This takes extra arguments specifying the
+<li><a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><tt class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></tt></a> &#8211; This takes extra arguments specifying the
 units of each of the types of data (like the energy, volume, and time
 units). The defaults correspond to the AKMA unit system, which is more
 familiar to Amber and CHARMM users.</li>
-<li><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.NetCDFReporter" title="parmed.openmm.NetCDFReporter"><tt class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+<li><a class="reference internal" href="openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter" title="parmed.openmm.NetCDFReporter"><tt class="xref py py-class docutils literal"><span class="pre">NetCDFReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
 the Amber NetCDF format.</li>
-<li><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter" title="parmed.openmm.MdcrdReporter"><tt class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
+<li><a class="reference internal" href="openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter" title="parmed.openmm.MdcrdReporter"><tt class="xref py py-class docutils literal"><span class="pre">MdcrdReporter</span></tt></a> &#8211; This allows you to write a trajectory file in
 the Amber ASCII mdcrd format.</li>
-<li><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.RestartReporter" title="parmed.openmm.RestartReporter"><tt class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></tt></a> &#8211; This allows you to periodically write NetCDF
+<li><a class="reference internal" href="openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter" title="parmed.openmm.RestartReporter"><tt class="xref py py-class docutils literal"><span class="pre">RestartReporter</span></tt></a> &#8211; This allows you to periodically write NetCDF
 or ASCII restart files during the course of the calculation</li>
-<li><a class="reference internal" href="api/parmed/parmed.openmm.html#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><tt class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></tt></a> &#8211; This prints a file during the course of the
+<li><a class="reference internal" href="openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><tt class="xref py py-class docutils literal"><span class="pre">ProgressReporter</span></tt></a> &#8211; This prints a file during the course of the
 simulation tracking the runtime speed of the calculation and predicting
 the amount of time remaining.</li>
+</ul>
+</div></blockquote>
+<p>The <a class="reference internal" href="openmmobj/parmed.openmm.energy_decomposition.html#parmed.openmm.energy_decomposition" title="parmed.openmm.energy_decomposition"><tt class="xref py py-func docutils literal"><span class="pre">energy_decomposition()</span></tt></a> function takes as input a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance, OpenMM <tt class="docutils literal"><span class="pre">Context</span></tt>, and an optional
+energy unit (<tt class="docutils literal"><span class="pre">nrg</span></tt>) and returns a dictionary of all energy components for the
+different force groups. This permits an form of energy decomposition that allows
+energy components to be compared between programs more effectively. For
+example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Instantiate the parm and create the system</span>
+<span class="gp">... </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s">&#39;tip4p.parm7&#39;</span><span class="p">,</span> <span class="s">&#39;tip4p.rst7&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">8</span><span class="o">*</span><span class="n">pmd</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Make the context and set the positions</span>
+<span class="gp">... </span><span class="n">context</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">0.001</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Find the energy decomposition</span>
+<span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">openmm</span><span class="o">.</span><span class="n">energy_decomposition</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+<span class="go">{&#39;total&#39;: -2133.295388974015, &#39;nonbonded&#39;: -2133.2953890231834, &#39;bond&#39;: 1.0126508125518531e-07}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loading-openmm-objects">
+<h2>Loading OpenMM Objects<a class="headerlink" href="#loading-openmm-objects" title="Permalink to this headline">¶</a></h2>
+<p>The OpenMM <tt class="docutils literal"><span class="pre">Topology</span></tt> object and <tt class="docutils literal"><span class="pre">System</span></tt> object contain the information
+stored in <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. You can use
+<a class="reference internal" href="openmmobj/parmed.openmm.load_topology.html#parmed.openmm.load_topology" title="parmed.openmm.load_topology"><tt class="xref py py-func docutils literal"><span class="pre">load_topology()</span></tt></a> to load an OpenMM <tt class="docutils literal"><span class="pre">Topology</span></tt> and create a
+<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from it. If you provide
+either a file containing a serialized <tt class="docutils literal"><span class="pre">System</span></tt> in XML format or a <tt class="docutils literal"><span class="pre">System</span></tt>
+object directly, parameters will be extracted from the various forces and added
+to the generated <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>. You can also
+pass coordinates (or any coordinate file, including an OpenMM XML-serialized
+State file) with the <tt class="docutils literal"><span class="pre">xyz</span></tt> argument and unit cell dimensions with the <tt class="docutils literal"><span class="pre">box</span></tt>
+argument (which will override any unit cell information contained in the input
+<tt class="docutils literal"><span class="pre">Topology</span></tt>, <tt class="docutils literal"><span class="pre">System</span></tt> or coordinate file if applicable).</p>
+<p>The <a class="reference internal" href="openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile" title="parmed.openmm.XmlFile"><tt class="xref py py-class docutils literal"><span class="pre">XmlFile</span></tt></a> class can parse and return a deserialized object from an
+OpenMM-generated XML file. Supported XML files are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Serialized <tt class="docutils literal"><span class="pre">System</span></tt> (returns an OpenMM <tt class="xref py py-class docutils literal"><span class="pre">System</span></tt> instance)</li>
+<li>Serialized <tt class="docutils literal"><span class="pre">State</span></tt> (returns a container object with attributes
+<tt class="docutils literal"><span class="pre">coordinates</span></tt>, <tt class="docutils literal"><span class="pre">velocities</span></tt>, <tt class="docutils literal"><span class="pre">forces</span></tt>, <tt class="docutils literal"><span class="pre">energy</span></tt>, and <tt class="docutils literal"><span class="pre">time</span></tt>)</li>
+<li>Serialized <tt class="docutils literal"><span class="pre">Integrator</span></tt> (returns an OpenMM <tt class="xref py py-class docutils literal"><span class="pre">Integrator</span></tt> subclass)</li>
+<li>XML <tt class="docutils literal"><span class="pre">ForceField</span></tt> file (returns an OpenMM <tt class="xref py py-class docutils literal"><span class="pre">ForceField</span></tt> instance)</li>
 </ul>
 </div></blockquote>
 </div>
@@ -224,11 +278,11 @@ the annotated and explained example):</p>
 and <tt class="docutils literal"><span class="pre">Topology</span></tt> instance from any of a number of file formats (e.g., Amber
 topology file, Gromacs topology file, or CHARMM PSF file), it is also possible
 to go in the reverse direction. That is, to start with <tt class="docutils literal"><span class="pre">Topology</span></tt> and
-<tt class="docutils literal"><span class="pre">System</span></tt> instances and convert those to a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
+<tt class="docutils literal"><span class="pre">System</span></tt> instances and convert those to a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance.</p>
 <p>The function for this is <tt class="xref py py-func docutils literal"><span class="pre">load_openmm</span></tt>, and takes a mandatory <tt class="docutils literal"><span class="pre">Topology</span></tt>
 instance, along with either an optional <tt class="docutils literal"><span class="pre">System</span></tt> instance or name of a
 serialized <tt class="docutils literal"><span class="pre">System</span></tt> XML file defining an OpenMM <tt class="docutils literal"><span class="pre">System</span></tt>, and returns a
-populated <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> from it. This is
+populated <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> from it. This is
 particularly useful when you parametrize a system using the OpenMM modelling
 capabilities, but want to use that parametrized system in another program, like
 Amber or Gromacs.</p>
@@ -279,6 +333,7 @@ prevents ParmEd from recognizing the potential.</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#how-does-parmed-enhance-openmm">How does ParmEd enhance OpenMM?</a></li>
+<li><a class="reference internal" href="#loading-openmm-objects">Loading OpenMM Objects</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 <li><a class="reference internal" href="#taking-openmm-topology-and-system-to-a-parmed-structure">Taking OpenMM <tt class="docutils literal"><span class="pre">Topology</span></tt> and <tt class="docutils literal"><span class="pre">System</span></tt> to a ParmEd <tt class="docutils literal"><span class="pre">Structure</span></tt></a></li>
 </ul>

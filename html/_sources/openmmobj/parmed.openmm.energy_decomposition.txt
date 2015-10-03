@@ -1,0 +1,6 @@
+parmed.openmm.energy_decomposition
+==================================
+
+.. currentmodule:: parmed.openmm
+
+.. autofunction:: energy_decomposition

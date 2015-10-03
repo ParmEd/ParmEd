@@ -1,0 +1,7 @@
+parmed.openmm.xmlfile module
+============================
+
+.. automodule:: parmed.openmm.xmlfile
+    :members:
+    :undoc-members:
+    :show-inheritance:

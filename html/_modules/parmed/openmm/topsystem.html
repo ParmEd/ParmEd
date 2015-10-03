@@ -58,7 +58,10 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;load_topology&#39;</span><span class="p">]</span>
 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">OpenMMWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.formats</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="kn">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
@@ -70,23 +73,14 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-    <span class="k">def</span> <span class="nf">create_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="k">def</span> <span class="nf">create_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">array</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">pass</span>
+    <span class="n">mm</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="load_topology"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.topsystem.html#parmed.openmm.topsystem.load_topology">[docs]</a><span class="k">def</span> <span class="nf">load_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="load_topology"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.topsystem.html#parmed.openmm.topsystem.load_topology">[docs]</a><span class="k">def</span> <span class="nf">load_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a :class:`parmed.structure.Structure` instance from an OpenMM</span>
 <span class="sd">    Topology, optionally filling in parameters from a System</span>
@@ -100,6 +94,12 @@
 <span class="sd">        Structure. If a string is given, it will be interpreted as the file name</span>
 <span class="sd">        of an XML-serialized System, and it will be deserialized into a System</span>
 <span class="sd">        before used to supply parameters</span>
+<span class="sd">    xyz : str or array of float</span>
+<span class="sd">        Name of a file containing coordinate information or an array of</span>
+<span class="sd">        coordinates. If file has unit cell information, it also uses that</span>
+<span class="sd">        information unless ``box`` (below) is also specified</span>
+<span class="sd">    box : array of 6 floats</span>
+<span class="sd">        Unit cell dimensions</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -153,15 +153,35 @@
         <span class="n">ang</span> <span class="o">=</span> <span class="n">ang</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="n">leng</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">leng</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">leng</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
 
+    <span class="n">loaded_box</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="n">xyz</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">coordinates</span>
+            <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">xyz</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">loaded_box</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">box</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">xyz</span>
+
+    <span class="k">if</span> <span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">loaded_box</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
+
     <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">create_array</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">system</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">struct</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">system</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">System</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;system must be an OpenMM System object or serialized &#39;</span>
+                        <span class="s">&#39;XML of an OpenMM System object&#39;</span><span class="p">)</span>
 
     <span class="c"># We have a system, try to extract parameters from it</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">!=</span> <span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">():</span>
@@ -175,13 +195,14 @@
                       <span class="n">mm</span><span class="o">.</span><span class="n">GBSAOBCForce</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">CustomGBForce</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">():</span>
-        <span class="n">vectors</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getDefaultPeriodicBoxVectors</span><span class="p">()</span>
-        <span class="n">leng</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">(</span><span class="o">*</span><span class="n">vectors</span><span class="p">)</span>
-        <span class="n">leng</span> <span class="o">=</span> <span class="n">leng</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
-        <span class="n">ang</span> <span class="o">=</span> <span class="n">ang</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
-        <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">create_array</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">leng</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">leng</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">leng</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">loaded_box</span><span class="p">:</span>
+            <span class="n">vectors</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getDefaultPeriodicBoxVectors</span><span class="p">()</span>
+            <span class="n">leng</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">(</span><span class="o">*</span><span class="n">vectors</span><span class="p">)</span>
+            <span class="n">leng</span> <span class="o">=</span> <span class="n">leng</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
+            <span class="n">ang</span> <span class="o">=</span> <span class="n">ang</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">leng</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">leng</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">leng</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ang</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="bp">None</span>
 

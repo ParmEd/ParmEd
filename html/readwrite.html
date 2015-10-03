@@ -55,9 +55,9 @@
 input/output easier for a wide range of file formats.</p>
 <p>The API for parsing different file types is not always consistent due to the
 technical needs of each class.  For instance, the Amber topology file class
-subclasses from <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, so it can be
+subclasses from <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a>, so it can be
 instantiated directly from a filename. On the other hand, <a class="reference internal" href="api/parmed/parmed.formats.pdb.html#parmed.formats.pdb.PDBFile" title="parmed.formats.pdb.PDBFile"><tt class="xref py py-class docutils literal"><span class="pre">PDBFile</span></tt></a> contains a <tt class="docutils literal"><span class="pre">parse</span></tt> static method that returns a
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance directly rather than
+<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance directly rather than
 subclassing.</p>
 <div class="section" id="reading-files-with-load-file">
 <h2>Reading files with <a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file</span></tt></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
@@ -141,6 +141,19 @@ below (the filename argument is omitted):</p>
 <tr class="row-even"><td>PSF file</td>
 <td>None</td>
 </tr>
+<tr class="row-odd"><td>Serialized System XML</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>Serialized State XML</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>Serialized Integrator
+XML file</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>ForceField XML file</td>
+<td>None</td>
+</tr>
 </tbody>
 </table>
 <p>*These arguments are <em>required</em> when parsing the corresponding format file</p>
@@ -157,7 +170,7 @@ is a trajectory file, the first frame is used for the coordinates.</li>
 via an <tt class="docutils literal"><span class="pre">OrderedDict</span></tt>)</li>
 <li><tt class="docutils literal"><span class="pre">parametrize</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, parameters are assigned from the parameter
 database.  If <tt class="docutils literal"><span class="pre">False</span></tt>, they are not (default is <tt class="docutils literal"><span class="pre">True</span></tt>).</li>
-<li><tt class="docutils literal"><span class="pre">structure</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, return the Mol2/Mol3 file as a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance. Default is <tt class="docutils literal"><span class="pre">False</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">structure</span></tt> &#8211; If <tt class="docutils literal"><span class="pre">True</span></tt>, return the Mol2/Mol3 file as a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance. Default is <tt class="docutils literal"><span class="pre">False</span></tt></li>
 </ul>
 <p><a class="reference internal" href="api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><tt class="xref py py-func docutils literal"><span class="pre">load_file()</span></tt></a> automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
@@ -170,23 +183,23 @@ using Gzip or Bzip2, respectively (except for some binary file formats, like
 NetCDF). Furthermore, URLs beginning with <tt class="docutils literal"><span class="pre">http://</span></tt>, <tt class="docutils literal"><span class="pre">https://</span></tt>, or
 <tt class="docutils literal"><span class="pre">ftp://</span></tt> are valid file names and will result in the remote file being
 downloaded and processed (again, in-memory).</p>
-<p>Finally, to make it so that you can always retrieve a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from file types that support returning
+<p>Finally, to make it so that you can always retrieve a <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance from file types that support returning
 one by passing the <tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword to <tt class="docutils literal"><span class="pre">load_file</span></tt>. If this argument
 is not supported by the resulting file type, it is simply ignored, as is the
 <tt class="docutils literal"><span class="pre">natom</span></tt> and <tt class="docutils literal"><span class="pre">hasbox</span></tt> keywords (which are required arguments for the Amber
 ASCII trajectory file).</p>
 </div>
 <div class="section" id="writing-files-with-structure-save">
-<h2>Writing files with <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
+<h2>Writing files with <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
 <p>Many of the file formats supported by ParmEd either parse directly to a
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance or subclass, and many
+<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance or subclass, and many
 of the desired file type conversions that ParmEd is designed to facilitate are
 between these formats (e.g., Amber topology, PDB, CHARMM PSF file, etc.).</p>
 <p>To facilitate the required conversion and file writing, the base
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class has a <tt class="docutils literal"><span class="pre">save</span></tt> method that
+<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class has a <tt class="docutils literal"><span class="pre">save</span></tt> method that
 will convert to the requested file format and write the output file. The desired
 format is specified either explicitly or by file name extension (with explicit
-format specifications taking precedence).  Because <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a> is a convenience method, it will protect
+format specifications taking precedence).  Because <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></tt></a> is a convenience method, it will protect
 against accidentally overwriting an existing file. The <tt class="docutils literal"><span class="pre">overwrite</span></tt> argument,
 when set to <tt class="docutils literal"><span class="pre">True</span></tt>, will allow an existing file to be overwritten. If set to
 <tt class="docutils literal"><span class="pre">False</span></tt> (or left at its default), <tt class="docutils literal"><span class="pre">IOError</span></tt> will be raised when attempting
@@ -361,8 +374,8 @@ be found in the <tt class="docutils literal"><span class="pre">test/files/</span
 <span class="go">&lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
-<p>Any of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> subclasses shown
-above can be saved as any other kind of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class or subclass <em>for which the conversion is
+<p>Any of the <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> subclasses shown
+above can be saved as any other kind of <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> class or subclass <em>for which the conversion is
 supported</em>. For instance, a raw PDB file has no defined parameters, so it cannot
 be saved as an Amber topology file. An Amber topology file, on the other hand,
 has all of the information required for a PDB, and so that conversion is

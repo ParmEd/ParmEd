@@ -6,37 +6,43 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm.topsystem module &mdash; ParmEd 2.0 documentation</title>
+    <title>parmed.openmm.load_topology &mdash; ParmEd 2.0 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
+        URL_ROOT:    '../',
         VERSION:     '2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+    <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
+    <link rel="up" title="OpenMM Functionality" href="../openmm.html" />
+    <link rel="next" title="parmed.openmm.energy_decomposition" href="parmed.openmm.energy_decomposition.html" /> 
   </head>
   <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="parmed.openmm.energy_decomposition.html" title="parmed.openmm.energy_decomposition"
+             accesskey="N">next</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,14 +51,12 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-parmed.openmm.topsystem">
-<span id="parmed-openmm-topsystem-module"></span><h1>parmed.openmm.topsystem module<a class="headerlink" href="#module-parmed.openmm.topsystem" title="Permalink to this headline">¶</a></h1>
-<p>Convert an OpenMM Topology into a Structure instance, optionally filling in
-parameters from a System</p>
+  <div class="section" id="parmed-openmm-load-topology">
+<h1>parmed.openmm.load_topology<a class="headerlink" href="#parmed-openmm-load-topology" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="parmed.openmm.topsystem.load_topology">
-<tt class="descclassname">parmed.openmm.topsystem.</tt><tt class="descname">load_topology</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/topsystem.html#load_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.topsystem.load_topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a> instance from an OpenMM
+<dt id="parmed.openmm.load_topology">
+<tt class="descclassname">parmed.openmm.</tt><tt class="descname">load_topology</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.openmm.load_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a <a class="reference internal" href="../api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a> instance from an OpenMM
 Topology, optionally filling in parameters from a System</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -81,7 +85,7 @@ information unless <tt class="docutils literal"><span class="pre">box</span></tt
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../api/parmed/parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
 <blockquote>
 <div><p>The structure from the provided topology</p>
 </div></blockquote>
@@ -117,12 +121,12 @@ processed and will result in an unknown functional form</p>
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.openmm.topsystem.txt"
+    <li><a href="../_sources/openmmobj/parmed.openmm.load_topology.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
+    <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -141,12 +145,16 @@ processed and will result in an unknown functional form</p>
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="parmed.openmm.energy_decomposition.html" title="parmed.openmm.energy_decomposition"
+             >next</a> |</li>
+        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li><a href="../openmm.html" >OpenMM Functionality</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

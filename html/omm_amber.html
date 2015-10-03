@@ -26,7 +26,8 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="up" title="OpenMM Functionality" href="openmm.html" />
-    <link rel="next" title="Examples using CHARMM Files" href="omm_charmm.html" /> 
+    <link rel="next" title="Examples using CHARMM Files" href="omm_charmm.html" />
+    <link rel="prev" title="parmed.openmm.energy_decomposition" href="openmmobj/parmed.openmm.energy_decomposition.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,6 +42,9 @@
         <li class="right" >
           <a href="omm_charmm.html" title="Examples using CHARMM Files"
              accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="openmmobj/parmed.openmm.energy_decomposition.html" title="parmed.openmm.energy_decomposition"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
       </ul>
@@ -86,13 +90,12 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
 
 <span class="c"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberParm</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="kn">import</span> <span class="n">StateDataReporter</span><span class="p">,</span> <span class="n">NetCDFReporter</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span>
 
 <span class="c"># Load the Amber files</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading Amber files...&#39;</span><span class="p">)</span>
-<span class="n">ala5_gas</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s">&#39;ala5_gas.parm7&#39;</span><span class="p">,</span> <span class="s">&#39;ala5_gas.rst7&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading AMBER files...&#39;</span><span class="p">)</span>
+<span class="n">ala5_gas</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;ala5_gas.parm7&#39;</span><span class="p">,</span> <span class="s">&#39;ala5_gas.rst7&#39;</span><span class="p">)</span>
 
 <span class="c"># Create the OpenMM system</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
@@ -126,11 +129,10 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="c"># Set up the reporters to report energies and coordinates every 100 steps</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
         <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                               <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-        <span class="n">NetCDFReporter</span><span class="p">(</span><span class="s">&#39;ala5_gb.nc&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">atom</span><span class="o">=</span><span class="n">ala5_gas</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s">&#39;natom&#39;</span><span class="p">),</span>
-                       <span class="n">uses_pbc</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">NetCDFReporter</span><span class="p">(</span><span class="s">&#39;ala5_gb.nc&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c"># Run dynamics</span>
@@ -262,14 +264,12 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
 
 <span class="c"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.openmmloader</span> <span class="kn">import</span> <span class="n">AmberParm</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm.parameters</span> <span class="kn">import</span> <span class="n">CharmmParameterSet</span>
-<span class="kn">from</span> <span class="nn">parmed.openmm.reporters</span> <span class="kn">import</span> <span class="n">StateDataReporter</span><span class="p">,</span> <span class="n">NetCDFReporter</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="kn">import</span> <span class="n">StateDataReporter</span><span class="p">,</span> <span class="n">NetCDFReporter</span>
 
 <span class="c"># Load the Amber files</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;Loading AMBER files...&#39;</span><span class="p">)</span>
-<span class="n">ala2_solv</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s">&#39;ala2_solv.parm7&#39;</span><span class="p">,</span> <span class="s">&#39;ala2_solv.rst7&#39;</span><span class="p">)</span>
+<span class="n">ala2_solv</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s">&#39;ala2_solv.parm7&#39;</span><span class="p">,</span> <span class="s">&#39;ala2_solv.rst7&#39;</span><span class="p">)</span>
 
 <span class="c"># Create the OpenMM system</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
@@ -479,6 +479,9 @@ regarding running a long simulation in chunks.</p>
         <li class="right" >
           <a href="omm_charmm.html" title="Examples using CHARMM Files"
              >next</a> |</li>
+        <li class="right" >
+          <a href="openmmobj/parmed.openmm.energy_decomposition.html" title="parmed.openmm.energy_decomposition"
+             >previous</a> |</li>
         <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
           <li><a href="openmm.html" >OpenMM Functionality</a> &raquo;</li> 
       </ul>
