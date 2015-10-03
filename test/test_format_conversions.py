@@ -7,15 +7,9 @@ from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import unit as u
-try:
-    import simtk.openmm as mm
-    import simtk.openmm.app as app
-    CPU = mm.Platform.getPlatformByName('CPU')
-    has_openmm = True
-except ImportError:
-    has_openmm = False
 import unittest
-from utils import get_fn, get_saved_fn, diff_files, TestCaseRelative, FileIOTestCase
+from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
+                   FileIOTestCase, CPU, mm, app, has_openmm)
 import warnings
 
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):

@@ -128,10 +128,7 @@ class PSFFile(object):
                 if not atom.type: typ = atom.name
             else:
                 fmt = atmfmt1
-            if hasattr(atom, 'segid'):
-                segid = atom.segid
-            else:
-                segid = 'SYS'
+            segid = atom.residue.segid or 'SYS'
             atmstr = fmt % (i+1, segid, atom.residue.number,
                             atom.residue.name, atom.name, typ,
                             atom.charge, atom.mass)
