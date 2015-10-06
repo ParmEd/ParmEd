@@ -36,13 +36,12 @@ distribution) will set up and run the simulation using OpenMM::
     import simtk.openmm.app as app
     
     # ParmEd Imports
-    from parmed.amber import AmberParm
+    from parmed import load_file, unit as u
     from parmed.openmm import StateDataReporter, NetCDFReporter
-    from parmed import unit
     
     # Load the Amber files
-    print('Loading Amber files...')
-    ala5_gas = AmberParm('ala5_gas.parm7', 'ala5_gas.rst7')
+    print('Loading AMBER files...')
+    ala5_gas = load_file('ala5_gas.parm7', 'ala5_gas.rst7')
     
     # Create the OpenMM system
     print('Creating OpenMM System')
@@ -76,11 +75,10 @@ distribution) will set up and run the simulation using OpenMM::
     # Set up the reporters to report energies and coordinates every 100 steps
     sim.reporters.append(
             StateDataReporter(sys.stdout, 100, step=True, potentialEnergy=True,
-                              kineticEnergy=True, temperature=True)
+                                   kineticEnergy=True, temperature=True)
     )
     sim.reporters.append(
-            NetCDFReporter('ala5_gb.nc', 100, atom=ala5_gas.ptr('natom'),
-                           uses_pbc=False, crds=True)
+            NetCDFReporter('ala5_gb.nc', 100, crds=True)
     )
     
     # Run dynamics
@@ -220,14 +218,12 @@ distribution) will set up and run the simulation using OpenMM::
     import simtk.openmm.app as app
     
     # ParmEd Imports
-    from parmed.amber.openmmloader import AmberParm
-    from parmed.charmm.parameters import CharmmParameterSet
-    from parmed.openmm.reporters import StateDataReporter, NetCDFReporter
-    from parmed import unit as u
+    from parmed import load_file, unit as u
+    from parmed.openmm import StateDataReporter, NetCDFReporter
     
     # Load the Amber files
     print('Loading AMBER files...')
-    ala2_solv = AmberParm('ala2_solv.parm7', 'ala2_solv.rst7')
+    ala2_solv = load_file('ala2_solv.parm7', 'ala2_solv.rst7')
     
     # Create the OpenMM system
     print('Creating OpenMM System')

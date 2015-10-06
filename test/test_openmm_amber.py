@@ -2,15 +2,6 @@
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
 from __future__ import division, print_function, absolute_import
-import utils
-
-try:
-    import simtk.openmm as mm
-    import simtk.openmm.app as app
-    has_openmm = True
-except ImportError:
-    from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
-    has_openmm = False
 
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology
@@ -22,12 +13,8 @@ import os
 import parmed.tools as PT
 import sys
 import unittest
-
-get_fn = utils.get_fn
-
-if has_openmm:
-    CPU = mm.Platform.getPlatformByName('CPU')
-
+from utils import (get_fn, CPU, Reference, mm, app, has_openmm, FileIOTestCase,
+        TestCaseRelative, get_saved_fn, skip_big_tests)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -73,7 +60,8 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
         energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
     return energies
 
-class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
+@unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
+class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
     def testEPEnergy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
@@ -85,7 +73,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 # Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
@@ -106,7 +94,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
         # the presence of extra points
         pstate = sim.context.getState(getForces=True)
         sstate = mm.XmlSerializer.deserialize(
-                open(utils.get_saved_fn('tip4pforces.xml'), 'r').read()
+                open(get_saved_fn('tip4pforces.xml'), 'r').read()
         )
         pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
         sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
@@ -119,7 +107,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                 else:
                     self.assertAlmostEqual(x1, x2, delta=2e-2)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping long tests")
+    @unittest.skipIf(skip_big_tests(), "Skipping long tests")
     def testRoundTripEP(self):
         """ Test ParmEd -> OpenMM round trip with Amber EPs and PME """
         parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
@@ -135,8 +123,8 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                     constraints=app.HBonds,
                                     rigidWater=True,
                                     flexibleConstraints=True)
-        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
-        con2 = mm.Context(system2, mm.VerletIntegrator(0.001), CPU)
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
+        con2 = mm.Context(system2, mm.VerletIntegrator(0.001), Reference)
         con1.setPositions(parm.positions)
         con2.setPositions(parm.positions)
         e1 = decomposed_energy(con1, parm)
@@ -172,7 +160,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    rigidWater=True,
                                    flexibleConstraints=False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0)
@@ -188,7 +176,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
         # the presence of extra points
         pstate = sim.context.getState(getForces=True)
         sstate = mm.XmlSerializer.deserialize(
-                open(utils.get_saved_fn('tip5pforces.xml'), 'r').read()
+                open(get_saved_fn('tip5pforces.xml'), 'r').read()
         )
         pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
         sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
@@ -457,7 +445,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
         self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping long tests")
+    @unittest.skipIf(skip_big_tests(), "Skipping long tests")
     def testEwald(self):
         """ Compare Amber and OpenMM Ewald energies """
         parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
@@ -488,7 +476,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -514,7 +502,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -538,7 +526,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -565,7 +553,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
                 self.assertTrue(force.getUseLongRangeCorrection())
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =   193.6
@@ -608,7 +596,7 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
             if isinstance(force, mm.CustomNonbondedForce):
                 self.assertTrue(force.getUseLongRangeCorrection())
         integrator = mm.VerletIntegrator(1*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 0.9675961, places=3)
@@ -860,7 +848,8 @@ class TestAmberParm(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
 
-class TestChamberParm(utils.TestCaseRelative):
+@unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
+class TestChamberParm(TestCaseRelative):
     
     def testGasEnergy(self):
         """ Compare OpenMM and CHAMBER gas phase energies """
@@ -1140,7 +1129,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #Bond         =            1.1324222     Angle        =            1.0688008
@@ -1169,7 +1158,7 @@ class TestChamberParm(utils.TestCaseRelative):
             elif isinstance(force, mm.CustomNonbondedForce):
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #Bond         =            1.1324222     Angle        =            1.0688008
@@ -1195,7 +1184,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -1210,7 +1199,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
         self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigPME(self):
         """ Compare OpenMM and CHAMBER PME energies on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1220,7 +1209,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms,
                                    ewaldErrorTolerance=1e-5)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1238,7 +1227,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigDispersionCorrection(self):
         """ Compare OpenMM and CHAMBER w/out vdW corr on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1251,7 +1240,7 @@ class TestChamberParm(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = decomposed_energy(sim.context, parm)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
@@ -1269,7 +1258,7 @@ class TestChamberParm(utils.TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigSHAKE(self):
         """ Compare OpenMM and CHAMBER PME excluding SHAKEn bonds (big) """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1281,7 +1270,7 @@ class TestChamberParm(utils.TestCaseRelative):
                                    flexibleConstraints=False,
                                    constraints=app.HBonds)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         # The only thing that changes here compared to the other periodic tests
         # is the bond energy, which should be slightly smaller than before
@@ -1513,12 +1502,3 @@ class TestChamberParm(utils.TestCaseRelative):
                 parm.createSystem(nonbondedMethod=app.CutoffPeriodic))
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
-
-if not has_openmm:
-    # If we don't have OpenMM installed, delete all of the test classes so we
-    # don't try to test anything (nor does it count in the final tally, giving
-    # us a sense of false achievement)
-    del TestAmberParm, TestChamberParm
-
-if __name__ == '__main__':
-    unittest.main()

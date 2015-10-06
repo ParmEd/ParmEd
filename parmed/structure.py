@@ -341,7 +341,7 @@ class Structure(object):
 
     #===================================================
 
-    def add_atom(self, atom, resname, resnum, chain='', inscode=''):
+    def add_atom(self, atom, resname, resnum, chain='', inscode='', segid=''):
         """
         Adds a new atom to the Structure, adding a new residue to `residues` if
         it has a different name or number as the last residue added and adding
@@ -359,13 +359,15 @@ class Structure(object):
             The chain ID character for this residue
         inscode : ``str``
             The insertion code ID character for this residue (it is stripped)
+        segid : ``str``
+            The segment identifier for this residue (it is stripped)
 
         Notes
         -----
         If the residue name and number differ from the last residue in this
         list, a new residue is added and the atom is added to that residue
         """
-        self.residues.add_atom(atom, resname, resnum, chain, inscode)
+        self.residues.add_atom(atom, resname, resnum, chain, inscode, segid)
         self.atoms.append(atom)
 
     #===================================================

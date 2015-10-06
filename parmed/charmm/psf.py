@@ -225,9 +225,9 @@ class CharmmPsfFile(Structure):
                 mass = conv(words[7], float, 'atomic mass')
                 props = words[8:]
                 atom = Atom(name=name, type=attype, charge=charge, mass=mass)
-                atom.segid = segid
                 atom.props = props
-                self.add_atom(atom,resname,resid,chain=segid,inscode=inscode)
+                self.add_atom(atom, resname, resid, chain=segid,
+                              inscode=inscode, segid=segid)
             # Now get the number of bonds
             nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
             if len(psfsections['NBOND'][1]) != nbond * 2:

@@ -245,6 +245,44 @@ class TestGromacsTop(FileIOTestCase):
                 self.assertEqual(a1.name, a2.name)
                 self.assertEqual(a1.type, a2.type)
 
+    def testMoleculeCombine(self):
+        """ Tests selective molecule combination in Gromacs topology files """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
+        fname = get_fn('combined.top', written=True)
+        # Make sure that combining non-adjacent molecules fails
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine=[[1, 3]]))
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine='joey'))
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine=[1, 2, 3]))
+        self.assertRaises(TypeError, lambda:
+                parm.write(fname, combine=1))
+        parm.write(fname, combine=[[3, 4], [126, 127, 128, 129, 130]])
+        with open(fname, 'r') as f:
+            for line in f:
+                if line.startswith('[ molecules ]'):
+                    break
+            molecule_list = []
+            for line in f:
+                if line[0] == ';': continue
+                words = line.split()
+                molecule_list.append((words[0], int(words[1])))
+        parm2 = load_file(fname)
+        self.assertEqual(molecule_list, [('DPPC', 3), ('system1', 1),
+                         ('SOL', 121), ('system2', 1), ('SOL', 121)])
+        self.assertEqual(len(parm2.atoms), len(parm.atoms))
+        self.assertEqual(len(parm2.residues), len(parm2.residues))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self._equal_atoms(a1, a2)
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
+
+    _equal_atoms = utils.equal_atoms
+
 class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
 

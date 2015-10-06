@@ -17,17 +17,6 @@ recalculated using ParmEd for comparison here to improve the precision. The
 implementation these energies were computed by has already been validated.
 """
 from __future__ import division, print_function, absolute_import
-import utils
-
-try:
-    import simtk.openmm as mm
-    import simtk.openmm.app as app
-    PDBFile = app.PDBFile
-    has_openmm = True
-except ImportError:
-    # To prevent NameError's
-    def PDBFile(*args, **kwargs): return None
-    has_openmm = False
 
 from parmed.amber.readparm import Rst7
 from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
@@ -38,17 +27,16 @@ from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest
+from utils import get_fn, TestCaseRelative, mm, app, has_openmm, CPU, Reference
 import warnings
     
-get_fn = utils.get_fn
-
 # Suppress warning output from bad psf file... sigh.
 warnings.filterwarnings('ignore', category=CharmmWarning)
 
 if has_openmm:
     # System
     charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
-    charmm_gas_crds = PDBFile(get_fn('ala_ala_ala.pdb'))
+    charmm_gas_crds = app.PDBFile(get_fn('ala_ala_ala.pdb'))
     charmm_solv = CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
     charmm_solv_crds = CharmmCrdFile(get_fn('dhfr_min_charmm.crd'))
     charmm_nbfix = CharmmPsfFile(get_fn('ala3_solv.psf'))
@@ -59,8 +47,6 @@ if has_openmm:
                                  get_fn('par_all22_prot.inp'))
     param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                  get_fn('toppar_water_ions.str'))
-
-    CPU = mm.Platform.getPlatformByName('CPU')
 
 def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     """ Gets a decomposed energy for a given system """
@@ -84,7 +70,7 @@ def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
     return energies
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
-class TestCharmmFiles(utils.TestCaseRelative):
+class TestCharmmFiles(TestCaseRelative):
 
     def setUp(self):
         if charmm_solv.box is None:
@@ -286,7 +272,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstrom)
         self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
@@ -307,7 +293,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(charmm_solv_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
@@ -325,7 +311,7 @@ class TestCharmmFiles(utils.TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms)
         self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = decomposed_energy(sim.context, parm)
         self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)
