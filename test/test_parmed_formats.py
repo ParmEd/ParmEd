@@ -15,8 +15,7 @@ import random
 import os
 import unittest
 from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
-        HAS_GROMACS
-                   FileIOTestCase)
+                   HAS_GROMACS, FileIOTestCase)
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
