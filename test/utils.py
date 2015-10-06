@@ -3,12 +3,13 @@ Useful functions for the test cases
 """
 import os
 import numpy as np
-from parmed import gromacs
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
 import random
 import unittest
 import warnings
+from os.path import join, split, abspath
+from parmed import gromacs
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import zip
 warnings.filterwarnings('error', category=DeprecationWarning)
 
 try:
