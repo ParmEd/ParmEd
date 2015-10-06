@@ -1326,7 +1326,7 @@ class GromacsTopologyFile(Structure):
                 if print_atnum:
                     parfile.write('%8d ' % atom_type.atomic_number)
                 parfile.write('%10.5f  %10.6f  A %13.6g %13.6g\n' % (
-                              0, atom_type.mass, atom_type.sigma/10,
+                              atom_type.mass, 0, atom_type.sigma/10,
                               atom_type.epsilon*econv))
             parfile.write('\n')
             # Print all parameter types unless we asked for inline
