@@ -4,6 +4,7 @@ Tests for the various actions in ParmEd
 from __future__ import division, print_function
 
 import utils
+from utils import HAS_GROMACS
 from parmed import periodic_table, gromacs, load_file
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
@@ -57,6 +58,7 @@ class TestNonParmActions(unittest.TestCase):
         self.assertEqual(lines[0], 'Loaded topology files:')
         self.assertEqual(lines[1], '[0]\t%s (active)' % get_fn('trx.prmtop'))
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testChamber(self):
         """ Test the chamber action with a basic protein """
         # To keep stderr clean
@@ -169,6 +171,7 @@ class TestNonParmActions(unittest.TestCase):
         self._extensive_checks(parm)
         self.assertIs(parm.box, None)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testGromber2(self):
         """ Test the gromber action with coordinates """
         a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
@@ -183,6 +186,7 @@ class TestNonParmActions(unittest.TestCase):
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testGromber3(self):
         """ Test the gromber action passing various defines """
         a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
@@ -201,6 +205,7 @@ class TestNonParmActions(unittest.TestCase):
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testGromberBox(self):
         """ Test the gromber action when a box should be defined """
         a = PT.gromber(None, os.path.join(get_fn('09.DHFR-PME'), 'topol.top'),

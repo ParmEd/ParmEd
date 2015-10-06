@@ -15,6 +15,7 @@ import random
 import os
 import unittest
 from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
+        HAS_GROMACS
                    FileIOTestCase)
 
 def reset_stringio(io):
@@ -128,6 +129,7 @@ class TestFileLoader(FileIOTestCase):
         mol3 = formats.load_file(get_fn('tripos9.mol2'))
         self.assertIsInstance(mol3, ResidueTemplate)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testLoadGromacsTop(self):
         """ Tests automatic loading of Gromacs topology file """
         top = formats.load_file(get_fn('1aki.charmm27.top'))
@@ -1107,6 +1109,7 @@ class TestFileDownloader(unittest.TestCase):
         mol3 = formats.Mol2File.parse(self.url + 'tripos9.mol2')
         self.assertIsInstance(mol3, ResidueTemplate)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testDownloadGromacsTop(self):
         """ Tests automatic loading of downloaded Gromacs topology file """
         self.assertTrue(gromacs.GromacsTopologyFile.id_format(self.url + '1aki.charmm27.top'))
