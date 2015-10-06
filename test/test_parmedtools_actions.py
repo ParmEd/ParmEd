@@ -162,6 +162,7 @@ class TestNonParmActions(unittest.TestCase):
         for x, y in zip(parm.box, [33]*3 + [109.475]*3):
             self.assertAlmostEqual(x, y)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testGromber(self):
         """ Test the gromber action on a small system (no coords) """
         a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'))
