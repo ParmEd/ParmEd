@@ -247,7 +247,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._compare_parametersets(structure.parameterset,
                                     unpickled.parameterset)
 
-   @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacscharmm_serialization(self):
         """ Tests the serialization of a CHARMM FF Gromacs topology """
         structure = pmd.load_file(utils.get_fn('1aki.charmm27.solv.top'))
