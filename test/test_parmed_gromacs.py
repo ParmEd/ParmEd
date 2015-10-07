@@ -9,8 +9,8 @@ from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-import utils
 from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
+import utils
 import warnings
 
 @unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
