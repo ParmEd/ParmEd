@@ -103,6 +103,11 @@ class version(namedtuple('version', ['major', 'minor', 'patchlevel'])):
     def __ne__(self, other):
         return self < other or self > other
 
+    def __ge__(self, other):
+        return self > other or self == other
+    def __le__(self, other):
+        return self < other or self > other
+
     def __repr__(self):
         ret = super(type(self), self).__repr__()
         if self.beta is None:
