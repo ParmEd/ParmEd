@@ -1188,7 +1188,6 @@ class GromacsTopologyFile(Structure):
         # Now check what the 1-4 scaling factors should be
         if hasattr(struct, 'defaults') and isinstance(struct.defaults,
                                                       _Defaults):
-            print('Copying defaults: %r' % struct.defaults)
             gmxtop.defaults = struct.defaults
         else:
             scee_values = set()
