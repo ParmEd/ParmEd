@@ -1099,6 +1099,32 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
+    def copy(self, cls, split_dihedrals=False):
+        """
+        Makes a copy of the current structure as an instance of a specified
+        subclass
+
+        Parameters
+        ----------
+        cls : Structure subclass
+            The returned object is a copy of this structure as a `cls` instance
+        split_dihedrals : ``bool``
+            If True, then the Dihedral entries will be split up so that each one
+            is paired with a single DihedralType (rather than a
+            DihedralTypeList)
+
+        Returns
+        -------
+        *cls* instance
+            The instance of the Structure subclass `cls` with a copy of the
+            current Structure's topology information
+        """
+        c = super(GromacsTopologyFile, self).copy(cls, split_dihedrals)
+        c.defaults = copy.copy(self.defaults)
+        return c
+
+    #===================================================
+
     @classmethod
     def from_structure(cls, struct, copy=False):
         """ Instantiates a GromacsTopologyFile instance from a Structure
@@ -1151,6 +1177,7 @@ class GromacsTopologyFile(Structure):
         # Now check what the 1-4 scaling factors should be
         if hasattr(struct, 'defaults') and isinstance(struct.defaults,
                                                       _Defaults):
+            print('Copying defaults: %r' % struct.defaults)
             gmxtop.defaults = struct.defaults
         else:
             scee_values = set()
