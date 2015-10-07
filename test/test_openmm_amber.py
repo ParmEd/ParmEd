@@ -3,13 +3,14 @@ Contains unittests for running OpenMM calculations using the Amber file parsers
 """
 from __future__ import division, print_function, absolute_import
 
+from collections import defaultdict
+from copy import copy
+from math import sqrt
+import os
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology
 import parmed.unit as u
 from parmed.utils.six.moves import range, zip
-from copy import copy
-from math import sqrt
-import os
 import parmed.tools as PT
 import sys
 import unittest
@@ -24,41 +25,12 @@ from utils import (get_fn, CPU, Reference, mm, app, has_openmm, FileIOTestCase,
 #   3 - Ewald
 #   4 - PME
 
-def decomposed_energy(context, parm, NRG_UNIT=u.kilocalories_per_mole):
-    """ Gets a decomposed energy for a given system """
-    energies = {}
-    # Get energy components
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.ptr('ifbox')>0,
-                         groups=2**parm.BOND_FORCE_GROUP)
-    energies['bond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.ptr('ifbox')>0,
-                         groups=2**parm.ANGLE_FORCE_GROUP)
-    energies['angle'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.ptr('ifbox')>0,
-                         groups=2**parm.DIHEDRAL_FORCE_GROUP)
-    energies['dihedral'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    s = context.getState(getEnergy=True,
-                         enforcePeriodicBox=parm.ptr('ifbox')>0,
-                         groups=2**parm.NONBONDED_FORCE_GROUP)
-    energies['nonbond'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    # Extra energy terms for chamber systems
-    if isinstance(parm, ChamberParm):
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.UREY_BRADLEY_FORCE_GROUP)
-        energies['urey'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.IMPROPER_FORCE_GROUP)
-        energies['improper']=s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-        s = context.getState(getEnergy=True,
-                             enforcePeriodicBox=parm.ptr('ifbox')>0,
-                             groups=2**parm.CMAP_FORCE_GROUP)
-        energies['cmap'] = s.getPotentialEnergy().value_in_unit(NRG_UNIT)
-    return energies
+def energy_decomposition(parm, context):
+    from parmed.openmm.utils import energy_decomposition
+    ret = defaultdict(float)
+    for key, val in energy_decomposition(parm, context).items():
+        ret[key] = val
+    return ret
 
 @unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
 class TestAmberParm(FileIOTestCase, TestCaseRelative):
@@ -75,7 +47,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 # Etot   =     -1756.2018  EKtot   =       376.7454  EPtot      =     -2132.9472
 # BOND   =         0.0000  ANGLE   =         0.0000  DIHED      =         0.0000
 # 1-4 NB =         0.0000  1-4 EEL =         0.0000  VDWAALS    =       378.4039
@@ -84,7 +56,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 0)
         self.assertAlmostEqual(energies['angle'], 0)
         self.assertAlmostEqual(energies['dihedral'], 0)
-        self.assertRelativeEqual(energies['nonbond'], -2133.2963, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -2133.2963, places=4)
         # Check that we have the correct number of virtual sites
         nvirt = 0
         for i in range(system.getNumParticles()):
@@ -127,12 +99,12 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         con2 = mm.Context(system2, mm.VerletIntegrator(0.001), Reference)
         con1.setPositions(parm.positions)
         con2.setPositions(parm.positions)
-        e1 = decomposed_energy(con1, parm)
-        e2 = decomposed_energy(con2, parm)
+        e1 = energy_decomposition(parm, con1)
+        e2 = energy_decomposition(parm, con2)
         self.assertAlmostEqual(e1['bond'], e2['bond'])
         self.assertAlmostEqual(e1['angle'], e2['angle'])
         self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
-        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'], places=5)
+        self.assertAlmostEqual(e1['nonbonded'], e2['nonbonded'], places=5)
         # Check that we have the correct number of virtual sites
         nvirt1 = nvirt2 = 0
         for i in range(system.getNumParticles()):
@@ -162,11 +134,11 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
         self.assertAlmostEqual(energies['bond'], 0)
         self.assertAlmostEqual(energies['angle'], 0)
         self.assertAlmostEqual(energies['dihedral'], 0)
-        self.assertRelativeEqual(energies['nonbond'], -2142.418956, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -2142.418956, places=4)
         # Check that we have the correct number of virtual sites
         nvirt = 0
         for i in range(system.getNumParticles()):
@@ -202,7 +174,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =         2.4544  EKtot   =         0.0000  EPtot      =         2.4544
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -212,7 +184,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -30.2355, places=3)
 
     def testRoundTrip(self):
         """ Test ParmEd -> OpenMM round trip with Amber gas phase """
@@ -224,12 +196,12 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con1.setPositions(parm.positions)
         con2.setPositions(parm.positions)
-        e1 = decomposed_energy(con1, parm)
-        e2 = decomposed_energy(con2, parm)
+        e1 = energy_decomposition(parm, con1)
+        e2 = energy_decomposition(parm, con2)
         self.assertAlmostEqual(e1['bond'], e2['bond'])
         self.assertAlmostEqual(e1['angle'], e2['angle'])
         self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
-        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'])
+        self.assertAlmostEqual(e1['nonbonded'], e2['nonbonded'])
 
     def testRoundTripXML(self):
         """ Test ParmEd -> OpenMM round trip with Amber gas phase via XML """
@@ -244,12 +216,12 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         con1.setPositions(parm.positions)
         con2.setPositions(parm.positions)
-        e1 = decomposed_energy(con1, parm)
-        e2 = decomposed_energy(con2, parm)
+        e1 = energy_decomposition(parm, con1)
+        e2 = energy_decomposition(parm, con2)
         self.assertAlmostEqual(e1['bond'], e2['bond'])
         self.assertAlmostEqual(e1['angle'], e2['angle'])
         self.assertAlmostEqual(e1['dihedral'], e2['dihedral'])
-        self.assertAlmostEqual(e1['nonbond'], e2['nonbond'])
+        self.assertAlmostEqual(e1['nonbonded'], e2['nonbonded'])
 
     def testGB1Energy(self): # HCT (igb=1)
         """ Compare Amber and OpenMM GB (igb=1) energies (w/ and w/out salt) """
@@ -259,7 +231,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0306  EKtot   =         0.0000  EPtot      =       -24.0306
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -268,13 +240,13 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -56.7205, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -56.7205, places=3)
         system = parm.createSystem(implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0508  EKtot   =         0.0000  EPtot      =       -24.0508
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -283,7 +255,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -56.7406, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -56.7406, places=3)
 
     def testGB2Energy(self): # OBC1 (igb=2)
         """ Compare Amber and OpenMM GB (igb=2) energies (w/ and w/out salt) """
@@ -293,7 +265,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0306  EKtot   =         0.0000  EPtot      =       -24.0306
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -302,13 +274,13 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -58.4044, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -58.4044, places=3)
         system = parm.createSystem(implicitSolvent=app.OBC1,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0508  EKtot   =         0.0000  EPtot      =       -24.0508
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -317,7 +289,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -58.4250, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -58.4250, places=3)
 
     def testGB5Energy(self): # OBC2 (igb=5)
         """ Compare Amber and OpenMM GB (igb=5) energies (w/ and w/out salt) """
@@ -327,7 +299,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0306  EKtot   =         0.0000  EPtot      =       -24.0306
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -336,13 +308,13 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -55.6994, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -55.6994, places=3)
         system = parm.createSystem(implicitSolvent=app.OBC2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0508  EKtot   =         0.0000  EPtot      =       -24.0508
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -351,7 +323,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -55.7190, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -55.7190, places=3)
 
     def testGB7Energy(self): # GBn (igb=7)
         """ Compare Amber and OpenMM GB (igb=7) energies (w/ and w/out salt) """
@@ -363,7 +335,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0306  EKtot   =         0.0000  EPtot      =       -24.0306
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -372,13 +344,13 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -51.3367, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -51.3367, places=3)
         system = parm.createSystem(implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0508  EKtot   =         0.0000  EPtot      =       -24.0508
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -387,7 +359,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -51.3549, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -51.3549, places=3)
 
     def testGB8Energy(self): # GBn2 (igb=8)
         """ Compare Amber and OpenMM GB (igb=8) energies (w/ and w/out salt) """
@@ -399,7 +371,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0306  EKtot   =         0.0000  EPtot      =       -24.0306
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -408,13 +380,13 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -53.6994, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -53.6994, places=3)
         system = parm.createSystem(implicitSolvent=app.GBn2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -24.0508  EKtot   =         0.0000  EPtot      =       -24.0508
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -423,7 +395,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -53.7187, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -53.7187, places=3)
 
     def testRst7(self):
         """ Test loading coordinates via the OpenMMRst7 class """
@@ -433,7 +405,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(Rst7.open(get_fn('ash.rst7')).positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =         2.4544  EKtot   =         0.0000  EPtot      =         2.4544
 #BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
@@ -443,7 +415,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -30.2355, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -30.2355, places=3)
 
     @unittest.skipIf(skip_big_tests(), "Skipping long tests")
     def testEwald(self):
@@ -456,7 +428,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =    -91560.0534  EKtot   =         0.0000  EPtot      =    -91560.0534
 #BOND   =       495.0414  ANGLE   =      1268.9447  DIHED      =      1764.7201
@@ -466,7 +438,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 495.0414, 4)
         self.assertRelativeEqual(energies['angle'], 1268.9447, 5)
         self.assertRelativeEqual(energies['dihedral'], 1764.7201, 5)
-        self.assertRelativeEqual(energies['nonbond'], -95078.7346, 4)
+        self.assertRelativeEqual(energies['nonbonded'], -95078.7346, 4)
 
     def testPME(self):
         """ Compare Amber and OpenMM PME energies """
@@ -478,7 +450,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =    -91544.8269  EKtot   =         0.0000  EPtot      =    -91544.8269
 #BOND   =       495.0414  ANGLE   =      1268.9447  DIHED      =      1764.7201
@@ -488,7 +460,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 495.0414, places=4)
         self.assertRelativeEqual(energies['angle'], 1268.9447, places=4)
         self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -95073.5331, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -95073.5331, places=4)
 
     def testDispersionCorrection(self):
         """ Compare Amber and OpenMM PME energies w/out vdW correction """
@@ -504,7 +476,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =    -90623.3323  EKtot   =         0.0000  EPtot      =    -90623.3323
 #BOND   =       495.0414  ANGLE   =      1268.9447  DIHED      =      1764.7201
@@ -514,7 +486,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['bond'], 495.0414, places=4)
         self.assertRelativeEqual(energies['angle'], 1268.9447, places=4)
         self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=4)
-        self.assertRelativeEqual(energies['nonbond'], -94152.0384, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -94152.0384, places=4)
 
     def testSHAKE(self):
         """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
@@ -555,7 +527,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =   193.6
 #Etot   =     -7042.2475  EKtot   =         0.0000  EPtot      =     -7042.2475
 #BOND   =         0.0654  ANGLE   =         0.9616  DIHED      =        -5.4917
@@ -566,7 +538,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 0.0654, delta=0.0002)
         self.assertAlmostEqual(energies['angle'], 0.9616, 4)
         self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
-        self.assertAlmostEqual(energies['nonbond'], 1256.3579, 3)
+        self.assertAlmostEqual(energies['nonbonded'], 1256.3579, 3)
 
     def test1264(self):
         """ Testing the 12-6-4 LJ potential in OpenMM """
@@ -580,11 +552,11 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
         self.assertAlmostEqual(energies['bond'], 26.3947079, places=3)
         self.assertAlmostEqual(energies['angle'], 122.8243431, places=3)
         self.assertAlmostEqual(energies['dihedral'], 319.0419347, places=3)
-        self.assertAlmostEqual(energies['nonbond'], -2133.6170786, delta=2e-3)
+        self.assertAlmostEqual(energies['nonbonded'], -2133.6170786, delta=2e-3)
 
     def test1012(self):
         """ Testing the 10-12 LJ H-bond potential in OpenMM """
@@ -598,11 +570,11 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         integrator = mm.VerletIntegrator(1*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
         self.assertAlmostEqual(energies['bond'], 0.9675961, places=3)
         self.assertAlmostEqual(energies['angle'], 82.5853211, places=3)
         self.assertAlmostEqual(energies['dihedral'], 1.2476012, places=3)
-        self.assertRelativeEqual(energies['nonbond'], -11191.2563220, delta=3e-5)
+        self.assertRelativeEqual(energies['nonbonded'], -11191.2563220, delta=3e-5)
 
     def testHangleConstraints(self):
         """ Tests that HAngle constraints get applied correctly """
@@ -860,7 +832,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =        39.1266  EKtot   =         0.0000  EPtot      =        39.1266
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -874,7 +846,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], 9.2210, places=4)
 
     def testGB1Energy(self): # HCT (igb=1)
         """Compare OpenMM and CHAMBER GB (igb=1) energies (w/ and w/out salt)"""
@@ -885,7 +857,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -74.0748  EKtot   =         0.0000  EPtot      =       -74.0748
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -898,13 +870,13 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -103.9804, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -103.9804, places=4)
         system = parm.createSystem(implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -74.4173  EKtot   =         0.0000  EPtot      =       -74.4173
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -917,7 +889,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -104.3229, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -104.3229, places=4)
 
     def testGB2Energy(self): # OBC1 (igb=2)
         """Compare OpenMM and CHAMBER GB (igb=2) energies (w/ and w/out salt)"""
@@ -928,7 +900,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -77.9618  EKtot   =         0.0000  EPtot      =       -77.9618
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -941,13 +913,13 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -107.8675, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -107.8675, places=4)
         system = parm.createSystem(implicitSolvent=app.OBC1,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -78.3072  EKtot   =         0.0000  EPtot      =       -78.3072
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -960,7 +932,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -108.2129, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -108.2129, places=4)
 
     def testGB5Energy(self): # OBC2 (igb=5)
         """Compare OpenMM and CHAMBER GB (igb=5) energies (w/ and w/out salt)"""
@@ -971,7 +943,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -73.7129  EKtot   =         0.0000  EPtot      =       -73.7129
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -984,13 +956,13 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -103.6186, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -103.6186, places=4)
         system = parm.createSystem(implicitSolvent=app.OBC2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -74.0546  EKtot   =         0.0000  EPtot      =       -74.0546
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -1003,7 +975,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -103.9603, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -103.9603, places=4)
 
     def testGB7Energy(self): # GBn (igb=7)
         """Compare OpenMM and CHAMBER GB (igb=7) energies (w/ and w/out salt)"""
@@ -1016,7 +988,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -75.0550  EKtot   =         0.0000  EPtot      =       -75.0550
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -1029,13 +1001,13 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -104.9606, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -104.9606, places=4)
         system = parm.createSystem(implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -75.3985  EKtot   =         0.0000  EPtot      =       -75.3985
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -1048,7 +1020,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -105.3041, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -105.3041, places=4)
 
     def testGB8Energy(self): # GBn2 (igb=8)
         """Compare OpenMM and CHAMBER GB (igb=8) energies (w/ and w/out salt)"""
@@ -1074,7 +1046,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -108.1396, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -108.1396, places=4)
         system = parm.createSystem(implicitSolvent=app.GBn2,
                                    implicitSolventSaltConc=1.0*u.molar)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -1093,7 +1065,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], -108.4858, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -108.4858, places=4)
 
     def testRst7(self):
         """ Test using OpenMMRst7 to provide coordinates (CHAMBER) """
@@ -1119,7 +1091,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
-        self.assertRelativeEqual(energies['nonbond'], 9.2210, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], 9.2210, places=4)
 
     def testPME(self):
         """ Compare OpenMM and CHAMBER PME energies """
@@ -1143,7 +1115,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 7.8114, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
-        self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], 6514.4460, places=3)
 
     def testDispersionCorrection(self):
         """ Compare OpenMM and CHAMBER energies without vdW correction """
@@ -1172,7 +1144,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
-        self.assertRelativeEqual(energies['nonbond'], 6584.1604, delta=5e-4)
+        self.assertRelativeEqual(energies['nonbonded'], 6584.1604, delta=5e-4)
 
     def testSHAKE(self):
         """ Compare OpenMM and CHAMBER PME energies excluding SHAKEn bonds """
@@ -1197,7 +1169,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
-        self.assertRelativeEqual(energies['nonbond'], 6514.4460, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], 6514.4460, places=3)
 
     @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigPME(self):
@@ -1225,7 +1197,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 740.9529, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 14.2581, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
-        self.assertRelativeEqual(energies['nonbond'], -242263.9896, places=3)
+        self.assertRelativeEqual(energies['nonbonded'], -242263.9896, places=3)
 
     @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigDispersionCorrection(self):
@@ -1256,7 +1228,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 740.9529, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 14.2581, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
-        self.assertRelativeEqual(energies['nonbond'], -240681.6702, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -240681.6702, places=4)
 
     @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def testBigSHAKE(self):
