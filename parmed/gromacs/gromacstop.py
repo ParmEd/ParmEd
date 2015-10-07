@@ -1125,6 +1125,17 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
+    def __getitem__(self, selection):
+        """ See Structure.__getitem__ for documentation """
+        # Make sure defaults is properly copied
+        struct = super(GromacsTopologyFile, self).__getitem__(selection)
+        if isinstance(struct, Atom):
+            return struct
+        struct.defaults = copy.copy(self.defaults)
+        return struct
+
+    #===================================================
+
     @classmethod
     def from_structure(cls, struct, copy=False):
         """ Instantiates a GromacsTopologyFile instance from a Structure
