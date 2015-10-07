@@ -255,6 +255,15 @@ class TestGromacsTop(FileIOTestCase):
         newparm = GromacsTopologyFile(newfile)
         self.assertEqual(parm.defaults, newparm.defaults)
 
+    def testGetitemDefaults(self):
+        """ Tests that GromacsTopologyFile[] sets Defaults correctly """
+        parm = load_file(get_fn('159.top'))
+        newfile = StringIO()
+        parm[0,:].write(newfile)
+        newfile.seek(0)
+        newparm = GromacsTopologyFile(newfile)
+        self.assertEqual(parm.defaults, newparm.defaults)
+
     def testMoleculeCombine(self):
         """ Tests selective molecule combination in Gromacs topology files """
         warnings.filterwarnings('ignore', category=GromacsWarning)
