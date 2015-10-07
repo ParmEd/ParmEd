@@ -6,7 +6,7 @@ between standard and amber file formats, manipulate structures, etc.
 # Version format should be "major.minor.patch". For beta releases, attach
 # "-beta#" to the end. The beta number will be turned into another number in the
 # version tuple
-__version__ = '2.0.4-beta3'
+__version__ = '2.0.4'
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
@@ -102,6 +102,12 @@ class version(namedtuple('version', ['major', 'minor', 'patchlevel'])):
 
     def __ne__(self, other):
         return self < other or self > other
+
+    def __repr__(self):
+        ret = super(type(self), self).__repr__()
+        if self.beta is None:
+            return ret
+        return ret[:-1] + ', beta=%d)' % self.beta
 
 # Build the version
 _betare = re.compile(r'-beta*')
