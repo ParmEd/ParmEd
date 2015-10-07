@@ -2,9 +2,15 @@
 This package contains some useful functionality for common tasks in OpenMM
 """
 from parmed import unit as u
+from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import iteritems
+from parmed.utils.six.moves import range, zip
+try:
+    from simtk import openmm as mm
+except ImportError:
+    mm = None
 
-def energy_decomposition(structure, context, nrg=None):
+def energy_decomposition(structure, context, nrg=u.kilocalories_per_mole):
     """
     This computes the energy of every force group in the given structure and
     computes the energy for each force group for the given Context.  Note, the
@@ -30,8 +36,6 @@ def energy_decomposition(structure, context, nrg=None):
     all_names = dict()
     force_group_names = dict()
     energy_components = dict()
-    if nrg is None:
-        nrg = u.kilocalories_per_mole
 
     for attr in dir(structure):
         if attr.endswith('_FORCE_GROUP'):
@@ -50,3 +54,60 @@ def energy_decomposition(structure, context, nrg=None):
     energy_components['total'] = e.value_in_unit(nrg)
 
     return energy_components
+
+@needs_openmm
+def energy_decomposition_system(structure, system, platform=None,
+                                nrg=u.kilocalories_per_mole):
+    """
+    This function computes the energy contribution for all of the different
+    force groups.
+
+    Parameters
+    ----------
+    structure : Structure
+        The Structure with the coordinates for this system
+    system : mm.System
+        The OpenMM System object to get decomposed energies from
+    platform : str
+        The platform to use. Options are None (default), 'CPU', 'Reference',
+        'CUDA', and 'OpenCL'. None will pick default OpenMM platform for this
+        installation and computer
+    nrg : energy unit, optional
+        The unit to convert all energies into. Default is kcal/mol
+
+    Returns
+    -------
+    energies : list of tuple
+        Each entry is a tuple with the name of the force followed by its
+        contribution
+    """
+    # First get all of the old force groups so we can restore them
+    old_groups = [f.getForceGroup() for f in system.getForces()]
+    old_recip_group = []
+    def _ene(context, grp):
+        st = context.getState(getEnergy=True, groups=1<<grp)
+        return (type(system.getForce(grp)).__name__,
+                st.getPotentialEnergy().value_in_unit(nrg))
+
+    try:
+        for i, f in enumerate(system.getForces()):
+            if isinstance(f, mm.NonbondedForce):
+                old_recip_group.append(f.getReciprocalSpaceForceGroup())
+                f.setReciprocalSpaceForceGroup(i)
+            f.setForceGroup(i)
+        if platform is None:
+            context = mm.Context(system, mm.VerletIntegrator(0.001))
+        else:
+            context = mm.Context(system, mm.VerletIntegrator(0.001),
+                                 mm.Platform.getPlatformByName(platform))
+        context.setPositions(structure.positions)
+        context.setPeriodicBoxVectors(*structure.box_vectors)
+
+        return map(lambda x: _ene(context, x), range(system.getNumForces()))
+    finally:
+        idx = 0
+        for grp, force in zip(old_groups, system.getForces()):
+            if isinstance(force, mm.NonbondedForce):
+                force.setReciprocalSpaceForceGroup(old_recip_group[idx])
+                idx += 1
+            force.setForceGroup(grp)
