@@ -1,14 +1,15 @@
 """
 Useful functions for the test cases
 """
-import numpy as np
 import os
-from os.path import join, split, abspath
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
+import numpy as np
 import random
 import unittest
 import warnings
+from os.path import join, split, abspath
+from parmed import gromacs
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import zip
 warnings.filterwarnings('error', category=DeprecationWarning)
 
 try:
@@ -29,6 +30,8 @@ except ImportError:
 
 def skip_big_tests():
     return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+
+HAS_GROMACS = os.path.isdir(gromacs.GROMACS_TOPDIR)
 
 class TestCaseRelative(unittest.TestCase):
 

@@ -13,7 +13,7 @@ from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
 import utils
 import warnings
 
-@unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
+@unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 
