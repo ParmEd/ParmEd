@@ -1099,6 +1099,43 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
+    def copy(self, cls, split_dihedrals=False):
+        """
+        Makes a copy of the current structure as an instance of a specified
+        subclass
+
+        Parameters
+        ----------
+        cls : Structure subclass
+            The returned object is a copy of this structure as a `cls` instance
+        split_dihedrals : ``bool``
+            If True, then the Dihedral entries will be split up so that each one
+            is paired with a single DihedralType (rather than a
+            DihedralTypeList)
+
+        Returns
+        -------
+        *cls* instance
+            The instance of the Structure subclass `cls` with a copy of the
+            current Structure's topology information
+        """
+        c = super(GromacsTopologyFile, self).copy(cls, split_dihedrals)
+        c.defaults = copy.copy(self.defaults)
+        return c
+
+    #===================================================
+
+    def __getitem__(self, selection):
+        """ See Structure.__getitem__ for documentation """
+        # Make sure defaults is properly copied
+        struct = super(GromacsTopologyFile, self).__getitem__(selection)
+        if isinstance(struct, Atom):
+            return struct
+        struct.defaults = copy.copy(self.defaults)
+        return struct
+
+    #===================================================
+
     @classmethod
     def from_structure(cls, struct, copy=False):
         """ Instantiates a GromacsTopologyFile instance from a Structure

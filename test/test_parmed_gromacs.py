@@ -1,7 +1,7 @@
 """
 Tests the functionality in the parmed.gromacs package
 """
-import utils
+import copy
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
@@ -10,6 +10,7 @@ from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
+import utils
 import warnings
 
 @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
@@ -244,6 +245,24 @@ class TestGromacsTop(FileIOTestCase):
             for a1, a2 in zip(r1.atoms, r2.atoms):
                 self.assertEqual(a1.name, a2.name)
                 self.assertEqual(a1.type, a2.type)
+
+    def testCopyingDefaults(self):
+        """ Tests that copying GromacsTopologyFile copies Defaults too """
+        parm = load_file(get_fn('159.top'))
+        newfile = StringIO()
+        copy.copy(parm).write(newfile)
+        newfile.seek(0)
+        newparm = GromacsTopologyFile(newfile)
+        self.assertEqual(parm.defaults, newparm.defaults)
+
+    def testGetitemDefaults(self):
+        """ Tests that GromacsTopologyFile[] sets Defaults correctly """
+        parm = load_file(get_fn('159.top'))
+        newfile = StringIO()
+        parm[0,:].write(newfile)
+        newfile.seek(0)
+        newparm = GromacsTopologyFile(newfile)
+        self.assertEqual(parm.defaults, newparm.defaults)
 
     def testMoleculeCombine(self):
         """ Tests selective molecule combination in Gromacs topology files """
