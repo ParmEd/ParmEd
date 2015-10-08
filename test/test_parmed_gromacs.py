@@ -9,7 +9,7 @@ from parmed import gromacs as gmx
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
+from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
 import utils
 import warnings
 
