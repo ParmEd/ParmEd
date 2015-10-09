@@ -8,7 +8,7 @@ from copy import copy
 from math import sqrt
 import os
 from parmed.amber import AmberParm, ChamberParm, Rst7
-from parmed.openmm import load_topology
+from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
 from parmed.utils.six.moves import range, zip
 import parmed.tools as PT
@@ -396,6 +396,24 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
         self.assertRelativeEqual(energies['nonbonded'], -53.7187, places=3)
+
+    def testEnergyDecompSystem(self):
+        """ Tests the energy_decomposition_system function """
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
+        system = parm.createSystem(implicitSolvent=app.GBn2)
+        energies = energy_decomposition_system(parm, system)
+#NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
+#Etot   =       -24.0306  EKtot   =         0.0000  EPtot      =       -24.0306
+#BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
+#1-4 NB =         6.1446  1-4 EEL =        20.8049  VDWAALS    =        44.3715
+#EELEC  =      -101.5565  EGB     =       -23.4639  RESTRAINT  =         0.0000
+        self.assertRelativeEqual(energies[0][1], 5.4435, places=4)
+        self.assertRelativeEqual(energies[1][1], 2.8766, places=4)
+        self.assertRelativeEqual(energies[2][1], 24.3697, places=4)
+        self.assertRelativeEqual(energies[3][1], -30.238225, places=3)
+        self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
+        self.assertEqual(energies[5][1], 0)
 
     def testRst7(self):
         """ Test loading coordinates via the OpenMMRst7 class """
@@ -842,7 +860,7 @@ class TestChamberParm(TestCaseRelative):
         # Compare OpenMM energies with the Amber energies (above)
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -866,7 +884,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -113.2014  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -885,7 +903,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -113.5439  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -909,7 +927,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -117.0885  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -928,7 +946,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -117.4339  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -952,7 +970,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -112.8396  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -971,7 +989,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -113.1813  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -997,7 +1015,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -114.1816  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -1016,7 +1034,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -114.5251  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -1033,7 +1051,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -78.2339  EKtot   =         0.0000  EPtot      =       -78.2339
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -1042,7 +1060,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -117.3606  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -1052,7 +1070,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =       -78.5802  EKtot   =         0.0000  EPtot      =       -78.5802
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -1061,7 +1079,7 @@ class TestChamberParm(TestCaseRelative):
 #EELEC  =      -269.7122  EGB     =      -117.7068  RESTRAINT  =         0.0000
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -1077,7 +1095,7 @@ class TestChamberParm(TestCaseRelative):
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         rst = Rst7.open(get_fn('ala_ala_ala.rst7')).positions
         sim.context.setPositions(rst)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =        39.1266  EKtot   =         0.0000  EPtot      =        39.1266
 #BOND   =         1.3351  ANGLE   =        14.1158  DIHED      =        14.2773
@@ -1087,7 +1105,7 @@ class TestChamberParm(TestCaseRelative):
         # Compare OpenMM energies with the Amber energies (above)
         self.assertAlmostEqual(energies['bond'], 1.3351, delta=5e-4)
         self.assertAlmostEqual(energies['angle'], 14.1158, delta=5e-4)
-        self.assertAlmostEqual(energies['urey'], 0.3669, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.3669, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 14.2773, delta=5e-4)
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
@@ -1103,7 +1121,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #Bond         =            1.1324222     Angle        =            1.0688008
 #Dihedral     =            7.8114302     Urey-Bradley =            0.0614241
 #Improper     =            0.0000000     CMAP         =            0.1267899
@@ -1111,7 +1129,7 @@ class TestChamberParm(TestCaseRelative):
 #TOTAL        =         6524.6468990
         self.assertAlmostEqual(energies['bond'], 1.1324, delta=5e-3)
         self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
-        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.06142, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 7.8114, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
@@ -1132,7 +1150,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #Bond         =            1.1324222     Angle        =            1.0688008
 #Dihedral     =            7.8114302     Urey-Bradley =            0.0614241
 #Improper     =            0.0000000     CMAP         =            0.1267899
@@ -1140,7 +1158,7 @@ class TestChamberParm(TestCaseRelative):
 #TOTAL        =         6594.3612201
         self.assertAlmostEqual(energies['bond'], 1.13242, delta=5e-5)
         self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
-        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.06142, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
@@ -1162,10 +1180,10 @@ class TestChamberParm(TestCaseRelative):
         # is the bond energy, which should be slightly smaller than before
         state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
                                      groups=2**parm.BOND_FORCE_GROUP)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
         self.assertAlmostEqual(energies['bond'], 1.13236, delta=5e-5)
         self.assertAlmostEqual(energies['angle'], 1.0688, delta=5e-3)
-        self.assertAlmostEqual(energies['urey'], 0.06142, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.06142, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 7.81143, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 0, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
@@ -1183,7 +1201,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =   -228093.7288  EKtot   =         0.0000  EPtot      =   -228093.7288
 #BOND   =      8582.2932  ANGLE   =      5019.3573  DIHED      =       740.9529
@@ -1193,7 +1211,7 @@ class TestChamberParm(TestCaseRelative):
 #Ewald error estimate:   0.3355E-03
         self.assertAlmostEqual(energies['bond'], 8582.2932, delta=5e-3)
         self.assertAlmostEqual(energies['angle'], 5019.3573, delta=5e-3)
-        self.assertAlmostEqual(energies['urey'], 29.6502, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 29.6502, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 740.9529, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 14.2581, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
@@ -1214,7 +1232,7 @@ class TestChamberParm(TestCaseRelative):
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
-        energies = decomposed_energy(sim.context, parm)
+        energies = energy_decomposition(parm, sim.context)
 #NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
 #Etot   =   -226511.4095  EKtot   =         0.0000  EPtot      =   -226511.4095
 #BOND   =      8582.2932  ANGLE   =      5019.3573  DIHED      =       740.9529
@@ -1224,7 +1242,7 @@ class TestChamberParm(TestCaseRelative):
 #Ewald error estimate:   0.3355E-03
         self.assertAlmostEqual(energies['bond'], 8582.2932, delta=5e-3)
         self.assertAlmostEqual(energies['angle'], 5019.3573, delta=5e-3)
-        self.assertAlmostEqual(energies['urey'], 29.6502, delta=5e-4)
+        self.assertAlmostEqual(energies['urey_bradley'], 29.6502, delta=5e-4)
         self.assertAlmostEqual(energies['dihedral'], 740.9529, delta=5e-3)
         self.assertAlmostEqual(energies['improper'], 14.2581, delta=5e-4)
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
