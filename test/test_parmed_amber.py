@@ -7,7 +7,7 @@ import glob
 import math
 import numpy as np
 import os
-from parmed.amber import readparm, asciicrd, mask, parameters
+from parmed.amber import readparm, asciicrd, mask, parameters, mdin
 from parmed.exceptions import AmberWarning
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types, iteritems
@@ -70,6 +70,11 @@ class TestReadParm(unittest.TestCase):
         for i, atom in enumerate(gasparm.atoms):
             np.testing.assert_allclose(coords[0,i], [atom.xx, atom.xy, atom.xz])
             np.testing.assert_allclose(vels[0,i], [atom.vx, atom.vy, atom.vz])
+
+    def testAmberMdin(self):
+        """ Tests the Amber Mdin class """
+        inp = mdin.Mdin()
+        inp.change('cntrl', 'ntb', 2)
 
     def testRemakeParm(self):
         """ Tests the rebuilding of the AmberParm raw data structures """
