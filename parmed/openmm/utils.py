@@ -4,7 +4,7 @@ This package contains some useful functionality for common tasks in OpenMM
 from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import iteritems
-from parmed.utils.six.moves import range, zip
+from parmed.utils.six.moves import range, zip, map
 try:
     from simtk import openmm as mm
 except ImportError:
@@ -96,15 +96,15 @@ def energy_decomposition_system(structure, system, platform=None,
                 f.setReciprocalSpaceForceGroup(i)
             f.setForceGroup(i)
         if platform is None:
-            context = mm.Context(system, mm.VerletIntegrator(0.001))
+            con = mm.Context(system, mm.VerletIntegrator(0.001))
         else:
-            context = mm.Context(system, mm.VerletIntegrator(0.001),
+            con = mm.Context(system, mm.VerletIntegrator(0.001),
                                  mm.Platform.getPlatformByName(platform))
-        context.setPositions(structure.positions)
+        con.setPositions(structure.positions)
         if structure.box is not None:
-            context.setPeriodicBoxVectors(*structure.box_vectors)
+            con.setPeriodicBoxVectors(*structure.box_vectors)
 
-        return map(lambda x: _ene(context, x), range(system.getNumForces()))
+        return list(map(lambda x: _ene(con, x), range(system.getNumForces())))
     finally:
         idx = 0
         for grp, force in zip(old_groups, system.getForces()):
