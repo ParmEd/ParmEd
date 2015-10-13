@@ -53,6 +53,7 @@ other general comments!
 
 * Carlos Hernandez
 * David L. Mobley
+* Hai Nguyen
 * Lee-Ping Wang
 * Pawel Janowski
 
