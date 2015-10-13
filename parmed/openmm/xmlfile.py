@@ -93,7 +93,6 @@ class XmlFile(object):
         if '<ForceField' in contents:
             obj = StringIO()
             obj.write(contents)
-            del contents # Save some memory
             obj.seek(0)
             return app.ForceField(obj)
 

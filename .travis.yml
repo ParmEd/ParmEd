@@ -1,4 +1,4 @@
-language: python
+language: generic
 
 sudo: false
 addons:
@@ -9,11 +9,12 @@ addons:
             - g++
             - gromacs
 
-env:
-    matrix:
-        - PYTHON_VERSION=2.7
-        - PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes
-        - PYTHON_VERSION=3.4
+matrix:
+  include:
+    - { os: linux, env: PYTHON_VERSION=2.7 }
+    - { os: linux, env: PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes }
+    - { os: linux, env: PYTHON_VERSION=3.4 }
+    - { os: osx, env: PYTHON_VERSION=3.4 }
 
 install:
     - source devtools/travis-ci/install.sh

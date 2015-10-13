@@ -11,6 +11,7 @@ from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
 import os
 import unittest
 import utils
+from utils import HAS_GROMACS
 
 get_fn = utils.get_fn
 
@@ -318,6 +319,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.cmaps), 447)
         self.assertEqual(cpsf.residues[281].insertion_code, 'A')
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testFromStructure(self):
         """ Tests the CharmmPsfFile.from_structure constructor """
         top1 = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
@@ -550,6 +552,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testCharmmParameterSetConversion(self):
         """ Tests CharmmParameterSet.from_parameterset and from_structure """
         params1 = ParameterSet.from_structure(
