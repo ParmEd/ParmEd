@@ -52,6 +52,7 @@ other general comments!
 * Jason Swails (principal developer) | jason.swails@gmail.com
 * Carlos Hernandez
 * David L. Mobley
+* Hai Nguyen
 * Lee-Ping Wang
 * Pawel Janowski
 

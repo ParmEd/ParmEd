@@ -285,9 +285,10 @@ class Mdin(object):
         """ Change the value of a variable without adding a new key-pair """
       
         variable = variable.lower()
-        if (value.startswith('"') and value.endswith('"')) or (
-               value.startswith("'") and value.endswith("'")):
-            value = value[1:-1]
+        if isinstance(value, string_types):
+            if (value.startswith('"') and value.endswith('"')) or (
+                   value.startswith("'") and value.endswith("'")):
+                value = value[1:-1]
       
         if namelist == "cntrl":
             if variable in self.cntrl_nml.keys():

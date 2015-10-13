@@ -1,20 +1,27 @@
 """
 Useful functions for the test cases
 """
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
 import os
-from os.path import join, split, abspath
+import numpy as np
 import random
 import unittest
 import warnings
+from os.path import join, split, abspath
+from parmed import gromacs
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import zip
 warnings.filterwarnings('error', category=DeprecationWarning)
 
 try:
-    from simtk import openmm
-    openmm_version = tuple([int(x) for x in openmm.__version__.split('.')])
+    from simtk import openmm as mm
+    from simtk.openmm import app
+    openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
+    CPU = mm.Platform.getPlatformByName('CPU')
+    Reference = mm.Platform.getPlatformByName('Reference')
+    has_openmm = True
 except ImportError:
-    openmm_version = None
+    has_openmm = False
+    app = openmm_version = CPU = Reference = mm = None
 
 try:
     from string import uppercase
@@ -23,6 +30,8 @@ except ImportError:
 
 def skip_big_tests():
     return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+
+HAS_GROMACS = os.path.isdir(gromacs.GROMACS_TOPDIR)
 
 class TestCaseRelative(unittest.TestCase):
 
@@ -485,3 +494,45 @@ def create_random_structure(parametrized, novalence=False):
     struct.unchange()
     struct.update_dihedral_exclusions()
     return struct
+
+def equal_atoms(tester, a1, a2):
+    """ Tests equality of two atoms based on properties
+
+    Parameters
+    ----------
+    tester : unittest.TestCase
+        TestCase instance
+    a1 : Atom
+        First atom to compare
+    a2 : Atom
+        Second atom to compare
+    """
+    tester.assertEqual(a1.atomic_number, a2.atomic_number)
+    tester.assertEqual(a1.screen, a2.screen)
+    tester.assertEqual(a1.name, a2.name)
+    tester.assertEqual(a1.type, a2.type)
+    tester.assertEqual(a1.atom_type, a2.atom_type)
+    tester.assertEqual(a1.charge, a2.charge)
+    tester.assertEqual(a1.mass, a2.mass)
+    tester.assertEqual(a1.nb_idx, a2.nb_idx)
+    tester.assertEqual(a1.radii, a2.radii)
+    tester.assertEqual(a1.tree, a2.tree)
+    tester.assertEqual(a1.join, a2.join)
+    tester.assertEqual(a1.irotat, a2.irotat)
+    tester.assertEqual(a1.occupancy, a2.occupancy)
+    tester.assertEqual(a1.bfactor, a2.bfactor)
+    tester.assertEqual(a1.rmin, a2.rmin)
+    tester.assertEqual(a1.epsilon, a2.epsilon)
+    tester.assertEqual(a1.rmin_14, a2.rmin_14)
+    tester.assertEqual(a1.epsilon_14, a2.epsilon_14)
+    for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles',
+                'type_idx', 'class_idx', 'polarizability', 'vdw_weight'):
+        if hasattr(a2, key):
+            if isinstance(getattr(a2, key), np.ndarray):
+                np.testing.assert_equal(
+                        getattr(a1, key), getattr(a2, key)
+                )
+            else:
+                tester.assertEqual(getattr(a1, key), getattr(a2, key))
+        else:
+            tester.assertFalse(hasattr(a1, key))

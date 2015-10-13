@@ -66,6 +66,15 @@ below (the filename argument is omitted):
 +--------------------------+--------------------------------+
 | PSF file                 | None                           |
 +--------------------------+--------------------------------+
+| Serialized System XML    | None                           |
++--------------------------+--------------------------------+
+| Serialized State XML     | None                           |
++--------------------------+--------------------------------+
+| Serialized Integrator    | None                           |
+| XML file                 |                                |
++--------------------------+--------------------------------+
+| ForceField XML file      | None                           |
++--------------------------+--------------------------------+
 \*These arguments are *required* when parsing the corresponding format file
 
 The optional keyword arguments are described below:

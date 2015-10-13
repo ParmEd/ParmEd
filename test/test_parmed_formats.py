@@ -15,7 +15,7 @@ import random
 import os
 import unittest
 from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
-                   FileIOTestCase)
+                   HAS_GROMACS, FileIOTestCase)
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -128,6 +128,7 @@ class TestFileLoader(FileIOTestCase):
         mol3 = formats.load_file(get_fn('tripos9.mol2'))
         self.assertIsInstance(mol3, ResidueTemplate)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testLoadGromacsTop(self):
         """ Tests automatic loading of Gromacs topology file """
         top = formats.load_file(get_fn('1aki.charmm27.top'))
@@ -250,7 +251,7 @@ class TestChemistryPDBStructure(FileIOTestCase):
         """ Test PDB file where atom number goes to ***** after 99999 """
         pdbfile = read_PDB(self.overflow2)
         self.assertEqual(len(pdbfile.atoms), 114277)
-        self.assertEqual(len(pdbfile.residues), 25042)
+        self.assertEqual(len(pdbfile.residues), 25044)
         for i, atom in enumerate(pdbfile.atoms):
             self.assertEqual(atom.number, i+1)
             self.assertEqual(atom.idx, i)
@@ -437,24 +438,24 @@ class TestChemistryPDBStructure(FileIOTestCase):
                          'MEMB', 'TIP3', 'POT', 'CLA'])
         foundsegids = set()
         for atom in pdbfile.atoms:
-            self.assertTrue(hasattr(atom, 'segid'))
-            foundsegids.add(atom.segid)
+            foundsegids.add(atom.residue.segid)
         self.assertEqual(foundsegids, allsegids)
-        self.assertEqual(pdbfile.atoms[0].segid, 'PROA')
-        self.assertEqual(pdbfile.atoms[5161].segid, 'PROA')
-        self.assertEqual(pdbfile.atoms[5162].segid, 'PROB')
-        self.assertEqual(pdbfile.atoms[-1].segid, 'CLA')
+        self.assertEqual(pdbfile.atoms[0].residue.segid, 'PROA')
+        self.assertEqual(pdbfile.atoms[5161].residue.segid, 'PROA')
+        self.assertEqual(pdbfile.atoms[5162].residue.segid, 'PROB')
+        self.assertEqual(pdbfile.atoms[-1].residue.segid, 'CLA')
         f = get_fn('pdb_segid_test1.pdb', written=True)
         f2 = get_fn('pdb_segid_test2.pdb', written=True)
         pdbfile.write_pdb(f)
         pdbfile2 = read_PDB(f)
         for atom in pdbfile2.atoms:
-            self.assertFalse(hasattr(atom, 'segid'))
+            self.assertFalse(atom.residue.segid)
         pdbfile.write_pdb(f2, charmm=True)
         pdbfile3 = read_PDB(f2)
         for atom in pdbfile3.atoms:
-            self.assertTrue(hasattr(atom, 'segid'))
-            self.assertEqual(atom.segid, pdbfile.atoms[atom.idx].segid)
+            self.assertTrue(atom.residue.segid)
+            self.assertEqual(atom.residue.segid,
+                             pdbfile.atoms[atom.idx].residue.segid)
 
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):
@@ -1107,6 +1108,7 @@ class TestFileDownloader(unittest.TestCase):
         mol3 = formats.Mol2File.parse(self.url + 'tripos9.mol2')
         self.assertIsInstance(mol3, ResidueTemplate)
 
+    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testDownloadGromacsTop(self):
         """ Tests automatic loading of downloaded Gromacs topology file """
         self.assertTrue(gromacs.GromacsTopologyFile.id_format(self.url + '1aki.charmm27.top'))

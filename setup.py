@@ -7,6 +7,14 @@ if sys.version_info < (2, 7):
                      'correctly.\n')
     sys.exit(0)
 
+if sys.platform == 'darwin':
+    # You *need* to use clang and clang++ for ParmEd extensions on a Mac;
+    # Anaconda does annoying stuff that breaks this, since their distutils
+    # automatically tries to use "gcc", which would conflict with the MacPorts
+    # gcc... sigh.
+    os.environ['CXX'] = 'clang++'
+    os.environ['CC'] = 'clang'
+
 is_pypy = '__pypy__' in sys.builtin_module_names
 
 # parmed package and all its subpackages
@@ -14,7 +22,7 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
-            'parmed.utils', 'parmed.gromacs', 'parmed.tools',
+            'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm

@@ -277,7 +277,7 @@ class StateDataReporter(object):
         try:
             if self._out is not None and self._openedFile:
                 self._out.close()
-        except NameError:
+        except AttributeError:
             pass
 
 class NetCDFReporter(object):
@@ -385,7 +385,7 @@ class NetCDFReporter(object):
         try:
             if self._out is not None:
                 self._out.close()
-        except NameError:
+        except AttributeError:
             pass
 
     def finalize(self):
@@ -393,7 +393,7 @@ class NetCDFReporter(object):
         try:
             if self._out is not None:
                 self._out.close()
-        except NameError:
+        except AttributeError:
             pass
 
 class MdcrdReporter(object):
@@ -518,7 +518,7 @@ class MdcrdReporter(object):
         try:
             if self._out is not None:
                 self._out.close()
-        except NameError:
+        except AttributeError:
             pass
 
     def finalize(self):
@@ -526,7 +526,7 @@ class MdcrdReporter(object):
         try:
             if self._out is not None:
                 self._out.close()
-        except NameError:
+        except AttributeError:
             pass
 
 class RestartReporter(object):
@@ -888,5 +888,5 @@ class EnergyMinimizerReporter(StateDataReporter):
         try:
             if self._out is not None:
                 self._out.close()
-        except NameError:
+        except AttributeError:
             pass

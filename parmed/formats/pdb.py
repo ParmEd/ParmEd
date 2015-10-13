@@ -27,7 +27,7 @@ import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def _compare_atoms(old_atom, new_atom, resname, resid, chain):
+def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
     """
     Compares two atom instances, along with the residue name, number, and chain
     identifier, to determine if two atoms are actually the *same* atom, but
@@ -45,6 +45,8 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
         The number of the residue that the new atom would belong to
     chain : ``str``
         The chain identifier that the new atom would belong to
+    segid : ``str``
+        The segment identifier for the molecule
 
     Returns
     -------
@@ -54,6 +56,7 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     if old_atom.residue.name != resname: return False
     if old_atom.residue.number != resid: return False
     if old_atom.residue.chain != chain.strip(): return False
+    if old_atom.residue.segid != segid.strip(): return False
     return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -421,16 +424,16 @@ class PDBFile(object):
                                 charge=chg, mass=mass, occupancy=occupancy,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
-                    if segid: atom.segid = segid
-                    if (_compare_atoms(last_atom, atom, resname, resid, chain)
-                            and altloc):
+                    if (_compare_atoms(last_atom, atom, resname,
+                                       resid, chain, segid) and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
                         last_atom_added = atom
                         continue
                     last_atom = last_atom_added = atom
                     if modelno == 1:
-                        struct.add_atom(atom, resname, resid, chain, inscode)
+                        struct.add_atom(atom, resname, resid, chain,
+                                        inscode, segid)
                     else:
                         try:
                             orig_atom = struct.atoms[atomno-1]
@@ -721,6 +724,10 @@ class PDBFile(object):
                     atoms = res.atoms
                 else:
                     atoms = sorted(res.atoms, key=lambda atom: atom.number)
+                if charmm:
+                    segid = (res.segid or res.chain)[:4]
+                else:
+                    segid = ''
                 for atom in atoms:
                     pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
@@ -739,10 +746,6 @@ class PDBFile(object):
                         aname = ' %-3s' % pa.name
                     else:
                         aname = pa.name[:4]
-                    if charmm and hasattr(pa, 'segid'):
-                        segid = pa.segid[:4]
-                    else:
-                        segid = ''
                     dest.write(atomrec % (anum , aname, pa.altloc,
                                standardize(res.name), res.chain[:1], rnum,
                                res.insertion_code[:1], x, y, z, pa.occupancy,
@@ -770,10 +773,6 @@ class PDBFile(object):
                             aname = ' %-3s' % oatom.name
                         else:
                             aname = oatom.name[:4]
-                        if charmm and hasattr(oatom, 'segid'):
-                            segid = oatom.segid[:4]
-                        else:
-                            segid = ''
                         dest.write(atomrec % (anum, aname, key,
                                    standardize(res.name), res.chain[:1], rnum,
                                    res.insertion_code[:1], x, y, z,
@@ -1145,7 +1144,8 @@ class CIFFile(object):
                                 charge=charge, mass=mass, occupancy=occup,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
-                if (_compare_atoms(last_atom, atom, resname, resnum, chain)
+                if (_compare_atoms(last_atom, atom, resname, resnum,
+                                   chain, '')
                         and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom

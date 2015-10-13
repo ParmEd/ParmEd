@@ -7,11 +7,11 @@ import utils
 try:
     import simtk.openmm as mm
     import simtk.openmm.app as app
-    has_openmm = True
+    HAS_OPENMM = True
     CPU = mm.Platform.getPlatformByName('CPU')
 except ImportError:
     from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
-    has_openmm = False
+    HAS_OPENMM = False
 
 from parmed import load_file, ExtraPoint, openmm, gromacs
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
@@ -23,8 +23,8 @@ from parmed.vec3 import Vec3
 import os
 import unittest
 import warnings
-
-get_fn = utils.get_fn
+from utils import (get_fn, CPU, has_openmm, mm, app, TestCaseRelative,
+                   skip_big_tests, Reference)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -57,7 +57,8 @@ def zero_ep_frc(frc, struct):
         if isinstance(atom, ExtraPoint):
             frc[i] = vec0
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+@unittest.skipIf(not utils.HAS_GROMACS, "Cannot test without GROMACS")
 class TestGromacsTop(utils.TestCaseRelative):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
@@ -163,7 +164,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping long-running tests")
+    @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
     def testJAC(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (no PBC) """
         # Load the top and gro files
@@ -191,7 +192,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.5)
 
-    @unittest.skipIf(utils.skip_big_tests(), "Skipping long-running tests")
+    @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
     def testJACPME(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (PME) """
         # Load the top and gro files
@@ -204,7 +205,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -234,7 +235,7 @@ class TestGromacsTop(utils.TestCaseRelative):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
