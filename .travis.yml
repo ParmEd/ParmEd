@@ -11,9 +11,9 @@ addons:
 
 matrix:
   include:
-    - { os: linux, env: PYTHON_VERSION=2.7 }
-    - { os: linux, env: PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes }
-    - { os: linux, env: PYTHON_VERSION=3.4 }
+    - { os: linux, env: PYTHON_VERSION=2.7 NUMPYVER="numpy=1.8" SCIENTIFIC="yes" }
+    - { os: linux, env: PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes NUMPYVER="numpy" }
+    - { os: linux, env: PYTHON_VERSION=3.4 NUMPYVER="numpy" }
     - { os: osx, env: PYTHON_VERSION=3.4 }
 
 install:

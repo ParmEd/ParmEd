@@ -12,11 +12,19 @@ conda config --add channels omnia
 
 if [ -z "$MINIMAL_PACKAGES" ]; then
     conda create -y -n myenv python=$PYTHON_VERSION \
-        numpy scipy netcdf4 pandas nose openmm pyflakes
+        $NUMPYVER scipy netcdf4 pandas nose openmm pyflakes
     conda update -y -n myenv --all
 else
     # Do not install the full numpy/scipy stack
-    conda create -y -n myenv python=$PYTHON_VERSION nose numpy pyflakes
+    conda create -y -n myenv python=$PYTHON_VERSION $NUMPYVER nose pyflakes
 fi
 
+if [ ! -z "$SCIENTIFIC" ]; then
+    # Install ScientificPython
+    wget https://sourcesup.renater.fr/frs/download.php/file/4570/ScientificPython-2.9.4.tar.gz
+    tar zxvf ScientificPython-2.9.4.tar.gz
+    cd ScientificPython-2.9.4
+    python setup.py install --netcdf_prefix=`dirname \`which python\`../`
+    cd ../
+fi
 source activate myenv
