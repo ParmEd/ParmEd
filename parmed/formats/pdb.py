@@ -122,10 +122,10 @@ class PDBFile(object):
                     # Check for various attributes. This is the first atom, so
                     # we can assume we haven't gotten into the regime of "weird"
                     # yet, like hexadecimal atom/residue indices.
-                    if not atnum.strip().isdigit(): return False
+                    if not atnum.strip().lstrip('-').isdigit(): return False
                     if atname.strip().isdigit(): return False
                     if not resname.strip(): return False
-                    if not resid.strip().isdigit(): return False
+                    if not resid.strip().lstrip('-').isdigit(): return False
                     try:
                         float(x), float(y), float(z)
                     except ValueError:
