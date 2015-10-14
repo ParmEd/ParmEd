@@ -175,6 +175,16 @@ class TestFileLoader(FileIOTestCase):
         self.assertIsInstance(mol2, Structure)
         pdb = formats.load_file(get_fn('4lzt.pdb'), structure=True)
 
+    def testNegativeResNum(self):
+        """ Tests automatic detection of PDB file with negative residue #s """
+        pdb = download_PDB('1kx5', saveto=get_fn('1kx5.pdb', written=True))
+        pdb2 = formats.load_file(get_fn('1kx5.pdb', written=True))
+        self.assertEqual(len(pdb.atoms), len(pdb2.atoms))
+        for a1, a2 in zip(pdb.atoms, pdb2.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.residue.name, a2.residue.name)
+        np.testing.assert_allclose(pdb.coordinates, pdb2.coordinates)
+
     def testNatomHasboxKeyword(self):
         """ Tests that the hasbox/natom arguments are special-cased in load_file """
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
