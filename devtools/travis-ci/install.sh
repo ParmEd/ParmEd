@@ -26,6 +26,7 @@ if [ ! -z "$SCIENTIFIC" ]; then
     wget https://sourcesup.renater.fr/frs/download.php/file/4570/ScientificPython-2.9.4.tar.gz
     tar zxvf ScientificPython-2.9.4.tar.gz
     cd ScientificPython-2.9.4
-    python setup.py install --netcdf_prefix=`dirname \`which python\`../`
+    binprefix=`dirname \`which python\``
+    python setup.py install --netcdf_prefix=`dirname $binprefix`
     cd ../
 fi
