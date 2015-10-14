@@ -289,8 +289,8 @@ class NetCDFRestart(object):
         # Assign the main attributes
         ncfile.Conventions = 'AMBERRESTART'
         ncfile.ConventionVersion = "1.0"
-        ncfile.title = title
-        ncfile.application = "AMBER"
+        ncfile.title = str(title) # Cast to avoid ScientificPython segfault
+        ncfile.application = "AmberTools"
         ncfile.program = "ParmEd"
         ncfile.programVersion = str(__version__)
         # Make all of the dimensions
@@ -374,10 +374,16 @@ class NetCDFRestart(object):
         ncfile = inst._ncfile
         inst.Conventions = _coerce_to_string(ncfile.Conventions)
         inst.ConventionVersion = _coerce_to_string(ncfile.ConventionVersion)
-        inst.application = _coerce_to_string(ncfile.application)
         inst.program = _coerce_to_string(ncfile.program)
         inst.programVersion = _coerce_to_string(ncfile.programVersion)
-        inst.title = _coerce_to_string(ncfile.title)
+        if hasattr(ncfile, 'application'):
+            inst.application = _coerce_to_string(ncfile.application)
+        else:
+            inst.application = None
+        if hasattr(ncfile, 'title'):
+            inst.title = _coerce_to_string(ncfile.title)
+        else:
+            inst.title = None
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
@@ -718,10 +724,16 @@ class NetCDFTraj(object):
         ncfile = inst._ncfile
         inst.Conventions = _coerce_to_string(ncfile.Conventions)
         inst.ConventionVersion = _coerce_to_string(ncfile.ConventionVersion)
-        inst.application = _coerce_to_string(ncfile.application)
         inst.program = _coerce_to_string(ncfile.program)
         inst.programVersion = _coerce_to_string(ncfile.programVersion)
-        inst.title = _coerce_to_string(ncfile.title)
+        if hasattr(ncfile, 'application'):
+            inst.application = _coerce_to_string(ncfile.application)
+        else:
+            inst.application = None
+        if hasattr(ncfile, 'title'):
+            inst.title = _coerce_to_string(ncfile.title)
+        else:
+            inst.title = None
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             setattr(inst, dim, get_int_dimension(ncfile, dim))
@@ -778,7 +790,7 @@ class NetCDFTraj(object):
         """
         if u.is_quantity(stuff):
             stuff = stuff.value_in_unit(u.angstroms)
-        stuff = np.asarray(stuff)
+        stuff = np.asarray(stuff, dtype='f')
         self._ncfile.variables['coordinates'][self._last_crd_frame] = \
                 np.reshape(stuff, (self.atom, 3))
         self._last_crd_frame += 1
