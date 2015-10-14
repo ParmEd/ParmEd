@@ -19,6 +19,8 @@ else
     conda create -y -n myenv python=$PYTHON_VERSION $NUMPYVER nose pyflakes
 fi
 
+source activate myenv
+
 if [ ! -z "$SCIENTIFIC" ]; then
     # Install ScientificPython
     wget https://sourcesup.renater.fr/frs/download.php/file/4570/ScientificPython-2.9.4.tar.gz
@@ -27,4 +29,3 @@ if [ ! -z "$SCIENTIFIC" ]; then
     python setup.py install --netcdf_prefix=`dirname \`which python\`../`
     cd ../
 fi
-source activate myenv
