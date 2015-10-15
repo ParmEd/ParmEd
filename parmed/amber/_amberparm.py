@@ -401,9 +401,7 @@ class AmberParm(AmberFormat, Structure):
    
     def __getitem__(self, selection):
         other = super(AmberParm, self).__getitem__(selection)
-        if other is None:
-            return None
-        elif isinstance(other, Atom):
+        if isinstance(other, Atom):
             return other
         other.pointers = {}
         other.LJ_types = self.LJ_types.copy()

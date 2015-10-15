@@ -245,7 +245,7 @@ class TestReadParm(unittest.TestCase):
         np.testing.assert_allclose(parm2.box, parm.box)
 
     def testAmberParmFromStructure(self):
-        """ Tests AmberParm.from_structure with another AmberParm """
+        """ Tests AmberParm.from_structure """
         aparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         cparm = load_file(get_fn('ala_ala_ala.parm7'),
                           get_fn('ala_ala_ala.rst7'))
@@ -290,6 +290,40 @@ class TestReadParm(unittest.TestCase):
         # For some reason "is" does not work between numpy arrays, so compare
         # IDs to make sure they are the same object
         self.assertEqual(id(cparm.coordinates), id(cnocopy.coordinates))
+
+        # Check that non-orthogonal unit cell conversions are properly handled
+        tmp = load_file(get_fn(os.path.join('02.6water', 'topol.top')),
+                        xyz=get_fn(os.path.join('02.6water', 'conf.gro')))
+        tmp.box = [3, 3, 3, 109, 109, 90]
+        parm = readparm.AmberParm.from_structure(tmp)
+        np.testing.assert_equal(parm.box, tmp.box)
+        self.assertEqual(parm.ptr('ifbox'), 2)
+        self.assertEqual(parm.parm_data['BOX_DIMENSIONS'], [109, 3, 3, 3])
+
+        # Check that a loaded structure without periodicities is properly warned
+        # against
+        tmp = load_file(get_fn(os.path.join('04.Ala', 'topol.top')),
+                        xyz=get_fn(os.path.join('04.Ala', 'conf.gro')))
+        # Test that a periodicity of zero is properly handled by AmberTools and
+        # converted to a dummy term with a force constant of 0 (and ensure it
+        # warns)
+        tmp.dihedral_types[0][0].per = 0
+        warnings.filterwarnings('error', category=AmberWarning)
+        self.assertRaises(AmberWarning, lambda:
+                readparm.AmberParm.from_structure(tmp))
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        parm = readparm.AmberParm.from_structure(tmp)
+        self.assertEqual(parm.dihedral_types[0].per, 1)
+        self.assertEqual(parm.dihedral_types[0].phi_k, 0)
+        self.assertEqual(parm.dihedral_types[0].phase,
+                         tmp.dihedral_types[0][0].phase)
+
+    def testOldParmFormat(self):
+        """ Test reading old Amber prmtop file format """
+        self.assertTrue(readparm.AmberParm.id_format(get_fn('old.prmtop')))
+        parm = load_file(get_fn('old.prmtop'), get_fn('old.inpcrd'))
+        self.assertIsInstance(parm, readparm.AmberParm)
+        self._standard_parm_tests(parm)
 
     # Tests for individual prmtops
     def _standard_parm_tests(self, parm, has1012=False):

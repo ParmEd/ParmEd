@@ -498,9 +498,10 @@ class AmberFormat(object):
 
         current_flag = ''
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
+        version = None
 
         # Open up the file and read the data into memory
-        with closing(genopen(self.name, 'r')) as prm:
+        with closing(genopen(fname, 'r')) as prm:
             for line in prm:
                 if line[0] == '%':
                     if line[0:8] == '%VERSION':
@@ -523,7 +524,12 @@ class AmberFormat(object):
                             fmt.read = fmt._read_nostrip
                         self.formats[current_flag] = fmt
                         continue
-                self.parm_data[current_flag].extend(fmt.read(line))
+                try:
+                    self.parm_data[current_flag].extend(fmt.read(line))
+                except KeyError:
+                    if version is not None:
+                        raise
+                    # Otherwise, try the slow parser
 
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
