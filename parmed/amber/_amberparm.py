@@ -1426,8 +1426,8 @@ class AmberParm(AmberFormat, Structure):
         # to fill in the residue sequence IDs in the add_atom call above. Add it
         # in as a post-hoc addition now if that information is present
         if 'RESIDUE_NUMBER' in self.parm_data:
-            for res, num in zip(self.parm_data['RESIDUE_NUMBER'],
-                                self.residues):
+            for res, num in zip(self.residues,
+                                self.parm_data['RESIDUE_NUMBER']):
                 res.number = num
 
     #===================================================
@@ -1622,14 +1622,14 @@ class AmberParm(AmberFormat, Structure):
         nres = len(self.residues)
         data['POINTERS'][NRES] = nres
         self.pointers['NRES'] = nres
-        data['RESIDUE_LABEL'] = [res.name[:4] for res in self.residues]
-        data['RESIDUE_POINTER'] = [res.atoms[0].idx+1 for res in self.residues]
+        data['RESIDUE_LABEL'] = [r.name[:4] for r in self.residues]
+        data['RESIDUE_POINTER'] = [r.atoms[0].idx+1 for r in self.residues]
         if 'RESIDUE_NUMBER' in data:
-            data['RESIDUE_NUMBER'] = [res.number for res in self.residues]
+            data['RESIDUE_NUMBER'] = [r.number for r in self.residues]
         if 'RESIDUE_CHAINID' in data:
             data['RESIDUE_CHAINID'] = [res.chain for res in self.residues]
         if 'RESIDUE_ICODE' in data:
-            data['RESIDUE_ICODE'] = [res.icode for res in self.residues]
+            data['RESIDUE_ICODE'] = [r.insertion_code for r in self.residues]
         nmxrs = max([len(res) for res in self.residues])
         data['POINTERS'][NMXRS] = nmxrs
         self.pointers['NMXRS'] = nmxrs

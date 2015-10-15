@@ -21,6 +21,9 @@ import warnings
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
     
+    def tearDown(self):
+        warnings.filterwarnings('always', category=DeprecationWarning)
+
     def testOptimizedReader(self):
         """ Check that the optimized reader imports correctly """
         from parmed.amber import _rdparm
@@ -41,6 +44,18 @@ class TestReadParm(unittest.TestCase):
         """ Check that bzip2ed prmtop files can be parsed correctly """
         parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
         self.assertEqual(parm.ptr('natom'), 864)
+
+    def testDeprecations(self):
+        """ Test proper deprecation of AmberParm keyword rst7_name """
+        warnings.filterwarnings('error', category=DeprecationWarning)
+        self.assertRaises(DeprecationWarning, lambda:
+                readparm.AmberParm(get_fn('trx.prmtop'),
+                                   rst7_name=get_fn('trx.inpcrd'))
+        )
+        self.assertRaises(DeprecationWarning, lambda:
+                readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'),
+                                   rst7_name=get_fn('trx.inpcrd'))
+        )
 
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """

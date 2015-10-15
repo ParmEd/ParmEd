@@ -1021,6 +1021,13 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
             self.assertEqual(periodic_table.Element[atnum], elem)
             self.assertEqual(atnum, periodic_table.AtomicNum[elem])
+        # Test reading Amber topology file with insertion codes and PDB
+        # information stored in it
+        parm.write_parm(get_fn('addpdb.parm7', written=True))
+        nparm = AmberParm(get_fn('addpdb.parm7', written=True))
+        self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
+                         len(nparm.residues))
+        # Test deletePDB
         PT.deletePDB(parm).execute()
         self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
