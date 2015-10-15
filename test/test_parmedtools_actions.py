@@ -767,9 +767,16 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         warnings.filterwarnings('ignore', category=AmberWarning)
         PT.setMolecules(parm).execute()
         self.assertFalse(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
-        PT.setMolecules(parm).execute()
+        # Now check that setMolecules can apply another time.
+        PT.setMolecules(parm, solute_ions=False).execute()
+
+        # Now check that solute_ions keyword works as expected
+        parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
+        PT.setMolecules(parm, solute_ions=False).execute()
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [5, 926, 2])
+        PT.setMolecules(parm, solute_ions=True).execute()
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
 
     def testNetCharge(self):
         """ Test netCharge on AmberParm """
@@ -1624,9 +1631,8 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         # To keep the output clean
         PT.setMolecules(parm).execute()
         self.assertTrue(all([x is y for x,y in zip(parm.atoms, atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
-        PT.setMolecules(parm).execute()
+        # Now check that setMolecules can apply another time.
+        PT.setMolecules(parm, solute_ions=False).execute()
 
     def testNetCharge(self):
         """ Test netCharge for ChamberParm """

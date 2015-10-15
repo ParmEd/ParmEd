@@ -33,7 +33,7 @@ from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
 from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
 from parmed.geometry import box_lengths_and_angles_to_vectors
 from parmed.periodic_table import AtomicNum, element_by_mass
-from parmed.residue import SOLVENT_NAMES
+from parmed.residue import SOLVENT_NAMES, ALLION_NAMES
 from parmed.structure import Structure, needs_openmm
 from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
                        BondType, AngleType, DihedralType, AtomType, ExtraPoint)
@@ -707,21 +707,16 @@ class AmberParm(AmberFormat, Structure):
         if not self.parm_data['POINTERS'][IFBOX]: return None
 
         owner = set_molecules(self)
-        ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
-                'CIO','MG2', 'SOD', 'CLA', 'POT', 'CAL']
-        indices = []
-        for res in self.residues:
-            if res.name in SOLVENT_NAMES:
-                indices.append(res.idx)
-                break
-        # Add ions to list of solvent if necessary
+        all_solvent = SOLVENT_NAMES
         if not solute_ions:
-            for res in self.residues:
-                if res.name in ions:
-                    indices.append(res.idx)
-                    break
+            all_solvent = all_solvent | ALLION_NAMES
+        first_solvent = None
+        for i, res in enumerate(self.residues):
+            if res.name in all_solvent:
+                first_solvent = i
+                break
         # If we have no water, we do not have a molecules section!
-        if not indices:
+        if first_solvent is None:
             self.parm_data['POINTERS'][IFBOX] = 0
             self.pointers['IFBOX'] = 0
             if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
@@ -734,16 +729,10 @@ class AmberParm(AmberFormat, Structure):
             self.box = None
             return None
         # Now remake our SOLVENT_POINTERS and ATOMS_PER_MOLECULE section
-        self.parm_data['SOLVENT_POINTERS'] = [min(indices), len(owner), 0]
-        first_solvent = self.residues[min(indices)].atoms[0].idx
+        self.parm_data['SOLVENT_POINTERS'] = [first_solvent, len(owner), 0]
         # Find the first solvent molecule
-        for i, mol in enumerate(owner):
-            if first_solvent in mol: # mol is a set, so it is efficient
-                self.parm_data['SOLVENT_POINTERS'][2] = i + 1
-                break
-        else: # this else belongs to 'for', not 'if'
-            warn('Could not find first solvent atom. Set to 0', AmberWarning)
-            self.parm_data['SOLVENT_POINTERS'][2] = 0
+        self.parm_data['SOLVENT_POINTERS'][2] = \
+                self.residues[first_solvent].atoms[0].marked
 
         # Now set up ATOMS_PER_MOLECULE and catch any errors
         self.parm_data['ATOMS_PER_MOLECULE'] = [len(mol) for mol in owner]

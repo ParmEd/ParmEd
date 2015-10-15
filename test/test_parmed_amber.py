@@ -62,6 +62,11 @@ class TestReadParm(unittest.TestCase):
                     load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
                 )
         )
+        self.assertRaises(DeprecationWarning, lambda:
+                readparm.AmberParm.load_from_structure(
+                    load_file(get_fn('ash.parm7'))
+                )
+        )
 
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
@@ -233,6 +238,10 @@ class TestReadParm(unittest.TestCase):
         crds = load_file(get_fn('ff14ipq.rst7'))
         parm = load_file(get_fn('ff14ipq.parm7'), xyz=crds.coordinates,
                          box=crds.box)
+        np.testing.assert_allclose(crds.coordinates[0], parm.coordinates)
+        np.testing.assert_allclose(crds.box, parm.box)
+        parm = readparm.AmberParm(get_fn('ff14ipq.parm7'), xyz=crds.coordinates,
+                                  box=crds.box)
         np.testing.assert_allclose(crds.coordinates[0], parm.coordinates)
         np.testing.assert_allclose(crds.box, parm.box)
         # Also check .from_rawdata
