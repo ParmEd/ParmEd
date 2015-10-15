@@ -1,4 +1,4 @@
-language: python
+language: generic
 
 sudo: false
 addons:
@@ -8,6 +8,7 @@ addons:
         packages:
             - g++
             - gromacs
+            - pypy
 
 matrix:
   include:
