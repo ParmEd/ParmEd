@@ -7,8 +7,9 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     pyenv install pypy-2.6.0
     pyenv global pypy-2.6.0
 
-    pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
     pypy -m pip install nose coverage pyflakes
+    which pyflakes
+    pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
 else # Otherwise, CPython... go through conda
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         wget http://repo.continuum.io/miniconda/Miniconda-3.7.0-MacOSX-x86_64.sh -O miniconda.sh;
