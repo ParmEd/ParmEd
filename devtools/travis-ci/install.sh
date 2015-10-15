@@ -1,7 +1,14 @@
 if [ "$PYTHON_VERSION" = "pypy" ]; then
+    # Upgrade to pypy 2.6 -- recipe taken from google/oauth2client
+    git clone https://github.com/yyuu/pyenv.git ${HOME}/.pyenv
+    export PYENV_ROOT="${HOME}/.pyenv"
+    export PATH="${PYENV_ROOT}/bin:${PATH}"
+    eval "$(pyenv init -)"
+    pyenv install pypy-2.6.0
+    pyenv global pypy-2.6.0
+
     pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
     pypy -m pip install nose coverage
-    pypy --version
 else # Otherwise, CPython... go through conda
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         wget http://repo.continuum.io/miniconda/Miniconda-3.7.0-MacOSX-x86_64.sh -O miniconda.sh;
