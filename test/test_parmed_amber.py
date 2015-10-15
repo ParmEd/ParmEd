@@ -15,7 +15,8 @@ from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
-from utils import get_fn, FileIOTestCase
+from utils import (get_fn, FileIOTestCase, equal_atoms,
+                   create_random_structure)
 import warnings
 
 class TestReadParm(unittest.TestCase):
@@ -46,7 +47,7 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.ptr('natom'), 864)
 
     def testDeprecations(self):
-        """ Test proper deprecation of AmberParm keyword rst7_name """
+        """ Test proper deprecation of old/renamed AmberParm features """
         warnings.filterwarnings('error', category=DeprecationWarning)
         self.assertRaises(DeprecationWarning, lambda:
                 readparm.AmberParm(get_fn('trx.prmtop'),
@@ -55,6 +56,11 @@ class TestReadParm(unittest.TestCase):
         self.assertRaises(DeprecationWarning, lambda:
                 readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'),
                                    rst7_name=get_fn('trx.inpcrd'))
+        )
+        self.assertRaises(DeprecationWarning, lambda:
+                readparm.AmberParm.load_from_rawdata(
+                    load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+                )
         )
 
     def testAmberGasParm(self):
@@ -187,6 +193,103 @@ class TestReadParm(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('ff91.parm7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm, has1012=True)
+
+    def testBadArguments(self):
+        """ Test proper error handling for bad AmberParm arguments """
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm(get_fn('trx.prmtop'),
+                                   xyz=get_fn('trx.prmtop'))
+        )
+        struct = create_random_structure(True)
+        struct.unknown_functional = True
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm.from_structure(struct))
+        try:
+            readparm.AmberParm.from_structure(struct)
+        except TypeError as e:
+            self.assertEqual('Cannot instantiate an AmberParm from unknown '
+                             'functional', str(e))
+        struct.unknown_functional = False
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm.from_structure(struct))
+        try:
+            readparm.AmberParm.from_structure(struct)
+        except TypeError as e:
+            self.assertTrue(str(e).startswith('AmberParm does not support all'))
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm.from_structure(
+                    load_file(get_fn('ala_ala_ala.parm7'))
+                )
+        )
+        try:
+            readparm.AmberParm.from_structure(
+                    load_file(get_fn('ala_ala_ala.parm7'))
+            )
+        except TypeError as e:
+            self.assertTrue(str(e).endswith('Try ChamberParm'))
+
+    def testAmberParmBoxXyzArgs(self):
+        """ Test passing coord and box arrays to AmberParm """
+        crds = load_file(get_fn('ff14ipq.rst7'))
+        parm = load_file(get_fn('ff14ipq.parm7'), xyz=crds.coordinates,
+                         box=crds.box)
+        np.testing.assert_allclose(crds.coordinates[0], parm.coordinates)
+        np.testing.assert_allclose(crds.box, parm.box)
+        # Also check .from_rawdata
+        parm.velocities = np.random.rand(3, len(parm.atoms))
+        parm2 = readparm.AmberParm.from_rawdata(parm)
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            equal_atoms(self, a1, a2)
+        np.testing.assert_allclose(parm2.coordinates, parm.coordinates)
+        np.testing.assert_allclose(parm2.velocities, parm.velocities)
+        np.testing.assert_allclose(parm2.box, parm.box)
+
+    def testAmberParmFromStructure(self):
+        """ Tests AmberParm.from_structure with another AmberParm """
+        aparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        cparm = load_file(get_fn('ala_ala_ala.parm7'),
+                          get_fn('ala_ala_ala.rst7'))
+        acopy = readparm.AmberParm.from_structure(aparm, copy=True)
+        ccopy = readparm.ChamberParm.from_structure(cparm, copy=True)
+        anocopy = readparm.AmberParm.from_structure(aparm, copy=False)
+        cnocopy = readparm.ChamberParm.from_structure(cparm, copy=False)
+
+        self.assertEqual(len(aparm.atoms), len(acopy.atoms))
+        self.assertEqual(len(aparm.bonds), len(acopy.bonds))
+        self.assertEqual(len(cparm.atoms), len(ccopy.atoms))
+        self.assertEqual(len(cparm.bonds), len(ccopy.bonds))
+        self.assertEqual(len(aparm.atoms), len(anocopy.atoms))
+        self.assertEqual(len(aparm.bonds), len(anocopy.bonds))
+        self.assertEqual(len(cparm.atoms), len(cnocopy.atoms))
+        self.assertEqual(len(cparm.bonds), len(cnocopy.bonds))
+
+        self.assertIsNot(aparm.atoms, acopy.atoms)
+        self.assertIsNot(aparm.bonds, acopy.bonds)
+        self.assertIsNot(aparm.angles, acopy.angles)
+        self.assertIsNot(aparm.dihedrals, acopy.dihedrals)
+        self.assertIsNot(aparm.coordinates, acopy.coordinates)
+
+        self.assertIs(aparm.atoms, anocopy.atoms)
+        self.assertIs(aparm.bonds, anocopy.bonds)
+        self.assertIs(aparm.angles, anocopy.angles)
+        self.assertIs(aparm.dihedrals, anocopy.dihedrals)
+        # For some reason "is" does not work between numpy arrays, so compare
+        # IDs to make sure they are the same object
+        self.assertEqual(id(aparm.coordinates), id(anocopy.coordinates))
+
+        self.assertIsNot(cparm.atoms, ccopy.atoms)
+        self.assertIsNot(cparm.bonds, ccopy.bonds)
+        self.assertIsNot(cparm.angles, ccopy.angles)
+        self.assertIsNot(cparm.dihedrals, ccopy.dihedrals)
+        self.assertIsNot(cparm.coordinates, ccopy.coordinates)
+
+        self.assertIs(cparm.atoms, cnocopy.atoms)
+        self.assertIs(cparm.bonds, cnocopy.bonds)
+        self.assertIs(cparm.angles, cnocopy.angles)
+        self.assertIs(cparm.dihedrals, cnocopy.dihedrals)
+        # For some reason "is" does not work between numpy arrays, so compare
+        # IDs to make sure they are the same object
+        self.assertEqual(id(cparm.coordinates), id(cnocopy.coordinates))
 
     # Tests for individual prmtops
     def _standard_parm_tests(self, parm, has1012=False):

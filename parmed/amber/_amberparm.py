@@ -305,7 +305,7 @@ class AmberParm(AmberFormat, Structure):
         :class:`AmberParm`, in which case the original object is returned unless
         ``copy`` is ``True``.
         """
-        if isinstance(struct, cls):
+        if type(struct) is cls:
             if copy:
                 return _copy.copy(struct)
             return struct
@@ -318,7 +318,8 @@ class AmberParm(AmberFormat, Structure):
                 struct.torsion_torsions or struct.multipole_frames):
             if (struct.rb_torsions or struct.trigonal_angles or
                     struct.pi_torsions or struct.out_of_plane_bends or
-                    struct.torsion_torsions or struct.multipole_frames):
+                    struct.torsion_torsions or struct.multipole_frames or
+                    struct.stretch_bends):
                 raise TypeError('AmberParm does not support all of the '
                                 'parameters defined in the input Structure')
             # Maybe it just has CHARMM parameters?
