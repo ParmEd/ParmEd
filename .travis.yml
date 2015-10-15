@@ -1,4 +1,4 @@
-language: python
+language: generic
 
 sudo: false
 addons:
@@ -32,4 +32,5 @@ script:
     - devtools/travis-ci/pyflakes_check.sh
     - cd test
     - echo "Using `which python` (`python -V`)::"
+    - which nosetests
     - nosetests -vs .
