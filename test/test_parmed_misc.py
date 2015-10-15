@@ -40,7 +40,7 @@ class InitTestCase(unittest.TestCase):
         self.assertLess(v2_0_0b1, (2, 0, 0))
         self.assertLess(v2_0_0b1, (2, 0, 0, 2))
         self.assertLess(v2_0_0b1, (2, 0, 1))
-        self.assertLess(v2_0_0b1, (2, 0, 1))
+        self.assertLess(v2_0_0b1, (2, 0, 1, 1))
         self.assertLess(v2_0_0b2, (2, 0, 0, 3))
         self.assertEqual(v2_0_0b1, (2, 0, 0, 1))
         self.assertEqual(v2_0_0b2, (2, 0, 0, 2))
