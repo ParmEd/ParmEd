@@ -6,9 +6,11 @@ from random import randint
 import numpy as np
 from parmed import __version__
 from parmed.utils.six.moves import range, zip
+from parmed.utils import PYPY
 from unittest import skipIf
 from utils import get_fn, FileIOTestCase, TestCaseRelative
 
+@skipIf(PYPY, 'NetCDF parsing does not yet work with pypy')
 class TestNetCDF(FileIOTestCase, TestCaseRelative):
     """ Test NetCDF Functionality """
     
@@ -47,7 +49,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         nframe = randint(5, 20)
         coords = np.random.rand(nframe, natom, 3) * 20 - 10
         coords = np.array(coords, dtype='f')
-        nctraj = NetCDFFile(get_fn('test2.nc', written=True), 'w')
+        nctraj = NetCDFFile(get_fn('test2.nc', written=True), 'w', mmap=False)
         nctraj.Conventions = 'AMBER'
         nctraj.ConventionVersion = '1.0'
         nctraj.program = 'ParmEd'
@@ -69,7 +71,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         natom = randint(100, 1000)
         nframe = randint(5, 20)
         coords = np.random.rand(natom, 3) * 20 - 10
-        nctraj = NetCDFFile(get_fn('test2.ncrst', written=True), 'w')
+        nctraj = NetCDFFile(get_fn('test2.ncrst', written=True), 'w', mmap=False)
         nctraj.Conventions = 'AMBERRESTART'
         nctraj.ConventionVersion = '1.0'
         nctraj.program = 'ParmEd'

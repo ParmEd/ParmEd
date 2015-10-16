@@ -46,8 +46,8 @@ class NetCDFRestart(object):
                 or filename.startswith('ftp://'):
             return False
         try:
-            f = NetCDFFile(filename, 'r')
-        except: # Bare except... each package raises different exceptions
+            f = NetCDFFile(filename, 'r', mmap=False)
+        except (TypeError, OSError):
             return False
         try:
             try:
@@ -68,7 +68,7 @@ class NetCDFRestart(object):
         respectively.
         """
         self.closed = False
-        self._ncfile = NetCDFFile(fname, mode)
+        self._ncfile = NetCDFFile(fname, mode, mmap=False)
    
     @classmethod
     def open_new(cls, fname, natom, box, vels, title='',
@@ -390,8 +390,8 @@ class NetCDFTraj(object):
                 or filename.startswith('ftp://'):
             return False
         try:
-            f = NetCDFFile(filename, 'r')
-        except: # Bare except... each package raises different exceptions
+            f = NetCDFFile(filename, 'r', mmap=False)
+        except (TypeError, OSError):
             return False
         try:
             try:
@@ -407,7 +407,7 @@ class NetCDFTraj(object):
     def __init__(self, fname, mode='r'):
         """ Opens a NetCDF File """
         self.closed = False
-        self._ncfile = NetCDFFile(fname, mode)
+        self._ncfile = NetCDFFile(fname, mode, mmap=False)
    
     @classmethod
     def open_new(cls, fname, natom, box, crds=True, vels=False, frcs=False,

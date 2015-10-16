@@ -9,6 +9,7 @@ from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
+from parmed.utils import PYPY
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, StringIO
 import random
@@ -87,6 +88,7 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('ncinpcrd.rst7'))
         self.assertIsInstance(crd, amber.NetCDFRestart)
 
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
     def testLoadNetCDFTraj(self):
         """ Tests automatic loading of Amber NetCDF trajectory file """
         crd = formats.load_file(get_fn('tz2.truncoct.nc'))
@@ -182,9 +184,11 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberMdcrd)
-        crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
-                                hasbox=True)
-        self.assertIsInstance(crd, amber.NetCDFTraj)
+        # Does not currently run under pypy
+        if not PYPY:
+            crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
+                                    hasbox=True)
+            self.assertIsInstance(crd, amber.NetCDFTraj)
         crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberParm)
