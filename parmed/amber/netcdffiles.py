@@ -18,7 +18,7 @@ from parmed import __version__
 from parmed.formats.registry import FileFormatType
 from parmed import unit as u
 from parmed.utils.netcdf import netcdf_file as NetCDFFile
-from parmed.utils.six import wraps, add_metaclass
+from parmed.utils.six import add_metaclass
 
 @add_metaclass(FileFormatType)
 class NetCDFRestart(object):
@@ -224,7 +224,7 @@ class NetCDFRestart(object):
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
             if dim == 'time': continue
-            setattr(inst, dim, get_int_dimension(ncfile, dim))
+            setattr(inst, dim, ncfile.dimensions[dim])
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
                        'cell_angles' in ncfile.variables)
@@ -293,7 +293,7 @@ class NetCDFRestart(object):
 
     @property
     def time(self):
-        return get_float(self._ncfile, 'time')
+        return self._ncfile.variables['time'].getValue()
 
     @time.setter
     def time(self, stuff):
@@ -302,7 +302,7 @@ class NetCDFRestart(object):
 
     @property
     def temp0(self):
-        return get_float(self._ncfile, 'temp0')
+        return self._ncfile.variables['temp0'].getValue()
 
     @temp0.setter
     def temp0(self, stuff):
@@ -565,7 +565,7 @@ class NetCDFTraj(object):
             inst.title = None
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
-            setattr(inst, dim, get_int_dimension(ncfile, dim))
+            setattr(inst, dim, ncfile.dimensions[dim])
         inst.hascrds = 'coordinates' in ncfile.variables
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasfrcs = 'forces' in ncfile.variables
