@@ -21,7 +21,6 @@ import warnings
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
     
-    @unittest.skipIf('__pypy__' in sys.builtin_module_names, 'Cannot import in pypy')
     def testOptimizedReader(self):
         """ Check that the optimized reader imports correctly """
         from parmed.amber import _rdparm
