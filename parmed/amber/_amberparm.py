@@ -837,8 +837,10 @@ class AmberParm(AmberFormat, Structure):
             for j in range(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
                 if index < 0:
-                    pd['LENNARD_JONES_ACOEF'][-index] = 0.0
-                    pd['LENNARD_JONES_BCOEF'][-index] = 0.0
+                    # This indicates *either* a 10-12 potential for this pair
+                    # _or_ it indicates a placeholder for HW atom type
+                    # interactions and serves as a tag for fast water routines
+                    # (or did in the past, anyway). So just skip to the next one
                     continue
                 rij = comb_sig(LJ_sigma[i], LJ_sigma[j]) * fac
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])

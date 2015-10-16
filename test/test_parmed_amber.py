@@ -9,7 +9,7 @@ import numpy as np
 import os
 import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin
-from parmed.exceptions import AmberWarning
+from parmed.exceptions import AmberWarning, MoleculeError
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
@@ -67,6 +67,23 @@ class TestReadParm(unittest.TestCase):
                     load_file(get_fn('ash.parm7'))
                 )
         )
+
+    def testMoleculeErrorDetection(self):
+        """ Tests noncontiguous molecule detection """
+        parm = readparm.AmberParm(get_fn('things.parm7'))
+        self.assertRaises(MoleculeError, lambda:
+                parm.rediscover_molecules(fix_broken=False))
+
+    def testRecalculateLJ(self):
+        """ Test the AmberParm.recalculate_LJ() method """
+        parm = readparm.AmberParm(get_fn('things.parm7'))
+        orig_LJ_A = np.array(parm.parm_data['LENNARD_JONES_ACOEF'])
+        orig_LJ_B = np.array(parm.parm_data['LENNARD_JONES_BCOEF'])
+        parm.recalculate_LJ()
+        np.testing.assert_allclose(orig_LJ_A,
+                np.array(parm.parm_data['LENNARD_JONES_ACOEF']))
+        np.testing.assert_allclose(orig_LJ_B,
+                np.array(parm.parm_data['LENNARD_JONES_BCOEF']))
 
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
