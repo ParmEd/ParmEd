@@ -14,7 +14,7 @@ from parmed.utils.six.moves import zip, StringIO
 import random
 import os
 import unittest
-from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
+from utils import (get_fn, diff_files, get_saved_fn, skip_big_tests,
                    HAS_GROMACS, FileIOTestCase)
 
 def reset_stringio(io):
@@ -406,20 +406,14 @@ class TestChemistryPDBStructure(FileIOTestCase):
         pdbfile3 = read_PDB(output)
         self._compareInputOutputPDBs(pdbfile, pdbfile3)
         for a1, a2 in zip(pdbfile.atoms, pdbfile3.atoms):
-            if has_numpy():
-                self.assertEqual(a1.anisou.shape, a2.anisou.shape)
-            else:
-                self.assertEqual(len(a1.anisou), len(a2.anisou))
+            self.assertEqual(a1.anisou.shape, a2.anisou.shape)
             for x, y in zip(a1.anisou, a2.anisou):
                 self.assertAlmostEqual(x, y, delta=1e-4)
             self.assertEqual(len(a1.other_locations), len(a2.other_locations))
             for key in sorted(a1.other_locations.keys()):
                 oa1 = a1.other_locations[key]
                 oa2 = a2.other_locations[key]
-                if has_numpy():
-                    self.assertEqual(oa1.anisou.shape, oa2.anisou.shape)
-                else:
-                    self.assertEqual(len(oa1.anisou), len(oa2.anisou))
+                self.assertEqual(oa1.anisou.shape, oa2.anisou.shape)
                 for x, y in zip(oa1.anisou, oa2.anisou):
                     self.assertAlmostEqual(x, y, delta=1e-4)
 

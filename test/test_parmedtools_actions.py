@@ -322,14 +322,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = copy(gasparm)
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
         PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
-        if utils.has_numpy():
-            self.assertTrue(diff_files(get_saved_fn('test.off'),
-                                       get_fn('test.off', written=True),
-                                       absolute_error=0.0001))
-        else:
-            self.assertTrue(diff_files(get_saved_fn('test_nonpy.off'),
-                                       get_fn('test.off', written=True),
-                                       absolute_error=0.0001))
+        self.assertTrue(diff_files(get_saved_fn('test.off'),
+                                   get_fn('test.off', written=True),
+                                   absolute_error=0.0001))
 
     def testChangeRadii(self):
         """ Test changeRadii on AmberParm """

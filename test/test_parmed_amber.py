@@ -15,7 +15,7 @@ from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
-from utils import get_fn, has_numpy, FileIOTestCase
+from utils import get_fn, FileIOTestCase
 import warnings
 
 class TestReadParm(unittest.TestCase):
