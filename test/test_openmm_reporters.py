@@ -149,6 +149,7 @@ class TestStateDataReporter(FileIOTestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestTrajRestartReporter(FileIOTestCase):
 
     def testReporters(self):
