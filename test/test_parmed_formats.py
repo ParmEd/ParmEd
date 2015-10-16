@@ -9,12 +9,13 @@ from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
+from parmed.utils import PYPY
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, StringIO
 import random
 import os
 import unittest
-from utils import (get_fn, has_numpy, diff_files, get_saved_fn, skip_big_tests,
+from utils import (get_fn, diff_files, get_saved_fn, skip_big_tests,
                    HAS_GROMACS, FileIOTestCase)
 
 def reset_stringio(io):
@@ -84,21 +85,14 @@ class TestFileLoader(FileIOTestCase):
 
     def testLoadNetCDFRestart(self):
         """ Tests automatic loading of Amber NetCDF restart file """
-        if amber.HAS_NETCDF:
-            crd = formats.load_file(get_fn('ncinpcrd.rst7'))
-            self.assertIsInstance(crd, amber.NetCDFRestart)
-        else:
-            self.assertRaises(exceptions.FormatNotFound, lambda:
-                    formats.load_file(get_fn('ncinpcrd.rst7')))
+        crd = formats.load_file(get_fn('ncinpcrd.rst7'))
+        self.assertIsInstance(crd, amber.NetCDFRestart)
 
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
     def testLoadNetCDFTraj(self):
         """ Tests automatic loading of Amber NetCDF trajectory file """
-        if amber.HAS_NETCDF:
-            crd = formats.load_file(get_fn('tz2.truncoct.nc'))
-            self.assertIsInstance(crd, amber.NetCDFTraj)
-        else:
-            self.assertRaises(exceptions.FormatNotFound, lambda:
-                    formats.load_file(get_fn('ncinpcrd.rst7')))
+        crd = formats.load_file(get_fn('tz2.truncoct.nc'))
+        self.assertIsInstance(crd, amber.NetCDFTraj)
 
     def testLoadPDB(self):
         """ Tests automatic loading of PDB files """
@@ -190,14 +184,14 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberMdcrd)
-        if amber.HAS_NETCDF:
+        # Does not currently run under pypy
+        if not PYPY:
             crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
                                     hasbox=True)
             self.assertIsInstance(crd, amber.NetCDFTraj)
-        else:
-            crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
-                                    hasbox=True)
-            self.assertIsInstance(crd, amber.AmberParm)
+        crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
+                                hasbox=True)
+        self.assertIsInstance(crd, amber.AmberParm)
 
 class TestChemistryPDBStructure(FileIOTestCase):
     
@@ -416,20 +410,14 @@ class TestChemistryPDBStructure(FileIOTestCase):
         pdbfile3 = read_PDB(output)
         self._compareInputOutputPDBs(pdbfile, pdbfile3)
         for a1, a2 in zip(pdbfile.atoms, pdbfile3.atoms):
-            if has_numpy():
-                self.assertEqual(a1.anisou.shape, a2.anisou.shape)
-            else:
-                self.assertEqual(len(a1.anisou), len(a2.anisou))
+            self.assertEqual(a1.anisou.shape, a2.anisou.shape)
             for x, y in zip(a1.anisou, a2.anisou):
                 self.assertAlmostEqual(x, y, delta=1e-4)
             self.assertEqual(len(a1.other_locations), len(a2.other_locations))
             for key in sorted(a1.other_locations.keys()):
                 oa1 = a1.other_locations[key]
                 oa2 = a2.other_locations[key]
-                if has_numpy():
-                    self.assertEqual(oa1.anisou.shape, oa2.anisou.shape)
-                else:
-                    self.assertEqual(len(oa1.anisou), len(oa2.anisou))
+                self.assertEqual(oa1.anisou.shape, oa2.anisou.shape)
                 for x, y in zip(oa1.anisou, oa2.anisou):
                     self.assertAlmostEqual(x, y, delta=1e-4)
 

@@ -913,7 +913,6 @@ class TestStructureSave(FileIOTestCase):
                                    pmd.load_file(f4).coordinates[0],
                                    atol=1e-6)
 
-    @unittest.skipIf(not pmd.amber.HAS_NETCDF, 'Cannot test without NetCDF package')
     def testSaveNCRst7(self):
         """ Test saving various Structure instances as Amber NetCDF restarts """
         f1 = get_fn('test.ncrst', written=True)

@@ -352,9 +352,9 @@ class AmberMask(object):
         pmask = _mask(len(self.parm.atoms))
         # Determine if we want > or <
         if pmask1[0] == '<':
-            cmp = float.__lt__
+            cmp = lambda x, y: x < y
         elif pmask1[0] == '>':
-            cmp = float.__gt__
+            cmp = lambda x, y: x > y
         else:
             raise MaskError('Unknown comparison criteria for distance mask: %s'
                             % pmask1[0])

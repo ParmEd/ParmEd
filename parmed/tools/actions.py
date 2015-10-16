@@ -14,7 +14,7 @@ from parmed.structure import Structure
 from parmed.formats.registry import load_file
 import parmed.gromacs as gromacs
 from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
-        HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
+        NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
 from parmed.charmm import CharmmPsfFile, CharmmParameterSet
 from parmed.exceptions import ParmedError
@@ -425,12 +425,8 @@ class writeCoordinates(Action):
         if self.filetype is None:
             if filename.endswith('.nc'):
                 self.filetype = 'NCTRAJ'
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
-            elif filename.endswith('.ncrst') and HAS_NETCDF:
+            elif filename.endswith('.ncrst'):
                 self.filetype = 'NCRESTART'
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
             elif filename.endswith('.pdb'):
                 self.filetype = 'PDB'
             elif filename.endswith('.cif'):
@@ -446,13 +442,9 @@ class writeCoordinates(Action):
                 self.filetype = 'RESTART'
         else:
             if self.filetype == 'netcdftraj':
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
                 self.filetype = 'NCTRAJ'
             elif self.filetype == 'netcdf':
                 self.filetype = 'NCRESTART'
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
             elif self.filetype == 'pdb':
                 self.filetype = 'PDB'
             elif self.filetype == 'cif':

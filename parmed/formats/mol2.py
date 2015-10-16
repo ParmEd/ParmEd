@@ -360,12 +360,18 @@ class Mol2File(object):
         if split:
             # Write sequentially if it is a multi-residue container or Structure
             if isinstance(struct, ResidueTemplateContainer):
-                for res in struct:
-                    Mol2File.write(res, dest, mol3)
+                try:
+                    for res in struct:
+                        Mol2File.write(res, dest, mol3)
+                finally:
+                    if own_handle: dest.close()
                 return
             elif isinstance(struct, Structure) and len(struct.residues) > 1:
-                for res in ResidueTemplateContainer.from_structure(struct):
-                    Mol2File.write(res, dest, mol3)
+                try:
+                    for res in ResidueTemplateContainer.from_structure(struct):
+                        Mol2File.write(res, dest, mol3)
+                finally:
+                    if own_handle: dest.close()
                 return
         try:
             if isinstance(struct, ResidueTemplateContainer):

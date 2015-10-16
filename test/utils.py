@@ -118,37 +118,6 @@ def get_saved_fn(filename):
     """
     return join(split(abspath(__file__))[0], 'files', 'saved', filename)
 
-def has_scipy():
-    try:
-        import scipy.io.netcdf as nc
-        return True
-    except ImportError:
-        return False
-
-def has_netcdf4():
-    try:
-        import netCDF4
-        return True
-    except ImportError:
-        return False
-
-def has_scientific():
-    try:
-        from Scientific.IO.NetCDF import NetCDFFile
-        return True
-    except ImportError:
-        return False
-
-def has_pynetcdf():
-    try:
-        import pynetcdf
-        return True
-    except ImportError:
-        return False
-
-def has_numpy():
-    return True
-
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,
                comment=None):

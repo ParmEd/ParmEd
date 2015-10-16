@@ -1,7 +1,10 @@
 """ Various utilities used by ParmEd that don't really fit elsewhere """
 from parmed.exceptions import MoleculeError as _MoleculeError
+import sys
 
-__all__ = ['six', 'io', 'timer', 'which', 'tag_molecules']
+__all__ = ['six', 'io', 'timer', 'which', 'tag_molecules', 'PYPY']
+
+PYPY = '__pypy__' in sys.builtin_module_names
 
 def which(prog):
     """ Returns the full path of a program if it exists in PATH
