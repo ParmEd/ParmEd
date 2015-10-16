@@ -25,22 +25,12 @@ else # Otherwise, CPython... go through conda
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
-            $NUMPYVER scipy netcdf4 pandas nose openmm pyflakes
+            numpy scipy pandas nose openmm pyflakes
         conda update -y -n myenv --all
     else
         # Do not install the full numpy/scipy stack
-        conda create -y -n myenv python=$PYTHON_VERSION $NUMPYVER nose pyflakes
+        conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes
     fi
 
     source activate myenv
-
-    if [ ! -z "$SCIENTIFIC" ]; then
-        # Install ScientificPython
-        wget https://sourcesup.renater.fr/frs/download.php/file/4570/ScientificPython-2.9.4.tar.gz
-        tar zxvf ScientificPython-2.9.4.tar.gz
-        cd ScientificPython-2.9.4
-        binprefix=`dirname \`which python\``
-        python setup.py install --netcdf_prefix=`dirname $binprefix`
-        cd ../
-    fi
 fi # CPython
