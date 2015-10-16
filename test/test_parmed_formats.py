@@ -84,21 +84,13 @@ class TestFileLoader(FileIOTestCase):
 
     def testLoadNetCDFRestart(self):
         """ Tests automatic loading of Amber NetCDF restart file """
-        if amber.HAS_NETCDF:
-            crd = formats.load_file(get_fn('ncinpcrd.rst7'))
-            self.assertIsInstance(crd, amber.NetCDFRestart)
-        else:
-            self.assertRaises(exceptions.FormatNotFound, lambda:
-                    formats.load_file(get_fn('ncinpcrd.rst7')))
+        crd = formats.load_file(get_fn('ncinpcrd.rst7'))
+        self.assertIsInstance(crd, amber.NetCDFRestart)
 
     def testLoadNetCDFTraj(self):
         """ Tests automatic loading of Amber NetCDF trajectory file """
-        if amber.HAS_NETCDF:
-            crd = formats.load_file(get_fn('tz2.truncoct.nc'))
-            self.assertIsInstance(crd, amber.NetCDFTraj)
-        else:
-            self.assertRaises(exceptions.FormatNotFound, lambda:
-                    formats.load_file(get_fn('ncinpcrd.rst7')))
+        crd = formats.load_file(get_fn('tz2.truncoct.nc'))
+        self.assertIsInstance(crd, amber.NetCDFTraj)
 
     def testLoadPDB(self):
         """ Tests automatic loading of PDB files """
@@ -190,14 +182,12 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberMdcrd)
-        if amber.HAS_NETCDF:
-            crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
-                                    hasbox=True)
-            self.assertIsInstance(crd, amber.NetCDFTraj)
-        else:
-            crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
-                                    hasbox=True)
-            self.assertIsInstance(crd, amber.AmberParm)
+        crd = formats.load_file(get_fn('tz2.truncoct.nc'), natom=5827,
+                                hasbox=True)
+        self.assertIsInstance(crd, amber.NetCDFTraj)
+        crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
+                                hasbox=True)
+        self.assertIsInstance(crd, amber.AmberParm)
 
 class TestChemistryPDBStructure(FileIOTestCase):
     
