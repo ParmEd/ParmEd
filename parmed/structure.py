@@ -44,7 +44,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
-from parmed.utils import tag_molecules
+from parmed.utils import tag_molecules, PYPY
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
@@ -825,7 +825,15 @@ class Structure(object):
         self.unchange()
         # Slice out coordinates if present
         if self._coordinates is not None:
-            self._coordinates = self._coordinates[:, np.array(sel)==0]
+            if PYPY:
+                # numpypy does not currently support advanced indexing it seems
+                self._coordinates = np.array(
+                        [[[x, y, z] for i, (x, y, z) in enumerate(crd)
+                            if sel[i]==0] for crd in self._coordinates]
+                )
+            else:
+                # Pure numpy is faster in CPython, so do that when we can
+                self._coordinates = self._coordinates[:, np.array(sel)==0]
 
     #===================================================
 

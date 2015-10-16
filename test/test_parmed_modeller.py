@@ -800,7 +800,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
-            self.assertIs(res.head.name, 'N')
+            self.assertEqual(res.head.name, 'N')
             self.assertIs(res.type, PROTEIN)
 
     def testReadSolvents(self):
