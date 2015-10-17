@@ -1053,8 +1053,8 @@ class AmberParm(AmberFormat, Structure):
                 nonbondedMethod, nonbondedCutoff, switchDistance,
                 ewaldErrorTolerance, reactionFieldDielectric
         )
-        hasnbfix = self.has_NBFIX()
         has1012 = self.has_1012()
+        hasnbfix = self.has_NBFIX()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
         if not hasnbfix and not has1264 and not has1012:
             return nonbfrc
@@ -1062,11 +1062,17 @@ class AmberParm(AmberFormat, Structure):
         # If we have NBFIX, omm_nonbonded_force returned a tuple
         if hasnbfix: nonbfrc = nonbfrc[0]
 
+        # If we have a 10-12 potential, toggle hasnbfix since the 12-6 terms
+        # need to be handled via a lookup table (to avoid counting *both* 10-12
+        # and 12-6 terms for the same pairs). Do this now, since nonbfrc is only
+        # a tuple if hasnbfix is True *without* 10-12 detection.
+        hasnbfix = hasnbfix or has1012
+
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
             if has1012:
                 force = mm.CustomNonbondedForce(
-                        '(a/r6)^2-b/r6-c/r4+ah/(r6*r6)-bh/(r6*r4); r6=r4*r2;'
+                        '(a/r6)^2-b/r6-c/r4+(ah/r6)^2-bh/(r6*r4); r6=r4*r2;'
                                                 'r4=r2^2; r2=r^2;'
                                                 'a=acoef(type1, type2);'
                                                 'b=bcoef(type1, type2);'
@@ -1083,8 +1089,8 @@ class AmberParm(AmberFormat, Structure):
         elif hasnbfix:
             if has1012:
                 force = mm.CustomNonbondedForce(
-                        '(a/r6)^2-b/r6+ah/(r6*r6)-bh/(r6*r4);'
-                        'r6=r2*r2*r2;r2=r^2;'
+                        '(a/r6)^2-b/r6+(ah/r6)^2-bh/(r6*r4);'
+                        'r6=r4*r2;r4=r2^2;r2=r^2;'
                         'a=acoef(type1, type2);'
                         'b=bcoef(type1, type2);'
                         'ah=ahcoef(type1, type2);'
@@ -1095,17 +1101,7 @@ class AmberParm(AmberFormat, Structure):
                                                 'r2=r^2; a=acoef(type1, type2);'
                                                 'b=bcoef(type1, type2);')
         elif has1264:
-            if has1012:
-                force = mm.CustomNonbondedForce('-c/r^4+ah/r^12-bh/r^10;'
-                                                'c=ccoef(type1, type2);'
-                                                'ah=ahcoef(type1, type2);'
-                                                'bh=bhcoef(type1, type2);')
-            else:
-                force = mm.CustomNonbondedForce('-c/r^4;c=ccoef(type1, type2);')
-        elif has1012:
-            force = mm.CustomNonbondedForce('a/r^12-b/r^10;'
-                                            'a=ahcoef(type1, type2);'
-                                            'b=bhcoef(type1, type2);')
+            force = mm.CustomNonbondedForce('-c/r^4;c=ccoef(type1, type2);')
 
         # Set up the force with all of the particles
         force.addPerParticleParameter('type')
@@ -1132,7 +1128,7 @@ class AmberParm(AmberFormat, Structure):
             afac = sqrt(ene_conv) * length_conv**6
             bfac = ene_conv * length_conv**6
             cfac = ene_conv * length_conv**4
-            ahfac = ene_conv * length_conv**12
+            ahfac = sqrt(ene_conv) * length_conv**6
             bhfac = ene_conv * length_conv**10
             nbidx = self.parm_data['NONBONDED_PARM_INDEX']
             for i in range(ntypes):
@@ -1141,7 +1137,7 @@ class AmberParm(AmberFormat, Structure):
                     ii = i + ntypes * j
                     if idx < 0 and has1012:
                         idx = -idx - 2 # Fix adjust for 0 since it was negative
-                        ahcoef[ii] = parm_ahcoef[idx] * ahfac
+                        ahcoef[ii] = sqrt(parm_ahcoef[idx]) * ahfac
                         bhcoef[ii] = parm_bhcoef[idx] * bhfac
                         if has1264:
                             ccoef[ii] = parm_ccoef[idx] * cfac
@@ -1168,17 +1164,12 @@ class AmberParm(AmberFormat, Structure):
             # off-diagonal modifications. Offload this to a private method so it
             # can be overridden in the ChamberParm class
             self._modify_nonb_exceptions(nonbfrc, force)
-        elif has1264 or has1012:
+        elif has1264:
             # Here we have JUST the r^-4 or r^-10/r^-12 parts, since the
             # hasnbfix block above handled the "hasnbfix and has1264" case
             if has1264:
                 ccoef = [0 for i in range(ntypes*ntypes)]
                 parm_ccoef = self.parm_data['LENNARD_JONES_CCOEF']
-            if has1012:
-                ahcoef = [0 for i in range(ntypes*ntypes)]
-                bhcoef = ahcoef[:]
-                parm_ahcoef = self.parm_data['HBOND_ACOEF']
-                parm_bhcoef = self.parm_data['HBOND_BCOEF']
             cfac = ene_conv * length_conv**4
             ahfac = ene_conv * length_conv**12
             bhfac = ene_conv * length_conv**10
@@ -1186,18 +1177,10 @@ class AmberParm(AmberFormat, Structure):
             for i in range(ntypes):
                 for j in range(ntypes):
                     idx = nbidx[ntypes*i+j] - 1
-                    if idx < 0 and has1012:
-                        idx = -idx - 2 # Fix adjust for 0 since it was negative
-                        ahcoef[i+ntypes*j] = parm_ahcoef[idx] * ahfac
-                        bhcoef[i+ntypes*j] = parm_bhcoef[idx] * bhfac
-                        if has1264:
-                            ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
-                    elif idx > 0:
-                        if has1264:
-                            ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
-            if has1264:
-                force.addTabulatedFunction('ccoef',
-                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+                    if idx < 0: continue
+                    ccoef[i+ntypes*j] = parm_ccoef[idx] * cfac
+            force.addTabulatedFunction('ccoef',
+                    mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Copy the exclusions
             for ii in range(nonbfrc.getNumExceptions()):
                 i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)

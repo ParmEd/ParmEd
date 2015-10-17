@@ -592,7 +592,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(energies['bond'], 0.9675961, places=3)
         self.assertAlmostEqual(energies['angle'], 82.5853211, places=3)
         self.assertAlmostEqual(energies['dihedral'], 1.2476012, places=3)
-        self.assertRelativeEqual(energies['nonbonded'], -11191.2563220, delta=3e-5)
+        self.assertRelativeEqual(energies['nonbonded'], -11194.4588654, delta=3e-5)
 
     def testHangleConstraints(self):
         """ Tests that HAngle constraints get applied correctly """

@@ -67,6 +67,29 @@ class TestReadParm(unittest.TestCase):
                     load_file(get_fn('ash.parm7'))
                 )
         )
+        ash = readparm.AmberParm(get_fn('ash.parm7'))
+        self.assertRaises(DeprecationWarning, lambda:
+                ash.load_coordinates(np.random.rand(len(ash.atoms), 3))
+        )
+        self.assertRaises(DeprecationWarning, lambda:
+                ash.load_velocities(np.random.rand(2174, 3))
+        )
+        self.assertRaises(DeprecationWarning, lambda:
+                ash.coords
+        )
+        self.assertRaises(DeprecationWarning, lambda:
+                ash.vels
+        )
+        try:
+            ash.coords = np.random.rand(len(ash.atoms), 3)
+            self.assertTrue(False)
+        except DeprecationWarning:
+            self.assertTrue(True)
+        try:
+            ash.vels = np.random.rand(len(ash.atoms), 3)
+            self.assertTrue(False)
+        except DeprecationWarning:
+            self.assertTrue(True)
 
     def testMoleculeErrorDetection(self):
         """ Tests noncontiguous molecule detection """
@@ -84,6 +107,13 @@ class TestReadParm(unittest.TestCase):
                 np.array(parm.parm_data['LENNARD_JONES_ACOEF']))
         np.testing.assert_allclose(orig_LJ_B,
                 np.array(parm.parm_data['LENNARD_JONES_BCOEF']))
+
+    def testDetectNBFIX(self):
+        """ Tests NBFIX detection for AmberParm """
+        parm = readparm.AmberParm(get_fn('ash.parm7'))
+        self.assertFalse(parm.has_NBFIX())
+        parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0.0
+        self.assertTrue(parm.has_NBFIX())
 
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
