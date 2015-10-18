@@ -268,6 +268,10 @@ class TestReadParm(unittest.TestCase):
             readparm.AmberParm.from_structure(struct)
         except TypeError as e:
             self.assertTrue(str(e).startswith('AmberParm does not support all'))
+        try:
+            readparm.ChamberParm.from_structure(struct)
+        except TypeError as e:
+            self.assertTrue(str(e).startswith('ChamberParm does not support all'))
         self.assertRaises(TypeError, lambda:
                 readparm.AmberParm.from_structure(
                     load_file(get_fn('ala_ala_ala.parm7'))
@@ -368,15 +372,22 @@ class TestReadParm(unittest.TestCase):
         # against
         tmp = load_file(get_fn(os.path.join('04.Ala', 'topol.top')),
                         xyz=get_fn(os.path.join('04.Ala', 'conf.gro')))
-        # Test that a periodicity of zero is properly handled by AmberTools and
+        # Test that a periodicity of zero is properly handled by ParmEd and
         # converted to a dummy term with a force constant of 0 (and ensure it
         # warns)
         tmp.dihedral_types[0][0].per = 0
         warnings.filterwarnings('error', category=AmberWarning)
         self.assertRaises(AmberWarning, lambda:
                 readparm.AmberParm.from_structure(tmp))
+        self.assertRaises(AmberWarning, lambda:
+                readparm.ChamberParm.from_structure(tmp))
         warnings.filterwarnings('ignore', category=AmberWarning)
         parm = readparm.AmberParm.from_structure(tmp)
+        self.assertEqual(parm.dihedral_types[0].per, 1)
+        self.assertEqual(parm.dihedral_types[0].phi_k, 0)
+        self.assertEqual(parm.dihedral_types[0].phase,
+                         tmp.dihedral_types[0][0].phase)
+        parm = readparm.ChamberParm.from_structure(tmp)
         self.assertEqual(parm.dihedral_types[0].per, 1)
         self.assertEqual(parm.dihedral_types[0].phi_k, 0)
         self.assertEqual(parm.dihedral_types[0].phase,

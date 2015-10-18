@@ -2161,13 +2161,6 @@ class Rst7(object):
         self.title = f.title
         self.time = f.time
 
-    @property
-    def coords(self):
-        """ Deprecated for coordinates now """
-        warn('coords attribute of Rst7 is deprecated. Use coordinates instead',
-             DeprecationWarning)
-        return self.coordinates
-   
     @classmethod
     def copy_from(cls, thing):
         """
@@ -2212,13 +2205,8 @@ class Rst7(object):
     @property
     def positions(self):
         """ Atomic coordinates with units """
-        try:
-            coordinates = self.coordinates.reshape(self.natom, 3)
-            return [Vec3(*x) for x in coordinates] * u.angstroms
-        except AttributeError:
-            natom3 = self.natom * 3
-            return ([Vec3(*self.coordinates[i:i+3]) for i in range(0,natom3,3)]
-                        * u.angstroms)
+        coordinates = self.coordinates.reshape(self.natom, 3)
+        return [Vec3(*x) for x in coordinates] * u.angstroms
 
     @property
     def velocities(self):
@@ -2234,20 +2222,12 @@ class Rst7(object):
     @property
     def hasbox(self):
         """ Whether or not this Rst7 has unit cell information """
-        try:
-            return bool(self.box)
-        except ValueError:
-            # This only occurs for numpy arrays, so it must be set...
-            return True
+        return self.box is not None
 
     @property
     def hasvels(self):
         """ Whether or not this Rst7 has velocities """
-        try:
-            return bool(self.vels)
-        except ValueError:
-            # This only occurs for numpy arrays, so it must be set...
-            return True
+        return self.vels is not None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
