@@ -9,7 +9,7 @@ import numpy as np
 import os
 import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin
-from parmed.exceptions import AmberWarning, MoleculeError
+from parmed.exceptions import AmberWarning, MoleculeError, AmberError
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
@@ -279,6 +279,14 @@ class TestReadParm(unittest.TestCase):
             )
         except TypeError as e:
             self.assertTrue(str(e).endswith('Try ChamberParm'))
+
+    def testCorruptParms(self):
+        """ Test proper error detection on bad topology files """
+        # First test proper error handling of a truncated section
+        parm = readparm.AmberFormat(get_fn('ash.parm7'))
+        del parm.parm_data['ATOM_NAME'][0]
+        self.assertRaises(AmberError, lambda:
+                readparm.AmberParm.from_rawdata(parm))
 
     def testAmberParmBoxXyzArgs(self):
         """ Test passing coord and box arrays to AmberParm """

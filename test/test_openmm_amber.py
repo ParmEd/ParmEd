@@ -793,7 +793,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         has_cmmotion = False
         for f in system.getForces():
             has_cmmotion = has_cmmotion or isinstance(f, mm.CMMotionRemover)
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
         self.assertTrue(has_cmmotion)
         system = parm.createSystem(nonbondedMethod=app.CutoffNonPeriodic,
@@ -801,54 +801,54 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                                    implicitSolvent=app.HCT,
                                    implicitSolventSaltConc=0.1*u.molar)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 1)
                 self.assertEqual(f.getCutoffDistance(), 100*u.angstroms)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC1,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC1,
                                    implicitSolventKappa=0.8)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
                                    implicitSolventKappa=0.8)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
                                    implicitSolventSaltConc=10.0,
                                    implicitSolventKappa=0.8) # kappa is priority
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
@@ -856,14 +856,14 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                                    implicitSolventSaltConc=10.0,
                                    implicitSolventKappa=0.8) # kappa is priority
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.GBn2,
                                    solventDielectric=80, soluteDielectric=4)
         for f in system.getForces():
-            if isinstance(f, mm.NonbondedForce):
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
 
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
@@ -872,8 +872,32 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                                    temperature=400.0*u.kelvin,
                                    implicitSolventSaltConc=0.1*u.molar)
         for f in system.getForces():
+            if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
+                self.assertEqual(f.getNonbondedMethod(), 0)
+        # Check when CustomNonbondedForce is required that the cutoff methods
+        # get appropriately transferred.
+        parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0.0
+        self.assertTrue(parm.has_NBFIX())
+        system = parm.createSystem(nonbondedMethod=app.NoCutoff)
+        has_custom = has_normal = False
+        for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
+                has_normal = True
+            elif isinstance(f, mm.CustomNonbondedForce):
+                self.assertEqual(f.getNonbondedMethod(), 0)
+                has_custom = True
+        self.assertTrue(has_custom and has_normal)
+        system = parm.createSystem(nonbondedMethod=app.CutoffNonPeriodic)
+        has_custom = has_normal = False
+        for f in system.getForces():
+            if isinstance(f, mm.NonbondedForce):
+                self.assertEqual(f.getNonbondedMethod(), 1)
+                has_normal = True
+            elif isinstance(f, mm.CustomNonbondedForce):
+                self.assertEqual(f.getNonbondedMethod(), 1)
+                has_custom = True
+        self.assertTrue(has_custom and has_normal)
         # Test some illegal options
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.PME))
@@ -881,6 +905,8 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                 parm.createSystem(nonbondedMethod=app.CutoffPeriodic))
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
+        self.assertRaises(ValueError, lambda:
+                parm.createSystem(nonbondedMethod='cat'))
 
 @unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
 class TestChamberParm(TestCaseRelative):
@@ -1314,7 +1340,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(bond, 139.2453, delta=5e-4)
 
     def testInterfacePBC(self):
-        """ Testing all OpenMMChamberParm.createSystem options (periodic) """
+        """ Testing all ChamberParm.createSystem options (periodic) """
         parm = ChamberParm(get_fn('ala3_solv.parm7'),
                            get_fn('ala3_solv.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
@@ -1435,7 +1461,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
     def testInterfaceNoPBC(self):
-        """Testing all OpenMMChamberParm.createSystem options (non-periodic)"""
+        """Testing all ChamberParm.createSystem options (non-periodic)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
                            get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')

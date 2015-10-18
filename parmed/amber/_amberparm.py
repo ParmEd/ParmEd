@@ -1426,8 +1426,9 @@ class AmberParm(AmberFormat, Structure):
                             atom._dihedral_partners + atom._tortor_partners +
                             atom._exclusion_partners)
             nexcl = num_excluded[i]
-            for j in range(first_excl, nexcl):
-                exclusions.add(self.atoms[excluded_list[j]-1])
+            for j in range(first_excl, first_excl+nexcl):
+                if excluded_list[j]: # Zeros are placeholders
+                    exclusions.add(self.atoms[excluded_list[j]-1])
             for eatom in exclusions - bond_excl:
                 atom.exclude(eatom)
             first_excl += nexcl

@@ -820,13 +820,25 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         in_exclusions_after = []
         for atom1 in parm.residues[0].atoms:
             all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
-                             atom1.dihedral_partners + atom1.exclusion_partners)
+                                atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
                 in_exclusions_after.append(atom2 in all_exclusions)
                 if not in_exclusions_after[-1]:
                     print('%s %s not excluded' % (atom1, atom2))
         self.assertTrue(all(in_exclusions_after))
+        # Make sure the exclusions are correct when reading in a new version
+        # with exceptions defined
+        parm.remake_parm()
+        parm = AmberParm.from_rawdata(parm)
+        in_exclusions_before = []
+        for atom1 in parm.residues[0].atoms:
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+                             atom1.dihedral_partners + atom1.exclusion_partners)
+            for atom2 in parm.residues[0].atoms:
+                if atom1 is atom2: continue
+                in_exclusions_before.append(atom2 in all_exclusions)
+        self.assertTrue(all(in_exclusions_before))
 
     def testAddDeleteDihedral(self):
         """ Test addDihedral and deleteDihedral on AmberParm """
