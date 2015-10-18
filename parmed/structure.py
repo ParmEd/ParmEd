@@ -3570,6 +3570,14 @@ class Structure(object):
                                    assign_type(self.adjust_types, it[2]))
                 for it in d['adjusts']
         )
+        self.acceptors = TrackedList(
+                AcceptorDonor(self.atoms[it[0]], self.atoms[it[1]])
+                for it in d['acceptors']
+        )
+        self.donors = TrackedList(
+                AcceptorDonor(self.atoms[it[0]], self.atoms[it[1]])
+                for it in d['donors']
+        )
         # Transfer the exclusions
         for atom, excl in zip(self.atoms, d['exclusions']):
             for idx in excl:

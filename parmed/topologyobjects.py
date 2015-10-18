@@ -603,10 +603,12 @@ class Atom(_ListItem):
         """
         List of all exclusions not otherwise excluded by bonds/angles/torsions
         """
-        bp = set(self._bond_partners)
-        ap = set(self._angle_partners)
-        dp = set(self._dihedral_partners)
-        tp = set(self._tortor_partners)
+        # A little expensive, but the only way to ensure this is completely
+        # correct easily
+        bp = set(self.bond_partners)
+        ap = set(self.angle_partners)
+        dp = set(self.dihedral_partners)
+        tp = set(self.tortor_partners)
         ep = set(self._exclusion_partners) - tp - dp - ap - bp
         toadd = set()
         for p in ep:
@@ -3983,6 +3985,10 @@ class Residue(_ListItem):
         return rep + '>'
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __setstate__(self, d):
+        self.__dict__.update(d)
+        for a in self: a.residue = self
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -1432,22 +1432,6 @@ class AmberParm(AmberFormat, Structure):
             for eatom in exclusions - bond_excl:
                 atom.exclude(eatom)
             first_excl += nexcl
-        # Do the extra points after all of the exclusions have been loaded to
-        # make sure the lists are all up-to-date.
-        for i, atom in enumerate(self.atoms):
-            if atom.atomic_number > 0: continue
-            # This is an extra point -- exclude accordingly
-            real_atom = atom.bond_partners[0]
-            for atom2 in real_atom.bond_partners:
-                if atom2 is atom: continue
-                atom.bond_to(atom2)
-            for atom2 in real_atom.angle_partners:
-                atom.angle_to(atom2)
-            for atom2 in real_atom.dihedral_partners:
-                atom.dihedral_to(atom2)
-            for atom2 in real_atom.tortor_partners:
-                atom.tortor_to(atom2)
-            atom.prune_exclusions()
 
     #===================================================
 
