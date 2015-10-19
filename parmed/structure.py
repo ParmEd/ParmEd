@@ -2294,7 +2294,6 @@ class Structure(object):
         def exclude_to(origin, atom, level, end):
             if level >= end: return
             for partner in atom.bond_partners:
-                if isinstance(partner, ExtraPoint): continue # Handled later
                 if partner is origin: continue
                 force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
                 # Exclude EP children, too
@@ -2310,7 +2309,6 @@ class Structure(object):
                                            0.0, True)
                 exclude_to(origin, partner, level+1, end)
         for atom in self.atoms:
-            if isinstance(atom, ExtraPoint): continue # Handled separately
             exclude_to(atom, atom, 0, self.nrexcl)
         # Add the exceptions from the dihedral list IFF no explicit exceptions
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a

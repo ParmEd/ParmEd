@@ -743,8 +743,6 @@ class ChamberParm(AmberParm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-charmm_solvent = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC')
-
 def ConvertFromPSF(struct, params, title=''):
     """
     This function instantiates a ChamberParm instance from a data structure

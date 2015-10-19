@@ -1112,6 +1112,31 @@ class BeemanRestart(AmberFormat):
     format as the topology file
     """
 
+    @classmethod
+    def from_rawdata(cls, rawdata):
+        """
+        Take the raw data from a AmberFormat object and initialize a
+        BeemanRestart from that data.
+
+        Parameters
+        ----------
+        rawdata : :class:`AmberFormat`
+            An AmberFormat instance that has already been instantiated
+
+        Returns
+        -------
+        inst : :class:`BeemanRestart`
+            An instance of this type from the data in rawdata
+        """
+        inst = cls()
+        inst.name = rawdata.name
+        inst.version = rawdata.version
+        inst.formats = rawdata.formats
+        inst.parm_data = rawdata.parm_data
+        inst.parm_comments = rawdata.parm_comments
+        inst.flag_list = rawdata.flag_list
+        return inst
+
     @property
     def natom(self):
         return self.parm_data['ATOMIC_COORDS_NUM_LIST'][0]

@@ -2339,6 +2339,28 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
             elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
             self.assertEqual(periodic_table.Element[atnum], elem)
             self.assertEqual(atnum, periodic_table.AtomicNum[elem])
+        parm.write_parm(get_fn('amoeba_pdb.parm7', written=True))
+        parm = AmoebaParm(get_fn('amoeba_pdb.parm7', written=True))
+        self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
+        self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
+        self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
+        self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
+        self.assertTrue(len(parm.parm_data['RESIDUE_ICODE']), parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['ATOM_ELEMENT']), parm.ptr('natom'))
+        self.assertTrue(len(parm.parm_data['RESIDUE_NUMBER']), parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['RESIDUE_CHAINID']),parm.ptr('nres'))
+        for i in range(parm.ptr('nres')):
+            self.assertEqual(parm.parm_data['RESIDUE_NUMBER'][i], i+1)
+            self.assertEqual(parm.parm_data['RESIDUE_ICODE'][i], '')
+            if parm.residues[i].name == 'WAT':
+                self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'B')
+            else:
+                self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'A')
+        for i, atom in enumerate(parm.atoms):
+            atnum = atom.atomic_number
+            elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
+            self.assertEqual(periodic_table.Element[atnum], elem)
+            self.assertEqual(atnum, periodic_table.AtomicNum[elem])
         PT.deletePDB(parm).execute()
         self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)

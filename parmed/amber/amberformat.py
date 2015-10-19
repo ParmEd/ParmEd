@@ -361,11 +361,14 @@ class AmberFormat(object):
         in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
         AmoebaParm, or AmberFormat)
         """
-        from parmed.amber import LoadParm
+        from parmed.amber import LoadParm, BeemanRestart
         try:
             return LoadParm(filename, *args, **kwargs)
         except IndexError:
-            return AmberFormat(filename, *args, **kwargs)
+            parm = AmberFormat(filename, *args, **kwargs)
+            if 'ATOMIC_COORDS_LIST' in parm.parm_data:
+                return BeemanRestart.from_rawdata(parm)
+            return parm
 
     #===================================================
 

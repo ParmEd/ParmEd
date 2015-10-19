@@ -232,7 +232,7 @@ class TestReadParm(unittest.TestCase):
 
     def testAmoebaSmall(self):
         """ Test the AmoebaParm class w/ small system (not all terms) """
-        parm = readparm.AmoebaParm(get_fn('nma.parm7'))
+        parm = readparm.AmoebaParm(get_fn('nma.parm7'), get_fn('nma.rst'))
         rst7 = readparm.BeemanRestart(get_fn('nma.rst'))
         self.assertEqual(3*rst7.natom, len(rst7.coordinates))
         self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
@@ -288,9 +288,16 @@ class TestReadParm(unittest.TestCase):
         """ Test proper error detection on bad topology files """
         # First test proper error handling of a truncated section
         parm = readparm.AmberFormat(get_fn('ash.parm7'))
+        atom_names = parm.parm_data['ATOM_NAME'][:]
         del parm.parm_data['ATOM_NAME'][0]
         self.assertRaises(AmberError, lambda:
                 readparm.AmberParm.from_rawdata(parm))
+        self.assertRaises(AmberError, lambda:
+                readparm.AmoebaParm(get_fn('ash.parm7')))
+        parm.parm_data['ATOM_NAME'] = atom_names
+        parm.add_flag('AMOEBA_FORCEFIELD', '1I10', data=[0])
+        self.assertRaises(AmberError, lambda:
+                readparm.AmoebaParm.from_rawdata(parm))
 
     def testAmberParmBoxXyzArgs(self):
         """ Test passing coord and box arrays to AmberParm """

@@ -428,3 +428,4 @@ def _process_nonbonded(struct, force):
             warnings.warn('Detected incomplete exceptions. Not supported.',
                           OpenMMWarning)
             struct.unknown_functional = True
+            break
