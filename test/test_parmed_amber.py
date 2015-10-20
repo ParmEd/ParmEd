@@ -7,6 +7,7 @@ import glob
 import math
 import numpy as np
 import os
+import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin
 from parmed.exceptions import AmberWarning
 from parmed import topologyobjects, load_file
@@ -14,7 +15,7 @@ from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
 import random
 import unittest
-from utils import get_fn, has_numpy, FileIOTestCase
+from utils import get_fn, FileIOTestCase
 import warnings
 
 class TestReadParm(unittest.TestCase):

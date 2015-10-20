@@ -6,7 +6,7 @@ from __future__ import division, print_function
 import numpy as np
 import os
 from parmed import unit as u
-from parmed.amber import (HAS_NETCDF, AmberParm, AmberMdcrd,
+from parmed.amber import (AmberParm, AmberMdcrd,
                 AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
 from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 ProgressReporter, RestartReporter, StateDataReporter,
@@ -149,7 +149,7 @@ class TestStateDataReporter(FileIOTestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
-@unittest.skipIf(not has_openmm or not HAS_NETCDF, "Cannot test without OMM and NetCDF")
+@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestTrajRestartReporter(FileIOTestCase):
 
     def testReporters(self):

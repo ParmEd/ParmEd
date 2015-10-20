@@ -4,7 +4,7 @@ Tests the parmed/namd module
 import unittest
 import os
 
-from utils import get_fn, has_numpy
+from utils import get_fn
 import parmed.namd as namd
 
 class TestNamdBin(unittest.TestCase):

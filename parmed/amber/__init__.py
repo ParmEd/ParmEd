@@ -3,14 +3,14 @@
 __author__ = "Jason Swails <jason.swails@gmail.com>"
 
 __all__ = ['AmberFormat', 'FortranFormat', 'AmberAsciiRestart', 'AmberMdcrd',
-           'AmberMask', 'use', 'NetCDFTraj', 'NetCDFRestart', 'HAS_NETCDF',
-           'AmberOFFLibrary', 'AmberParameterSet', 'AmberParm', 'ChamberParm',
-           'AmoebaParm', 'Rst7', 'BeemanRestart', 'ConvertFromPSF', 'LoadParm']
+           'AmberMask', 'NetCDFTraj', 'NetCDFRestart', 'AmberOFFLibrary',
+           'AmberParameterSet', 'AmberParm', 'ChamberParm', 'AmoebaParm',
+           'Rst7', 'BeemanRestart', 'ConvertFromPSF', 'LoadParm', 'AMBERHOME']
 
 from parmed.amber.amberformat import AmberFormat, FortranFormat
 from parmed.amber.asciicrd import AmberAsciiRestart, AmberMdcrd
 from parmed.amber.mask import AmberMask
-from parmed.amber.netcdffiles import use, NetCDFTraj, NetCDFRestart, HAS_NETCDF
+from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
 from parmed.amber.offlib import AmberOFFLibrary
 from parmed.amber.parameters import AmberParameterSet
 from parmed.amber.readparm import (AmberParm, ChamberParm, AmoebaParm,

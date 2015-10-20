@@ -8,13 +8,15 @@ addons:
         packages:
             - g++
             - gromacs
+            - pypy
 
 matrix:
   include:
     - { os: linux, env: PYTHON_VERSION=2.7 }
     - { os: linux, env: PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes }
     - { os: linux, env: PYTHON_VERSION=3.4 }
-    - { os: osx, env: PYTHON_VERSION=3.4 }
+    - { os: linux, env: PYTHON_VERSION=pypy }
+    - { os: osx, env: PYTHON_VERSION=3.4 MINIMAL_PACKAGES=yes }
 
 install:
     - source devtools/travis-ci/install.sh
@@ -27,7 +29,11 @@ script:
     - export PARMED_SKIP_BIG_TESTS=1
     - export OPENMM_CPU_THREADS=1
     - echo "Checking parmed source with pyflakes linter"
+    - if [ "$PYTHON_VERSION" = "pypy" ]; then export PYENV_ROOT="${HOME}/.pyenv"; fi
+    - if [ "$PYTHON_VERSION" = "pypy" ]; then export PATH="${PYENV_ROOT}/bin:${PATH}"; fi
+    - if [ "$PYTHON_VERSION" = "pypy" ]; then eval "$(pyenv init -)"; fi
     - devtools/travis-ci/pyflakes_check.sh
     - cd test
-    - echo "Using `which python` (`python -V`)::"
+    - echo "Using `which nosetests`::"
+    - which nosetests
     - nosetests -vs .
