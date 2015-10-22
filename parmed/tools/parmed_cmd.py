@@ -186,6 +186,7 @@ class ParmedCmd(cmd.Cmd):
 
     def do_source(self, line):
         action = COMMANDMAP['source'](self.parm, line)
+        if not action.valid: return
         self.stdout.write('%s\n' % action)
         _cmd = ParmedCmd(self.parm, stdin=open(action.filename, 'r'),
                          stdout=self.stdout)
