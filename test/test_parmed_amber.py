@@ -14,6 +14,7 @@ from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip
 import random
+import saved_outputs as saved
 import unittest
 from utils import (get_fn, FileIOTestCase, equal_atoms,
                    create_random_structure)
@@ -239,6 +240,13 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(rst7.natom, parm.ptr('natom'))
         self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
+        coords = np.random.rand(len(parm.atoms), 3)
+        self.assertRaises(TypeError, lambda:
+                parm.initialize_topology(xyz=get_fn('ala3_solv.parm7')))
+        parm.initialize_topology(xyz=coords, box=[1, 1, 1, 90, 90, 90])
+        np.testing.assert_allclose(parm.coordinates, coords)
+        np.testing.assert_equal(parm.box, [1, 1, 1, 90, 90, 90])
+        self.assertEqual(saved.AMOEBA_SMALL_MDIN, parm.mdin_skeleton())
 
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """

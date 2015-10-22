@@ -321,59 +321,12 @@ class AmoebaParm(AmberParm):
                 '     do_reg_angle=%d, do_trig_angle=%d, do_opbend=%d,\n'
                 '     do_torsion=%d, do_pi_torsion=%d, do_strbend=%d,\n'
                 '     do_torsion_torsion=%d,\n'
-                ' /\n' % (bool(self.bond_list), bool(self.urey_bradley_list),
-                bool(self.angle_list), bool(self.trigonal_angle_list),
-                bool(self.oopbend_list), bool(self.dihedral_list),
-                bool(self.pitorsion_list), bool(self.stretch_bend_list),
-                bool(self.torsion_torsion_list))
+                ' /\n' % (bool(self.bonds), bool(self.urey_bradleys),
+                bool(self.angles), bool(self.trigonal_angles),
+                bool(self.out_of_plane_bends), bool(self.dihedrals),
+                bool(self.pi_torsions), bool(self.stretch_bends),
+                bool(self.torsion_torsions))
         )
-
-    #=============================================
-
-    @property
-    def bonds_inc_h(self):
-        """ All bonds with at least one atom being hydrogen """
-        for bnd in self.bonds:
-            if 1 in (bnd.atom1.element, bnd.atom2.element):
-                yield bnd
-   
-    @property
-    def bonds_without_h(self):
-        """ All bonds in which neither atom is hydrogen """
-        for bnd in self.bonds:
-            if not 1 in (bnd.atom1.element, bnd.atom2.element):
-                yield bnd
-
-    @property
-    def angles_inc_h(self):
-        """ All angles in which at least one atom is hydrogen """
-        for ang in self.angles:
-            if 1 in (ang.atom1.element, ang.atom2.element, ang.atom3.element):
-                yield ang
-
-    @property
-    def angles_without_h(self):
-        """ All angles in which no atom is hydrogen """
-        for ang in self.angles:
-            if not 1 in (ang.atom1.element, ang.atom2.element,
-                         ang.atom3.element):
-                yield ang
-
-    @property
-    def dihedrals_inc_h(self):
-        """ All dihedrals in which at least one atom is hydrogen """
-        for dih in self.dihedrals:
-            if 1 in (dih.atom1.element, dih.atom2.element,
-                     dih.atom3.element, dih.atom4.element):
-                yield dih
-
-    @property
-    def dihedrals_without_h(self):
-        """ All dihedrals in which no atom is hydrogen """
-        for dih in self.dihedral_list:
-            if not 1 in (dih.atom1.element, dih.atom2.element,
-                         dih.atom3.element, dih.atom4.element):
-                yield dih
 
     #=============================================
 

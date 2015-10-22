@@ -364,7 +364,7 @@ class AmberFormat(object):
         from parmed.amber import LoadParm, BeemanRestart
         try:
             return LoadParm(filename, *args, **kwargs)
-        except IndexError:
+        except (IndexError, KeyError):
             parm = AmberFormat(filename, *args, **kwargs)
             if 'ATOMIC_COORDS_LIST' in parm.parm_data:
                 return BeemanRestart.from_rawdata(parm)

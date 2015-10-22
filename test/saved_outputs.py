@@ -576,3 +576,25 @@ Residue count:         ALA: 12, ARG: 11, ASN: 14, ASP: 7, CYS: 8, GLN: 3, GLU: 2
 System volume (ang^3): 25998.98
 System density (g/mL): 1.018244
 """
+
+AMOEBA_SMALL_MDIN = """\
+Input file for AMOEBA simulations.
+ &cntrl
+     ! Add whatever variables you need here
+     ntb=1, ntt=1, ntp=0, ! PBC, thermostat, barostat
+     irest=0, ntx=1,      ! restart flags
+ /
+ &amoeba
+     ! Some basic potential parameters. For better
+     ! energy conservation you need to adjust these
+     ! defaults
+     beeman_integrator=1,   ! Use Beeman integrator
+     dipole_scf_tol=0.01,   ! 10e-6 gives good NVE
+
+     ! You should not generally modify these variables:
+     do_valence=1, do_bond=1, do_ureyb=0,
+     do_reg_angle=1, do_trig_angle=1, do_opbend=1,
+     do_torsion=1, do_pi_torsion=1, do_strbend=1,
+     do_torsion_torsion=0,
+ /
+"""
