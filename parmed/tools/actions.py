@@ -210,8 +210,6 @@ class Action(lawsuit):
             except AttributeError:
                 usage = cmdname
             Action.stderr.write("Bad command %s:\n\t%s\n" % (cmdname, usage))
-            self.__str__ = Action.__str__
-            self.execute = Action.execute
             return
 
         # Check any unmarked commands
