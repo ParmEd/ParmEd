@@ -592,7 +592,7 @@ Input file for AMOEBA simulations.
      dipole_scf_tol=0.01,   ! 10e-6 gives good NVE
 
      ! You should not generally modify these variables:
-     do_valence=1, do_bond=1, do_ureyb=0,
+     do_valence=1, do_bond=1, do_ureyb=1,
      do_reg_angle=1, do_trig_angle=1, do_opbend=1,
      do_torsion=1, do_pi_torsion=1, do_strbend=1,
      do_torsion_torsion=0,

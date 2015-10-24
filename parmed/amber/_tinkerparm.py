@@ -170,7 +170,7 @@ class AmoebaParm(AmberParm):
 
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
-        if 'RESIDUE_ICODE' in self.flag_list:
+        if 'RESIDUE_ICODE' in self.parm_data:
             self._truncate_array('RESIDUE_ICODE',
                                  self.parm_data['POINTERS'][NRES])
 
@@ -390,23 +390,23 @@ class AmoebaParm(AmberParm):
 
     def _load_urey_bradley_info(self):
         """ Loads the AMOEBA Urey-Bradley terms, if they exist """
-        if not 'AMOEBA_UREY_BRADLEY_LIST' in self.parm_data: return
+        if not 'AMOEBA_UREY_BRADLEY_BOND_LIST' in self.parm_data: return
         data = self.parm_data
         del self.urey_bradleys[:]
         del self.urey_bradley_types[:]
-        for k, eq in zip(data['AMOEBA_UREY_BRADLEY_FORCE_CONSTANT'],
-                         data['AMOEBA_UREY_BRADLEY_EQUIL_VALUE']):
+        for k, eq in zip(data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'],
+                         data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE']):
             self.urey_bradley_types.append(
                     BondType(k, eq, self.urey_bradley_types)
             )
         self.urey_bradley_types.degree = degree = \
                 data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'][0]
         self.urey_bradley_types.coeffs = coeffs = \
-                data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'][:]
+                data['AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS'][:]
         if len(coeffs) != degree + 1:
             raise AmberError('Urey-Bradley degree (%d) does not make sense '
                               'with %d coefficients' % (degree, len(coeffs)))
-        it = iter(data['AMOEBA_UREY_BRADLEY_LIST'])
+        it = iter(data['AMOEBA_UREY_BRADLEY_BOND_LIST'])
         for i, j, k in zip(it, it, it):
             self.urey_bradleys.append(
                     UreyBradley(self.atoms[i-1], self.atoms[j-1],
@@ -727,13 +727,13 @@ class AmoebaParm(AmberParm):
         arrays to the raw data arrays
         """
         if len(self.urey_bradleys) == 0:
-            self.delete_flag('AMOEBA_UREY_BRADLEY_NUM_PARAMS')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_FORCE_CONSTANT')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_EQUIL_VALUE')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_FTAB_DEGREE')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_FTAB_COEFFS')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_NUM_LIST')
-            self.delete_flag('AMOEBA_UREY_BRADLEY_LIST')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_NUM_PARAMS')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST')
+            self.delete_flag('AMOEBA_UREY_BRADLEY_BOND_LIST')
             return
         data = self.parm_data
         for urey_bradley_type in self.urey_bradley_types:
@@ -741,15 +741,18 @@ class AmoebaParm(AmberParm):
         for urey_bradley in self.urey_bradleys:
             urey_bradley.type.used = True
         self.urey_bradley_types.prune_unused()
-        data['AMOEBA_UREY_BRADLEY_NUM_PARAMS'] = [len(self.urey_bradley_types)]
-        data['AMOEBA_UREY_BRADLEY_FORCE_CONSTANT'] = \
+        data['AMOEBA_UREY_BRADLEY_BOND_NUM_PARAMS'] = \
+                [len(self.urey_bradley_types)]
+        data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'] = \
                     [ut.k for ut in self.urey_bradley_types]
-        data['AMOEBA_UREY_BRADLEY_EQUIL_VALUE'] = \
+        data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE'] = \
                     [ut.req for ut in self.urey_bradley_types]
-        data['AMOEBA_UREY_BRADLEY_FTAB_DEGREE'] = [self.urey_bradley_types.degree]
-        data['AMOEBA_UREY_BRADLEY_FTAB_COEFFS'] = self.urey_bradley_types.coeffs[:]
-        data['AMOEBA_UREY_BRADLEY_NUM_LIST'] = [len(self.urey_bradleys)]
-        data['AMOEBA_UREY_BRADLEY_LIST'] = urey_array = []
+        data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'] = \
+                [self.urey_bradley_types.degree]
+        data['AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS'] = \
+                self.urey_bradley_types.coeffs[:]
+        data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'] = [len(self.urey_bradleys)]
+        data['AMOEBA_UREY_BRADLEY_BOND_LIST'] = urey_array = []
         for urey in self.urey_bradleys:
             urey_array.extend([urey.atom1.idx+1, urey.atom2.idx+1,
                                urey.type.idx+1])
@@ -961,9 +964,10 @@ class AmoebaParm(AmberParm):
         topology arrays to the raw data arrays
         """
         if len(self.torsion_torsions) == 0:
-            for flag in self.flag_list:
-                if flag.startswith('AMOEBA_TORSION_TORSION'):
-                    self.delete_flag(flag)
+            delete_flags = set(flag for flag in self.flag_list
+                                if flag.startswith('AMOEBA_TORSION_TORSION'))
+            for flag in delete_flags:
+                self.delete_flag(flag)
             return
         data = self.parm_data
         for tortor_type in self.torsion_torsion_types:
@@ -973,9 +977,10 @@ class AmoebaParm(AmberParm):
         self.torsion_torsion_types.prune_unused()
         after = 'AMOEBA_TORSION_TORSION_NUM_PARAMS'
         data[after] = [len(self.torsion_torsion_types)]
-        for flag in self.flag_list:
-            if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE_'):
-                self.delete_flag(flag)
+        delete_flags = set(flag for flag in self.flag_list
+                    if flag.startswith('AMOEBA_TORSION_TORSION_TORTOR_TABLE'))
+        for flag in delete_flags:
+            self.delete_flag(flag)
         for i, tt in enumerate(self.torsion_torsion_types):
             tblsize = ['dimension = (%d,%d)' % tt.dims]
             prefix = 'AMOEBA_TORSION_TORSION_TORTOR_TABLE_%02d_' % (i+1)
@@ -999,8 +1004,8 @@ class AmoebaParm(AmberParm):
                           data=tt.d2fda1da2.data[:], comments=tblsize[:],
                           after=prefix+'DFUNC_DANGLE2')
             after = prefix + 'D2FUNC_DANGLE1_DANGLE2'
-        data['TORSION_TORSION_NUM_LIST'] = [len(self.torsion_torsions)]
-        data['TORSION_TORSION_LIST'] = tlist = []
+        data['AMOEBA_TORSION_TORSION_NUM_LIST'] = [len(self.torsion_torsions)]
+        data['AMOEBA_TORSION_TORSION_LIST'] = tlist = []
         for tortor in self.torsion_torsions:
             tlist.extend([tortor.atom1.idx+1, tortor.atom2.idx+1,
                           tortor.atom3.idx+1, tortor.atom4.idx+1,

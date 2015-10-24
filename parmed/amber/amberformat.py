@@ -901,9 +901,10 @@ class AmberFormat(object):
             # If the 'after' flag is the last one, just append
             if self.flag_list[-1] == after:
                 self.flag_list.append(flag_name.upper())
-            # Otherwise find the index and add it after
-            idx = self.flag_list.index(after) + 1
-            self.flag_list.insert(idx, flag_name.upper())
+            else:
+                # Otherwise find the index and add it after
+                idx = self.flag_list.index(after) + 1
+                self.flag_list.insert(idx, flag_name.upper())
         else:
             self.flag_list.append(flag_name.upper())
         self.formats[flag_name.upper()] = FortranFormat(flag_format)
@@ -928,12 +929,14 @@ class AmberFormat(object):
     def delete_flag(self, flag_name):
         """ Removes a flag from the topology file """
         flag_name = flag_name.upper()
-        if not flag_name in self.flag_list:
-            return # already gone
-        del self.flag_list[self.flag_list.index(flag_name)]
-        del self.parm_comments[flag_name]
-        del self.formats[flag_name]
-        del self.parm_data[flag_name]
+        if flag_name in self.flag_list:
+            del self.flag_list[self.flag_list.index(flag_name)]
+        if flag_name in self.parm_comments:
+            del self.parm_comments[flag_name]
+        if flag_name in self.formats:
+            del self.formats[flag_name]
+        if flag_name in self.parm_data:
+            del self.parm_data[flag_name]
 
     #===================================================
 

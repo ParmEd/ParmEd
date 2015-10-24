@@ -7,6 +7,7 @@ import glob
 import math
 import numpy as np
 import os
+import re
 import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin
 from parmed.exceptions import AmberWarning, MoleculeError, AmberError
@@ -230,6 +231,36 @@ class TestReadParm(unittest.TestCase):
                      'dihedral_types', 'pi_torsion_types', 'stretch_bend_types',
                      'torsion_torsion_types']:
             self.assertTrue(hasattr(parm, attr))
+        # Check that TORSION_TORSION data is restored properly
+        used_tortors = sorted(set(tt.type.idx+1 for tt in parm.torsion_torsions))
+        tortordata = dict()
+        for flag, data in iteritems(parm.parm_data):
+            if 'TORSION_TORSION' not in flag: continue
+            tortordata[flag] = np.array(data)
+
+        parm._xfer_torsion_torsion_info()
+
+        myre = re.compile('AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
+        for flag, data in iteritems(parm.parm_data):
+            if 'TORSION_TORSION' not in flag: continue
+            rematch = myre.match(flag)
+            if rematch:
+                idx = int(rematch.groups()[0]) - 1
+                tortornum = used_tortors[idx]
+                oldflag = flag.replace(rematch.groups()[0], '%02d' % tortornum)
+                np.testing.assert_equal(np.array(data), tortordata[oldflag])
+            elif flag == 'AMOEBA_TORSION_TORSION_LIST':
+                # We need to adjust for the unused types that we deleted
+                for i, (new, old) in enumerate(zip(data, tortordata[flag])):
+                    if i % 6 == 5:
+                        self.assertEqual(used_tortors[new-1], old)
+                    else:
+                        self.assertEqual(new, old)
+            elif flag == 'AMOEBA_TORSION_TORSION_NUM_PARAMS':
+                self.assertEqual(tortordata[flag], [8])
+                self.assertEqual(data, [3])
+            else:
+                np.testing.assert_equal(tortordata[flag], np.array(data))
 
     def testAmoebaSmall(self):
         """ Test the AmoebaParm class w/ small system (not all terms) """
@@ -247,6 +278,67 @@ class TestReadParm(unittest.TestCase):
         np.testing.assert_allclose(parm.coordinates, coords)
         np.testing.assert_equal(parm.box, [1, 1, 1, 90, 90, 90])
         self.assertEqual(saved.AMOEBA_SMALL_MDIN, parm.mdin_skeleton())
+        self.assertEqual(len(parm.urey_bradleys), 818)
+        self.assertEqual(len(parm.urey_bradley_types), 1)
+        # Now make sure that the future layout of the stretch bend force
+        # constants will work (i.e., when it is split into 2 fields)
+        parm.add_flag(
+                'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1',
+                str(parm.formats['AMOEBA_STRETCH_BEND_FORCE_CONSTANT']),
+                data=parm.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'][:],
+                after='AMOEBA_STRETCH_BEND_FORCE_CONSTANT',
+        )
+        parm.add_flag(
+                'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2',
+                str(parm.formats['AMOEBA_STRETCH_BEND_FORCE_CONSTANT']),
+                data=parm.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'][:],
+                after='AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1',
+        )
+        parm.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
+        parm2 = readparm.AmoebaParm.from_rawdata(parm)
+        self.assertEqual(len(parm.stretch_bends), len(parm2.stretch_bends))
+        for sb1, sb2 in zip(parm.stretch_bends, parm2.stretch_bends):
+            self.assertEqual(sb1.atom1.idx, sb2.atom1.idx)
+            self.assertEqual(sb1.atom2.idx, sb2.atom2.idx)
+            self.assertEqual(sb1.atom3.idx, sb2.atom3.idx)
+            self.assertEqual(sb1.type, sb2.type)
+        # Now walk through, deleting each of the valence terms and make sure
+        # that gets rid of the corresponding parm sections
+        del parm.bonds[:], parm.bond_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_REGULAR_BOND_NUM_PARAMS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_FTAB_DEGREE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_FTAB_COEFFS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_LIST', parm.parm_data)
+        del parm.angles[:], parm.angle_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_NUM_PARAMS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_FTAB_DEGREE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_FTAB_COEFFS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_LIST', parm.parm_data)
+        del parm.stretch_bends[:], parm.stretch_bend_types[:]
+        self.assertEqual(len(parm.stretch_bends), 0)
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_LIST', parm.parm_data)
+        del parm.multipole_frames[:], parm.chiral_frames[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_CHIRAL_FRAME_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_CHIRAL_FRAME_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_FRAME_DEF_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_FRAME_DEF_LIST', parm.parm_data)
 
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """
