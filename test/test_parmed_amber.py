@@ -18,7 +18,7 @@ import random
 import saved_outputs as saved
 import unittest
 from utils import (get_fn, FileIOTestCase, equal_atoms,
-                   create_random_structure)
+                   create_random_structure, HAS_GROMACS)
 import warnings
 
 class TestReadParm(unittest.TestCase):
@@ -238,7 +238,7 @@ class TestReadParm(unittest.TestCase):
             if 'TORSION_TORSION' not in flag: continue
             tortordata[flag] = np.array(data)
 
-        parm._xfer_torsion_torsion_info()
+        parm.remake_parm()
 
         myre = re.compile('AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
         for flag, data in iteritems(parm.parm_data):
@@ -262,12 +262,17 @@ class TestReadParm(unittest.TestCase):
             else:
                 np.testing.assert_equal(tortordata[flag], np.array(data))
 
+        # Now check getting rid of all torsion-torsions
+        del parm.torsion_torsions[:], parm.torsion_torsion_types[:]
+        parm.remake_parm()
+        for flag in parm.parm_data:
+            self.assertFalse(flag.startswith('AMOEBA_TORSION_TORSION'))
+
     def testAmoebaSmall(self):
         """ Test the AmoebaParm class w/ small system (not all terms) """
         parm = readparm.AmoebaParm(get_fn('nma.parm7'), get_fn('nma.rst'))
         rst7 = readparm.BeemanRestart(get_fn('nma.rst'))
-        self.assertEqual(3*rst7.natom, len(rst7.coordinates))
-        self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
+        self.assertEqual(3*rst7.natom, len(rst7.coordinates.flatten()))
         self.assertEqual(rst7.natom, parm.ptr('natom'))
         self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
@@ -323,7 +328,6 @@ class TestReadParm(unittest.TestCase):
         self.assertNotIn('AMOEBA_REGULAR_ANGLE_NUM_LIST', parm.parm_data)
         self.assertNotIn('AMOEBA_REGULAR_ANGLE_LIST', parm.parm_data)
         del parm.stretch_bends[:], parm.stretch_bend_types[:]
-        self.assertEqual(len(parm.stretch_bends), 0)
         parm.remake_parm()
         self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT', parm.parm_data)
         self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1', parm.parm_data)
@@ -339,6 +343,95 @@ class TestReadParm(unittest.TestCase):
         self.assertNotIn('AMOEBA_CHIRAL_FRAME_LIST', parm.parm_data)
         self.assertNotIn('AMOEBA_FRAME_DEF_NUM_LIST', parm.parm_data)
         self.assertNotIn('AMOEBA_FRAME_DEF_LIST', parm.parm_data)
+        del parm.urey_bradleys[:], parm.urey_bradley_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_NUM_PARAMS', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_LIST', parm.parm_data)
+
+    def testBeemanRestart(self):
+        """ Tests the BeemanRestart class """
+        rst = load_file(get_fn('formbox_amoeba.rst'))
+        rst2 = load_file(get_fn('nma.rst'))
+
+        self.assertEqual(rst.natom, rst.parm_data['ATOMIC_COORDS_NUM_LIST'][0])
+        self.assertEqual(rst2.natom, rst2.parm_data['ATOMIC_COORDS_NUM_LIST'][0])
+
+        np.testing.assert_equal(rst.coordinates.flatten(),
+                                rst.parm_data['ATOMIC_COORDS_LIST'])
+        np.testing.assert_equal(rst2.coordinates.flatten(),
+                                rst2.parm_data['ATOMIC_COORDS_LIST'])
+
+        # Make the number of atoms in each case a little bit bigger
+        oldcrds = rst.coordinates, rst2.coordinates
+        rst.natom = rst.natom + 20
+        rst2.natom = rst2.natom + 20
+
+        np.testing.assert_equal(oldcrds[0].flatten().tolist() +
+                                        [0 for i in range(60)],
+                                rst.coordinates.flatten())
+        np.testing.assert_equal(oldcrds[1].flatten().tolist() +
+                                        [0 for i in range(60)],
+                                rst2.coordinates.flatten())
+
+        # Set coordinates
+        rst.coordinates = np.arange(rst.natom*3, dtype=np.float64)
+        np.testing.assert_equal(rst.coordinates,
+                np.arange(rst.natom*3).reshape((1, rst.natom, 3)))
+        np.testing.assert_equal(np.arange(rst.natom*3),
+                                rst.parm_data['ATOMIC_COORDS_LIST'])
+
+        # Make sure accelerations, and old_accelerations are not present in the
+        # restart that does not contain them
+        self.assertRaises(AttributeError, lambda: rst2.velocities)
+        self.assertRaises(AttributeError, lambda: rst2.accelerations)
+        self.assertRaises(AttributeError, lambda: rst2.old_accelerations)
+
+        # Make sure they do exist in the restart that *does* have them
+        np.testing.assert_equal(rst.velocities.flatten(),
+                                rst.parm_data['ATOMIC_VELOCITIES_LIST'])
+        np.testing.assert_equal(rst.accelerations.flatten(),
+                                rst.parm_data['ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst.old_accelerations.flatten(),
+                                rst.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'])
+
+        # Set velocities, accelerations, and old_accelerations
+        rst2.velocities = np.random.rand(1, rst2.natom, 3)
+        rst2.accelerations = np.random.rand(1, rst2.natom, 3)
+        rst2.old_accelerations = np.random.rand(1, rst2.natom, 3)
+        np.testing.assert_equal(rst2.velocities.flatten(),
+                                rst2.parm_data['ATOMIC_VELOCITIES_LIST'])
+        np.testing.assert_equal(rst2.accelerations.flatten(),
+                                rst2.parm_data['ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst2.old_accelerations.flatten(),
+                                rst2.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'])
+
+        # Reduce number of atoms
+        rst = load_file(get_fn('formbox_amoeba.rst'))
+        rst_bak = load_file(get_fn('formbox_amoeba.rst'))
+        rst2 = load_file(get_fn('nma.rst'))
+        rst2_bak = load_file(get_fn('nma.rst'))
+
+        rst.natom = rst.natom - 20
+        np.testing.assert_equal(rst_bak.coordinates[:,:-20,:],
+                                rst.coordinates)
+        np.testing.assert_equal(rst_bak.velocities[:,:-20,:],
+                                rst.velocities)
+        np.testing.assert_equal(rst_bak.accelerations[:,:-20,:],
+                                rst.accelerations)
+        np.testing.assert_equal(rst_bak.old_accelerations[:,:-20,:],
+                                rst.old_accelerations)
+
+        rst2.natom = rst2.natom - 20
+        np.testing.assert_equal(rst2_bak.coordinates[:,:-20,:],
+                                rst2.coordinates)
+        self.assertRaises(AttributeError, lambda: rst2.velocities)
+        self.assertRaises(AttributeError, lambda: rst2.accelerations)
+        self.assertRaises(AttributeError, lambda: rst2.old_accelerations)
 
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """
@@ -419,6 +512,7 @@ class TestReadParm(unittest.TestCase):
         np.testing.assert_allclose(parm2.velocities, parm.velocities)
         np.testing.assert_allclose(parm2.box, parm.box)
 
+    @unittest.skipIf(not HAS_GROMACS, 'Cannot test without Gromacs')
     def testAmberParmFromStructure(self):
         """ Tests AmberParm.from_structure """
         aparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
@@ -448,9 +542,6 @@ class TestReadParm(unittest.TestCase):
         self.assertIs(aparm.bonds, anocopy.bonds)
         self.assertIs(aparm.angles, anocopy.angles)
         self.assertIs(aparm.dihedrals, anocopy.dihedrals)
-        # For some reason "is" does not work between numpy arrays, so compare
-        # IDs to make sure they are the same object
-        self.assertEqual(id(aparm.coordinates), id(anocopy.coordinates))
 
         self.assertIsNot(cparm.atoms, ccopy.atoms)
         self.assertIsNot(cparm.bonds, ccopy.bonds)
@@ -462,9 +553,6 @@ class TestReadParm(unittest.TestCase):
         self.assertIs(cparm.bonds, cnocopy.bonds)
         self.assertIs(cparm.angles, cnocopy.angles)
         self.assertIs(cparm.dihedrals, cnocopy.dihedrals)
-        # For some reason "is" does not work between numpy arrays, so compare
-        # IDs to make sure they are the same object
-        self.assertEqual(id(cparm.coordinates), id(cnocopy.coordinates))
 
         # Check that non-orthogonal unit cell conversions are properly handled
         tmp = load_file(get_fn(os.path.join('02.6water', 'topol.top')),

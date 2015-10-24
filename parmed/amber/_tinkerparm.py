@@ -22,6 +22,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division, print_function, absolute_import
 
+import numpy as np
 from parmed.amber._amberparm import AmberParm
 from parmed.amber.amberformat import AmberFormat
 from parmed.constants import NATOM, NRES, IFBOX, RAD_TO_DEG, DEG_TO_RAD
@@ -1101,59 +1102,132 @@ class BeemanRestart(AmberFormat):
 
     @natom.setter
     def natom(self, value):
+        value = int(value) * 3
+        old_natom3 = self.natom * 3
+        if value > old_natom3:
+            # Getting bigger
+            zeros = [0 for i in range(value)]
+            new_data = zeros[:]
+            new_data[:old_natom3] = self.parm_data['ATOMIC_COORDS_LIST']
+            self.parm_data['ATOMIC_COORDS_LIST'] = new_data
+            if 'ATOMIC_VELOCITIES_LIST' in self.parm_data:
+                new_data = zeros[:]
+                new_data[:old_natom3] = self.parm_data['ATOMIC_VELOCITIES_LIST']
+                self.parm_data['ATOMIC_VELOCITIES_LIST'] = new_data
+            if 'ATOMIC_ACCELERATIONS_LIST' in self.parm_data:
+                new_data = zeros[:]
+                new_data[:old_natom3] = self.parm_data['ATOMIC_ACCELERATIONS_LIST']
+                self.parm_data['ATOMIC_ACCELERATIONS_LIST'] = new_data
+            if 'OLD_ATOMIC_ACCELERATIONS_LIST' in self.parm_data:
+                new_data = zeros[:]
+                new_data[:old_natom3] = \
+                        self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']
+                self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'] = new_data
+        else:
+            # Getting smaller
+            del self.parm_data['ATOMIC_COORDS_LIST'][value:]
+            if 'ATOMIC_VELOCITIES_LIST' in self.parm_data:
+                del self.parm_data['ATOMIC_VELOCITIES_LIST'][value:]
+            if 'ATOMIC_ACCELERATIONS_LIST' in self.parm_data:
+                del self.parm_data['ATOMIC_ACCELERATIONS_LIST'][value:]
+            if 'OLD_ATOMIC_ACCELERATIONS_LIST' in self.parm_data:
+                del self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'][value:]
+        value //= 3
         self.parm_data['ATOMIC_COORDS_NUM_LIST'][0] = value
-        self.parm_data['ATOMIC_VELOCITIES_NUM_LIST'][0] = value
-        self.parm_data['ATOMIC_ACCELERATIONS_NUM_LIST'][0] = value
-        self.parm_data['OLD_ATOMIC_ACCELERATIONS_NUM_LIST'][0] = value
+        if 'ATOMIC_VELOCITIES_LIST' in self.parm_data:
+            self.parm_data['ATOMIC_VELOCITIES_NUM_LIST'][0] = value
+        if 'ATOMIC_ACCELERATIONS_LIST' in self.parm_data:
+            self.parm_data['ATOMIC_ACCELERATIONS_NUM_LIST'][0] = value
+        if 'OLD_ATOMIC_ACCELERATIONS_NUM_LIST' in self.parm_data:
+            self.parm_data['OLD_ATOMIC_ACCELERATIONS_NUM_LIST'][0] = value
 
     @property
     def coordinates(self):
-        return self.parm_data['ATOMIC_COORDS_LIST']
+        return np.array(self.parm_data['ATOMIC_COORDS_LIST']).reshape(
+                        (1, self.natom, 3))
 
     @coordinates.setter
     def coordinates(self, value):
-        if len(value) != 3 * self.natom:
+        value = np.asarray(value).flatten()
+        if value.shape != (3*self.natom,):
             raise ValueError('Require %d-length sequence for coordinates' %
                              (3*self.natom))
-        self.parm_data['ATOMIC_COORDS_LIST'] = value
+        self.parm_data['ATOMIC_COORDS_LIST'] = value.tolist()
 
     @property
     def velocities(self):
-        return self.parm_data['ATOMIC_VELOCITIES_LIST']
+        try:
+            return np.array(self.parm_data['ATOMIC_VELOCITIES_LIST']).reshape(
+                            (1, self.natom, 3))
+        except KeyError:
+            raise AttributeError('Beeman restart does not have velocities')
 
     @velocities.setter
     def velocities(self, value):
-        if len(value) != 3 * self.natom:
+        value = np.asarray(value).flatten()
+        if value.shape != (3*self.natom,):
             raise ValueError('Require %d-length sequence for velocities' %
                              (3*self.natom))
-        self.parm_data['ATOMIC_VELOCITIES_LIST'] = value
+        if not 'ATOMIC_VELOCITIES_LIST' in self.flag_list:
+            self.add_flag('ATOMIC_VELOCITIES_NUM_LIST', 'i8', data=[self.natom])
+            self.add_flag('ATOMIC_VELOCITIES_LIST', '3e20.12',
+                          data=value.tolist())
+        else:
+            self.parm_data['ATOMIC_VELOCITIES_LIST'] = value.tolist()
 
     @property
     def accelerations(self):
-        return self.parm_data['ATOMIC_ACCELERATIONS_LIST']
+        try:
+            return np.array(
+                    self.parm_data['ATOMIC_ACCELERATIONS_LIST']).reshape(
+                            (1, self.natom, 3)
+            )
+        except KeyError:
+            raise AttributeError('Accelerations not present in Beeman restart')
 
     @accelerations.setter
     def accelerations(self, value):
-        if len(value) != 3 * self.natom:
+        value = np.asarray(value).flatten()
+        if value.shape != (3*self.natom,):
             raise ValueError('Require %d-length sequence for accelerations' %
                              3*self.natom)
-        self.parm_data['ATOMIC_ACCELERATIONS_LIST'] = value
+        if not 'ATOMIC_ACCELERATIONS_LIST' in self.flag_list:
+            self.add_flag('ATOMIC_ACCELERATIONS_NUM_LIST', 'i8',
+                          data=[self.natom])
+            self.add_flag('ATOMIC_ACCELERATIONS_LIST', '3e20.12',
+                          data=value.tolist())
+        else:
+            self.parm_data['ATOMIC_ACCELERATIONS_LIST'] = value.tolist()
 
     @property
     def old_accelerations(self):
-        return self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']
+        try:
+            return np.array(
+                    self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']).reshape(
+                        (1, self.natom, 3)
+            )
+        except KeyError:
+            raise AttributeError('Old accelerations not present in Beeman '
+                                 'restart')
 
     @old_accelerations.setter
     def old_accelerations(self, value):
-        if len(value) != 3 * self.natom:
+        value = np.asarray(value).flatten()
+        if value.shape != (3*self.natom,):
             raise ValueError('Require %d-length sequence for accelerations' %
                              3*self.natom)
-        self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'] = value
+        if not 'OLD_ATOMIC_ACCELERATIONS_LIST' in self.flag_list:
+            self.add_flag('OLD_ATOMIC_ACCELERATIONS_NUM_LIST', 'i8',
+                          data=[self.natom])
+            self.add_flag('OLD_ATOMIC_ACCELERATIONS_LIST', '3e20.12',
+                          data=value.tolist())
+        else:
+            self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'] = value.tolist()
 
     @property
     def box(self):
         try:
-            return self.parm_data['UNIT_CELL_PARAMETERS']
+            return np.array(self.parm_data['UNIT_CELL_PARAMETERS'])
         except KeyError:
             raise AttributeError('No box dimensions available.')
 
@@ -1161,4 +1235,4 @@ class BeemanRestart(AmberFormat):
     def box(self, stuff):
         if len(stuff) != 6:
             raise ValueError('Expected 3 box lengths and 3 box angles')
-        self.parm_data['UNIT_CELL_PARAMETERS'] = stuff
+        self.parm_data['UNIT_CELL_PARAMETERS'] = list(stuff)
