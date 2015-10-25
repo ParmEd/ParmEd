@@ -22,7 +22,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from parmed.amber.amberformat import AmberFormat, _deprecated
+from parmed.amber.amberformat import AmberFormat
 from parmed.amber.asciicrd import AmberAsciiRestart
 from parmed.amber.netcdffiles import NetCDFRestart
 from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
@@ -266,11 +266,6 @@ class AmberParm(AmberFormat, Structure):
         inst.hasvels = inst.velocities is not None
         return inst
 
-    @classmethod
-    @_deprecated('load_from_rawdata', 'from_rawdata')
-    def load_from_rawdata(cls, rawdata):
-        return cls.from_rawdata(rawdata)
-
     #===================================================
 
     @classmethod
@@ -381,12 +376,6 @@ class AmberParm(AmberFormat, Structure):
         inst._set_nonbonded_tables(nbfixes)
 
         return inst
-
-    # For backwards-compatibility
-    @classmethod
-    @_deprecated('load_from_structure', 'from_structure')
-    def load_from_structure(cls, struct):
-        return cls.from_structure(struct)
 
     #===================================================
 
@@ -941,66 +930,6 @@ class AmberParm(AmberFormat, Structure):
         self.hasbox = self.box is not None
         if self.hasvels:
             self.velocities = rst7.vels
-
-    #===================================================
-
-    def load_coordinates(self, coords):
-        """ Loads the coordinates into the atom list
-
-        Parameters
-        ----------
-        coords : list of floats
-            A 1-dimensional iterable of coordinates of shape (natom*3,) from
-            which all atomic coordinates are assigned. In Angstroms
-
-        Notes
-        -----
-        This function is deprecated and will be removed in future versions. Just
-        set the 'coordinates' attribute instead
-        """
-        warn('load_coordinates is deprecated. Just set coordinates attribute '
-             'instead.', DeprecationWarning)
-        self.coordinates = coords
-
-    #===================================================
-
-    def load_velocities(self, vels):
-        """ Loads the coordinates into the atom list
-
-        Parameters
-        ----------
-        vels : list of floats
-            A 1-dimensional iterable of velocities of shape (natom*3,) from
-            which all atomic velocities are assigned. In Angstroms/picosecond
-
-        Notes
-        -----
-        This function is deprecated and will be removed in future versions. Just
-        set the 'velocities' attribute instead
-        """
-        warn('load_velocities is deprecated. Just set velocities attribute '
-             'instead.', DeprecationWarning)
-        self.hasvels = True
-        self.velocities = vels
-
-    #===================================================
-
-    @property
-    def coords(self):
-        warn('Use coordinates attribute instead of coords', DeprecationWarning)
-        return self.coordinates
-    @coords.setter
-    def coords(self, value):
-        warn('Use coordinates attribute instead of coords', DeprecationWarning)
-        self.coordinates = value
-    @property
-    def vels(self):
-        warn('Use velocities attribute instead of vels', DeprecationWarning)
-        return self.velocities
-    @vels.setter
-    def vels(self, value):
-        warn('Use velocities attribute instead of vels', DeprecationWarning)
-        self.velocities = value
 
     #===================================================
 

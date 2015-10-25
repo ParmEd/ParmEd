@@ -22,16 +22,6 @@ from warnings import warn, filterwarnings
 
 filterwarnings('always', message='.', category=DeprecationWarning)
 
-def _deprecated(oldname, newname):
-    def wrapper(func):
-        @wraps(func)
-        def new_func(self, *args, **kwargs):
-            warn('%s has been deprecated and will be removed in the future, '
-                 'use %s instead' % (oldname, newname), DeprecationWarning)
-            return func(self, *args, **kwargs)
-        return new_func
-    return wrapper
-
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class FortranFormat(object):
@@ -948,14 +938,3 @@ class AmberFormat(object):
 
     def __setstate__(self, d):
         self.__dict__ = d
-
-    #===================================================
-
-    # For backwards-compatibility, but warn of deprecation
-
-    addFlag = _deprecated('addFlag', 'add_flag')(add_flag)
-    deleteFlag = _deprecated('deleteFlag', 'delete_flag')(delete_flag)
-
-    @_deprecated('writeParm', 'write_parm')
-    def writeParm(self, name):
-        return self.write_parm(name)

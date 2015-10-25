@@ -59,39 +59,6 @@ class TestReadParm(unittest.TestCase):
                 readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'),
                                    rst7_name=get_fn('trx.inpcrd'))
         )
-        self.assertRaises(DeprecationWarning, lambda:
-                readparm.AmberParm.load_from_rawdata(
-                    load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-                )
-        )
-        self.assertRaises(DeprecationWarning, lambda:
-                readparm.AmberParm.load_from_structure(
-                    load_file(get_fn('ash.parm7'))
-                )
-        )
-        ash = readparm.AmberParm(get_fn('ash.parm7'))
-        self.assertRaises(DeprecationWarning, lambda:
-                ash.load_coordinates(np.random.rand(len(ash.atoms), 3))
-        )
-        self.assertRaises(DeprecationWarning, lambda:
-                ash.load_velocities(np.random.rand(2174, 3))
-        )
-        self.assertRaises(DeprecationWarning, lambda:
-                ash.coords
-        )
-        self.assertRaises(DeprecationWarning, lambda:
-                ash.vels
-        )
-        try:
-            ash.coords = np.random.rand(len(ash.atoms), 3)
-            self.assertTrue(False)
-        except DeprecationWarning:
-            self.assertTrue(True)
-        try:
-            ash.vels = np.random.rand(len(ash.atoms), 3)
-            self.assertTrue(False)
-        except DeprecationWarning:
-            self.assertTrue(True)
 
     def testMoleculeErrorDetection(self):
         """ Tests noncontiguous molecule detection """
@@ -432,6 +399,39 @@ class TestReadParm(unittest.TestCase):
         self.assertRaises(AttributeError, lambda: rst2.velocities)
         self.assertRaises(AttributeError, lambda: rst2.accelerations)
         self.assertRaises(AttributeError, lambda: rst2.old_accelerations)
+
+        # Check the error checking
+        def bad_setting(trial):
+            if trial == 1:
+                rst.coordinates = [1]
+            elif trial == 2:
+                rst.velocities = [1]
+            elif trial == 3:
+                rst.accelerations = [1]
+            elif trial == 4:
+                rst.old_accelerations = [1]
+            elif trial == 5:
+                rst.box = [1]
+
+        self.assertRaises(ValueError, lambda: bad_setting(1))
+        self.assertRaises(ValueError, lambda: bad_setting(2))
+        self.assertRaises(ValueError, lambda: bad_setting(3))
+        self.assertRaises(ValueError, lambda: bad_setting(4))
+        self.assertRaises(ValueError, lambda: bad_setting(5))
+
+        # Overwrite existing vels
+        rst.velocities = np.random.rand(1, rst.natom, 3)
+        rst.accelerations = np.random.rand(1, rst.natom, 3)
+        rst.old_accelerations = np.random.rand(1, rst.natom, 3)
+        rst.box = [1, 2, 3, 90, 90, 90]
+        np.testing.assert_equal(rst.velocities.flatten(),
+                                rst.parm_data['ATOMIC_VELOCITIES_LIST'])
+        np.testing.assert_equal(rst.accelerations.flatten(),
+                                rst.parm_data['ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst.old_accelerations.flatten(),
+                                rst.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst.box,
+                                rst.parm_data['UNIT_CELL_PARAMETERS'])
 
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """

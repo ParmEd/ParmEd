@@ -1226,10 +1226,7 @@ class BeemanRestart(AmberFormat):
 
     @property
     def box(self):
-        try:
-            return np.array(self.parm_data['UNIT_CELL_PARAMETERS'])
-        except KeyError:
-            raise AttributeError('No box dimensions available.')
+        return np.array(self.parm_data['UNIT_CELL_PARAMETERS'])
 
     @box.setter
     def box(self, stuff):
