@@ -6,7 +6,7 @@ from __future__ import division, print_function
 import utils
 from utils import HAS_GROMACS
 from parmed import periodic_table, gromacs, load_file
-from parmed.amber import AmberParm, ChamberParm, AmoebaParm
+from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
@@ -1046,6 +1046,10 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         nparm = AmberParm(get_fn('addpdb.parm7', written=True))
         self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
                          len(nparm.residues))
+        nparm = AmberFormat()
+        nparm.rdparm(get_fn('addpdb.parm7', written=True), slow=True)
+        self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
+                         len(parm.residues))
         # Test deletePDB
         PT.deletePDB(parm).execute()
         self.assertFalse('RESIDUE_ICODE' in parm.flag_list)

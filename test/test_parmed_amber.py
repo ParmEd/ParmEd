@@ -9,11 +9,11 @@ import numpy as np
 import os
 import re
 import sys
-from parmed.amber import readparm, asciicrd, mask, parameters, mdin
+from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
 from parmed.exceptions import AmberWarning, MoleculeError, AmberError
 from parmed import topologyobjects, load_file
 from parmed.utils.six import string_types, iteritems
-from parmed.utils.six.moves import range, zip
+from parmed.utils.six.moves import range, zip, StringIO
 import random
 import saved_outputs as saved
 import unittest
@@ -27,6 +27,51 @@ class TestReadParm(unittest.TestCase):
     def tearDown(self):
         warnings.filterwarnings('always', category=DeprecationWarning)
 
+    def testFortranFormat(self):
+        """ Tests the FortranFormat object """
+        fmt = FortranFormat('(F8.5)')
+        self.assertEqual(fmt.nitems, 1)
+        self.assertEqual(fmt.itemlen, 8)
+        self.assertEqual(fmt.num_decimals, 5)
+        self.assertEqual(fmt.fmt, '%8.5F')
+        fmt = FortranFormat('(E8.5)')
+        self.assertEqual(fmt.nitems, 1)
+        self.assertEqual(fmt.itemlen, 8)
+        self.assertEqual(fmt.num_decimals, 5)
+        self.assertEqual(fmt.fmt, '%8.5E')
+        self.assertEqual(repr(fmt), '<FortranFormat: (E8.5)>')
+        file = StringIO()
+        fmt.write(10, file)
+        file.seek(0)
+        self.assertEqual(file.read(), '1.00000E+01\n')
+        file = StringIO()
+        fmt = FortranFormat('a80')
+        fmt.write('this', file)
+        file.seek(0)
+        self.assertEqual(file.read(), 'this' + ' '*76 + '\n')
+        fmt = FortranFormat('6a12', strip_strings=False)
+        fmt.read = fmt._read_nostrip
+        stuff = fmt.read(' '*12 + 'abcde ' + ' '*18)
+        self.assertEqual(stuff, [' '*12, 'abcde' + ' '*7, ' '*12])
+        # Test hashability of FortranFormat
+        obj1 = object()
+        obj2 = object()
+        d = {FortranFormat('6a12') : obj1, FortranFormat('6a12', False) : obj2}
+        self.assertIs(d[FortranFormat('6a12')], obj1)
+        self.assertIs(d[FortranFormat('6a12', False)], obj2)
+
+    def testAmberFormat(self):
+        """ Test some general functionality of the AmberFormat class """
+        parm = readparm.AmberFormat(get_fn('ash.parm7'))
+        after = parm.flag_list[-1]
+        parm.add_flag('NEW_FLAG', '10i6', num_items=20, after=after,
+                      comments='This is a comment')
+        self.assertEqual(parm.flag_list[-1], 'NEW_FLAG')
+        self.assertEqual(parm.parm_comments['NEW_FLAG'], ['This is a comment'])
+        self.assertRaises(AmberError, lambda:
+                parm.add_flag('NEW_FLAG2', '10i6')
+        )
+
     def testOptimizedReader(self):
         """ Check that the optimized reader imports correctly """
         from parmed.amber import _rdparm
@@ -35,6 +80,7 @@ class TestReadParm(unittest.TestCase):
         """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
+        self.assertIs(parm2.view_as(readparm.AmberParm), parm2)
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
 
@@ -491,6 +537,12 @@ class TestReadParm(unittest.TestCase):
         parm.add_flag('AMOEBA_FORCEFIELD', '1I10', data=[0])
         self.assertRaises(AmberError, lambda:
                 readparm.AmoebaParm.from_rawdata(parm))
+        self.assertRaises(AmberError, lambda:
+                parm.add_flag('RESIDUE_LABEL', '20a4', num_items=10)
+        )
+        self.assertRaises(IndexError, lambda:
+                parm.add_flag('NEW_FLAG', '20a4', num_items=10, after='NO_FLAG')
+        )
 
     def testAmberParmBoxXyzArgs(self):
         """ Test passing coord and box arrays to AmberParm """
@@ -593,6 +645,12 @@ class TestReadParm(unittest.TestCase):
         self.assertTrue(readparm.AmberParm.id_format(get_fn('old.prmtop')))
         parm = load_file(get_fn('old.prmtop'), get_fn('old.inpcrd'))
         self.assertIsInstance(parm, readparm.AmberParm)
+        self._standard_parm_tests(parm)
+
+        # Now check the "slow" reader
+        parm = readparm.AmberFormat()
+        parm.rdparm(get_fn('old.prmtop'), slow=True)
+        parm = parm.view_as(readparm.AmberParm)
         self._standard_parm_tests(parm)
 
     # Tests for individual prmtops
@@ -927,6 +985,24 @@ class TestCoordinateFiles(unittest.TestCase):
             arr1 = mdcrd.coordinates[i]
             runsum += arr1.sum()
         self.assertAlmostEqual(runsum, 7049.817, places=3)
+
+    def testErrorHandling(self):
+        """ Tests error handling of Amber ASCII coordinate files """
+        self.assertRaises(ValueError, lambda:
+                asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'), mode='x',
+                                    natom=5827, hasbox=True)
+        )
+        self.assertRaises(NotImplementedError, lambda:
+                asciicrd._AmberAsciiCoordinateFile(get_fn('tz2.truncoct.crd'),
+                            mode='r', natom=5827, hasbox=True)
+        )
+        class NewType(asciicrd._AmberAsciiCoordinateFile):
+            DEFAULT_TITLE = 'default'
+            CRDS_PER_LINE = 6
+        self.assertRaises(NotImplementedError, lambda:
+                NewType(get_fn('tz2.truncoct.crd'), mode='r', natom=5827,
+                        hasbox=True)
+        )
 
     def testRestart(self):
         """ Test the ASCII restart file parsing """

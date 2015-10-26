@@ -63,6 +63,8 @@ class _AmberAsciiCoordinateFile(object):
 
         self.natom = natom
         self.hasbox = hasbox
+        if self.CRDS_PER_LINE is None:
+            raise NotImplementedError('This object must be subclassed')
         self._full_lines_per_frame = self.natom * 3 // self.CRDS_PER_LINE
         self._nextras = self.natom * 3 - (self._full_lines_per_frame *
                                           self.CRDS_PER_LINE)
@@ -71,8 +73,6 @@ class _AmberAsciiCoordinateFile(object):
             self._parse()
         elif self._status == 'new':
             if title is None:
-                if self.DEFAULT_TITLE is None:
-                    raise NotImplemented('This object must be subclassed')
                 self._file.write('%s\n' % self.DEFAULT_TITLE)
             else:
                 self._file.write(title.rstrip() + '\n')

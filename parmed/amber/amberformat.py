@@ -180,7 +180,7 @@ class FortranFormat(object):
             if i % self.nitems != mod:
                 dest.write('\n')
         else:
-            dest.write(self.fmt % item)
+            dest.write(self.fmt % items)
             dest.write('\n')
 
     #===================================================
@@ -196,7 +196,7 @@ class FortranFormat(object):
             if i % self.nitems != mod:
                 dest.write('\n')
         else:
-            dest.write((self.fmt % item).ljust(self.itemlen))
+            dest.write((self.fmt % items).ljust(self.itemlen))
             dest.write('\n')
 
     #===================================================
@@ -522,7 +522,7 @@ class AmberFormat(object):
                 except KeyError:
                     if version is not None:
                         raise
-                    # Otherwise, try the slow parser
+                    break # Skip out of the loop down to the old-format parser
 
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
@@ -601,7 +601,7 @@ class AmberFormat(object):
                 except ValueError:
                     raise ValueError(
                             'Error parsing line %d, token %d [%s]: Problem '
-                            'during floating point  read.' % (line_idx, idx,
+                            'during floating point read.' % (line_idx, idx,
                             lines[line_idx][idx*16:idx*16+16])
                     )
                 i += 1
