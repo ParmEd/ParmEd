@@ -10,7 +10,7 @@ from parmed.constants import (NATOM, NTYPES, NBONH, NTHETH, NPHIH,
 from parmed.exceptions import AmberError
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
-from parmed.utils.six import wraps, string_types, add_metaclass
+from parmed.utils.six import string_types, add_metaclass
 from parmed.utils.six.moves import range
 from contextlib import closing
 from copy import copy
@@ -18,9 +18,6 @@ import datetime
 from parmed.utils.fortranformat import FortranRecordReader, FortranRecordWriter
 from math import ceil
 import re
-from warnings import warn, filterwarnings
-
-filterwarnings('always', message='.', category=DeprecationWarning)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -144,7 +144,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             return False
         try:
             natom = int(words[0])
-            time = float(words[1])
+            float(words[1])
         except ValueError:
             return False
         except IndexError:
