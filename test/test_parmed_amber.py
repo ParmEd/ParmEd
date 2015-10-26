@@ -1031,6 +1031,122 @@ class TestCoordinateFiles(FileIOTestCase):
             self.assertEqual(py, y*u.angstroms)
             self.assertEqual(pz, z*u.angstroms)
 
+    def testWriteRestart(self):
+        """ Test writing Amber restart files """
+        self._check_restarts_with_atoms(10)
+        self._check_restarts_with_atoms(11)
+
+    def testRestartErrorHandling(self):
+        """ Test Amber ASCII restart file error handling """
+        fn = get_fn('test_file', written=True)
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d%15e7\n' % (10,10))
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+            f.write('\n\n\n\n\n\n\ntoo many lines!\n')
+        self.assertRaises(RuntimeError, lambda: load_file(fn))
+
+        # Try illegal stuff with coordinate setting
+        rst = asciicrd.AmberAsciiRestart(fn, 'w', natom=10)
+        crd = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, lambda: rst.coordinates)
+        def set_bad_num_crd():
+            rst.coordinates = np.random.rand(20, 3)
+        self.assertRaises(ValueError, set_bad_num_crd)
+        rst.coordinates = crd
+        np.testing.assert_equal(rst.coordinates.squeeze(), crd)
+        def write_crd_twice():
+            rst.coordinates = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, write_crd_twice)
+        rst.close()
+        def set_crd_on_old_file():
+            load_file(fn).coordinates = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, set_crd_on_old_file)
+
+        # Try illegal stuff with velocities
+        rst = asciicrd.AmberAsciiRestart(fn, 'w', natom=10)
+        crd = np.random.rand(10, 3)
+        vel = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, lambda: rst.velocities)
+        def set_vel_early():
+            rst.velocities = vel
+        self.assertRaises(RuntimeError, set_vel_early)
+        rst.coordinates = crd
+        np.testing.assert_equal(rst.coordinates.squeeze(), crd)
+        def set_bad_num_vel():
+            rst.velocities = np.random.rand(20, 3)
+        self.assertRaises(ValueError, set_bad_num_vel)
+        rst.velocities = vel
+        np.testing.assert_equal(rst.velocities.squeeze(), vel)
+        def write_vel_twice():
+            rst.velocities = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, write_vel_twice)
+        rst.close()
+        def set_vel_on_old_file():
+            load_file(fn).velocities = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, set_vel_on_old_file)
+
+    def _check_restarts_with_atoms(self, natom):
+        # Write a file with coordinates. Then read it back in and make sure
+        # everything is OK
+        fn = get_fn('test.rst7', written=True)
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        restart.coordinates = crd
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze())
+        self.assertIs(check.velocities, None)
+        self.assertIs(check.box, None)
+
+        # Write a file with coordinates and velocities. Then read it back in and
+        # make sure everything is OK
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        vel = np.random.rand(natom, 3) * 5 - 10
+        restart.coordinates = crd
+        restart.velocities = vel
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze(), atol=1e-4)
+        np.testing.assert_allclose(vel, check.velocities.squeeze(), atol=1e-4)
+        self.assertIs(check.box, None)
+
+        # Write a file with coordinates and box. Then read it back in and
+        # make sure everything is OK
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        box = [20, 20, 20, 90, 90, 90]
+        restart.coordinates = crd
+        restart.box = box
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze(), atol=1e-4)
+        np.testing.assert_equal(check.box, [20, 20, 20, 90, 90, 90])
+        self.assertIs(check.velocities, None)
+
+        # Write a file with coordinates and velocities. Then read it back in and
+        # make sure everything is OK
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        vel = np.random.rand(natom, 3) * 5 - 10
+        box = [20, 20, 20, 90, 90, 90]
+        restart.coordinates = crd
+        restart.velocities = vel
+        restart.box = box
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze(), atol=1e-4)
+        np.testing.assert_allclose(vel, check.velocities.squeeze(), atol=1e-4)
+        np.testing.assert_equal(box, check.box)
+
     def testAutoDetection(self):
         """ Tests ASCII coordinate file autodetections """
         fn = get_fn('test_file', written=True)
@@ -1100,10 +1216,25 @@ class TestCoordinateFiles(FileIOTestCase):
             f.write('Some arbitrary title\n')
             f.write('%5d\n' % 10)
             for j in range(5):
+                for i in range(4):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('   1.345679 ')
+                f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
                 for i in range(5):
                     f.write('%12.7f' % (random.random()*10-5))
                 f.write('   1.345a79 ')
                 f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Only one line\n')
         self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
 
 class TestAmberMask(unittest.TestCase):
