@@ -137,9 +137,18 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         f.close()
         # Look for natom
         try:
-            natom = int(lines[1].split()[0])
+            words = lines[1].split()
         except (ValueError, IndexError):
             return False
+        if len(words) > 2 or len(words) < 1:
+            return False
+        try:
+            natom = int(words[0])
+            time = float(words[1])
+        except ValueError:
+            return False
+        except IndexError:
+            pass
         # Next 3 lines, make sure we have %12.7f format. This only works if we
         # have at least 6 atoms. Any fewer than that means the restart file is
         # shorter than that.
@@ -222,7 +231,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             self.hasbox = self.hasvels = True
         else:
             raise RuntimeError('Badly formatted restart file. Has %d lines '
-                               'for %d atoms.' % (len(self.lines), self.natom))
+                               'for %d atoms.' % (len(lines), self.natom))
         self._coordinates = np.zeros((self.natom, 3))
         if self.hasvels:
             self._velocities = np.zeros((self.natom, 3))

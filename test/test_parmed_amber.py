@@ -12,6 +12,7 @@ import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
 from parmed.exceptions import AmberWarning, MoleculeError, AmberError
 from parmed import topologyobjects, load_file
+import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip, StringIO
 import random
@@ -970,7 +971,7 @@ class TestParameterFiles(unittest.TestCase):
         self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
                          topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
 
-class TestCoordinateFiles(unittest.TestCase):
+class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
     
     def testMdcrd(self):
@@ -985,6 +986,14 @@ class TestCoordinateFiles(unittest.TestCase):
             arr1 = mdcrd.coordinates[i]
             runsum += arr1.sum()
         self.assertAlmostEqual(runsum, 7049.817, places=3)
+
+        pos = mdcrd.positions
+        self.assertEqual(len(pos), 5827)
+        self.assertTrue(u.is_quantity(pos))
+        for (px, py, pz), (x, y, z) in zip(pos, mdcrd.coordinates[0]):
+            self.assertEqual(px, x*u.angstroms)
+            self.assertEqual(py, y*u.angstroms)
+            self.assertEqual(pz, z*u.angstroms)
 
     def testErrorHandling(self):
         """ Tests error handling of Amber ASCII coordinate files """
@@ -1013,6 +1022,89 @@ class TestCoordinateFiles(unittest.TestCase):
         self.assertIsInstance(restart.coordinates, np.ndarray)
         crdsum = restart.coordinates.sum()
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
+
+        pos = restart.positions
+        self.assertEqual(len(pos), 5293)
+        self.assertTrue(u.is_quantity(pos))
+        for (px, py, pz), (x, y, z) in zip(pos, restart.coordinates[0]):
+            self.assertEqual(px, x*u.angstroms)
+            self.assertEqual(py, y*u.angstroms)
+            self.assertEqual(pz, z*u.angstroms)
+
+    def testAutoDetection(self):
+        """ Tests ASCII coordinate file autodetections """
+        fn = get_fn('test_file', written=True)
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % -1)
+            for i in range(6):
+                f.write('%12.7f' % random.random())
+            f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d%15e7\n' % (10,10))
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertTrue(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d' % 10)
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+            f.write('\n\n\n\n')
+        self.assertTrue(asciicrd.AmberAsciiRestart.id_format(fn))
+        rst = load_file(fn)
+        self.assertEqual(rst.natom, 10)
+        self.assertEqual(rst.time, 0)
+        self.assertTrue(
+                np.all(np.logical_and(-5<=rst.coordinates, rst.coordinates<=5))
+        )
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(5):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('   123456790')
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                f.write('   1.345679 ')
+                for i in range(5):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(5):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('   1.345a79 ')
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
 
 class TestAmberMask(unittest.TestCase):
     """ Test the Amber mask parser """
