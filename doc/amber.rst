@@ -564,6 +564,21 @@ selected, is shown below::
     @1-100,150-160   Select the first 100 atoms as well as the 11 atoms 150-160
     @CA,C,10-15      Select all atoms whose names are CA or C, and 6 atoms 10-15
 
+Atom element selections
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You can select all residues that are a specific *element* if you want to.
+Examples are shown below, accompanied by comments annotating what is being
+selected::
+
+    @/C          Select all carbon atoms
+    @/H          Select all hydrogen atoms
+    @/C,N,O,H,S  Select all carbon, nitrogen, oxygen, hydrogen, and sulfur atoms
+    @/Fe         Select all iron atoms
+
+Be careful, though!  These element names are case-sensitive, and bad element
+names will cause the mask parser to raise an exception.
+
 Atom type selections
 ~~~~~~~~~~~~~~~~~~~~
 

@@ -10,7 +10,7 @@ import os
 import re
 import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
-from parmed.exceptions import AmberWarning, MoleculeError, AmberError
+from parmed.exceptions import AmberWarning, MoleculeError, AmberError, MaskError
 from parmed import topologyobjects, load_file
 import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
@@ -1244,10 +1244,16 @@ class TestAmberMask(unittest.TestCase):
         """ Test the Amber mask parser """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
         mask_res1 = mask.AmberMask(parm, ':1')
+        mask_res2 = mask.AmberMask(parm, ':1:2')
         mask_resala = mask.AmberMask(parm, ':ALA')
+        mask_carbonat = mask.AmberMask(parm, '@/C')
         mask_atname = mask.AmberMask(parm, '@CA')
+        mask_atname2 = mask.AmberMask(parm, '@CA@CB')
         mask_resat = mask.AmberMask(parm, ':ALA@CA')
         mask_attyp = mask.AmberMask(parm, '@%CT')
+        mask_wldcrd = mask.AmberMask(parm, '@H=')
+        mask_wldcrd2 = mask.AmberMask(parm, '*&(@H*)')
+        mult_op = mask.AmberMask(parm, '(!:1&@CA)|!:2')
 
         # Check all of the masks
         self.assertEqual(sum(mask_res1.Selection()), 13)
@@ -1260,6 +1266,14 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+        self.assertEqual(sum(mask_res1.Selection(invert=True))+13,
+                         len(parm.atoms))
+
+        self.assertEqual(sum(mask_res2.Selection()), len(parm.residues[0])+
+                                                     len(parm.residues[1]))
+        _ = (0, 1)
+        for idx in mask_res1.Selected():
+            self.assertIn(parm.atoms[idx].residue.idx, _)
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
@@ -1270,13 +1284,29 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
-        
+
+        for idx in mask_carbonat.Selected():
+            self.assertEqual(parm.atoms[idx].atomic_number, 6)
+        sel = mask_carbonat.Selection()
+        for atom in parm.atoms:
+            if atom.atomic_number == 6:
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
         sel = mask_atname.Selection()
         for atom in parm.atoms:
             if atom.name == 'CA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+        sel = mask_atname2.Selection()
+        for atom in parm.atoms:
+            if atom.name == 'CA' or atom.name == 'CB':
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
@@ -1301,6 +1331,58 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+        for atom, sel in zip(parm.atoms, mask_wldcrd.Selection()):
+            if sel:
+                self.assertTrue(atom.name.startswith('H'))
+            else:
+                self.assertFalse(atom.name.startswith('H'))
+
+        for atom, sel in zip(parm.atoms, mask_wldcrd2.Selection()):
+            if sel:
+                self.assertTrue(atom.name.startswith('H'))
+            else:
+                self.assertFalse(atom.name.startswith('H'))
+
+        for atom, val in zip(parm.atoms, mult_op.Selection()):
+            if atom.residue.idx == 1:
+                if atom.name == 'CA':
+                    self.assertEqual(val, 1)
+                else:
+                    self.assertEqual(val, 0)
+            else:
+                self.assertEqual(val, 1)
+
+    def testIllegalMasks(self):
+        """ Test bad mask strings """
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm_nocor = load_file(get_fn('ash.parm7'))
+
+        mask1 = mask.AmberMask(parm, '(@1)=')
+        mask2 = mask.AmberMask(parm_nocor, ':2<@5')
+        mask3 = mask.AmberMask(parm, '@1<10')
+        mask4 = mask.AmberMask(parm, 'C')
+        mask5 = mask.AmberMask(parm, 'C&@1')
+        mask6 = mask.AmberMask(parm, ':(T=HIS)')
+        mask7 = mask.AmberMask(parm, ':1,%^')
+        mask8 = mask.AmberMask(parm, '(\xc3)')
+        mask9 = mask.AmberMask(parm, '@&:1')
+        mask10 = mask.AmberMask(parm, '(((:10)&@CA)|:1')
+        mask11 = mask.AmberMask(parm, '!!:1')
+        mask12 = mask.AmberMask(parm, ':1<:10.a')
+
+        self.assertRaises(MaskError, mask1.Selection)
+        self.assertRaises(MaskError, mask2.Selection)
+        self.assertRaises(MaskError, mask3.Selection)
+        self.assertRaises(MaskError, mask4.Selection)
+        self.assertRaises(MaskError, mask5.Selection)
+        self.assertRaises(MaskError, mask6.Selection)
+        self.assertRaises(MaskError, mask7.Selection)
+        self.assertRaises(MaskError, mask8.Selection)
+        self.assertRaises(MaskError, mask9.Selection)
+        self.assertRaises(MaskError, mask10.Selection)
+        self.assertRaises(MaskError, mask11.Selection)
+        self.assertRaises(MaskError, mask12.Selection)
 
     def testCompoundMask(self):
         """ Tests compound/complex Amber selection masks """
