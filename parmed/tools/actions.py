@@ -1218,8 +1218,6 @@ class setMolecules(Action):
         solute_ions = arg_list.get_key_string('solute_ions', None)
         if solute_ions is None:
             self.solute_ions = arg_list.get_next_string(optional=True)
-        if solute_ions is None:
-            self.solute_ions = True
         elif solute_ions.lower() == 'true':
             self.solute_ions = True
         elif solute_ions.lower() == 'false':

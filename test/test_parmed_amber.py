@@ -7,20 +7,72 @@ import glob
 import math
 import numpy as np
 import os
+import re
 import sys
-from parmed.amber import readparm, asciicrd, mask, parameters, mdin
-from parmed.exceptions import AmberWarning
+from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
+from parmed.exceptions import AmberWarning, MoleculeError, AmberError, MaskError
 from parmed import topologyobjects, load_file
+import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
-from parmed.utils.six.moves import range, zip
+from parmed.utils.six.moves import range, zip, StringIO
 import random
+import saved_outputs as saved
 import unittest
-from utils import get_fn, FileIOTestCase
+from utils import (get_fn, FileIOTestCase, equal_atoms,
+                   create_random_structure, HAS_GROMACS)
 import warnings
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
     
+    def tearDown(self):
+        warnings.filterwarnings('always', category=DeprecationWarning)
+
+    def testFortranFormat(self):
+        """ Tests the FortranFormat object """
+        fmt = FortranFormat('(F8.5)')
+        self.assertEqual(fmt.nitems, 1)
+        self.assertEqual(fmt.itemlen, 8)
+        self.assertEqual(fmt.num_decimals, 5)
+        self.assertEqual(fmt.fmt, '%8.5F')
+        fmt = FortranFormat('(E8.5)')
+        self.assertEqual(fmt.nitems, 1)
+        self.assertEqual(fmt.itemlen, 8)
+        self.assertEqual(fmt.num_decimals, 5)
+        self.assertEqual(fmt.fmt, '%8.5E')
+        self.assertEqual(repr(fmt), '<FortranFormat: (E8.5)>')
+        file = StringIO()
+        fmt.write(10, file)
+        file.seek(0)
+        self.assertEqual(file.read(), '1.00000E+01\n')
+        file = StringIO()
+        fmt = FortranFormat('a80')
+        fmt.write('this', file)
+        file.seek(0)
+        self.assertEqual(file.read(), 'this' + ' '*76 + '\n')
+        fmt = FortranFormat('6a12', strip_strings=False)
+        fmt.read = fmt._read_nostrip
+        stuff = fmt.read(' '*12 + 'abcde ' + ' '*18)
+        self.assertEqual(stuff, [' '*12, 'abcde' + ' '*7, ' '*12])
+        # Test hashability of FortranFormat
+        obj1 = object()
+        obj2 = object()
+        d = {FortranFormat('6a12') : obj1, FortranFormat('6a12', False) : obj2}
+        self.assertIs(d[FortranFormat('6a12')], obj1)
+        self.assertIs(d[FortranFormat('6a12', False)], obj2)
+
+    def testAmberFormat(self):
+        """ Test some general functionality of the AmberFormat class """
+        parm = readparm.AmberFormat(get_fn('ash.parm7'))
+        after = parm.flag_list[-1]
+        parm.add_flag('NEW_FLAG', '10i6', num_items=20, after=after,
+                      comments='This is a comment')
+        self.assertEqual(parm.flag_list[-1], 'NEW_FLAG')
+        self.assertEqual(parm.parm_comments['NEW_FLAG'], ['This is a comment'])
+        self.assertRaises(AmberError, lambda:
+                parm.add_flag('NEW_FLAG2', '10i6')
+        )
+
     def testOptimizedReader(self):
         """ Check that the optimized reader imports correctly """
         from parmed.amber import _rdparm
@@ -29,6 +81,7 @@ class TestReadParm(unittest.TestCase):
         """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
+        self.assertIs(parm2.view_as(readparm.AmberParm), parm2)
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
 
@@ -41,6 +94,42 @@ class TestReadParm(unittest.TestCase):
         """ Check that bzip2ed prmtop files can be parsed correctly """
         parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
         self.assertEqual(parm.ptr('natom'), 864)
+
+    def testDeprecations(self):
+        """ Test proper deprecation of old/renamed AmberParm features """
+        warnings.filterwarnings('error', category=DeprecationWarning)
+        self.assertRaises(DeprecationWarning, lambda:
+                readparm.AmberParm(get_fn('trx.prmtop'),
+                                   rst7_name=get_fn('trx.inpcrd'))
+        )
+        self.assertRaises(DeprecationWarning, lambda:
+                readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'),
+                                   rst7_name=get_fn('trx.inpcrd'))
+        )
+
+    def testMoleculeErrorDetection(self):
+        """ Tests noncontiguous molecule detection """
+        parm = readparm.AmberParm(get_fn('things.parm7'))
+        self.assertRaises(MoleculeError, lambda:
+                parm.rediscover_molecules(fix_broken=False))
+
+    def testRecalculateLJ(self):
+        """ Test the AmberParm.recalculate_LJ() method """
+        parm = readparm.AmberParm(get_fn('things.parm7'))
+        orig_LJ_A = np.array(parm.parm_data['LENNARD_JONES_ACOEF'])
+        orig_LJ_B = np.array(parm.parm_data['LENNARD_JONES_BCOEF'])
+        parm.recalculate_LJ()
+        np.testing.assert_allclose(orig_LJ_A,
+                np.array(parm.parm_data['LENNARD_JONES_ACOEF']))
+        np.testing.assert_allclose(orig_LJ_B,
+                np.array(parm.parm_data['LENNARD_JONES_BCOEF']))
+
+    def testDetectNBFIX(self):
+        """ Tests NBFIX detection for AmberParm """
+        parm = readparm.AmberParm(get_fn('ash.parm7'))
+        self.assertFalse(parm.has_NBFIX())
+        parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0.0
+        self.assertTrue(parm.has_NBFIX())
 
     def testAmberGasParm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
@@ -156,22 +245,414 @@ class TestReadParm(unittest.TestCase):
                      'dihedral_types', 'pi_torsion_types', 'stretch_bend_types',
                      'torsion_torsion_types']:
             self.assertTrue(hasattr(parm, attr))
+        # Check that TORSION_TORSION data is restored properly
+        used_tortors = sorted(set(tt.type.idx+1 for tt in parm.torsion_torsions))
+        tortordata = dict()
+        for flag, data in iteritems(parm.parm_data):
+            if 'TORSION_TORSION' not in flag: continue
+            tortordata[flag] = np.array(data)
+
+        parm.remake_parm()
+
+        myre = re.compile('AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
+        for flag, data in iteritems(parm.parm_data):
+            if 'TORSION_TORSION' not in flag: continue
+            rematch = myre.match(flag)
+            if rematch:
+                idx = int(rematch.groups()[0]) - 1
+                tortornum = used_tortors[idx]
+                oldflag = flag.replace(rematch.groups()[0], '%02d' % tortornum)
+                np.testing.assert_equal(np.array(data), tortordata[oldflag])
+            elif flag == 'AMOEBA_TORSION_TORSION_LIST':
+                # We need to adjust for the unused types that we deleted
+                for i, (new, old) in enumerate(zip(data, tortordata[flag])):
+                    if i % 6 == 5:
+                        self.assertEqual(used_tortors[new-1], old)
+                    else:
+                        self.assertEqual(new, old)
+            elif flag == 'AMOEBA_TORSION_TORSION_NUM_PARAMS':
+                self.assertEqual(tortordata[flag], [8])
+                self.assertEqual(data, [3])
+            else:
+                np.testing.assert_equal(tortordata[flag], np.array(data))
+
+        # Now check getting rid of all torsion-torsions
+        del parm.torsion_torsions[:], parm.torsion_torsion_types[:]
+        parm.remake_parm()
+        for flag in parm.parm_data:
+            self.assertFalse(flag.startswith('AMOEBA_TORSION_TORSION'))
 
     def testAmoebaSmall(self):
         """ Test the AmoebaParm class w/ small system (not all terms) """
-        parm = readparm.AmoebaParm(get_fn('nma.parm7'))
+        parm = readparm.AmoebaParm(get_fn('nma.parm7'), get_fn('nma.rst'))
         rst7 = readparm.BeemanRestart(get_fn('nma.rst'))
-        self.assertEqual(3*rst7.natom, len(rst7.coordinates))
-        self.assertEqual(rst7.coordinates, rst7.parm_data['ATOMIC_COORDS_LIST'])
+        self.assertEqual(3*rst7.natom, len(rst7.coordinates.flatten()))
         self.assertEqual(rst7.natom, parm.ptr('natom'))
         self.assertFalse(parm.torsion_torsions)
         self.assertTrue(parm.amoeba)
+        coords = np.random.rand(len(parm.atoms), 3)
+        self.assertRaises(TypeError, lambda:
+                parm.initialize_topology(xyz=get_fn('ala3_solv.parm7')))
+        parm.initialize_topology(xyz=coords, box=[1, 1, 1, 90, 90, 90])
+        np.testing.assert_allclose(parm.coordinates, coords)
+        np.testing.assert_equal(parm.box, [1, 1, 1, 90, 90, 90])
+        self.assertEqual(saved.AMOEBA_SMALL_MDIN, parm.mdin_skeleton())
+        self.assertEqual(len(parm.urey_bradleys), 818)
+        self.assertEqual(len(parm.urey_bradley_types), 1)
+        # Now make sure that the future layout of the stretch bend force
+        # constants will work (i.e., when it is split into 2 fields)
+        parm.add_flag(
+                'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1',
+                str(parm.formats['AMOEBA_STRETCH_BEND_FORCE_CONSTANT']),
+                data=parm.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'][:],
+                after='AMOEBA_STRETCH_BEND_FORCE_CONSTANT',
+        )
+        parm.add_flag(
+                'AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2',
+                str(parm.formats['AMOEBA_STRETCH_BEND_FORCE_CONSTANT']),
+                data=parm.parm_data['AMOEBA_STRETCH_BEND_FORCE_CONSTANT'][:],
+                after='AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1',
+        )
+        parm.delete_flag('AMOEBA_STRETCH_BEND_FORCE_CONSTANT')
+        parm2 = readparm.AmoebaParm.from_rawdata(parm)
+        self.assertEqual(len(parm.stretch_bends), len(parm2.stretch_bends))
+        for sb1, sb2 in zip(parm.stretch_bends, parm2.stretch_bends):
+            self.assertEqual(sb1.atom1.idx, sb2.atom1.idx)
+            self.assertEqual(sb1.atom2.idx, sb2.atom2.idx)
+            self.assertEqual(sb1.atom3.idx, sb2.atom3.idx)
+            self.assertEqual(sb1.type, sb2.type)
+        # Now walk through, deleting each of the valence terms and make sure
+        # that gets rid of the corresponding parm sections
+        del parm.bonds[:], parm.bond_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_REGULAR_BOND_NUM_PARAMS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_FTAB_DEGREE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_FTAB_COEFFS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_BOND_LIST', parm.parm_data)
+        del parm.angles[:], parm.angle_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_NUM_PARAMS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_FTAB_DEGREE', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_FTAB_COEFFS', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_REGULAR_ANGLE_LIST', parm.parm_data)
+        del parm.stretch_bends[:], parm.stretch_bend_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_1', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_FORCE_CONSTANT_2', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_BOND1_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_BOND2_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_ANGLE_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_STRETCH_BEND_LIST', parm.parm_data)
+        del parm.multipole_frames[:], parm.chiral_frames[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_CHIRAL_FRAME_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_CHIRAL_FRAME_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_FRAME_DEF_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_FRAME_DEF_LIST', parm.parm_data)
+        del parm.urey_bradleys[:], parm.urey_bradley_types[:]
+        parm.remake_parm()
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_NUM_PARAMS', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_NUM_LIST', parm.parm_data)
+        self.assertNotIn('AMOEBA_UREY_BRADLEY_BOND_LIST', parm.parm_data)
+
+    def testBeemanRestart(self):
+        """ Tests the BeemanRestart class """
+        rst = load_file(get_fn('formbox_amoeba.rst'))
+        rst2 = load_file(get_fn('nma.rst'))
+
+        self.assertEqual(rst.natom, rst.parm_data['ATOMIC_COORDS_NUM_LIST'][0])
+        self.assertEqual(rst2.natom, rst2.parm_data['ATOMIC_COORDS_NUM_LIST'][0])
+
+        np.testing.assert_equal(rst.coordinates.flatten(),
+                                rst.parm_data['ATOMIC_COORDS_LIST'])
+        np.testing.assert_equal(rst2.coordinates.flatten(),
+                                rst2.parm_data['ATOMIC_COORDS_LIST'])
+
+        # Make the number of atoms in each case a little bit bigger
+        oldcrds = rst.coordinates, rst2.coordinates
+        rst.natom = rst.natom + 20
+        rst2.natom = rst2.natom + 20
+
+        np.testing.assert_equal(oldcrds[0].flatten().tolist() +
+                                        [0 for i in range(60)],
+                                rst.coordinates.flatten())
+        np.testing.assert_equal(oldcrds[1].flatten().tolist() +
+                                        [0 for i in range(60)],
+                                rst2.coordinates.flatten())
+
+        # Set coordinates
+        rst.coordinates = np.arange(rst.natom*3, dtype=np.float64)
+        np.testing.assert_equal(rst.coordinates,
+                np.arange(rst.natom*3).reshape((1, rst.natom, 3)))
+        np.testing.assert_equal(np.arange(rst.natom*3),
+                                rst.parm_data['ATOMIC_COORDS_LIST'])
+
+        # Make sure accelerations, and old_accelerations are not present in the
+        # restart that does not contain them
+        self.assertRaises(AttributeError, lambda: rst2.velocities)
+        self.assertRaises(AttributeError, lambda: rst2.accelerations)
+        self.assertRaises(AttributeError, lambda: rst2.old_accelerations)
+
+        # Make sure they do exist in the restart that *does* have them
+        np.testing.assert_equal(rst.velocities.flatten(),
+                                rst.parm_data['ATOMIC_VELOCITIES_LIST'])
+        np.testing.assert_equal(rst.accelerations.flatten(),
+                                rst.parm_data['ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst.old_accelerations.flatten(),
+                                rst.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'])
+
+        # Set velocities, accelerations, and old_accelerations
+        rst2.velocities = np.random.rand(1, rst2.natom, 3)
+        rst2.accelerations = np.random.rand(1, rst2.natom, 3)
+        rst2.old_accelerations = np.random.rand(1, rst2.natom, 3)
+        np.testing.assert_equal(rst2.velocities.flatten(),
+                                rst2.parm_data['ATOMIC_VELOCITIES_LIST'])
+        np.testing.assert_equal(rst2.accelerations.flatten(),
+                                rst2.parm_data['ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst2.old_accelerations.flatten(),
+                                rst2.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'])
+
+        # Reduce number of atoms
+        rst = load_file(get_fn('formbox_amoeba.rst'))
+        rst_bak = load_file(get_fn('formbox_amoeba.rst'))
+        rst2 = load_file(get_fn('nma.rst'))
+        rst2_bak = load_file(get_fn('nma.rst'))
+
+        rst.natom = rst.natom - 20
+        np.testing.assert_equal(rst_bak.coordinates[:,:-20,:],
+                                rst.coordinates)
+        np.testing.assert_equal(rst_bak.velocities[:,:-20,:],
+                                rst.velocities)
+        np.testing.assert_equal(rst_bak.accelerations[:,:-20,:],
+                                rst.accelerations)
+        np.testing.assert_equal(rst_bak.old_accelerations[:,:-20,:],
+                                rst.old_accelerations)
+
+        rst2.natom = rst2.natom - 20
+        np.testing.assert_equal(rst2_bak.coordinates[:,:-20,:],
+                                rst2.coordinates)
+        self.assertRaises(AttributeError, lambda: rst2.velocities)
+        self.assertRaises(AttributeError, lambda: rst2.accelerations)
+        self.assertRaises(AttributeError, lambda: rst2.old_accelerations)
+
+        # Check the error checking
+        def bad_setting(trial):
+            if trial == 1:
+                rst.coordinates = [1]
+            elif trial == 2:
+                rst.velocities = [1]
+            elif trial == 3:
+                rst.accelerations = [1]
+            elif trial == 4:
+                rst.old_accelerations = [1]
+            elif trial == 5:
+                rst.box = [1]
+
+        self.assertRaises(ValueError, lambda: bad_setting(1))
+        self.assertRaises(ValueError, lambda: bad_setting(2))
+        self.assertRaises(ValueError, lambda: bad_setting(3))
+        self.assertRaises(ValueError, lambda: bad_setting(4))
+        self.assertRaises(ValueError, lambda: bad_setting(5))
+
+        # Overwrite existing vels
+        rst.velocities = np.random.rand(1, rst.natom, 3)
+        rst.accelerations = np.random.rand(1, rst.natom, 3)
+        rst.old_accelerations = np.random.rand(1, rst.natom, 3)
+        rst.box = [1, 2, 3, 90, 90, 90]
+        np.testing.assert_equal(rst.velocities.flatten(),
+                                rst.parm_data['ATOMIC_VELOCITIES_LIST'])
+        np.testing.assert_equal(rst.accelerations.flatten(),
+                                rst.parm_data['ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst.old_accelerations.flatten(),
+                                rst.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'])
+        np.testing.assert_equal(rst.box,
+                                rst.parm_data['UNIT_CELL_PARAMETERS'])
 
     def test1012(self):
         """ Test that 10-12 prmtop files are recognized properly """
         parm = readparm.AmberParm(get_fn('ff91.parm7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm, has1012=True)
+
+    def testBadArguments(self):
+        """ Test proper error handling for bad AmberParm arguments """
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm(get_fn('trx.prmtop'),
+                                   xyz=get_fn('trx.prmtop'))
+        )
+        struct = create_random_structure(True)
+        struct.unknown_functional = True
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm.from_structure(struct))
+        try:
+            readparm.AmberParm.from_structure(struct)
+        except TypeError as e:
+            self.assertEqual('Cannot instantiate an AmberParm from unknown '
+                             'functional', str(e))
+        struct.unknown_functional = False
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm.from_structure(struct))
+        try:
+            readparm.AmberParm.from_structure(struct)
+        except TypeError as e:
+            self.assertTrue(str(e).startswith('AmberParm does not support all'))
+        try:
+            readparm.ChamberParm.from_structure(struct)
+        except TypeError as e:
+            self.assertTrue(str(e).startswith('ChamberParm does not support all'))
+        self.assertRaises(TypeError, lambda:
+                readparm.AmberParm.from_structure(
+                    load_file(get_fn('ala_ala_ala.parm7'))
+                )
+        )
+        try:
+            readparm.AmberParm.from_structure(
+                    load_file(get_fn('ala_ala_ala.parm7'))
+            )
+        except TypeError as e:
+            self.assertTrue(str(e).endswith('Try ChamberParm'))
+
+    def testCorruptParms(self):
+        """ Test proper error detection on bad topology files """
+        # First test proper error handling of a truncated section
+        parm = readparm.AmberFormat(get_fn('ash.parm7'))
+        atom_names = parm.parm_data['ATOM_NAME'][:]
+        del parm.parm_data['ATOM_NAME'][0]
+        self.assertRaises(AmberError, lambda:
+                readparm.AmberParm.from_rawdata(parm))
+        self.assertRaises(AmberError, lambda:
+                readparm.AmoebaParm(get_fn('ash.parm7')))
+        parm.parm_data['ATOM_NAME'] = atom_names
+        parm.add_flag('AMOEBA_FORCEFIELD', '1I10', data=[0])
+        self.assertRaises(AmberError, lambda:
+                readparm.AmoebaParm.from_rawdata(parm))
+        self.assertRaises(AmberError, lambda:
+                parm.add_flag('RESIDUE_LABEL', '20a4', num_items=10)
+        )
+        self.assertRaises(IndexError, lambda:
+                parm.add_flag('NEW_FLAG', '20a4', num_items=10, after='NO_FLAG')
+        )
+
+    def testAmberParmBoxXyzArgs(self):
+        """ Test passing coord and box arrays to AmberParm """
+        crds = load_file(get_fn('ff14ipq.rst7'))
+        parm = load_file(get_fn('ff14ipq.parm7'), xyz=crds.coordinates,
+                         box=crds.box)
+        np.testing.assert_allclose(crds.coordinates[0], parm.coordinates)
+        np.testing.assert_allclose(crds.box, parm.box)
+        parm = readparm.AmberParm(get_fn('ff14ipq.parm7'), xyz=crds.coordinates,
+                                  box=crds.box)
+        np.testing.assert_allclose(crds.coordinates[0], parm.coordinates)
+        np.testing.assert_allclose(crds.box, parm.box)
+        # Also check .from_rawdata
+        parm.velocities = np.random.rand(3, len(parm.atoms))
+        parm2 = readparm.AmberParm.from_rawdata(parm)
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            equal_atoms(self, a1, a2)
+        np.testing.assert_allclose(parm2.coordinates, parm.coordinates)
+        np.testing.assert_allclose(parm2.velocities, parm.velocities)
+        np.testing.assert_allclose(parm2.box, parm.box)
+
+    @unittest.skipIf(not HAS_GROMACS, 'Cannot test without Gromacs')
+    def testAmberParmFromStructure(self):
+        """ Tests AmberParm.from_structure """
+        aparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        cparm = load_file(get_fn('ala_ala_ala.parm7'),
+                          get_fn('ala_ala_ala.rst7'))
+        acopy = readparm.AmberParm.from_structure(aparm, copy=True)
+        ccopy = readparm.ChamberParm.from_structure(cparm, copy=True)
+        anocopy = readparm.AmberParm.from_structure(aparm, copy=False)
+        cnocopy = readparm.ChamberParm.from_structure(cparm, copy=False)
+
+        self.assertEqual(len(aparm.atoms), len(acopy.atoms))
+        self.assertEqual(len(aparm.bonds), len(acopy.bonds))
+        self.assertEqual(len(cparm.atoms), len(ccopy.atoms))
+        self.assertEqual(len(cparm.bonds), len(ccopy.bonds))
+        self.assertEqual(len(aparm.atoms), len(anocopy.atoms))
+        self.assertEqual(len(aparm.bonds), len(anocopy.bonds))
+        self.assertEqual(len(cparm.atoms), len(cnocopy.atoms))
+        self.assertEqual(len(cparm.bonds), len(cnocopy.bonds))
+
+        self.assertIsNot(aparm.atoms, acopy.atoms)
+        self.assertIsNot(aparm.bonds, acopy.bonds)
+        self.assertIsNot(aparm.angles, acopy.angles)
+        self.assertIsNot(aparm.dihedrals, acopy.dihedrals)
+        self.assertIsNot(aparm.coordinates, acopy.coordinates)
+
+        self.assertIs(aparm.atoms, anocopy.atoms)
+        self.assertIs(aparm.bonds, anocopy.bonds)
+        self.assertIs(aparm.angles, anocopy.angles)
+        self.assertIs(aparm.dihedrals, anocopy.dihedrals)
+
+        self.assertIsNot(cparm.atoms, ccopy.atoms)
+        self.assertIsNot(cparm.bonds, ccopy.bonds)
+        self.assertIsNot(cparm.angles, ccopy.angles)
+        self.assertIsNot(cparm.dihedrals, ccopy.dihedrals)
+        self.assertIsNot(cparm.coordinates, ccopy.coordinates)
+
+        self.assertIs(cparm.atoms, cnocopy.atoms)
+        self.assertIs(cparm.bonds, cnocopy.bonds)
+        self.assertIs(cparm.angles, cnocopy.angles)
+        self.assertIs(cparm.dihedrals, cnocopy.dihedrals)
+
+        # Check that non-orthogonal unit cell conversions are properly handled
+        tmp = load_file(get_fn(os.path.join('02.6water', 'topol.top')),
+                        xyz=get_fn(os.path.join('02.6water', 'conf.gro')))
+        tmp.box = [3, 3, 3, 109, 109, 90]
+        parm = readparm.AmberParm.from_structure(tmp)
+        np.testing.assert_equal(parm.box, tmp.box)
+        self.assertEqual(parm.ptr('ifbox'), 2)
+        self.assertEqual(parm.parm_data['BOX_DIMENSIONS'], [109, 3, 3, 3])
+
+        # Check that a loaded structure without periodicities is properly warned
+        # against
+        tmp = load_file(get_fn(os.path.join('04.Ala', 'topol.top')),
+                        xyz=get_fn(os.path.join('04.Ala', 'conf.gro')))
+        # Test that a periodicity of zero is properly handled by ParmEd and
+        # converted to a dummy term with a force constant of 0 (and ensure it
+        # warns)
+        tmp.dihedral_types[0][0].per = 0
+        warnings.filterwarnings('error', category=AmberWarning)
+        self.assertRaises(AmberWarning, lambda:
+                readparm.AmberParm.from_structure(tmp))
+        self.assertRaises(AmberWarning, lambda:
+                readparm.ChamberParm.from_structure(tmp))
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        parm = readparm.AmberParm.from_structure(tmp)
+        self.assertEqual(parm.dihedral_types[0].per, 1)
+        self.assertEqual(parm.dihedral_types[0].phi_k, 0)
+        self.assertEqual(parm.dihedral_types[0].phase,
+                         tmp.dihedral_types[0][0].phase)
+        parm = readparm.ChamberParm.from_structure(tmp)
+        self.assertEqual(parm.dihedral_types[0].per, 1)
+        self.assertEqual(parm.dihedral_types[0].phi_k, 0)
+        self.assertEqual(parm.dihedral_types[0].phase,
+                         tmp.dihedral_types[0][0].phase)
+
+    def testOldParmFormat(self):
+        """ Test reading old Amber prmtop file format """
+        self.assertTrue(readparm.AmberParm.id_format(get_fn('old.prmtop')))
+        parm = load_file(get_fn('old.prmtop'), get_fn('old.inpcrd'))
+        self.assertIsInstance(parm, readparm.AmberParm)
+        self._standard_parm_tests(parm)
+
+        # Now check the "slow" reader
+        parm = readparm.AmberFormat()
+        parm.rdparm(get_fn('old.prmtop'), slow=True)
+        parm = parm.view_as(readparm.AmberParm)
+        self._standard_parm_tests(parm)
 
     # Tests for individual prmtops
     def _standard_parm_tests(self, parm, has1012=False):
@@ -490,7 +971,7 @@ class TestParameterFiles(unittest.TestCase):
         self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
                          topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
 
-class TestCoordinateFiles(unittest.TestCase):
+class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
     
     def testMdcrd(self):
@@ -506,6 +987,32 @@ class TestCoordinateFiles(unittest.TestCase):
             runsum += arr1.sum()
         self.assertAlmostEqual(runsum, 7049.817, places=3)
 
+        pos = mdcrd.positions
+        self.assertEqual(len(pos), 5827)
+        self.assertTrue(u.is_quantity(pos))
+        for (px, py, pz), (x, y, z) in zip(pos, mdcrd.coordinates[0]):
+            self.assertEqual(px, x*u.angstroms)
+            self.assertEqual(py, y*u.angstroms)
+            self.assertEqual(pz, z*u.angstroms)
+
+    def testErrorHandling(self):
+        """ Tests error handling of Amber ASCII coordinate files """
+        self.assertRaises(ValueError, lambda:
+                asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'), mode='x',
+                                    natom=5827, hasbox=True)
+        )
+        self.assertRaises(NotImplementedError, lambda:
+                asciicrd._AmberAsciiCoordinateFile(get_fn('tz2.truncoct.crd'),
+                            mode='r', natom=5827, hasbox=True)
+        )
+        class NewType(asciicrd._AmberAsciiCoordinateFile):
+            DEFAULT_TITLE = 'default'
+            CRDS_PER_LINE = 6
+        self.assertRaises(NotImplementedError, lambda:
+                NewType(get_fn('tz2.truncoct.crd'), mode='r', natom=5827,
+                        hasbox=True)
+        )
+
     def testRestart(self):
         """ Test the ASCII restart file parsing """
         restart = asciicrd.AmberAsciiRestart(get_fn('tz2.ortho.rst7'), 'r')
@@ -516,6 +1023,220 @@ class TestCoordinateFiles(unittest.TestCase):
         crdsum = restart.coordinates.sum()
         self.assertAlmostEqual(crdsum, 301623.26028240257, places=4)
 
+        pos = restart.positions
+        self.assertEqual(len(pos), 5293)
+        self.assertTrue(u.is_quantity(pos))
+        for (px, py, pz), (x, y, z) in zip(pos, restart.coordinates[0]):
+            self.assertEqual(px, x*u.angstroms)
+            self.assertEqual(py, y*u.angstroms)
+            self.assertEqual(pz, z*u.angstroms)
+
+    def testWriteRestart(self):
+        """ Test writing Amber restart files """
+        self._check_restarts_with_atoms(10)
+        self._check_restarts_with_atoms(11)
+
+    def testRestartErrorHandling(self):
+        """ Test Amber ASCII restart file error handling """
+        fn = get_fn('test_file', written=True)
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d%15e7\n' % (10,10))
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+            f.write('\n\n\n\n\n\n\ntoo many lines!\n')
+        self.assertRaises(RuntimeError, lambda: load_file(fn))
+
+        # Try illegal stuff with coordinate setting
+        rst = asciicrd.AmberAsciiRestart(fn, 'w', natom=10)
+        crd = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, lambda: rst.coordinates)
+        def set_bad_num_crd():
+            rst.coordinates = np.random.rand(20, 3)
+        self.assertRaises(ValueError, set_bad_num_crd)
+        rst.coordinates = crd
+        np.testing.assert_equal(rst.coordinates.squeeze(), crd)
+        def write_crd_twice():
+            rst.coordinates = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, write_crd_twice)
+        rst.close()
+        def set_crd_on_old_file():
+            load_file(fn).coordinates = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, set_crd_on_old_file)
+
+        # Try illegal stuff with velocities
+        rst = asciicrd.AmberAsciiRestart(fn, 'w', natom=10)
+        crd = np.random.rand(10, 3)
+        vel = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, lambda: rst.velocities)
+        def set_vel_early():
+            rst.velocities = vel
+        self.assertRaises(RuntimeError, set_vel_early)
+        rst.coordinates = crd
+        np.testing.assert_equal(rst.coordinates.squeeze(), crd)
+        def set_bad_num_vel():
+            rst.velocities = np.random.rand(20, 3)
+        self.assertRaises(ValueError, set_bad_num_vel)
+        rst.velocities = vel
+        np.testing.assert_equal(rst.velocities.squeeze(), vel)
+        def write_vel_twice():
+            rst.velocities = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, write_vel_twice)
+        rst.close()
+        def set_vel_on_old_file():
+            load_file(fn).velocities = np.random.rand(10, 3)
+        self.assertRaises(RuntimeError, set_vel_on_old_file)
+
+    def _check_restarts_with_atoms(self, natom):
+        # Write a file with coordinates. Then read it back in and make sure
+        # everything is OK
+        fn = get_fn('test.rst7', written=True)
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        restart.coordinates = crd
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze())
+        self.assertIs(check.velocities, None)
+        self.assertIs(check.box, None)
+
+        # Write a file with coordinates and velocities. Then read it back in and
+        # make sure everything is OK
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        vel = np.random.rand(natom, 3) * 5 - 10
+        restart.coordinates = crd
+        restart.velocities = vel
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze(), atol=1e-4)
+        np.testing.assert_allclose(vel, check.velocities.squeeze(), atol=1e-4)
+        self.assertIs(check.box, None)
+
+        # Write a file with coordinates and box. Then read it back in and
+        # make sure everything is OK
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        box = [20, 20, 20, 90, 90, 90]
+        restart.coordinates = crd
+        restart.box = box
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze(), atol=1e-4)
+        np.testing.assert_equal(check.box, [20, 20, 20, 90, 90, 90])
+        self.assertIs(check.velocities, None)
+
+        # Write a file with coordinates and velocities. Then read it back in and
+        # make sure everything is OK
+        restart = asciicrd.AmberAsciiRestart(fn, 'w', natom=natom, title='nose',
+                                             time=100)
+        crd = np.random.rand(natom, 3) * 5 - 10
+        vel = np.random.rand(natom, 3) * 5 - 10
+        box = [20, 20, 20, 90, 90, 90]
+        restart.coordinates = crd
+        restart.velocities = vel
+        restart.box = box
+        restart.close()
+        check = load_file(fn)
+        np.testing.assert_allclose(crd, check.coordinates.squeeze(), atol=1e-4)
+        np.testing.assert_allclose(vel, check.velocities.squeeze(), atol=1e-4)
+        np.testing.assert_equal(box, check.box)
+
+    def testAutoDetection(self):
+        """ Tests ASCII coordinate file autodetections """
+        fn = get_fn('test_file', written=True)
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % -1)
+            for i in range(6):
+                f.write('%12.7f' % random.random())
+            f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d%15e7\n' % (10,10))
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertTrue(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d' % 10)
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(6):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+            f.write('\n\n\n\n')
+        self.assertTrue(asciicrd.AmberAsciiRestart.id_format(fn))
+        rst = load_file(fn)
+        self.assertEqual(rst.natom, 10)
+        self.assertEqual(rst.time, 0)
+        self.assertTrue(
+                np.all(np.logical_and(-5<=rst.coordinates, rst.coordinates<=5))
+        )
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(5):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('   123456790')
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                f.write('   1.345679 ')
+                for i in range(5):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(4):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('   1.345679 ')
+                f.write('%12.7f' % (random.random()*10-5))
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Some arbitrary title\n')
+            f.write('%5d\n' % 10)
+            for j in range(5):
+                for i in range(5):
+                    f.write('%12.7f' % (random.random()*10-5))
+                f.write('   1.345a79 ')
+                f.write('\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+        with open(fn, 'w') as f:
+            f.write('Only one line\n')
+        self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
 class TestAmberMask(unittest.TestCase):
     """ Test the Amber mask parser """
     
@@ -523,10 +1244,16 @@ class TestAmberMask(unittest.TestCase):
         """ Test the Amber mask parser """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
         mask_res1 = mask.AmberMask(parm, ':1')
+        mask_res2 = mask.AmberMask(parm, ':1:2')
         mask_resala = mask.AmberMask(parm, ':ALA')
+        mask_carbonat = mask.AmberMask(parm, '@/C')
         mask_atname = mask.AmberMask(parm, '@CA')
+        mask_atname2 = mask.AmberMask(parm, '@CA@CB')
         mask_resat = mask.AmberMask(parm, ':ALA@CA')
         mask_attyp = mask.AmberMask(parm, '@%CT')
+        mask_wldcrd = mask.AmberMask(parm, '@H=')
+        mask_wldcrd2 = mask.AmberMask(parm, '*&(@H*)')
+        mult_op = mask.AmberMask(parm, '(!:1&@CA)|!:2')
 
         # Check all of the masks
         self.assertEqual(sum(mask_res1.Selection()), 13)
@@ -539,6 +1266,14 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+        self.assertEqual(sum(mask_res1.Selection(invert=True))+13,
+                         len(parm.atoms))
+
+        self.assertEqual(sum(mask_res2.Selection()), len(parm.residues[0])+
+                                                     len(parm.residues[1]))
+        _ = (0, 1)
+        for idx in mask_res1.Selected():
+            self.assertIn(parm.atoms[idx].residue.idx, _)
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
@@ -549,13 +1284,29 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
-        
+
+        for idx in mask_carbonat.Selected():
+            self.assertEqual(parm.atoms[idx].atomic_number, 6)
+        sel = mask_carbonat.Selection()
+        for atom in parm.atoms:
+            if atom.atomic_number == 6:
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
         sel = mask_atname.Selection()
         for atom in parm.atoms:
             if atom.name == 'CA':
+                self.assertEqual(sel[atom.idx], 1)
+            else:
+                self.assertEqual(sel[atom.idx], 0)
+
+        sel = mask_atname2.Selection()
+        for atom in parm.atoms:
+            if atom.name == 'CA' or atom.name == 'CB':
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
@@ -580,6 +1331,58 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+        for atom, sel in zip(parm.atoms, mask_wldcrd.Selection()):
+            if sel:
+                self.assertTrue(atom.name.startswith('H'))
+            else:
+                self.assertFalse(atom.name.startswith('H'))
+
+        for atom, sel in zip(parm.atoms, mask_wldcrd2.Selection()):
+            if sel:
+                self.assertTrue(atom.name.startswith('H'))
+            else:
+                self.assertFalse(atom.name.startswith('H'))
+
+        for atom, val in zip(parm.atoms, mult_op.Selection()):
+            if atom.residue.idx == 1:
+                if atom.name == 'CA':
+                    self.assertEqual(val, 1)
+                else:
+                    self.assertEqual(val, 0)
+            else:
+                self.assertEqual(val, 1)
+
+    def testIllegalMasks(self):
+        """ Test bad mask strings """
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm_nocor = load_file(get_fn('ash.parm7'))
+
+        mask1 = mask.AmberMask(parm, '(@1)=')
+        mask2 = mask.AmberMask(parm_nocor, ':2<@5')
+        mask3 = mask.AmberMask(parm, '@1<10')
+        mask4 = mask.AmberMask(parm, 'C')
+        mask5 = mask.AmberMask(parm, 'C&@1')
+        mask6 = mask.AmberMask(parm, ':(T=HIS)')
+        mask7 = mask.AmberMask(parm, ':1,%^')
+        mask8 = mask.AmberMask(parm, '(\xc3)')
+        mask9 = mask.AmberMask(parm, '@&:1')
+        mask10 = mask.AmberMask(parm, '(((:10)&@CA)|:1')
+        mask11 = mask.AmberMask(parm, '!!:1')
+        mask12 = mask.AmberMask(parm, ':1<:10.a')
+
+        self.assertRaises(MaskError, mask1.Selection)
+        self.assertRaises(MaskError, mask2.Selection)
+        self.assertRaises(MaskError, mask3.Selection)
+        self.assertRaises(MaskError, mask4.Selection)
+        self.assertRaises(MaskError, mask5.Selection)
+        self.assertRaises(MaskError, mask6.Selection)
+        self.assertRaises(MaskError, mask7.Selection)
+        self.assertRaises(MaskError, mask8.Selection)
+        self.assertRaises(MaskError, mask9.Selection)
+        self.assertRaises(MaskError, mask10.Selection)
+        self.assertRaises(MaskError, mask11.Selection)
+        self.assertRaises(MaskError, mask12.Selection)
 
     def testCompoundMask(self):
         """ Tests compound/complex Amber selection masks """

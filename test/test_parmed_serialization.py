@@ -90,6 +90,8 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(len(res.atoms), len(unpickled.atoms))
         for a1, a2 in zip(res, unpickled):
             self._equal_atoms(a1, a2)
+            self.assertIs(a1.residue, res)
+            self.assertIs(a2.residue, unpickled)
 
     def test_structure_serialization(self):
         """ Tests the serialization of Structure """

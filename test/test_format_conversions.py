@@ -7,16 +7,10 @@ from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import unit as u
-try:
-    import simtk.openmm as mm
-    import simtk.openmm.app as app
-    CPU = mm.Platform.getPlatformByName('CPU')
-    HAS_OPENMM = True
-except ImportError:
-    HAS_OPENMM = False
 import unittest
 from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
-                   FileIOTestCase, HAS_GROMACS)
+                   FileIOTestCase, HAS_GROMACS, CPU, has_openmm as HAS_OPENMM,
+                   mm, app)
 import warnings
 
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
@@ -162,6 +156,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
     @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
     def testEnergyComplicated(self):
         """ Check equal energies for Gmx -> Amber conversion of complex FF """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(get_fn(os.path.join('12.DPPC', 'topol2.top')))
         gro = load_file(get_fn(os.path.join('12.DPPC', 'conf.gro')))
         parm = amber.AmberParm.from_structure(top)
@@ -178,6 +173,8 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         cona.setPositions(gro.positions)
 
         self._check_energies(top, cong, parm, cona)
+
+        warnings.filterwarnings('always', category=GromacsWarning)
 
 
     def _check_energies(self, parm1, con1, parm2, con2):
