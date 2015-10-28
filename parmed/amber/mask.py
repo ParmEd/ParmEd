@@ -5,6 +5,7 @@ which a selected atom is 1 and one that's not is 0.
 from __future__ import division, print_function
 
 from parmed.exceptions import MaskError
+from parmed.periodic_table import AtomicNum
 from parmed.utils.six.moves import range
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -152,7 +153,7 @@ class AmberMask(object):
                     p = self.mask[i]
                     buffer += p
                     flag = 3
-                    if not all(hasattr(a, 'xx') for a in self.parm.atoms):
+                    if self.parm.coordinates is None:
                         raise MaskError('<,> operators require coordinates')
                     if not p in [':','@']:
                         raise MaskError('Bad syntax [%s]' % self.mask)
@@ -326,10 +327,13 @@ class AmberMask(object):
             pos += 1
         # end while i < len(postfix)
 
-        pmask = stack.pop()
+        try:
+            pmask = stack.pop()
+        except IndexError:
+            raise MaskError('Empty stack -- no available operands')
 
         if stack:
-            raise MaskError('There may be missing operands in the mask!')
+            raise MaskError('There may be missing operands in the mask')
 
         if prnlev > 7:
             stderr.write('%d atoms selected by %s' % (sum(pmask), self.mask))
@@ -363,7 +367,7 @@ class AmberMask(object):
             raise MaskError('Bad distance criteria for mask: %s' % pmask1)
         try:
             distance = float(pmask1[1:])
-        except TypeError:
+        except (TypeError, ValueError):
             raise MaskError('Distance must be a number: %s' % pmask1[1:])
         distance *= distance # Faster to compare square of distance
         # First select all atoms that satisfy the distance. If we ended up
@@ -539,7 +543,7 @@ class AmberMask(object):
         Fills a _mask based on atom elements. For now it will just be Atom
         names, since elements are not stored in the prmtop anywhere.
         """
-        self._atom_namelist(self, buffer, mask, key='name')
+        self._atom_namelist(buffer, mask, key='element')
 
     #======================================================
 
@@ -613,6 +617,13 @@ class AmberMask(object):
             atname = int(atname) - 1
             for i, atom in enumerate(self.parm.atoms):
                 mask[i] = mask[i] | int(atname == i)
+        elif key == 'element':
+            try:
+                for i, atom in enumerate(self.parm.atoms):
+                    mask[i] = mask[i] | int(AtomicNum[atname] ==
+                                                atom.atomic_number)
+            except KeyError:
+                raise MaskError('Unknown element %s' % atname)
         else:
             for i, atom in enumerate(self.parm.atoms):
                 mask[i] = mask[i] | int(_nameMatch(atname, getattr(atom, key)))

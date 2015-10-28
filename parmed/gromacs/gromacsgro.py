@@ -4,6 +4,7 @@ This module contains functionality relevant to loading and parsing GROMACS GRO
 """
 from __future__ import print_function, division, absolute_import
 
+from contextlib import closing
 from parmed.constants import TINY
 from parmed.exceptions import GromacsError
 from parmed.formats.registry import FileFormatType
@@ -16,11 +17,6 @@ from parmed.topologyobjects import Atom, ExtraPoint
 from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
-from contextlib import closing
-try:
-    import numpy as np
-except ImportError:
-    np = None
 
 @add_metaclass(FileFormatType)
 class GromacsGroFile(object):
@@ -159,8 +155,6 @@ class GromacsGroFile(object):
                     a, b, c = leng.value_in_unit(u.angstroms)
                     alpha, beta, gamma = ang.value_in_unit(u.degrees)
                     struct.box = [a, b, c, alpha, beta, gamma]
-                if np is not None:
-                    struct.box = np.array(struct.box)
         finally:
             if own_handle:
                 fileobj.close()

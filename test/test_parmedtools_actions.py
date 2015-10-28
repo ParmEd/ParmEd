@@ -6,7 +6,7 @@ from __future__ import division, print_function
 import utils
 from utils import HAS_GROMACS
 from parmed import periodic_table, gromacs, load_file
-from parmed.amber import AmberParm, ChamberParm, AmoebaParm
+from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
@@ -767,9 +767,16 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         warnings.filterwarnings('ignore', category=AmberWarning)
         PT.setMolecules(parm).execute()
         self.assertFalse(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
-        PT.setMolecules(parm).execute()
+        # Now check that setMolecules can apply another time.
+        PT.setMolecules(parm, solute_ions=False).execute()
+
+        # Now check that solute_ions keyword works as expected
+        parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
+        PT.setMolecules(parm, solute_ions=False).execute()
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [5, 926, 2])
+        PT.setMolecules(parm, solute_ions=True).execute()
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
 
     def testNetCharge(self):
         """ Test netCharge on AmberParm """
@@ -813,13 +820,25 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         in_exclusions_after = []
         for atom1 in parm.residues[0].atoms:
             all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
-                             atom1.dihedral_partners + atom1.exclusion_partners)
+                                atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
                 in_exclusions_after.append(atom2 in all_exclusions)
                 if not in_exclusions_after[-1]:
                     print('%s %s not excluded' % (atom1, atom2))
         self.assertTrue(all(in_exclusions_after))
+        # Make sure the exclusions are correct when reading in a new version
+        # with exceptions defined
+        parm.remake_parm()
+        parm = AmberParm.from_rawdata(parm)
+        in_exclusions_before = []
+        for atom1 in parm.residues[0].atoms:
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+                             atom1.dihedral_partners + atom1.exclusion_partners)
+            for atom2 in parm.residues[0].atoms:
+                if atom1 is atom2: continue
+                in_exclusions_before.append(atom2 in all_exclusions)
+        self.assertTrue(all(in_exclusions_before))
 
     def testAddDeleteDihedral(self):
         """ Test addDihedral and deleteDihedral on AmberParm """
@@ -1021,6 +1040,17 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
             self.assertEqual(periodic_table.Element[atnum], elem)
             self.assertEqual(atnum, periodic_table.AtomicNum[elem])
+        # Test reading Amber topology file with insertion codes and PDB
+        # information stored in it
+        parm.write_parm(get_fn('addpdb.parm7', written=True))
+        nparm = AmberParm(get_fn('addpdb.parm7', written=True))
+        self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
+                         len(nparm.residues))
+        nparm = AmberFormat()
+        nparm.rdparm(get_fn('addpdb.parm7', written=True), slow=True)
+        self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
+                         len(parm.residues))
+        # Test deletePDB
         PT.deletePDB(parm).execute()
         self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
@@ -1617,9 +1647,8 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         # To keep the output clean
         PT.setMolecules(parm).execute()
         self.assertTrue(all([x is y for x,y in zip(parm.atoms, atoms)]))
-        # Now check that setMolecules can apply another time. solute_ions seems
-        # to be broken, and I can't figure out why.
-        PT.setMolecules(parm).execute()
+        # Now check that setMolecules can apply another time.
+        PT.setMolecules(parm, solute_ions=False).execute()
 
     def testNetCharge(self):
         """ Test netCharge for ChamberParm """
@@ -2294,6 +2323,28 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         """ Test addPDB and deletePDB for AmoebaParm """
         parm = copy(amoebaparm)
         PT.addPDB(parm, get_fn('nma.pdb'), 'elem allicodes').execute()
+        self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
+        self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
+        self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
+        self.assertTrue('RESIDUE_CHAINID' in parm.flag_list)
+        self.assertTrue(len(parm.parm_data['RESIDUE_ICODE']), parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['ATOM_ELEMENT']), parm.ptr('natom'))
+        self.assertTrue(len(parm.parm_data['RESIDUE_NUMBER']), parm.ptr('nres'))
+        self.assertTrue(len(parm.parm_data['RESIDUE_CHAINID']),parm.ptr('nres'))
+        for i in range(parm.ptr('nres')):
+            self.assertEqual(parm.parm_data['RESIDUE_NUMBER'][i], i+1)
+            self.assertEqual(parm.parm_data['RESIDUE_ICODE'][i], '')
+            if parm.residues[i].name == 'WAT':
+                self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'B')
+            else:
+                self.assertEqual(parm.parm_data['RESIDUE_CHAINID'][i], 'A')
+        for i, atom in enumerate(parm.atoms):
+            atnum = atom.atomic_number
+            elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
+            self.assertEqual(periodic_table.Element[atnum], elem)
+            self.assertEqual(atnum, periodic_table.AtomicNum[elem])
+        parm.write_parm(get_fn('amoeba_pdb.parm7', written=True))
+        parm = AmoebaParm(get_fn('amoeba_pdb.parm7', written=True))
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)

@@ -172,7 +172,7 @@ class ChamberParm(AmberParm):
         if (struct.rb_torsions or struct.trigonal_angles or struct.pi_torsions
                 or struct.out_of_plane_bends or struct.stretch_bends
                 or struct.torsion_torsions or struct.multipole_frames):
-            raise ValueError('ChamberParm does not support all potential terms '
+            raise TypeError('ChamberParm does not support all potential terms '
                              'defined in the input Structure')
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
@@ -742,8 +742,6 @@ class ChamberParm(AmberParm):
                 data['LENNARD_JONES_14_BCOEF'][i] = 0.0
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-charmm_solvent = ('WAT', 'TIP3', 'HOH', 'TIP4', 'TIP5', 'SPCE', 'SPC')
 
 def ConvertFromPSF(struct, params, title=''):
     """
