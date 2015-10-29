@@ -72,8 +72,7 @@ class NetCDFRestart(object):
    
     @classmethod
     def open_new(cls, fname, natom, box, vels, title='',
-                 remd=None, temp=None, remd_indices=None,
-                 remd_groups=None, remd_dimtypes=None):
+                 remd=None, temp=None, remd_dimtypes=None):
         """
         Opens a new NetCDF file and sets the attributes
 
@@ -92,7 +91,7 @@ class NetCDFRestart(object):
         remd : str=None
             None -- No REMD information is written
             'T[emperature]' -- target temperature (or pH) will be written
-            'M[ulti-D]' -- remd_indices and remd_groups will be written
+            'M[ulti-D]' -- remd_dimtypes will be written
         remd_dimtypes : iterable of int=None
             Array of exchange types for each group. The length will be the REMD
             dimension (if `remd` above is "M[ulti-D]")
@@ -109,12 +108,16 @@ class NetCDFRestart(object):
                                      'T-REMD restarts.')
             elif remd[0] in 'mM':
                 remd_type = 'MULTI'
-                if (remd_indices is None or remd_groups is None or 
-                    len(remd_indices) != len(remd_groups)):
-                    raise ValueError('remd_indices and remd_groups must be '
-                                     'given for multi-D REMD, and must have '
-                                     'the same length.')
-                remd_dimension = len(remd_indices)
+                if remd_dimtypes is None:
+                    raise ValueError('remd_dimtypes must be given for multi-D '
+                                     'REMD, and must have the same length.')
+                for dt in remd_dimtypes:
+                    if dt not in (1, 3):
+                        raise ValueError(
+                                'remd_dimtypes only supports dimension types '
+                                '1 and 3 currently'
+                        )
+                remd_dimension = len(remd_dimtypes)
             else:
                 raise ValueError('remd must be None, T[emperature] or M[ulti]')
         else:
@@ -173,12 +176,6 @@ class NetCDFRestart(object):
         if inst.hasvels:
             v = ncfile.createVariable('velocities', 'd',
                                             ('atom', 'spatial'))
-            try:
-                # Prevent NetCDF4 from trying to autoscale the values. Ugh.
-                v.set_auto_maskandscale(False)
-            except AttributeError:
-                # Other packages do not have this variable.
-                pass
             v.units = 'angstrom/picosecond'
             v.scale_factor = np.float32(20.455)
             inst.velocity_scale = 20.455
@@ -186,13 +183,13 @@ class NetCDFRestart(object):
         if remd_type == 'TEMPERATURE':
             v = ncfile.createVariable('temp0', 'd', ('time',))
             v.units = 'kelvin'
+            v[0] = temp
         elif remd_type == 'MULTI':
             ncfile.createVariable('remd_indices', 'i',
                                         ('remd_dimension',))
-            ncfile.createVariable('remd_groups', 'i',
+            v = ncfile.createVariable('remd_dimtype', 'i',
                                         ('remd_dimension',))
-            ncfile.createVariable('remd_dimtype', 'i',
-                                        ('remd_dimension',))
+            v[:] = remd_dimtypes
 
         return inst
 
@@ -231,12 +228,6 @@ class NetCDFRestart(object):
         if inst.hasvels:
             vels = ncfile.variables['velocities']
             inst.velocity_scale = vels.scale_factor
-            # Turn off automatic scaling for netCDF4. Ugh.
-            try:
-                vels.set_auto_maskandscale(False)
-            except AttributeError:
-                # Other packages do not have this variable
-                pass
         return inst
 
     parse = open_old
@@ -304,11 +295,6 @@ class NetCDFRestart(object):
     def temp0(self):
         return self._ncfile.variables['temp0'].getValue()
 
-    @temp0.setter
-    def temp0(self, stuff):
-        self._ncfile.variables['temp0'][0] = float(stuff)
-        self.flush()
-   
     @property
     def remd_indices(self):
         return self._ncfile.variables['remd_indices'][:]
@@ -319,22 +305,8 @@ class NetCDFRestart(object):
         self.flush()
 
     @property
-    def remd_groups(self):
-        return self._ncfile.variables['remd_groups'][:]
-
-    @remd_groups.setter
-    def remd_groups(self, stuff):
-        self._ncfile.variables['remd_groups'][:] = np.asarray(stuff, dtype='i')
-        self.flush()
-
-    @property
     def remd_dimtype(self):
         return self._ncfile.variables['remd_dimtype'][:]
-
-    @remd_dimtype.setter
-    def remd_dimtype(self, stuff):
-        self._ncfile.variables['remd_dimtype'][:] = np.asarray(stuff, dtype='i')
-        self.flush()
 
     def close(self):
         self.closed = True
@@ -505,12 +477,6 @@ class NetCDFTraj(object):
             v.units = 'angstrom/picosecond'
             inst.velocity_scale = v.scale_factor = 20.455
             inst._last_vel_frame = 0
-            try:
-                # Prevent NetCDF4 from trying to autoscale the values. Ugh.
-                v.set_auto_maskandscale(False)
-            except AttributeError:
-                # Other packages do not have this variable.
-                pass
         if inst.hasfrcs:
             v = ncfile.createVariable('forces', 'f',
                                             ('frame', 'atom', 'spatial'))
@@ -578,12 +544,6 @@ class NetCDFTraj(object):
                 scale = ncfile.variables['velocities'].scale_factor
             except AttributeError:
                 scale = 1
-            try:
-                # Prevent NetCDF4 from trying to autoscale the values. Ugh.
-                ncfile.variables['velocities'].set_auto_maskandscale(False)
-            except AttributeError:
-                # Other packages do not have this variable.
-                pass
             inst._velocities = np.array(ncfile.variables['velocities'][:])*scale
             inst.velocity_scale = scale
         if inst.hasfrcs:

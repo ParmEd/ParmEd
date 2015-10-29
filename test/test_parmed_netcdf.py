@@ -5,8 +5,10 @@ Tests the NetCDF file parsing capabilities with the different backends
 from random import randint
 import numpy as np
 from parmed import __version__
+from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
 from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
+from parmed.utils.netcdf import NetCDFFile
 from unittest import skipIf
 from utils import get_fn, FileIOTestCase, TestCaseRelative
 
@@ -16,8 +18,6 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
     
     def testNetCDF(self):
         """ Test scipy NetCDF parsing """
-        from parmed.utils.netcdf import NetCDFFile
-        from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
         traj = NetCDFTraj.open_old(get_fn('tz2.truncoct.nc'))
         self._check_traj(traj)
         rst = NetCDFRestart.open_old(get_fn('ncinpcrd.rst7'))
@@ -87,6 +87,43 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         nctraj.close()
         traj2 = NetCDFRestart.open_old(get_fn('test2.ncrst', written=True))
         np.testing.assert_allclose(traj2.coordinates[0], coords)
+
+    def testRemdFiles(self):
+        """ Test proper reading and writing of NetCDF files with REMD info """
+        rstfn = get_fn('restart.ncrst', written=True)
+        trjfn = get_fn('traj.nc', written=True)
+        # Do the restart with T-REMD first
+        traj = NetCDFRestart.open_new(
+                rstfn, 100, True, True, 'Restart w/ REMD', remd='Temperature',
+                temp=300,
+        )
+        crd = np.random.rand(100, 3)
+        vel = np.random.rand(100, 3)
+        traj.coordinates = crd
+        traj.velocities = vel
+        traj.box = [40, 40, 40, 90, 90, 90]
+        traj.close()
+        traj = NetCDFRestart.open_old(rstfn)
+        self.assertEqual(traj.temp0, 300)
+        np.testing.assert_allclose(crd, traj.coordinates.squeeze())
+        np.testing.assert_allclose(vel, traj.velocities.squeeze())
+
+        traj = NetCDFRestart.open_new(
+                rstfn, 100, False, True, 'Restart w/ REMD', remd='Multi',
+                remd_dimtypes=[1, 3, 3, 3],
+        )
+        crd = np.random.rand(100, 3)
+        vel = np.random.rand(100, 3)
+        traj.coordinates = crd
+        traj.velocities = vel
+        remd_indices = np.random.choice(np.arange(20), size=4, replace=True)
+        traj.remd_indices = remd_indices
+        traj.close()
+        traj = NetCDFRestart.open_old(rstfn)
+        np.testing.assert_allclose(crd, traj.coordinates.squeeze())
+        np.testing.assert_allclose(vel, traj.velocities.squeeze())
+        np.testing.assert_equal(remd_indices, traj.remd_indices)
+        np.testing.assert_equal([1, 3, 3, 3], traj.remd_dimtype)
 
     def _check_traj(self, traj, written=False):
         """ Checks various trajectory properties """
