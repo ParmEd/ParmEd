@@ -721,18 +721,32 @@ def _num_unique_dtypes(dct):
         num += len(x)
     return num
 
-class TestParameterFiles(unittest.TestCase):
+class TestParameterFiles(FileIOTestCase):
     """ Tests Amber parameter and frcmod files """
+
+    def testFindAmberFiles(self):
+        """ Tests the Amber file finder helper function """
+        finder = parameters._find_amber_file
+        self.assertEqual(finder(__file__), __file__)
+        self.assertRaises(ValueError, lambda: finder('nofile'))
 
     def testFileDetectionFrcmod(self):
         """ Tests the detection of Amber frcmod files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'frcmod.*')):
             self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+        # Now try creating a bunch of non-frcmod files to test the file ID
+        # discrimination
+        fn = get_fn('test.frcmod', written=True)
+        with open(fn, 'w') as f:
+            f.write('\n\n\n\n\n\n')
 
     def testFileDetectionParm(self):
         """ Tests the detection of Amber parm.dat files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'parm*.dat')):
             self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+        # Now try a bunch of slightly-off files to test discrimination
+        for fname in glob.glob(os.path.join(get_fn('noparm'), '*')):
+            self.assertFalse(parameters.AmberParameterSet.id_format(fname))
 
     def testFrcmodParsing(self):
         """ Tests parsing an Amber frcmod file """
