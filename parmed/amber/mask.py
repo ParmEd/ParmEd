@@ -733,7 +733,7 @@ class _mask(list):
     def Not(self):
         new_mask = _mask(self.natom)
         for i in range(self.natom):
-            new_mask[i] = int(not self[i])
+            new_mask[i] = 1 - self[i]
         return new_mask
 
     def select_all(self):
