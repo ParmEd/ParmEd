@@ -1607,6 +1607,7 @@ class TestWriteFiles(FileIOTestCase):
         rst = Restart(get_fn('testcvb.rst7', written=True), 'w', natom=15)
         rst.coordinates = list(range(45))
         rst.velocities = list(reversed(range(45)))
+        self.assertRaises(RuntimeError, lambda: rst.box)
         rst.box = box[:]
         rst.close()
         self._check_written_restarts(box)
@@ -1704,10 +1705,28 @@ class TestWriteFiles(FileIOTestCase):
                               lambda: assign(rst, 'rst.coordinates=range(20)'))
             self.assertRaises(RuntimeError,
                               lambda: assign(rst, 'rst.box=[10]*3+[90]*3'))
+            self.assertRaises(RuntimeError,
+                              lambda: assign(rst, 'rst.cell_angles=[90]*3'))
             rst.coordinates = list(range(27))
+            self.assertRaises(ValueError,
+                              lambda: assign(rst, 'rst.cell_lengths=[0, 1]'))
+            self.assertRaises(RuntimeError, lambda: rst.cell_lengths)
+            self.assertRaises(RuntimeError, lambda: rst.cell_angles)
             rst.box = box
             self.assertRaises(RuntimeError, lambda:
                               assign(rst, 'rst.velocities=list(range(27))'))
+            self.assertRaises(RuntimeError, lambda:
+                              assign(rst, 'rst.cell_lengths=[1, 2, 3]'))
+            self.assertRaises(RuntimeError, lambda:
+                              assign(rst, 'rst.cell_angles=[1, 2, 3]'))
+        finally:
+            rst.close()
+        try:
+            rst = Restart(get_fn('testc.rst7', written=True), 'r')
+            self.assertRaises(RuntimeError, lambda:
+                    assign(rst, 'rst.cell_lengths=[1, 2, 3]'))
+            self.assertRaises(RuntimeError, lambda:
+                    assign(rst, 'rst.cell_angles=[1, 2, 3]'))
         finally:
             rst.close()
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=True,
@@ -1730,8 +1749,12 @@ class TestWriteFiles(FileIOTestCase):
         # assertAlmostEqual in this case).
         rst = readparm.Rst7.open(get_fn('testc.rst7', written=True))
         self.assertFalse(rst.hasbox)
+        self.assertIs(rst.box, None)
         self.assertFalse(rst.hasvels)
         np.testing.assert_equal(rst.coordinates.flatten(), list(range(27)))
+        rst = asciicrd.AmberAsciiRestart(get_fn('testc.rst7', written=True))
+        self.assertIs(rst.cell_lengths, None)
+        self.assertIs(rst.cell_angles, None)
         rst = readparm.Rst7.open(get_fn('testcb.rst7', written=True))
         self.assertTrue(rst.hasbox)
         self.assertFalse(rst.hasvels)

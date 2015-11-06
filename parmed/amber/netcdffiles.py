@@ -316,10 +316,7 @@ class NetCDFRestart(object):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
 
     def flush(self):
-        try:
-            self._ncfile.flush()
-        except AttributeError:
-            pass
+        self._ncfile.flush()
 
 @add_metaclass(FileFormatType)
 class NetCDFTraj(object):
@@ -717,7 +714,7 @@ class NetCDFTraj(object):
 
     @property
     def temp0(self):
-        return self._ncfile.variables['temp0']
+        return self._ncfile.variables['temp0'][:]
 
     def add_temp0(self, stuff):
         """ The temperature to add to the current frame of the NetCDF file
@@ -750,7 +747,4 @@ class NetCDFTraj(object):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
 
     def flush(self):
-        try:
-            self._ncfile.flush()
-        except AttributeError:
-            pass
+        self._ncfile.flush()
