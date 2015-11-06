@@ -7,7 +7,7 @@ Date: Aug. 11, 2015
 """
 from __future__ import division, print_function
 
-from collections import defaultdict
+from collections import defaultdict, Sequence
 from contextlib import closing
 import math
 import os
@@ -64,7 +64,7 @@ class AmberParameterSet(ParameterSet):
 
     Parameters
     ----------
-    filenames : str or list of str
+    filenames : str, list of str, file-like, or list of file-like
         Either the name of a file or a list of filenames from which parameters
         should be parsed.
 
@@ -201,9 +201,12 @@ class AmberParameterSet(ParameterSet):
         for filename in filenames:
             if isinstance(filename, string_types):
                 self.load_parameters(filename)
-            else:
+            elif isinstance(filename, Sequence):
                 for fname in filename:
                     self.load_parameters(fname)
+            else:
+                # Assume open file object
+                self.load_parameters(filename)
 
     #===================================================
 

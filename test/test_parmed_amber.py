@@ -948,14 +948,29 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['K+'].atomic_number, 19)
         self.assertTrue(params.residues)
+        with open(os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd', 'leaprc.ff14SB')) as f:
+            params = parameters.AmberParameterSet.from_leaprc(f)
+        self.assertEqual(params.atom_types['H'].atomic_number, 1)
+        self.assertEqual(params.atom_types['3C'].atomic_number, 6)
+        self.assertEqual(params.atom_types['K+'].atomic_number, 19)
+        self.assertTrue(params.residues)
 
     def testParmSetParsing(self):
         """ Tests parsing a set of Amber parameter files """
         params = parameters.AmberParameterSet(
                 os.path.join(get_fn('parm'), 'parm99.dat'),
-                os.path.join(get_fn('parm'), 'frcmod.ff99SB'),
-                os.path.join(get_fn('parm'), 'frcmod.parmbsc0'),
+              [ os.path.join(get_fn('parm'), 'frcmod.ff99SB'),
+                os.path.join(get_fn('parm'), 'frcmod.parmbsc0'), ],
         )
+        self._check_paramset(params)
+        params = parameters.AmberParameterSet(
+                open(os.path.join(get_fn('parm'), 'parm99.dat')),
+                open(os.path.join(get_fn('parm'), 'frcmod.ff99SB')),
+                open(os.path.join(get_fn('parm'), 'frcmod.parmbsc0')),
+        )
+        self._check_paramset(params)
+
+    def _check_paramset(self, params):
         self.assertGreater(_num_unique_types(params.atom_types), 0)
         self.assertGreater(_num_unique_types(params.bond_types), 0)
         self.assertGreater(_num_unique_types(params.angle_types), 0)
