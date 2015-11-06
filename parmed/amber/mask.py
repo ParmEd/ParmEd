@@ -475,7 +475,7 @@ class AmberMask(object):
             pmask.select_all()
         elif ptoken[0] in ['<','>']:
             return ptoken
-        else:
+        else: # Should never reach here
             raise MaskError('Mask is missing : and @')
         # end if ':' in ptoken:
 

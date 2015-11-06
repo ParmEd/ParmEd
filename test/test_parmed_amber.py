@@ -1252,6 +1252,7 @@ class TestAmberMask(unittest.TestCase):
         mask_atnum2 = mask.AmberMask(parm, '@1-10,21-30')
         mask_atname = mask.AmberMask(parm, '@CA')
         mask_atname2 = mask.AmberMask(parm, '@CA@CB')
+        mask_atname3 = mask.AmberMask(parm, '@CA,1,CB,2-3')
         mask_resat = mask.AmberMask(parm, ':ALA@CA')
         mask_attyp = mask.AmberMask(parm, '@%CT')
         mask_wldcrd = mask.AmberMask(parm, '@H=')
@@ -1327,6 +1328,14 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+        for atom, val in zip(parm.atoms, mask_atname3.Selection()):
+            if atom.name in ('CA', 'CB'):
+                self.assertEqual(val, 1)
+            elif atom.idx < 3:
+                self.assertEqual(val, 1)
+            else:
+                self.assertEqual(val, 0)
 
         self.assertEqual(sum(mask_resat.Selection()), 12)
         for idx in mask_resat.Selected():
@@ -1419,6 +1428,9 @@ class TestAmberMask(unittest.TestCase):
         mask18 = mask.AmberMask(parm, '@1-20,40-xyz')
         mask19 = mask.AmberMask(parm, ':1-xyz')
         mask20 = mask.AmberMask(parm, ':1-4,40-xyz')
+        mask21 = mask.AmberMask(parm, '@C%')
+        mask22 = mask.AmberMask(parm, ':C%')
+        mask23 = mask.AmberMask(parm, '@/Fk') # Looking for all Fakeiums
 
         self.assertRaises(MaskError, mask1.Selection)
         self.assertRaises(MaskError, mask2.Selection)
@@ -1440,6 +1452,25 @@ class TestAmberMask(unittest.TestCase):
         self.assertRaises(MaskError, mask18.Selection)
         self.assertRaises(MaskError, mask19.Selection)
         self.assertRaises(MaskError, mask20.Selection)
+        self.assertRaises(MaskError, mask21.Selection)
+        self.assertRaises(MaskError, mask22.Selection)
+        self.assertRaises(MaskError, mask23.Selection)
+        # These should never be triggered, but they are good safeguards
+        self.assertRaises(MaskError, lambda:
+                mask23._binop('/', mask._mask(len(parm.atoms)), mask._mask(len(parm.atoms))))
+        self.assertRaises(MaskError, lambda: mask23._priority('/'))
+
+        # Test the internal mask interface
+        pmask = mask._mask(20)
+        pmask2 = mask._mask(21)
+        self.assertEqual(len(pmask), 20)
+        self.assertEqual(pmask.pop(), 0)
+        self.assertEqual(len(pmask), 20) # Pop does not change length
+        self.assertRaises(MaskError, lambda: pmask.append(10)) # append disabled
+        self.assertRaises(MaskError, lambda: pmask.extend([0,0]))
+        self.assertRaises(MaskError, lambda: pmask.remove(0)) # remove disabled
+        self.assertRaises(MaskError, lambda: pmask.And(pmask2))
+        self.assertRaises(MaskError, lambda: pmask.Or(pmask2))
 
     def testCompoundMask(self):
         """ Tests compound/complex Amber selection masks """
