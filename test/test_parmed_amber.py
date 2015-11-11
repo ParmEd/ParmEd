@@ -750,9 +750,18 @@ class TestParameterFiles(FileIOTestCase):
 
     def testFrcmodParsing(self):
         """ Tests parsing an Amber frcmod file """
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'frcmod.ff99SB')
+        self._check_ff99sb(
+                parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'frcmod.ff99SB')
+                )
         )
+        self._check_ff99sb(
+                parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'frcmod.1')
+                )
+        )
+
+    def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
         self.assertEqual(_num_unique_types(params.bond_types), 0)
         self.assertEqual(_num_unique_types(params.angle_types), 0)
@@ -935,6 +944,17 @@ class TestParameterFiles(FileIOTestCase):
                          math.sqrt(0.162750*0.2104))
         self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
                          1.775931+1.66)
+        # Check inside an frcmod file
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'frcmod.2')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 4)
+        self.assertEqual(_num_unique_types(params.bond_types), 0)
+        self.assertEqual(_num_unique_types(params.angle_types), 0)
+        self.assertEqual(_num_unique_types(params.dihedral_types), 0)
+        self.assertEqual(params.nbfix_types[('HC', 'OH')][0],
+                         math.sqrt(0.0150*0.2))
+        self.assertEqual(params.nbfix_types[('HC', 'OH')][1], 1.377+1.721)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def testLoadLeaprc(self):
@@ -999,6 +1019,28 @@ class TestParameterFiles(FileIOTestCase):
                          topologyobjects.DihedralType(0.27, 2, 0, 1.2, 2.0))
         self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
                          topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
+
+    def testPrivateFunctions(self):
+        """ Test some of the private utility functions in AmberParameterSet """
+        improper_key = parameters.AmberParameterSet._periodic_improper_key
+        # Construct an improper with 4 atoms
+        a1 = topologyobjects.Atom(name='CA', type='CA')
+        a2 = topologyobjects.Atom(name='CB', type='CB')
+        a3 = topologyobjects.Atom(name='CC', type='CD')
+        a4 = topologyobjects.Atom(name='CD', type='CC')
+        bonds = [topologyobjects.Bond(a1, a3), topologyobjects.Bond(a2, a3),
+                 topologyobjects.Bond(a3, a4)]
+        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a4, a3, a2, a1), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a1, a4, a2, a3), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a2, a4, a1, a3), ('CA', 'CB', 'CD', 'CC'))
+        # Now have no connectivity, check fallback
+        a1 = topologyobjects.Atom(name='CA', type='CA')
+        a2 = topologyobjects.Atom(name='CB', type='CB')
+        a3 = topologyobjects.Atom(name='CC', type='CD')
+        a4 = topologyobjects.Atom(name='CD', type='CC')
+        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a4, a3, a2, a1), ('CC', 'CD', 'CB', 'CA'))
 
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """

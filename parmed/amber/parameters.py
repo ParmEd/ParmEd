@@ -352,15 +352,15 @@ class AmberParameterSet(ParameterSet):
     def _periodic_improper_key(atom1, atom2, atom3, atom4):
         """ The central atom must always come third """
         all_atoms = set([atom1, atom2, atom3, atom4])
-        for atom in all_atoms:
-            for atom2 in all_atoms:
-                if atom2 is atom: continue
-                if not atom2 in atom.bond_partners:
+        for a in all_atoms:
+            for a2 in all_atoms:
+                if a2 is a: continue
+                if not a2 in a.bond_partners:
                     break
             else:
                 # We found our central atom
-                others = sorted(all_atoms - set([atom]))
-                key = (others[0].type, others[1].type, atom.type,
+                others = sorted(all_atoms - {a}, key=lambda x: x.type or x.name)
+                key = (others[0].type, others[1].type, a.type,
                        others[2].type)
                 break
         else:
@@ -375,7 +375,6 @@ class AmberParameterSet(ParameterSet):
         def fiter():
             yield line
             for l in f: yield l
-            yield '' # Keep yielding empty string after file has ended
         section = None
         finished_diheds = defaultdict(lambda: True)
         for line in fiter():
@@ -503,8 +502,8 @@ class AmberParameterSet(ParameterSet):
         if len(words) < 2:
             raise ParameterError('Could not parse the kind of nonbonded '
                                  'parameters in Amber parameter file')
-            if words[1].upper() != 'RE':
-                raise ParameterError('Only RE nonbonded parameters supported')
+        if words[1].upper() != 'RE':
+            raise ParameterError('Only RE nonbonded parameters supported')
         rawline = next(fiter)
         while rawline:
             line = rawline.strip()
