@@ -598,3 +598,34 @@ Input file for AMOEBA simulations.
      do_torsion_torsion=0,
  /
 """
+
+MDIN_TEXT1 = """\
+mdin prepared by mdin.py
+&cntrl
+ icnstph=1, ifsc=1, dt=0.004, 
+ tautp=5.0, nstlim=500000, 
+ scmask='@1-10', clambda=0.5, ig=-1, 
+ ntb=1, ifqnt=1, irest=1, taup=10.0, 
+ pres0=100.0, rgbmax=15.0, 
+ crgmask='@1-10', ntx=5, solvph=1.0, 
+ saltcon=0.1, restraint_wt=5.0, ntr=1, 
+ ntt=3, ntc=2, ntf=2, logdvdl=1000, 
+ restraintmask='@N,CA,C', imin=5, 
+ gamma_ln=5.0, igb=8, icfe=1, 
+/
+&ewald
+ nfft3='96', nfft2='64', nfft1='50', 
+ vdwmeth='0', 
+/
+&pb
+ istrng=1.0, 
+/
+&qmmm
+ qmcharge=-1, printdipole=1, 
+/
+Restraints!
+10.5
+RES 1 10
+END
+END
+"""

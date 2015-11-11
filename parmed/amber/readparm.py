@@ -36,7 +36,7 @@ assert BeemanRestart and ConvertFromPSF
 __all__ = ['AmberFormat', 'AmberParm', 'ChamberParm', 'LoadParm', 'Rst7']
 
 # Supply a function to load a topology file in the 'correct' format
-def LoadParm(parmname, xyz=None, box=None, rst7_name=None):
+def LoadParm(parmname, xyz=None, box=None):
     """
     Loads a topology file using the correct class.
 
@@ -69,15 +69,6 @@ def LoadParm(parmname, xyz=None, box=None, rst7_name=None):
         parm = parm.view_as(AmoebaParm)
     else:
         parm = parm.view_as(AmberParm)
-
-    # Now read the coordinate file if applicable
-    if xyz is None and rst7_name is not None:
-        _warn('rst7_name keyword is deprecated. Use xyz instead',
-              DeprecationWarning)
-        xyz = rst7_name
-    elif xyz is not None and rst7_name is not None:
-        _warn('rst7_name keyword is deprecated and ignored in favor of xyz',
-              DeprecationWarning)
 
     if isinstance(xyz, string_types):
         f = load_file(xyz)

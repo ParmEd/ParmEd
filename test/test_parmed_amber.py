@@ -10,7 +10,8 @@ import os
 import re
 import sys
 from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
-from parmed.exceptions import AmberWarning, MoleculeError, AmberError, MaskError
+from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
+                               MaskError, InputError)
 from parmed import topologyobjects, load_file
 import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
@@ -81,9 +82,14 @@ class TestReadParm(unittest.TestCase):
         """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
-        self.assertIs(parm2.view_as(readparm.AmberParm), parm2)
+        self.assertIs(parm.view_as(readparm.AmberParm), parm)
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
+        # Now check that the box info is set properly
+        crd3 = load_file(get_fn('solv.rst7'))
+        parm3 = readparm.LoadParm(get_fn('solv.prmtop'), xyz=crd3.coordinates)
+        np.testing.assert_equal(parm3.box[:3], parm3.parm_data['BOX_DIMENSIONS'][1:])
+        self.assertEqual(parm3.box[3], parm3.parm_data['BOX_DIMENSIONS'][0])
 
     def testGzippedParm(self):
         """ Check that gzipped prmtop files can be parsed correctly """
@@ -2064,5 +2070,114 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(d1.improper, d2.improper)
             self.assertEqual(d1.type, d2.type)
 
-if __name__ == '__main__':
-    unittest.main()
+class TestAmberMdin(FileIOTestCase):
+    """ Tests the Mdin class.... not a good class """
+
+    def testMdinAPI(self):
+        """ Tests the Mdin object basic features """
+        fn = get_fn('test.mdin', written=True)
+        mdin1 = mdin.Mdin('sander')
+        self.assertEqual(set(mdin1.valid_namelists), {'cntrl', 'ewald', 'qmmm', 'pb'})
+        self.assertEqual(mdin1.title, 'mdin prepared by mdin.py')
+        self.assertEqual(mdin1.verbosity, 0)
+        # What the heck was this for?
+        self.assertTrue(mdin1.check())
+        mdin1.time()
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.001)
+        self.assertEqual(mdin1.cntrl_nml['nstlim'], 1000000)
+        self.assertEqual(mdin1.cntrl_nml['imin'], 0)
+        mdin1.SHAKE()
+        self.assertEqual(mdin1.cntrl_nml['ntf'], 2)
+        self.assertEqual(mdin1.cntrl_nml['ntc'], 2)
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.002)
+        mdin1.time()
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.002)
+        self.assertEqual(mdin1.cntrl_nml['nstlim'], 500000)
+        mdin1.constPressure(press=100.0, taup=10.0)
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 2)
+        self.assertEqual(mdin1.cntrl_nml['ntp'], 1)
+        self.assertEqual(mdin1.cntrl_nml['pres0'], 100.0)
+        self.assertEqual(mdin1.cntrl_nml['taup'], 10.0)
+        mdin1.constVolume()
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ntp'], 0)
+        mdin1.constTemp(ntt=3, temp=100)
+        self.assertEqual(mdin1.cntrl_nml['ntt'], 3)
+        self.assertEqual(mdin1.cntrl_nml['gamma_ln'], 2.0)
+        self.assertEqual(mdin1.cntrl_nml['ig'], -1)
+        self.assertEqual(mdin1.cntrl_nml['tautp'], 1.0)
+        mdin1.constTemp(ntt=2, temp=100)
+        self.assertEqual(mdin1.cntrl_nml['ntt'], 2)
+        self.assertEqual(mdin1.cntrl_nml['gamma_ln'], 0)
+        self.assertEqual(mdin1.cntrl_nml['ig'], -1)
+        self.assertEqual(mdin1.cntrl_nml['tautp'], 1.0)
+        mdin1.constpH(solvph=1.0)
+        self.assertEqual(mdin1.cntrl_nml['solvph'], 1.0)
+        self.assertEqual(mdin1.cntrl_nml['icnstph'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ntcnstph'], 10)
+        self.assertEqual(mdin1.cntrl_nml['igb'], 2)
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 0)
+        self.assertEqual(mdin1.cntrl_nml['saltcon'], 0.1)
+        mdin1.restrainHeavyAtoms(10.0)
+        self.assertEqual(mdin1.cntrl_nml['restraint_wt'], 10)
+        self.assertEqual(mdin1.cntrl_nml['restraintmask'], '!@H=')
+        mdin1.restrainBackbone(5.0)
+        self.assertEqual(mdin1.cntrl_nml['restraint_wt'], 5)
+        self.assertEqual(mdin1.cntrl_nml['restraintmask'], '@N,CA,C')
+        mdin1.genBorn(igb=8, rgbmax=15.0)
+        self.assertEqual(mdin1.cntrl_nml['igb'], 8)
+        self.assertEqual(mdin1.cntrl_nml['rgbmax'], 15)
+        self.assertEqual(mdin1.cntrl_nml['ntp'], 0)
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 0)
+        mdin1.time(dt=0.004, time=2000)
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.004)
+        self.assertEqual(mdin1.cntrl_nml['nstlim'], 500000)
+        self.assertEqual(mdin1.cntrl_nml['imin'], 0)
+        mdin1.heat()
+        self.assertEqual(mdin1.cntrl_nml['tempi'], 0)
+        self.assertEqual(mdin1.cntrl_nml['temp0'], 300)
+        self.assertEqual(mdin1.cntrl_nml['ntt'], 3)
+        self.assertEqual(mdin1.cntrl_nml['ig'], -1)
+        self.assertEqual(mdin1.cntrl_nml['gamma_ln'], 5.0)
+        mdin1.restart()
+        self.assertEqual(mdin1.cntrl_nml['irest'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ntx'], 5)
+        mdin1.TI(clambda=0.5)
+        self.assertEqual(mdin1.cntrl_nml['clambda'], 0.5)
+        self.assertEqual(mdin1.cntrl_nml['icfe'], 1)
+        mdin1.softcore_TI(scmask='@1-10', crgmask='@1-10', logdvdl=1000)
+        self.assertEqual(mdin1.cntrl_nml['icfe'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ifsc'], 1)
+        self.assertEqual(mdin1.cntrl_nml['scalpha'], 0.5)
+        self.assertEqual(mdin1.cntrl_nml['scmask'], '@1-10')
+        self.assertEqual(mdin1.cntrl_nml['crgmask'], '@1-10')
+        self.assertEqual(mdin1.cntrl_nml['logdvdl'], 1000)
+        mdin1.minimization(imin=5)
+        self.assertEqual(mdin1.cntrl_nml['imin'], 5)
+        self.assertEqual(mdin1.cntrl_nml['maxcyc'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ncyc'], 10)
+        self.assertEqual(mdin1.cntrl_nml['ntmin'], 1)
+        mdin1.change('cntrl', 'ifqnt', 1)
+        mdin1.change('pb', 'istrng', 1.0)
+        mdin1.change('qmmm', 'qmcharge', -1)
+        mdin1.change('qmmm', 'printdipole', 1)
+        mdin1.change('ewald', 'vdwmeth', 0)
+        mdin1.change('ewald', 'nfft1', 50)
+        mdin1.change('ewald', 'nfft2', 64)
+        mdin1.change('ewald', 'nfft3', 96)
+        mdin1.AddCard(title='Restraints!', cardString='10.5\nRES 1 10')
+        mdin1.write(fn)
+        with open(fn, 'r') as f:
+            self.assertEqual(f.read(), saved.MDIN_TEXT1)
+        mdin2 = mdin.Mdin(program='sander')
+        mdin2.read(fn)
+        for var in mdin1.cntrl_nml.keys():
+            self.assertEqual(mdin1.cntrl_nml[var], mdin2.cntrl_nml[var])
+        for var in mdin1.qmmm_nml.keys():
+            self.assertEqual(mdin1.qmmm_nml[var], mdin2.qmmm_nml[var])
+        mdin3 = mdin.Mdin(program='pmemd')
+        self.assertRaises(InputError, lambda: mdin3.change('cntrl', 'ievb', 1))
+        self.assertRaises(InputError, lambda: mdin.Mdin(program='charmm'))
+        mdin4 = mdin.Mdin(program='sander.APBS')
+        mdin4.change('cntrl', 'igb', 10)
+        mdin4.change('pb', 'bcfl', 1)
