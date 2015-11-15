@@ -118,7 +118,8 @@ class AmberParameterSet(ParameterSet):
                 return False
             # The first word is the atom type (must be <= 2 characters, and not
             # an integer)
-            if len(words[0]) > 2: return False
+            if len(words[0]) > 2:
+                return False
             try:
                 float(words[0])
                 return False
@@ -237,7 +238,8 @@ class AmberParameterSet(ParameterSet):
         # To make parsing easier, and because leaprc files are usually quite
         # short, I'll read the whole file into memory
         text = f.read()
-        if own_handle: f.close()
+        if own_handle:
+            f.close()
         lowertext = text.lower() # commands are case-insensitive
         try:
             idx = lowertext.index('addatomtypes')
@@ -265,7 +267,8 @@ class AmberParameterSet(ParameterSet):
                     nopen += 1
                 elif char == '}':
                     nopen -= 1
-                    if nopen == 0: break
+                    if nopen == 0:
+                        break
                 elif char == '\n':
                     char = ' '
                 chars.append(char)
@@ -351,7 +354,8 @@ class AmberParameterSet(ParameterSet):
         all_atoms = set([atom1, atom2, atom3, atom4])
         for atom in all_atoms:
             for atom2 in all_atoms:
-                if atom2 is atom: continue
+                if atom2 is atom:
+                    continue
                 if not atom2 in atom.bond_partners:
                     break
             else:
@@ -371,13 +375,15 @@ class AmberParameterSet(ParameterSet):
         """ Parses an frcmod file from an open file object """
         def fiter():
             yield line
-            for l in f: yield l
+            for l in f:
+                yield l
             yield '' # Keep yielding empty string after file has ended
         section = None
         finished_diheds = defaultdict(lambda: True)
         for line in fiter():
             line = line.rstrip()
-            if not line: continue
+            if not line:
+                continue
             if line.startswith('MASS'):
                 section = 'MASS'
                 continue
@@ -421,7 +427,8 @@ class AmberParameterSet(ParameterSet):
         """ Internal parser for parm.dat files from open file handle """
         def fiter():
             yield line
-            for l in f: yield l
+            for l in f:
+                yield l
             # Keep yielding empty string after file has ended
             yield ''
         fiter = fiter()
@@ -686,7 +693,8 @@ class AmberParameterSet(ParameterSet):
         outfile.write('BOND\n')
         done = set()
         for (a1, a2), typ in iteritems(self.bond_types):
-            if id(typ) in done: continue
+            if id(typ) in done:
+                continue
             done.add(id(typ))
             outfile.write('%s-%s   %8.3f  %6.3f\n' %
                           (a1.ljust(2), a2.ljust(2), typ.k, typ.req))
@@ -695,7 +703,8 @@ class AmberParameterSet(ParameterSet):
         outfile.write('ANGLE\n')
         done = set()
         for (a1, a2, a3), typ in iteritems(self.angle_types):
-            if id(typ) in done: continue
+            if id(typ) in done:
+                continue
             done.add(id(typ))
             outfile.write('%s-%s-%s   %8.3f  %6.3f\n' %
                           (a1.ljust(2), a2.ljust(2), a3.ljust(2), typ.k,
@@ -705,7 +714,8 @@ class AmberParameterSet(ParameterSet):
         outfile.write('DIHE\n')
         done = set()
         for (a1, a2, a3, a4), typ in iteritems(self.dihedral_types):
-            if id(typ) in done: continue
+            if id(typ) in done:
+                continue
             done.add(id(typ))
             if isinstance(typ, DihedralType) or len(typ) == 1:
                 if not isinstance(typ, DihedralType):

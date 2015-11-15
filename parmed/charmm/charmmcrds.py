@@ -145,7 +145,7 @@ class CharmmCrdFile(object):
 
             while len(line) == 0:      # Skip whitespace
                 line = crdfile.readline().strip()
-            
+
             try:
                 self.natom = int(line.split()[0])
                 for row in range(self.natom):
@@ -257,7 +257,7 @@ class CharmmRstFile(object):
         self.coordsold = []
         self.coords = []
         self.vels = []
-        
+
         self.ff_version = 0
         self.natom = 0
         self.npriv = 0
@@ -346,7 +346,8 @@ class CharmmRstFile(object):
     def scan(self, handle, str, r=0): # read lines in file till 'str' is found
         scanning = True
 
-        if(r): handle.seek(0)
+        if(r):
+            handle.seek(0)
 
         while scanning:
             line = handle.readline()

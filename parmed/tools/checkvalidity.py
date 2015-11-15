@@ -127,7 +127,7 @@ def check_validity(parm, warnings):
         if has_cmap:
             hk = checkme('CHARMM_CMAP_COUNT', 2, True, False, None, int)
             hasallkeys = hasallkeys and hk
-     
+
         if hasallkeys:
             # Get the number of terms
             nub = parm.parm_data['CHARMM_UREY_BRADLEY_COUNT'][0]
@@ -204,7 +204,8 @@ def check_validity(parm, warnings):
     # though, we can only check that CYX sulfurs are bonded to another Sulfur
     mask = AmberMask(parm, ':CYX@SG')
     for i, sel in enumerate(mask.Selection()):
-        if not sel: continue
+        if not sel:
+            continue
         atm = parm.atoms[i]
         # We expect 2 bonds
         bondedatms = [a.name for a in atm.bond_partners]
@@ -219,7 +220,8 @@ def check_validity(parm, warnings):
         mask = AmberMask(parm, ':CYS,CYM@SG')
         s_atms = []
         for i, sel in enumerate(mask.Selection()):
-            if not sel: continue
+            if not sel:
+                continue
             s_atms.append(parm.atoms[i])
         try:
             for i in range(len(s_atms)-1):

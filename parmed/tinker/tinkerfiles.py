@@ -19,7 +19,8 @@ class KeywordControlFile(object):
         # Parse the file
         for line in open(fname, 'r'):
             # Skip over any blank lines
-            if not line.strip(): continue
+            if not line.strip():
+                continue
             words = line.split()
             key = words[0].upper()
             # Get rid of the keyword and all whitespace
@@ -60,7 +61,8 @@ class XyzFile(object):
             super(XyzFile._AtomList, self).append(thing)
 
         def extend(self, things):
-            for thing in things: self.append(thing)
+            for thing in things:
+                self.append(thing)
 
     def __init__(self, fname):
         self.natom = 0

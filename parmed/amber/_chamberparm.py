@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -101,7 +101,7 @@ class ChamberParm(AmberParm):
         self.LJ_14_radius = []
         self.LJ_14_depth = []
         AmberParm.initialize_topology(self, xyz, box)
-      
+
     #===================================================
 
     def load_pointers(self):
@@ -134,7 +134,8 @@ class ChamberParm(AmberParm):
         self._load_improper_info()
         self._load_cmap_info()
         # All of our angles are urey-bradley types
-        for angle in self.angles: angle.funct = 5
+        for angle in self.angles:
+            angle.funct = 5
         super(ChamberParm, self).unchange()
 
     #===================================================
@@ -182,7 +183,8 @@ class ChamberParm(AmberParm):
         nbfixes = inst.atoms.assign_nbidx_from_types()
         # Give virtual sites a name that Amber understands
         for atom in inst.atoms:
-            if isinstance(atom, ExtraPoint): atom.type = 'EP'
+            if isinstance(atom, ExtraPoint):
+                atom.type = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
@@ -317,7 +319,7 @@ class ChamberParm(AmberParm):
     @property
     def chamber(self):
         return True
-   
+
     @property
     def amoeba(self):
         return False
@@ -366,7 +368,8 @@ class ChamberParm(AmberParm):
 
     def _load_cmap_info(self):
         """ Loads the CHARMM CMAP types and array """
-        if not self.has_cmap: return
+        if not self.has_cmap:
+            return
         del self.cmaps[:]
         del self.cmap_types[:]
         for i in range(self.pointers['CMAP_TYPES']):
@@ -390,7 +393,8 @@ class ChamberParm(AmberParm):
         super(ChamberParm, self)._check_section_lengths()
 
         def check_length(key, length, required=True):
-            if not required and not key in self.parm_data: return
+            if not required and not key in self.parm_data:
+                return
             if len(self.parm_data[key]) != length:
                 raise AmberError('FLAG %s has %d elements; expected %d' %
                                  (key, len(self.parm_data[key]), length))
@@ -472,7 +476,8 @@ class ChamberParm(AmberParm):
 
     def _xfer_cmap_properties(self):
         """ Sets the topology file section data from the cmap arrays """
-        if not self.has_cmap: return
+        if not self.has_cmap:
+            return
         data = self.parm_data
         for ct in self.cmap_types:
             ct.used = False
@@ -680,7 +685,8 @@ class ChamberParm(AmberParm):
         # B-coefficients, we have to expand our type list (assume all type
         # names will have the same L-J parameters, which has been a fair
         # assumption in my experience).
-        if not self.adjusts: return
+        if not self.adjusts:
+            return
         for i in range(len(data['LENNARD_JONES_14_ACOEF'])):
             data['LENNARD_JONES_14_ACOEF'][i] = None
             data['LENNARD_JONES_14_BCOEF'][i] = None

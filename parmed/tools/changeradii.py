@@ -16,15 +16,24 @@ def bondi(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 1: atom.radii = 1.2
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 1:
+            atom.radii = 1.2
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'Bondi radii (bondi)'
@@ -57,14 +66,22 @@ def amber6(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'amber6 modified Bondi radii (amber6)'
@@ -97,14 +114,22 @@ def mbondi(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8:  atom.radii = 1.5
-        elif atom.atomic_number == 9:  atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'modified Bondi radii (mbondi)'
@@ -134,14 +159,22 @@ def mbondi2(parm):
             else:
                 atom.radii = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 7:
+            atom.radii = 1.55
+        elif atom.atomic_number == 8:
+            atom.radii = 1.5
+        elif atom.atomic_number == 9:
+            atom.radii = 1.5
+        elif atom.atomic_number == 14:
+            atom.radii = 2.1
+        elif atom.atomic_number == 15:
+            atom.radii = 1.85
+        elif atom.atomic_number == 16:
+            atom.radii = 1.8
+        elif atom.atomic_number == 17:
+            atom.radii = 1.5
+        else:
+            atom.radii = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'H(N)-modified Bondi radii (mbondi2)'

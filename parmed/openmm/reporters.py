@@ -29,7 +29,7 @@ class StateDataReporter(object):
 
     Most of this code is copied from the OpenMM StateDataReporter class, with
     the above-mentioned changes made.
-    
+
     Parameters
     ----------
     f : str or file-like
@@ -425,9 +425,12 @@ class MdcrdReporter(object):
     def __init__(self, file, reportInterval, crds=True, vels=False, frcs=False):
         # ASCII mdcrds can have either coordinates, forces, or velocities
         ntrue = 0
-        if crds: ntrue += 1
-        if vels: ntrue += 1
-        if frcs: ntrue += 1
+        if crds:
+            ntrue += 1
+        if vels:
+            ntrue += 1
+        if frcs:
+            ntrue += 1
         if ntrue != 1:
             raise ValueError('MdcrdReporter must print exactly one of either '
                              'coordinates, velocities, or forces.')
@@ -549,7 +552,7 @@ class RestartReporter(object):
         Write velocities to the restart file. You can turn this off for passing
         in, for instance, a minimized structure.
     """
-   
+
     @needs_openmm
     def __init__(self, file, reportInterval, write_multiple=False, netcdf=False,
                  write_velocities=True):
@@ -723,7 +726,7 @@ class ProgressReporter(StateDataReporter):
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
         return (steps, False, False, False, self._needEnergy)
-   
+
     def report(self, simulation, state):
         """
         Generate a report and predict the time to completion (and
@@ -798,7 +801,8 @@ class ProgressReporter(StateDataReporter):
             f.write('\n')
             f.write('-+' * 39 + '\n')
 
-        if remaining_steps == 0: self._startTime = None
+        if remaining_steps == 0:
+            self._startTime = None
 
     def _constructReportValues(self, simulation, state):
         """
@@ -839,7 +843,7 @@ class ProgressReporter(StateDataReporter):
             values['density'] = dens.value_in_unit(self._densityUnit)
 
         return values
-   
+
     def __del__(self):
         """ We already closed the file. """
 

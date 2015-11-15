@@ -53,7 +53,7 @@ DEFAULT_C4_PARAMS = {
 }
 
 def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
-   
+
     from parmed import periodic_table as pt
 
     global DEFAULT_C4_PARAMS, WATER_POL
@@ -64,7 +64,7 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
         raise LJ12_6_4Error('Bad polarizability file %s. Expected a file with '
                             '2 columns: <Amber Atom Type> <Polarizability>' %
                             polfile)
-   
+
     if c4file is None:
         c4list = DEFAULT_C4_PARAMS[watermodel]
     else:
@@ -82,7 +82,8 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
     for i in mask.Selected():
         mettypind = parm.parm_data['ATOM_TYPE_INDEX'][i]
         metchg = parm.parm_data['CHARGE'][i]
-        if mettypind in mettypdict: continue
+        if mettypind in mettypdict:
+            continue
         mettypdict[mettypind] = (parm.atoms[i].atomic_number, int(metchg))
         print("The selected metal ion is %s" %
               pt.Element[parm.atoms[i].atomic_number])

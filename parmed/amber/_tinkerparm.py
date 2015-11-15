@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-   
+
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -334,7 +334,7 @@ class AmoebaParm(AmberParm):
     @property
     def chamber(self):
         return False
-   
+
     @property
     def amoeba(self):
         return True
@@ -343,7 +343,8 @@ class AmoebaParm(AmberParm):
 
     def _load_bond_info(self):
         """ Load the regular AMOEBA bonds, if they exist """
-        if not 'AMOEBA_REGULAR_BOND_LIST' in self.parm_data: return
+        if not 'AMOEBA_REGULAR_BOND_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.bonds[:]
         del self.bond_types[:]
@@ -367,7 +368,8 @@ class AmoebaParm(AmberParm):
 
     def _load_angle_info(self):
         """ Load the regular AMOEBA angles, if they exist """
-        if not 'AMOEBA_REGULAR_ANGLE_LIST' in self.parm_data: return
+        if not 'AMOEBA_REGULAR_ANGLE_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.angles[:]
         del self.angle_types[:]
@@ -391,7 +393,8 @@ class AmoebaParm(AmberParm):
 
     def _load_urey_bradley_info(self):
         """ Loads the AMOEBA Urey-Bradley terms, if they exist """
-        if not 'AMOEBA_UREY_BRADLEY_BOND_LIST' in self.parm_data: return
+        if not 'AMOEBA_UREY_BRADLEY_BOND_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.urey_bradleys[:]
         del self.urey_bradley_types[:]
@@ -418,7 +421,8 @@ class AmoebaParm(AmberParm):
 
     def _load_trigonal_angle_info(self):
         """ Loads the AMOEBA trigonal angle terms, if they exist """
-        if not 'AMOEBA_TRIGONAL_ANGLE_LIST' in self.parm_data: return
+        if not 'AMOEBA_TRIGONAL_ANGLE_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.trigonal_angles[:]
         del self.trigonal_angle_types[:]
@@ -446,7 +450,8 @@ class AmoebaParm(AmberParm):
 
     def _load_oopbend_info(self):
         """ Loads the AMOEBA out-of-plane bending terms, if they exist """
-        if not 'AMOEBA_OPBEND_ANGLE_LIST' in self.parm_data: return
+        if not 'AMOEBA_OPBEND_ANGLE_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.out_of_plane_bends[:]
         del self.out_of_plane_bend_types[:]
@@ -473,7 +478,8 @@ class AmoebaParm(AmberParm):
 
     def _load_dihedral_info(self):
         """ Loads the AMOEBA regular torsion terms, if they exist """
-        if not 'AMOEBA_TORSION_LIST' in self.parm_data: return
+        if not 'AMOEBA_TORSION_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.dihedrals[:]
         del self.dihedral_types[:]
@@ -495,7 +501,8 @@ class AmoebaParm(AmberParm):
 
     def _load_pitorsion_info(self):
         """ Loads the AMOEBA pi-torsion terms, if they exist """
-        if not 'AMOEBA_PI_TORSION_LIST' in self.parm_data: return
+        if not 'AMOEBA_PI_TORSION_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.pi_torsions[:]
         del self.pi_torsion_types[:]
@@ -518,7 +525,8 @@ class AmoebaParm(AmberParm):
 
     def _load_stretch_bend_info(self):
         """ Loads the AMOEBA stretch-bend terms, if they exist """
-        if not 'AMOEBA_STRETCH_BEND_LIST' in self.parm_data: return
+        if not 'AMOEBA_STRETCH_BEND_LIST' in self.parm_data:
+            return
         data = self.parm_data
         del self.stretch_bends[:]
         del self.stretch_bend_types[:]
@@ -552,7 +560,8 @@ class AmoebaParm(AmberParm):
 
     def _load_torsion_torsion_info(self):
         """ Loads the AMOEBA coupled torsion-torsion terms, if they exist """
-        if not 'AMOEBA_TORSION_TORSION_LIST' in self.parm_data: return
+        if not 'AMOEBA_TORSION_TORSION_LIST' in self.parm_data:
+            return
         del self.torsion_torsion_types[:]
         del self.torsion_torsions[:]
         data = self.parm_data

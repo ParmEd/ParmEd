@@ -106,12 +106,18 @@ class _Defaults(object):
 
     def __getitem__(self, idx):
         # Treat it like the array that it is in the topology file
-        if idx < 0: idx += 5
-        if idx == 0: return self.nbfunc
-        if idx == 1: return self.comb_rule
-        if idx == 2: return self.gen_pairs
-        if idx == 3: return self.fudgeLJ
-        if idx == 4: return self.fudgeQQ
+        if idx < 0:
+            idx += 5
+        if idx == 0:
+            return self.nbfunc
+        if idx == 1:
+            return self.comb_rule
+        if idx == 2:
+            return self.gen_pairs
+        if idx == 3:
+            return self.fudgeLJ
+        if idx == 4:
+            return self.fudgeQQ
         raise IndexError('Index %d out of range' % idx)
 
     def __eq__(self, other):
@@ -122,7 +128,8 @@ class _Defaults(object):
                 self.fudgeQQ == other.fudgeQQ)
 
     def __setitem__(self, idx, value):
-        if idx < 0: idx += 5
+        if idx < 0:
+            idx += 5
         if idx == 0:
             if int(value) not in (1, 2):
                 raise ValueError('nbfunc must be 1 or 2')
@@ -200,13 +207,19 @@ class GromacsTopologyFile(Structure):
             for line in f:
                 if line.startswith(';'):
                     line = line[:line.index(';')]
-                if not line.strip(): continue
+                if not line.strip():
+                    continue
                 if line.startswith('#'):
-                    if line.startswith('#if'): continue
-                    if line.startswith('#define'): continue
-                    if line.startswith('#include'): continue
-                    if line.startswith('#undef'): continue
-                    if line.startswith('#endif'): continue
+                    if line.startswith('#if'):
+                        continue
+                    if line.startswith('#define'):
+                        continue
+                    if line.startswith('#include'):
+                        continue
+                    if line.startswith('#undef'):
+                        continue
+                    if line.startswith('#endif'):
+                        continue
                     return False
                 rematch = _sectionre.match(line)
                 if not rematch:
@@ -269,7 +282,8 @@ class GromacsTopologyFile(Structure):
             current_section = None
             for line in f:
                 line = line.strip()
-                if not line: continue
+                if not line:
+                    continue
 
                 if line[0] == '[':
                     current_section = line[1:-1].strip()
@@ -618,7 +632,8 @@ class GromacsTopologyFile(Structure):
                                     )
                                 kws['dp2'] = params.bond_types[key].req
                     for angle in parent.angles:
-                        if parent is not angle.atom2: continue
+                        if parent is not angle.atom2:
+                            continue
                         if atoms[0] not in angle or atoms[1] not in angle:
                             continue
                         foundt = True
@@ -885,8 +900,10 @@ class GromacsTopologyFile(Structure):
         def update_typelist_from(ptypes, types):
             added_types = set(id(typ) for typ in types)
             for k, typ in iteritems(ptypes):
-                if not typ.used: continue
-                if id(typ) in added_types: continue
+                if not typ.used:
+                    continue
+                if id(typ) in added_types:
+                    continue
                 added_types.add(id(typ))
                 types.append(typ)
             types.claim()
@@ -902,7 +919,8 @@ class GromacsTopologyFile(Structure):
                 gmx_pair.add((pair.atom2, pair.atom1))
             else:
                 gmx_pair.add((pair.atom1, pair.atom2))
-            if pair.type is not None: continue
+            if pair.type is not None:
+                continue
             key = (_gettype(pair.atom1), _gettype(pair.atom2))
             if key in params.pair_types:
                 pair.type = params.pair_types[key]
@@ -943,7 +961,8 @@ class GromacsTopologyFile(Structure):
                         true_14.add((bpj, bpi))
                     else:
                         true_14.add((bpi, bpj))
-            if bond.type is not None: continue
+            if bond.type is not None:
+                continue
             key = (_gettype(bond.atom1), _gettype(bond.atom2))
             if key in params.bond_types:
                 bond.type = params.bond_types[key]
@@ -970,7 +989,8 @@ class GromacsTopologyFile(Structure):
                           GromacsWarning)
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
-            if angle.type is not None: continue
+            if angle.type is not None:
+                continue
             key = (_gettype(angle.atom1), _gettype(angle.atom2),
                    _gettype(angle.atom3))
             if key in params.angle_types:
@@ -981,7 +1001,8 @@ class GromacsTopologyFile(Structure):
                               ParameterWarning)
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
-            if ub.type is not None: continue
+            if ub.type is not None:
+                continue
             key = (_gettype(ub.atom1), _gettype(ub.atom2))
             if key in params.urey_bradley_types:
                 ub.type = params.urey_bradley_types[key]
@@ -996,7 +1017,8 @@ class GromacsTopologyFile(Structure):
                 del self.urey_bradleys[i]
         update_typelist_from(params.urey_bradley_types, self.urey_bradley_types)
         for t in self.dihedrals:
-            if t.type is not None: continue
+            if t.type is not None:
+                continue
             key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
                    _gettype(t.atom4))
             if not t.improper:
@@ -1039,7 +1061,8 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.dihedral_types, self.dihedral_types)
         update_typelist_from(params.improper_periodic_types, self.dihedral_types)
         for t in self.rb_torsions:
-            if t.type is not None: continue
+            if t.type is not None:
+                continue
             key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
                    _gettype(t.atom4))
             wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
@@ -1065,7 +1088,8 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
         self.update_dihedral_exclusions()
         for t in self.impropers:
-            if t.type is not None: continue
+            if t.type is not None:
+                continue
             key = tuple(sorted([_gettype(t.atom1), _gettype(t.atom2),
                                 _gettype(t.atom3), _gettype(t.atom4)]))
             if key in params.improper_types:
@@ -1078,7 +1102,8 @@ class GromacsTopologyFile(Structure):
             for anchor in (_gettype(t.atom2), _gettype(t.atom3),
                            _gettype(t.atom4)):
                 wckey = tuple(sorted([_gettype(t.atom1), anchor, 'X', 'X']))
-                if wckey not in params.improper_types: continue
+                if wckey not in params.improper_types:
+                    continue
                 t.type = params.improper_types[wckey]
                 t.type.used = True
                 break
@@ -1087,7 +1112,8 @@ class GromacsTopologyFile(Structure):
                               ParameterWarning)
         update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
-            if c.type is not None: continue
+            if c.type is not None:
+                continue
             key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3),
                     _gettype(c.atom4), _gettype(c.atom5))
             if key in params.cmap_types:
@@ -1193,7 +1219,8 @@ class GromacsTopologyFile(Structure):
             scee_values = set()
             scnb_values = set()
             for dihedral in struct.dihedrals:
-                if dihedral.type is None: continue
+                if dihedral.type is None:
+                    continue
                 if isinstance(dihedral.type, DihedralTypeList):
                     for dt in dihedral.type:
                         if dt.scee:
@@ -1375,7 +1402,8 @@ class GromacsTopologyFile(Structure):
                     conv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
                                 u.kilojoule/u.nanometer**2) * 2
                     for key, param in iteritems(params.bond_types):
-                        if key in used_keys: continue
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         parfile.write('%-5s %-5s    1   %.5f   %f\n' % (key[0],
@@ -1391,7 +1419,8 @@ class GromacsTopologyFile(Structure):
                     bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
                                 u.kilojoule/u.nanometer**2) * 2
                     for key, param in iteritems(params.angle_types):
-                        if key in used_keys: continue
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
@@ -1414,7 +1443,8 @@ class GromacsTopologyFile(Structure):
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
                     fmt = '%-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
                     for key, param in iteritems(params.dihedral_types):
-                        if key in used_keys: continue
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         if isinstance(param, DihedralTypeList):
@@ -1437,7 +1467,8 @@ class GromacsTopologyFile(Structure):
                     conv = u.kilojoules.conversion_factor_to(u.kilocalories)
                     fmt = '%-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
                     for key, param in iteritems(params.improper_periodic_types):
-                        if key in used_keys: continue
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         parfile.write(fmt % (key[0], key[1], key[2], key[3],
@@ -1464,7 +1495,8 @@ class GromacsTopologyFile(Structure):
                     used_keys = set()
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
                     for key, param in iteritems(params.cmap_types):
-                        if key in used_keys: continue
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         parfile.write('%-6s %-6s %-6s %-6s %-6s   1   '
@@ -1559,7 +1591,8 @@ class GromacsTopologyFile(Structure):
                     else:
                         combmol = copy.copy(mols_in_mol[0])
                     for i, mol in enumerate(mols_in_mol):
-                        if i == 0: continue
+                        if i == 0:
+                            continue
                         assert id(mol) in counts and counts[id(mol)] > 0
                         if counts[id(mol)] > 1:
                             combmol += mol * counts[id(mol)]
@@ -1710,7 +1743,8 @@ class GromacsTopologyFile(Structure):
                        'funct', 'c0', 'c1', 'c2', 'c3'))
             # Get the 1-4 pairs from the dihedral list
             for dihed in struct.dihedrals:
-                if dihed.ignore_end or dihed.improper: continue
+                if dihed.ignore_end or dihed.improper:
+                    continue
                 a1, a2 = dihed.atom1, dihed.atom4
                 if a1 in a2.bond_partners or a1 in a2.angle_partners:
                     continue
@@ -1887,7 +1921,8 @@ class GromacsTopologyFile(Structure):
                     dest.write('[ virtual_sites2 ]\n')
                     dest.write('; Site  from    funct  a\n')
                     for EP in EPs:
-                        if not isinstance(EP.frame_type, ftype): continue
+                        if not isinstance(EP.frame_type, ftype):
+                            continue
                         a1, a2 = EP.frame_type.get_atoms()
                         dest.write('%-5d %-4d %-4d %-4d   %.6f\n' %
                                    (EP.idx+1, a1.idx+1, a2.idx+1, 1,
@@ -1957,10 +1992,12 @@ def _any_atoms_farther_than(structure, limit=3):
         atom
     """
     import sys
-    if len(structure.atoms) <= limit + 1: return False
+    if len(structure.atoms) <= limit + 1:
+        return False
     sys.setrecursionlimit(max(sys.getrecursionlimit(), limit+1))
     for atom in structure.atoms:
-        for atom in structure.atoms: atom.marked = limit + 1
+        for atom in structure.atoms:
+            atom.marked = limit + 1
         _mark_graph(atom, 0)
         if any((atom.marked > limit for atom in structure.atoms)):
             return True
@@ -1981,7 +2018,8 @@ def _mark_graph(atom, num):
     """
     atom.marked = num
     for a in atom.bond_partners:
-        if a.marked <= num: continue
+        if a.marked <= num:
+            continue
         _mark_graph(a, num+1)
 
 def _diff_diheds(dt1, dt2):
@@ -1993,7 +2031,8 @@ def _diff_diheds(dt1, dt2):
     if dt1 == dt2:
         return False
     if isinstance(dt2, DihedralTypeList) and isinstance(dt1, DihedralType):
-        if len(dt2) == 1 and dt2[0] == dt1: return False
+        if len(dt2) == 1 and dt2[0] == dt1:
+            return False
     return True
 
 def _gettype(atom):

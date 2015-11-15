@@ -41,7 +41,7 @@ class Timer(object):
       # Make sure the timer is not on already
       if timer_name in self.active_timers:
          return
-      
+
       # Check to make sure we've added the timer or not. If not, then add it
       if not timer_name in self.timer_names:
          self.add_timer(timer_name, '%s timer' % timer_name)
@@ -83,7 +83,7 @@ class Timer(object):
 
       # Make sure all timers are ended
       self.end_all()
-      
+
       tfactor = 1
       # Now test the magnitude of the global timer so we can decide what the 
       # reported units should be

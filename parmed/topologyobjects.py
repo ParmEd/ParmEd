@@ -93,7 +93,7 @@ class _ListItem(object):
         This is intended to be a read-only variable that determines where in the
         list this particular object is. If there is no `list` attribute for this
         object, or the item is not in the list at all, `idx` is -1
-        
+
     Notes
     -----
     For lists that support indexing its members and tracking when that list is
@@ -494,7 +494,7 @@ class Atom(_ListItem):
         self._rmin14 = rmin14
         self._epsilon14 = epsilon14
         self.children = []
-   
+
     #===================================================
 
     @classmethod
@@ -801,7 +801,7 @@ class Atom(_ListItem):
     def bond_to(self, other):
         """
         Log this atom as bonded to another atom.
-        
+
         Parameters
         ----------
         other : :class:`Atom`
@@ -822,7 +822,7 @@ class Atom(_ListItem):
         other._bond_partners.append(self)
 
     #===================================================
-      
+
     def angle_to(self, other):
         """
         Log this atom as angled to another atom.
@@ -841,13 +841,13 @@ class Atom(_ListItem):
             raise MoleculeError("Cannot angle an atom with itself!")
         self._angle_partners.append(other)
         other._angle_partners.append(self)
-   
+
     #===================================================
 
     def dihedral_to(self, other):
         """
         Log this atom as dihedral-ed to another atom.
-        
+
         Parameters
         ----------
         other : :class:`Atom`
@@ -862,7 +862,7 @@ class Atom(_ListItem):
             raise MoleculeError("Cannot dihedral an atom with itself!")
         self._dihedral_partners.append(other)
         other._dihedral_partners.append(self)
-      
+
     #===================================================
 
     def tortor_to(self, other):
@@ -1855,7 +1855,7 @@ class Angle(object):
     >>> Bond(a1, a3) in angle # this is not part of the angle definition
     False
     """
-      
+
     def __init__(self, atom1, atom2, atom3, type=None):
         # Make sure we're not angling me to myself
         if atom1 is atom2 or atom1 is atom3 or atom2 is atom3:
@@ -2029,7 +2029,7 @@ class Dihedral(_FourAtomTerm):
     >>> a1 in dihed and a2 in dihed and a3 in dihed and a4 in dihed
     True
     """
-      
+
     def __init__(self, atom1, atom2, atom3, atom4, improper=False,
                  ignore_end=False, type=None):
         _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
@@ -2237,7 +2237,7 @@ class DihedralType(_ListItem, _ParameterType):
     """
 
     #===================================================
-   
+
     def __init__(self, phi_k, per, phase, scee=1.0, scnb=1.0, list=None):
         """ DihedralType constructor """
         _ParameterType.__init__(self)
@@ -2331,7 +2331,7 @@ class RBTorsionType(_ListItem, _ParameterType):
     """
 
     #===================================================
-   
+
     def __init__(self, c0, c1, c2, c3, c4, c5, scee=1.0, scnb=1.0, list=None):
         _ParameterType.__init__(self)
         self.c0 = _strip_units(c0, u.kilocalories_per_mole)
@@ -2557,7 +2557,7 @@ class Improper(_FourAtomTerm):
     """
     A CHARMM-style improper torsion between 4 atoms. The first atom must be the
     central atom, as shown in the schematic below
-      
+
                       A3
                       |
                       |
@@ -3915,7 +3915,7 @@ class Residue(_ListItem):
         ----------
         atom : :class:`Atom`
             The atom to add to this residue
-        
+
         Notes
         -----
         This action assigns the `residue` attribute to `atom`
@@ -4798,7 +4798,7 @@ assert UnassignedAtomType is _UnassignedAtomType(), "Not a singleton"
 class AcceptorDonor(object):
     """
     Just a holder for donors and acceptors in CHARMM speak
-    
+
     Parameters
     ----------
     atom1 : :class:`Atom`

@@ -81,7 +81,8 @@ class FortranFormat(object):
             self.itemlen = int(itemlen)
             self.fmt = '%s'
             # See if we want to strip the strings
-            if strip_strings: self.process_method = lambda x: x.strip()
+            if strip_strings:
+                self.process_method = lambda x: x.strip()
 
         elif FortranFormat.intre.match(format_string):
             self.type = int
@@ -568,7 +569,8 @@ class AmberFormat(object):
                     )
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         def read_string(line_idx, lines, num_items):
@@ -582,7 +584,8 @@ class AmberFormat(object):
                 tmp_data.append(lines[line_idx][idx*4:idx*4+4])
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         def read_float(line_idx, lines, num_items):
@@ -603,7 +606,8 @@ class AmberFormat(object):
                     )
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         # First add a title
@@ -659,7 +663,7 @@ class AmberFormat(object):
         # Next read number excluded atoms
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
         self.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', data=tmp_data)
-      
+
         # Next read nonbonded parm index
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntypes**2)
         self.add_flag('NONBONDED_PARM_INDEX', '10I8', data=tmp_data)
@@ -671,7 +675,7 @@ class AmberFormat(object):
         # Next read residue pointer
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nres)
         self.add_flag('RESIDUE_POINTER', '10I8', data=tmp_data)
-   
+
         # Next read bond force constant
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numbnd)
         self.add_flag('BOND_FORCE_CONSTANT', '5E16.8', data=tmp_data)

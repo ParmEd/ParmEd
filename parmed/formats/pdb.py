@@ -52,11 +52,16 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
     -------
     True if they are the same atom, False otherwise
     """
-    if old_atom.name != new_atom.name: return False
-    if old_atom.residue.name != resname: return False
-    if old_atom.residue.number != resid: return False
-    if old_atom.residue.chain != chain.strip(): return False
-    if old_atom.residue.segid != segid.strip(): return False
+    if old_atom.name != new_atom.name:
+        return False
+    if old_atom.residue.name != resname:
+        return False
+    if old_atom.residue.number != resid:
+        return False
+    if old_atom.residue.chain != chain.strip():
+        return False
+    if old_atom.residue.segid != segid.strip():
+        return False
     return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -122,10 +127,14 @@ class PDBFile(object):
                     # Check for various attributes. This is the first atom, so
                     # we can assume we haven't gotten into the regime of "weird"
                     # yet, like hexadecimal atom/residue indices.
-                    if not atnum.strip().lstrip('-').isdigit(): return False
-                    if atname.strip().isdigit(): return False
-                    if not resname.strip(): return False
-                    if not resid.strip().lstrip('-').isdigit(): return False
+                    if not atnum.strip().lstrip('-').isdigit():
+                        return False
+                    if atname.strip().isdigit():
+                        return False
+                    if not resname.strip():
+                        return False
+                    if not resid.strip().lstrip('-').isdigit():
+                        return False
                     try:
                         float(x), float(y), float(z)
                     except ValueError:
@@ -237,7 +246,7 @@ class PDBFile(object):
         --------
         The PDB parser also adds metadata to the returned Structure object that
         may be present in the PDB file
-    
+
         experimental : ``str``
             EXPDTA record
         journal : ``str``
@@ -264,7 +273,7 @@ class PDBFile(object):
             The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
-    
+
         Returns
         -------
         structure : :class:`Structure`
@@ -320,7 +329,8 @@ class PDBFile(object):
                     inscode = inscode.strip()
 
                     elem = '%-2s' % elem # Make sure we have at least 2 chars
-                    if elem[0] == ' ': elem = elem[1] + ' '
+                    if elem[0] == ' ':
+                        elem = elem[1] + ' '
                     try:
                         atsym = (elem[0] + elem[1].lower()).strip()
                         atomic_number = AtomicNum[atsym]
@@ -493,7 +503,8 @@ class PDBFile(object):
                     la.anisou = np.array([u11/1e4, u22/1e4, u33/1e4,
                                           u12/1e4, u13/1e4, u23/1e4])
                 elif rec.strip() == 'TER':
-                    if modelno == 1: last_atom.residue.ter = True
+                    if modelno == 1:
+                        last_atom.residue.ter = True
                 elif rec == 'ENDMDL':
                     # End the current model
                     if len(struct.atoms) == 0:
@@ -508,7 +519,8 @@ class PDBFile(object):
                     resend = 26
                     atom_overflow = False
                 elif rec == 'MODEL ':
-                    if modelno == 1 and len(struct.atoms) == 0: continue
+                    if modelno == 1 and len(struct.atoms) == 0:
+                        continue
                     if len(coordinates) > 0:
                         if len(struct.atoms)*3 != len(coordinates):
                             raise ValueError('Inconsistent atom numbers in '
@@ -566,7 +578,8 @@ class PDBFile(object):
                             struct.related_entries.append(rematch.groups())
                     elif line[6:10] == '   2':
                         # Resolution
-                        if not line[11:22].strip(): continue
+                        if not line[11:22].strip():
+                            continue
                         if struct.resolution is not None:
                             # Skip over comments
                             continue
@@ -584,7 +597,8 @@ class PDBFile(object):
                                           'to float' % line[23:30])
         finally:
             # Make sure our file is closed if we opened it
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         # Post-process some of the metadata to make it more reader-friendly
         struct.keywords = [s.strip() for s in struct.keywords.split(',')
@@ -824,7 +838,8 @@ class CIFFile(object):
         f = genopen(filename)
         try:
             for line in f:
-                if line.startswith('#'): continue
+                if line.startswith('#'):
+                    continue
                 if line[:5] == 'data_' and len(line.split()) == 1:
                     return True
                 else:
@@ -968,7 +983,8 @@ class CIFFile(object):
             data = []
             cifobj.read(data)
         finally:
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         structures = []
         for cont in data:
@@ -1084,12 +1100,14 @@ class CIFFile(object):
                 elem = row[elemid]
                 atname = row[atnameid]
                 altloc = row[altlocid]
-                if altloc == '.': altloc = ''
+                if altloc == '.':
+                    altloc = ''
                 resname = row[resnameid]
                 chain = row[chainid]
                 resnum = int(row[resnumid])
                 inscode = row[inscodeid]
-                if inscode in '?.': inscode = ''
+                if inscode in '?.':
+                    inscode = ''
                 try:
                     model = int(row[modelid])
                 except ValueError:
@@ -1115,7 +1133,8 @@ class CIFFile(object):
                         charge = 0.0
                 # Try to figure out the element
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
-                if elem[0] == ' ': elem = elem[1] + ' '
+                if elem[0] == ' ':
+                    elem = elem[1] + ' '
                 try:
                     atsym = (elem[0] + elem[1].lower()).strip()
                     atomic_number = AtomicNum[atsym]
@@ -1223,8 +1242,10 @@ class CIFFile(object):
                             u12 = float(row[u12id])
                             u13 = float(row[u13id])
                             u23 = float(row[u23id])
-                            if altloc == '.': altloc = ''
-                            if inscode in '?.': inscode = ''
+                            if altloc == '.':
+                                altloc = ''
+                            if inscode in '?.':
+                                inscode = ''
                             key = (resnum, resname, inscode, chain, atnum,
                                    altloc, atname)
                             atommap[key].anisou = np.array(

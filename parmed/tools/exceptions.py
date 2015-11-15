@@ -161,7 +161,7 @@ class TiMergeError(ParmError):
 
 class WarningList(list):
     """ List of warnings """
-   
+
     def __init__(self, empty_msg='No warnings found'):
         self._empty_msg = empty_msg
         list.__init__(self)

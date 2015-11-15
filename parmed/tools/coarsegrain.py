@@ -43,7 +43,8 @@ class Angle(object):
         """
         # First see if we are looking to match the angles in forward or reverse
         reversed_angles = False
-        if self.atom2 != other.atom2: return False
+        if self.atom2 != other.atom2:
+            return False
         if self.atom1 != other.atom1:
             if self.atom1 != other.atom3:
                 if self.atom1 != 'X' and other.atom1 != 'X':
@@ -219,7 +220,7 @@ def addCoarseGrain(parm, param_file):
                 'This section is not used for Coarse grained topologies')
     parm.parm_comments['DIHEDRAL_PHASE'].append(
                 'This section is not used for Coarse grained topologies')
-   
+
     # Now let's add our new sections
     parm.add_flag('ANGLE_COEF_A','5E16.8',parm.ptr('numang'),
                  comments='A Coefficient for Coarse grained force field')
@@ -264,7 +265,7 @@ def addCoarseGrain(parm, param_file):
         parm.parm_data['ANGLE_COEF_B'][i] = angl.bcoef
         parm.parm_data['ANGLE_COEF_C'][i] = angl.ccoef
         parm.parm_data['ANGLE_COEF_D'][i] = angl.dcoef
-   
+
     for i in range(len(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])):
         try:
             index = int(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'][i])

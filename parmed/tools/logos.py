@@ -175,7 +175,7 @@ ParmEd: a Parameter file Editor
  |  // //    \\\\\\  |
  |  `  `      \\\\\\ ,
  |________...______,"
- 
+
 ParmEd: a Parameter file Editor
 
 """, r"""
