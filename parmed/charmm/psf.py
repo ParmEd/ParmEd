@@ -442,7 +442,8 @@ class CharmmPsfFile(Structure):
             In addition to `params`, this method also takes all arguments for
             :meth:`parmed.structure.Structure.createSystem`
         """
-        if params is not None: self.load_parameters(params)
+        if params is not None:
+            self.load_parameters(params)
         return super(CharmmPsfFile, self).createSystem(*args, **kwargs)
 
     #===================================================
@@ -504,7 +505,8 @@ class CharmmPsfFile(Structure):
         # Build the bond_types list
         del self.bond_types[:]
         for bond in self.bonds:
-            if bond.type.used: continue
+            if bond.type.used:
+                continue
             bond.type.used = True
             self.bond_types.append(bond.type)
             bond.type.list = self.bond_types
@@ -528,12 +530,14 @@ class CharmmPsfFile(Structure):
         del self.urey_bradley_types[:]
         del self.angle_types[:]
         for ub in self.urey_bradleys:
-            if ub.type.used: continue
+            if ub.type.used:
+                continue
             ub.type.used = True
             self.urey_bradley_types.append(ub.type)
             ub.type.list = self.urey_bradley_types
         for ang in self.angles:
-            if ang.type.used: continue
+            if ang.type.used:
+                continue
             ang.type.used = True
             self.angle_types.append(ang.type)
             ang.type.list = self.angle_types
@@ -563,7 +567,8 @@ class CharmmPsfFile(Structure):
                 active_dih_list.add((dih.atom4.idx, dih.atom1.idx))
         del self.dihedral_types[:]
         for dihedral in self.dihedrals:
-            if dihedral.type.used: continue
+            if dihedral.type.used:
+                continue
             dihedral.type.used = True
             self.dihedral_types.append(dihedral.type)
             dihedral.type.list = self.dihedral_types
@@ -600,7 +605,8 @@ class CharmmPsfFile(Structure):
         # prepare list of harmonic impropers present in system
         del self.improper_types[:]
         for improper in self.impropers:
-            if improper.type.used: continue
+            if improper.type.used:
+                continue
             improper.type.used = True
             if isinstance(improper.type, ImproperType):
                 self.improper_types.append(improper.type)
@@ -631,13 +637,15 @@ class CharmmPsfFile(Structure):
             cmap.type.used = False
         del self.cmap_types[:]
         for cmap in self.cmaps:
-            if cmap.type.used: continue
+            if cmap.type.used:
+                continue
             cmap.type.used = True
             self.cmap_types.append(cmap.type)
             cmap.type.list = self.cmap_types
         # If the types started out as integers, change them back
         if types_are_int:
-            for atom in self.atoms: atom.type = int(atom.atom_type)
+            for atom in self.atoms:
+                atom.type = int(atom.atom_type)
 
     #===================================================
 

@@ -81,7 +81,8 @@ class FortranFormat(object):
             self.itemlen = int(itemlen)
             self.fmt = '%s'
             # See if we want to strip the strings
-            if strip_strings: self.process_method = lambda x: x.strip()
+            if strip_strings:
+                self.process_method = lambda x: x.strip()
 
         elif FortranFormat.intre.match(format_string):
             self.type = int
@@ -568,7 +569,8 @@ class AmberFormat(object):
                     )
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         def read_string(line_idx, lines, num_items):
@@ -582,7 +584,8 @@ class AmberFormat(object):
                 tmp_data.append(lines[line_idx][idx*4:idx*4+4])
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         def read_float(line_idx, lines, num_items):
@@ -603,7 +606,8 @@ class AmberFormat(object):
                     )
                 i += 1
             # If we had no items, we need to jump a line:
-            if num_items == 0: line_idx += 1
+            if num_items == 0:
+                line_idx += 1
             return tmp_data, line_idx
 
         # First add a title

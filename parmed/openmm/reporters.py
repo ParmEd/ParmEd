@@ -425,9 +425,12 @@ class MdcrdReporter(object):
     def __init__(self, file, reportInterval, crds=True, vels=False, frcs=False):
         # ASCII mdcrds can have either coordinates, forces, or velocities
         ntrue = 0
-        if crds: ntrue += 1
-        if vels: ntrue += 1
-        if frcs: ntrue += 1
+        if crds:
+            ntrue += 1
+        if vels:
+            ntrue += 1
+        if frcs:
+            ntrue += 1
         if ntrue != 1:
             raise ValueError('MdcrdReporter must print exactly one of either '
                              'coordinates, velocities, or forces.')
@@ -798,7 +801,8 @@ class ProgressReporter(StateDataReporter):
             f.write('\n')
             f.write('-+' * 39 + '\n')
 
-        if remaining_steps == 0: self._startTime = None
+        if remaining_steps == 0:
+            self._startTime = None
 
     def _constructReportValues(self, simulation, state):
         """

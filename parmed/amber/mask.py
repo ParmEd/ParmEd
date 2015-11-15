@@ -80,8 +80,10 @@ class AmberMask(object):
             return list while atoms not selected will be assigned 0.
         """
         from sys import stderr, stdout
-        if prnlev > 2: stderr.write('In AmberMask.Selection(), debug active!\n')
-        if prnlev > 5: stdout.write('original mask: ==%s==\n' % self.mask)
+        if prnlev > 2:
+            stderr.write('In AmberMask.Selection(), debug active!\n')
+        if prnlev > 5:
+            stdout.write('original mask: ==%s==\n' % self.mask)
 
         # 0) See if we got the default "all" mask(*) and return accordingly
         if self.mask.strip() == '*':
@@ -89,11 +91,13 @@ class AmberMask(object):
 
         # 1) preprocess input expression
         infix = self._tokenize(prnlev)
-        if prnlev > 5: stdout.write('tokenized mask: ==%s==\n' % infix)
+        if prnlev > 5:
+            stdout.write('tokenized mask: ==%s==\n' % infix)
 
         # 2) construct postfix (RPN) notation
         postfix = self._torpn(infix, prnlev)
-        if prnlev > 5: stdout.write('postfix mask: ==%s==\n' % postfix)
+        if prnlev > 5:
+            stdout.write('postfix mask: ==%s==\n' % postfix)
 
         # 3) evaluate the postfix notation
         if invert:
@@ -140,12 +144,14 @@ class AmberMask(object):
                 # If this is the end of an operand, terminate the buffer, flush
                 # it to infix, and reset flag to 0 and empty the buffer
                 if flag > 0:
-                    if i == len(self.mask) - 1 and p != ')': buffer += p
+                    if i == len(self.mask) - 1 and p != ')':
+                        buffer += p
                     buffer += '])'
                     flag = 0
                     infix += buffer
                     buffer = ''
-                if i != len(self.mask) - 1 or p == ')': infix += p
+                if i != len(self.mask) - 1 or p == ')':
+                    infix += p
                 # else if p is >,<
                 if p in ['<','>']:
                     buffer = '([%s' % p
@@ -287,7 +293,8 @@ class AmberMask(object):
         pos = 0 # position in postfix
         while pos < len(postfix):
             p = postfix[pos]
-            if p == '[': buffer = ''
+            if p == '[':
+                buffer = ''
             elif p == ']': # end of the token
                 ptoken = buffer
                 pmask = self._selectElemMask(ptoken)
@@ -599,7 +606,8 @@ class AmberMask(object):
 
     def _atnum_select(self, at1, at2, mask):
         """ Fills a _mask array between atom numbers at1 and at2 """
-        for i in range(at1-1, at2): mask[i] = 1
+        for i in range(at1-1, at2):
+            mask[i] = 1
 
     #======================================================
 
@@ -607,7 +615,8 @@ class AmberMask(object):
         """ Fills a _mask array between residues res1 and res2 """
         for i, atom in enumerate(self.parm.atoms):
             res = atom.residue.idx + 1
-            if res >= res1 and res <= res2: mask[i] = 1
+            if res >= res1 and res <= res2:
+                mask[i] = 1
 
     #======================================================
 
@@ -651,12 +660,18 @@ class AmberMask(object):
     #======================================================
 
     def _priority(self, op):
-        if op in ['>','<']: return 6
-        if op in ['!']: return 5
-        if op in ['&']: return 4
-        if op in ['|']: return 3
-        if op in ['(']: return 2
-        if op in ['_']: return 1
+        if op in ['>','<']:
+            return 6
+        if op in ['!']:
+            return 5
+        if op in ['&']:
+            return 4
+        if op in ['|']:
+            return 3
+        if op in ['(']:
+            return 2
+        if op in ['_']:
+            return 1
 
         raise MaskError('Unknown operator [%s] in Mask ==%s==' %
                         (op, self.mask))

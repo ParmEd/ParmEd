@@ -45,7 +45,8 @@ class XmlFile(object):
         with closing(genopen(filename, 'r')) as f:
             for line in f:
                 line = line.strip()
-                if not line: continue
+                if not line:
+                    continue
                 rematch = _xmlre.match(line)
                 if not rematch:
                     return False

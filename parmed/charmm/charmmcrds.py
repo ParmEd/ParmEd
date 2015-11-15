@@ -346,7 +346,8 @@ class CharmmRstFile(object):
     def scan(self, handle, str, r=0): # read lines in file till 'str' is found
         scanning = True
 
-        if(r): handle.seek(0)
+        if(r):
+            handle.seek(0)
 
         while scanning:
             line = handle.readline()

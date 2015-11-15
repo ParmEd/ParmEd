@@ -41,11 +41,13 @@ def _find_all_instances_in_string(string, substr):
 
 def _replace_defines(line, defines):
     """ Replaces defined tokens in a given line """
-    if not defines: return line
+    if not defines:
+        return line
     for define in reversed(defines):
         value = defines[define]
         indices = _find_all_instances_in_string(line, define)
-        if not indices: continue
+        if not indices:
+            continue
         # Check to see if it's inside of quotes
         inside = ''
         idx = 0

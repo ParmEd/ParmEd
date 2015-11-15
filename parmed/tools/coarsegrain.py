@@ -43,7 +43,8 @@ class Angle(object):
         """
         # First see if we are looking to match the angles in forward or reverse
         reversed_angles = False
-        if self.atom2 != other.atom2: return False
+        if self.atom2 != other.atom2:
+            return False
         if self.atom1 != other.atom1:
             if self.atom1 != other.atom3:
                 if self.atom1 != 'X' and other.atom1 != 'X':

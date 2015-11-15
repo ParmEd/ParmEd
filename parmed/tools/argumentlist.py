@@ -132,7 +132,8 @@ class ArgumentList(object):
         for token in self.tokenlist:
             if token.isint() and not token.marked:
                 return int(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing integer argument!")
 
     def get_next_float(self, optional=False, default=None):
@@ -140,16 +141,19 @@ class ArgumentList(object):
         for token in self.tokenlist:
             if token.isfloat() and not token.marked:
                 return float(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing floating point argument!")
 
     def get_next_mask(self, optional=False, default=None):
         """ Returns the next string as long as it matches a mask """
         for token in self.tokenlist:
-            if token.marked: continue
+            if token.marked:
+                continue
             if token.ismask():
                 return str(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing Amber mask!")
 
     def get_next_string(self, optional=False, keep_quotes=False, default=None):
@@ -158,7 +162,8 @@ class ArgumentList(object):
             if not token.marked:
                 token.keep_quotes = keep_quotes
                 return str(token)
-        if optional: return default
+        if optional:
+            return default
         raise NoArgument("Missing string!")
 
     def unmarked(self):
@@ -175,7 +180,8 @@ class ArgumentList(object):
             # Skip all marked tokens. This allows us to allow users to specify
             # a token numerous times (useful if you want to enable an
             # arbitrary-length list of arguments
-            if token.marked: continue
+            if token.marked:
+                continue
             if token == key:
                 if self.tokenlist[i+1].marked:
                     raise RuntimeError("Expected token already marked! Should "
@@ -227,6 +233,7 @@ class ArgumentList(object):
         """ See if a particular keyword is present (optionally mark it) """
         for token in self.tokenlist:
             if not token.marked and token == key:
-                if mark: token.mark()
+                if mark:
+                    token.mark()
                 return True
         return False

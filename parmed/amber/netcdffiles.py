@@ -223,7 +223,8 @@ class NetCDFRestart(object):
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
-            if dim == 'time': continue
+            if dim == 'time':
+                continue
             setattr(inst, dim, ncfile.dimensions[dim])
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
@@ -701,7 +702,8 @@ class NetCDFTraj(object):
             includes angles as well.
         """
         def strip_units(x, desired_units):
-            if u.is_quantity(x): return x.value_in_unit(desired_units)
+            if u.is_quantity(x):
+                return x.value_in_unit(desired_units)
             return x
         if len(lengths) == 3 and angles is None:
             raise ValueError('Both lengths and angles are required.')
@@ -733,7 +735,8 @@ class NetCDFTraj(object):
         stuff : float or time-dimension Quantity
             The time to add to the current frame
         """
-        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.picoseconds)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.picoseconds)
         self._ncfile.variables['time'][self._last_time_frame] = float(stuff)
         self._last_time_frame += 1
         self.flush()
@@ -767,7 +770,8 @@ class NetCDFTraj(object):
         stuff : float or temperature Quantity
             The temperature to add to the current NetCDF file
         """
-        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.kelvin)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.kelvin)
         self._ncfile.variables['temp0'][self._last_remd_frame] = float(stuff)
         self._last_remd_frame += 1
         self.flush()

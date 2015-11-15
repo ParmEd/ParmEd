@@ -82,7 +82,8 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
     for i in mask.Selected():
         mettypind = parm.parm_data['ATOM_TYPE_INDEX'][i]
         metchg = parm.parm_data['CHARGE'][i]
-        if mettypind in mettypdict: continue
+        if mettypind in mettypdict:
+            continue
         mettypdict[mettypind] = (parm.atoms[i].atomic_number, int(metchg))
         print("The selected metal ion is %s" %
               pt.Element[parm.atoms[i].atomic_number])

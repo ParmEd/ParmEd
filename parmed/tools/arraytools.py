@@ -29,7 +29,8 @@ class NumberArray(list):
     __rmul__ = __mul__
 
     def __imul__(self, scalar):
-        for i in range(len(self)): self[i] *= scalar
+        for i in range(len(self)):
+            self[i] *= scalar
         return self
 
     @_same_len('addition')
@@ -38,7 +39,8 @@ class NumberArray(list):
 
     @_same_len('addition')
     def __iadd__(self, other):
-        for i, val in enumerate(other): self[i] += val
+        for i, val in enumerate(other):
+            self[i] += val
         return self
 
     @_same_len('subtraction')
@@ -47,5 +49,6 @@ class NumberArray(list):
 
     @_same_len('subtraction')
     def __isub__(self, other):
-        for i, val in enumerate(other): self[i] -= val
+        for i, val in enumerate(other):
+            self[i] -= val
         return self

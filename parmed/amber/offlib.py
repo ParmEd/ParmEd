@@ -140,7 +140,8 @@ class AmberOFFLibrary(object):
             residues[name] = AmberOFFLibrary._parse_residue(fileobj, name)
             line = fileobj.readline()
 
-        if own_handle: fileobj.close()
+        if own_handle:
+            fileobj.close()
 
         return residues
 
@@ -332,7 +333,8 @@ class AmberOFFLibrary(object):
             if templ.tail is not None and templ.tail is not templ[c2-1]:
                 warnings.warn('TAIL atom is not connect1')
             for i in (c3, c4, c5, c6):
-                if i == 0: continue
+                if i == 0:
+                    continue
                 templ.connections.append(templ[i-1])
         # Get the residues table
         line = fileobj.readline()
@@ -433,7 +435,8 @@ class AmberOFFLibrary(object):
         for name in names:
             AmberOFFLibrary._write_residue(dest, lib[name])
 
-        if own_handle: dest.close()
+        if own_handle:
+            dest.close()
 
     #===================================================
 
@@ -520,8 +523,10 @@ class AmberOFFLibrary(object):
             # Make the CONECT1 and 0 default to 1 so that the TREE gets set
             # correctly by tleap. Not used for anything else...
             conn = [1, 1, 0, 0, 0, 0]
-            if r.head is not None: conn[0] = r.head.idx + 1
-            if r.tail is not None: conn[1] = r.tail.idx + 1
+            if r.head is not None:
+                conn[0] = r.head.idx + 1
+            if r.tail is not None:
+                conn[1] = r.tail.idx + 1
             for i, at in enumerate(r.connections):
                 conn[i+2] = at.idx + 1
             dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
@@ -587,7 +592,8 @@ def _imaging_atom(res):
     for i, atom in enumerate(res):
         if atom.atomic_number > 1:
             heavy_idx = i
-            if found_heavy: break
+            if found_heavy:
+                break
             found_heavy = True
     else:
         if heavy_idx != -1:

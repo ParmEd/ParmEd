@@ -409,7 +409,8 @@ class Unit(object):
         for unit, power in self.iter_base_or_scaled_units():
             if power > 0:
                 pos_count += 1
-                if pos_count > 1: pos += " "
+                if pos_count > 1:
+                    pos += " "
                 pos += unit.symbol
                 if power != 1.0:
                     pos += "**%g" % power
@@ -420,7 +421,8 @@ class Unit(object):
         for unit, power in self.iter_base_or_scaled_units():
             if power < 0:
                 neg_count += 1
-                if neg_count > 1: neg += " "
+                if neg_count > 1:
+                    neg += " "
                 neg += unit.symbol
                 if power != -1.0:
                     neg += "**%g" % -power
@@ -457,7 +459,8 @@ class Unit(object):
         for unit, power in self.iter_base_or_scaled_units():
             if power > 0:
                 pos_count += 1
-                if pos_count > 1: pos += "*"
+                if pos_count > 1:
+                    pos += "*"
                 pos += unit.name
                 if power != 1.0:
                     pos += "**%g" % power
@@ -468,7 +471,8 @@ class Unit(object):
         for unit, power in self.iter_base_or_scaled_units():
             if power < 0:
                 neg_count += 1
-                if neg_count > 1: neg += "*"
+                if neg_count > 1:
+                    neg += "*"
                 neg += unit.name
                 if power != -1.0:
                     neg += "**%g" % -power

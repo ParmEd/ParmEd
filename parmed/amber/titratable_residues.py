@@ -44,11 +44,16 @@ class _ReferenceEnergy(object):
         Add solvent reference energies, copying the GB reference energies if
         none are explicitly given
         """
-        if igb1 is None: igb1 = self.igb1
-        if igb2 is None: igb2 = self.igb2
-        if igb5 is None: igb5 = self.igb5
-        if igb7 is None: igb7 = self.igb7
-        if igb8 is None: igb8 = self.igb8
+        if igb1 is None:
+            igb1 = self.igb1
+        if igb2 is None:
+            igb2 = self.igb2
+        if igb5 is None:
+            igb5 = self.igb5
+        if igb7 is None:
+            igb7 = self.igb7
+        if igb8 is None:
+            igb8 = self.igb8
         self.solvent = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
 
     def dielc2_energies(self, igb1=None, igb2=None, igb5=None,
@@ -67,22 +72,33 @@ class _ReferenceEnergy(object):
         the reference energy. Otherwise, this state is a 'protonated' state, so
         the pKa adjustment is added to the reference energy
         """
-        if self.pKa_is_set: return
+        if self.pKa_is_set:
+            return
         self.pKa_is_set = True
         factor = self.KB * self.LN_TO_LOG * self.TEMP * pKa
 
         if deprotonated:
-            if self.igb1 is not None: self.igb1 -= factor
-            if self.igb2 is not None: self.igb2 -= factor
-            if self.igb5 is not None: self.igb5 -= factor
-            if self.igb7 is not None: self.igb7 -= factor
-            if self.igb8 is not None: self.igb8 -= factor
+            if self.igb1 is not None:
+                self.igb1 -= factor
+            if self.igb2 is not None:
+                self.igb2 -= factor
+            if self.igb5 is not None:
+                self.igb5 -= factor
+            if self.igb7 is not None:
+                self.igb7 -= factor
+            if self.igb8 is not None:
+                self.igb8 -= factor
         else:
-            if self.igb1 is not None: self.igb1 += factor
-            if self.igb2 is not None: self.igb2 += factor
-            if self.igb5 is not None: self.igb5 += factor
-            if self.igb7 is not None: self.igb7 += factor
-            if self.igb8 is not None: self.igb8 += factor
+            if self.igb1 is not None:
+                self.igb1 += factor
+            if self.igb2 is not None:
+                self.igb2 += factor
+            if self.igb5 is not None:
+                self.igb5 += factor
+            if self.igb7 is not None:
+                self.igb7 += factor
+            if self.igb8 is not None:
+                self.igb8 += factor
         # Now apply the correction to our solvent reference energies if we have
         # them (and dielectric-2 energies, if we have them)
         if hasattr(self, 'solvent'):
@@ -340,7 +356,8 @@ class TitratableResidueList(list):
     def write_cpin(self, output, igb=2, intdiel=1.0, coions=False):
         """ Writes the CPIN file based on the titrated residues """
         # Reset all residues
-        for res in self: res.reset()
+        for res in self:
+            res.reset()
         # Sort our residue list
         self.sort()
         buf = _LineBuffer(output)
