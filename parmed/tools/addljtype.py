@@ -17,7 +17,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     # Now increment NTYPES
     parm.parm_data['POINTERS'][NTYPES] += 1
     parm.pointers['NTYPES'] += 1
-   
+
     # Now create a whole new array for NONBONDED_PARM_INDEX
     start_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1
     current_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1
@@ -49,7 +49,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
             depth = sqrt(parm.LJ_14_depth[i] * epsilon14)
             parm.parm_data['LENNARD_JONES_14_ACOEF'].append(depth * rad**12)
             parm.parm_data['LENNARD_JONES_14_BCOEF'].append(2 * depth * rad**6)
-   
+
     # Now add the last type interacting with itself, and add it to the
     # LJ_radius/depth arrays
     depth = epsilon

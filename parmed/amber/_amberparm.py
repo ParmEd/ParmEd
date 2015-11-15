@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -333,7 +333,8 @@ class AmberParm(AmberFormat, Structure):
         nbfixes = inst.atoms.assign_nbidx_from_types()
         # Give virtual sites a name that Amber understands
         for atom in inst.atoms:
-            if isinstance(atom, ExtraPoint): atom.type = 'EP'
+            if isinstance(atom, ExtraPoint):
+                atom.type = 'EP'
         # Fill the Lennard-Jones arrays/dicts
         ntyp = 0
         for atom in inst.atoms:
@@ -397,7 +398,7 @@ class AmberParm(AmberFormat, Structure):
         return other
 
     #===================================================
-   
+
     def __getitem__(self, selection):
         other = super(AmberParm, self).__getitem__(selection)
         if other is None:
@@ -478,7 +479,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_structure(self):
-        """ 
+        """
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
         (like deleting atoms)
@@ -654,7 +655,7 @@ class AmberParm(AmberFormat, Structure):
         self.residues.prune()
         self.rediscover_molecules()
 
-        # Transfer information from the topology lists 
+        # Transfer information from the topology lists
         self._xfer_atom_info()
         self._xfer_residue_info()
         self._xfer_bond_info()
@@ -666,9 +667,9 @@ class AmberParm(AmberFormat, Structure):
         super(AmberParm, self).unchange()
 
     #===================================================
-   
+
     def is_changed(self):
-        """ 
+        """
         Determines if any of the topological arrays have changed since the
         last upload
         """
@@ -705,7 +706,8 @@ class AmberParm(AmberFormat, Structure):
         the tleap bug. Returns None otherwise.
         """
         # Bail out of we are not doing a solvated prmtop
-        if not self.parm_data['POINTERS'][IFBOX]: return None
+        if not self.parm_data['POINTERS'][IFBOX]:
+            return None
 
         owner = set_molecules(self)
         ions = ['Br-','Cl-','Cs+','F-','I-','K+','Li+','Mg+','Na+','Rb+','IB',
@@ -725,9 +727,12 @@ class AmberParm(AmberFormat, Structure):
         if not indices:
             self.parm_data['POINTERS'][IFBOX] = 0
             self.pointers['IFBOX'] = 0
-            if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
-            if 'NSPM' in self.pointers: del self.pointers['NSPM']
-            if 'NSPSOL' in self.pointers: del self.pointers['NSPSOL']
+            if 'IPTRES' in self.pointers:
+                del self.pointers['IPTRES']
+            if 'NSPM' in self.pointers:
+                del self.pointers['NSPM']
+            if 'NSPSOL' in self.pointers:
+                del self.pointers['NSPSOL']
             self.delete_flag('SOLVENT_POINTERS')
             self.delete_flag('ATOMS_PER_MOLECULE')
             self.delete_flag('BOX_DIMENSIONS')
@@ -809,7 +814,7 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.pointers['NTYPES']
         for i in range(natom): # fill the LJ_types array
             self.LJ_types[pd["AMBER_ATOM_TYPE"][i]] = pd["ATOM_TYPE_INDEX"][i]
-         
+
         for i in range(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
@@ -885,7 +890,8 @@ class AmberParm(AmberFormat, Structure):
         for i in range(ntypes):
             for j in range(ntypes):
                 idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                if idx < 0: continue
+                if idx < 0:
+                    continue
                 rij = comb_sig(LJ_sigma[i], LJ_sigma[j]) * fac
                 wdij = sqrt(self.LJ_depth[i] * self.LJ_depth[j])
                 a = pd['LENNARD_JONES_ACOEF'][idx]
@@ -915,18 +921,22 @@ class AmberParm(AmberFormat, Structure):
         for i in range(ntypes):
             for j in range(ntypes):
                 idx = self.parm_data['NONBONDED_PARM_INDEX'][i*ntypes+j] - 1
-                if idx >= 0: continue
+                if idx >= 0:
+                    continue
                 # It was negative, so we should have ADDED 1 to adjust for
                 # indexing from 0
                 idx = -idx - 2
                 a = self.parm_data['HBOND_ACOEF'][idx]
                 b = self.parm_data['HBOND_BCOEF'][idx]
-                if a == 0 and b == 0: continue
+                if a == 0 and b == 0:
+                    continue
                 indices_with_1012.append((i, j))
-        if not indices_with_1012: return False
+        if not indices_with_1012:
+            return False
         # Now make sure that some of the atoms *have* those indices
         active_indices = set()
-        for atom in self.atoms: active_indices.add(atom.nb_idx-1)
+        for atom in self.atoms:
+            active_indices.add(atom.nb_idx-1)
         for i, j in indices_with_1012:
             if i in active_indices and j in active_indices:
                 return True
@@ -1058,7 +1068,8 @@ class AmberParm(AmberFormat, Structure):
             2-element tuple of NonbondedForce, CustomNonbondedForce. If only a
             NonbondedForce is necessary, that is the return value
         """
-        if not self.atoms: return None
+        if not self.atoms:
+            return None
         nonbfrc = super(AmberParm, self).omm_nonbonded_force(
                 nonbondedMethod, nonbondedCutoff, switchDistance,
                 ewaldErrorTolerance, reactionFieldDielectric
@@ -1070,7 +1081,8 @@ class AmberParm(AmberFormat, Structure):
             return nonbfrc
 
         # If we have NBFIX, omm_nonbonded_force returned a tuple
-        if hasnbfix: nonbfrc = nonbfrc[0]
+        if hasnbfix:
+            nonbfrc = nonbfrc[0]
 
         # We need a CustomNonbondedForce... determine what it needs to calculate
         if hasnbfix and has1264:
@@ -1120,7 +1132,8 @@ class AmberParm(AmberFormat, Structure):
         # Set up the force with all of the particles
         force.addPerParticleParameter('type')
         force.setForceGroup(self.NONBONDED_FORCE_GROUP)
-        for atom in self.atoms: force.addParticle([atom.nb_idx-1])
+        for atom in self.atoms:
+            force.addParticle([atom.nb_idx-1])
 
         # Now construct the lookup tables
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
@@ -1331,7 +1344,8 @@ class AmberParm(AmberFormat, Structure):
         AmberError if any of the lengths are incorrect
         """
         def check_length(key, length, required=True):
-            if not required and key not in self.parm_data: return
+            if not required and key not in self.parm_data:
+                return
             if len(self.parm_data[key]) != length:
                 raise AmberError('FLAG %s has %d elements; expected %d' %
                                      (key, len(self.parm_data[key]), length))
@@ -1461,11 +1475,13 @@ class AmberParm(AmberFormat, Structure):
         # Do the extra points after all of the exclusions have been loaded to
         # make sure the lists are all up-to-date.
         for i, atom in enumerate(self.atoms):
-            if atom.atomic_number > 0: continue
+            if atom.atomic_number > 0:
+                continue
             # This is an extra point -- exclude accordingly
             real_atom = atom.bond_partners[0]
             for atom2 in real_atom.bond_partners:
-                if atom2 is atom: continue
+                if atom2 is atom:
+                    continue
                 atom.bond_to(atom2)
             for atom2 in real_atom.angle_partners:
                 atom.angle_to(atom2)
@@ -1939,7 +1955,8 @@ class AmberParm(AmberFormat, Structure):
         if not self.adjusts:
             scalings = defaultdict(int)
             for dih in self.dihedrals:
-                if dih.ignore_end or dih.improper: continue
+                if dih.ignore_end or dih.improper:
+                    continue
                 scalings[(dih.type.scee, dih.type.scnb)] += 1
             if len(scalings) > 0:
                 maxkey, maxval = next(iteritems(scalings))
@@ -1967,7 +1984,8 @@ class AmberParm(AmberFormat, Structure):
                 assert False, "Unrecognized combining rule"
             fac = 2**(1/6)
             for dihedral in self.dihedrals:
-                if dihedral.ignore_end: continue
+                if dihedral.ignore_end:
+                    continue
                 key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
                 eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
                 rref = comb_sig(dihedral.atom1.sigma_14,
@@ -2011,13 +2029,17 @@ class AmberParm(AmberFormat, Structure):
             assert False, 'Unrecognized combining rule. Should not be here'
         fac = 2**(1/6)
         for atom in self.atoms:
-            if isinstance(atom, ExtraPoint): continue
+            if isinstance(atom, ExtraPoint):
+                continue
             for batom in atom.bond_partners:
-                if isinstance(batom, ExtraPoint): continue
+                if isinstance(batom, ExtraPoint):
+                    continue
                 for aatom in batom.bond_partners:
-                    if isinstance(aatom, ExtraPoint) or aatom is atom: continue
+                    if isinstance(aatom, ExtraPoint) or aatom is atom:
+                        continue
                     for datom in aatom.bond_partners:
-                        if isinstance(datom, ExtraPoint): continue
+                        if isinstance(datom, ExtraPoint):
+                            continue
                         if (datom in atom.angle_partners + atom.bond_partners +
                                 atom.dihedral_partners or datom is atom):
                             continue
@@ -2148,7 +2170,7 @@ class Rst7(object):
     @classmethod
     def open(cls, filename):
         """ Constructor that opens and parses an input coordinate file
-        
+
         Parameters
         ----------
         filename : str
@@ -2193,7 +2215,7 @@ class Rst7(object):
         warn('coords attribute of Rst7 is deprecated. Use coordinates instead',
              DeprecationWarning)
         return self.coordinates
-   
+
     @classmethod
     def copy_from(cls, thing):
         """
@@ -2204,8 +2226,10 @@ class Rst7(object):
         inst.natom = thing.natom
         inst.title = thing.title
         inst.coordinates = thing.coordinates[:]
-        if hasattr(thing, 'vels'): inst.vels = _copy.deepcopy(thing.vels)
-        if hasattr(thing, 'box'): inst.box = _copy.deepcopy(thing.box)
+        if hasattr(thing, 'vels'):
+            inst.vels = _copy.deepcopy(thing.vels)
+        if hasattr(thing, 'box'):
+            inst.box = _copy.deepcopy(thing.box)
         inst.time = thing.time
 
         return inst
@@ -2254,7 +2278,8 @@ class Rst7(object):
     @property
     def box_vectors(self):
         """ Unit cell vectors with units """
-        if self.box is None: return None
+        if self.box is None:
+            return None
         return box_lengths_and_angles_to_vectors(*self.box)
 
     @property
@@ -2303,12 +2328,12 @@ def set_molecules(parm):
     owner = []
     # The way I do this is via a recursive algorithm, in which
     # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and 
+    # has, which in turn calls set_owner for each of its partners and
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
     for i, atom in enumerate(parm.atoms):
         # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if 
+        # However, we only increment which molecule number we're on if
         # we actually assigned a new molecule (obviously)
         if not atom.marked:
             tmp = set()
@@ -2329,7 +2354,7 @@ def _set_owner(parm, owner_array, atm, mol_id):
             owner_array.add(partner.idx)
             _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
+            raise MoleculeError('Atom %d in multiple molecules' %
                                 partner.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

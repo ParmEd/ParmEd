@@ -8,7 +8,7 @@ from collections import OrderedDict
 class Atom(object):
     """ An atom in the system """
 
-    def __init__(self, symbol, type_, class_, 
+    def __init__(self, symbol, type_, class_,
                  atomic_number, mass, valence, desc):
         self.symbol = str(symbol).strip()
         self.type = int(type_)
@@ -45,7 +45,7 @@ class Atom(object):
                     '   Type:        %d\n'
                     '   Class:       %d\n'
                     '   Mass:        %.2f\n'
-                    '   Valence:     %d' % 
+                    '   Valence:     %d' %
                     (self.symbol, self.atomic_number, self.desc, self.type,
                      self.class_, self.mass, self.valence)
         )
@@ -333,13 +333,15 @@ class TorsionTorsionGrid(OrderedDict):
                 return ttg
         TorsionTorsionGrid._typelist.append(inst)
         return inst
-   
+
     def __eq__(self, other):
-        if self.keys() != other.keys(): return False
+        if self.keys() != other.keys():
+            return False
         for key in self:
-            if abs(self[key] - other[key]) > 1e-8: return False
+            if abs(self[key] - other[key]) > 1e-8:
+                return False
         return True
-   
+
     def __ne__(self, other):
         return not self == other
 

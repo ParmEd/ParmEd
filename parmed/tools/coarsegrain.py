@@ -43,7 +43,8 @@ class Angle(object):
         """
         # First see if we are looking to match the angles in forward or reverse
         reversed_angles = False
-        if self.atom2 != other.atom2: return False
+        if self.atom2 != other.atom2:
+            return False
         if self.atom1 != other.atom1:
             if self.atom1 != other.atom3:
                 if self.atom1 != 'X' and other.atom1 != 'X':
@@ -70,7 +71,7 @@ class Angle(object):
 
 class Dihedral(object):
     """ Dihedral between 4 bonded atoms """
-    def __init__(self, atom1, atom2, atom3, atom4, 
+    def __init__(self, atom1, atom2, atom3, atom4,
                  ampl1, ampl2, ampl3, ampl4,
                  phase1, phase2, phase3, phase4):
         self.atom1, self.atom2 = atom1, atom2
@@ -129,7 +130,7 @@ def addCoarseGrain(parm, param_file):
             file_line = file_line[:file_line.index('#')]
         # Filter out blank lines
         file_line = file_line.strip()
-        if len(file_line) == 0: 
+        if len(file_line) == 0:
             file_line = params.readline()
             continue
         # See if we start reading ANGLEs yet:
@@ -219,7 +220,7 @@ def addCoarseGrain(parm, param_file):
                 'This section is not used for Coarse grained topologies')
     parm.parm_comments['DIHEDRAL_PHASE'].append(
                 'This section is not used for Coarse grained topologies')
-   
+
     # Now let's add our new sections
     parm.add_flag('ANGLE_COEF_A','5E16.8',parm.ptr('numang'),
                  comments='A Coefficient for Coarse grained force field')
@@ -254,7 +255,7 @@ def addCoarseGrain(parm, param_file):
                  comments='4th Dihedral Phase for coarse grained force field')
 
     for i in range(len(parm.parm_data['ANGLE_FORCE_CONSTANT'])):
-        try: 
+        try:
             index = int(parm.parm_data['ANGLE_FORCE_CONSTANT'][i])
             angl = angle_params[index]
         except KeyError:
@@ -264,7 +265,7 @@ def addCoarseGrain(parm, param_file):
         parm.parm_data['ANGLE_COEF_B'][i] = angl.bcoef
         parm.parm_data['ANGLE_COEF_C'][i] = angl.ccoef
         parm.parm_data['ANGLE_COEF_D'][i] = angl.dcoef
-   
+
     for i in range(len(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])):
         try:
             index = int(parm.parm_data['DIHEDRAL_FORCE_CONSTANT'][i])

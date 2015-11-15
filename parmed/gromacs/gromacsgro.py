@@ -51,8 +51,10 @@ class GromacsGroFile(object):
             line = f.readline()
             try:
                 int(line[:5])
-                if not line[5:10].strip(): return False
-                if not line[10:15].strip(): return False
+                if not line[5:10].strip():
+                    return False
+                if not line[10:15].strip():
+                    return False
                 int(line[15:20])
                 pdeci = [i for i, x in enumerate(line) if x == '.']
                 ndeci = pdeci[1] - pdeci[0] - 5
@@ -105,7 +107,8 @@ class GromacsGroFile(object):
                 raise GromacsError('Could not parse %s as GRO file' % filename)
             digits = None
             for i, line in enumerate(fileobj):
-                if i == natom: break
+                if i == natom:
+                    break
                 try:
                     resnum = int(line[:5])
                     resname = line[5:10].strip()

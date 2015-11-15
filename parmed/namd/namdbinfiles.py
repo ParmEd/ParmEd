@@ -14,9 +14,9 @@ import numpy as np
 class NamdBinFile(object):
     """From the NAMD manual:
 
-        NAMD uses a trivial double-precision binary file format for 
-        coordinates, velocities, and forces ... The file consists of the atom 
-        count as a 32-bit integer followed by all three position or velocity 
+        NAMD uses a trivial double-precision binary file format for
+        coordinates, velocities, and forces ... The file consists of the atom
+        count as a 32-bit integer followed by all three position or velocity
         components for each atom as 64-bit double-precision floating point ...
 
     The main attributes are the number of atom entries (natom) and a (flat)
@@ -62,7 +62,7 @@ class NamdBinFile(object):
         self._values = newvalues
 
     def insertatoms(self, start_index, natoms, values=None):
-        """Insert space for natom entries beginning at start_index. If 
+        """Insert space for natom entries beginning at start_index. If
         specified, give them the provided values, otherwise set them to zero.
         """
         if values is not None:
@@ -99,7 +99,7 @@ class NamdBinCoor(NamdBinFile):
 class NamdBinVel(NamdBinFile):
     """Class to read or write NAMD "binvelocities" files.
 
-    NAMD internal units are assumed. These can be converted to 
+    NAMD internal units are assumed. These can be converted to
     Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.
     """
     SCALE_FACTOR = 20.45482706

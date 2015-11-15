@@ -19,7 +19,8 @@ class KeywordControlFile(object):
         # Parse the file
         for line in open(fname, 'r'):
             # Skip over any blank lines
-            if not line.strip(): continue
+            if not line.strip():
+                continue
             words = line.split()
             key = words[0].upper()
             # Get rid of the keyword and all whitespace
@@ -60,7 +61,8 @@ class XyzFile(object):
             super(XyzFile._AtomList, self).append(thing)
 
         def extend(self, things):
-            for thing in things: self.append(thing)
+            for thing in things:
+                self.append(thing)
 
     def __init__(self, fname):
         self.natom = 0
@@ -137,7 +139,7 @@ class DynFile(object):
                 self.velocities = [[0.0, 0.0, 0.0] for i in range(self.natom)]
                 DynFile._read_section(f, self.velocities, self.natom)
                 if f.readline().strip() != 'Current Atomic Accelerations :':
-                    raise TinkerError('Could not find accelerations in %s ' % 
+                    raise TinkerError('Could not find accelerations in %s ' %
                                       fname)
                 self.accelerations = [[0.0, 0.0, 0.0]
                                       for i in range(self.natom)]
@@ -145,7 +147,7 @@ class DynFile(object):
                 if f.readline().strip() != 'Alternate Atomic Accelerations :':
                     raise TinkerError('Could not find old accelerations in %s' %
                                       fname)
-                self.old_accelerations = [[0.0, 0.0, 0.0] 
+                self.old_accelerations = [[0.0, 0.0, 0.0]
                                           for i in range(self.natom)]
                 DynFile._read_section(f, self.old_accelerations, self.natom)
             else:

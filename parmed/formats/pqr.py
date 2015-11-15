@@ -70,10 +70,14 @@ class PQRFile(object):
                             float(words[10])
                         except ValueError:
                             offset = 0
-                    if not words[1].isdigit(): return False
-                    if words[2].isdigit(): return False
-                    if words[3].isdigit(): return False
-                    if not words[4+offset].isdigit(): return False
+                    if not words[1].isdigit():
+                        return False
+                    if words[2].isdigit():
+                        return False
+                    if words[3].isdigit():
+                        return False
+                    if not words[4+offset].isdigit():
+                        return False
                     try:
                         float(words[5+offset])
                         float(words[6+offset])
@@ -188,7 +192,8 @@ class PQRFile(object):
                     atomno = 0
                     coordinates = []
                 elif words[0] == 'MODEL':
-                    if modelno == 1 and len(struct.atoms) == 0: continue
+                    if modelno == 1 and len(struct.atoms) == 0:
+                        continue
                     if len(coordinates) > 0:
                         if len(struct.atoms)*3 != len(coordinates):
                             raise ValueError('Inconsistent atom numbers in '
@@ -205,7 +210,8 @@ class PQRFile(object):
                         A = B = C = 90.0
                     struct.box = [a, b, c, A, B, C]
         finally:
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         struct.unchange()
         if coordinates:

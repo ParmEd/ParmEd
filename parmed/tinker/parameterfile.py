@@ -80,10 +80,13 @@ class _ParamType(object):
             raise TypeError('cannot compare type %s to type %s' %
                             (type(self), type(other)))
         for prop in dir(cls):
-            if prop.startswith('_') or prop == 'TypeList': continue
+            if prop.startswith('_') or prop == 'TypeList':
+                continue
             # Skip all callable attributes
-            if hasattr(getattr(self, prop), '__call__'): continue
-            if getattr(self, prop) != getattr(other, prop): return False
+            if hasattr(getattr(self, prop), '__call__'):
+                continue
+            if getattr(self, prop) != getattr(other, prop):
+                return False
 
         return True
 
@@ -156,7 +159,7 @@ class _FourierAngleType(_AngleType):
                     self.k, self.theteq, self.periodicity)
 
 class _StretchBendType(_AngleType):
-   
+
     TypeList = dict()
     _param_type = 'stretch-bend'
 
@@ -170,7 +173,7 @@ class _StretchBendType(_AngleType):
         return '<_StretchBendType: k1=%s; k2=%s>' % (self.k1, self.k2)
 
 class _UreyBradleyType(_AngleType):
-   
+
     TypeList = dict()
     _param_type = 'urey-bradley'
 
@@ -427,7 +430,8 @@ class AmoebaParameterSet(object):
                 line = f.readline().replace('\t', ' ')
                 continue
             words = line.split()
-            if len(words) != 2: continue
+            if len(words) != 2:
+                continue
             # Now extract the property
             if _IS_INT(words[1]):
                 self.attributes[words[0].lower()] = int(words[1])

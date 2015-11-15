@@ -113,12 +113,12 @@ class CharmmPsfFile(Structure):
         psf : file
             Open file that is pointing to the first line of the section that is
             to be parsed
-        
+
         Returns
         -------
-        title : str 
+        title : str
             The label of the PSF section we are parsing
-        pointers : (int/tuple of ints) 
+        pointers : (int/tuple of ints)
             If one pointer is set, pointers is simply the integer that is value
             of that pointer. Otherwise it is a tuple with every pointer value
             defined in the first line
@@ -435,14 +435,15 @@ class CharmmPsfFile(Structure):
         ----------
         params : CharmmParameterSet=None
             If not None, this parameter set will be loaded
-        
+
         See Also
         --------
         :meth:`parmed.structure.Structure.createSystem`
             In addition to `params`, this method also takes all arguments for
             :meth:`parmed.structure.Structure.createSystem`
         """
-        if params is not None: self.load_parameters(params)
+        if params is not None:
+            self.load_parameters(params)
         return super(CharmmPsfFile, self).createSystem(*args, **kwargs)
 
     #===================================================
@@ -504,7 +505,8 @@ class CharmmPsfFile(Structure):
         # Build the bond_types list
         del self.bond_types[:]
         for bond in self.bonds:
-            if bond.type.used: continue
+            if bond.type.used:
+                continue
             bond.type.used = True
             self.bond_types.append(bond.type)
             bond.type.list = self.bond_types
@@ -528,12 +530,14 @@ class CharmmPsfFile(Structure):
         del self.urey_bradley_types[:]
         del self.angle_types[:]
         for ub in self.urey_bradleys:
-            if ub.type.used: continue
+            if ub.type.used:
+                continue
             ub.type.used = True
             self.urey_bradley_types.append(ub.type)
             ub.type.list = self.urey_bradley_types
         for ang in self.angles:
-            if ang.type.used: continue
+            if ang.type.used:
+                continue
             ang.type.used = True
             self.angle_types.append(ang.type)
             ang.type.list = self.angle_types
@@ -563,7 +567,8 @@ class CharmmPsfFile(Structure):
                 active_dih_list.add((dih.atom4.idx, dih.atom1.idx))
         del self.dihedral_types[:]
         for dihedral in self.dihedrals:
-            if dihedral.type.used: continue
+            if dihedral.type.used:
+                continue
             dihedral.type.used = True
             self.dihedral_types.append(dihedral.type)
             dihedral.type.list = self.dihedral_types
@@ -600,7 +605,8 @@ class CharmmPsfFile(Structure):
         # prepare list of harmonic impropers present in system
         del self.improper_types[:]
         for improper in self.impropers:
-            if improper.type.used: continue
+            if improper.type.used:
+                continue
             improper.type.used = True
             if isinstance(improper.type, ImproperType):
                 self.improper_types.append(improper.type)
@@ -631,13 +637,15 @@ class CharmmPsfFile(Structure):
             cmap.type.used = False
         del self.cmap_types[:]
         for cmap in self.cmaps:
-            if cmap.type.used: continue
+            if cmap.type.used:
+                continue
             cmap.type.used = True
             self.cmap_types.append(cmap.type)
             cmap.type.list = self.cmap_types
         # If the types started out as integers, change them back
         if types_are_int:
-            for atom in self.atoms: atom.type = int(atom.atom_type)
+            for atom in self.atoms:
+                atom.type = int(atom.atom_type)
 
     #===================================================
 
@@ -669,12 +677,12 @@ def set_molecules(atoms):
     owner = []
     # The way I do this is via a recursive algorithm, in which
     # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and 
+    # has, which in turn calls set_owner for each of its partners and
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
     for i in range(len(atoms)):
         # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if 
+        # However, we only increment which molecule number we're on if
         # we actually assigned a new molecule (obviously)
         if not atoms[i].marked:
             tmp = [i]
@@ -695,7 +703,7 @@ def _set_owner(atoms, owner_array, atm, mol_id):
             owner_array.append(partner.idx)
             _set_owner(atoms, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
+            raise MoleculeError('Atom %d in multiple molecules' %
                                 partner.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

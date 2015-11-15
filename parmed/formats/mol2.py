@@ -37,8 +37,10 @@ class Mol2File(object):
         f = genopen(filename, 'r')
         try:
             for line in f:
-                if line.startswith('#'): continue
-                if not line.strip(): continue
+                if line.startswith('#'):
+                    continue
+                if not line.strip():
+                    continue
                 return line.startswith('@<TRIPOS>')
             return False
         finally:
@@ -92,8 +94,10 @@ class Mol2File(object):
             headtail = 'head'
             molecule_number = 0
             for line in f:
-                if line.startswith('#'): continue
-                if not line.strip() and section is None: continue
+                if line.startswith('#'):
+                    continue
+                if not line.strip() and section is None:
+                    continue
                 if line.startswith('@<TRIPOS>'):
                     section = line[9:].strip()
                     if section == 'MOLECULE' and (restemp.atoms or rescont):
@@ -262,7 +266,8 @@ class Mol2File(object):
                     #   status -- ignored
                     #   comment -- ignored
                     words = line.split()
-                    if not words: continue
+                    if not words:
+                        continue
                     id = int(words[0])
                     resname = words[1]
                     try:
@@ -310,7 +315,8 @@ class Mol2File(object):
                         raise Mol2Error('Residue out of range in '
                                         'residueconnect')
                     for a in words[3:]:
-                        if a == '0': continue
+                        if a == '0':
+                            continue
                         for atom in res:
                             if atom.name == a:
                                 res.connections.append(atom)
@@ -330,7 +336,8 @@ class Mol2File(object):
         except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)
         finally:
-            if own_handle: f.close()
+            if own_handle:
+                f.close()
 
     #===================================================
 
@@ -531,4 +538,5 @@ class Mol2File(object):
                             dest.write(' 0')
                     dest.write('\n')
         finally:
-            if own_handle: dest.close()
+            if own_handle:
+                dest.close()

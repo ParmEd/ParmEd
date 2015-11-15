@@ -591,7 +591,8 @@ class ResidueTemplateContainer(list):
         if isinstance(value, str):
             # Behave like a dict here... albeit a slow one
             for res in self:
-                if res.name == value: return res
+                if res.name == value:
+                    return res
         return list.__getitem__(self, value)
 
     def fix_charges(self, precision=4):
@@ -639,7 +640,8 @@ class ResidueTemplateContainer(list):
         """
         ret = OrderedDict()
         for res in self:
-            if res.name in ret: continue
+            if res.name in ret:
+                continue
             ret[res.name] = res
         return ret
 

@@ -74,7 +74,7 @@ class PSFFile(object):
             attribute, it will be used to print the PSF file. Otherwise, it will
             be treated like a string and a file will be opened, printed, then
             closed
-        vmd : bool 
+        vmd : bool
             If True, it will write out a PSF in the format that VMD prints it in
             (i.e., no NUMLP/NUMLPH or MOLNT sections)
 
@@ -125,7 +125,8 @@ class PSFFile(object):
             typ = atom.type
             if isinstance(atom.type, str):
                 fmt = atmfmt2
-                if not atom.type: typ = atom.name
+                if not atom.type:
+                    typ = atom.name
             else:
                 fmt = atmfmt1
             segid = atom.residue.segid or 'SYS'
@@ -218,7 +219,8 @@ class PSFFile(object):
             dest.write(intfmt % 0)
             if i % 8 == 7: # Write 8 0's per line
                 dest.write('\n')
-        if len(struct.atoms) % 8 != 0: dest.write('\n')
+        if len(struct.atoms) % 8 != 0:
+            dest.write('\n')
         dest.write('\n')
         # Group section
         try:
@@ -230,7 +232,8 @@ class PSFFile(object):
         if struct.groups:
             for i, gp in enumerate(struct.groups):
                 dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
-                if i % 3 == 2: dest.write('\n')
+                if i % 3 == 2:
+                    dest.write('\n')
             if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
                 dest.write('\n')
         else:
@@ -246,8 +249,10 @@ class PSFFile(object):
             dest.write(intfmt % max(mollist) + ' !MOLNT\n')
             for i, atom in enumerate(struct.atoms):
                 dest.write(intfmt % atom.marked)
-                if i % 8 == 7: dest.write('\n')
-            if len(struct.atoms) % 8 != 0: dest.write('\n')
+                if i % 8 == 7:
+                    dest.write('\n')
+            if len(struct.atoms) % 8 != 0:
+                dest.write('\n')
             dest.write('\n')
             # NUMLP/NUMLPH section
             dest.write((intfmt*2) % (0, 0) + ' !NUMLP NUMLPH\n')

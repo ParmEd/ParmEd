@@ -149,18 +149,22 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             i = 0
             for line in lines[2:]:
                 i += 1
-                if i > natom: break
+                if i > natom:
+                    break
                 for j in range(3):
                     j12 = j * 12
-                    if line[j12+4] != '.': return False
+                    if line[j12+4] != '.':
+                        return False
                     float(line[j12:j12+12])
                     if line[j12+11] not in '0123456789':
                         return False
                 i += 1
-                if i > natom: break
+                if i > natom:
+                    break
                 for j in range(3):
                     j12 = j * 12 + 36
-                    if line[j12+4] != '.': return False
+                    if line[j12+4] != '.':
+                        return False
                     float(line[j12:j12+12])
                     if line[j12+11] not in '0123456789':
                         return False
@@ -310,8 +314,10 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             i3 = i * 3
             self._file.write(fmt % (stuff[i3], stuff[i3+1], stuff[i3+2]))
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0:
+                self._file.write('\n')
+        if self.natom % 2 == 1:
+            self._file.write('\n')
         self._coords_written = True
 
     @property
@@ -346,8 +352,10 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                                     stuff[i3+2]*ONEVELSCALE)
             )
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0:
+                self._file.write('\n')
+        if self.natom % 2 == 1:
+            self._file.write('\n')
         self._vels_written = True
 
     @property
@@ -452,7 +460,8 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 i += 1
                 for j in range(10):
                     j8 = j * 8
-                    if lines[i][j8+4] != '.': return False
+                    if lines[i][j8+4] != '.':
+                        return False
                     float(lines[i][j8:j8+8])
                     if lines[i][j8+7] not in '0123456789':
                         return False
@@ -479,13 +488,16 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
         try:
             while line:
                 frame = np.zeros(self.natom*3)
-                if not line: raise _FileEOF()
+                if not line:
+                    raise _FileEOF()
                 cell = np.zeros(3)
                 idx = 0
                 line = self._file.readline()
-                if not line: raise StopIteration()
+                if not line:
+                    raise StopIteration()
                 for i in range(self._full_lines_per_frame):
-                    if not line: raise _FileEOF()
+                    if not line:
+                        raise _FileEOF()
                     frame[idx:idx+10] = [float(line[j:j+8]) for j in mainiter]
                     idx += 10
                     line = self._file.readline()
@@ -496,7 +508,8 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
 
                 if self.hasbox:
                     line = self._file.readline()
-                    if not line: raise _FileEOF()
+                    if not line:
+                        raise _FileEOF()
                     cell[0] = float(line[:8])
                     cell[1] = float(line[8:16])
                     cell[2] = float(line[16:24])

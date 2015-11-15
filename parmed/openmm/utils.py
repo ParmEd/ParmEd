@@ -31,7 +31,7 @@ def energy_decomposition(structure, context, nrg=u.kilocalories_per_mole):
     dict {str:float}
         A dictionary mapping the name of the force group (taken from the
         attribute names of the format XXX_FORCE_GROUP in the structure object)
-        with the energy of that group in 
+        with the energy of that group in
     """
     all_names = dict()
     force_group_names = dict()

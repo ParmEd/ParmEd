@@ -128,8 +128,10 @@ class BaseUnit(object):
         self._conversion_factor_to[other] = factor
         self._conversion_factor_to_by_name[other.name] = factor
         for (unit, cfac) in other._conversion_factor_to.items():
-            if unit is self: continue
-            if unit in self._conversion_factor_to: continue
+            if unit is self:
+                continue
+            if unit in self._conversion_factor_to:
+                continue
             self._conversion_factor_to[unit] = factor * cfac
             unit._conversion_factor_to[self] = pow(factor * cfac, -1)
             self._conversion_factor_to_by_name[unit.name] = factor * cfac
@@ -139,8 +141,10 @@ class BaseUnit(object):
         other._conversion_factor_to[self] = invFac
         other._conversion_factor_to_by_name[self.name] = invFac
         for (unit, cfac) in self._conversion_factor_to.items():
-            if unit is other: continue
-            if unit in other._conversion_factor_to: continue
+            if unit is other:
+                continue
+            if unit in other._conversion_factor_to:
+                continue
             other._conversion_factor_to[unit] = invFac * cfac
             unit._conversion_factor_to[other] = pow(invFac * cfac, -1)
             other._conversion_factor_to_by_name[unit.name] = invFac * cfac
@@ -156,7 +160,8 @@ class BaseUnit(object):
         Raises LookupError if no conversion has been defined. (see define_conversion_factor_to).
 
         """
-        if self is other: return 1.0
+        if self is other:
+            return 1.0
         if self.dimension != other.dimension:
             raise TypeError('Cannot get conversion for BaseUnits with different dimensions.')
         if not other.name in self._conversion_factor_to_by_name:

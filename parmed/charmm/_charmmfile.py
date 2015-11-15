@@ -11,7 +11,7 @@ class CharmmFile(object):
     A CHARMM file that recognizes the "!" character as a 'comment' token. It
     can be iterated over and generally treated like a file object, but only
     spits out strings that have been truncated at its first comment character.
-    
+
     There is currently no way to recognize a ! as a _non_ comment character,
     since allowing an escape character does not seem to be common practice and
     would likely introduce negative performance implications.
@@ -163,5 +163,5 @@ class CharmmStreamFile(object):
         return None, None, None
 
 
-    def __del__(self): 
+    def __del__(self):
         pass

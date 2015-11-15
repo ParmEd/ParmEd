@@ -154,10 +154,10 @@ def use(package=None):
         get_float = spget_float
     else:
         raise ImportError('%s not a valid NetCDF package. Available options '
-                          'are %s' % (package, 
+                          'are %s' % (package,
                                       ', '.join(ALLOWED_NETCDF_PACKAGES))
         )
-    
+
     NETCDF_INITIALIZED = True # We have now selected a NetCDF implementation
 
 import numpy as np
@@ -231,7 +231,7 @@ class NetCDFRestart(object):
         """
         self.closed = False
         self._ncfile = open_netcdf(fname, mode)
-   
+
     @classmethod
     @needs_netcdf
     def open_new(cls, fname, natom, box, vels, title='',
@@ -272,7 +272,7 @@ class NetCDFRestart(object):
                                      'T-REMD restarts.')
             elif remd[0] in 'mM':
                 remd_type = 'MULTI'
-                if (remd_indices is None or remd_groups is None or 
+                if (remd_indices is None or remd_groups is None or
                     len(remd_indices) != len(remd_groups)):
                     raise ValueError('remd_indices and remd_groups must be '
                                      'given for multi-D REMD, and must have '
@@ -381,7 +381,8 @@ class NetCDFRestart(object):
         # Set up the dimensions as attributes
         for dim in ncfile.dimensions:
             # Exception for ParmEd-created ncrst files
-            if dim == 'time': continue
+            if dim == 'time':
+                continue
             setattr(inst, dim, get_int_dimension(ncfile, dim))
         inst.hasvels = 'velocities' in ncfile.variables
         inst.hasbox = ('cell_lengths' in ncfile.variables and
@@ -424,7 +425,7 @@ class NetCDFRestart(object):
     @property
     def cell_lengths(self):
         return self._ncfile.variables['cell_lengths'][:]
-   
+
     @cell_lengths.setter
     def cell_lengths(self, stuff):
         self._ncfile.variables['cell_lengths'][:] = np.asarray(stuff)
@@ -433,7 +434,7 @@ class NetCDFRestart(object):
     @property
     def cell_angles(self):
         return self._ncfile.variables['cell_angles'][:]
-   
+
     @cell_angles.setter
     def cell_angles(self, stuff):
         self._ncfile.variables['cell_angles'][:] = np.asarray(stuff)
@@ -466,7 +467,7 @@ class NetCDFRestart(object):
     def temp0(self, stuff):
         self._ncfile.variables['temp0'][0] = float(stuff)
         self.flush()
-   
+
     @property
     def remd_indices(self):
         return self._ncfile.variables['remd_indices'][:]
@@ -571,7 +572,7 @@ class NetCDFTraj(object):
         """ Opens a NetCDF File """
         self.closed = False
         self._ncfile = open_netcdf(fname, mode)
-   
+
     @classmethod
     @needs_netcdf
     def open_new(cls, fname, natom, box, crds=True, vels=False, frcs=False,
@@ -698,7 +699,7 @@ class NetCDFTraj(object):
             ncfile.createVariable('remd_dimtype', 'i',
                                         ('remd_dimension',))
             inst._last_remd_frame = 0
-    
+
         inst._last_time_frame = 0
 
         return inst
@@ -860,7 +861,8 @@ class NetCDFTraj(object):
             includes angles as well.
         """
         def strip_units(x, desired_units):
-            if u.is_quantity(x): return x.value_in_unit(desired_units)
+            if u.is_quantity(x):
+                return x.value_in_unit(desired_units)
             return x
         if len(lengths) == 3 and angles is None:
             raise ValueError('Both lengths and angles are required.')
@@ -892,7 +894,8 @@ class NetCDFTraj(object):
         stuff : float or time-dimension Quantity
             The time to add to the current frame
         """
-        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.picoseconds)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.picoseconds)
         self._ncfile.variables['time'][self._last_time_frame] = float(stuff)
         self._last_time_frame += 1
         self.flush()
@@ -926,7 +929,8 @@ class NetCDFTraj(object):
         stuff : float or temperature Quantity
             The temperature to add to the current NetCDF file
         """
-        if u.is_quantity(stuff): stuff = stuff.value_in_unit(u.kelvin)
+        if u.is_quantity(stuff):
+            stuff = stuff.value_in_unit(u.kelvin)
         self._ncfile.variables['temp0'][self._last_remd_frame] = float(stuff)
         self._last_remd_frame += 1
         self.flush()

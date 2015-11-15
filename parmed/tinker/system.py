@@ -17,7 +17,7 @@ class TinkerAnalout(object):
     """ Reads the output of "analyze" to determine system parameters """
 
     # Flags paired with the attributes in the pointers
-    atom_inter_flags = {'Atoms in System' : 'natom', 
+    atom_inter_flags = {'Atoms in System' : 'natom',
                         'Pisystem Atoms' : 'norbit',
                         'Bond Stretches' : 'nbond',
                         'Conjugated Pi-Bonds' : 'nbpi',

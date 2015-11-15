@@ -45,7 +45,8 @@ class XmlFile(object):
         with closing(genopen(filename, 'r')) as f:
             for line in f:
                 line = line.strip()
-                if not line: continue
+                if not line:
+                    continue
                 rematch = _xmlre.match(line)
                 if not rematch:
                     return False
@@ -101,7 +102,7 @@ class XmlFile(object):
             return obj
         elif isinstance(obj, mm.State):
             return _OpenMMStateContents(obj)
-        return 
+        return
 
 class _OpenMMStateContents(object):
     """

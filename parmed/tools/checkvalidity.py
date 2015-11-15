@@ -127,7 +127,7 @@ def check_validity(parm, warnings):
         if has_cmap:
             hk = checkme('CHARMM_CMAP_COUNT', 2, True, False, None, int)
             hasallkeys = hasallkeys and hk
-     
+
         if hasallkeys:
             # Get the number of terms
             nub = parm.parm_data['CHARMM_UREY_BRADLEY_COUNT'][0]
@@ -140,7 +140,7 @@ def check_validity(parm, warnings):
             checkme('LENNARD_JONES_14_ACOEF', nttyp, True, False, None, float)
             checkme('LENNARD_JONES_14_BCOEF', nttyp, True, False, None, float)
             checkme('CHARMM_UREY_BRADLEY', nub, True, False, None, int)
-            checkme('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', nubtypes, 
+            checkme('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', nubtypes,
                     True, False, None, float)
             checkme('CHARMM_UREY_BRADLEY_EQUIL_CONSTANT', nubtypes,
                     True, False, None, float)
@@ -204,7 +204,8 @@ def check_validity(parm, warnings):
     # though, we can only check that CYX sulfurs are bonded to another Sulfur
     mask = AmberMask(parm, ':CYX@SG')
     for i, sel in enumerate(mask.Selection()):
-        if not sel: continue
+        if not sel:
+            continue
         atm = parm.atoms[i]
         # We expect 2 bonds
         bondedatms = [a.name for a in atm.bond_partners]
@@ -219,7 +220,8 @@ def check_validity(parm, warnings):
         mask = AmberMask(parm, ':CYS,CYM@SG')
         s_atms = []
         for i, sel in enumerate(mask.Selection()):
-            if not sel: continue
+            if not sel:
+                continue
             s_atms.append(parm.atoms[i])
         try:
             for i in range(len(s_atms)-1):
@@ -296,7 +298,7 @@ def _check_exist_nvals(parm, key, nvals, required=True, addable=False,
         return
 
     if len(parm.parm_data[key]) != nvals:
-        warnings.warn('%%FLAG %s has %d values, expected %d!' % (key, 
+        warnings.warn('%%FLAG %s has %d values, expected %d!' % (key,
                         len(parm.parm_data[key]), nvals))
 
     for val in parm.parm_data[key]:

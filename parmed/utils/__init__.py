@@ -18,7 +18,8 @@ def which(prog):
     """
     import os
     def is_exe(fpath):
-        if os.path.isdir(fpath): return False
+        if os.path.isdir(fpath):
+            return False
         return os.path.exists(fpath) and os.access(fpath, os.X_OK)
     fpath, fprog = os.path.split(prog)
     if fpath:
@@ -53,7 +54,8 @@ def tag_molecules(struct):
     struct.atoms.unmark()
     mol_id = 1
     for atom in struct.atoms:
-        if atom.marked: continue
+        if atom.marked:
+            continue
         atom.marked = mol_id
         _set_owner(atom, mol_id)
         mol_id += 1

@@ -56,7 +56,8 @@ class ParmedCmd(cmd.Cmd):
             self._exit_on_fatal = not os.isatty(self.stdin.fileno())
         except AttributeError:
             self._exit_on_fatal = False
-        if not self._populated: self.populate_actions()
+        if not self._populated:
+            self.populate_actions()
 
     def setlog(self, f):
         """ Open up a log file to start logging the commands. """
@@ -233,7 +234,7 @@ class ParmedCmd(cmd.Cmd):
 
     def do_quit(self, line):
         """
-        Stops reading commands and quits WITHOUT running the last 'parmout' 
+        Stops reading commands and quits WITHOUT running the last 'parmout'
         command that had been issued
         """
         return True
@@ -287,7 +288,8 @@ class ParmedCmd(cmd.Cmd):
         python_interpreter = PythonCmd(stdin=self.stdin, stdout=self.stdout)
         python_interpreter.use_rawinput = self.use_rawinput
         python_interpreter.setlog(self._logfile)
-        if not self.prompt: python_interpreter.prompt = ''
+        if not self.prompt:
+            python_interpreter.prompt = ''
         python_interpreter.cmdloop()
         try:
             globals_ = dict(amber_prmtop=self.parm, actions=actions)
@@ -295,7 +297,7 @@ class ParmedCmd(cmd.Cmd):
             exec(python_interpreter.command_string, globals_)
         except Exception as err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
-      
+
     def do_help(self, arg):
         " Modify the original do_help to pull docstrings from actions "
         if arg:
@@ -368,7 +370,8 @@ class PythonCmd(cmd.Cmd):
 
     def setlog(self, f):
         """ Open up a log file to start logging the commands """
-        if f is None: return
+        if f is None:
+            return
         if hasattr(f, 'write'):
             self._logfile = f
         else:
@@ -396,7 +399,8 @@ class PythonCmd(cmd.Cmd):
 
     def default(self, line):
         """ Add this onto the command string """
-        if line.strip() == '!!': return True
+        if line.strip() == '!!':
+            return True
         self.command_string += line + '\n'
 
 # To pretty-print usage statements. Some are getting long, so they need to be
@@ -449,7 +453,8 @@ def _fmt_usage(usage):
             word += char
             i += 1
         # Now add the final word to the list of words if it's not blank
-        if word: words.append(word)
+        if word:
+            words.append(word)
         return words
 
     uwords = split_options(usage)
@@ -464,5 +469,6 @@ def _fmt_usage(usage):
         else:
             lines.append(line)
             line = ' ' * indent_size + uword
-    if line: lines.append(line)
+    if line:
+        lines.append(line)
     return '\n'.join(lines)

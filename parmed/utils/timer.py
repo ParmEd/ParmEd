@@ -41,7 +41,7 @@ class Timer(object):
       # Make sure the timer is not on already
       if timer_name in self.active_timers:
          return
-      
+
       # Check to make sure we've added the timer or not. If not, then add it
       if not timer_name in self.timer_names:
          self.add_timer(timer_name, '%s timer' % timer_name)
@@ -77,15 +77,15 @@ class Timer(object):
    #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
    def done(self):
-      """ Tell Timer we are done, and we can convert units to best 
-          human-readable option 
+      """ Tell Timer we are done, and we can convert units to best
+          human-readable option
       """
 
       # Make sure all timers are ended
       self.end_all()
-      
+
       tfactor = 1
-      # Now test the magnitude of the global timer so we can decide what the 
+      # Now test the magnitude of the global timer so we can decide what the
       # reported units should be
       if self.timers['global'] > 60 * 60 * 48:
          self.units = 'days'
@@ -104,7 +104,7 @@ class Timer(object):
 
    def print_(self, timer, outfile, newline=True):
       """ Prints the value of the timer """
-      outfile.write("%-40s %8.3f %s" % (self.descriptions[timer], 
+      outfile.write("%-40s %8.3f %s" % (self.descriptions[timer],
                                         self.timers[timer], self.units))
       if newline:
          outfile.write(ls)
