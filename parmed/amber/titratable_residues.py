@@ -293,7 +293,7 @@ class TitratableResidueList(list):
         self.system_name = system_name
         self.solvated = solvated
         self.first_sol = first_solvent
-   
+
     def add_residue(self, residue, resnum, first_atom, state=0):
         """ Adds a residue to the list """
         list.append(self, residue)

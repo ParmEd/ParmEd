@@ -127,7 +127,7 @@ def check_validity(parm, warnings):
         if has_cmap:
             hk = checkme('CHARMM_CMAP_COUNT', 2, True, False, None, int)
             hasallkeys = hasallkeys and hk
-     
+
         if hasallkeys:
             # Get the number of terms
             nub = parm.parm_data['CHARMM_UREY_BRADLEY_COUNT'][0]

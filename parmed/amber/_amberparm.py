@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -387,7 +387,7 @@ class AmberParm(AmberFormat, Structure):
         return other
 
     #===================================================
-   
+
     def __getitem__(self, selection):
         other = super(AmberParm, self).__getitem__(selection)
         if isinstance(other, Atom):
@@ -654,7 +654,7 @@ class AmberParm(AmberFormat, Structure):
         super(AmberParm, self).unchange()
 
     #===================================================
-   
+
     def is_changed(self):
         """ 
         Determines if any of the topological arrays have changed since the
@@ -786,7 +786,7 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.pointers['NTYPES']
         for i in range(natom): # fill the LJ_types array
             self.LJ_types[pd["AMBER_ATOM_TYPE"][i]] = pd["ATOM_TYPE_INDEX"][i]
-         
+
         for i in range(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
@@ -2035,7 +2035,7 @@ class Rst7(object):
     @classmethod
     def open(cls, filename):
         """ Constructor that opens and parses an input coordinate file
-        
+
         Parameters
         ----------
         filename : str

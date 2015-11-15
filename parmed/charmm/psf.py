@@ -113,7 +113,7 @@ class CharmmPsfFile(Structure):
         psf : file
             Open file that is pointing to the first line of the section that is
             to be parsed
-        
+
         Returns
         -------
         title : str 
@@ -435,7 +435,7 @@ class CharmmPsfFile(Structure):
         ----------
         params : CharmmParameterSet=None
             If not None, this parameter set will be loaded
-        
+
         See Also
         --------
         :meth:`parmed.structure.Structure.createSystem`

@@ -74,7 +74,7 @@ class ParmList(object):
             return name >= 0 and name < len(self)
         else:
             return str(name) in self._parm_names
-   
+
     def __iter__(self):
         """ Iterate through the prmtop names """
         return iter(self._parm_instances)

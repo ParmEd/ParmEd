@@ -12,7 +12,7 @@ def clapp():
     import signal
     import sys
     import warnings
-    
+
     # Load custom modules
     from parmed.exceptions import ParmedError
 
@@ -22,15 +22,15 @@ def clapp():
     from parmed.tools.actions import Action
     from parmed.tools.parmlist import ParmList
     from parmed import __version__
-    
+
     # Set up new excepthook to clean up fatal exception printouts
     def interrupted(*args, **kwargs):
         """ Handle interruptions gracefully """
         sys.stdout.write('Interrupted\n')
         sys.exit(1)
-    
+
     signal.signal(signal.SIGINT, interrupted)
-    
+
     # Define our own custom warning printer
     def _print_warnings(message, category, filename, lineno, file=None, line=None):
         """ Override the default showwarning method """
@@ -39,9 +39,9 @@ def clapp():
             file.write('%s: %s\n' % (category.__name__, message))
         except IOError:
             pass
-    
+
     warnings.showwarning = _print_warnings
-    
+
     # Set up parser
     parser = ArgumentParser()
     parser.add_argument('-v', '--version', action='version',
@@ -94,29 +94,29 @@ def clapp():
              help='Topology file to analyze.')
     parser.add_argument('script_cl', nargs='?', metavar='<script>', default=None,
              help='File with a series of ParmEd commands to execute.')
-    
+
     opt = parser.parse_args()
-    
+
     # If the user specified a prmtop and script in the 'old' way, append them to the
     # list constructed via the --parm and -i flags -- they come at the end
     if opt.script_cl is not None:
         opt.script.append(opt.script_cl)
-    
+
     if opt.prmtop_cl is not None:
         opt.prmtop.append(opt.prmtop_cl)
-    
+
     # Load the splash screen
     if opt.printlogo:
         splash = Logo()
         print(splash)
-    
+
     # Set our warning filter
     if not opt.strict:
         warnings.filterwarnings('always', category=SeriousParmWarning)
-    
+
     # Set our overwrite preferences
     Action.overwrite = opt.overwrite
-    
+
     amber_prmtop = ParmList()
     for i, parm in enumerate(opt.prmtop):
         if i < len(opt.inpcrd):
@@ -127,7 +127,7 @@ def clapp():
         else:
             amber_prmtop.add_parm(parm)
             print('Loaded Amber topology file %s' % parm)
-    
+
     if len(opt.script) > 0:
         # Read from the list of scripts
         print(opt.script)
@@ -137,7 +137,7 @@ def clapp():
             if not os.path.exists(script):
                 warnings.warn('Script file %s cannot be found.' % script,
                               SeriousParmWarning)
-    
+
         # We have already pre-screened the scripts.
         for script in opt.script:
             if not os.path.exists(script): continue
@@ -155,7 +155,7 @@ def clapp():
                 # This has already been caught and printed. If it was re-raised,
                 # then that means we wanted to exit
                 sys.exit(1)
-    
+
     else:
         close_log_file = False
         parmed_commands = ParmedCmd(amber_prmtop)
@@ -201,7 +201,7 @@ def clapp():
         finally:
             if close_log_file:
                 logfile.close()
-    
+
     print('Done!')
 
 def guiapp():
@@ -217,9 +217,9 @@ def guiapp():
     from parmed.tools.actions import Action
     from parmed.tools.parmlist import ParmList
     import sys
-    
+
     debug = False
-    
+
     def excepthook(exception_type, exception_value, tb):
         """ Default exception handler """
         import traceback
@@ -227,7 +227,7 @@ def guiapp():
         showerror('Fatal Error','%s: %s' % (exception_type.__name__,
                                             exception_value))
         sys.exit(1)
-    
+
     # Launch the root window
     root = tk.Tk()
     root.resizable(True, True)

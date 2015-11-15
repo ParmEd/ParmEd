@@ -156,7 +156,7 @@ class _FourierAngleType(_AngleType):
                     self.k, self.theteq, self.periodicity)
 
 class _StretchBendType(_AngleType):
-   
+
     TypeList = dict()
     _param_type = 'stretch-bend'
 
@@ -170,7 +170,7 @@ class _StretchBendType(_AngleType):
         return '<_StretchBendType: k1=%s; k2=%s>' % (self.k1, self.k2)
 
 class _UreyBradleyType(_AngleType):
-   
+
     TypeList = dict()
     _param_type = 'urey-bradley'
 

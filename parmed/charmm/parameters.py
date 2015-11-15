@@ -289,7 +289,7 @@ class CharmmParameterSet(ParameterSet):
         -------
         New CharmmParameterSet populated with parameters found in the provided
         files
-            
+
         Notes
         -----
         The RTF file is read first (if provided), followed by the PAR file,

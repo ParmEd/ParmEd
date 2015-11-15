@@ -333,13 +333,13 @@ class TorsionTorsionGrid(OrderedDict):
                 return ttg
         TorsionTorsionGrid._typelist.append(inst)
         return inst
-   
+
     def __eq__(self, other):
         if self.keys() != other.keys(): return False
         for key in self:
             if abs(self[key] - other[key]) > 1e-8: return False
         return True
-   
+
     def __ne__(self, other):
         return not self == other
 

@@ -76,7 +76,7 @@ def _replace_defines(line, defines):
                 idx += 1
             new_line.append(char)
         line = ''.join(new_line)
-                        
+
     return line
 
 # To track where in the "if-elif-else" block each conditional is

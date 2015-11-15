@@ -296,7 +296,7 @@ class ParmedCmd(cmd.Cmd):
             exec(python_interpreter.command_string, globals_)
         except Exception as err:
             self.stdout.write("%s: %s\n" % (type(err).__name__, err))
-      
+
     def do_help(self, arg):
         " Modify the original do_help to pull docstrings from actions "
         if arg:

@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -101,7 +101,7 @@ class ChamberParm(AmberParm):
         self.LJ_14_radius = []
         self.LJ_14_depth = []
         AmberParm.initialize_topology(self, xyz, box)
-      
+
     #===================================================
 
     def load_pointers(self):
@@ -317,7 +317,7 @@ class ChamberParm(AmberParm):
     @property
     def chamber(self):
         return True
-   
+
     @property
     def amoeba(self):
         return False

@@ -228,7 +228,7 @@ class Action(lawsuit):
 
     def __str__(self):
         return ''
-   
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class parmout(Action):
@@ -703,7 +703,7 @@ class change(Action):
     CHARGE, MASS, RADII, SCREEN, ATOM_NAME, ATOM_TYPE, ATOM_TYPE_INDEX,
     or ATOMIC_NUMBER (note, changing elements with this command will NOT
     change their assignment for SHAKE!).
-   
+
     If given, the [quiet] keyword will prevent ParmEd from printing out a
     summary with every property changed for every atom that was changed
     useful for suppressing overwhelming output if you are zeroing every
@@ -1198,7 +1198,7 @@ NSPSOL (The first solvent "molecule")............= %d
 """ % (self.parm.parm_data['SOLVENT_POINTERS'][0],
        self.parm.parm_data['SOLVENT_POINTERS'][1],
        self.parm.parm_data['SOLVENT_POINTERS'][2])
-         
+
         return ret_str
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1246,7 +1246,7 @@ class setMolecules(Action):
             # If we had to reorder our atoms, we need to remake our parm
             self.parm.remake_parm()
         self.parm.load_pointers()
-   
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #
 #class addCoarseGrain(Action):
@@ -1295,7 +1295,7 @@ class changeProtState(Action):
         res = self.parm.atoms[sel.index(1)].residue
         return 'Changing protonation state of residue %d (%s) to %d' % (
                             res.idx+1, res.name, self.state)
-   
+
     @staticmethod
     def _add_ash_glh(residues):
         """
@@ -1362,7 +1362,7 @@ class changeProtState(Action):
         if sum(sel) != len(res.states[self.state].charges):
             raise ChangeStateError('You must select one and only one entire '
                                    'titratable residue')
-      
+
         charges = res.states[self.state].charges
         for i, atom in enumerate(residue.atoms):
             if sel[atom.idx] != 1:
@@ -1456,7 +1456,7 @@ class addExclusions(Action):
     def __str__(self):
         return 'Adding atoms from %s to exclusion lists of atoms in %s' % (
             self.mask2, self.mask1)
-   
+
     def execute(self):
         # Loop through both selections and add each selected atom in sel2 to
         # the exclusion list for selected atoms in sel1 (and vice-versa).
@@ -1753,7 +1753,7 @@ class setBond(Action):
         self.req = arg_list.get_next_float()
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
-   
+
     def __str__(self):
         return ('Set a bond between %s and %s with k = %f kcal/(mol Angstrom'
                 '**2) and Req = %f Angstroms') % (self.mask1, self.mask2,
@@ -1833,7 +1833,7 @@ class setAngle(Action):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask3 = AmberMask(self.parm, arg_list.get_next_mask())
-   
+
     def __str__(self):
         return ('Set an angle between %s, %s and %s with k = %f kcal/(mol '
                 'rad**2) and THETeq = %f degrees') % (self.mask1, self.mask2,
@@ -1876,7 +1876,7 @@ class setAngle(Action):
             atm1 = self.parm.atoms[atnum1]
             atm2 = self.parm.atoms[atnum2]
             atm3 = self.parm.atoms[atnum3]
-   
+
             # See if the angle exists in the first place, and if so, replace its
             # angle type with our new angle type (new_ang)
             found = False
@@ -1892,7 +1892,7 @@ class setAngle(Action):
                 self.parm.angles.append(Angle(atm1, atm2, atm3, new_ang_typ))
         # Make sure we update 1-4 exception handling if we created any rings
         self.parm.update_dihedral_exclusions()
-   
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class addDihedral(Action):
@@ -1904,7 +1904,7 @@ class addDihedral(Action):
     atom1 in mask 3, and atom1 in mask 4.  A second dihedral will be placed
     around atom2 in mask 1, atom2 in mask 2, atom2 in mask 3, and atom2 in
     mask4.
-    
+
         - <mask1> : Selection of one of the end-atoms for each dihedral
         - <mask2> : Selection of the middle atom bonded to <mask1> and
                     <mask3> in each dihedral
@@ -1942,7 +1942,7 @@ class addDihedral(Action):
             self.type = 'an improper'
         else:
             raise InputError('addDihedral: type must be "normal" or "improper"')
-   
+
     def __str__(self):
         return ('Set %s dihedral between %s, %s, %s, and %s with phi_k = %f '
                 'kcal/mol periodicity = %f phase = %f degrees scee = %f '
@@ -1961,10 +1961,10 @@ class addDihedral(Action):
                                       sum(sel1) != sum(sel4)):
             raise SetParamError('addDihedral: Each mask must select the same '
                                 'number of atoms!')
-      
+
         # If we do nothing, just return
         if sum(sel1) == 0: return
-   
+
         # Create the new dihedral type
         new_dih_typ = DihedralType(self.phi_k, self.per, self.phase, self.scee,
                                    self.scnb)
@@ -2295,7 +2295,7 @@ class tiMerge(Action):
 
         if self.parm.coordinates is None:
             raise TiMergeError('Load coordinates before merging topology.')
-      
+
         # we now have enough info to remap the atom indicies if an atom in
         # molsel2 has no overlap (dihedrals, angles, bonds) with sel2 then we
         # can just delete it (it is redundant).
@@ -2315,7 +2315,7 @@ class tiMerge(Action):
                             keep_mask[i] = 1
 
         nremove = sum(molsel2) - sum(sel2)
-      
+
         # We use an ambmask here to minimize changes to the code and
         # not introduce extra maintenance issues
         remove_mask = []
@@ -2376,7 +2376,7 @@ class tiMerge(Action):
             if (np.abs(diff) > self.tol).any():
                 raise TiMergeError('Common (nonsoftcore) atoms must have the '
                                    'same coordinates.')
-      
+
         for j in range(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
                 atm = self.parm.atoms[j]
@@ -2407,7 +2407,7 @@ class tiMerge(Action):
                         # Now go through each array re-indexing the atoms
                         # Check to make sure that this is a bond/angle/dihed 
                         # involving the common atom j and the softcore atom k
-                      
+
                         for bond in self.parm.bonds:
                             if (bond.atom1.idx == j and bond.atom2.idx == k):
                                 bond.atom1 = atm_new
@@ -2424,7 +2424,7 @@ class tiMerge(Action):
                             elif angle.atom3.idx == j:
                                 if angle.atom1.idx == k or angle.atom2.idx == k:
                                     angle.atom3 = atm_new
-                  
+
                         for dihed in self.parm.dihedrals:
                             if dihed.atom1.idx == j:
                                 if (dihed.atom2.idx == k or dihed.atom3.idx == k
@@ -2522,7 +2522,7 @@ class tiMerge(Action):
                 atmk in new_sc_atm1_int or 
                 atmj in new_sc_atm2_int or 
                 atmk in new_sc_atm2_int): #dihedral includes sc atoms 
-            
+
                 #endpoint atoms are not softcore
                 #we are crossing through the softcore region
                 if (atmi not in new_sc_atm1_int and 
@@ -2646,7 +2646,7 @@ class parm(Action):
             return ("Copying prmtop %s to parm list. %s's copy is the active "
                     "parm." % (self.parm_list[idx], self.parm_list[idx]))
         return 'Internal error!' # should never reach here
-   
+
     def execute(self):
         """ Either set the new active parm or add the new parm """
         from copy import copy
@@ -2928,7 +2928,7 @@ class summary(Action):
                 ncion += 1
             else:
                 nunk += 1
-      
+
         tmass = sum(atom.mass for atom in self.parm.atoms)
         tchg = sum(atom.charge for atom in self.parm.atoms)
 
@@ -3022,7 +3022,7 @@ class lmod(Action):
 
     def init(self, arg_list):
         pass
-   
+
     def __str__(self):
         return ('Making adjustments for LMOD (LJ A-coef. for H atoms bonded '
                 'to O)')
@@ -3249,7 +3249,7 @@ class add12_6_4(Action):
     usage = ('[<divalent ion mask>] [c4file <C4 Param. File> | watermodel '
             '<water model>] [polfile <Pol. Param File> [tunfactor <tunfactor>]')
     strictly_supported = (AmberParm, ChamberParm)
-   
+
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
 
     def init(self, arg_list):
@@ -3382,7 +3382,7 @@ class OpenMM(Action):
     precedence. If present, the 'dcd' keyword triggers writting DCD-formatted
     trajectory files instead of NetCDF when ioutfm=1. The DCD trajectory writing
     offers binary trajectory support without requiring a NetCDF-Python library.
-   
+
     The 'progress' keyword triggers printing of ParmEd's progress in setting up
     and starting the calculation.
 
@@ -4259,7 +4259,7 @@ class gromber(Action):
 # Private helper methods
 
 def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
-   
+
     if one_4:
         key = 'LENNARD_JONES_14'
     else:
@@ -4268,10 +4268,10 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
     # Make sure that atom type 1 comes first
     a1, a2 = sorted([atom_1, atom_2])
     ntypes = parm.pointers['NTYPES']
-   
+
     # Find the atom1 - atom2 interaction (adjusting for indexing from 0)
     term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
-   
+
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
     parm.parm_data['%s_ACOEF' % key][term_idx] = eps * rmin**12
     parm.parm_data['%s_BCOEF' % key][term_idx] = 2 * eps * rmin**6

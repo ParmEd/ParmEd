@@ -27,7 +27,7 @@ class AmberMask(object):
     def __init__(self, parm, mask):
         self.parm = parm
         self.mask = mask
-      
+
     #======================================================
 
     def __str__(self):
@@ -37,7 +37,7 @@ class AmberMask(object):
 
     def Selected(self, invert=False):
         """ Generator that returns the indexes of selected atoms
-        
+
         Parameters
         ----------
         invert : bool, optional
@@ -207,11 +207,11 @@ class AmberMask(object):
                 if flag == 1:
                     n += 1
             i += 1
-      
+
         return infix + '_' # terminating _ for next step
 
     #======================================================
-   
+
     def _isOperator(self, char):
         """ Determines if a character is an operator """
         return len(char) == 1 and char in '!&|<>'
@@ -221,7 +221,7 @@ class AmberMask(object):
     def _isOperand(self, char):
         """ Determines if a character is an operand """
         return len(char) == 1 and (char in "\\*/%-?,'.=+" or char.isalnum())
-   
+
     #======================================================
 
     def _torpn(self, infix, prnlev):
@@ -341,7 +341,7 @@ class AmberMask(object):
         return pmask
 
     #======================================================
-   
+
     def _neg(self, pmask1):
         """ Negates a given mask """
         return pmask1.Not()
@@ -596,13 +596,13 @@ class AmberMask(object):
             pos += 1
 
     #======================================================
-   
+
     def _atnum_select(self, at1, at2, mask):
         """ Fills a _mask array between atom numbers at1 and at2 """
         for i in range(at1-1, at2): mask[i] = 1
 
     #======================================================
-   
+
     def _resnum_select(self, res1, res2, mask):
         """ Fills a _mask array between residues res1 and res2 """
         for i, atom in enumerate(self.parm.atoms):
@@ -610,7 +610,7 @@ class AmberMask(object):
             if res >= res1 and res <= res2: mask[i] = 1
 
     #======================================================
-   
+
     def _atname_select(self, atname, mask, key='name'):
         """ Fills a _mask array with all atom names of a given name """
         if atname.isdigit():
@@ -629,7 +629,7 @@ class AmberMask(object):
                 mask[i] = mask[i] | int(_nameMatch(atname, getattr(atom, key)))
 
     #======================================================
-   
+
     def _resname_select(self, resname, mask):
         """ Fills a _mask array with all residue names of a given name """
         for i, atm in enumerate(self.parm.atoms):
@@ -637,9 +637,9 @@ class AmberMask(object):
                 mask[i] = 1
             elif resname.isdigit():
                 mask[i] = mask[i] | int(int(resname) == atm.residue.idx + 1)
-            
+
     #======================================================
-   
+
     def _binop(self, op, pmask1, pmask2):
         """ Does a binary operation on a pair of masks """
         if op == '&':
@@ -668,7 +668,7 @@ def _nameMatch(atnam1, atnam2):
     Determines if atnam1 matches atnam2, where atnam1 can have * as a wildcard
     and spaces are ignored. atnam2 should come from the prmtop. We'll use regex
     to do this. 
-   
+
     We will replace * with a regex that will match any alphanumeric character
     0 or more times: * --> \\w*
 
@@ -733,7 +733,7 @@ class _mask(list):
         for i in range(len(self)):
             new_mask[i] = int(self[i] or other[i])
         return new_mask
-   
+
     def Not(self):
         new_mask = _mask(self.natom)
         for i in range(self.natom):

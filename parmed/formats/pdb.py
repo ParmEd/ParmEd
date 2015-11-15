@@ -237,7 +237,7 @@ class PDBFile(object):
         --------
         The PDB parser also adds metadata to the returned Structure object that
         may be present in the PDB file
-    
+
         experimental : ``str``
             EXPDTA record
         journal : ``str``
@@ -264,7 +264,7 @@ class PDBFile(object):
             The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
-    
+
         Returns
         -------
         structure : :class:`Structure`
