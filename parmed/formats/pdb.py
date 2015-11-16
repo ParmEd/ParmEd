@@ -274,7 +274,12 @@ class PDBFile(object):
             default.
         """
         if isinstance(filename, string_types):
-            if os.path.isfile(filename):
+            # this code is repetitive. Better way?
+            is_remote = (filename.startswith('http://') or
+                         filename.startswith('https://') or
+                         filename.startswith('ftp://'))
+
+            if os.path.isfile(filename) or is_remote:
                 own_handle = True
                 fileobj = genopen(filename, 'r')
             else:
