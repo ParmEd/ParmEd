@@ -9,7 +9,8 @@ import numpy as np
 import os
 import re
 import sys
-from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
+from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
+                          FortranFormat, titratable_residues)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError)
 from parmed import topologyobjects, load_file
@@ -20,8 +21,13 @@ import random
 import saved_outputs as saved
 import unittest
 from utils import (get_fn, FileIOTestCase, equal_atoms,
-                   create_random_structure, HAS_GROMACS)
+                   create_random_structure, HAS_GROMACS,
+                   diff_files, get_saved_fn)
 import warnings
+try:
+    from string import letters
+except ImportError:
+    from string import ascii_letters as letters
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -2181,3 +2187,76 @@ class TestAmberMdin(FileIOTestCase):
         mdin4 = mdin.Mdin(program='sander.APBS')
         mdin4.change('cntrl', 'igb', 10)
         mdin4.change('pb', 'bcfl', 1)
+
+class TestAmberTitratableResidues(FileIOTestCase):
+    """ Test Amber's titration module capabilities """
+
+    def testLineBuffer(self):
+        """ Tests private _LineBuffer for cpin utilities """
+        fobj = StringIO()
+        fobj2 = StringIO()
+        fobj3 = StringIO()
+        buf = titratable_residues._LineBuffer(fobj)
+        buf2 = titratable_residues._LineBuffer(fobj2)
+        buf3 = titratable_residues._LineBuffer(fobj3)
+        words = []
+        alphabet = list(letters)
+        for i in range(random.randint(20, 40)):
+            word = ''.join(np.random.choice(alphabet, size=random.randint(5, 20),
+                                            replace=True).tolist()
+            )
+            words.append(word)
+            buf.add_word(word)
+        buf2.add_words(words)
+        buf3.add_words(words, space_delimited=True)
+        buf.flush()
+        buf.flush() # Make sure second ones don't do anything
+        buf2.flush()
+        buf3.flush()
+
+        fobj.seek(0)
+        fobj2.seek(0)
+        fobj3.seek(0)
+        self.assertEqual(fobj.read(), fobj2.read())
+        self.assertNotEqual(fobj.read(), fobj3.read())
+        fobj3.seek(0)
+        self.assertEqual(fobj3.read().split(), words)
+
+    def testCpinCreation(self):
+        """ Test TitratableResidueList and cpin creation """
+        import cpinutil
+        repl = dict(parm=get_fn('trx.prmtop'),
+                    output=get_fn('test.cpin', written=True))
+        opt = cpinutil.parser.parse_args(
+                    ('-igb 2 -p %(parm)s -states 0,0,1,0,1,1,0,1,0,1,1,1 -o '
+                     '%(output)s' % (repl)).split()
+        )
+        cpinutil.main(opt)
+        self.assertTrue(
+                diff_files(get_saved_fn('test.cpin'),
+                           get_fn('test.cpin', written=True))
+        )
+
+    def testTitratableResidue(self):
+        """ Tests the TitratableResidue object """
+        as4 = titratable_residues.AS4
+        self.assertEqual(str(as4), saved.AS4_TITR_OUTPUT)
+        # Test error handling for TitratableResidue
+        newres = titratable_residues.TitratableResidue(
+                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], 7.0
+        )
+        self.assertEqual(newres.pKa, 7.0)
+        self.assertRaises(AmberError, lambda:
+                newres.add_state(3, [10.0, 20.0], 10.0)
+        )
+        self.assertRaises(AmberError, lambda:
+                newres.add_states([3, 2, 1], [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,
+                    5, 6, 7]], [10, 20, 30])
+        )
+        self.assertRaises(AmberError, lambda: newres.cpin_pointers(10))
+        newres.set_first_state(0)
+        newres.set_first_state(0) # Second setting should be ignored
+        self.assertRaises(AmberError, lambda: newres.set_first_state(1))
+        newres.set_first_charge(0)
+        newres.set_first_charge(0)
+        self.assertRaises(AmberError, lambda: newres.set_first_charge(1))
