@@ -5,6 +5,7 @@ from __future__ import division
 import utils
 
 import numpy as np
+import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF)
@@ -17,6 +18,7 @@ import os
 import unittest
 from utils import (get_fn, diff_files, get_saved_fn, skip_big_tests,
                    HAS_GROMACS, FileIOTestCase)
+from saved_outputs import SAVED_PDB_TEXT
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -204,6 +206,7 @@ class TestChemistryPDBStructure(FileIOTestCase):
         self.simple = get_fn('ala_ala_ala.pdb')
         self.format_test = get_fn('SCM_A.pdb')
         self.overflow2 = get_fn('overflow.pdb')
+        self.saved_pdb_text = SAVED_PDB_TEXT
         FileIOTestCase.setUp(self)
 
     def testAscii(self):
@@ -215,6 +218,16 @@ class TestChemistryPDBStructure(FileIOTestCase):
         self.assertEqual(all_crds.shape[0], 20)
         np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
         np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
+
+    def testReadfromText(self):
+        full_struct = pmd.download_PDB('1l2y')
+        struct = read_PDB(self.saved_pdb_text)
+        # use _compare_structures from test_parmed_serialization.py?
+        np.testing.assert_allclose(struct.coordinates, full_struct[:35].coordinates)
+        self.assertEqual([atom.name for atom in struct.atoms],
+                         [atom.name for atom in full_struct[:35].atoms])
+        self.assertEqual([residue.name for residue in struct.residues],
+                         [residue.name for residue in full_struct[:35].residues])
 
     def testDownload(self):
         """ Tests downloading PDB files """
