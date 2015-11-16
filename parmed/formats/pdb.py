@@ -4,9 +4,10 @@ PDBx/mmCIF files.
 """
 from __future__ import division, print_function, absolute_import
 
-from contextlib import closing
+import os
 import io
 import ftplib
+from contextlib import closing
 try:
     import gzip
 except ImportError:
@@ -228,7 +229,7 @@ class PDBFile(object):
         Parameters
         ----------
         filename : str or file-like
-            Name of the PDB file to read, or a file-like object that can iterate
+            Name of the PDB file to read, or a file-like object that can iterate or content of PBD file
             over the lines of a PDB. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pdb.gz,
             file.pdb.bz2)
@@ -273,8 +274,14 @@ class PDBFile(object):
             default.
         """
         if isinstance(filename, string_types):
-            own_handle = True
-            fileobj = genopen(filename, 'r')
+            if os.path.isfile(filename):
+                own_handle = True
+                fileobj = genopen(filename, 'r')
+            else:
+                # assume Python text
+                # split to lines
+                own_handle = False
+                fileobj = filename.split('\n')
         else:
             own_handle = False
             fileobj = filename
