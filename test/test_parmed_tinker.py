@@ -109,7 +109,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(len(xyz.atoms[0].bond_partners), 4)
         self.assertEqual(xyz.atoms[-1].name, 'H')
         self.assertEqual(xyz.atoms[-1].type, '248')
-        xyz = tinkerfiles.XyzFile(get_fn('2igd_924wat.xyz'), get_fn('2igd_924wat.pdb'))
+        xyz = pmd.load_file(get_fn('2igd_924wat.xyz'), get_fn('2igd_924wat.pdb'))
         pdb = pmd.load_file(get_fn('2igd_924wat.pdb'))
         self.assertEqual(len(pdb.atoms), len(xyz.atoms))
         self.assertEqual(len(pdb.residues), len(xyz.residues))
