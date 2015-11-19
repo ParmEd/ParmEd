@@ -27,7 +27,6 @@ from parmed.amber._amberparm import AmberParm, Rst7
 from parmed.amber._chamberparm import ChamberParm, ConvertFromPSF
 from parmed.amber._tinkerparm import AmoebaParm, BeemanRestart
 from parmed.utils.six import string_types
-from warnings import warn as _warn
 
 # Silence pyflakes warnings for deprecated/unused classes
 assert BeemanRestart and ConvertFromPSF
