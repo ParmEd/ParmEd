@@ -3,7 +3,7 @@ This module contains classes for reading various TINKER-style files
 """
 from parmed.exceptions import TinkerError
 from parmed.formats.registry import FileFormatType, load_file
-from parmed.periodic_table import element_by_name
+from parmed.periodic_table import element_by_name, AtomicNum
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, Residue
 from parmed.utils.io import genopen
@@ -165,8 +165,8 @@ class XyzFile(Structure):
         if len(words) == 6 and not XyzFile._check_atom_record(words):
             self.box = [float(w) for w in words]
             words = fxyz.readline().split()
-        atom = Atom(atomic_number=element_by_name(words[1]), name=words[1],
-                    type=words[5])
+        atom = Atom(atomic_number=AtomicNum[element_by_name(words[1])],
+                    name=words[1], type=words[5])
         atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
         residue = Residue('SYS')
         residue.number = 1
@@ -178,8 +178,8 @@ class XyzFile(Structure):
         bond_ids = [[int(w) for w in words[6:]]]
         for i, line in enumerate(fxyz):
             words = line.split()
-            atom = Atom(atomic_number=element_by_name(words[1]), name=words[1],
-                        type=words[5])
+            atom = Atom(atomic_number=AtomicNum[element_by_name(words[1])],
+                        name=words[1], type=words[5])
             atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
             if seq is not None:
                 residue = seqstruct.atoms[i+1].residue
