@@ -83,6 +83,7 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('sample-charmm.rst'))
         self.assertIsInstance(crd, charmm.CharmmRstFile)
 
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
     def testLoadNetCDFRestart(self):
         """ Tests automatic loading of Amber NetCDF restart file """
         crd = formats.load_file(get_fn('ncinpcrd.rst7'))
