@@ -108,6 +108,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(xyz.atoms[0].type, '221')
         self.assertEqual(len(xyz.atoms[0].bond_partners), 4)
         self.assertEqual(xyz.atoms[-1].name, 'H')
+        self.assertEqual(xyz.atoms[-1].atomic_number, 1)
         self.assertEqual(xyz.atoms[-1].type, '248')
         xyz = pmd.load_file(get_fn('2igd_924wat.xyz'), get_fn('2igd_924wat.pdb'))
         pdb = pmd.load_file(get_fn('2igd_924wat.pdb'))
