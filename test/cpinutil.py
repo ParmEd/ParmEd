@@ -290,6 +290,6 @@ if __name__ == '__main__':
     # Go ahead and make the CPIN file.
     try:
         main(opt)
-    except ParmedError, e:
+    except ParmedError as e:
         sys.exit('%s: %s' % (type(e).__name__, e))
     sys.exit(0)

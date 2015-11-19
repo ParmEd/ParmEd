@@ -2234,7 +2234,8 @@ class TestAmberTitratableResidues(FileIOTestCase):
         cpinutil.main(opt)
         self.assertTrue(
                 diff_files(get_saved_fn('test.cpin'),
-                           get_fn('test.cpin', written=True))
+                           get_fn('test.cpin', written=True),
+                           absolute_error=1e-6, spacechar='=,')
         )
 
     def testTitratableResidue(self):

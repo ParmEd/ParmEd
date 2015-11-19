@@ -120,7 +120,7 @@ def get_saved_fn(filename):
 
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,
-               comment=None):
+               comment=None, spacechar=None):
     """
     Compares 2 files line-by-line
 
@@ -140,6 +140,9 @@ def diff_files(file1, file2, ignore_whitespace=True,
         trigger failures. Cannot be used with absolute_error
     comment : str or None
         The character to identify comments in this file
+    spacechar : str or None
+        A collection of characters to turn into spaces (to facilitate proper
+        tokenization)
 
     Returns
     -------
@@ -189,7 +192,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1,l2,absolute_error,relative_error):
+                    if not detailed_diff(l1,l2,absolute_error,relative_error,spacechar):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -206,7 +209,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1,l2,absolute_error,relative_error):
+                    if not detailed_diff(l1,l2,absolute_error,relative_error,spacechar):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -226,13 +229,17 @@ def record_diffs(i, f1, f2, l1, l2):
     f.write('< %s> %s' % (l1, l2))
     f.close()
 
-def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
+def detailed_diff(l1, l2, absolute_error=None, relative_error=None, spacechar=None):
     """
     Check individual fields to make sure numbers are numerically equal if the
     lines differ. Also ignore fields that appear to be a file name, since those
     will be system-dependent
     """
     fdir = os.path.split(get_fn('writes'))[0]
+    if spacechar is not None:
+        for char in spacechar:
+            l1 = l1.replace(char, ' ')
+            l2 = l2.replace(char, ' ')
     w1 = l1.split()
     w2 = l2.split()
     if len(w1) != len(w2): return False
