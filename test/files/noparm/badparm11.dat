@@ -1,0 +1,6 @@
+PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA
+HE 10.01                             sp2 C pure aromatic (benzene)
+CB 12.01         0.360               sp2 aromatic C, 5&6 membered ring junction
+CC 12.01         0.360               sp2 aromatic C, 5 memb. ring HIS
+CD 12.01         0.360               sp2 C atom in the middle of: C=CD-CD=C
+CI 12.01                             parmbsc0

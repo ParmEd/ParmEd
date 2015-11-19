@@ -106,4 +106,4 @@ class cntrl:
              'es_cutoff' : 0.0, 'vdw_cutoff' : 0.0, 'ntwf' : 0,
              'dtemp' : 0, 'dxm' : 0, 'heat' : 0, 'alpb' : 0, 'arad' : 15.0,
              'iamd' : 0, 'restraintwt' : 0.0, 'barostat' : 1, 'mcbarint' : 100,
-             'lj1264' : 0}
+             'lj1264' : 0, 'icnstph' : 0, 'solvph' : 7.0, 'ntcnstph' : 10}

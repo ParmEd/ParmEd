@@ -83,16 +83,21 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('sample-charmm.rst'))
         self.assertIsInstance(crd, charmm.CharmmRstFile)
 
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
     def testLoadNetCDFRestart(self):
         """ Tests automatic loading of Amber NetCDF restart file """
         crd = formats.load_file(get_fn('ncinpcrd.rst7'))
         self.assertIsInstance(crd, amber.NetCDFRestart)
+        self.assertFalse(amber.NetCDFTraj.id_format(get_fn('ncinpcrd.rst7')))
+        self.assertFalse(amber.NetCDFTraj.id_format(get_fn('WMI_Lear.nc')))
 
     @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
     def testLoadNetCDFTraj(self):
         """ Tests automatic loading of Amber NetCDF trajectory file """
         crd = formats.load_file(get_fn('tz2.truncoct.nc'))
         self.assertIsInstance(crd, amber.NetCDFTraj)
+        self.assertFalse(amber.NetCDFRestart.id_format(get_fn('tz2.truncoct.nc')))
+        self.assertFalse(amber.NetCDFRestart.id_format(get_fn('WMI_Lear.nc')))
 
     def testLoadPDB(self):
         """ Tests automatic loading of PDB files """
@@ -1118,5 +1123,10 @@ class TestFileDownloader(unittest.TestCase):
         self.assertTrue(gromacs.GromacsGroFile.id_format(self.url + '1aki.ff99sbildn.gro'))
         gro = gromacs.GromacsGroFile.parse(self.url + '1aki.ff99sbildn.gro')
         self.assertIsInstance(gro, Structure)
+
+    def testDownloadNetCDF(self):
+        """ Tests that NetCDF files always fail when trying to download them """
+        self.assertFalse(amber.NetCDFRestart.id_format(self.url + 'ncinpcrd.rst7'))
+        self.assertFalse(amber.NetCDFTraj.id_format(self.url + 'tz2.truncoct.nc'))
 
 del skip_big_tests # Avoid fake testing this method :)

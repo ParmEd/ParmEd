@@ -9,8 +9,10 @@ import numpy as np
 import os
 import re
 import sys
-from parmed.amber import readparm, asciicrd, mask, parameters, mdin, FortranFormat
-from parmed.exceptions import AmberWarning, MoleculeError, AmberError, MaskError
+from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
+                          FortranFormat, titratable_residues)
+from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
+                               MaskError, InputError)
 from parmed import topologyobjects, load_file
 import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
@@ -19,8 +21,13 @@ import random
 import saved_outputs as saved
 import unittest
 from utils import (get_fn, FileIOTestCase, equal_atoms,
-                   create_random_structure, HAS_GROMACS)
+                   create_random_structure, HAS_GROMACS,
+                   diff_files, get_saved_fn)
 import warnings
+try:
+    from string import letters
+except ImportError:
+    from string import ascii_letters as letters
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
@@ -81,9 +88,14 @@ class TestReadParm(unittest.TestCase):
         """ Test the arbitrary parm loader """
         parm = readparm.LoadParm(get_fn('trx.prmtop'))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop'))
-        self.assertIs(parm2.view_as(readparm.AmberParm), parm2)
+        self.assertIs(parm.view_as(readparm.AmberParm), parm)
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
+        # Now check that the box info is set properly
+        crd3 = load_file(get_fn('solv.rst7'))
+        parm3 = readparm.LoadParm(get_fn('solv.prmtop'), xyz=crd3.coordinates)
+        np.testing.assert_equal(parm3.box[:3], parm3.parm_data['BOX_DIMENSIONS'][1:])
+        self.assertEqual(parm3.box[3], parm3.parm_data['BOX_DIMENSIONS'][0])
 
     def testGzippedParm(self):
         """ Check that gzipped prmtop files can be parsed correctly """
@@ -721,24 +733,47 @@ def _num_unique_dtypes(dct):
         num += len(x)
     return num
 
-class TestParameterFiles(unittest.TestCase):
+class TestParameterFiles(FileIOTestCase):
     """ Tests Amber parameter and frcmod files """
+
+    def testFindAmberFiles(self):
+        """ Tests the Amber file finder helper function """
+        finder = parameters._find_amber_file
+        self.assertEqual(finder(__file__), __file__)
+        self.assertRaises(ValueError, lambda: finder('nofile'))
 
     def testFileDetectionFrcmod(self):
         """ Tests the detection of Amber frcmod files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'frcmod.*')):
             self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+        # Now try creating a bunch of non-frcmod files to test the file ID
+        # discrimination
+        fn = get_fn('test.frcmod', written=True)
+        with open(fn, 'w') as f:
+            f.write('\n\n\n\n\n\n')
 
     def testFileDetectionParm(self):
         """ Tests the detection of Amber parm.dat files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'parm*.dat')):
             self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+        # Now try a bunch of slightly-off files to test discrimination
+        for fname in glob.glob(os.path.join(get_fn('noparm'), '*')):
+            self.assertFalse(parameters.AmberParameterSet.id_format(fname))
 
     def testFrcmodParsing(self):
         """ Tests parsing an Amber frcmod file """
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'frcmod.ff99SB')
+        self._check_ff99sb(
+                parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'frcmod.ff99SB')
+                )
         )
+        self._check_ff99sb(
+                parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'frcmod.1')
+                )
+        )
+
+    def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
         self.assertEqual(_num_unique_types(params.bond_types), 0)
         self.assertEqual(_num_unique_types(params.angle_types), 0)
@@ -921,6 +956,17 @@ class TestParameterFiles(unittest.TestCase):
                          math.sqrt(0.162750*0.2104))
         self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
                          1.775931+1.66)
+        # Check inside an frcmod file
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'frcmod.2')
+        )
+        self.assertEqual(_num_unique_types(params.atom_types), 4)
+        self.assertEqual(_num_unique_types(params.bond_types), 0)
+        self.assertEqual(_num_unique_types(params.angle_types), 0)
+        self.assertEqual(_num_unique_types(params.dihedral_types), 0)
+        self.assertEqual(params.nbfix_types[('HC', 'OH')][0],
+                         math.sqrt(0.0150*0.2))
+        self.assertEqual(params.nbfix_types[('HC', 'OH')][1], 1.377+1.721)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def testLoadLeaprc(self):
@@ -934,14 +980,29 @@ class TestParameterFiles(unittest.TestCase):
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['K+'].atomic_number, 19)
         self.assertTrue(params.residues)
+        with open(os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd', 'leaprc.ff14SB')) as f:
+            params = parameters.AmberParameterSet.from_leaprc(f)
+        self.assertEqual(params.atom_types['H'].atomic_number, 1)
+        self.assertEqual(params.atom_types['3C'].atomic_number, 6)
+        self.assertEqual(params.atom_types['K+'].atomic_number, 19)
+        self.assertTrue(params.residues)
 
     def testParmSetParsing(self):
         """ Tests parsing a set of Amber parameter files """
         params = parameters.AmberParameterSet(
                 os.path.join(get_fn('parm'), 'parm99.dat'),
-                os.path.join(get_fn('parm'), 'frcmod.ff99SB'),
-                os.path.join(get_fn('parm'), 'frcmod.parmbsc0'),
+              [ os.path.join(get_fn('parm'), 'frcmod.ff99SB'),
+                os.path.join(get_fn('parm'), 'frcmod.parmbsc0'), ],
         )
+        self._check_paramset(params)
+        params = parameters.AmberParameterSet(
+                open(os.path.join(get_fn('parm'), 'parm99.dat')),
+                open(os.path.join(get_fn('parm'), 'frcmod.ff99SB')),
+                open(os.path.join(get_fn('parm'), 'frcmod.parmbsc0')),
+        )
+        self._check_paramset(params)
+
+    def _check_paramset(self, params):
         self.assertGreater(_num_unique_types(params.atom_types), 0)
         self.assertGreater(_num_unique_types(params.bond_types), 0)
         self.assertGreater(_num_unique_types(params.angle_types), 0)
@@ -970,6 +1031,28 @@ class TestParameterFiles(unittest.TestCase):
                          topologyobjects.DihedralType(0.27, 2, 0, 1.2, 2.0))
         self.assertEqual(params.dihedral_types[('C','N','CT','C')][3],
                          topologyobjects.DihedralType(0, 1, 0, 1.2, 2.0))
+
+    def testPrivateFunctions(self):
+        """ Test some of the private utility functions in AmberParameterSet """
+        improper_key = parameters.AmberParameterSet._periodic_improper_key
+        # Construct an improper with 4 atoms
+        a1 = topologyobjects.Atom(name='CA', type='CA')
+        a2 = topologyobjects.Atom(name='CB', type='CB')
+        a3 = topologyobjects.Atom(name='CC', type='CD')
+        a4 = topologyobjects.Atom(name='CD', type='CC')
+        bonds = [topologyobjects.Bond(a1, a3), topologyobjects.Bond(a2, a3),
+                 topologyobjects.Bond(a3, a4)]
+        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a4, a3, a2, a1), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a1, a4, a2, a3), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a2, a4, a1, a3), ('CA', 'CB', 'CD', 'CC'))
+        # Now have no connectivity, check fallback
+        a1 = topologyobjects.Atom(name='CA', type='CA')
+        a2 = topologyobjects.Atom(name='CB', type='CB')
+        a3 = topologyobjects.Atom(name='CC', type='CD')
+        a4 = topologyobjects.Atom(name='CD', type='CC')
+        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
+        self.assertEqual(improper_key(a4, a3, a2, a1), ('CC', 'CD', 'CB', 'CA'))
 
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
@@ -1245,18 +1328,27 @@ class TestAmberMask(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
         mask_res1 = mask.AmberMask(parm, ':1')
         mask_res2 = mask.AmberMask(parm, ':1:2')
+        mask_res3 = mask.AmberMask(parm, ':1-3')
         mask_resala = mask.AmberMask(parm, ':ALA')
         mask_carbonat = mask.AmberMask(parm, '@/C')
+        mask_atnum = mask.AmberMask(parm, '@1-10')
+        mask_atnum2 = mask.AmberMask(parm, '@1-10,21-30')
         mask_atname = mask.AmberMask(parm, '@CA')
         mask_atname2 = mask.AmberMask(parm, '@CA@CB')
+        mask_atname3 = mask.AmberMask(parm, '@CA,1,CB,2-3')
         mask_resat = mask.AmberMask(parm, ':ALA@CA')
         mask_attyp = mask.AmberMask(parm, '@%CT')
         mask_wldcrd = mask.AmberMask(parm, '@H=')
         mask_wldcrd2 = mask.AmberMask(parm, '*&(@H*)')
+        mask_wldcrd3 = mask.AmberMask(parm, ':AL=')
+        mask_wldcrd4 = mask.AmberMask(parm, ':A=A')
+        mask_wldcrd5 = mask.AmberMask(parm, ':1,*')
+        mask_wldcrd6 = mask.AmberMask(parm, '@*')
+        mask_wldcrd7 = mask.AmberMask(parm, '@CA|@*')
         mult_op = mask.AmberMask(parm, '(!:1&@CA)|!:2')
 
         # Check all of the masks
-        self.assertEqual(sum(mask_res1.Selection()), 13)
+        self.assertEqual(sum(mask_res1.Selection(prnlev=9)), 13)
         for idx in mask_res1.Selected():
             self.assertEqual(parm.atoms[idx].residue.idx, 0)
         self.assertEqual(list(range(13)), list(mask_res1.Selected()))
@@ -1274,6 +1366,12 @@ class TestAmberMask(unittest.TestCase):
         _ = (0, 1)
         for idx in mask_res1.Selected():
             self.assertIn(parm.atoms[idx].residue.idx, _)
+
+        for atom, sel in zip(parm.atoms, mask_res3.Selection()):
+            if atom.residue.idx < 3:
+                self.assertEqual(sel, 1)
+            else:
+                self.assertEqual(sel, 0)
 
         self.assertEqual(sum(mask_resala.Selection()), 121)
         for idx in mask_resala.Selected():
@@ -1294,6 +1392,9 @@ class TestAmberMask(unittest.TestCase):
             else:
                 self.assertEqual(sel[atom.idx], 0)
 
+        self.assertEqual(sum(mask_atnum.Selection()), 10)
+        self.assertEqual(sum(mask_atnum2.Selection()), 20)
+
         self.assertEqual(sum(mask_atname.Selection()), 108)
         for idx in mask_atname.Selected():
             self.assertEqual(parm.atoms[idx].name, 'CA')
@@ -1310,6 +1411,14 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], 1)
             else:
                 self.assertEqual(sel[atom.idx], 0)
+
+        for atom, val in zip(parm.atoms, mask_atname3.Selection()):
+            if atom.name in ('CA', 'CB'):
+                self.assertEqual(val, 1)
+            elif atom.idx < 3:
+                self.assertEqual(val, 1)
+            else:
+                self.assertEqual(val, 0)
 
         self.assertEqual(sum(mask_resat.Selection()), 12)
         for idx in mask_resat.Selected():
@@ -1344,6 +1453,30 @@ class TestAmberMask(unittest.TestCase):
             else:
                 self.assertFalse(atom.name.startswith('H'))
 
+        for atom, sel in zip(parm.atoms, mask_wldcrd3.Selection()):
+            if sel:
+                self.assertTrue(atom.residue.name.startswith('AL'))
+            else:
+                self.assertFalse(atom.residue.name.startswith('AL'))
+
+        for atom, sel in zip(parm.atoms, mask_wldcrd4.Selection()):
+            if sel:
+                self.assertEqual(atom.residue.name[0], 'A')
+                self.assertEqual(atom.residue.name[2], 'A')
+            else:
+                if len(atom.residue.name) >= 3:
+                    self.assertFalse(atom.residue.name[0] == 'A' and
+                                     atom.residue.name[2] == 'A')
+
+        for sel in mask_wldcrd5.Selection():
+            self.assertEqual(sel, 1)
+
+        for sel in mask_wldcrd6.Selection():
+            self.assertEqual(sel, 1)
+
+        for sel in mask_wldcrd7.Selection():
+            self.assertEqual(sel, 1)
+
         for atom, val in zip(parm.atoms, mult_op.Selection()):
             if atom.residue.idx == 1:
                 if atom.name == 'CA':
@@ -1370,6 +1503,17 @@ class TestAmberMask(unittest.TestCase):
         mask10 = mask.AmberMask(parm, '(((:10)&@CA)|:1')
         mask11 = mask.AmberMask(parm, '!!:1')
         mask12 = mask.AmberMask(parm, ':1<:10.a')
+        mask13 = mask.AmberMask(parm, '(:A=A&@CA))')
+        mask14 = mask.AmberMask(parm, ':ALA(&)')
+        mask15 = mask.AmberMask(parm, '(:ALA<)|:3')
+        mask16 = mask.AmberMask(parm, ':ALA<3')
+        mask17 = mask.AmberMask(parm, ':ALA<')
+        mask18 = mask.AmberMask(parm, '@1-20,40-xyz')
+        mask19 = mask.AmberMask(parm, ':1-xyz')
+        mask20 = mask.AmberMask(parm, ':1-4,40-xyz')
+        mask21 = mask.AmberMask(parm, '@C%')
+        mask22 = mask.AmberMask(parm, ':C%')
+        mask23 = mask.AmberMask(parm, '@/Fk') # Looking for all Fakeiums
 
         self.assertRaises(MaskError, mask1.Selection)
         self.assertRaises(MaskError, mask2.Selection)
@@ -1383,6 +1527,33 @@ class TestAmberMask(unittest.TestCase):
         self.assertRaises(MaskError, mask10.Selection)
         self.assertRaises(MaskError, mask11.Selection)
         self.assertRaises(MaskError, mask12.Selection)
+        self.assertRaises(MaskError, mask13.Selection)
+        self.assertRaises(MaskError, mask14.Selection)
+        self.assertRaises(MaskError, mask15.Selection)
+        self.assertRaises(MaskError, mask16.Selection)
+        self.assertRaises(MaskError, mask17.Selection)
+        self.assertRaises(MaskError, mask18.Selection)
+        self.assertRaises(MaskError, mask19.Selection)
+        self.assertRaises(MaskError, mask20.Selection)
+        self.assertRaises(MaskError, mask21.Selection)
+        self.assertRaises(MaskError, mask22.Selection)
+        self.assertRaises(MaskError, mask23.Selection)
+        # These should never be triggered, but they are good safeguards
+        self.assertRaises(MaskError, lambda:
+                mask23._binop('/', mask._mask(len(parm.atoms)), mask._mask(len(parm.atoms))))
+        self.assertRaises(MaskError, lambda: mask23._priority('/'))
+
+        # Test the internal mask interface
+        pmask = mask._mask(20)
+        pmask2 = mask._mask(21)
+        self.assertEqual(len(pmask), 20)
+        self.assertEqual(pmask.pop(), 0)
+        self.assertEqual(len(pmask), 20) # Pop does not change length
+        self.assertRaises(MaskError, lambda: pmask.append(10)) # append disabled
+        self.assertRaises(MaskError, lambda: pmask.extend([0,0]))
+        self.assertRaises(MaskError, lambda: pmask.remove(0)) # remove disabled
+        self.assertRaises(MaskError, lambda: pmask.And(pmask2))
+        self.assertRaises(MaskError, lambda: pmask.Or(pmask2))
 
     def testCompoundMask(self):
         """ Tests compound/complex Amber selection masks """
@@ -1519,6 +1690,7 @@ class TestWriteFiles(FileIOTestCase):
         rst = Restart(get_fn('testcvb.rst7', written=True), 'w', natom=15)
         rst.coordinates = list(range(45))
         rst.velocities = list(reversed(range(45)))
+        self.assertRaises(RuntimeError, lambda: rst.box)
         rst.box = box[:]
         rst.close()
         self._check_written_restarts(box)
@@ -1616,10 +1788,28 @@ class TestWriteFiles(FileIOTestCase):
                               lambda: assign(rst, 'rst.coordinates=range(20)'))
             self.assertRaises(RuntimeError,
                               lambda: assign(rst, 'rst.box=[10]*3+[90]*3'))
+            self.assertRaises(RuntimeError,
+                              lambda: assign(rst, 'rst.cell_angles=[90]*3'))
             rst.coordinates = list(range(27))
+            self.assertRaises(ValueError,
+                              lambda: assign(rst, 'rst.cell_lengths=[0, 1]'))
+            self.assertRaises(RuntimeError, lambda: rst.cell_lengths)
+            self.assertRaises(RuntimeError, lambda: rst.cell_angles)
             rst.box = box
             self.assertRaises(RuntimeError, lambda:
                               assign(rst, 'rst.velocities=list(range(27))'))
+            self.assertRaises(RuntimeError, lambda:
+                              assign(rst, 'rst.cell_lengths=[1, 2, 3]'))
+            self.assertRaises(RuntimeError, lambda:
+                              assign(rst, 'rst.cell_angles=[1, 2, 3]'))
+        finally:
+            rst.close()
+        try:
+            rst = Restart(get_fn('testc.rst7', written=True), 'r')
+            self.assertRaises(RuntimeError, lambda:
+                    assign(rst, 'rst.cell_lengths=[1, 2, 3]'))
+            self.assertRaises(RuntimeError, lambda:
+                    assign(rst, 'rst.cell_angles=[1, 2, 3]'))
         finally:
             rst.close()
         crd = Mdcrd(get_fn('testc.mdcrd', written=True), natom=15, hasbox=True,
@@ -1642,8 +1832,12 @@ class TestWriteFiles(FileIOTestCase):
         # assertAlmostEqual in this case).
         rst = readparm.Rst7.open(get_fn('testc.rst7', written=True))
         self.assertFalse(rst.hasbox)
+        self.assertIs(rst.box, None)
         self.assertFalse(rst.hasvels)
         np.testing.assert_equal(rst.coordinates.flatten(), list(range(27)))
+        rst = asciicrd.AmberAsciiRestart(get_fn('testc.rst7', written=True))
+        self.assertIs(rst.cell_lengths, None)
+        self.assertIs(rst.cell_angles, None)
         rst = readparm.Rst7.open(get_fn('testcb.rst7', written=True))
         self.assertTrue(rst.hasbox)
         self.assertFalse(rst.hasvels)
@@ -1882,5 +2076,186 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(d1.improper, d2.improper)
             self.assertEqual(d1.type, d2.type)
 
-if __name__ == '__main__':
-    unittest.main()
+class TestAmberMdin(FileIOTestCase):
+    """ Tests the Mdin class.... not a good class """
+
+    def testMdinAPI(self):
+        """ Tests the Mdin object basic features """
+        fn = get_fn('test.mdin', written=True)
+        mdin1 = mdin.Mdin('sander')
+        self.assertEqual(set(mdin1.valid_namelists), {'cntrl', 'ewald', 'qmmm', 'pb'})
+        self.assertEqual(mdin1.title, 'mdin prepared by mdin.py')
+        self.assertEqual(mdin1.verbosity, 0)
+        # What the heck was this for?
+        self.assertTrue(mdin1.check())
+        mdin1.time()
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.001)
+        self.assertEqual(mdin1.cntrl_nml['nstlim'], 1000000)
+        self.assertEqual(mdin1.cntrl_nml['imin'], 0)
+        mdin1.SHAKE()
+        self.assertEqual(mdin1.cntrl_nml['ntf'], 2)
+        self.assertEqual(mdin1.cntrl_nml['ntc'], 2)
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.002)
+        mdin1.time()
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.002)
+        self.assertEqual(mdin1.cntrl_nml['nstlim'], 500000)
+        mdin1.constPressure(press=100.0, taup=10.0)
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 2)
+        self.assertEqual(mdin1.cntrl_nml['ntp'], 1)
+        self.assertEqual(mdin1.cntrl_nml['pres0'], 100.0)
+        self.assertEqual(mdin1.cntrl_nml['taup'], 10.0)
+        mdin1.constVolume()
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ntp'], 0)
+        mdin1.constTemp(ntt=3, temp=100)
+        self.assertEqual(mdin1.cntrl_nml['ntt'], 3)
+        self.assertEqual(mdin1.cntrl_nml['gamma_ln'], 2.0)
+        self.assertEqual(mdin1.cntrl_nml['ig'], -1)
+        self.assertEqual(mdin1.cntrl_nml['tautp'], 1.0)
+        mdin1.constTemp(ntt=2, temp=100)
+        self.assertEqual(mdin1.cntrl_nml['ntt'], 2)
+        self.assertEqual(mdin1.cntrl_nml['gamma_ln'], 0)
+        self.assertEqual(mdin1.cntrl_nml['ig'], -1)
+        self.assertEqual(mdin1.cntrl_nml['tautp'], 1.0)
+        mdin1.constpH(solvph=1.0)
+        self.assertEqual(mdin1.cntrl_nml['solvph'], 1.0)
+        self.assertEqual(mdin1.cntrl_nml['icnstph'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ntcnstph'], 10)
+        self.assertEqual(mdin1.cntrl_nml['igb'], 2)
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 0)
+        self.assertEqual(mdin1.cntrl_nml['saltcon'], 0.1)
+        mdin1.restrainHeavyAtoms(10.0)
+        self.assertEqual(mdin1.cntrl_nml['restraint_wt'], 10)
+        self.assertEqual(mdin1.cntrl_nml['restraintmask'], '!@H=')
+        mdin1.restrainBackbone(5.0)
+        self.assertEqual(mdin1.cntrl_nml['restraint_wt'], 5)
+        self.assertEqual(mdin1.cntrl_nml['restraintmask'], '@N,CA,C')
+        mdin1.genBorn(igb=8, rgbmax=15.0)
+        self.assertEqual(mdin1.cntrl_nml['igb'], 8)
+        self.assertEqual(mdin1.cntrl_nml['rgbmax'], 15)
+        self.assertEqual(mdin1.cntrl_nml['ntp'], 0)
+        self.assertEqual(mdin1.cntrl_nml['ntb'], 0)
+        mdin1.time(dt=0.004, time=2000)
+        self.assertEqual(mdin1.cntrl_nml['dt'], 0.004)
+        self.assertEqual(mdin1.cntrl_nml['nstlim'], 500000)
+        self.assertEqual(mdin1.cntrl_nml['imin'], 0)
+        mdin1.heat()
+        self.assertEqual(mdin1.cntrl_nml['tempi'], 0)
+        self.assertEqual(mdin1.cntrl_nml['temp0'], 300)
+        self.assertEqual(mdin1.cntrl_nml['ntt'], 3)
+        self.assertEqual(mdin1.cntrl_nml['ig'], -1)
+        self.assertEqual(mdin1.cntrl_nml['gamma_ln'], 5.0)
+        mdin1.restart()
+        self.assertEqual(mdin1.cntrl_nml['irest'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ntx'], 5)
+        mdin1.TI(clambda=0.5)
+        self.assertEqual(mdin1.cntrl_nml['clambda'], 0.5)
+        self.assertEqual(mdin1.cntrl_nml['icfe'], 1)
+        mdin1.softcore_TI(scmask='@1-10', crgmask='@1-10', logdvdl=1000)
+        self.assertEqual(mdin1.cntrl_nml['icfe'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ifsc'], 1)
+        self.assertEqual(mdin1.cntrl_nml['scalpha'], 0.5)
+        self.assertEqual(mdin1.cntrl_nml['scmask'], '@1-10')
+        self.assertEqual(mdin1.cntrl_nml['crgmask'], '@1-10')
+        self.assertEqual(mdin1.cntrl_nml['logdvdl'], 1000)
+        mdin1.minimization(imin=5)
+        self.assertEqual(mdin1.cntrl_nml['imin'], 5)
+        self.assertEqual(mdin1.cntrl_nml['maxcyc'], 1)
+        self.assertEqual(mdin1.cntrl_nml['ncyc'], 10)
+        self.assertEqual(mdin1.cntrl_nml['ntmin'], 1)
+        mdin1.change('cntrl', 'ifqnt', 1)
+        mdin1.change('pb', 'istrng', 1.0)
+        mdin1.change('qmmm', 'qmcharge', -1)
+        mdin1.change('qmmm', 'printdipole', 1)
+        mdin1.change('ewald', 'vdwmeth', 0)
+        mdin1.change('ewald', 'nfft1', 50)
+        mdin1.change('ewald', 'nfft2', 64)
+        mdin1.change('ewald', 'nfft3', 96)
+        mdin1.AddCard(title='Restraints!', cardString='10.5\nRES 1 10')
+        mdin1.write(fn)
+        mdin2 = mdin.Mdin(program='sander')
+        mdin2.read(fn)
+        for var in mdin1.cntrl_nml.keys():
+            self.assertEqual(mdin1.cntrl_nml[var], mdin2.cntrl_nml[var])
+        for var in mdin1.qmmm_nml.keys():
+            self.assertEqual(mdin1.qmmm_nml[var], mdin2.qmmm_nml[var])
+        mdin3 = mdin.Mdin(program='pmemd')
+        self.assertRaises(InputError, lambda: mdin3.change('cntrl', 'ievb', 1))
+        self.assertRaises(InputError, lambda: mdin.Mdin(program='charmm'))
+        mdin4 = mdin.Mdin(program='sander.APBS')
+        mdin4.change('cntrl', 'igb', 10)
+        mdin4.change('pb', 'bcfl', 1)
+
+class TestAmberTitratableResidues(FileIOTestCase):
+    """ Test Amber's titration module capabilities """
+
+    def testLineBuffer(self):
+        """ Tests private _LineBuffer for cpin utilities """
+        fobj = StringIO()
+        fobj2 = StringIO()
+        fobj3 = StringIO()
+        buf = titratable_residues._LineBuffer(fobj)
+        buf2 = titratable_residues._LineBuffer(fobj2)
+        buf3 = titratable_residues._LineBuffer(fobj3)
+        words = []
+        alphabet = list(letters)
+        for i in range(random.randint(20, 40)):
+            word = ''.join(np.random.choice(alphabet, size=random.randint(5, 20),
+                                            replace=True).tolist()
+            )
+            words.append(word)
+            buf.add_word(word)
+        buf2.add_words(words)
+        buf3.add_words(words, space_delimited=True)
+        buf.flush()
+        buf.flush() # Make sure second ones don't do anything
+        buf2.flush()
+        buf3.flush()
+
+        fobj.seek(0)
+        fobj2.seek(0)
+        fobj3.seek(0)
+        self.assertEqual(fobj.read(), fobj2.read())
+        self.assertNotEqual(fobj.read(), fobj3.read())
+        fobj3.seek(0)
+        self.assertEqual(fobj3.read().split(), words)
+
+    def testCpinCreation(self):
+        """ Test TitratableResidueList and cpin creation """
+        import cpinutil
+        repl = dict(parm=get_fn('trx.prmtop'),
+                    output=get_fn('test.cpin', written=True))
+        opt = cpinutil.parser.parse_args(
+                    ('-igb 2 -p %(parm)s -states 0,0,1,0,1,1,0,1,0,1,1,1 -o '
+                     '%(output)s' % (repl)).split()
+        )
+        cpinutil.main(opt)
+        self.assertTrue(
+                diff_files(get_saved_fn('test.cpin'),
+                           get_fn('test.cpin', written=True),
+                           absolute_error=1e-6, spacechar='=,')
+        )
+
+    def testTitratableResidue(self):
+        """ Tests the TitratableResidue object """
+        as4 = titratable_residues.AS4
+        self.assertEqual(str(as4), saved.AS4_TITR_OUTPUT)
+        # Test error handling for TitratableResidue
+        newres = titratable_residues.TitratableResidue(
+                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], 7.0
+        )
+        self.assertEqual(newres.pKa, 7.0)
+        self.assertRaises(AmberError, lambda:
+                newres.add_state(3, [10.0, 20.0], 10.0)
+        )
+        self.assertRaises(AmberError, lambda:
+                newres.add_states([3, 2, 1], [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,
+                    5, 6, 7]], [10, 20, 30])
+        )
+        self.assertRaises(AmberError, lambda: newres.cpin_pointers(10))
+        newres.set_first_state(0)
+        newres.set_first_state(0) # Second setting should be ignored
+        self.assertRaises(AmberError, lambda: newres.set_first_state(1))
+        newres.set_first_charge(0)
+        newres.set_first_charge(0)
+        self.assertRaises(AmberError, lambda: newres.set_first_charge(1))

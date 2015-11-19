@@ -411,7 +411,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self._cell_angles_written:
             raise RuntimeError('Can only write cell angles once')
         if len(stuff) != 3:
-            raise ValueError('Expected 3 numbers for cell lengths')
+            raise ValueError('Expected 3 numbers for cell angles')
         self._cell_angles = np.array(stuff, copy=False)
         self._file.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
         self._cell_angles_written = True
