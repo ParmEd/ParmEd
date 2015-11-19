@@ -2173,8 +2173,6 @@ class TestAmberMdin(FileIOTestCase):
         mdin1.change('ewald', 'nfft3', 96)
         mdin1.AddCard(title='Restraints!', cardString='10.5\nRES 1 10')
         mdin1.write(fn)
-        with open(fn, 'r') as f:
-            self.assertEqual(f.read(), saved.MDIN_TEXT1)
         mdin2 = mdin.Mdin(program='sander')
         mdin2.read(fn)
         for var in mdin1.cntrl_nml.keys():
