@@ -7,7 +7,7 @@ simulator engine.
 Build Status
 ============
 
-[![Linux Build Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
+[![Build/Test Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
 
 Description
 ===========
@@ -33,6 +33,22 @@ rapid prototyping.
 The API also provides bindings to the [OpenMM](https://simtk.org/home/openmm)
 library, permitting you to carry out full molecular dynamics investigations
 using ParmEd on high-performant hardware, like AMD and NVidia GPUs.
+
+Installing ParmEd
+=================
+
+To install ParmEd, either clone this git repository or download [the latest
+release](https://github.com/ParmEd/ParmEd/releases) and unpack the resulting
+tarball. This should create a new ParmEd source code directory. Change to that
+directory and build ParmEd with the command
+
+```
+python setup.py install
+```
+
+Note, if you are using the system Python, you may need to either run the above
+command as root (e.g., by using ``sudo``) or add the ``--user`` flag to install
+it to your home directory. I would suggest the latter choice.
 
 Documentation
 =============
