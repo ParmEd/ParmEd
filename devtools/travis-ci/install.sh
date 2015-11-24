@@ -1,11 +1,11 @@
 if [ "$PYTHON_VERSION" = "pypy" ]; then
-    # Upgrade to pypy 2.6 -- recipe taken from google/oauth2client
+    # Upgrade to pypy 4.0.1 -- original recipe taken from google/oauth2client
     git clone https://github.com/yyuu/pyenv.git ${HOME}/.pyenv
     export PYENV_ROOT="${HOME}/.pyenv"
     export PATH="${PYENV_ROOT}/bin:${PATH}"
     eval "$(pyenv init -)"
-    pyenv install pypy-2.6.0
-    pyenv global pypy-2.6.0
+    pyenv install pypy-4.0.1
+    pyenv global pypy-4.0.1
 
     pypy -m pip install nose coverage pyflakes
     which pyflakes
