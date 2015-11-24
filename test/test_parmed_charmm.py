@@ -9,6 +9,7 @@ from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
+import parmed.unit as u
 import os
 import unittest
 import utils
@@ -21,7 +22,32 @@ class TestCharmmCoords(utils.FileIOTestCase):
     
     def testCharmmCrd(self):
         """ Test CHARMM coordinate file parser """
-        crd = charmmcrds.CharmmCrdFile(get_fn('1tnm.crd'))
+        self.assertTrue(charmmcrds.CharmmCrdFile.id_format(get_fn('1tnm.crd')))
+        self._check_crd(charmmcrds.CharmmCrdFile(get_fn('1tnm.crd')))
+        # Make sure format ID is good
+        # Skipped whitespace
+        fn = get_fn('test.crd', written=True)
+        with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
+            f.write('\n\n\n\n')
+            f.write(f2.read())
+        self.assertTrue(charmmcrds.CharmmCrdFile.id_format(fn))
+        self._check_crd(charmmcrds.CharmmCrdFile(fn))
+        with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
+            f.write(f2.readline())
+            f.write(f2.readline())
+            f.write(f2.readline())
+            f.write('\n')
+            f.write(f2.read())
+        self.assertTrue(charmmcrds.CharmmCrdFile.id_format(fn))
+        self._check_crd(charmmcrds.CharmmCrdFile(fn))
+        # Make sure incomplete files are properly error-detected
+        with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
+            for i in range(100):
+                f.write(f2.readline())
+        self.assertRaises(exceptions.CharmmError, lambda:
+                charmmcrds.CharmmCrdFile(fn))
+
+    def _check_crd(self, crd):
         self.assertEqual(crd.natom, 1414)
         self.assertEqual(max(crd.resno), 91)
         self.assertAlmostEqual(crd.coords.sum(), -218.19346999999757)
@@ -39,6 +65,14 @@ class TestCharmmCoords(utils.FileIOTestCase):
         crd = charmmcrds.CharmmCrdFile(get_fn('test.crd', written=True))
         np.testing.assert_allclose(struct.coordinates,
                                    crd.coordinates.reshape((len(struct.atoms), 3)))
+        fd = StringIO()
+        charmmcrds.CharmmCrdFile.write(struct, fd)
+        fd.seek(0)
+        with open(get_fn('test2.crd', written=True), 'w') as f:
+            f.write(fd.read())
+        crd = charmmcrds.CharmmCrdFile(get_fn('test2.crd', written=True))
+        np.testing.assert_allclose(struct.coordinates,
+                                   crd.coordinates.reshape((len(struct.atoms), 3)))
 
     def testCharmmRst(self):
         """ Test CHARMM restart file parser """
@@ -47,17 +81,37 @@ class TestCharmmCoords(utils.FileIOTestCase):
         self.assertEqual(crd.nstep, 100)
         self.assertTrue(hasattr(crd, 'header'))
         self.assertAlmostEqual(crd.coords.sum(), 0.3114525961458884)
+        self.assertAlmostEqual(crd.coordinates.sum(), 0.3114525961458884)
         self.assertAlmostEqual(crd.coordsold.sum(), 5439.333671681806)
+        self.assertAlmostEqual(crd.coordinatesold.sum(), 5439.333671681806)
         self.assertAlmostEqual(crd.vels.sum(), 42.364377359350534)
+        self.assertAlmostEqual(crd.velocities.sum(), 42.364377359350534)
         self.assertEqual(crd.coords.shape, (1, crd.natom, 3))
         self.assertEqual(crd.coordsold.shape, (1, crd.natom, 3))
         self.assertEqual(crd.velocities.shape, (1, crd.natom, 3))
+        self.assertTrue(u.is_quantity(crd.positions))
+        for xyz, pos in zip(crd.coordinates[0], crd.positions):
+            np.testing.assert_equal(xyz, pos.value_in_unit(u.angstroms))
+        for xyz, pos in zip(crd.coordinatesold[0], crd.positionsold):
+            np.testing.assert_equal(xyz, pos.value_in_unit(u.angstroms))
         # Check variables whose meaning I don't understand
         self.assertEqual(crd.jhstrt, 754200)
         self.assertEqual(crd.npriv, 754200)
         self.assertEqual(crd.nsavc, 100)
         self.assertEqual(crd.enrgstat, [])
         self.assertEqual(crd.nsavv, 10)
+        self.assertIs(crd.box, None)
+        # Check proper handling of truncated files
+        fn = get_fn('test.rst', written=True)
+        with open(fn, 'w') as f, open(get_fn('sample-charmm.rst'), 'r') as f2:
+            for i in range(200):
+                f.write(f2.readline())
+        self.assertRaises(exceptions.CharmmError, lambda:
+                charmmcrds.CharmmRstFile(fn))
+        with open(fn, 'w') as f:
+            f.write('\n\n\n\n\n\n')
+        self.assertRaises(exceptions.CharmmError, lambda:
+                charmmcrds.CharmmRstFile(fn))
 
 class TestCharmmPsf(unittest.TestCase):
     """ Test CHARMM PSF file capabilities """
