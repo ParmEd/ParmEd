@@ -4,7 +4,6 @@ files is that the ! character is a comment character and everything after ! is
 ignored.
 """
 from parmed.utils.io import genopen
-from parmed.exceptions import CharmmError
 
 class CharmmFile(object):
     """
