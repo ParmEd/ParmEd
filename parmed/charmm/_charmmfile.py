@@ -24,10 +24,7 @@ class CharmmFile(object):
             self.status = 'OLD'
         else:
             self.status = 'NEW'
-        try:
-            self._handle = genopen(fname, mode)
-        except IOError as e:
-            raise CharmmError(str(e))
+        self._handle = genopen(fname, mode)
         self.closed = False
         self.line_number = 0
         self.comment = ''

@@ -7,6 +7,7 @@ import numpy as np
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
+from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
 import os
 import unittest
@@ -682,6 +683,66 @@ class TestCharmmParameters(utils.FileIOTestCase):
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
 
+    def testCharmmFile(self):
+        """ Test the CharmmFile API and error handling """
+        self.assertRaises(ValueError, lambda:
+                CharmmFile(get_fn('trx.prmtop'), 'x')
+        )
+        self.assertRaises(IOError, lambda:
+                CharmmFile(get_fn('file_does_not_exist'), 'r')
+        )
+        with CharmmFile(get_fn('newfile.chm', written=True), 'w') as f:
+            f.write('abc123\ndef456\nghi789!comment...\n')
+        with CharmmFile(get_fn('newfile.chm', written=True), 'r') as f:
+            self.assertEqual(f.read(), 'abc123\ndef456\nghi789\n')
+        with CharmmFile(get_fn('trx.prmtop')) as f1, open(get_fn('trx.prmtop')) as f2:
+            firstline = f1.readline()
+            self.assertEqual(firstline, f2.readline())
+            self.assertEqual(f1.tell(), f2.tell())
+            f1.seek(0)
+            f2.seek(0)
+            firstline2 = f2.readline()
+            self.assertEqual(f1.readline(), firstline2)
+            self.assertEqual(firstline, firstline2)
+            f1.rewind()
+            self.assertEqual(f1.readline(), firstline)
+        # Now make sure that every way of opening/reading a file in CharmmFile
+        # gets rid of ! comments
+        with open(get_fn('test.chm', written=True), 'w') as f:
+            f.write('First line ! first comment\n'
+                    'Second line ! second comment\n'
+                    'Third line ! third comment\n'
+                    'Fourth line ! fourth comment\n')
+        with CharmmFile(get_fn('test.chm', written=True), 'r') as f:
+            lines = []
+            comments = []
+            line = f.readline()
+            while line:
+                lines.append(line)
+                comments.append(f.comment)
+                line = f.readline()
+            self.assertEqual(lines, ['First line \n', 'Second line \n',
+                                     'Third line \n', 'Fourth line \n'])
+            self.assertEqual(comments, ['! first comment', '! second comment',
+                                        '! third comment', '! fourth comment'])
+
+    def testCharmmStreamFile(self):
+        """ Test the CharmmStreamFile API """
+        stream = CharmmStreamFile(get_fn('toppar_spin_label_dummy.str'))
+        lines = open(get_fn('toppar_spin_label_dummy.str'), 'r').readlines()
+        for l1, l2, c in zip(stream, lines, stream.comments):
+            if '!' in l2:
+                self.assertEqual(l1, l2[:l2.index('!')] + '\n')
+                self.assertEqual(c, l2[l2.index('!'):].rstrip())
+            else:
+                self.assertEqual(l1, l2)
+                self.assertEqual(c, '')
+        stream.rewind()
+        if '!' in lines[0]:
+            self.assertEqual(next(iter(stream)), lines[0][:lines[0].index('!')] + '\n')
+        else:
+            self.assertEqual(next(iter(stream)), lines[0])
+
     def testWriteCharmm(self):
         """ Test writing CHARMM-style PSF files """
         # Test writing CHARMM-style PSFs
@@ -738,6 +799,3 @@ class TestFileWriting(utils.FileIOTestCase):
         finally:
             f.close()
         self.assertFalse(has_key)
-
-if __name__ == '__main__':
-    unittest.main()
