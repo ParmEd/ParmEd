@@ -7,7 +7,7 @@ Author: Jason Deckman
 Contributors: Jason Swails
 Date: June 19, 2015
 """
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
 
 from contextlib import closing
 import numpy as np
@@ -19,7 +19,7 @@ from parmed.utils.six import add_metaclass, string_types
 from parmed.utils.six.moves import range
 from parmed.vec3 import Vec3
 
-charmlen = 22
+CHARMLEN = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
 ONE_TIMESCALE = 1 / TIMESCALE
 
@@ -161,12 +161,7 @@ class CharmmCrdFile(object):
                     self.resid.append(int(line[8]))
                     self.weighting.append(float(line[9]))
 
-                if 3*self.natom != len(self.coords):
-                    raise CharmmError("Error parsing CHARMM .crd file: %d "
-                                          "atoms requires %d coords (not %d)" %
-                                          (self.natom, 3*self.natom,
-                                           len(self.coords))
-                    )
+                assert 3*self.natom == len(self.coords), '# atom mismatch'
             except (ValueError, IndexError):
                 raise CharmmError('Error parsing CHARMM coordinate file')
             self.coords = np.array(self.coords).reshape((-1, self.natom, 3))
@@ -279,12 +274,12 @@ class CharmmRstFile(object):
     @property
     def positions(self):
         """ Atomic positions with units """
-        return [Vec3(*xyz) for xyz in self.coords] * u.angstroms
+        return [Vec3(*xyz) for xyz in self.coords[0]] * u.angstroms
 
     @property
     def positionsold(self):
         """ Old atomic positions with units """
-        return [Vec3(*xyz) for xyz in self.coordsold] * u.angstroms
+        return [Vec3(*xyz) for xyz in self.coordsold[0]] * u.angstroms
 
     @property
     def velocities(self):
@@ -364,18 +359,14 @@ class CharmmRstFile(object):
             if not line:
                 raise CharmmError('Premature end of file')
 
-            if len(line) < 3*charmlen:
+            if len(line) < 3*CHARMLEN:
                 raise CharmmError("Less than 3 coordinates present in "
-                                      "coordinate row or coords may be "
-                                      "truncated.") 
+                                  "coordinate row or coords may be "
+                                  "truncated.") 
 
             line = line.replace('D','E')     # CHARMM uses 'D' for exponentials
 
-            # CHARMM uses fixed format (len = charmlen = 22) for crds in .rst's
-            crds.append(float(line[0:charmlen]))  
-            crds.append(float(line[charmlen:2*charmlen]))
-            crds.append(float(line[2*charmlen:3*charmlen]))
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+            # CHARMM uses fixed format (len = CHARMLEN = 22) for crds in .rst's
+            crds.append(float(line[0:CHARMLEN]))  
+            crds.append(float(line[CHARMLEN:2*CHARMLEN]))
+            crds.append(float(line[2*CHARMLEN:3*CHARMLEN]))
