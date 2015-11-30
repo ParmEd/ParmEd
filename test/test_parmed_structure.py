@@ -11,6 +11,7 @@ from parmed.topologyobjects import *
 import parmed.unit as u
 from parmed.utils.six import integer_types
 from parmed.utils.six.moves import range, zip
+from parmed.utils import PYPY
 from copy import copy
 import random
 import string
@@ -913,6 +914,7 @@ class TestStructureSave(FileIOTestCase):
                                    pmd.load_file(f4).coordinates[0],
                                    atol=1e-6)
 
+    @unittest.skipIf(PYPY, 'NetCDF tests cannot run on pypy yet')
     def testSaveNCRst7(self):
         """ Test saving various Structure instances as Amber NetCDF restarts """
         f1 = get_fn('test.ncrst', written=True)

@@ -3,12 +3,17 @@ Tests for the parmed/charmm subpackage
 """
 from __future__ import division, print_function
 
+from collections import OrderedDict
 import numpy as np
+import os
+import parmed as pmd
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
+from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
-import os
+import parmed.unit as u
+import random
 import unittest
 import utils
 from utils import HAS_GROMACS
@@ -20,7 +25,32 @@ class TestCharmmCoords(utils.FileIOTestCase):
     
     def testCharmmCrd(self):
         """ Test CHARMM coordinate file parser """
-        crd = charmmcrds.CharmmCrdFile(get_fn('1tnm.crd'))
+        self.assertTrue(charmmcrds.CharmmCrdFile.id_format(get_fn('1tnm.crd')))
+        self._check_crd(charmmcrds.CharmmCrdFile(get_fn('1tnm.crd')))
+        # Make sure format ID is good
+        # Skipped whitespace
+        fn = get_fn('test.crd', written=True)
+        with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
+            f.write('\n\n\n\n')
+            f.write(f2.read())
+        self.assertTrue(charmmcrds.CharmmCrdFile.id_format(fn))
+        self._check_crd(charmmcrds.CharmmCrdFile(fn))
+        with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
+            f.write(f2.readline())
+            f.write(f2.readline())
+            f.write(f2.readline())
+            f.write('\n')
+            f.write(f2.read())
+        self.assertTrue(charmmcrds.CharmmCrdFile.id_format(fn))
+        self._check_crd(charmmcrds.CharmmCrdFile(fn))
+        # Make sure incomplete files are properly error-detected
+        with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
+            for i in range(100):
+                f.write(f2.readline())
+        self.assertRaises(exceptions.CharmmError, lambda:
+                charmmcrds.CharmmCrdFile(fn))
+
+    def _check_crd(self, crd):
         self.assertEqual(crd.natom, 1414)
         self.assertEqual(max(crd.resno), 91)
         self.assertAlmostEqual(crd.coords.sum(), -218.19346999999757)
@@ -38,6 +68,14 @@ class TestCharmmCoords(utils.FileIOTestCase):
         crd = charmmcrds.CharmmCrdFile(get_fn('test.crd', written=True))
         np.testing.assert_allclose(struct.coordinates,
                                    crd.coordinates.reshape((len(struct.atoms), 3)))
+        fd = StringIO()
+        charmmcrds.CharmmCrdFile.write(struct, fd)
+        fd.seek(0)
+        with open(get_fn('test2.crd', written=True), 'w') as f:
+            f.write(fd.read())
+        crd = charmmcrds.CharmmCrdFile(get_fn('test2.crd', written=True))
+        np.testing.assert_allclose(struct.coordinates,
+                                   crd.coordinates.reshape((len(struct.atoms), 3)))
 
     def testCharmmRst(self):
         """ Test CHARMM restart file parser """
@@ -46,17 +84,37 @@ class TestCharmmCoords(utils.FileIOTestCase):
         self.assertEqual(crd.nstep, 100)
         self.assertTrue(hasattr(crd, 'header'))
         self.assertAlmostEqual(crd.coords.sum(), 0.3114525961458884)
+        self.assertAlmostEqual(crd.coordinates.sum(), 0.3114525961458884)
         self.assertAlmostEqual(crd.coordsold.sum(), 5439.333671681806)
+        self.assertAlmostEqual(crd.coordinatesold.sum(), 5439.333671681806)
         self.assertAlmostEqual(crd.vels.sum(), 42.364377359350534)
+        self.assertAlmostEqual(crd.velocities.sum(), 42.364377359350534)
         self.assertEqual(crd.coords.shape, (1, crd.natom, 3))
         self.assertEqual(crd.coordsold.shape, (1, crd.natom, 3))
         self.assertEqual(crd.velocities.shape, (1, crd.natom, 3))
+        self.assertTrue(u.is_quantity(crd.positions))
+        for xyz, pos in zip(crd.coordinates[0], crd.positions):
+            np.testing.assert_equal(xyz, pos.value_in_unit(u.angstroms))
+        for xyz, pos in zip(crd.coordinatesold[0], crd.positionsold):
+            np.testing.assert_equal(xyz, pos.value_in_unit(u.angstroms))
         # Check variables whose meaning I don't understand
         self.assertEqual(crd.jhstrt, 754200)
         self.assertEqual(crd.npriv, 754200)
         self.assertEqual(crd.nsavc, 100)
         self.assertEqual(crd.enrgstat, [])
         self.assertEqual(crd.nsavv, 10)
+        self.assertIs(crd.box, None)
+        # Check proper handling of truncated files
+        fn = get_fn('test.rst', written=True)
+        with open(fn, 'w') as f, open(get_fn('sample-charmm.rst'), 'r') as f2:
+            for i in range(200):
+                f.write(f2.readline())
+        self.assertRaises(exceptions.CharmmError, lambda:
+                charmmcrds.CharmmRstFile(fn))
+        with open(fn, 'w') as f:
+            f.write('\n\n\n\n\n\n')
+        self.assertRaises(exceptions.CharmmError, lambda:
+                charmmcrds.CharmmRstFile(fn))
 
 class TestCharmmPsf(unittest.TestCase):
     """ Test CHARMM PSF file capabilities """
@@ -368,15 +426,60 @@ class TestCharmmPsf(unittest.TestCase):
 
 class TestCharmmParameters(utils.FileIOTestCase):
     """ Test CHARMM Parameter file parsing """
-    
+
+    def testPrivateFunctions(self):
+        """ Tests private helper functions for CharmmParameterSet """
+        # EmptyStringIterator
+        si = parameters._EmptyStringIterator()
+        it = iter(si)
+        for i in range(random.randint(100, 1000)):
+            self.assertEqual(next(it), '')
+        self.assertEqual(si[random.randint(0, 10000)], '')
+        # _typeconv
+        randint = random.randint(0, 100000)
+        self.assertEqual(parameters._typeconv(randint), randint)
+        self.assertEqual(parameters._typeconv('NOCHNG'), 'NOCHNG')
+        self.assertEqual(parameters._typeconv('NoCh'), 'NOCHLTU')
+
+    def testE14FAC(self):
+        """ Test reading CHARMM parameter files with 1-4 EEL scaling """
+        params = parameters.CharmmParameterSet(
+                get_fn('parm14sb_all.prm'),
+        )
+        for i, tortype in iteritems(params.dihedral_types):
+            for typ in tortype:
+                self.assertAlmostEqual(typ.scee, 1.2)
+        params = parameters.CharmmParameterSet(
+                get_fn('parm14sb_all_2.prm')
+        )
+        for i, tortype in iteritems(params.dihedral_types):
+            for typ in tortype:
+                self.assertAlmostEqual(typ.scee, 1.2)
+
     def testSingleParameterset(self):
         """ Test reading a single parameter set """
+        # Make sure we error if trying to load parameters before topology
         self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
                                                 get_fn('par_all22_prot.inp')))
-        params = parameters.CharmmParameterSet(
+        # Test error handling for loading files with unsupported extensions
+        self.assertRaises(ValueError, lambda:
+                parameters.CharmmParameterSet(get_fn('trx.prmtop'))
+        )
+        self.assertRaises(ValueError, lambda: parameters.CharmmParameterSet('x.inp'))
+        self._check_single_paramset(
+                parameters.CharmmParameterSet(
                                 get_fn('top_all22_prot.inp'),
                                 get_fn('par_all22_prot.inp'),
+                )
         )
+        self._check_single_paramset(
+                parameters.CharmmParameterSet.load_set(
+                                tfile=get_fn('top_all22_prot.inp'),
+                                pfile=get_fn('par_all22_prot.inp'),
+                )
+        )
+
+    def _check_single_paramset(self, params):
         for i, tup in enumerate(params.atom_types_tuple):
             name, num = tup
             self.assertTrue(params.atom_types_tuple[tup] is
@@ -447,6 +550,11 @@ class TestCharmmParameters(utils.FileIOTestCase):
     def testParamFileOnly(self):
         """ Test reading only a parameter file with no RTF (CHARMM36) """
         parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
+        # Make sure read_parameter_file can accept a list of lines *without*
+        # comments
+        with CharmmFile(get_fn('par_all36_carb.prm'), 'r') as f:
+            params = parameters.CharmmParameterSet()
+            params.read_parameter_file(f.readlines())
 
     def testCollection(self):
         """ Test reading a large number of parameter files """
@@ -488,10 +596,18 @@ class TestCharmmParameters(utils.FileIOTestCase):
                                 get_fn('test.par', written=True)
         )
         params3 = parameters.CharmmParameterSet(get_fn('test.str', written=True))
+        params4 = parameters.CharmmParameterSet.load_set(
+                sfiles=get_fn('test.str', written=True)
+        )
+        params5 = parameters.CharmmParameterSet.load_set(
+                sfiles=[get_fn('test.str', written=True)]
+        )
 
         # Check that all of the params are equal
         self._compare_paramsets(params, params2, copy=True)
         self._compare_paramsets(params, params3, copy=True)
+        self._compare_paramsets(params, params4, copy=True)
+        self._compare_paramsets(params, params5, copy=True)
 
     def testCGenFF(self):
         """ Test parsing stream files generated by CGenFF """
@@ -584,6 +700,56 @@ class TestCharmmParameters(utils.FileIOTestCase):
             self.assertTrue(name.endswith('LTU'))
         for name in chparams3.atom_types:
             self.assertTrue(name.endswith('LTU'))
+
+        # Load a parameter set with NoUreyBradley to make sure it's retained as
+        # a singleton. Also build a list of atom type tuples
+        for i, (typstr, typ) in enumerate(iteritems(params1.atom_types)):
+            params1.atom_types_tuple[(typstr, i+1)] = typ
+            params1.atom_types_int[i+1] = typ
+        for key in params1.angle_types:
+            params1.urey_bradley_types[key] = to.NoUreyBradley
+        chparams = parameters.CharmmParameterSet.from_parameterset(params1)
+        for _, item in iteritems(chparams.urey_bradley_types):
+            self.assertIs(item, to.NoUreyBradley)
+        for (typstr1, typ1), (typstr2, typ2) in zip(iteritems(params1.atom_types),
+                                                    iteritems(params1.atom_types)):
+            self.assertEqual(typstr1, typstr2)
+            self.assertEqual(typ1, typ2)
+        for (typstr1, typ1), (typstr2, typ2) in zip(iteritems(params1.atom_types_int),
+                                                    iteritems(params1.atom_types_int)):
+            self.assertEqual(typstr1, typstr2)
+            self.assertEqual(typ1, typ2)
+        for (typstr1, typ1), (typstr2, typ2) in zip(iteritems(params1.atom_types_tuple),
+                                                    iteritems(params1.atom_types_tuple)):
+            self.assertEqual(typstr1, typstr2)
+            self.assertEqual(typ1, typ2)
+
+        # Convert from the GROMACS topology file parameter set to
+        # CharmmParameterSet when loaded from the CHARMM force field
+        gmx = pmd.gromacs.GromacsTopologyFile(
+                os.path.join(pmd.gromacs.GROMACS_TOPDIR,
+                             'charmm27.ff', 'forcefield.itp')
+        )
+        from_gmx = parameters.CharmmParameterSet.from_parameterset(gmx.parameterset)
+        gmx = pmd.gromacs.GromacsTopologyFile(
+                os.path.join(pmd.gromacs.GROMACS_TOPDIR,
+                             'charmm27.ff', 'forcefield.itp')
+        )
+        # Make sure it can handle 8-key CMAPs
+        types = OrderedDict()
+        for key, typ in iteritems(gmx.parameterset.cmap_types):
+            assert len(key) == 5, 'Unexpected cmap key length'
+            types[(key[0], key[1], key[2], key[3],
+                   key[1], key[2], key[3], key[4])] = typ
+        gmx.parameterset.cmap_types = types
+        gmx.parameterset.nbfix_types[('X', 'Y')] = (2.0, 3.0)
+        from_gmx2 = parameters.CharmmParameterSet.from_parameterset(gmx.parameterset)
+        for (key1, typ1), (key2, typ2) in zip(iteritems(from_gmx.cmap_types),
+                                              iteritems(from_gmx2.cmap_types)):
+            self.assertEqual(key1, key2)
+            self.assertEqual(typ1, typ2)
+        self.assertEqual(len(from_gmx2.nbfix_types), 1)
+        self.assertEqual(from_gmx2.nbfix_types[('X', 'Y')], (2.0, 3.0))
 
     def _check_uppercase_types(self, params):
         for aname, atom_type in iteritems(params.atom_types):
@@ -682,6 +848,66 @@ class TestCharmmParameters(utils.FileIOTestCase):
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
 
+    def testCharmmFile(self):
+        """ Test the CharmmFile API and error handling """
+        self.assertRaises(ValueError, lambda:
+                CharmmFile(get_fn('trx.prmtop'), 'x')
+        )
+        self.assertRaises(IOError, lambda:
+                CharmmFile(get_fn('file_does_not_exist'), 'r')
+        )
+        with CharmmFile(get_fn('newfile.chm', written=True), 'w') as f:
+            f.write('abc123\ndef456\nghi789!comment...\n')
+        with CharmmFile(get_fn('newfile.chm', written=True), 'r') as f:
+            self.assertEqual(f.read(), 'abc123\ndef456\nghi789\n')
+        with CharmmFile(get_fn('trx.prmtop')) as f1, open(get_fn('trx.prmtop')) as f2:
+            firstline = f1.readline()
+            self.assertEqual(firstline, f2.readline())
+            self.assertEqual(f1.tell(), f2.tell())
+            f1.seek(0)
+            f2.seek(0)
+            firstline2 = f2.readline()
+            self.assertEqual(f1.readline(), firstline2)
+            self.assertEqual(firstline, firstline2)
+            f1.rewind()
+            self.assertEqual(f1.readline(), firstline)
+        # Now make sure that every way of opening/reading a file in CharmmFile
+        # gets rid of ! comments
+        with open(get_fn('test.chm', written=True), 'w') as f:
+            f.write('First line ! first comment\n'
+                    'Second line ! second comment\n'
+                    'Third line ! third comment\n'
+                    'Fourth line ! fourth comment\n')
+        with CharmmFile(get_fn('test.chm', written=True), 'r') as f:
+            lines = []
+            comments = []
+            line = f.readline()
+            while line:
+                lines.append(line)
+                comments.append(f.comment)
+                line = f.readline()
+            self.assertEqual(lines, ['First line \n', 'Second line \n',
+                                     'Third line \n', 'Fourth line \n'])
+            self.assertEqual(comments, ['! first comment', '! second comment',
+                                        '! third comment', '! fourth comment'])
+
+    def testCharmmStreamFile(self):
+        """ Test the CharmmStreamFile API """
+        stream = CharmmStreamFile(get_fn('toppar_spin_label_dummy.str'))
+        lines = open(get_fn('toppar_spin_label_dummy.str'), 'r').readlines()
+        for l1, l2, c in zip(stream, lines, stream.comments):
+            if '!' in l2:
+                self.assertEqual(l1, l2[:l2.index('!')] + '\n')
+                self.assertEqual(c, l2[l2.index('!'):].rstrip())
+            else:
+                self.assertEqual(l1, l2)
+                self.assertEqual(c, '')
+        stream.rewind()
+        if '!' in lines[0]:
+            self.assertEqual(next(iter(stream)), lines[0][:lines[0].index('!')] + '\n')
+        else:
+            self.assertEqual(next(iter(stream)), lines[0])
+
     def testWriteCharmm(self):
         """ Test writing CHARMM-style PSF files """
         # Test writing CHARMM-style PSFs
@@ -738,6 +964,3 @@ class TestFileWriting(utils.FileIOTestCase):
         finally:
             f.close()
         self.assertFalse(has_key)
-
-if __name__ == '__main__':
-    unittest.main()
