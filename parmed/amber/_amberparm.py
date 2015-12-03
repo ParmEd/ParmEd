@@ -693,7 +693,8 @@ class AmberParm(AmberFormat, Structure):
         the tleap bug. Returns None otherwise.
         """
         # Bail out of we are not doing a solvated prmtop
-        if not self.parm_data['POINTERS'][IFBOX]: return None
+        if self.parm_data['POINTERS'][IFBOX] == 0 or self.box is None:
+            return None
 
         owner = set_molecules(self)
         all_solvent = SOLVENT_NAMES
@@ -2022,10 +2023,9 @@ class AmberParm(AmberFormat, Structure):
                 # We need to add topology information
                 if np.allclose(box[3:], 90):
                     # Orthogonal
-                    self.parm_data['POINTERS'][IFBOX] = 1
+                    self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
                 else:
-                    self.parm_data['POINTERS'][IFBOX] = 2
-                self.rediscover_molecules()
+                    self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
                 if 'SOLVENT_POINTERS' not in self.flag_list:
                     self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3,
                                   after='IROTAT')
@@ -2036,6 +2036,14 @@ class AmberParm(AmberFormat, Structure):
                     self.add_flag('BOX_DIMENSIONS', '5E16.8',
                                   data=[box[3], box[0], box[1], box[2]],
                                   after='ATOMS_PER_MOLECULE')
+                try:
+                    self.rediscover_molecules(fix_broken=False)
+                except MoleculeError:
+                    # Do not reorder molecules here -- only do that when
+                    # specifically requested. Otherwise we could get out-of-sync
+                    # with coordinates.
+                    pass
+                self.load_pointers()
             else:
                 self._box = box
 

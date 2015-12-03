@@ -104,6 +104,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         self.assertEqual(top.combining_rule, 'geometric')
         del top.rb_torsions[:]
         parm = amber.AmberParm.from_structure(top)
+        parm.box = None # Get rid of the unit cell
         self.assertEqual(parm.combining_rule, 'geometric')
         parm.write_parm(get_fn('opls.parm7', written=True))
         self.assertTrue(diff_files(get_fn('opls.parm7', written=True),
