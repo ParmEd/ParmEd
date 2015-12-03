@@ -1399,19 +1399,27 @@ class netCharge(Action):
 class strip(Action):
     """
     Deletes the atoms specified by <mask> from the topology file and rebuilds
-    the topology file according to the parameters that remain.
+    the topology file according to the parameters that remain. If nobox is
+    provided, the unit cell information is discarded (useful when stripping
+    solvent to run an aperiodic implicit solvent calculation).
     """
-    usage = '<mask>'
+    usage = '<mask> [nobox]'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+        self.nobox = arg_list.has_key('nobox')
         self.num_atms = sum(self.mask.Selection())
 
     def __str__(self):
-        return "Removing mask '%s' (%d atoms) from the topology file." % (
-                                    self.mask, self.num_atms)
+        retstr = ["Removing mask '%s' (%d atoms) from the topology file." %
+                    (self.mask, self.num_atoms)]
+        if self.nobox:
+            retstr.append('Deleting box info.')
+        return ' '.join(retstr)
 
     def execute(self):
         self.parm.strip(self.mask)
+        if self.nobox:
+            self.parm.box = None
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

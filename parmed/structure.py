@@ -625,7 +625,7 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(g.bs, g.type, g.move))
-        c.box = copy(self.box)
+        c._box = copy(self.box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
         return c
