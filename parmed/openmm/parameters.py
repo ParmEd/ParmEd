@@ -34,6 +34,25 @@ class OpenMMParameterSet(ParameterSet):
     :class:`parmed.parameters.ParameterSet`
     """
 
+    @staticmethod
+    def id_format(filename):
+        """
+        Identifies the file type as either an Amber-style frcmod or parm.dat
+        file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to check format for
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is an Amber-style parameter file. False otherwise.
+        """
+        # Not implemented yet
+        return False
+
     def __init__(self, *filenames):
         super(OpenMMParameterSet, self).__init__()
         if filenames:
