@@ -10,7 +10,7 @@ from copy import copy as _copy
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.topologyobjects import NoUreyBradley
-from parmed.utils.six import add_metaclass
+from parmed.utils.six import add_metaclass, string_types
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -103,3 +103,37 @@ class OpenMMParameterSet(ParameterSet):
         new_params.residues = params.residues
 
         return new_params
+
+    def write(self, dest, provenance=None):
+        """ Write the parameter set to an XML file for use with OpenMM
+
+        Parameters
+        ----------
+        dest : str or file-like
+            The name of the file or the file-like object (with a ``write``
+            attribute) to which the XML file will be written
+        provenance : str, optional
+            Provenance information for the force field being converted
+        """
+        if isinstance(dest, string_types):
+            dest = genopen(dest, 'w')
+            own_handle = True
+        else:
+            own_handle = False
+
+        try:
+            if provenance is not None:
+                self._write_omm_provenance(provenance)
+            self._write_omm_residues(dest)
+            self._write_omm_bonds(dest)
+            self._write_omm_angles(dest)
+            self._write_omm_ubs(dest)
+            self._write_omm_dihedrals(dest)
+            self._write_omm_periodic_impropers(dest)
+            self._write_omm_impropers(dest)
+            self._write_omm_rb_torsions(dest)
+            self._write_omm_cmaps(dest)
+            self._write_omm_nonbonded(dest)
+        finally:
+            if own_handle:
+                dest.close()
