@@ -218,6 +218,22 @@ class TestReadParm(unittest.TestCase):
         self.assertFalse(parm.chamber)
         self.assertFalse(parm.amoeba)
         self.assertEqual(parm.ptr('ifbox'), 1)
+        orig_box = parm.box
+        orig_boxdims = parm.parm_data['BOX_DIMENSIONS'][:]
+        # Strip the solvent and make sure that the box info sticks around
+        parm.strip(':WAT,Cl-')
+        self.assertEqual(parm.ptr('ifbox'), 1)
+        np.testing.assert_equal(orig_box, parm.box)
+        self.assertEqual(parm.parm_data['BOX_DIMENSIONS'], orig_boxdims)
+        self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [163, 2, 3])
+        self.assertEqual(parm.parm_data['ATOMS_PER_MOLECULE'], [2603, 12])
+        # Make sure that setting box to None gets rid of all boxy stuff
+        parm.box = None
+        self.assertEqual(parm.ptr('ifbox'), 0)
+        self.assertIs(parm.box, None)
+        self.assertNotIn('BOX_DIMENSIONS', parm.parm_data)
+        self.assertNotIn('SOLVENT_POINTERS', parm.parm_data)
+        self.assertNotIn('ATOMS_PER_MOLECULE', parm.parm_data)
 
     def testChamberGasParm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""

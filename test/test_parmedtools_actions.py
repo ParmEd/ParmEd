@@ -179,6 +179,7 @@ class TestNonParmActions(unittest.TestCase):
                        os.path.join(get_fn('03.AlaGlu'), 'conf.gro'))
         a.execute()
         parm = a.parm
+        parm.box = None
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
         self.assertIs(parm.box, None) # AmberParm deletes the box without solvent
@@ -198,6 +199,7 @@ class TestNonParmActions(unittest.TestCase):
         self.assertIn('SOMEDEF2', stra)
         a.execute()
         parm = a.parm
+        parm.box = None
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
         self.assertIs(parm.box, None)
@@ -1641,7 +1643,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         parm = copy(solvchamber)
         atoms = [atom for atom in parm.atoms] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        self.assertEqual(parm.ptr('IPTRES'), 160)
+        self.assertEqual(parm.ptr('IPTRES'), 159)
         self.assertEqual(parm.ptr('NSPM'), 17857)
         self.assertEqual(parm.ptr('NSPSOL'), 2)
         # To keep the output clean
