@@ -167,7 +167,7 @@ class AmberParm(AmberFormat, Structure):
         Structure.__init__(self)
         self.hasvels = False
         self.hasbox = False
-        self.box = None
+        self._box = None
         if xyz is None and rst7_name is not None:
             warn('rst7_name keyword is deprecated. Use xyz instead',
                  DeprecationWarning)
@@ -704,24 +704,15 @@ class AmberParm(AmberFormat, Structure):
             if res.name in all_solvent:
                 first_solvent = i
                 break
-        # If we have no water, we do not have a molecules section!
-        if first_solvent is None:
-            self.parm_data['POINTERS'][IFBOX] = 0
-            self.pointers['IFBOX'] = 0
-            if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
-            if 'NSPM' in self.pointers: del self.pointers['NSPM']
-            if 'NSPSOL' in self.pointers: del self.pointers['NSPSOL']
-            self.delete_flag('SOLVENT_POINTERS')
-            self.delete_flag('ATOMS_PER_MOLECULE')
-            self.delete_flag('BOX_DIMENSIONS')
-            self.hasbox = False
-            self.box = None
-            return None
         # Now remake our SOLVENT_POINTERS and ATOMS_PER_MOLECULE section
         self.parm_data['SOLVENT_POINTERS'] = [first_solvent, len(owner), 0]
-        # Find the first solvent molecule
-        self.parm_data['SOLVENT_POINTERS'][2] = \
-                self.residues[first_solvent].atoms[0].marked
+        # Find the first solvent molecule if there are any
+        if first_solvent is None:
+            self.parm_data['SOLVENT_POINTERS'][0] = len(self.residues)
+            self.parm_data['SOLVENT_POINTERS'][2] = len(owner) + 1
+        else:
+            self.parm_data['SOLVENT_POINTERS'][2] = \
+                    self.residues[first_solvent].atoms[0].marked
 
         # Now set up ATOMS_PER_MOLECULE and catch any errors
         self.parm_data['ATOMS_PER_MOLECULE'] = [len(mol) for mol in owner]
@@ -1981,6 +1972,72 @@ class AmberParm(AmberFormat, Structure):
                      'most-used values scee=%f scnb=%f' % (scee, scnb),
                      AmberWarning)
         return n13, n14
+
+    #===================================================
+
+    @property
+    def box(self):
+        return self._box
+
+    @box.setter
+    def box(self, value):
+        # Deleting the box is more complicated for AmberParm, so override it
+        # here
+        if value is None:
+            # Delete all of the other box info in the prmtop
+            self._box = None
+            self.parm_data['POINTERS'][IFBOX] = 0
+            self.pointers['IFBOX'] = 0
+            if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
+            if 'NSPM' in self.pointers: del self.pointers['NSPM']
+            if 'NSPSOL' in self.pointers: del self.pointers['NSPSOL']
+            self.delete_flag('SOLVENT_POINTERS')
+            self.delete_flag('ATOMS_PER_MOLECULE')
+            self.delete_flag('BOX_DIMENSIONS')
+            self.hasbox = False
+        else:
+            if isinstance(value, np.ndarray):
+                box = value
+            else:
+                box = list(value)
+                if len(box) != 6:
+                    raise ValueError('Box information must be 6 floats')
+                if u.is_quantity(box[0]):
+                    box[0] = box[0].value_in_unit(u.angstroms)
+                if u.is_quantity(box[1]):
+                    box[1] = box[1].value_in_unit(u.angstroms)
+                if u.is_quantity(box[2]):
+                    box[2] = box[2].value_in_unit(u.angstroms)
+                if u.is_quantity(box[3]):
+                    box[3] = box[3].value_in_unit(u.degrees)
+                if u.is_quantity(box[4]):
+                    box[4] = box[4].value_in_unit(u.degrees)
+                if u.is_quantity(box[5]):
+                    box[5] = box[5].value_in_unit(u.degrees)
+            box = np.array(box, dtype=np.float64, copy=False, subok=True)
+            if box.shape != (6,):
+                raise ValueError('Box information must be 6 floats')
+            if self._box is None:
+                self._box = box
+                # We need to add topology information
+                if np.allclose(box[3:], 90):
+                    # Orthogonal
+                    self.parm_data['POINTERS'][IFBOX] = 1
+                else:
+                    self.parm_data['POINTERS'][IFBOX] = 2
+                self.rediscover_molecules()
+                if 'SOLVENT_POINTERS' not in self.flag_list:
+                    self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3,
+                                  after='IROTAT')
+                if 'ATOMS_PER_MOLECULE' not in self.flag_list:
+                    self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=[0],
+                                  after='SOLVENT_POINTERS')
+                if 'BOX_DIMENSIONS' not in self.flag_list:
+                    self.add_flag('BOX_DIMENSIONS', '5E16.8',
+                                  data=[box[3], box[0], box[1], box[2]],
+                                  after='ATOMS_PER_MOLECULE')
+            else:
+                self._box = box
 
     #===================================================
 
