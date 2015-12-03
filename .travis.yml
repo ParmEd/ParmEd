@@ -33,7 +33,13 @@ script:
     - if [ "$PYTHON_VERSION" = "pypy" ]; then export PATH="${PYENV_ROOT}/bin:${PATH}"; fi
     - if [ "$PYTHON_VERSION" = "pypy" ]; then eval "$(pyenv init -)"; fi
     - devtools/travis-ci/pyflakes_check.sh
-    - cd test
+    # stay in root folder so coverage report will show relative path (and coveralls.io can show source code)
+    #- cd test
     - echo "Using `which nosetests`::"
     - which nosetests
-    - nosetests -vs .
+    #- nosetests -vs . --with-coverage --cover-package parmed
+    - nosetests -vs ./test/ --with-coverage --cover-package parmed
+
+after_success:
+    - echo "after_success"
+    - coveralls
