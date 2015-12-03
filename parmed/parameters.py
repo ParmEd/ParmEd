@@ -54,6 +54,10 @@ class ParameterSet(object):
         Dictionary mapping the 4-element tuple of the names of the four atom
         types involved in the improper torsion (modeled as a Fourier series) to
         the DihedralType instances
+    rb_torsion_types : dict((str,str,str,str):RBTorsionType)
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the Ryckaert-Bellemans torsion to the RBTorsionType
+        instances
     cmap_types : dict((str,str,str,str,str):CmapType)
         Dictionary mapping the 5-element tuple of the names of the five atom
         types involved in the correction map to the CmapType instances
@@ -61,6 +65,14 @@ class ParameterSet(object):
         Dictionary mapping the 2-element tuple of the names of the two atom
         types whose LJ terms are modified to the tuple of the (epsilon,rmin)
         terms for that off-diagonal term
+    pair_types : dict((str,str):NonbondedExceptionType)
+        Dictionary mapping the 2-element tuple of atom type names for which
+        explicit exclusion rules should be applied
+    parametersets : list(str)
+        List of parameter set names processed in the current ParameterSet
+    residues : dict(str:ResidueTemplate|ResidueTemplateContainer)
+        A library of ResidueTemplate objects mapped to the residue name defined
+        in the force field library files
     """
 
     def __init__(self, *args):
@@ -80,6 +92,7 @@ class ParameterSet(object):
         self.pair_types = OrderedDict()
         self.parametersets = []
         self._combining_rule = 'lorentz'
+        self.residues = dict()
 
     def __copy__(self):
         other = type(self)()
@@ -132,6 +145,8 @@ class ParameterSet(object):
             typ = copy(item)
             other.cmap_types[key] = typ
             other.cmap_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.residues):
+            other.residues[key] = copy(item)
         other.combining_rule = self.combining_rule
 
         return other

@@ -64,7 +64,7 @@ class AmberParameterSet(ParameterSet):
 
     Parameters
     ----------
-    filenames : str, list of str, file-like, or list of file-like
+    filenames : str, list of str, file-like, or list of file-like; optional
         Either the name of a file or a list of filenames from which parameters
         should be parsed.
 
@@ -74,6 +74,10 @@ class AmberParameterSet(ParameterSet):
     in the order they are provided, and any parameters that are specified in
     multiple places are overwritten (that is, the *last* occurrence is the
     parameter type that is used)
+
+    See Also
+    --------
+    :class:`parmed.parameters.ParameterSet`
     """
 
     #===================================================
@@ -197,7 +201,6 @@ class AmberParameterSet(ParameterSet):
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
         self.titles = []
-        self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
                 self.load_parameters(filename)
