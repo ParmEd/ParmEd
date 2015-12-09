@@ -680,7 +680,7 @@ class TestChemistryCIFStructure(FileIOTestCase):
         # Now check CIF writing without anisotropic B-factors and with
         # renumbering
         io = StringIO()
-        cif.write_cif(io)
+        cif.write_cif(io, coordinates=cif.get_coordinates('all'))
         io.seek(0)
         cif3 = read_CIF(io)
         # cif and cif3 should have equivalent atom properties (basically,
