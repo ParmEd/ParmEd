@@ -277,6 +277,14 @@ class TestChemistryPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdbfile2.atoms), 33)
         self.assertEqual(len(pdbfile2.residues), 3)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
+        # Test that passing the coordinates attribute works
+        output = StringIO()
+        pdbfile.write_pdb(output, coordinates=pdbfile.get_coordinates('all'))
+        output.seek(0)
+        pdbfile2 = read_PDB(output)
+        self.assertEqual(len(pdbfile2.atoms), 33)
+        self.assertEqual(len(pdbfile2.residues), 3)
+        self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
     def testPdbWriteModels(self):
         """ Test PDB file writing from NMR structure with models """
