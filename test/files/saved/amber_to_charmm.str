@@ -395,8 +395,9 @@ CA     C      HA     CA          1.1000  2   180.00
 N      C      H      H           1.0000  2   180.00
 N2     CA     H      H           1.0000  2   180.00
 N2     CT     H      CA          1.0000  2   180.00
+
 NONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
-cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 1.2 wmin 1.5
+cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 0.8333333333333334 wmin 1.5
 
 N3           0.000000  -0.170000       1.824000 -0.085000       1.824000
 H            0.000000  -0.015700       0.600000 -0.007850       0.600000
