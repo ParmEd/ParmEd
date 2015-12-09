@@ -209,7 +209,8 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
         )
         self.assertTrue(
                 diff_files(get_saved_fn('amber_to_charmm.str'),
-                           get_fn('amber_to_charmm.str', written=True)
+                           get_fn('amber_to_charmm.str', written=True),
+                           absolute_error=1e-5,
                 )
         )
 
