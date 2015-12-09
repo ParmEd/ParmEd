@@ -2,7 +2,7 @@
 from __future__ import print_function, division, absolute_import
 
 import numpy as np
-from parmed import openmm, load_file
+from parmed import openmm, load_file, exceptions
 import os
 import unittest
 from utils import get_fn, mm, app, has_openmm
@@ -50,6 +50,8 @@ class TestOpenMM(unittest.TestCase):
 
     def testLoadTopology(self):
         """ Tests loading an OpenMM Topology and System instance """
+        import warnings
+        warnings.filterwarnings('error', category=exceptions.OpenMMWarning)
         ommparm = app.AmberPrmtopFile(get_fn('complex.prmtop'))
         parm = load_file(get_fn('complex.prmtop'))
         system = ommparm.createSystem(implicitSolvent=app.OBC1)
@@ -57,3 +59,4 @@ class TestOpenMM(unittest.TestCase):
         self.assertEqual(len(parm.atoms), len(structure.atoms))
         self.assertEqual(len(parm.residues), len(structure.residues))
         self.assertEqual(len(parm.bonds), len(structure.bonds))
+        warnings.filterwarnings('always', category=exceptions.OpenMMWarning)
