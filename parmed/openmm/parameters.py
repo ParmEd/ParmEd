@@ -7,10 +7,15 @@ Author(s): Jason Swails
 from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
+import datetime
 from parmed.formats.registry import FileFormatType
+from parmed.modeller.residue import ResidueTemplate
 from parmed.parameters import ParameterSet
+from parmed.periodic_table import Element, Mass
 from parmed.topologyobjects import NoUreyBradley
-from parmed.utils.six import add_metaclass, string_types
+from parmed import unit as u
+from parmed.utils.io import genopen
+from parmed.utils.six import add_metaclass, string_types, iteritems
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -101,10 +106,18 @@ class OpenMMParameterSet(ParameterSet):
         new_params.parametersets = params.parametersets
         new_params._combining_rule = params.combining_rule
         new_params.residues = params.residues
+        # Make sure we have a complete set of atom types in the _tuple list
+        if len(params.atom_types_tuple) == 0:
+            i = 1
+            for name, type in iteritems(params.atom_types):
+                type.number = i
+                params.atom_types_tuple[(name, i)] = type
+                params.atom_types_int[i] = type
+                i += 1
 
         return new_params
 
-    def write(self, dest, provenance=None):
+    def write(self, dest, original_file='', reference=''):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -112,8 +125,11 @@ class OpenMMParameterSet(ParameterSet):
         dest : str or file-like
             The name of the file or the file-like object (with a ``write``
             attribute) to which the XML file will be written
-        provenance : str, optional
-            Provenance information for the force field being converted
+        original_file : str, optional
+            The original file name to put in the provenance information. Default
+            is empty string
+        reference = str, optional
+            The literature reference for this force field
         """
         if isinstance(dest, string_types):
             dest = genopen(dest, 'w')
@@ -122,18 +138,87 @@ class OpenMMParameterSet(ParameterSet):
             own_handle = False
 
         try:
-            if provenance is not None:
-                self._write_omm_provenance(provenance)
+            dest.write('<ForceField>\n')
+            self._write_omm_provenance(dest, original_file, reference)
+            self._write_omm_atom_types(dest)
             self._write_omm_residues(dest)
             self._write_omm_bonds(dest)
             self._write_omm_angles(dest)
-            self._write_omm_ubs(dest)
-            self._write_omm_dihedrals(dest)
-            self._write_omm_periodic_impropers(dest)
-            self._write_omm_impropers(dest)
-            self._write_omm_rb_torsions(dest)
-            self._write_omm_cmaps(dest)
-            self._write_omm_nonbonded(dest)
+#           self._write_omm_dihedrals(dest)
+#           self._write_omm_periodic_impropers(dest)
+#           self._write_omm_impropers(dest)
+#           self._write_omm_rb_torsions(dest)
+#           self._write_omm_cmaps(dest)
+#           self._write_omm_scripts(dest)
+#           self._write_omm_nonbonded(dest)
         finally:
+            dest.write('</ForceField>\n')
             if own_handle:
                 dest.close()
+
+    def _write_omm_provenance(self, dest, original_file, reference):
+        dest.write(' <Info>\n')
+        dest.write('  <Source>%s</Source>\n' % original_file)
+        dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
+                   datetime.datetime.now().timetuple()[:3])
+        dest.write('  <Reference>%s</Reference>\n' % reference)
+        dest.write(' </Info>\n')
+
+    def _write_omm_atom_types(self, dest):
+        dest.write(' <AtomTypes>\n')
+        for (name, i), atom_type in iteritems(self.atom_types_tuple):
+            assert atom_type.atomic_number >= 0, 'Atomic number not set!'
+            element = Element[atom_type.atomic_number]
+            dest.write('  <Type name="%s" class="%d" element="%s" mass="%f"/>\n'
+                       % (name, i, element, atom_type.mass or Mass[element]))
+        dest.write(' </AtomTypes>\n')
+
+    def _write_omm_residues(self, dest):
+        self.typeify_templates()
+        dest.write(' <Residues>\n')
+        for name, residue in iteritems(self.residues):
+            if not isinstance(residue, ResidueTemplate):
+                continue
+            dest.write('  <Residue name="%s">\n' % residue.name)
+            for atom in residue.atoms:
+                dest.write('   <Atom name="%s" type="%s" charge="%f"/>\n' %
+                           (atom.name, atom.atom_type.number, atom.charge))
+            for bond in residue.bonds:
+                dest.write('   <Bond atomName1="%s" atomName2="%s" />\n' %
+                           (bond.atom1.name, bond.atom2.name))
+            if residue.head is not None:
+                dest.write('   <ExternalBond atomName="%s">\n' %
+                           residue.head.name)
+            if residue.tail is not None:
+                dest.write('   <ExternalBond atomName="%s">\n' %
+                           residue.tail.name)
+        dest.write(' </Residues>\n')
+
+    def _write_omm_bonds(self, dest):
+        if not self.bond_types: return
+        dest.write(' <HarmonicBondForce>\n')
+        bonds_done = set()
+        lconv = u.angstroms.conversion_factor_to(u.nanometers)
+        kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) / lconv**2 * 2
+        for (a1, a2), bond in iteritems(self.bond_types):
+            if (a1, a2) in bonds_done: continue
+            bonds_done.add((a1, a2))
+            bonds_done.add((a2, a1))
+            dest.write('  <Bond class1="%s" class2="%s", length="%f", k="%f"/>\n'
+                       % (a1, a2, bond.req*lconv, bond.k*kconv))
+        dest.write(' </HarmonicBondForce>\n')
+
+    def _write_omm_angles(self, dest):
+        if not self.angle_types: return
+        dest.write(' <HarmonicAngleForce>\n')
+        angles_done = set()
+        tconv = u.degree.conversion_factor_to(u.radians)
+        kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) * 2
+        for (a1, a2, a3), angle in iteritems(self.angle_types):
+            if (a1, a2, a3) in angles_done: continue
+            angles_done.add((a1, a2, a3))
+            angles_done.add((a3, a2, a1))
+            dest.write('  <Angle class1="%s" class2="%s" class3="%s" '
+                       'angle="%s" k="%s"/>\n' %
+                       (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
+        dest.write(' </HarmonicAngleForce>\n')

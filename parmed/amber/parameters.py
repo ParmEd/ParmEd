@@ -242,7 +242,9 @@ class AmberParameterSet(ParameterSet):
             own_handle = False
         # To make parsing easier, and because leaprc files are usually quite
         # short, I'll read the whole file into memory
-        text = f.read()
+        lines = map(lambda line:
+                line if '#' not in line else line[:line.index('#')], f)
+        text = ''.join(lines)
         if own_handle: f.close()
         lowertext = text.lower() # commands are case-insensitive
         try:

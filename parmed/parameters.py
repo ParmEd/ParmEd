@@ -92,7 +92,7 @@ class ParameterSet(object):
         self.pair_types = OrderedDict()
         self.parametersets = []
         self._combining_rule = 'lorentz'
-        self.residues = dict()
+        self.residues = OrderedDict()
 
     def __copy__(self):
         other = type(self)()
@@ -462,3 +462,16 @@ class ParameterSet(object):
         if value not in ('lorentz', 'geometric'):
             raise ValueError('combining_rule must be "lorentz" or "geometric"')
         self._combining_rule = value
+
+    def typeify_templates(self):
+        """ Assign atom types to atom names in templates """
+        from parmed.modeller import ResidueTemplateContainer, ResidueTemplate
+        for name, residue in iteritems(self.residues):
+            if isinstance(residue, ResidueTemplateContainer):
+                for res in residue:
+                    for atom in residue:
+                        atom.atom_type = self.atom_types[atom.type]
+            else:
+                assert isinstance(residue, ResidueTemplate), 'Wrong type!'
+                for atom in residue:
+                    atom.atom_type = self.atom_types[atom.type]
