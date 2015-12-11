@@ -1228,7 +1228,7 @@ class Structure(object):
             - PDBx/mmCIF (.cif, cif)
             - PQR (.pqr, pqr)
             - Amber topology file (.prmtop/.parm7, amber)
-            - CHARMM PSF file (.psf, charmm)
+            - CHARMM PSF file (.psf, psf)
             - CHARMM coordinate file (.crd, charmmcrd)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)

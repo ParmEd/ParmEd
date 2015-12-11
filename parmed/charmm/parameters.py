@@ -1074,9 +1074,9 @@ class CharmmParameterSet(ParameterSet):
                     i += 1
                     f.write(' %13.6f' % val)
                 f.write('\n\n\n')
-        f.write('NONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance '
+        f.write('\nNONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance '
                 'vfswitch -\ncutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 '
-                'e14fac %s wmin 1.5\n\n' % scee)
+                'e14fac %s wmin 1.5\n\n' % (1/scee))
         for key, typ in iteritems(self.atom_types):
             f.write('%-6s %14.6f %10.6f %14.6f' % (key, 0.0, -abs(typ.epsilon),
                     typ.rmin))
