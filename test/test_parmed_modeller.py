@@ -1068,7 +1068,7 @@ quit
             self.assertEqual(a1.atomic_number, a2.atomic_number)
             self.assertEqual(a1.atom_type.rmin, a2.atom_type.rmin)
             self.assertEqual(a1.atom_type.epsilon, a2.atom_type.epsilon)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
             self.assertEqual(a1.screen, a2.screen)
             # Ugh. OFF libs are inconsistent
             if tree:

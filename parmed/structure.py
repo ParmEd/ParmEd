@@ -3057,7 +3057,7 @@ class Structure(object):
         """
         if implicitSolvent is app.GBn:
             screen = [0.5 for atom in self.atoms]
-            radii = [atom.radii for atom in self.atoms]
+            radii = [atom.solvent_radius for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 0.48435382330
@@ -3077,7 +3077,7 @@ class Structure(object):
             beta = [0.8 for i in self.atoms]
             gamma = [4.85 for i in self.atoms]
             screen = [0.5 for i in self.atoms]
-            radii = [atom.radii for atom in self.atoms]
+            radii = [atom.solvent_radius for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 1.058554
@@ -3107,7 +3107,7 @@ class Structure(object):
                 if not radii[i]:
                     radii[i] = _mbondi3(atom)
         else:
-            radii = [atom.radii for atom in self.atoms]
+            radii = [atom.solvent_radius for atom in self.atoms]
             screen = [atom.screen for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if not radii[i] or not screen[i]:

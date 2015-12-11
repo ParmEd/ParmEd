@@ -564,7 +564,7 @@ class changeRadii(Action):
             ChRad(self.parm, self.radii)
             # Load the data into the parm arrays
             for i, atom in enumerate(self.parm.atoms):
-                self.parm.parm_data['RADII'][i] = atom.radii
+                self.parm.parm_data['RADII'][i] = atom.solvent_radius
                 self.parm.parm_data['SCREEN'][i] = atom.screen
         else:
             # Otherwise, just set the radii
@@ -1114,7 +1114,7 @@ class printDetails(Action):
                     "%7d%7d%9s%6s%6s%7d%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n" %
                     (i+1, atm.residue.idx+1, atm.residue.name, atm.name,
                      atm.type, atm.atomic_number, atm.rmin, atm.epsilon,
-                     atm.mass, atm.charge, atm.radii, atm.screen)
+                     atm.mass, atm.charge, atm.solvent_radius, atm.screen)
                 )
         return ''.join(retstr)
 

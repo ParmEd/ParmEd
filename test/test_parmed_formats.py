@@ -146,11 +146,11 @@ class TestFileLoader(FileIOTestCase):
         self.assertEqual(len(pqr.residues), 214)
         self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
         self.assertEqual(pqr.atoms[0].charge, -0.30)
-        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].solvent_radius, 1.85)
         self.assertEqual(pqr.atoms[0].atomic_number, 7)
         self.assertEqual(pqr.atoms[35].charge, -0.8)
         self.assertEqual(pqr.atoms[-1].charge, -0.67)
-        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].solvent_radius, 1.7)
         self.assertEqual(pqr.atoms[-1].atomic_number, 8)
         self.assertIsInstance(random.choice(pqr.residues).number, int)
         self.assertIsInstance(random.choice(pqr.atoms).number, int)
@@ -592,11 +592,11 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(len(pqr.residues), 214)
         self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
         self.assertEqual(pqr.atoms[0].charge, -0.30)
-        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].solvent_radius, 1.85)
         self.assertEqual(pqr.atoms[0].atomic_number, 7)
         self.assertEqual(pqr.atoms[35].charge, -0.8)
         self.assertEqual(pqr.atoms[-1].charge, -0.67)
-        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].solvent_radius, 1.7)
         self.assertEqual(pqr.atoms[-1].atomic_number, 8)
 
     def testPQRWriter(self):
@@ -617,7 +617,7 @@ class TestParmedPQRStructure(FileIOTestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
             self.assertAlmostEqual(a1.charge, a2.charge)
-            self.assertAlmostEqual(a1.radii, a2.radii)
+            self.assertAlmostEqual(a1.solvent_radius, a2.solvent_radius)
         self.assertEqual(pqr.get_coordinates().shape[0], 3)
         np.testing.assert_allclose(pqr.get_coordinates(0),
                                    parm.get_coordinates(0), atol=2e-3)
@@ -629,7 +629,7 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(len(pqr.atoms), 458)
         self.assertEqual(len(pqr.residues), 14)
         self.assertEqual(pqr.atoms[0].charge, -0.9526)
-        self.assertEqual(pqr.atoms[-1].radii, 0.8)
+        self.assertEqual(pqr.atoms[-1].solvent_radius, 0.8)
 
 class TestChemistryCIFStructure(FileIOTestCase):
 

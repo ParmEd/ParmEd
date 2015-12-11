@@ -245,7 +245,7 @@ class Atom(_ListItem):
     nb_idx : ``int``
         The nonbonded index. This is a pointer that is relevant in the context
         of an Amber topology file and identifies its Lennard-Jones atom type
-    radii : ``float``
+    solvent_radius : ``float``
         The intrinsic solvation radius of this atom.
     screen : ``float``
         The Generalized Born screening factor for this atom.
@@ -452,8 +452,8 @@ class Atom(_ListItem):
     #===================================================
 
     def __init__(self, list=None, atomic_number=0, name='', type='',
-                 charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
-                 tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
+                 charge=0.0, mass=0.0, nb_idx=0, solvent_radius=0.0,
+                 screen=0.0, tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
                  bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
                  rmin14=None, epsilon14=None):
         self.list = list
@@ -467,7 +467,7 @@ class Atom(_ListItem):
         self.charge = _strip_units(charge, u.elementary_charge)
         self.mass = _strip_units(mass, u.dalton)
         self.nb_idx = nb_idx
-        self.radii = _strip_units(radii, u.angstrom)
+        self.solvent_radius = _strip_units(solvent_radius, u.angstrom)
         self.screen = screen
         self.tree = tree
         self.join = join
@@ -501,7 +501,7 @@ class Atom(_ListItem):
     def _copy(cls, item):
         new = cls(atomic_number=item.atomic_number, name=item.name,
                   type=item.type, charge=item.charge, mass=item.mass,
-                  nb_idx=item.nb_idx, radii=item.radii,
+                  nb_idx=item.nb_idx, solvent_radius=item.solvent_radius,
                   screen=item.screen, tree=item.tree, join=item.join,
                   irotat=item.irotat, occupancy=item.occupancy,
                   bfactor=item.bfactor, altloc=item.altloc)
@@ -972,10 +972,11 @@ class Atom(_ListItem):
     def __getstate__(self):
         retval = dict(name=self.name, type=self.type, atom_type=self.atom_type,
                       charge=self.charge, mass=self.mass, nb_idx=self.nb_idx,
-                      radii=self.radii, screen=self.screen, tree=self.tree,
-                      join=self.join, irotat=self.irotat, bfactor=self.bfactor,
-                      altloc=self.altloc, occupancy=self.occupancy,
-                      number=self.number, anisou=self.anisou, _rmin=self._rmin,
+                      solvent_radius=self.solvent_radius, screen=self.screen,
+                      tree=self.tree, join=self.join, irotat=self.irotat,
+                      bfactor=self.bfactor, altloc=self.altloc,
+                      occupancy=self.occupancy, number=self.number,
+                      anisou=self.anisou, _rmin=self._rmin,
                       _epsilon=self._epsilon, _rmin14=self._rmin14,
                       _epsilon14=self._epsilon14, children=self.children,
                       atomic_number=self.atomic_number,
@@ -1184,6 +1185,15 @@ class ExtraPoint(Atom):
             self._frame_type = OutOfPlaneExtraPointFrame(self)
 
         return self._frame_type
+
+    @property
+    @deprecated
+    def radii(self):
+        return self.solvent_radius
+    @radii.setter
+    @deprecated
+    def radii(self, value):
+        self.solvent_radius = value
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

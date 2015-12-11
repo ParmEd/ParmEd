@@ -122,15 +122,15 @@ class TestTopologyObjects(unittest.TestCase):
     def test_atom(self):
         """ Tests the Atom object """
         a1 = Atom(atomic_number=6, name='C1', type='CT', charge=-0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a3 = Atom(atomic_number=6, name='C3', type='CT', charge=0.0,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a4 = Atom(atomic_number=6, name='C4', type='CT', charge=-0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         # Make sure the atom attributes are transferred correctly (only check
         # the first atom)
         self.assertEqual(a1.atomic_number, 6)
@@ -141,7 +141,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a1.mass, 12.01)
         self.assertEqual(a1.tree, 'M')
         self.assertEqual(a1.nb_idx, 1)
-        self.assertEqual(a1.radii, 1.8)
+        self.assertEqual(a1.solvent_radius, 1.8)
         self.assertEqual(a1.idx, -1)
         self.assertEqual(a1.marked, 0)
         self.assertEqual(a1.screen, 0)

@@ -37,7 +37,7 @@ def create_dataframe(obj):
         - charge : float
         - mass : float
         - nb_idx : int
-        - radii : float
+        - solvent_radius : float
         - screen : float
         - occupancy : float
         - bfactor : float
@@ -98,7 +98,7 @@ def create_dataframe(obj):
     ret['charge'] = [atom.charge for atom in atoms]
     ret['mass'] = [atom.mass for atom in atoms]
     ret['nb_idx'] = [atom.nb_idx for atom in atoms]
-    ret['radii'] = [atom.radii for atom in atoms]
+    ret['solvent_radius'] = [atom.solvent_radius for atom in atoms]
     ret['screen'] = [atom.screen for atom in atoms]
     ret['occupancy'] = [atom.occupancy for atom in atoms]
     ret['bfactor'] = [atom.bfactor for atom in atoms]
@@ -201,7 +201,7 @@ def load_dataframe(obj, dataframe):
         - charge : float
         - mass : float
         - nb_idx : int
-        - radii : float
+        - solvent_radius : float
         - screen : float
         - occupancy : float
         - bfactor : float
@@ -275,8 +275,8 @@ def load_dataframe(obj, dataframe):
             set_attribute('mass', data)
         elif key == 'nb_idx':
             set_attribute('nb_idx', data)
-        elif key == 'radii':
-            set_attribute('radii', data)
+        elif key == 'solvent_radius':
+            set_attribute('solvent_radius', data)
         elif key == 'screen':
             set_attribute('screen', data)
         elif key == 'occupancy':
