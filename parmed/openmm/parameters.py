@@ -106,14 +106,6 @@ class OpenMMParameterSet(ParameterSet):
         new_params.parametersets = params.parametersets
         new_params._combining_rule = params.combining_rule
         new_params.residues = params.residues
-        # Make sure we have a complete set of atom types in the _tuple list
-        if len(params.atom_types_tuple) == 0:
-            i = 1
-            for name, type in iteritems(params.atom_types):
-                type.number = i
-                params.atom_types_tuple[(name, i)] = type
-                params.atom_types_int[i] = type
-                i += 1
 
         return new_params
 
@@ -166,11 +158,18 @@ class OpenMMParameterSet(ParameterSet):
 
     def _write_omm_atom_types(self, dest):
         dest.write(' <AtomTypes>\n')
-        for (name, i), atom_type in iteritems(self.atom_types_tuple):
+        ljtypes = dict()
+        counter = 0
+        for name, atom_type in iteritems(self.atom_types)
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             element = Element[atom_type.atomic_number]
+            key = (atom_type.rmin, atom_type.epsilon)
+            if key not in ljtypes:
+                ljtypes[key] = counter
+                counter += 1
             dest.write('  <Type name="%s" class="%d" element="%s" mass="%f"/>\n'
-                       % (name, i, element, atom_type.mass or Mass[element]))
+                % (name, ljtypes[key], element, atom_type.mass or Mass[element])
+            )
         dest.write(' </AtomTypes>\n')
 
     def _write_omm_residues(self, dest):
@@ -182,7 +181,7 @@ class OpenMMParameterSet(ParameterSet):
             dest.write('  <Residue name="%s">\n' % residue.name)
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%f"/>\n' %
-                           (atom.name, atom.atom_type.number, atom.charge))
+                           (atom.name, atom.type, atom.charge))
             for bond in residue.bonds:
                 dest.write('   <Bond atomName1="%s" atomName2="%s" />\n' %
                            (bond.atom1.name, bond.atom2.name))
@@ -204,7 +203,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond class1="%s" class2="%s", length="%f", k="%f"/>\n'
+            dest.write('  <Bond type1="%s" type2="%s", length="%f", k="%f"/>\n'
                        % (a1, a2, bond.req*lconv, bond.k*kconv))
         dest.write(' </HarmonicBondForce>\n')
 
@@ -218,7 +217,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
-            dest.write('  <Angle class1="%s" class2="%s" class3="%s" '
+            dest.write('  <Angle type1="%s" type2="%s" type3="%s" '
                        'angle="%s" k="%s"/>\n' %
                        (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
         dest.write(' </HarmonicAngleForce>\n')
