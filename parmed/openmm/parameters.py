@@ -258,10 +258,13 @@ class OpenMMParameterSet(ParameterSet):
         for (a2, a3, a1, a4), improp in iteritems(self.improper_periodic_types):
             # Try to make the wild-cards in the middle
             if a4 == 'X':
-                if a3 != 'X':
-                    a3, a4 = a4, a3
-                elif a2 != 'X':
+                if a2 != 'X':
                     a2, a4 = a4, a2
+                elif a3 != 'X':
+                    a3, a4 = a4, a3
+            if a2 != 'X' and a3 == 'X':
+                # Single wild-card entries put the wild-card in position 2
+                a2, a3 = a3, a2
             dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
                        'type4="%s" periodicity1="%d" phase1="%f" k1="%f"/>\n' %
                        (a1, nowild(a2), nowild(a3), nowild(a4), improp.per,
