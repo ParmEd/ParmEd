@@ -20,6 +20,7 @@ from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
                                     DihedralTypeList)
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
+from parmed.utils.six.moves import map
 import re
 
 # parameter file regexes
