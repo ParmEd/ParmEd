@@ -280,5 +280,7 @@ CHIS = CHIE
         params = openmm.OpenMMParameterSet.from_parameterset(
                 amber.AmberParameterSet.from_leaprc(leaprc)
         )
-        params.write(get_fn('amber_conv.xml', written=True), 'leaprc.ff14SB',
-                     'Maier & Simmerling')
+        params.write(get_fn('amber_conv.xml', written=True),
+                     provenance=dict(OriginalFile='leaprc.ff14SB',
+                     Reference='Maier & Simmerling')
+        )

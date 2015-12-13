@@ -110,7 +110,7 @@ class OpenMMParameterSet(ParameterSet):
 
         return new_params
 
-    def write(self, dest, original_file='', reference=''):
+    def write(self, dest, provenance=None):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -118,11 +118,17 @@ class OpenMMParameterSet(ParameterSet):
         dest : str or file-like
             The name of the file or the file-like object (with a ``write``
             attribute) to which the XML file will be written
-        original_file : str, optional
-            The original file name to put in the provenance information. Default
-            is empty string
-        reference = str, optional
-            The literature reference for this force field
+        provenance : dict, optional
+            If present, the XML file will be tagged with the available fields.
+            The keys of this dictionary are turned into the XML tags, and the
+            values become the contents of that tag. Default is no provenance
+
+        Notes
+        -----
+        The generated XML file will have the XML tag ``DateGenerated`` added to
+        the provenance information set to the current date. Therefore, you
+        should not provide this information in ``provenance`` (it will be
+        removed if it is provided).
         """
         if isinstance(dest, string_types):
             dest = genopen(dest, 'w')
@@ -132,7 +138,7 @@ class OpenMMParameterSet(ParameterSet):
 
         try:
             dest.write('<ForceField>\n')
-            self._write_omm_provenance(dest, original_file, reference)
+            self._write_omm_provenance(dest, provenance)
             self._write_omm_atom_types(dest)
             self._write_omm_residues(dest)
             self._write_omm_bonds(dest)
@@ -148,12 +154,14 @@ class OpenMMParameterSet(ParameterSet):
             if own_handle:
                 dest.close()
 
-    def _write_omm_provenance(self, dest, original_file, reference):
+    def _write_omm_provenance(self, dest, provenance):
         dest.write(' <Info>\n')
-        dest.write('  <Source>%s</Source>\n' % original_file)
         dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
                    datetime.datetime.now().timetuple()[:3])
-        dest.write('  <Reference>%s</Reference>\n' % reference)
+        provenance = provenance if provenance is not None else {}
+        for item, key in iteritems(provenance):
+            if item == 'DateGenerated': continue
+            dest.write('  <%s>%s</%s>\n' % (item, key, item))
         dest.write(' </Info>\n')
 
     def _write_omm_atom_types(self, dest):
