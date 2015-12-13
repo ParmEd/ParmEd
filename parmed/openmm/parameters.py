@@ -107,16 +107,6 @@ class OpenMMParameterSet(ParameterSet):
         new_params.parametersets = params.parametersets
         new_params._combining_rule = params.combining_rule
         new_params.residues = params.residues
-        # Assign Lennard-Jones atom classes
-        ljtypes = dict()
-        counter = 0
-        for name, atom_type in iteritems(new_params.atom_types):
-            key = (atom_type.rmin, atom_type.epsilon, atom_type.rmin_14,
-                    atom_type.epsilon_14)
-            if key not in ljtypes:
-                ljtypes[key] = counter
-                counter += 1
-            atom_type.number = ljtypes[key]
 
         return new_params
 
@@ -171,9 +161,8 @@ class OpenMMParameterSet(ParameterSet):
         for name, atom_type in iteritems(self.atom_types):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             element = Element[atom_type.atomic_number]
-            dest.write('  <Type name="%s" class="%d" element="%s" mass="%f"/>\n'
-                % (name, atom_type.number, element,
-                   atom_type.mass or Mass[element])
+            dest.write('  <Type name="%s" element="%s" mass="%f"/>\n'
+                % (name, element, atom_type.mass or Mass[element])
             )
         dest.write(' </AtomTypes>\n')
 
