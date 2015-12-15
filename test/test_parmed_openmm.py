@@ -292,7 +292,7 @@ CHIS = CHIE
             charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                       get_fn('top_all36_prot.rtf')
     ))
-    params.write(get_fn('charmm_conv.xml', written=True),
+    params.write(get_fn('charmm_conv.xml'),
                  provenance=dict(OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
-                                 Reference= 'MacKerrell')
+                                 Reference='MacKerrell')
                  )
