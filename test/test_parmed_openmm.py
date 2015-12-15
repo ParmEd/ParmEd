@@ -2,7 +2,7 @@
 from __future__ import print_function, division, absolute_import
 
 import numpy as np
-from parmed import openmm, load_file, exceptions, amber
+from parmed import openmm, load_file, exceptions, amber, charmm
 from parmed.utils.six.moves import StringIO
 import os
 import unittest
@@ -284,3 +284,15 @@ CHIS = CHIE
                      provenance=dict(OriginalFile='leaprc.ff14SB',
                      Reference='Maier & Simmerling')
         )
+
+    def testWriteXMLParametersCharmm(self):
+        """ Test writing XML parameter files from Charmm parameter files"""
+
+    params = openmm.OpenMMParameterSet.from_parameterset(
+            charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                      get_fn('top_all36_prot.rtf')
+    ))
+    params.write(get_fn('charmm_conv.xml', written=True),
+                 provenance=dict(OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                                 Reference= 'MacKerrell')
+                 )
