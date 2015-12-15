@@ -308,10 +308,10 @@ class OpenMMParameterSet(ParameterSet):
         used_torsions = set()
         for (a1, a2, a3, a4, a5, a6, a7, a8), cmap in iteritems(self.cmap_types):
             if (a1, a2, a3, a4, a5) in used_torsions: continue
-            used_torsions.add((a1, a2, a3, a4, a5, a6, a7, a8))
-            used_torsions.add((a8, a7, a6, a5, a4, a3, a2, a1))
+            used_torsions.add((a1, a2, a3, a4, a5))
+            used_torsions.add((a5, a4, a3, a2, a1))
             dest.write('   <Torsion map="%d" type1="%s" type=2"%s" type3="%s" '
-                       'type4="%s" type5="%s" type6="%s" type7="%s" type8="%s"/>\n' %
-                       (maps[id(cmap)], a1, a2, a3, a4, a5, a6, a7, a8)
+                       'type4="%s" type5="%s"/>\n' %
+                       (maps[id(cmap)], a1, a2, a3, a4, a5)
             )
         dest.write(' </CmapTorsionForce>\n')
