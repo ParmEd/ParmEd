@@ -306,7 +306,7 @@ class OpenMMParameterSet(ParameterSet):
                 dest.write('\n')
             dest.write('  </Map>\n')
         used_torsions = set()
-        for (a1, a2, a3, a4, a5, a6, a7, a8), cmap in iteritems(self.cmap_types):
+        for (a1, a2, a3, a4, _, _, _, a5), cmap in iteritems(self.cmap_types):
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
