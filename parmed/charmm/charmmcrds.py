@@ -100,7 +100,7 @@ class CharmmCrdFile(object):
         self.resno = []                    # Residue number
         self.resname = []                  # Residue name
         self.resid = []                    # Residue ID
-        self.attype = []                   # Atom type
+        self.atname = []                   # Atom type
         self.coords = []                   # 3N atomic coordinates
         self.title = []                    # .crd file title block
         self.segid = []                    # Segment ID
@@ -153,7 +153,7 @@ class CharmmCrdFile(object):
                     self.atomno.append(int(line[0]))
                     self.resno.append(int(line[1]))
                     self.resname.append(line[2])
-                    self.attype.append(line[3])
+                    self.atname.append(line[3])
                     self.coords.append(float(line[4]))
                     self.coords.append(float(line[5]))
                     self.coords.append(float(line[6]))
@@ -190,7 +190,7 @@ class CharmmCrdFile(object):
             res = atom.residue
             segid = res.segid.strip() or res.chain.strip() or 'SYS'
             dest.write('%10d%10d  %-8s  %-8s%20.10f%20.10f%20.10f  %-8s  '
-                       '%-8s%20.10f\n' % (i+1, atom.residue.idx+1,
+                       '%-8s%20.10f\n' % (i+1, atom.residue.number,
                        atom.residue.name, atom.name, atom.xx, atom.xy, atom.xz,
                        segid, atom.residue.number, 0))
         if own_handle:
