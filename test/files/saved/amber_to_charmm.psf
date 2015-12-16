@@ -422,7 +422,7 @@ PSF CHEQ EXT
        416 SYS      27       TRP      CB       CT      -0.005000       12.0100           
        417 SYS      27       TRP      HB2      HC       0.033900        1.0080           
        418 SYS      27       TRP      HB3      HC       0.033900        1.0080           
-       419 SYS      27       TRP      CG       C*      -0.141500       12.0100           
+       419 SYS      27       TRP      CG       CSTR    -0.141500       12.0100           
        420 SYS      27       TRP      CD1      CW      -0.163800       12.0100           
        421 SYS      27       TRP      HD1      H4       0.206200        1.0080           
        422 SYS      27       TRP      NE1      NA      -0.341800       14.0100           
@@ -471,7 +471,7 @@ PSF CHEQ EXT
        465 SYS      30       TRP      CB       CT      -0.005000       12.0100           
        466 SYS      30       TRP      HB2      HC       0.033900        1.0080           
        467 SYS      30       TRP      HB3      HC       0.033900        1.0080           
-       468 SYS      30       TRP      CG       C*      -0.141500       12.0100           
+       468 SYS      30       TRP      CG       CSTR    -0.141500       12.0100           
        469 SYS      30       TRP      CD1      CW      -0.163800       12.0100           
        470 SYS      30       TRP      HD1      H4       0.206200        1.0080           
        471 SYS      30       TRP      NE1      NA      -0.341800       14.0100           

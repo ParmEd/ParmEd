@@ -395,10 +395,10 @@ class CharmmPsfFile(Structure):
         # Make all atom type names upper-case
         def typeconv(name):
             if name.upper() == name:
-                return name
+                return name.replace('*', 'STR')
             # Lowercase letters present -- decorate the type name with LTU --
             # Lower To Upper
-            return '%sLTU' % name.upper()
+            return ('%sLTU' % name.upper()).replace('*', 'STR')
         for atom in psf.atoms:
             atom.type = typeconv(atom.type)
             if atom.atom_type is not None:

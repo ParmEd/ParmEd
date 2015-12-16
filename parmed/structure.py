@@ -1311,7 +1311,8 @@ class Structure(object):
             elif format == 'PQR':
                 formats.PQRFile.write(self, fname, **kwargs)
             elif format == 'PSF':
-                self.write_psf(fname, **kwargs)
+                s = charmm.CharmmPsfFile.from_structure(self)
+                s.write_psf(fname, **kwargs)
             elif format == 'GRO':
                 gromacs.GromacsGroFile.write(self, fname, **kwargs)
             elif format == 'MOL2':
