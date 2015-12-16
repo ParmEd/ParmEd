@@ -288,11 +288,11 @@ CHIS = CHIE
     def testWriteXMLParametersCharmm(self):
         """ Test writing XML parameter files from Charmm parameter files"""
 
-    params = openmm.OpenMMParameterSet.from_parameterset(
-            charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                      get_fn('top_all36_prot.rtf')
-    ))
-    params.write(get_fn('charmm_conv.xml'),
-                 provenance=dict(OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
-                                 Reference='MacKerrell')
-                 )
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                        get_fn('top_all36_prot.rtf')
+        ))
+        params.write(get_fn('charmm_conv.xml', written=True),
+                    provenance=dict(OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                                    Reference='MacKerrell')
+        )
