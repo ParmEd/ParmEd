@@ -6,11 +6,12 @@ import numpy as np
 from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
+from parmed.utils.six.moves import zip, range
 from parmed import unit as u
 import unittest
 from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
                    FileIOTestCase, HAS_GROMACS, CPU, has_openmm as HAS_OPENMM,
-                   mm, app)
+                   mm, app, equal_atoms)
 import warnings
 
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
@@ -104,6 +105,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         self.assertEqual(top.combining_rule, 'geometric')
         del top.rb_torsions[:]
         parm = amber.AmberParm.from_structure(top)
+        parm.box = None # Get rid of the unit cell
         self.assertEqual(parm.combining_rule, 'geometric')
         parm.write_parm(get_fn('opls.parm7', written=True))
         self.assertTrue(diff_files(get_fn('opls.parm7', written=True),
@@ -208,9 +210,36 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
         )
         self.assertTrue(
                 diff_files(get_saved_fn('amber_to_charmm.str'),
-                           get_fn('amber_to_charmm.str', written=True)
+                           get_fn('amber_to_charmm.str', written=True),
+                           absolute_error=1e-5,
                 )
         )
+        # Check the PSF file
+        psf = load_file(get_fn('amber_to_charmm.psf', written=True))
+        psf.load_parameters(
+                charmm.CharmmParameterSet(get_fn('amber_to_charmm.str',
+                                          written=True))
+        )
+        for a1, a2 in zip(psf.atoms, parm.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.mass, a2.mass)
+        self.assertEqual(len(psf.bonds), len(parm.bonds))
+        self.assertEqual(len(psf.angles), len(parm.angles))
+        # Get number of unique torsions
+        nnormal = nimp = 0
+        torsfound = set()
+        for tor in parm.dihedrals:
+            a1, a2, a3, a4 = tor.atom1, tor.atom2, tor.atom3, tor.atom4
+            if tor.improper:
+                nimp += 1
+                continue
+            if (a1, a2, a3, a4) in torsfound or (a4, a3, a2, a1) in torsfound:
+                continue
+            torsfound.add((a1, a2, a3, a4))
+            nnormal += 1
+        # Make sure that written psf only contains unique torsions.
+        self.assertEqual(nnormal+nimp, len(psf.dihedrals))
 
 @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
 class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):

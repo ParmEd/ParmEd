@@ -625,7 +625,7 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(g.bs, g.type, g.move))
-        c.box = copy(self.box)
+        c._box = copy(self.box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
         return c
@@ -1228,7 +1228,7 @@ class Structure(object):
             - PDBx/mmCIF (.cif, cif)
             - PQR (.pqr, pqr)
             - Amber topology file (.prmtop/.parm7, amber)
-            - CHARMM PSF file (.psf, charmm)
+            - CHARMM PSF file (.psf, psf)
             - CHARMM coordinate file (.crd, charmmcrd)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)
