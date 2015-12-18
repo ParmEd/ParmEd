@@ -805,7 +805,17 @@ class TestStructureSave(FileIOTestCase):
         # this difference. Add methods to determine the numbers of proper and
         # improper torsions
         def _propers(struct):
-            return sum(1 for dih in struct.dihedrals if not dih.improper)
+            # Only uniques
+            nnormal = 0
+            added = set()
+            for dih in struct.dihedrals:
+                a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+                if dih.improper: continue
+                if (a1, a2, a3, a4) in added or (a4, a3, a2, a1) in added:
+                    continue
+                nnormal += 1
+                added.add((a1, a2, a3, a4))
+            return nnormal
         def _impropers(struct):
             return sum(1 for dih in struct.dihedrals if dih.improper) + len(struct.impropers)
         # Check equivalence of topologies
