@@ -338,7 +338,6 @@ class TestParmedSerialization(unittest.TestCase):
                         unpickled.torsion_torsion_types)
         cmp_type_arrays(structure.pi_torsion_types, unpickled.pi_torsion_types)
         cmp_type_arrays(structure.adjust_types, unpickled.adjust_types)
-        cmp_type_arrays(structure.groups, unpickled.groups)
 
         # Make sure all of the connectivity arrays are equivalent
         def cmp_top_arrays(arr1, arr2):
@@ -366,6 +365,7 @@ class TestParmedSerialization(unittest.TestCase):
         cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
         cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
         cmp_top_arrays(structure.adjusts, unpickled.adjusts)
+        cmp_top_arrays(structure.groups, unpickled.groups)
 
     def _compare_parametersets(self, set1, set2):
 
