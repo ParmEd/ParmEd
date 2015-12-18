@@ -303,7 +303,7 @@ class CharmmPsfFile(Structure):
                                      (len(tmp), ngrp))
             it = iter(psfsections['NGRP NST2'][1])
             for i, j, k in zip(it, it, it):
-                self.groups.append(Group(i, j, k))
+                self.groups.append(Group(self.atoms[i], j, k))
             # Assign all of the atoms to molecules recursively
             tmp = psfsections['MOLNT'][1]
             set_molecules(self.atoms)
@@ -375,6 +375,7 @@ class CharmmPsfFile(Structure):
             struct = _copy(struct)
         psf = cls()
         psf.atoms = struct.atoms
+        psf.residues = struct.residues
         psf.bonds = struct.bonds
         psf.angles = struct.angles
         psf.urey_bradleys = struct.urey_bradleys
@@ -412,7 +413,6 @@ class CharmmPsfFile(Structure):
                     psf.groups.append(Group(residue[0], 1, 0))
                 else:
                     psf.groups.append(Group(residue[0], 2, 0))
-            psf.groups.append(group)
             psf.groups.nst2 = 0
 
         return psf
