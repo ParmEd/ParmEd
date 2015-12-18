@@ -247,7 +247,7 @@ class PSFFile(object):
         dest.write(' !NGRP NST2\n')
         if struct.groups:
             for i, gp in enumerate(struct.groups):
-                dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
+                dest.write((intfmt*3) % (gp.atom.idx, gp.type, gp.move))
                 if i % 3 == 2: dest.write('\n')
             if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
                 dest.write('\n')

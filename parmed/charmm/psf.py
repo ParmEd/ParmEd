@@ -404,12 +404,14 @@ class CharmmPsfFile(Structure):
             if atom.atom_type is not None:
                 atom.atom_type.name = typeconv(atom.atom_type.name)
 
-        # If no groups are defined, make the entire system one group
+        # If no groups are defined, make each residue its own group
         if not psf.groups:
-            if abs(sum(atom.charge for atom in psf.atoms)) < 1e-4:
-                group = Group(0, 1, 0)
-            else:
-                group = Group(0, 2, 0)
+            for residue in psf.residues:
+                chg = sum(a.charge for a in residue)
+                if chg < 1e-4:
+                    psf.groups.append(Group(residue[0], 1, 0))
+                else:
+                    psf.groups.append(Group(residue[0], 2, 0))
             psf.groups.append(group)
             psf.groups.nst2 = 0
 

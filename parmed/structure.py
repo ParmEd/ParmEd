@@ -624,7 +624,7 @@ class Structure(object):
                     AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
             )
         for g in self.groups:
-            c.groups.append(Group(g.bs, g.type, g.move))
+            c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
         c._box = copy(self.box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
@@ -995,7 +995,7 @@ class Structure(object):
         copy_valence_terms(struct.acceptors, [], self.acceptors, [],
                            ['atom1', 'atom2'])
         copy_valence_terms(struct.groups, [], self.groups, [],
-                           ['bs', 'type', 'move'])
+                           ['atom', 'type', 'move'])
         return struct
 
     def _get_selection_array(self, selection):
@@ -3232,7 +3232,7 @@ class Structure(object):
         copy_valence_terms(other.acceptors, [], self.acceptors, [],
                            ['atom1', 'atom2'])
         copy_valence_terms(other.groups, [], self.groups, [],
-                           ['bs', 'type', 'move'])
+                           ['atom', 'type', 'move'])
         if self._coordinates is None or other._coordinates is None:
             self._coordinates = None
         elif self._coordinates.shape[0] != other._coordinates.shape[0]:
@@ -3329,7 +3329,7 @@ class Structure(object):
             copy_valence_terms(other.acceptors, aoffset, self.acceptors, [],
                                ['atom1', 'atom2'])
             copy_valence_terms(other.groups, aoffset, self.groups, [],
-                               ['bs', 'type', 'move'])
+                               ['atom', 'type', 'move'])
         if self._coordinates is not None:
             coords = np.tile(self._coordinates.ravel(), ncopies).reshape(
                     (-1, len(self.atoms), 3))
