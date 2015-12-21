@@ -458,6 +458,8 @@ class TestStructureAdd(unittest.TestCase):
         """ Tests addition of two parametrized Structure instances """
         s1 = create_random_structure(parametrized=True)
         s2 = create_random_structure(parametrized=True)
+        s1.coordinates = np.random.random((len(s1.atoms), 3))
+        s2.coordinates = np.random.random((len(s2.atoms), 3))
         self.assertTrue(bool(s1.bond_types))
         self.assertTrue(bool(s2.bond_types))
         s = s1 + s2
