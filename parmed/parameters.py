@@ -59,7 +59,7 @@ class ParameterSet(object):
         Dictionary mapping the 4-element tuple of the names of the four atom
         types involved in the Ryckaert-Bellemans torsion to the RBTorsionType
         instances
-    cmap_types : dict((str,str,str,str,str):CmapType)
+    cmap_types : dict((str,str,str,str,str,str,str,str):CmapType)
         Dictionary mapping the 5-element tuple of the names of the five atom
         types involved in the correction map to the CmapType instances
     nbfix_types : dict((str,str):(float,float))
@@ -337,12 +337,14 @@ class ParameterSet(object):
         for cmap in struct.cmaps:
             if cmap.type is None: continue
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
+                    cmap.atom4.type, cmap.atom2.type, cmap.atom3.type,
                     cmap.atom4.type, cmap.atom5.type)
             if key in params.cmap_types:
                 if (not allow_unequal_duplicates and
                         cmap.type != params.cmap_types[key]):
                     raise ParameterError('Unequal CMAP types defined between '
-                            '%s, %s, %s, %s, and %s' % key)
+                            '%s, %s, %s, %s, and %s' % (key[0], key[1], key[2],
+                                key[3], key[7]))
                 continue
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
