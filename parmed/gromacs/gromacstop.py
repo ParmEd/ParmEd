@@ -831,8 +831,8 @@ class GromacsTopologyFile(Structure):
                     if res1 != res2:
                         raise GromacsError('Only square CMAPs are supported')
                     cmaptype = CmapType(res1, grid)
-                    params.cmap_types[(a1, a2, a3, a4, a5)] = cmaptype
-                    params.cmap_types[(a5, a4, a3, a2, a1)] = cmaptype
+                    params.cmap_types[(a1,a2,a3,a4,a2,a3,a4,a5)] = cmaptype
+                    params.cmap_types[(a5,a4,a3,a2,a4,a3,a2,a1)] = cmaptype
                 elif current_section == 'pairtypes':
                     words = line.split()
                     a1, a2 = words[:2]
@@ -1090,6 +1090,7 @@ class GromacsTopologyFile(Structure):
             if c.type is not None: continue
             key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3),
                     _gettype(c.atom4), _gettype(c.atom5))
+            key = (key[0],key[1],key[2],key[3],key[1],key[2],key[3],key[4])
             if key in params.cmap_types:
                 c.type = params.cmap_types[key]
                 c.type.used = True
@@ -1469,7 +1470,7 @@ class GromacsTopologyFile(Structure):
                         used_keys.add(tuple(reversed(key)))
                         parfile.write('%-6s %-6s %-6s %-6s %-6s   1   '
                                       '%4d %4d' % (key[0], key[1], key[2],
-                                      key[3], key[4], param.resolution,
+                                      key[3], key[7], param.resolution,
                                       param.resolution))
                         res2 = param.resolution * param.resolution
                         for i in range(0, res2, 10):

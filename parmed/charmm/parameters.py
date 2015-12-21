@@ -183,11 +183,8 @@ class CharmmParameterSet(ParameterSet):
         for key, typ in iteritems(params.improper_types):
             copy_paramtype(key, typ, new_params.improper_types)
         for key, typ in iteritems(params.cmap_types):
-            if len(key) == 8:
-                key = (key[0], key[1], key[2], key[3], key[7])
-                copy_paramtype(key, typ, new_params.cmap_types)
-            elif len(key) == 5:
-                copy_paramtype(key, typ, new_params.cmap_types)
+            assert len(key) == 8, '%d-key cmap type detected!' % len(key)
+            copy_paramtype(key, typ, new_params.cmap_types)
         for key, typ in iteritems(params.nbfix_types):
             copy_paramtype(key, typ, new_params.nbfix_types)
 
