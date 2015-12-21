@@ -118,6 +118,45 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.box[3], 90)
         self.assertEqual(s.box[4], 90)
         self.assertEqual(s.box[5], 90)
+        s.box = [[10*u.angstroms, 1*u.nanometers, 10*u.angstroms,
+                  90*u.degrees, 90*u.degrees, 90*u.degrees],
+                 [11*u.angstroms, 1*u.nanometers, 11*u.angstroms,
+                  91*u.degrees, 91*u.degrees, 91*u.degrees]]
+        self.assertIsInstance(s.box, np.ndarray)
+        self.assertEqual(s.box[0], 10)
+        self.assertEqual(s.box[1], 10)
+        self.assertEqual(s.box[2], 10)
+        self.assertEqual(s.box[3], 90)
+        self.assertEqual(s.box[4], 90)
+        self.assertEqual(s.box[5], 90)
+        box = s.get_box(0)
+        self.assertEqual(box[0], 10)
+        self.assertEqual(box[1], 10)
+        self.assertEqual(box[2], 10)
+        self.assertEqual(box[3], 90)
+        self.assertEqual(box[4], 90)
+        self.assertEqual(box[5], 90)
+        box = s.get_box(1)
+        self.assertEqual(box[0], 11)
+        self.assertEqual(box[1], 10)
+        self.assertEqual(box[2], 11)
+        self.assertEqual(box[3], 91)
+        self.assertEqual(box[4], 91)
+        self.assertEqual(box[5], 91)
+        box = s.get_box('all')
+        self.assertEqual(box[0][0], 10)
+        self.assertEqual(box[0][1], 10)
+        self.assertEqual(box[0][2], 10)
+        self.assertEqual(box[0][3], 90)
+        self.assertEqual(box[0][4], 90)
+        self.assertEqual(box[0][5], 90)
+        self.assertEqual(box[1][0], 11)
+        self.assertEqual(box[1][1], 10)
+        self.assertEqual(box[1][2], 11)
+        self.assertEqual(box[1][3], 91)
+        self.assertEqual(box[1][4], 91)
+        self.assertEqual(box[1][5], 91)
+        self.assertRaises(IndexError, lambda: s.get_box(3))
 
     def testBadBoxHandling(self):
         """ Tests error handling when Structure.box is improperly assigned """
@@ -238,6 +277,16 @@ class TestStructureAPI(unittest.TestCase):
         # coordinates corresponding to the ones that did *not* get stripped
         n = sum(natom_per_res[:5])
         self.assertTrue((coords[:,n:,:] == s.get_coordinates()).all())
+
+    def testHelpers(self):
+        """ Test private helper functions in parmed/structure.py """
+        ang, deg = u.angstroms, u.degrees
+        strip_units = structure._strip_box_units
+        self.assertEqual(strip_units([1, 2, 3]), [1, 2, 3])
+        self.assertEqual(strip_units([1*ang, 2*ang, 3*ang]), [1, 2, 3])
+        self.assertEqual(strip_units([1*ang, 90*deg]), [1, 90])
+        self.assertEqual(strip_units([[1*ang, 90*deg], [2*ang, 109*deg]]),
+                         [[1, 90], [2, 109]])
 
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
@@ -458,10 +507,15 @@ class TestStructureAdd(unittest.TestCase):
         """ Tests addition of two parametrized Structure instances """
         s1 = create_random_structure(parametrized=True)
         s2 = create_random_structure(parametrized=True)
+        s1.coordinates = np.random.random((4, len(s1.atoms), 3))
+        s2.coordinates = np.random.random((2, len(s2.atoms), 3))
+        s1.box = [[10, 10, 10, 90, 90, 90], [11, 11, 11, 90, 90, 90]]
+        s2.box = [[20, 20, 20, 90, 90, 90], [21, 21, 21, 90, 90, 90]]
         self.assertTrue(bool(s1.bond_types))
         self.assertTrue(bool(s2.bond_types))
         s = s1 + s2
         self._check_sum(s, s1, s2)
+        self.assertEqual(s.get_coordinates('all').shape, (2, len(s.atoms), 3))
 
     def testAddToEmptyStructure(self):
         """ Tests addition to empty Structure """
@@ -985,6 +1039,3 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.pdb', written=True), overwrite=True)
         pdb = pmd.load_file(get_fn('test.pdb', written=True))
         self.assertEqual(len(pdb.atoms), len(self.sys1.atoms))
-
-if __name__ == '__main__':
-    unittest.main()
