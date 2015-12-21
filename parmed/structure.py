@@ -3141,6 +3141,9 @@ class Structure(object):
     def __iadd__(self, other):
         if not isinstance(other, Structure):
             return NotImplemented
+        # Cache my coordinates, since changing the structure will destroy the
+        # coordinate list
+        mycrd = self._coordinates
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3233,12 +3236,13 @@ class Structure(object):
                            ['atom1', 'atom2'])
         copy_valence_terms(other.groups, [], self.groups, [],
                            ['atom', 'type', 'move'])
-        if self._coordinates is None or other._coordinates is None:
-            self._coordinates = None
-        elif self._coordinates.shape[0] != other._coordinates.shape[0]:
+        if mycrd is None or other._coordinates is None:
             self._coordinates = None
         else:
-            np.concatenate((self._coordinates, other.coordinates))
+            ocrd = other.coordinates.reshape((-1, len(other.atoms), 3))
+            nframes = min(ocrd.shape[0], mycrd.shape[0])
+            self._coordinates = np.concatenate(
+                    (mycrd[:nframes,:,:], ocrd[:nframes,:,:]), axis=1)
         return self
 
     def __mul__(self, ncopies):
