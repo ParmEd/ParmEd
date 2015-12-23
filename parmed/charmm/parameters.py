@@ -60,49 +60,9 @@ class CharmmParameterSet(ParameterSet):
                     "top" is in the file name, it is a topology file.
                     Otherwise, ValueError is raised.
 
-    Attributes
-    ----------
-    atom_types : dict(str:AtomType)
-        Dictionary mapping the names of the atom types to the corresponding
-        AtomType instances
-    atom_types_str : dict(str:AtomType)
-        alias for atom_types
-    atom_types_int : dict(int:AtomType)
-        Dictionary mapping the serial indexes of the atom types to the
-        corresponding AtomType instances
-    atom_types_tuple : dict((str,int):AtomType)
-        Dictionary mapping the (name,number) tuple of the atom types to the
-        corresponding AtomType instances
-    bond_types : dict((str,str):AtomType)
-        Dictionary mapping the 2-element tuple of the names of the two atom
-        types involved in the bond to the BondType instances
-    angle_types : dict((str,str,str):AngleType)
-        Dictionary mapping the 3-element tuple of the names of the three atom
-        types involved in the angle to the AngleType instances
-    urey_bradley_types : dict((str,str,str):BondType)
-        Dictionary mapping the 3-element tuple of the names of the three atom
-        types involved in the angle to the BondType instances of the
-        Urey-Bradley terms
-    dihedral_types : dict((str,str,str,str):list(DihedralType))
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the dihedral to the DihedralType instances. Since each
-        torsion term can be a multiterm expansion, each item corresponding to a
-        key in this dict is a list of `DihedralType`s for each term in the
-        expansion
-    improper_types : dict((str,str,str,str):ImproperType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the improper torsion to the ImproperType instances
-    improper_periodic_types : dict((str,str,str,str):DihedralType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the improper torsion (modeled as a Fourier series) to
-        the DihedralType instances
-    cmap_types : dict((str,str,str,str,str):CmapType)
-        Dictionary mapping the 5-element tuple of the names of the five atom
-        types involved in the correction map to the CmapType instances
-    nbfix_types : dict((str,str):(float,float))
-        Dictionary mapping the 2-element tuple of the names of the two atom
-        types whose LJ terms are modified to the tuple of the (epsilon,rmin)
-        terms for that off-diagonal term
+    See Also
+    --------
+    :class:`parmed.parameters.ParameterSet`
     """
 
     def __copy__(self):
@@ -123,9 +83,8 @@ class CharmmParameterSet(ParameterSet):
 
     def __init__(self, *args):
         # Instantiate the list types
-        super(CharmmParameterSet, self).__init__(self)
+        super(CharmmParameterSet, self).__init__()
         self.parametersets = []
-        self.residues = dict()
         self.patches = dict()
         self._declared_nbrules = False
 
@@ -224,11 +183,8 @@ class CharmmParameterSet(ParameterSet):
         for key, typ in iteritems(params.improper_types):
             copy_paramtype(key, typ, new_params.improper_types)
         for key, typ in iteritems(params.cmap_types):
-            if len(key) == 8:
-                key = (key[0], key[1], key[2], key[3], key[7])
-                copy_paramtype(key, typ, new_params.cmap_types)
-            elif len(key) == 5:
-                copy_paramtype(key, typ, new_params.cmap_types)
+            assert len(key) == 8, '%d-key cmap type detected!' % len(key)
+            copy_paramtype(key, typ, new_params.cmap_types)
         for key, typ in iteritems(params.nbfix_types):
             copy_paramtype(key, typ, new_params.nbfix_types)
 
