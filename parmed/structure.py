@@ -93,6 +93,28 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     if old_atom.residue.chain != chain.strip(): return False
     return True
 
+def _strip_box_units(args):
+    new_args = []
+    for arg in args:
+        # Handle 3 types of arguments here: units, regular numbers, and
+        # iterables. Iterables have units removed recursively. But protect
+        # against strings, since you get infinite recursion that way
+        if u.is_quantity(arg):
+            if arg.unit.is_compatible(u.degree):
+                new_args.append(arg.value_in_unit(u.degree))
+            else:
+                new_args.append(arg.value_in_unit(u.angstroms))
+        elif isinstance(arg, string_types):
+            raise TypeError('Unit cell cannot have strings')
+        else:
+            try:
+                iter(arg)
+                arg = _strip_box_units(arg)
+            except TypeError:
+                pass
+            new_args.append(arg)
+    return new_args
+
 def _bondi(atom):
     if atom.atomic_number == 6: return 1.7
     if atom.atomic_number == 1: return 1.2
@@ -624,7 +646,7 @@ class Structure(object):
                     AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
             )
         for g in self.groups:
-            c.groups.append(Group(g.bs, g.type, g.move))
+            c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
         c._box = copy(self.box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
@@ -995,7 +1017,7 @@ class Structure(object):
         copy_valence_terms(struct.acceptors, [], self.acceptors, [],
                            ['atom1', 'atom2'])
         copy_valence_terms(struct.groups, [], self.groups, [],
-                           ['bs', 'type', 'move'])
+                           ['atom', 'type', 'move'])
         return struct
 
     def _get_selection_array(self, selection):
@@ -1311,7 +1333,8 @@ class Structure(object):
             elif format == 'PQR':
                 formats.PQRFile.write(self, fname, **kwargs)
             elif format == 'PSF':
-                self.write_psf(fname, **kwargs)
+                s = charmm.CharmmPsfFile.from_structure(self)
+                s.write_psf(fname, **kwargs)
             elif format == 'GRO':
                 gromacs.GromacsGroFile.write(self, fname, **kwargs)
             elif format == 'MOL2':
@@ -1559,7 +1582,9 @@ class Structure(object):
 
     @property
     def box(self):
-        return self._box
+        if self._box is None:
+            return None
+        return self._box[0]
 
     @box.setter
     def box(self, value):
@@ -1569,25 +1594,44 @@ class Structure(object):
             if isinstance(value, np.ndarray):
                 box = value
             else:
-                box = list(value)
-                if len(box) != 6:
-                    raise ValueError('Box information must be 6 floats')
-                if u.is_quantity(box[0]):
-                    box[0] = box[0].value_in_unit(u.angstroms)
-                if u.is_quantity(box[1]):
-                    box[1] = box[1].value_in_unit(u.angstroms)
-                if u.is_quantity(box[2]):
-                    box[2] = box[2].value_in_unit(u.angstroms)
-                if u.is_quantity(box[3]):
-                    box[3] = box[3].value_in_unit(u.degrees)
-                if u.is_quantity(box[4]):
-                    box[4] = box[4].value_in_unit(u.degrees)
-                if u.is_quantity(box[5]):
-                    box[5] = box[5].value_in_unit(u.degrees)
+                box = _strip_box_units(list(value))
             box = np.array(box, dtype=np.float64, copy=False, subok=True)
             if box.shape != (6,):
-                raise ValueError('Box information must be 6 floats')
-            self._box = box
+                if len(box.shape) != 2 or box.shape[-1] != 6:
+                    raise ValueError('Box information must be 6 floats')
+            self._box = box.reshape((-1, 6))
+
+    def get_box(self, frame='all'):
+        """
+        In some cases, multiple conformations may be stored in the Structure.
+        This function retrieves a particular frame's unit cell (box) dimensions
+
+        Parameters
+        ----------
+        frame : int or 'all', optional
+            The frame number whose coordinates should be retrieved. Default is
+            'all'
+
+        Returns
+        -------
+        box : np.ndarray, shape([#,] natom, 3) or None
+            If frame is 'all', all coordinates are returned with shape
+            (#, natom, 3). Otherwise the requested frame is returned with shape
+            (natom, 3). If no coordinates exist and 'all' is requested, None is
+            returned
+
+        Raises
+        ------
+        IndexError if there are fewer than ``frame`` unit cell dimensions
+        """
+        if self._box is None:
+            if frame != 'all':
+                raise IndexError('No unit cell frames present')
+            return None
+        elif frame == 'all':
+            return self._box
+        else:
+            return self._box[frame]
 
     #===================================================
 
@@ -3140,6 +3184,9 @@ class Structure(object):
     def __iadd__(self, other):
         if not isinstance(other, Structure):
             return NotImplemented
+        # Cache my coordinates, since changing the structure will destroy the
+        # coordinate list
+        mycrd = self.get_coordinates('all')
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3231,13 +3278,14 @@ class Structure(object):
         copy_valence_terms(other.acceptors, [], self.acceptors, [],
                            ['atom1', 'atom2'])
         copy_valence_terms(other.groups, [], self.groups, [],
-                           ['bs', 'type', 'move'])
-        if self._coordinates is None or other._coordinates is None:
-            self._coordinates = None
-        elif self._coordinates.shape[0] != other._coordinates.shape[0]:
+                           ['atom', 'type', 'move'])
+        if mycrd is None or other._coordinates is None:
             self._coordinates = None
         else:
-            np.concatenate((self._coordinates, other.coordinates))
+            ocrd = other.get_coordinates('all')
+            nframes = min(ocrd.shape[0], mycrd.shape[0])
+            self._coordinates = np.concatenate(
+                    (mycrd[:nframes,:,:], ocrd[:nframes,:,:]), axis=1)
         return self
 
     def __mul__(self, ncopies):
@@ -3328,7 +3376,7 @@ class Structure(object):
             copy_valence_terms(other.acceptors, aoffset, self.acceptors, [],
                                ['atom1', 'atom2'])
             copy_valence_terms(other.groups, aoffset, self.groups, [],
-                               ['bs', 'type', 'move'])
+                               ['atom', 'type', 'move'])
         if self._coordinates is not None:
             coords = np.tile(self._coordinates.ravel(), ncopies).reshape(
                     (-1, len(self.atoms), 3))

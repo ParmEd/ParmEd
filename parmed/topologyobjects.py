@@ -4825,8 +4825,8 @@ class Group(object):
 
     Parameters
     ----------
-    bs : ``int``
-        Smallest atom number within a group (0-based)
+    atom : :class:`Atom`
+        The first atom within a group
     type : ``int``
         Flag for group information; 0 when all atoms have zero charge,
         1 when group has a net zero charge but at least one atom has a non-zero
@@ -4839,16 +4839,16 @@ class Group(object):
     See the discussion on Github for the source of the meanings of these
     variables: https://github.com/ParmEd/ParmEd/pull/307#issuecomment-128244134
     """
-    def __init__(self, bs, type, move):
-        self.bs = bs
+    def __init__(self, atom, type, move):
+        self.atom = atom
         self.type = type
         self.move = move
 
     def __copy__(self):
-        return type(self)(self.bs, self.type, self.move)
+        return type(self)(self.atom, self.type, self.move)
 
     def __eq__(self, other):
-        return (self.bs == other.bs and self.type == other.type and
+        return (self.atom is other.atom and self.type == other.type and
                 self.move == other.move)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
