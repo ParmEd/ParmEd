@@ -122,6 +122,7 @@ class PSFFile(object):
         dest.write(intfmt % len(struct.atoms) + ' !NATOM\n')
         # atmfmt1 is for CHARMM format (i.e., atom types are integers)
         # atmfmt is for XPLOR format (i.e., atom types are strings)
+        add = 0 if struct.residues[0].number > 0 else 1-struct.residues[0].number
         for i, atom in enumerate(struct.atoms):
             typ = atom.type
             if isinstance(atom.type, str):
@@ -130,7 +131,7 @@ class PSFFile(object):
             else:
                 fmt = atmfmt1
             segid = atom.residue.segid or 'SYS'
-            atmstr = fmt % (i+1, segid, atom.residue.number,
+            atmstr = fmt % (i+1, segid, atom.residue.number+add,
                             atom.residue.name, atom.name, typ,
                             atom.charge, atom.mass)
             if hasattr(atom, 'props'):
@@ -247,7 +248,7 @@ class PSFFile(object):
         dest.write(' !NGRP NST2\n')
         if struct.groups:
             for i, gp in enumerate(struct.groups):
-                dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
+                dest.write((intfmt*3) % (gp.atom.idx, gp.type, gp.move))
                 if i % 3 == 2: dest.write('\n')
             if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
                 dest.write('\n')

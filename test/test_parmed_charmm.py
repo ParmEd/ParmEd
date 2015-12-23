@@ -778,8 +778,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
         def typenames(key):
             if isinstance(key, string_types):
                 if key != key.upper():
-                    return '%sLTU' % key.upper()
-                return key
+                    return ('%sLTU' % key.upper()).replace('*', 'STR')
+                return key.replace('*', 'STR')
             return tuple(typenames(k) for k in key)
         # Bonds
         b1, b2 = get_typeset(set1.bond_types, set2.bond_types)
