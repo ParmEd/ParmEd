@@ -351,6 +351,7 @@ class CharmmParameterSet(ParameterSet):
         current_cmap_res = 0
         nonbonded_types = dict() # Holder
         parameterset = None
+        declared_geometric = False
         for i, line in enumerate(f):
             line = line.strip()
             try:
@@ -383,7 +384,7 @@ class CharmmParameterSet(ParameterSet):
                 section = 'CMAP'
                 continue
             if line.startswith('NONBONDED'):
-                read_first_nonbonded = False
+                read_first_nonbonded = declared_geometric = False
                 section = 'NONBONDED'
                 # Get nonbonded keywords
                 words = line.split()[1:]
@@ -400,7 +401,9 @@ class CharmmParameterSet(ParameterSet):
                         if self._declared_nbrules:
                             # We already specified it -- make sure it's the same
                             # as the one we specified before
-                            if abs(self.dihedral_types[0][0].scee-scee) > TINY:
+                            _, dt0 = next(iteritems(self.dihedral_types))
+                            diff = abs(dt0[0].scee - scee)
+                            if diff > TINY:
                                 raise CharmmError('Inconsistent 1-4 scalings')
                         else:
                             scee = 1 / scee
@@ -415,6 +418,7 @@ class CharmmParameterSet(ParameterSet):
                                     'different combining rules'
                             )
                         self.combining_rule = 'geometric'
+                        declared_geometric = True
                 continue
             if line.startswith('NBFIX'):
                 section = 'NBFIX'
@@ -447,8 +451,8 @@ class CharmmParameterSet(ParameterSet):
                 # The parameter file might or might not have an element name
                 try:
                     elem = words[4].upper()
-                    if len(elem) == 2:
-                        elem = elem[0] + elem[1].lower()
+                    if len(elem) in (1, 2):
+                        elem = elem.lower(); elem[0] = elem[0].upper()
                     atomic_number = AtomicNum[elem]
                 except (IndexError, KeyError):
                     # Figure it out from the mass
@@ -526,16 +530,6 @@ class CharmmParameterSet(ParameterSet):
                             if dtype != dihedral:
                                 warnings.warn('Replacing dihedral %r with %r' % 
                                               (dtype, dihedral))
-                            self.dihedral_types[key][i] = dihedral
-                            replaced = True
-                            break
-                    if not replaced:
-                        self.dihedral_types[key].append(dihedral)
-                    # Now do the other order
-                    replaced = False
-                    key = (type4, type3, type2, type1)
-                    for i, dtype in enumerate(self.dihedral_types[key]):
-                        if dtype.per == dihedral.per:
                             self.dihedral_types[key][i] = dihedral
                             replaced = True
                             break
@@ -661,9 +655,19 @@ class CharmmParameterSet(ParameterSet):
                                         'different combining rules'
                                 )
                             self.combining_rule = 'geometric'
+                            declared_geometric = True
                     continue
                 else:
-                    # OK, we've read our first nonbonded section for sure now
+                    # OK, we've read our first nonbonded section for sure now.
+                    # Make sure we did not try to read in a str file that did
+                    # not define GEOM if a previous file did, since
+                    # Lorentz-Berthelot and geometric combining rules are
+                    # incompatible
+                    if (self._declared_nbrules and
+                            self.combining_rule == 'geometric' and
+                            not declared_geometric):
+                        raise CharmmError('Cannot combine parameter files with '
+                                          'different combining rules')
                     read_first_nonbonded = True
                     self._declared_nbrules = True
                 # See if we have 1-4 parameters
