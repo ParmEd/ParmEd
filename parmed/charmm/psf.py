@@ -13,8 +13,7 @@ from copy import copy as _copy
 from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
                     Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
                     DihedralType, ImproperType)
-from parmed.exceptions import (CharmmError, MoleculeError, CharmmWarning,
-        ParameterError)
+from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError)
 from parmed.structure import needs_openmm
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
