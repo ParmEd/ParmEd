@@ -696,6 +696,6 @@ def _set_owner(atoms, owner_array, atm, mol_id):
         if not partner.marked:
             owner_array.append(partner.idx)
             _set_owner(atoms, owner_array, partner.idx, mol_id)
-        assert partner.marked != mol_id, 'Atom in multiple molecules!'
+        assert partner.marked == mol_id, 'Atom in multiple molecules!'
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
