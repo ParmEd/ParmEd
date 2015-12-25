@@ -457,7 +457,7 @@ def create_random_structure(parametrized, novalence=False):
     for i in range(random.randint(5, 10)):
         struct.acceptors.append(AcceptorDonor(*random.sample(struct.atoms, 2)))
         struct.donors.append(AcceptorDonor(*random.sample(struct.atoms, 2)))
-        struct.groups.append(Group(*random.sample(range(1, 11), 3)))
+        struct.groups.append(Group(random.choice(struct.atoms), 2, 0))
         struct.chiral_frames.append(ChiralFrame(*random.sample(struct.atoms, 2),
                                                 chirality=random.choice([-1, 1])))
         struct.multipole_frames.append(MultipoleFrame(random.choice(struct.atoms),

@@ -455,6 +455,37 @@ class TestCharmmParameters(utils.FileIOTestCase):
         for i, tortype in iteritems(params.dihedral_types):
             for typ in tortype:
                 self.assertAlmostEqual(typ.scee, 1.2)
+        # Now test that adding to the parameter set with a DIFFERENT 1-4 scaling
+        # factor is caught
+        self.assertRaises(exceptions.CharmmError, lambda:
+                params.read_parameter_file(get_fn('par_all36_prot.prm'))
+        )
+        self.assertRaises(exceptions.CharmmError, lambda:
+                parameters.CharmmParameterSet(get_fn('parm14sb_all.prm'),
+                                              get_fn('dummy_charmm.str'))
+        )
+
+    def testGeometric(self):
+        """ Test reading CHARMM parameter file with geometric comb. rule """
+        opls = parameters.CharmmParameterSet(get_fn('top_opls_aa.inp'),
+                                             get_fn('par_opls_aa.inp'))
+        self.assertEqual(opls.combining_rule, 'geometric')
+        # Now test error handling corresponding to illegal mixing of
+        # incompatible parameter files.
+        non_opls = parameters.CharmmParameterSet(get_fn('par_all36_prot.prm'))
+        self.assertEqual(non_opls.combining_rule, 'lorentz')
+        non_opls.read_topology_file(get_fn('top_opls_aa.inp'))
+        self.assertRaises(exceptions.CharmmError, lambda:
+                non_opls.read_parameter_file(get_fn('par_geometric_combining.inp'))
+        )
+        self.assertRaises(exceptions.CharmmError, lambda:
+                non_opls.read_parameter_file(get_fn('par_opls_aa.inp'))
+        )
+        for _, dt in iteritems(opls.dihedral_types):
+            for t in dt: t.scee = t.scnb = 1.0
+        self.assertRaises(exceptions.CharmmError, lambda:
+                opls.read_parameter_file(get_fn('par_all36_prot.prm'))
+        )
 
     def testSingleParameterset(self):
         """ Test reading a single parameter set """
@@ -780,8 +811,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
         def typenames(key):
             if isinstance(key, string_types):
                 if key != key.upper():
-                    return '%sLTU' % key.upper()
-                return key
+                    return ('%sLTU' % key.upper()).replace('*', 'STR')
+                return key.replace('*', 'STR')
             return tuple(typenames(k) for k in key)
         # Bonds
         b1, b2 = get_typeset(set1.bond_types, set2.bond_types)
