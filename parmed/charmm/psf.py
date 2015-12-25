@@ -209,8 +209,8 @@ class CharmmPsfFile(Structure):
                 segid = words[1]
                 rematch = _resre.match(words[2])
                 if not rematch:
-                    raise RuntimeError('Could not interpret residue number %s' %
-                                       words[2])
+                    raise CharmmError('Could not interpret residue number %s' %
+                                      words[2])
                 resid, inscode = rematch.groups()
                 resid = conv(resid, int, 'residue number')
                 resname = words[3]
@@ -232,7 +232,7 @@ class CharmmPsfFile(Structure):
             nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
             if len(psfsections['NBOND'][1]) != nbond * 2:
                 raise CharmmError('Got %d indexes for %d bonds' %
-                                     (len(psfsections['NBOND'][1]), nbond))
+                                  (len(psfsections['NBOND'][1]), nbond))
             it = iter(psfsections['NBOND'][1])
             for i, j in zip(it, it):
                 self.bonds.append(Bond(self.atoms[i-1], self.atoms[j-1]))
@@ -240,7 +240,7 @@ class CharmmPsfFile(Structure):
             ntheta = conv(psfsections['NTHETA'][0], int, 'number of angles')
             if len(psfsections['NTHETA'][1]) != ntheta * 3:
                 raise CharmmError('Got %d indexes for %d angles' %
-                                     (len(psfsections['NTHETA'][1]), ntheta))
+                                  (len(psfsections['NTHETA'][1]), ntheta))
             it = iter(psfsections['NTHETA'][1])
             for i, j, k in zip(it, it, it):
                 self.angles.append(
@@ -251,7 +251,7 @@ class CharmmPsfFile(Structure):
             nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
             if len(psfsections['NPHI'][1]) != nphi * 4:
                 raise CharmmError('Got %d indexes for %d torsions' %
-                                     (len(psfsections['NPHI']), nphi))
+                                  (len(psfsections['NPHI']), nphi))
             it = iter(psfsections['NPHI'][1])
             for i, j, k, l in zip(it, it, it, it):
                 self.dihedrals.append(
@@ -263,7 +263,7 @@ class CharmmPsfFile(Structure):
             nimphi = conv(psfsections['NIMPHI'][0], int, 'number of impropers')
             if len(psfsections['NIMPHI'][1]) != nimphi * 4:
                 raise CharmmError('Got %d indexes for %d impropers' %
-                                     (len(psfsections['NIMPHI'][1]), nimphi))
+                                  (len(psfsections['NIMPHI'][1]), nimphi))
             it = iter(psfsections['NIMPHI'][1])
             for i, j, k, l in zip(it, it, it, it):
                 self.impropers.append(
@@ -274,7 +274,7 @@ class CharmmPsfFile(Structure):
             ndon = conv(psfsections['NDON'][0], int, 'number of donors')
             if len(psfsections['NDON'][1]) != ndon * 2:
                 raise CharmmError('Got %d indexes for %d donors' %
-                                     (len(psfsections['NDON'][1]), ndon))
+                                  (len(psfsections['NDON'][1]), ndon))
             it = iter(psfsections['NDON'][1])
             for i, j in zip(it, it):
                 self.donors.append(
@@ -284,7 +284,7 @@ class CharmmPsfFile(Structure):
             nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
             if len(psfsections['NACC'][1]) != nacc * 2:
                 raise CharmmError('Got %d indexes for %d acceptors' %
-                                     (len(psfsections['NACC'][1]), nacc))
+                                  (len(psfsections['NACC'][1]), nacc))
             it = iter(psfsections['NACC'][1])
             for i, j in zip(it, it):
                 self.acceptors.append(
@@ -551,7 +551,7 @@ class CharmmPsfFile(Structure):
                 key = ('X', a2.type, a3.type, 'X')
                 if not key in parmset.dihedral_types:
                     raise ParameterError('No dihedral parameters found for '
-                                           '%r' % dih)
+                                         '%r' % dih)
             dih.type = parmset.dihedral_types[key]
             dih.type.used = False
             pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions
@@ -611,7 +611,7 @@ class CharmmPsfFile(Structure):
                 self.dihedral_types.append(improper.type)
                 improper.type.list = self.dihedral_types
             else:
-                raise RuntimeError('Should not be here') # Avoid masking errors
+                assert False, 'Should not be here'
         # Look through the list of impropers -- if there are any periodic
         # impropers, move them over to the dihedrals list
         for i in reversed(range(len(self.impropers))):
@@ -696,8 +696,6 @@ def _set_owner(atoms, owner_array, atm, mol_id):
         if not partner.marked:
             owner_array.append(partner.idx)
             _set_owner(atoms, owner_array, partner.idx, mol_id)
-        elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
-                                partner.idx)
+        assert partner.marked != mol_id, 'Atom in multiple molecules!'
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
