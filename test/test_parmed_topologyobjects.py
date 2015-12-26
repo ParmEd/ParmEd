@@ -5,15 +5,17 @@ By Jason Swails
 """
 from __future__ import division
 
-from utils import get_fn
+import math
 from parmed.exceptions import MoleculeError, ParameterError
-import parmed.topologyobjects as topologyobjects
-from parmed.topologyobjects import _ListItem, _FourAtomTerm
-from parmed.topologyobjects import *
 from parmed.amber.readparm import AmberFormat
+import parmed.topologyobjects as topologyobjects
+from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
+from parmed.topologyobjects import *
+import parmed.unit as u
 from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
+from utils import get_fn
 import random
 
 class TestTopologyObjects(unittest.TestCase):
@@ -30,6 +32,7 @@ class TestTopologyObjects(unittest.TestCase):
         objects = [_ListItem() for i in range(100)]
         # Assign it a list container
         for obj in objects:
+            self.assertEqual(obj.idx, -1)
             obj.list = my_container
             my_container.append(obj)
         for i, obj in enumerate(my_container):
@@ -48,6 +51,16 @@ class TestTopologyObjects(unittest.TestCase):
         # updated
         for i, obj in enumerate(my_container):
             self.assertEqual(obj.idx, i)
+        # Test some corner cases
+        class NewList(list): pass
+        objects = NewList([_ListItem() for i in range(100)])
+        objects.needs_indexing = True
+        for i, obj in enumerate(objects):
+            obj.list = objects
+            self.assertEqual(i, obj.idx)
+        objects[-1].list = NewList()
+        objects[-1].list.needs_indexing = True
+        self.assertEqual(objects[-1].idx, -1)
 
     #=============================================
 
@@ -215,6 +228,158 @@ class TestTopologyObjects(unittest.TestCase):
         for i, atom in enumerate(atoms):
             atom.list = atoms
             self.assertEqual(atom.idx, i)
+
+        # Test deprecated API
+        self.assertWarns(DeprecationWarning, lambda: a1.starting_index)
+        self.assertWarns(DeprecationWarning, lambda: a1.atname)
+        self.assertWarns(DeprecationWarning, lambda: a1.attype)
+        self.assertWarns(DeprecationWarning, lambda: setattr(a1, 'atname', 'NA'))
+        self.assertWarns(DeprecationWarning, lambda: setattr(a1, 'attype', 'N1'))
+
+    #=============================================
+
+    def test_extra_point(self):
+        """ Test ExtraPoint API and exclusion handling """
+        # Analyze the exception parameters for bonding pattern
+        #
+        # E1 -- A1 -- A2 -- A3 -- A4 -- A5 -- E5
+        #             |     |     |
+        #             E2    E3    E4
+
+        Bond = topologyobjects.Bond
+        Angle = topologyobjects.Angle
+        Dihedral = topologyobjects.Dihedral
+        ep1 = topologyobjects.ExtraPoint(name='E1', type='EP', atomic_number=0)
+        ep2 = topologyobjects.ExtraPoint(name='E2', type='EP', atomic_number=0)
+        ep3 = topologyobjects.ExtraPoint(name='E3', type='EP', atomic_number=0)
+        ep4 = topologyobjects.ExtraPoint(name='E4', type='EP', atomic_number=0)
+        ep5 = topologyobjects.ExtraPoint(name='E5', type='EP', atomic_number=0)
+        a1 = topologyobjects.Atom(name='A1', type='AX', atomic_number=6)
+        a2 = topologyobjects.Atom(name='A2', type='AY', atomic_number=6)
+        a3 = topologyobjects.Atom(name='A3', type='AZ', atomic_number=7)
+        a4 = topologyobjects.Atom(name='A4', type='AX', atomic_number=6)
+        a5 = topologyobjects.Atom(name='A5', type='AY', atomic_number=6)
+        bonds = [Bond(a1, ep1), Bond(a1, a2), Bond(a2, ep2), Bond(a2, a3),
+                 Bond(a3, ep3), Bond(a3, a4), Bond(a4, ep4), Bond(a4, a5),
+                 Bond(a5, ep5)]
+        angles = [Angle(a1, a2, a3), Angle(a2, a3, a4), Angle(a3, a4, a5)]
+        dihedrals = [Dihedral(a1, a2, a3, a4), Dihedral(a2, a3, a4, a5)]
+        # Make sure exclusions are properly handled with EPs
+        # EP1
+        self.assertIn(a1, ep1.bond_partners)
+        self.assertIn(a2, ep1.bond_partners)
+        self.assertIn(ep2, ep1.bond_partners)
+        self.assertIn(a3, ep1.angle_partners)
+        self.assertIn(ep3, ep1.angle_partners)
+        self.assertIn(a4, ep1.dihedral_partners)
+        self.assertIn(ep4, ep1.dihedral_partners)
+        # A1
+        self.assertIn(ep1, a1.bond_partners)
+        self.assertIn(a2, a1.bond_partners)
+        self.assertIn(ep2, a1.bond_partners)
+        self.assertIn(a3, a1.angle_partners)
+        self.assertIn(ep3, a1.angle_partners)
+        self.assertIn(a4, a1.dihedral_partners)
+        self.assertIn(ep4, a1.dihedral_partners)
+        self.assertNotIn(ep3, a1.bond_partners)
+        self.assertNotIn(a5, a1.bond_partners+a1.angle_partners+a1.dihedral_partners)
+        self.assertNotIn(a5, a1.exclusion_partners)
+        # EP2
+        self.assertIn(ep1, ep2.bond_partners)
+        self.assertIn(a1, ep2.bond_partners)
+        self.assertIn(a2, ep2.bond_partners)
+        self.assertIn(a3, ep2.bond_partners)
+        self.assertIn(ep3, ep2.bond_partners)
+        self.assertIn(a4, ep2.angle_partners)
+        self.assertIn(ep4, ep2.angle_partners)
+        self.assertIn(a5, ep2.dihedral_partners)
+        self.assertIn(ep5, ep2.dihedral_partners)
+        # A2
+        self.assertIn(ep1, a2.bond_partners)
+        self.assertIn(ep2, a2.bond_partners)
+        self.assertIn(ep3, a2.bond_partners)
+        self.assertIn(a1, a2.bond_partners)
+        self.assertIn(a3, a2.bond_partners)
+        self.assertIn(a4, a2.angle_partners)
+        self.assertIn(ep4, a2.angle_partners)
+        self.assertIn(ep5, a2.dihedral_partners)
+        self.assertIn(a5, a2.dihedral_partners)
+        # EP3
+        self.assertIn(ep2, ep3.bond_partners)
+        self.assertIn(ep4, ep3.bond_partners)
+        self.assertIn(a2, ep3.bond_partners)
+        self.assertIn(a4, ep3.bond_partners)
+        self.assertIn(a3, ep3.bond_partners)
+        self.assertIn(ep1, ep3.angle_partners)
+        self.assertIn(a1, ep3.angle_partners)
+        self.assertIn(a5, ep3.angle_partners)
+        self.assertIn(ep5, ep3.angle_partners)
+        # A3
+        self.assertIn(ep2, a3.bond_partners)
+        self.assertIn(ep4, a3.bond_partners)
+        self.assertIn(a2, a3.bond_partners)
+        self.assertIn(a4, a3.bond_partners)
+        self.assertIn(ep3, a3.bond_partners)
+        self.assertIn(ep1, a3.angle_partners)
+        self.assertIn(a1, a3.angle_partners)
+        self.assertIn(a5, a3.angle_partners)
+        self.assertIn(ep5, a3.angle_partners)
+        # EP4
+        self.assertIn(ep3, ep4.bond_partners)
+        self.assertIn(a3, ep4.bond_partners)
+        self.assertIn(a4, ep4.bond_partners)
+        self.assertIn(a5, ep4.bond_partners)
+        self.assertIn(ep5, ep4.bond_partners)
+        self.assertIn(ep2, ep4.angle_partners)
+        self.assertIn(a2, ep4.angle_partners)
+        self.assertIn(ep1, ep4.dihedral_partners)
+        self.assertIn(a1, ep4.dihedral_partners)
+        # A4
+        self.assertIn(ep3, a4.bond_partners)
+        self.assertIn(a3, a4.bond_partners)
+        self.assertIn(ep4, a4.bond_partners)
+        self.assertIn(a5, a4.bond_partners)
+        self.assertIn(ep5, a4.bond_partners)
+        self.assertIn(ep2, a4.angle_partners)
+        self.assertIn(a2, a4.angle_partners)
+        self.assertIn(ep1, a4.dihedral_partners)
+        self.assertIn(a1, a4.dihedral_partners)
+        # EP5
+        self.assertIn(ep4, ep5.bond_partners)
+        self.assertIn(a4, ep5.bond_partners)
+        self.assertIn(a5, ep5.bond_partners)
+        self.assertIn(a3, ep5.angle_partners)
+        self.assertIn(ep3, ep5.angle_partners)
+        self.assertIn(a2, ep5.dihedral_partners)
+        self.assertIn(ep2, ep5.dihedral_partners)
+        # A5
+        self.assertIn(ep4, a5.bond_partners)
+        self.assertIn(a4, a5.bond_partners)
+        self.assertIn(ep5, a5.bond_partners)
+        self.assertIn(a3, a5.angle_partners)
+        self.assertIn(ep3, a5.angle_partners)
+        self.assertIn(a2, a5.dihedral_partners)
+        self.assertIn(ep2, a5.dihedral_partners)
+        # Test exclusions now
+        a1.exclude(a5)
+        self.assertIn(a1, a5.exclusion_partners)
+        self.assertIn(a5, a1.exclusion_partners)
+        self.assertIn(ep5, a1.exclusion_partners)
+        self.assertIn(ep1, a5.exclusion_partners)
+        self.assertIn(ep1, ep5.exclusion_partners)
+        self.assertIn(ep5, ep1.exclusion_partners)
+        self.assertIn(a1, ep5.exclusion_partners)
+        self.assertIn(a5, ep1.exclusion_partners)
+        # Now try TorsionTorsion
+        tortor = topologyobjects.TorsionTorsion(a1, a2, a3, a4, a5)
+        self.assertIn(a1, a5.tortor_partners)
+        self.assertIn(a5, a1.tortor_partners)
+        self.assertIn(ep1, a5.tortor_partners)
+        self.assertIn(ep5, a1.tortor_partners)
+        self.assertIn(ep1, ep5.tortor_partners)
+        self.assertIn(a1, ep5.tortor_partners)
+        self.assertIn(a5, ep1.tortor_partners)
+        self.assertIn(ep5, ep1.tortor_partners)
 
     #=============================================
 
@@ -1034,5 +1199,13 @@ class TestTopologyObjects(unittest.TestCase):
         items.remove(items[0])
         self.assertTrue(items.changed)
 
-if __name__ == '__main__':
-    unittest.main()
+    #=============================================
+
+    def test_helper_functions(self):
+        """ Test the helper private functions in topologyobjects.py """
+        self.assertEqual(_strip_units(10), 10)
+        self.assertAlmostEqual(_strip_units(math.pi*u.radians), 180)
+        self.assertAlmostEqual(_strip_units(1*u.kilojoule_per_mole), 1/4.184)
+        self.assertEqual(_strip_units(10*u.kilojoule_per_mole, u.kilocalorie_per_mole),
+                         10/4.184)
+        self.assertAlmostEqual(_strip_units(180*u.degree, u.radians), math.pi)
