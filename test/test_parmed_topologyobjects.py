@@ -229,6 +229,20 @@ class TestTopologyObjects(unittest.TestCase):
             atom.list = atoms
             self.assertEqual(atom.idx, i)
 
+        # Test L-J handling
+        lja1 = Atom(atomic_number=6, name='C1', type='CT', charge=-0.1,
+                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+        self.assertIs(lja1.sigma, None)
+        lja1.atom_type = AtomType('CT', 1, 12.01, 6)
+        lja1.atom_type.set_lj_params(1.0, 2.0, 1.1, 2.1)
+#       lja2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
+#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+#       lja3 = Atom(atomic_number=6, name='C3', type='CT', charge=0.0,
+#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+#       lja4 = Atom(atomic_number=6, name='C4', type='CT', charge=-0.1,
+#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+#       lja5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
+#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
         # Test deprecated API
         self.assertWarns(DeprecationWarning, lambda: a1.starting_index)
         self.assertWarns(DeprecationWarning, lambda: a1.atname)
