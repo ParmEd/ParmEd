@@ -719,14 +719,14 @@ class Atom(_ListItem):
 
         Parameters
         ----------
-        only_greater : ``bool``
-            If True, only atoms whose `idx` value is greater than this `Atom`s
-            `idx` will be counted as an exclusion (to avoid double-counting
-            exclusions). If False, all exclusions will be counted.
-        index_from : ``int``
+        only_greater : ``bool``, optional
+            If True (default), only atoms whose `idx` value is greater than this
+            `Atom`s `idx` will be counted as an exclusion (to avoid double-
+            counting exclusions). If False, all exclusions will be counted.
+        index_from : ``int``, optional
             This is the index of the first atom, and is intended to be 0 (for C-
-            and Python-style numbering) or 1 (for Fortran-style numbering, such
-            as that used in the Amber and CHARMM topology files)
+            and Python-style numbering, default) or 1 (for Fortran-style
+            numbering, such as that used in the Amber and CHARMM topology files)
 
         Returns
         -------
@@ -903,26 +903,6 @@ class Atom(_ListItem):
 
     #===================================================
 
-    def reset_topology(self, keep_exclusions=True):
-        """
-        Empties all of the bond, angle, and dihedral partners so they can be set
-        up again with updated data.
-
-        Parameters
-        ----------
-        keep_exclusions : ``bool``
-            If True, the `exclusion_partners` array is left alone. If False,
-            `exclusion_partners` is emptied as well.
-        """
-        self._bond_partners = []
-        self._angle_partners = []
-        self._dihedral_partners = []
-        self._tortor_partners = []
-        if not keep_exclusions:
-            self._exclusion_partners = []
-
-    #===================================================
-
     def prune_exclusions(self):
         """
         For extra points, the exclusion partners may be filled before the bond,
@@ -955,10 +935,8 @@ class Atom(_ListItem):
 
     def __repr__(self):
         start = '<Atom %s [%d]' % (self.name, self.idx)
-        if self.residue is not None and hasattr(self.residue, 'idx'):
+        if self.residue is not None:
             return start + '; In %s %d>' % (self.residue.name, self.residue.idx)
-        elif self.residue is not None:
-            return start + '; In %s>' % self.residue.name
         return start + '>'
 
     #===================================================
@@ -1055,8 +1033,6 @@ class ExtraPoint(Atom):
             return sorted([self.parent] +
                     [x for x in self.parent.bond_partners if x is not self])
         except AttributeError:
-            if self.parent is not None:
-                return [self.parent]
             return []
 
     @property
@@ -1227,7 +1203,7 @@ class TwoParticleExtraPointFrame(object):
         try:
             mybond, = [bond for bond in self.ep.parent.bonds
                                 if self.ep not in bond]
-        except TypeError:
+        except (ValueError, TypeError):
             raise RuntimeError("Bad bond pattern in EP frame")
 
         if mybond.atom1 is self.ep.parent:
@@ -1254,8 +1230,8 @@ class TwoParticleExtraPointFrame(object):
             r1 = b2.type.req
             r2 = b1.type.req
         else:
-            r1 = b2.type.req
-            r2 = b1.type.req
+            r1 = b1.type.req
+            r2 = b2.type.req
 
         if self.inside:
             # It is closer to atom 1, but both weights are positive and add to 1
@@ -1426,7 +1402,7 @@ class ThreeParticleExtraPointFrame(object):
         if abs(dp1 - dp2) > TINY:
             raise ValueError('Cannot deal with asymmetry in EP frame')
 
-        return w1 * 2 * math.cos(theteq * 0.5) * dp1
+        return abs(w1 * 2 * math.cos(theteq * 0.5) * dp1)
 
     def get_weights(self):
         """
@@ -1714,11 +1690,6 @@ class Bond(object):
         self.type = type
         self.funct = 1
 
-    @property
-    def bond_type(self):
-        warnings.warn("bond_type has been replaced by type", DeprecationWarning)
-        return self.type
-
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom is in this Bond """
         return thing is self.atom1 or thing is self.atom2
@@ -1869,12 +1840,6 @@ class Angle(object):
         atom1.angle_to(atom3)
         atom2.angle_to(atom3)
         self.funct = 1
-
-    @property
-    def angle_type(self):
-        warnings.warn("angle_type has been replaced with type",
-                      DeprecationWarning)
-        return self.type
 
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom or a Bond is in this Angle """
@@ -2052,12 +2017,6 @@ class Dihedral(_FourAtomTerm):
             atom2.dihedral_to(atom4)
             atom3.dihedral_to(atom4)
             self._funct = None
-
-    @property
-    def dihed_type(self):
-        warnings.warn('dihed_type has been replaced by type',
-                      DeprecationWarning)
-        return self.type
 
     @property
     def funct(self):
@@ -2494,10 +2453,10 @@ class UreyBradley(object):
         # Load the force constant and equilibrium distance
         self.type = type
 
-    @property
-    def ub_type(self):
-        warnings.warn("ub_type has been replaced by type", DeprecationWarning)
-        return self.type
+#   @property
+#   def ub_type(self):
+#       warnings.warn("ub_type has been replaced by type", DeprecationWarning)
+#       return self.type
 
     def __contains__(self, thing):
         " Quick and easy way to see if an Atom or Bond is in this Urey-Bradley "
@@ -2599,11 +2558,11 @@ class Improper(_FourAtomTerm):
         self.type = type
         self.funct = 2
 
-    @property
-    def improp_type(self):
-        warnings.warn('improp_type has been replaced by type',
-                      DeprecationWarning)
-        return self.type
+#   @property
+#   def improp_type(self):
+#       warnings.warn('improp_type has been replaced by type',
+#                     DeprecationWarning)
+#       return self.type
 
     def __contains__(self, thing):
         """
@@ -2824,11 +2783,6 @@ class Cmap(object):
                                       'supported by CMAPs currently')
         return cls(atom1, atom2, atom3, atom4, atom8, type=type)
 
-    @property
-    def cmap_type(self):
-        warnings.warn('cmap_type has been replaced by type', DeprecationWarning)
-        return self.type
-
     def __contains__(self, thing):
         """
         Quick and easy way to find out an atom or bond is in this
@@ -2863,7 +2817,7 @@ class Cmap(object):
         # are comparing with a list or tuple
         if len(thing) != 5:
             raise MoleculeError('CMAP can compare to 5 elements, not %d' %
-                                (type(thing).__name__, len(thing)))
+                                len(thing))
         return ((self.atom1.idx == thing[0] and self.atom2.idx == thing[1] and
                  self.atom3.idx == thing[2] and self.atom4.idx == thing[3] and
                  self.atom5.idx == thing[4]) or
