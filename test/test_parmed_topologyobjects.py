@@ -274,12 +274,6 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a1.atomic_number, 7)
         self.assertEqual(a1.element, 7)
 
-        self.assertWarns(DeprecationWarning, lambda: a1.starting_index)
-        self.assertWarns(DeprecationWarning, lambda: a1.atname)
-        self.assertWarns(DeprecationWarning, lambda: a1.attype)
-        self.assertWarns(DeprecationWarning, lambda: setattr(a1, 'atname', 'NA'))
-        self.assertWarns(DeprecationWarning, lambda: setattr(a1, 'attype', 'N1'))
-
     #=============================================
 
     def test_extra_point(self):

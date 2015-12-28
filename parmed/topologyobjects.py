@@ -520,33 +520,6 @@ class Atom(_ListItem):
 
     #===================================================
 
-    # To alert people to changes in the API
-    @property
-    def starting_index(self):
-        warnings.warn('starting_index has been replaced by idx',
-                      DeprecationWarning)
-        return self.idx
-
-    @property
-    def atname(self):
-        warnings.warn('atname has been replaced by name', DeprecationWarning)
-        return self.name
-    @atname.setter
-    def atname(self, thing):
-        warnings.warn('atname has been replaced by name', DeprecationWarning)
-        self.name = thing
-
-    @property
-    def attype(self):
-        warnings.warn('attype has been replaced by type', DeprecationWarning)
-        return self.type
-    @attype.setter
-    def attype(self, thing):
-        warnings.warn('attype has been replaced by type', DeprecationWarning)
-        self.type = thing
-
-    #===================================================
-
     @property
     def bond_partners(self):
         """ Go through all bonded partners """
@@ -2453,11 +2426,6 @@ class UreyBradley(object):
         # Load the force constant and equilibrium distance
         self.type = type
 
-#   @property
-#   def ub_type(self):
-#       warnings.warn("ub_type has been replaced by type", DeprecationWarning)
-#       return self.type
-
     def __contains__(self, thing):
         " Quick and easy way to see if an Atom or Bond is in this Urey-Bradley "
         if isinstance(thing, Atom):
@@ -2557,12 +2525,6 @@ class Improper(_FourAtomTerm):
         # Load the force constant and equilibrium angle
         self.type = type
         self.funct = 2
-
-#   @property
-#   def improp_type(self):
-#       warnings.warn('improp_type has been replaced by type',
-#                     DeprecationWarning)
-#       return self.type
 
     def __contains__(self, thing):
         """
@@ -3099,12 +3061,6 @@ class TrigonalAngle(_FourAtomTerm):
         _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         self.type = type
 
-    @property
-    def trigang_type(self):
-        warnings.warn('trigang_type has been replaced with type',
-                      DeprecationWarning)
-        return type
-
     def __contains__(self, thing):
         if isinstance(thing, Atom):
             return _FourAtomTerm.__contains(self, thing)
@@ -3143,12 +3099,6 @@ class OutOfPlaneBend(_FourAtomTerm):
     def __init__(self, atom1, atom2, atom3, atom4, type=None):
         _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         self.type = type
-
-    @property
-    def oopbend_type(self):
-        warnings.warn('oopbend_type has been replaced with type',
-                      DeprecationWarning)
-        return self.type
 
     def __contains__(self, thing):
         if isinstance(thing, Atom):
@@ -3272,12 +3222,6 @@ class PiTorsion(object):
         self.atom6 = atom6
         self.type = type
 
-    @property
-    def pitor_type(self):
-        warnings.warn("pitor_type has been replaced by type",
-                      DeprecationWarning)
-        return self.type
-
     def __contains__(self, thing):
         if isinstance(thing, Atom):
             return (thing is self.atom1 or thing is self.atom2 or
@@ -3327,12 +3271,6 @@ class StretchBend(object):
         self.atom2 = atom2
         self.atom3 = atom3
         self.type = type
-
-    @property
-    def strbnd_type(self):
-        warnings.warn("strbnd_type has been replaced by type",
-                      DeprecationWarning)
-        return self.type
 
     def __contains__(self, thing):
         if isinstance(thing, Atom):
@@ -3483,12 +3421,6 @@ class TorsionTorsion(Cmap):
         atom3.tortor_to(atom4)
         atom3.tortor_to(atom5)
         atom4.tortor_to(atom5)
-
-    @property
-    def tortor_type(self):
-        warnings.warn("tortor_type has been replaced by type",
-                      DeprecationWarning)
-        return self.type
 
     def delete(self):
         """
