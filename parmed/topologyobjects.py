@@ -1057,8 +1057,8 @@ class ExtraPoint(Atom):
                     mybond = bond
                 else:
                     otherbond = bond
-            if mybond is None or otherbond is None:
-                raise RuntimeError('Strange bond pattern detected')
+            assert mybond is not None and otherbond is not None, \
+                    'Strange bond pattern detected'
             bonddist = otherbond.type.req
             if otherbond.atom1 is self.parent:
                 otheratom = otherbond.atom2
@@ -1087,8 +1087,8 @@ class ExtraPoint(Atom):
                     else:
                         other_atom = bond.atom1
                     break
-            if other_atom is None:
-                raise RuntimeError('Strange bond pattern detected')
+            assert other_atom is not None, \
+                    'Strange bond pattern detected'
             try:
                 x1, y1, z1 = other_atom.xx, other_atom.xy, other_atom.xz
                 x2, y2, z2 = self.parent.xx, self.parent.xy, self.parent.xz
@@ -1264,7 +1264,7 @@ class ThreeParticleExtraPointFrame(object):
         try:
             b1, b2 = [bond for bond in self.ep.parent.bonds
                                 if self.ep not in bond]
-        except TypeError:
+        except (ValueError, TypeError):
             raise RuntimeError('Unsupported bonding pattern in EP frame')
         if b1.atom1 is self.ep.parent:
             oatom1 = b1.atom2
@@ -1362,7 +1362,7 @@ class ThreeParticleExtraPointFrame(object):
                 theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
             else:
                 for angle in a1.angles:
-                    if a2 in angle and a2 is not angle.atom2:
+                    if a2 in angle and a2 is not angle.atom2: #TODO test angle.type is None
                         theteq = angle.type.theteq * DEG_TO_RAD
                         break
                 else:

@@ -305,11 +305,21 @@ class TestTopologyObjects(unittest.TestCase):
         bond_type3 = BondType(10.0, 0.5)
         bond_type4 = BondType(10.0, math.sqrt(2))
         angle_type = AngleType(10.0, 90)
-        bonds = [Bond(a1, ep1, type=bond_type), Bond(a1, a2, type=bond_type),
-                 Bond(a2, ep2, type=bond_type), Bond(a2, a3, type=bond_type4),
-                 Bond(a3, ep3, type=bond_type3), Bond(a3, a4, type=bond_type4),
-                 Bond(a4, ep4, type=bond_type), Bond(a4, a5, type=bond_type2),
+        bonds = [Bond(a1, ep1, type=bond_type),
+                 Bond(a2, ep2, type=bond_type),
+                 Bond(a3, ep3, type=bond_type3),
+                 Bond(a4, ep4, type=bond_type),
                  Bond(a5, ep5, type=bond_type)]
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a2, a1, a3, 1.0, 1.0)
+        )
+        bonds.extend([Bond(a1, a2, type=bond_type),
+                      Bond(a4, a3, type=bond_type4),
+                      Bond(a3, a2, type=bond_type4),
+                      Bond(a4, a5, type=bond_type2)])
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a2, a1, a3, 1.0, 1.0)
+        )
         angles = [Angle(a1, a2, a3), Angle(a2, a3, a4, type=angle_type), Angle(a3, a4, a5)]
         dihedrals = [Dihedral(a1, a2, a3, a4), Dihedral(a2, a3, a4, a5)]
         self.assertEqual(ep1.weights, [1, 2])
@@ -489,7 +499,7 @@ class TestTopologyObjects(unittest.TestCase):
         ep3.xx, ep3.xy, ep3.xz = 1.0, 0.5, 0.0
         ep3._frame_type = None
         self.assertTrue(ep3.frame_type.inside)
-        self.assertEqual(ep3.frame_type.get_atoms(), (a3, a2, a4))
+        self.assertEqual(ep3.frame_type.get_atoms(), (a3, a4, a2))
         w1, w2, w3 = ep3.frame_type.get_weights()
         self.assertAlmostEqual(ep3.xx, a3.xx*w1+a2.xx*w2+a4.xx*w3)
         self.assertAlmostEqual(ep3.xy, a3.xy*w1+a2.xy*w2+a4.xy*w3)
@@ -499,7 +509,7 @@ class TestTopologyObjects(unittest.TestCase):
         ep3._frame_type = None
         ep3.xx, ep3.xy, ep3.xz = 1.0, 1.5, 0.0
         self.assertFalse(ep3.frame_type.inside)
-        self.assertEqual(ep3.frame_type.get_atoms(), (a3, a2, a4))
+        self.assertEqual(ep3.frame_type.get_atoms(), (a3, a4, a2))
         w1, w2, w3 = ep3.frame_type.get_weights()
         self.assertAlmostEqual(ep3.xx, a3.xx*w1+a2.xx*w2+a4.xx*w3)
         self.assertAlmostEqual(ep3.xy, a3.xy*w1+a2.xy*w2+a4.xy*w3)
@@ -517,6 +527,73 @@ class TestTopologyObjects(unittest.TestCase):
         # ft1 is outdated, and should fail now
         self.assertRaises(RuntimeError, ft1.get_atoms)
         self.assertRaises(ValueError, ft1.get_weights)
+        self.assertRaises(RuntimeError, ft3.get_atoms)
+        self.assertRaises(ValueError, ft3.get_weights)
+        # Create a duplicate bond and check ft5
+        duplicate_bond = Bond(a4, a5, type=bond_type2)
+        ep5._frame_type = None
+        del a5.xx
+        self.assertRaises(RuntimeError, lambda: ep5.frame_type)
+        # Delete the duplicate bonds
+        duplicate_bond.delete(); bonds.pop().delete()
+        # Check that from_weights works again
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3), 0.5
+        )
+        types = []
+        for bond in bonds:
+            types.append(bond.type)
+            bond.type = None
+        self.assertRaises(ParameterError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
+        )
+        for bond, type in zip(bonds, types):
+            if bond.atom1 is a3 and bond.atom2 is a2:
+                continue
+            bond.type = type
+#       bonds.extend([Bond(a1, a2, type=bond_type),
+#                     Bond(a4, a3, type=bond_type4),
+#                     Bond(a3, a2, type=bond_type4),
+#                     Bond(a4, a5, type=bond_type2)])
+        # Still missing 1 bond type
+        self.assertRaises(ParameterError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
+        )
+        for bond, type in zip(bonds, types):
+            bond.type = type
+        angles[1].type = None
+#       self.assertRaises(ParameterError, lambda:
+#               ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
+#       )
+
+    #=============================================
+
+    def test_tip4p_ep_pattern(self):
+        """ Tests handling of typical TIP4P-style extra points """
+        o = Atom(name='O', atomic_number=8)
+        h1 = Atom(name='H1', atomic_number=1)
+        h2 = Atom(name='H2', atomic_number=1)
+        ep = ExtraPoint(name='EP', atomic_number=0)
+        bt = BondType(10.0, 1.0)
+        epbt = BondType(10.0, 0.5)
+        bonds = [Bond(o, h1, bt), Bond(o, h2, bt), Bond(o, ep, epbt), Bond(h1, h2)]
+        self.assertRaises(ParameterError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 1.0, 1.0)
+        )
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 0.5, 0.5,
+                                                          dp1=1.0, dp2=1.0, d12=1.0),
+                abs(math.cos(math.acos(0.5)*0.5))
+        )
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 0.5, 0.5,
+                                                          dp1=1.0, dp2=1.0, theteq=45),
+                abs(math.cos(math.pi/8))
+        )
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 0.5, 0.5,
+                                                          dp1=1.0, dp2=1.1, theteq=45)
+        )
 
     #=============================================
 
