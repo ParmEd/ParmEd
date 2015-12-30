@@ -11,7 +11,7 @@ import datetime
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate
 from parmed.parameters import ParameterSet
-from parmed.periodic_table import Element, Mass
+from parmed.periodic_table import Element
 #from parmed.topologyobjects import NoUreyBradley
 from parmed import unit as u
 from parmed.utils.io import genopen
@@ -166,7 +166,6 @@ class OpenMMParameterSet(ParameterSet):
 
     def _write_omm_atom_types(self, dest):
         dest.write(' <AtomTypes>\n')
-        resnames_processed = set()
         for name, residue in iteritems(self.residues):
             if not isinstance(residue, ResidueTemplate):
                 continue
