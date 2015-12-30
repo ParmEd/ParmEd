@@ -64,6 +64,8 @@ class TestOpenMM(FileIOTestCase):
         self.assertEqual(len(parm.bonds), len(structure.bonds))
         warnings.filterwarnings('always', category=exceptions.OpenMMWarning)
 
+class TestWriteParameters(FileIOTestCase):
+
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def testWriteXMLParameters(self):
         """ Test writing XML parameters loaded from Amber files """
@@ -290,9 +292,11 @@ CHIS = CHIE
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                 charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                        get_fn('top_all36_prot.rtf')
-        ))
+                                          get_fn('top_all36_prot.rtf'))
+        )
         params.write(get_fn('charmm_conv.xml', written=True),
-                    provenance=dict(OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
-                                    Reference='MacKerrell')
+                     provenance=dict(
+                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                         Reference='MacKerrell'
+                     )
         )
