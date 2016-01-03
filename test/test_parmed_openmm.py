@@ -287,6 +287,25 @@ CHIS = CHIE
                      Reference='Maier & Simmerling')
         )
 
+
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def testWriteXMLParametersGAFF(self):
+        """ Test writing XML parameters loaded from Amber GAFF parameter files """
+        leaprc = StringIO("""\
+parm10 = loadamberparams gaff.dat
+""")
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                amber.AmberParameterSet.from_leaprc(leaprc)
+        )
+        citations = """\
+Wang, J., Wang, W., Kollman P. A.; Case, D. A. "Automatic atom type and bond type perception in molecular mechanical calculations". Journal of Molecular Graphics and Modelling , 25, 2006, 247260.
+Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development and testing of a general AMBER force field". Journal of Computational Chemistry, 25, 2004, 1157-1174.
+"""
+        params.write(get_fn('gaff.xml', written=True),
+                     provenance=dict(OriginalFile='gaff.dat',
+                     Reference=citations)
+        )
+
     def testWriteXMLParametersCharmm(self):
         """ Test writing XML parameter files from Charmm parameter files"""
 
