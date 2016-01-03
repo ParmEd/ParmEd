@@ -148,7 +148,7 @@ class OpenMMParameterSet(ParameterSet):
 #           self._write_omm_rb_torsions(dest)
             self._write_omm_cmaps(dest)
 #           self._write_omm_scripts(dest)
-#           self._write_omm_nonbonded(dest)
+            self._write_omm_nonbonded(dest)
         finally:
             dest.write('</ForceField>\n')
             if own_handle:
@@ -170,7 +170,7 @@ class OpenMMParameterSet(ParameterSet):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             element = Element[atom_type.atomic_number]
             dest.write('  <Type name="%s" element="%s" mass="%f"/>\n'
-                       % (name, element, atom_type.mass or Mass[element])
+                       % (name, element, atom_type.mass)
                        )
         dest.write(' </AtomTypes>\n')
 
@@ -315,3 +315,35 @@ class OpenMMParameterSet(ParameterSet):
                        (maps[id(cmap)], a1, a2, a3, a4, a5)
             )
         dest.write(' </CmapTorsionForce>\n')
+
+    def _write_omm_nonbonded(self, dest):
+        if self.combining_rule == 'geometric':
+            if len(self.nbfix_types) > 0:
+                raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
+            else:
+                raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
+
+        if len(self.nbfix_types) > 0:
+            raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
+
+        # Compute conversion factors for writing in natrual OpenMM units.
+        length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+
+        # TODO: We shouldn't hardcode these, but I don't know how they are stored.
+        coulomb14scale = 1.0 / 1.2
+        lj14scale = 0.5
+
+        # Write NonbondedForce records.
+        dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' % (coulomb14scale, lj14scale))
+        for name, atom_type in iteritems(self.atom_types):
+            if (atom_type.rmin != None) and (atom_type.epsilon != None):
+                sigma = (2.0**(-1./6.) * atom_type.rmin) * length_conv # in md_unit_system
+                epsilon = atom_type.epsilon * ene_conv # in md_unit_system
+            else:
+                # Dummy atom
+                sigma = 1.0
+                epsilon = 0.0
+            dest.write('  <Atom type="%s" sigma="%f" epsilon="%f"/>\n' % (name, sigma, epsilon))
+        dest.write(' </NonbondedForce>\n')
+
