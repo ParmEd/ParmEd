@@ -344,6 +344,14 @@ class OpenMMParameterSet(ParameterSet):
                 # Dummy atom
                 sigma = 1.0
                 epsilon = 0.0
+
+            # Ensure we don't have sigma = 0
+            if (sigma == 0.0):
+                if (epsilon == 0.0):
+                    sigma = 1.0 # reset sigma = 1
+                else:
+                    raise Exception("For atom type '%s', sigma = 0 but epsilon != 0." % name)
+
             dest.write('  <Atom type="%s" sigma="%f" epsilon="%f"/>\n' % (name, sigma, epsilon))
         dest.write(' </NonbondedForce>\n')
 
