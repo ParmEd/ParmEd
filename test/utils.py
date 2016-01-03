@@ -65,7 +65,6 @@ class FileIOTestCase(unittest.TestCase):
             pass
 
     def tearDown(self):
-        return # DEBUG
         self._empty_writes()
         try:
             os.rmdir(get_fn('writes'))
