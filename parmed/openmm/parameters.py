@@ -166,14 +166,12 @@ class OpenMMParameterSet(ParameterSet):
 
     def _write_omm_atom_types(self, dest):
         dest.write(' <AtomTypes>\n')
-        for name, residue in iteritems(self.residues):
-            if not isinstance(residue, ResidueTemplate):
-                continue
-            for atom in residue.atoms:
-                element = Element[atom.atom_type.atomic_number]
-                dest.write('  <Type name="%s-%s" class="%s" element="%s" '
-                           'mass="%f"/>\n' % (name, atom.name, atom.type,
-                           element, atom.atom_type.mass))
+        for name, atom_type in iteritems(self.atom_types):
+            assert atom_type.atomic_number >= 0, 'Atomic number not set!'
+            element = Element[atom_type.atomic_number]
+            dest.write('  <Type name="%s" element="%s" mass="%f"/>\n'
+                       % (name, element, atom_type.mass or Mass[element])
+                       )
         dest.write(' </AtomTypes>\n')
 
     def _write_omm_residues(self, dest):
@@ -183,8 +181,8 @@ class OpenMMParameterSet(ParameterSet):
                 continue
             dest.write('  <Residue name="%s">\n' % residue.name)
             for atom in residue.atoms:
-                dest.write('   <Atom name="%s" type="%s-%s" charge="%f"/>\n' %
-                           (atom.name, name, atom.name, atom.charge))
+                dest.write('   <Atom name="%s" type="%s" charge="%f"/>\n' %
+                           (atom.name, atom.type, atom.charge))
             for bond in residue.bonds:
                 dest.write('   <Bond atomName1="%s" atomName2="%s" />\n' %
                            (bond.atom1.name, bond.atom2.name))
@@ -207,7 +205,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond class1="%s" class2="%s", length="%f", k="%f"/>\n'
+            dest.write('  <Bond type1="%s" type2="%s", length="%f", k="%f"/>\n'
                        % (a1, a2, bond.req*lconv, bond.k*kconv))
         dest.write(' </HarmonicBondForce>\n')
 
@@ -221,7 +219,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
-            dest.write('  <Angle class1="%s" class2="%s" class3="%s" '
+            dest.write('  <Angle type1="%s" type2="%s" type3="%s" '
                        'angle="%s" k="%s"/>\n' %
                        (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
         dest.write(' </HarmonicAngleForce>\n')
@@ -241,8 +239,8 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3, a4) in diheds_done: continue
             diheds_done.add((a1, a2, a3, a4))
             diheds_done.add((a4, a3, a2, a1))
-            dest.write('  <Proper class1="%s" class2="%s" class3="%s" '
-                       'class4="%s"' % (nowild(a1), a2, a3, nowild(a4)))
+            dest.write('  <Proper type1="%s" type2="%s" type3="%s" '
+                       'type4="%s"' % (nowild(a1), a2, a3, nowild(a4)))
             for i, term in enumerate(dihed):
                 i += 1
                 dest.write(' periodicity%d="%d" phase%d="%f" k%d="%f"' %
@@ -264,8 +262,8 @@ class OpenMMParameterSet(ParameterSet):
             if a2 != 'X' and a3 == 'X':
                 # Single wild-card entries put the wild-card in position 2
                 a2, a3 = a3, a2
-            dest.write('  <Improper class1="%s" class2="%s" class3="%s" '
-                       'class4="%s" periodicity1="%d" phase1="%f" k1="%f"/>\n' %
+            dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
+                       'type4="%s" periodicity1="%d" phase1="%f" k1="%f"/>\n' %
                        (a1, nowild(a2), nowild(a3), nowild(a4), improp.per,
                         improp.phase*pconv, improp.phi_k*kconv)
             )
@@ -281,8 +279,8 @@ class OpenMMParameterSet(ParameterSet):
         def nowild(name):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
-            dest.write('  <Improper class1="%s" class2="%s" class3="%s" '
-                       'class4="%s" k="%f" theta0="%f"/>\n' %
+            dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
+                       'type4="%s" k="%f" theta0="%f"/>\n' %
                        (nowild(a1), nowild(a2), nowild(a3), nowild(a4),
                        improp.psi_k*kconv, improp.psi_eq*tconv)
             )
@@ -312,8 +310,8 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
-            dest.write('   <Torsion map="%d" class1="%s" class=2"%s" '
-                       'class3="%s" class4="%s" class5="%s"/>\n' %
+            dest.write('   <Torsion map="%d" type1="%s" type=2"%s" '
+                       'type3="%s" type4="%s" type5="%s"/>\n' %
                        (maps[id(cmap)], a1, a2, a3, a4, a5)
             )
         dest.write(' </CmapTorsionForce>\n')
