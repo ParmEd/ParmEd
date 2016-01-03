@@ -324,7 +324,7 @@ class OpenMMParameterSet(ParameterSet):
                 raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
 
         if len(self.nbfix_types) > 0:
-            raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
+            raise NotImplementedError("Nonbonded forces with NBFIX have not been implemented yet.")
 
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -336,6 +336,7 @@ class OpenMMParameterSet(ParameterSet):
 
         # Write NonbondedForce records.
         dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' % (coulomb14scale, lj14scale))
+        dest.write('  <UseAttributeFromResidue name="charge">\n')
         for name, atom_type in iteritems(self.atom_types):
             if (atom_type.rmin != None) and (atom_type.epsilon != None):
                 sigma = (2.0**(-1./6.) * atom_type.rmin) * length_conv # in md_unit_system
