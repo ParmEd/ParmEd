@@ -10,11 +10,11 @@ from __future__ import division
 
 from contextlib import closing
 from copy import copy as _copy
-from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
-                    Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
-                    DihedralType, ImproperType)
+from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
+                    AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
+                    Atom, DihedralType, ImproperType, UnassignedAtomType)
 from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError)
-from parmed.structure import needs_openmm
+from parmed.structure import needs_openmm, Structure
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
 from parmed.utils.six.moves import zip, range
@@ -401,7 +401,7 @@ class CharmmPsfFile(Structure):
             return ('%sLTU' % name.upper()).replace('*', 'STR')
         for atom in psf.atoms:
             atom.type = typeconv(atom.type)
-            if atom.atom_type is not None:
+            if atom.atom_type is not UnassignedAtomType:
                 atom.atom_type.name = typeconv(atom.atom_type.name)
 
         # If no groups are defined, make each residue its own group
