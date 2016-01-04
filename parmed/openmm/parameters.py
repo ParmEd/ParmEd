@@ -363,7 +363,7 @@ class OpenMMParameterSet(ParameterSet):
                        (name, sigma, epsilon))
         dest.write(' </NonbondedForce>\n')
 
-    def _write_omm_scripts(self):
+    def _write_omm_scripts(self, dest):
         # Not currently implemented, so throw an exception if any unsupported
         # options are specified
         if self.combining_rule == 'geometric':
