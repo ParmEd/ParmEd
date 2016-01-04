@@ -2685,8 +2685,12 @@ class Structure(object):
             The dielectric constant of the water used in GB
         """
         from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
-                GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force,
-                convertParameters)
+                GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force)
+        try:
+            from simtk.openmm.app.internal.customgbforces import convertParameters
+        except ImportError:
+            # Unnecessary in newer versions of OpenMM
+            convertParameters = lambda params, choice: params
         if implicitSolvent is None: return None
         if useSASA:
             sasa = 'ACE'
