@@ -147,7 +147,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_impropers(dest)
 #           self._write_omm_rb_torsions(dest)
             self._write_omm_cmaps(dest)
-#           self._write_omm_scripts(dest)
+            self._write_omm_scripts(dest)
             self._write_omm_nonbonded(dest)
         finally:
             dest.write('</ForceField>\n')
@@ -317,29 +317,34 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </CmapTorsionForce>\n')
 
     def _write_omm_nonbonded(self, dest):
-        if self.combining_rule == 'geometric':
-            if len(self.nbfix_types) > 0:
-                raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
-            else:
-                raise NotImplementedError("Nonbonded forces with geometric combining rules have not been implemented yet.")
-
-        if len(self.nbfix_types) > 0:
-            raise NotImplementedError("Nonbonded forces with NBFIX have not been implemented yet.")
-
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
 
-        # TODO: We shouldn't hardcode these, but I don't know how they are stored.
-        coulomb14scale = 1.0 / 1.2
-        lj14scale = 0.5
+        # Get the 1-4 scaling factors from the torsion list
+        scee, scnb = set(), set()
+        for dt in self.dihedral_types:
+            for t in dt:
+                if t.scee: scee.add(t.scee)
+                if t.scnb: scnb.add(t.scnb)
+        if len(scee) > 1:
+            raise NotImplementedError('Cannot currently handle mixed 1-4 '
+                    'scaling: Elec. Scaling factors %s detected' %
+                    (', '.join([str(x) for x in scee])))
+        if len(scnb) > 1:
+            raise NotImplementedError('Cannot currently handle mixed 1-4 '
+                    'scaling: L-J Scaling factors %s detected' %
+                    (', '.join([str(x) for x in scnb])))
+        coulomb14scale = 1.0 / scee.pop()
+        lj14scale = 1.0 / scnb.pop()
 
         # Write NonbondedForce records.
-        dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' % (coulomb14scale, lj14scale))
+        dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' %
+                   (coulomb14scale, lj14scale))
         dest.write('  <UseAttributeFromResidue name="charge">\n')
         for name, atom_type in iteritems(self.atom_types):
-            if (atom_type.rmin != None) and (atom_type.epsilon != None):
-                sigma = (2.0**(-1./6.) * atom_type.rmin) * length_conv # in md_unit_system
+            if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
+                sigma = atom_type.sigma * length_conv  # in md_unit_system
                 epsilon = atom_type.epsilon * ene_conv # in md_unit_system
             else:
                 # Dummy atom
@@ -351,8 +356,21 @@ class OpenMMParameterSet(ParameterSet):
                 if (epsilon == 0.0):
                     sigma = 1.0 # reset sigma = 1
                 else:
-                    raise Exception("For atom type '%s', sigma = 0 but epsilon != 0." % name)
+                    raise ValueError("For atom type '%s', sigma = 0 but "
+                                     "epsilon != 0." % name)
 
-            dest.write('  <Atom type="%s" sigma="%f" epsilon="%f"/>\n' % (name, sigma, epsilon))
+            dest.write('  <Atom type="%s" sigma="%f" epsilon="%f"/>\n' %
+                       (name, sigma, epsilon))
         dest.write(' </NonbondedForce>\n')
 
+    def _write_omm_scripts(self, dest):
+        # Not currently implemented, so throw an exception if any unsupported
+        # options are specified
+        if self.combining_rule == 'geometric':
+            raise NotImplementedError('Geometric combining rule not currently '
+                                      'supported.')
+        if len(self.nbfix_types) > 0:
+            raise NotImplementedError('NBFIX not currently supported')
+        if self.urey_bradley_types:
+            raise NotImplementedError('Urey-Bradley angles not currently '
+                                      'supported.')
