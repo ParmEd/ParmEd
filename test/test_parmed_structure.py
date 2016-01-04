@@ -937,6 +937,11 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
+    def testSavePSF2(self):
+        """ Test saving PSF file for unparametrized system """
+        url = 'http://ambermd.org/tutorials/advanced/tutorial1/files/polyAT.pdb'
+        pmd.load_file(url).save(get_fn('test.psf', written=True))
+
     def testSaveGRO(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.gro', written=True))
