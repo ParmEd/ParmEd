@@ -387,13 +387,13 @@ class TitratableResidueList(list):
         # Print the residue pointers
         buf.add_word(' ') # get a leading space
         for i, p in enumerate(pointers):
-            buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i,p['FIRST_ATOM']))
-            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, "
-                    % (i,p['FIRST_CHARGE']))
+            buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i, p['FIRST_ATOM']))
+            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, " %
+                         (i, p['FIRST_CHARGE']))
             buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " %
-                    (i,p['FIRST_STATE']))
-            buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i,p['NUM_ATOMS']))
-            buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i,p['NUM_STATES']))
+                         (i, p['FIRST_STATE']))
+            buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i, p['NUM_ATOMS']))
+            buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i, p['NUM_STATES']))
         buf.flush()
         # Print the reference energies
         buf.add_word(' STATENE=')
@@ -401,7 +401,7 @@ class TitratableResidueList(list):
             if energy is None:
                 raise AmberError("%d'th reference energy not known for "
                                  "igb = %d" % (i, igb))
-            buf.add_word('%s,' % energy)
+            buf.add_word('%.6f,' % energy)
         buf.flush()
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))

@@ -1021,23 +1021,12 @@ class CharmmParameterSet(ParameterSet):
         # van der Waals scaling factors are
         scee, scnb = set(), set()
         for _, typ in iteritems(self.dihedral_types):
-            if isinstance(typ, DihedralTypeList):
-                for t in typ:
-                    if t.scee: scee.add(t.scee)
-                    if t.scnb: scnb.add(t.scnb)
-            else:
+            for t in typ:
                 if t.scee: scee.add(t.scee)
                 if t.scnb: scnb.add(t.scnb)
-        if len(scee) > 1 or len(scnb) > 1:
-            raise ValueError('Mixed 1-4 scaling not supported in CHARMM')
-        if scee:
-            scee = scee.pop()
-        else:
-            scee = 1.0
-        if scnb:
-            scnb = scnb.pop()
-        else:
-            scnb = 1.0
+        assert len(scee) == len(scnb) == 1, 'Mixed 1-4 scaling not supported'
+        scee = 1.0 if not scee else scee.pop()
+        scnb = 1.0 if not scnb else scnb.pop()
 
         f.write('ATOMS\n')
         self._write_top_to(f, False)
@@ -1060,34 +1049,19 @@ class CharmmParameterSet(ParameterSet):
         for key, typ in iteritems(self.dihedral_types):
             if key in written: continue
             written.add(key); written.add(tuple(reversed(key)))
-            if isinstance(typ, DihedralTypeList):
-                for t in typ:
-                    f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                            (key[0], key[1], key[2], key[3], t.phi_k,
-                             int(t.per), t.phase))
-            else:
+            for t in typ:
                 f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], typ.phi_k,
-                         int(typ.per), typ.phase))
+                        (key[0], key[1], key[2], key[3], t.phi_k,
+                         int(t.per), t.phase))
         f.write('\nIMPROPERS\n')
         written = set()
         for key, typ in iteritems(self.improper_periodic_types):
             sortkey = tuple(sorted(key))
             if sortkey in written: continue
             written.add(sortkey)
-            if isinstance(typ, DihedralTypeList):
-                for t in typ:
-                    if key[2] == 'X':
-                        key = (key[0], key[2], key[3], key[1])
-                    elif key[3] == 'X':
-                        key = (key[0], key[3], key[1], key[2])
-                    f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                            (key[0], key[1], key[2], key[3], t.phi_k,
-                             int(t.per), t.phase))
-            else:
-                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], typ.phi_k,
-                         int(typ.per), typ.phase))
+            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                    (key[0], key[1], key[2], key[3], typ.phi_k,
+                     int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
             if key[2] == 'X':
                 key = (key[0], key[2], key[3], key[1])
