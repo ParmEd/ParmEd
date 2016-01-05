@@ -12,6 +12,7 @@ import parmed.topologyobjects as topologyobjects
 from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
 from parmed.topologyobjects import *
 import parmed.unit as u
+from parmed.utils.six import PY3
 from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
@@ -1422,13 +1423,15 @@ class TestTopologyObjects(unittest.TestCase):
         # Check segid assignment
         self.assertEqual(res.segid, 'SYS')
         # Deprecated behavior
-        self.assertWarns(DeprecationWarning, lambda: res[0].segid)
+        warnings.filterwarnings('error', category=DeprecationWarning)
+        self.assertRaises(DeprecationWarning, lambda: res[0].segid)
         def tmp():
             res[0].segid = 'SYS1'
-        self.assertWarns(DeprecationWarning, tmp)
-        warnings.filterwarnings('always', category=DeprecationWarning)
+        self.assertRaises(DeprecationWarning, tmp)
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
         tmp()
         self.assertEqual(res.segid, 'SYS1')
+        warnings.filterwarnings('always', category=DeprecationWarning)
 
         # __repr__ testing
         self.assertEqual(repr(atoms[0]), '<Atom CA [0]; In ALA -1>')
