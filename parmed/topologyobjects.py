@@ -1492,7 +1492,7 @@ class OutOfPlaneExtraPointFrame(object):
                                 if (not isinstance(bond.atom1, ExtraPoint) and
                                     not isinstance(bond.atom2, ExtraPoint))
             ]
-        except TypeError:
+        except (ValueError, TypeError):
             raise RuntimeError('Unsupported bonding pattern in EP frame')
         if b1.atom1 is self.ep.parent:
             oatom1 = b1.atom2
@@ -3006,7 +3006,7 @@ class _CmapGrid(object):
                     return False
             return True
         except AttributeError:
-            return TypeError('Bad type comparison with _CmapGrid')
+            return NotImplemented
 
     def switch_range(self):
         """
@@ -3063,7 +3063,7 @@ class TrigonalAngle(_FourAtomTerm):
 
     def __contains__(self, thing):
         if isinstance(thing, Atom):
-            return _FourAtomTerm.__contains(self, thing)
+            return _FourAtomTerm.__contains__(self, thing)
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
@@ -3102,7 +3102,7 @@ class OutOfPlaneBend(_FourAtomTerm):
 
     def __contains__(self, thing):
         if isinstance(thing, Atom):
-            return _FourAtomTerm.__contains(self, thing)
+            return _FourAtomTerm.__contains__(self, thing)
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing) or
                 (self.atom2 in thing and self.atom4 in thing))
@@ -3234,11 +3234,6 @@ class PiTorsion(object):
                 (self.atom4 in thing and self.atom5 in thing) or
                 (self.atom4 in thing and self.atom6 in thing))
 
-    def delete(self):
-        """ Sets all atoms to None and deletes the type """
-        self.type = self.atom1 = self.atom2 = self.atom3 = None
-        self.atom4 = self.atom5 = self.atom6 = None
-
     def __repr__(self):
         return '<%s; (%r,%r)--%r--%r--(%r,%r); type=%r>' % (type(self).__name__,
                 self.atom1, self.atom2, self.atom3, self.atom4, self.atom5,
@@ -3279,12 +3274,8 @@ class StretchBend(object):
         return ((self.atom1 in thing and self.atom2 in thing) or
                 (self.atom2 in thing and self.atom3 in thing))
 
-    def delete(self):
-        """ Sets all of the atoms and parameter type to None """
-        self.atom1 = self.atom2 = self.atom3 = self.type = None
-
     def __repr__(self):
-        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
+        return '<%s; %r--%r--%r; type=%r>' % (type(self).__name__,
                 self.atom1, self.atom2, self.atom3, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

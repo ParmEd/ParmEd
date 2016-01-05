@@ -306,21 +306,23 @@ class TestTopologyObjects(unittest.TestCase):
         bond_type4 = BondType(10.0, math.sqrt(2))
         angle_type = AngleType(10.0, 90)
         bonds = [Bond(a1, ep1, type=bond_type),
-                 Bond(a2, ep2, type=bond_type),
+                 Bond(ep2, a2, type=bond_type),
                  Bond(a3, ep3, type=bond_type3),
-                 Bond(a4, ep4, type=bond_type),
-                 Bond(a5, ep5, type=bond_type)]
+                 Bond(a4, ep4, type=bond_type)]
         self.assertRaises(ValueError, lambda:
                 ThreeParticleExtraPointFrame.from_weights(a2, a1, a3, 1.0, 1.0)
         )
         bonds.extend([Bond(a1, a2, type=bond_type),
                       Bond(a4, a3, type=bond_type4),
                       Bond(a3, a2, type=bond_type4),
-                      Bond(a4, a5, type=bond_type2)])
+                      Bond(a4, a5, type=bond_type2),
+                      Bond(a5, ep5, type=bond_type)])
         self.assertRaises(ValueError, lambda:
                 ThreeParticleExtraPointFrame.from_weights(a2, a1, a3, 1.0, 1.0)
         )
-        angles = [Angle(a1, a2, a3), Angle(a2, a3, a4, type=angle_type), Angle(a3, a4, a5)]
+        angles = [Angle(a1, a2, a3, type=angle_type),
+                  Angle(a2, a3, a4, type=angle_type),
+                  Angle(a3, a4, a5)]
         dihedrals = [Dihedral(a1, a2, a3, a4), Dihedral(a2, a3, a4, a5)]
         self.assertEqual(ep1.weights, [1, 2])
         self.assertEqual(ep2.weights, None)
@@ -551,10 +553,6 @@ class TestTopologyObjects(unittest.TestCase):
             if bond.atom1 is a3 and bond.atom2 is a2:
                 continue
             bond.type = type
-#       bonds.extend([Bond(a1, a2, type=bond_type),
-#                     Bond(a4, a3, type=bond_type4),
-#                     Bond(a3, a2, type=bond_type4),
-#                     Bond(a4, a5, type=bond_type2)])
         # Still missing 1 bond type
         self.assertRaises(ParameterError, lambda:
                 ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
@@ -562,9 +560,6 @@ class TestTopologyObjects(unittest.TestCase):
         for bond, type in zip(bonds, types):
             bond.type = type
         angles[1].type = None
-#       self.assertRaises(ParameterError, lambda:
-#               ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
-#       )
 
     #=============================================
 
@@ -1049,6 +1044,8 @@ class TestTopologyObjects(unittest.TestCase):
                      cmap_types[1])
         cmap3 = Cmap(atoms[5], atoms[6], atoms[7], atoms[8], atoms[9],
                      cmap_types[2])
+        self.assertEqual(repr(cmap1), '<Cmap; %r--%r--%r--%r--%r; type=%r>' %
+                         tuple(atoms[:5] + [cmap_types[0]]))
         # Check illegal CmapType assignment
         self.assertRaises(TypeError, lambda: CmapType(5, cg1))
         self.assertRaises(NotImplementedError, lambda:
@@ -1094,6 +1091,8 @@ class TestTopologyObjects(unittest.TestCase):
             self.assertEqual(transpose[i2, i1], val)
         # Transpose of the transpose should be the original
         self.assertEqual(transpose.T, cmap_types[0].grid)
+        # Check caching
+        self.assertIs(transpose, cmap_types[0].grid.T)
         # Check switch_range functionality
         sg = cmap_types[0].grid.switch_range()
         for i in range(6):
@@ -1106,6 +1105,60 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.idx, -1)
         self.assertEqual(cp.resolution, cmap_types[0].resolution)
         self.assertEqual(cp.grid, cmap_types[0].grid)
+        # Check error handling
+        self.assertRaises(IndexError, lambda: cmap_types[0].grid[10,10])
+        def err():
+            cmap_types[0].grid[10, 10] = 10.0
+        self.assertRaises(IndexError, err)
+
+    #=============================================
+
+    def test_cmap_grid(self):
+        """ Tests the CmapGrid API """
+        raw = list(range(36))
+        cg1 = CmapType(6, list(range(36))).grid
+        for i in range(36):
+            self.assertEqual(cg1[i], i)
+        for i in range(6):
+            for j in range(6):
+                self.assertEqual(cg1[i,j], i*6+j)
+        # Now check *setting* elements
+        for i, j in enumerate(reversed(range(36))):
+            cg1[i] = j
+        for i in range(36):
+            self.assertEqual(cg1[i], 35-i)
+        for i in range(6):
+            for j in range(6):
+                cg1[i,j] = i*10+j*6
+        for i in range(6):
+            for j in range(6):
+                self.assertEqual(cg1[i,j], i*10+j*6)
+        # Now try setting slices
+        cg1[:10] = 0
+        for i in range(10):
+            self.assertEqual(cg1[i], 0)
+        for i in range(10, 36):
+            self.assertNotEqual(cg1[i], 0)
+        # Now set slice to an array (akin to numpy broadcasting)
+        cg1[:10] = [(x+4)*10 for x in range(10)]
+        for i in range(10):
+            self.assertEqual(cg1[i], i*10+40)
+        # Test error handling for improper broadcasting
+        def err():
+            cg1[:10] = [1, 2, 3]
+        self.assertRaises(ValueError, err)
+        # Test string methods
+        self.assertEqual(repr(cg1), '<_CmapGrid: 6x6>')
+
+        # Test comparison methods
+        cg2 = CmapType(7, list(range(49))).grid
+        self.assertNotEqual(cg1, cg2)
+        cg1[:] = list(range(36))
+        cg3 = copy(cg1)
+        self.assertEqual(cg1, cg3)
+        cg3[-1] += 0.01
+        self.assertNotEqual(cg1, cg3)
+        self.assertNotEqual(cg1, 1)
 
     #=============================================
 
@@ -1124,6 +1177,15 @@ class TestTopologyObjects(unittest.TestCase):
         t1.type = AngleType(50.0, 90.0)
         self.assertIsNot(t1.type, t2.type)
         self.assertEqual(t1.type, t2.type)
+        self.assertIn(atoms[0], t1)
+        self.assertIn(atoms[1], t1)
+        self.assertIn(atoms[2], t1)
+        self.assertIn(atoms[3], t1)
+        self.assertIn(atoms[4], t2)
+        self.assertIn(atoms[5], t2)
+        self.assertIn(atoms[6], t2)
+        self.assertIn(atoms[7], t2)
+        self.assertIn(atoms[0], t1)
         self.assertIn(bonds[0], t1)
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
@@ -1132,6 +1194,10 @@ class TestTopologyObjects(unittest.TestCase):
                           TrigonalAngle(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
         self.assertEqual(t1.type.theteq, 90.0)
+        self.assertEqual(repr(t1), '<TrigonalAngle; %r--(%r,%r,%r); type=%r>' %
+                (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
+        self.assertEqual(repr(t2), '<TrigonalAngle; %r--(%r,%r,%r); type=%r>' %
+                (atoms[5], atoms[4], atoms[6], atoms[7], t2.type))
 
     #=============================================
 
@@ -1146,10 +1212,18 @@ class TestTopologyObjects(unittest.TestCase):
         bonds.append(Bond(atoms[0], atoms[2]))
         t1 = OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[3])
         t2 = OutOfPlaneBend(atoms[4], atoms[5], atoms[6], atoms[7],
-                            AngleType(50.0, 90.0))
-        t1.type = AngleType(50.0, 90.0)
+                            OutOfPlaneBendType(50.0))
+        t1.type = OutOfPlaneBendType(50.0)
         self.assertIsNot(t1.type, t2.type)
         self.assertEqual(t1.type, t2.type)
+        self.assertIn(atoms[0], t1)
+        self.assertIn(atoms[1], t1)
+        self.assertIn(atoms[2], t1)
+        self.assertIn(atoms[3], t1)
+        self.assertIn(atoms[4], t2)
+        self.assertIn(atoms[5], t2)
+        self.assertIn(atoms[6], t2)
+        self.assertIn(atoms[7], t2)
         self.assertIn(bonds[0], t1)
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
@@ -1157,7 +1231,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertRaises(MoleculeError, lambda:
                           OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
-        self.assertEqual(t1.type.theteq, 90.0)
+        self.assertEqual(repr(t1), '<OutOfPlaneBend; %r--(%r,%r,%r); type=%r>' %
+                (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
 
     #=============================================
 
@@ -1178,6 +1253,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(pit.type.phi_k, 10)
         self.assertEqual(pit.type.per, 2)
         self.assertEqual(pit.type.phase, 180)
+        self.assertEqual(repr(pit), '<PiTorsion; (%r,%r)--%r--%r--(%r,%r); type=%r>' %
+                tuple(atoms + [pit.type]))
 
     #=============================================
 
@@ -1210,6 +1287,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.req1, 1.1)
         self.assertEqual(cp.req2, 1.2)
         self.assertEqual(cp.theteq, 109.0)
+        self.assertEqual(repr(strbnd), '<StretchBend; %r--%r--%r; type=%r>' %
+                tuple(atoms + [strbnd.type]))
 
     #=============================================
 
