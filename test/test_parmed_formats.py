@@ -126,6 +126,27 @@ class TestFileLoader(FileIOTestCase):
         self.assertIsInstance(mol2, ResidueTemplateContainer)
         mol3 = formats.load_file(get_fn('tripos9.mol2'))
         self.assertIsInstance(mol3, ResidueTemplate)
+        # Check mol2 file where last 4 or 5 columns do not exist in ATOM
+        mol2 = formats.load_file(get_fn('tripos2.mol2'))
+        self.assertIsInstance(mol2, ResidueTemplate)
+        for atom in mol2.atoms:
+            self.assertEqual(atom.charge, 0)
+            self.assertEqual(atom.residue.name, 'UNK')
+        # Check bad file detection
+        fn = get_fn('junk_file', written=True)
+        with open(fn, 'w') as f:
+            f.write('\n')
+        self.assertFalse(formats.mol2.Mol2File.id_format(fn))
+        with open(fn, 'w') as f:
+            f.write('junkity junk junk\n')
+            f.write('not a mol2 file\n')
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.mol2.Mol2File.parse(fn))
+
+    def test_mol2_box(self):
+        """ Tests parsing Mol2 file with CRYSIN section """
+        mol2 = formats.load_file(get_fn('tripos3.mol2'), structure=True)
+        np.testing.assert_equal(mol2.box, [20, 20, 20, 90, 90, 90])
 
     @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def testLoadGromacsTop(self):

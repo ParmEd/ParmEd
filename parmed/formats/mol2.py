@@ -207,7 +207,7 @@ class Mol2File(object):
                             raise Mol2Error('Bad bonding pattern detected')
                         if atom2.residue.idx == len(rescont):
                             res2 = restemp
-                        elif atom1.residue.idx < len(rescont):
+                        elif atom2.residue.idx < len(rescont):
                             res2 = rescont[atom2.residue.idx]
                         else:
                             raise Mol2Error('Bad bonding pattern detected')
@@ -410,8 +410,7 @@ class Mol2File(object):
                     name = struct.residues[0].name
                 charges = [a.charge for a in struct.atoms]
             dest.write('@<TRIPOS>MOLECULE\n')
-            dest.write('%s' % name)
-            dest.write('\n')
+            dest.write('%s\n' % name)
             dest.write('%d %d %d 0 1\n' % (natom, len(bonds), len(residues)))
             if len(residues) == 1:
                 dest.write('SMALL\n')
