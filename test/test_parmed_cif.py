@@ -19,6 +19,7 @@ from __future__ import print_function, division
 import sys, unittest, traceback, os
 from utils import get_fn, get_saved_fn, diff_files, FileIOTestCase
 
+from parmed.exceptions import PdbxSyntaxError
 from parmed.formats.pdbx import PdbxReader, PdbxWriter
 from parmed.formats.pdbx.PdbxContainers import *
 from parmed.utils.six.moves import range
@@ -32,6 +33,16 @@ class PdbxReaderTests(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def testException(self):
+        """ Test the PDBx/mmCIF parser exception """
+        def tmp():
+            raise PdbxSyntaxError(10, 'This is the error text')
+        self.assertRaises(PdbxSyntaxError, tmp)
+        try:
+            tmp()
+        except PdbxSyntaxError as e:
+            self.assertEqual(str(e), '%ERROR - [at line: 10] This is the error text')
 
     def testReadSmallDataFile(self): 
         """ Test reading small CIF file """
