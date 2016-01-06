@@ -14,7 +14,6 @@ from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import zip, range
 from copy import copy
 import math
-import warnings
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
