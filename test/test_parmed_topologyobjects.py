@@ -131,6 +131,11 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(a3, fat)
         self.assertIn(a4, fat)
         self.assertNotIn(a5, fat)
+        fat.delete()
+        self.assertIs(fat.atom1, None)
+        self.assertIs(fat.atom2, None)
+        self.assertIs(fat.atom3, None)
+        self.assertIs(fat.atom4, None)
 
     #=============================================
 
@@ -269,11 +274,36 @@ class TestTopologyObjects(unittest.TestCase):
 #                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
 #       lja5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
 #                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
-        # Test deprecated API
 
         a1.element = 7
         self.assertEqual(a1.atomic_number, 7)
         self.assertEqual(a1.element, 7)
+
+    #=============================================
+
+    def test_atom_type(self):
+        """ Test the AtomType API """
+        at1 = AtomType(1, None, 12.01, 6)
+        at2 = AtomType(None, 1, 12.01, 6)
+        self.assertEqual(at1, at2)
+        self.assertEqual(at1, 1)
+        self.assertEqual(at2, 1)
+        at1.set_lj_params(0.5, 1.0)
+        self.assertNotEqual(at1, at2)
+        # Now check out strings
+        at3 = AtomType("CA", 1, 12.01, 6)
+        at4 = AtomType("CA", 1, 12.01, 6)
+        self.assertEqual(at3, 'CA')
+        self.assertEqual(at4, (1, 'CA'))
+        # bond_type -- this is like OpenMM "class"
+        self.assertEqual(at3.bond_type, 'CA')
+        at3.bond_type = 'CN'
+        self.assertEqual(at3.name, 'CA')
+        self.assertEqual(at3.bond_type, 'CN')
+        # Try the sigma_14 setter
+        at3.sigma_14 = 1.0
+        self.assertEqual(at3.sigma_14, 1.0)
+        self.assertEqual(at3.rmin_14, 2**(-5/6))
 
     #=============================================
 
@@ -1317,12 +1347,29 @@ class TestTopologyObjects(unittest.TestCase):
                     data[pre+'03_DFUNC_DANGLE2'],
                     data[pre+'03_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
         ])
+        self.assertEqual(repr(tortor_types[0]), '<TorsionTorsionType; 25x25>')
         tortor1 = TorsionTorsion(atoms[0], atoms[1], atoms[2], atoms[3],
                                  atoms[4], type=tortor_types[0])
         tortor2 = TorsionTorsion(atoms[5], atoms[6], atoms[7], atoms[8],
                                  atoms[9], type=tortor_types[1])
         tortor3 = TorsionTorsion(atoms[10], atoms[11], atoms[12], atoms[13],
                                  atoms[14], type=tortor_types[2])
+        # Check some error handling
+        self.assertRaises(ValueError, lambda:
+                TorsionTorsionType((25,),
+                    data[pre+'03_ANGLE1'], data[pre+'03_ANGLE2'],
+                    data[pre+'03_FUNC'], data[pre+'03_DFUNC_DANGLE1'],
+                    data[pre+'03_DFUNC_DANGLE2'],
+                    data[pre+'03_D2FUNC_DANGLE1_DANGLE2']
+                )
+        )
+        self.assertRaises(ValueError, lambda:
+                TorsionTorsionType((26, 25),
+                    data[pre+'03_ANGLE1'], data[pre+'03_ANGLE2'],
+                    data[pre+'03_FUNC'], data[pre+'03_DFUNC_DANGLE1'],
+                    data[pre+'03_DFUNC_DANGLE2'],
+                    data[pre+'03_D2FUNC_DANGLE1_DANGLE2'])
+        )
 
         # Check the container properties of the torsion-torsion
         for i, atom in enumerate(atoms):
@@ -1363,8 +1410,18 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(tortor2.type.idx, 1)
         self.assertEqual(tortor3.type.idx, 2)
         # Now check the _TorTorTable API
+        self.assertRaises(TypeError, lambda:
+                topologyobjects._TorTorTable([0, 90, 180], [0, 90, 180], [1, 2])
+        )
         self.assertEqual(tortor1.type.f, tortor2.type.f)
         self.assertNotEqual(tortor1.type.f, tortor3.type.f)
+        # Check the element accessors
+        c = 0
+        for a1 in data[pre+'01_ANGLE1']:
+            for a2 in data[pre+'01_ANGLE2']:
+                self.assertEqual(tortor1.type.f[(a1, a2)], data[pre+'01_FUNC'][c])
+                self.assertEqual(tortor1.type.f[a1, a2], data[pre+'01_FUNC'][c])
+                c += 1
         # Check the TorsionTorsionType.__copy__ method
         cp = copy(tortor_types[-1])
         self.assertIsNot(cp, tortor_types[-1])
@@ -1380,6 +1437,14 @@ class TestTopologyObjects(unittest.TestCase):
                 TorsionTorsion(atoms[0], atoms[1], atoms[2], atoms[3], atoms[0])
         )
         self.assertRaises(MoleculeError, lambda: atoms[0].tortor_to(atoms[0]))
+        # Make sure that if a torsion-torsion table has different angles, but
+        # same energies, it is considered non-equal
+        ttt = topologyobjects._TorTorTable(
+                [x+0.001 for x in data[pre+'01_ANGLE1']],
+                data[pre+'01_ANGLE2'], data[pre+'01_FUNC']
+        )
+        self.assertNotEqual(tortor1.type.f, ttt)
+        self.assertNotEqual(ttt, tortor1.type.f)
 
     #=============================================
 
@@ -1394,6 +1459,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(atom2, cf1)
         self.assertIn(atom1, cf2)
         self.assertIn(atom2, cf2)
+        self.assertEqual(repr(cf1), '<ChiralFrame; %r--%r, direction=1>' % (atom1, atom2))
 
     #=============================================
 
@@ -1407,8 +1473,8 @@ class TestTopologyObjects(unittest.TestCase):
 
     def test_residue(self):
         """ Tests the Residue object """
-        atoms = TrackedList()
-        atoms.extend([Atom(name='CA', list=atoms) for i in range(10)])
+        atoms = AtomList()
+        atoms.extend([Atom(name='CA') for i in range(10)])
         res = Residue('ALA', segid='SYS')
         for atom in atoms:
             res.add_atom(atom)
@@ -1430,11 +1496,18 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertRaises(DeprecationWarning, tmp)
         warnings.filterwarnings('ignore', category=DeprecationWarning)
         tmp()
+        self.assertEqual(res[0].segid, 'SYS1')
         self.assertEqual(res.segid, 'SYS1')
         warnings.filterwarnings('always', category=DeprecationWarning)
 
         # __repr__ testing
         self.assertEqual(repr(atoms[0]), '<Atom CA [0]; In ALA -1>')
+        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS1>')
+        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS1>')
+        res.chain = 'B'
+        res.insertion_code = 'B'
+        self.assertEqual(repr(res),
+                '<Residue ALA[-1]; chain=B; insertion_code=B; segid=SYS1>')
 
         # Try deleting all of our atoms
         while len(res):
@@ -1509,6 +1582,11 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertGreaterEqual(atoms[1], atoms[0])
         self.assertLessEqual(atoms[0], atoms[0])
         self.assertLessEqual(atoms[0], atoms[1])
+        # Check some error handling
+        self.assertRaises(ValueError, lambda: atoms.remove(atoms.pop()))
+        self.assertRaises(RuntimeError, atoms.assign_nbidx_from_types)
+        self.assertIs(atoms.__iadd__([Atom(), Atom()]), NotImplemented)
+        self.assertRaises(IndexError, lambda: atoms.find_original_index(1000))
 
     #=============================================
 
@@ -1541,6 +1619,26 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(len(reslist), 3) # Got rid of empty residue.
         self.assertEqual(len(atoms), sum([len(r) for r in reslist]))
 
+        # Check ordering of residues
+        self.assertGreater(reslist[1], reslist[0])
+        self.assertFalse(reslist[1] > reslist[1])
+        self.assertLess(reslist[0], reslist[1])
+        self.assertFalse(reslist[0] < reslist[0])
+
+        self.assertGreaterEqual(reslist[0], reslist[0])
+        self.assertGreaterEqual(reslist[1], reslist[0])
+        self.assertFalse(reslist[0] >= reslist[1])
+        self.assertLessEqual(reslist[0], reslist[0])
+        self.assertLessEqual(reslist[0], reslist[1])
+        self.assertFalse(reslist[1] <= reslist[0])
+        # Delete a couple residues
+        del reslist[:2]
+        self.assertEqual(len(reslist), 1)
+        del reslist[0]
+        self.assertEqual(len(reslist), 0)
+        del reslist[10:20]
+        self.assertEqual(len(reslist), 0)
+
     #=============================================
 
     def test_tracked_list(self):
@@ -1561,6 +1659,11 @@ class TestTopologyObjects(unittest.TestCase):
         for atom in all_atoms:
             self.assertIsNot(atom.list, all_atoms)
             self.assertIn(atom, items)
+        # Test the repr
+        self.assertEqual(repr(items), 'TrackedList([\n\t' +
+                '\n\t'.join(repr(a) for a in items[:24]) + '\n\t...\n\t' +
+                '\n\t'.join(repr(a) for a in items[-5:]) + '\n])')
+        # Delete the whole list in random order
         while items:
             atom = items.pop(random.choice(range(len(items))))
             for item in items:
@@ -1575,6 +1678,68 @@ class TestTopologyObjects(unittest.TestCase):
         items.changed = False
         items.remove(items[0])
         self.assertTrue(items.changed)
+        # Delete slice
+        while all_atoms:
+            del all_atoms[:10]
+        self.assertEqual(len(all_atoms), 0)
+        # Try a tracked list of an immutable built-in type
+        ints = TrackedList(range(9))
+        ints.append(9)
+        self.assertTrue(ints.needs_indexing)
+        ints.claim()
+        self.assertFalse(ints.needs_indexing)
+        before_len = len(ints)
+        ints.prune_unused() # Should be a no-op
+        self.assertEqual(len(ints), before_len)
+        self.assertEqual(repr(ints), """TrackedList([
+\t0
+\t1
+\t2
+\t3
+\t4
+\t5
+\t6
+\t7
+\t8
+\t9
+])""")
+
+    #=============================================
+
+    def test_nonbonded_exception(self):
+        """ Tests the NonbondedException and NonbondedExceptionType objects """
+        a1 = Atom(name='CA', type='CX', atomic_number=6)
+        a2 = Atom(name='CB', type='CT', atomic_number=6)
+        a3 = Atom(name='DU', type='DU', atomic_number=0)
+        nbe = NonbondedException(a1, a2)
+        self.assertIn(a1, nbe)
+        self.assertIn(a2, nbe)
+        self.assertNotIn(a3, nbe)
+        self.assertEqual(repr(nbe), '<NonbondedException; %r and %r>' % (a1, a2))
+        # Now add the type
+        nbet = NonbondedExceptionType(1.0, 2.0, chgscale=3.0)
+        nbet2 = NonbondedExceptionType(1.1, 2.0, chgscale=3.0)
+        self.assertEqual(nbet.sigma, 2**(-1/6))
+        self.assertEqual(nbet, nbet)
+        self.assertNotEqual(nbet, nbet2)
+        nbet2.sigma = 1.0
+        self.assertEqual(nbet2.rmin*2**(-1/6), nbet2.sigma)
+        nbe.type = nbet
+        self.assertEqual(repr(nbe), '<NonbondedException; %r and %r, type=%r>' %
+                         (a1, a2, nbet))
+
+    #=============================================
+
+    def test_acceptor_donor(self):
+        """ Test the AcceptorDonor API """
+        a1 = Atom(name='O', atomic_number=8)
+        a2 = Atom(name='H', atomic_number=1)
+        a3 = Atom(name='H2', atomic_number=1)
+        ad = AcceptorDonor(a1, a2)
+        self.assertIn(a1, ad)
+        self.assertIn(a2, ad)
+        self.assertNotIn(a3, ad)
+        self.assertEqual(repr(ad), '<AcceptorDonor; %r %r>' % (a1, a2))
 
     #=============================================
 

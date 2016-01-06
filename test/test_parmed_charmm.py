@@ -228,6 +228,11 @@ class TestCharmmPsf(utils.FileIOTestCase):
         for cmap in cpsf.cmaps:
             self.assertEqual(sum([int(a in cmap) for a in atoms]), 5)
             self.assertEqual(sum([int(b in cmap) for b in bonds]), 4)
+        # Test CHARMM groups
+        g = to.Group(cpsf.groups[0].atom, cpsf.groups[0].type, cpsf.groups[0].move)
+        self.assertEqual(g, cpsf.groups[0])
+        g.type = 0
+        self.assertNotEqual(g, cpsf.groups[0])
 
     def testXplorPsf(self):
         """ Test Xplor-format CHARMM PSF file parsing """

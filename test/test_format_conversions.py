@@ -8,6 +8,7 @@ from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
+from parmed.tools import addLJType
 import unittest
 from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
                    FileIOTestCase, HAS_GROMACS, CPU, has_openmm as HAS_OPENMM,
@@ -85,6 +86,17 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                              set([a.idx for a in a2.angle_partners]))
             self.assertEqual(set([a.idx for a in a1.dihedral_partners]),
                              set([a.idx for a in a2.dihedral_partners]))
+        # Make sure that assign_nbidx_from_types compresses maximally. First
+        # add a new, equivalent L-J type. Then call assign_nbidx_from_types
+        # again, which should recompress
+        before_nbidx = [a.nb_idx for a in parm.atoms]
+        addLJType(parm, '@1').execute()
+        after_nbidx = [a.nb_idx for a in parm.atoms]
+        self.assertEqual(before_nbidx[1:], after_nbidx[1:])
+        self.assertEqual(after_nbidx[0], max(before_nbidx)+1)
+        parm.atoms.assign_nbidx_from_types()
+        # Should recompress
+        self.assertEqual(before_nbidx, [a.nb_idx for a in parm.atoms])
 
     def testChamber(self):
         """ Tests converting standard Gromacs system into Chamber prmtop """

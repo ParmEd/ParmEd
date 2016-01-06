@@ -3500,20 +3500,12 @@ class _TorTorTable(object):
                 self._indexes[(a1, a2)] = i
                 i += 1
 
-    def __getitem__(self, idx, idx2=None):
-        if idx2 is None:
-            return self.data[self._indexes[idx]]
-        return self.data[self._indexes[(idx, idx2)]]
+    def __getitem__(self, idx):
+        return self.data[self._indexes[idx]]
 
-    def __setitem__(self, idx, second, third=None):
-        if third is not None:
-            idx = self._indexes[(_strip_units(idx, u.degrees),
-                                 _strip_units(second, u.degrees))]
-            value = _strip_units(third, u.kilocalories_per_mole)
-        else:
-            idx = self._indexes[_strip_units(idx, u.degrees)]
-            value = _strip_units(second, u.kilocalories_per_mole)
-        self.data[idx] = value
+    def __setitem__(self, idx, value):
+        idx = self._indexes[_strip_units(idx, u.degrees)]
+        self.data[idx] = _strip_units(value, u.kilocalories_per_mole)
 
     def __eq__(self, other):
         try:
@@ -3854,6 +3846,8 @@ class Residue(_ListItem):
             rep += '; chain=%s' % self.chain
         if self.insertion_code:
             rep += '; insertion_code=%s' % self.insertion_code
+        if self.segid:
+            rep += '; segid=%s' % self.segid
         return rep + '>'
 
     __getstate__ = _getstate_with_exclusions()
@@ -3942,20 +3936,7 @@ class TrackedList(list):
     @_changes
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... """
-        if not self: return
-        indices = range(start, min(stop, len(self)))
-        for index in indices:
-            try:
-                self[index]._idx = -1
-            except AttributeError:
-                # If we can't set _idx attribute on this object, don't fret
-                pass
-            try:
-                self[index].list = None
-            except AttributeError:
-                # If we can't set list attribute on this object, don't fret
-                pass
-        return list.__delslice__(self, start, stop)
+        self.__delitem__(slice(start, stop))
 
     @_changes
     def pop(self, idx=-1):
@@ -4118,17 +4099,6 @@ class AtomList(TrackedList):
         list.__delitem__(self, idx)
 
     @_changes
-    def __delslice__(self, start, stop):
-        """ Python 2 still uses __delslice__... sigh. """
-        indices = range(start, min(stop, len(self)))
-        for index in indices:
-            atom = self[index]
-            atom._idx = -1
-            atom.list = None
-            if atom.residue is not None: atom.residue.delete_atom(atom)
-        list.__delslice__(self, start, stop)
-
-    @_changes
     def pop(self, idx=-1):
         atom = list.pop(self, idx)
         atom._idx = -1
@@ -4224,11 +4194,10 @@ class AtomList(TrackedList):
         natoms = len(self)
         atom_type_lookups = dict() # For fast lookups
         atom_type_list = []
-        try:
-            for i, atom in enumerate(self):
-                atom.atom_type._idx = -1
-        except AttributeError:
-            raise RuntimeError('atom types are not assigned')
+        for i, atom in enumerate(self):
+            if atom.atom_type is UnassignedAtomType:
+                raise RuntimeError('atom types are not assigned')
+            atom.atom_type._idx = -1
 
         for i, atom in enumerate(self):
             type1 = atom.atom_type
@@ -4529,6 +4498,21 @@ class AtomType(object):
                 return False
             # Now check if LJ parameters are defined, and make sure those are
             # also equal
+            has_all = True
+            has_none = True
+            for attr in ('epsilon', 'rmin', 'epsilon_14', 'rmin_14'):
+                if getattr(self, attr) is None and getattr(other, attr) is None:
+                    has_all = False
+                    continue
+                elif getattr(self, attr) is None or getattr(other, attr) is None:
+                    return False # can't be equal
+                else:
+                    has_none = False
+            assert (has_all and not has_none) or (has_none and not has_all), \
+                    'Should have all or none at this point'
+            if not has_all:
+                return True
+            # At this point, we have all the attributes we need to compare
             return (abs(self.epsilon - other.epsilon) < TINY and
                     abs(self.rmin - other.rmin) < TINY and
                     abs(self.epsilon_14 - other.epsilon_14) < TINY and
@@ -4616,14 +4600,14 @@ class AtomType(object):
         return self.name
 
     # Comparisons are all based on number
-    def __gt__(self, other):
-        return self._member_number > other._member_number
-    def __lt__(self, other):
-        return self._member_number < other._member_number
-    def __ge__(self, other):
-        return self._member_number > other._member_number or self == other
-    def __le__(self, other):
-        return self._member_number < other._member_number or self == other
+#   def __gt__(self, other):
+#       return self._member_number > other._member_number
+#   def __lt__(self, other):
+#       return self._member_number < other._member_number
+#   def __ge__(self, other):
+#       return self._member_number > other._member_number or self == other
+#   def __le__(self, other):
+#       return self._member_number < other._member_number or self == other
 
     def __copy__(self):
         cp = AtomType(self.name, self.number, self.mass, self.atomic_number,
@@ -4716,8 +4700,8 @@ class Group(object):
         self.type = type
         self.move = move
 
-    def __copy__(self):
-        return type(self)(self.atom, self.type, self.move)
+#   def __copy__(self): TODO delete
+#       return type(self)(self.atom, self.type, self.move)
 
     def __eq__(self, other):
         return (self.atom is other.atom and self.type == other.type and
@@ -4729,6 +4713,6 @@ NoUreyBradley = BondType(0.0, 0.0) # singleton representing lack of a U-B term
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+#if __name__ == '__main__':
+#    import doctest
+#    doctest.testmod()
