@@ -917,7 +917,7 @@ class Structure(object):
             return selection
         sumsel = sum(selection)
         if sumsel == 0:
-            # No atoms selected. Return None
+            # No atoms selected. Return empty type
             return type(self)()
         # The cumulative sum of selection will give our index + 1 of each
         # selected atom into the new structure
