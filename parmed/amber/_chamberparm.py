@@ -324,7 +324,7 @@ class ChamberParm(AmberParm):
 
     @property
     def has_cmap(self):
-        return len(self.cmaps) > 0
+        return len(self.cmaps) > 0 or 'CHARMM_CMAP_COUNT' in self.parm_data
 
     #===========  PRIVATE INSTANCE METHODS  ============
 

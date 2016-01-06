@@ -3670,7 +3670,10 @@ class deleteBond(Action):
             del self.parm.torsion_torsions[i]
         for i in reversed(self.del_strbnds):
             del self.parm.stretch_bends[i]
-        self.parm.prune_empty_terms()
+        try:
+            self.parm.remake_parm()
+        except AttributeError:
+            self.parm.prune_empty_terms()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
