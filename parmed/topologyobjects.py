@@ -4700,9 +4700,6 @@ class Group(object):
         self.type = type
         self.move = move
 
-#   def __copy__(self): TODO delete
-#       return type(self)(self.atom, self.type, self.move)
-
     def __eq__(self, other):
         return (self.atom is other.atom and self.type == other.type and
                 self.move == other.move)
@@ -4710,9 +4707,3 @@ class Group(object):
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 NoUreyBradley = BondType(0.0, 0.0) # singleton representing lack of a U-B term
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-#if __name__ == '__main__':
-#    import doctest
-#    doctest.testmod()
