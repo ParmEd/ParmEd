@@ -203,14 +203,12 @@ class Mol2File(object):
                             res1 = restemp
                         elif atom1.residue.idx < len(rescont):
                             res1 = rescont[atom1.residue.idx]
-#                       else: TODO delete
-                        assert atom.residue.idx <= len(rescont), 'Bad bond!' #raise Mol2Error('Bad bonding pattern detected')
+                        assert atom.residue.idx <= len(rescont), 'Bad bond!'
                         if atom2.residue.idx == len(rescont):
                             res2 = restemp
                         elif atom2.residue.idx < len(rescont):
                             res2 = rescont[atom2.residue.idx]
-#                       else: TODO delete
-                        assert atom.residue.idx <= len(rescont), 'Bad bond!' #raise Mol2Error('Bad bonding pattern detected')
+                        assert atom.residue.idx <= len(rescont), 'Bad bond!'
                         assert res1 is not res2, 'BAD identical residues'
                         idx1 = atom1.idx - atom1.residue[0].idx
                         idx2 = atom2.idx - atom2.residue[0].idx
@@ -395,10 +393,7 @@ class Mol2File(object):
                                       struct[i+1].head.idx+bases[i+1]))
                     charges.extend([a.charge for a in res])
                 residues = struct
-#               if not struct.name: TODO delete
                 name = struct.name or struct[0].name
-#               else:
-#                   name = struct.name
             else:
                 natom = len(struct.atoms)
                 bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
