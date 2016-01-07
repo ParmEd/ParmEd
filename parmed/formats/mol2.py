@@ -203,14 +203,12 @@ class Mol2File(object):
                             res1 = restemp
                         elif atom1.residue.idx < len(rescont):
                             res1 = rescont[atom1.residue.idx]
-                        else:
-                            raise Mol2Error('Bad bonding pattern detected')
+                        assert atom.residue.idx <= len(rescont), 'Bad bond!'
                         if atom2.residue.idx == len(rescont):
                             res2 = restemp
-                        elif atom1.residue.idx < len(rescont):
+                        elif atom2.residue.idx < len(rescont):
                             res2 = rescont[atom2.residue.idx]
-                        else:
-                            raise Mol2Error('Bad bonding pattern detected')
+                        assert atom.residue.idx <= len(rescont), 'Bad bond!'
                         assert res1 is not res2, 'BAD identical residues'
                         idx1 = atom1.idx - atom1.residue[0].idx
                         idx2 = atom2.idx - atom2.residue[0].idx
@@ -395,10 +393,7 @@ class Mol2File(object):
                                       struct[i+1].head.idx+bases[i+1]))
                     charges.extend([a.charge for a in res])
                 residues = struct
-                if not struct.name:
-                    name = struct[0].name
-                else:
-                    name = struct.name
+                name = struct.name or struct[0].name
             else:
                 natom = len(struct.atoms)
                 bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
@@ -410,8 +405,7 @@ class Mol2File(object):
                     name = struct.residues[0].name
                 charges = [a.charge for a in struct.atoms]
             dest.write('@<TRIPOS>MOLECULE\n')
-            dest.write('%s' % name)
-            dest.write('\n')
+            dest.write('%s\n' % name)
             dest.write('%d %d %d 0 1\n' % (natom, len(bonds), len(residues)))
             if len(residues) == 1:
                 dest.write('SMALL\n')
@@ -432,6 +426,12 @@ class Mol2File(object):
             else:
                 dest.write('USER_CHARGES\n')
                 printchg = True
+            # See if we want to print box info
+            if hasattr(struct, 'box') and struct.box is not None:
+                box = struct.box
+                dest.write('@<TRIPOS>CRYSIN\n')
+                dest.write('%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n' %
+                           (box[0], box[1], box[2], box[3], box[4], box[5]))
             # Now do ATOM section
             dest.write('@<TRIPOS>ATOM\n')
             j = 1

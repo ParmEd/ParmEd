@@ -18,7 +18,7 @@ import warnings
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
     """ Tests converting Amber prmtop files to Gromacs topologies """
 
-    def testBenzeneCyclohexane(self):
+    def test_benzene_cyclohexane(self):
         """ Test converting binary liquid from Amber prmtop to Gromacs top """
         parm = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'),
                               get_fn('benzene_cyclohexane_10_500.inpcrd'))
@@ -59,7 +59,7 @@ class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
 class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
     """ Tests converting Gromacs top/gro files to Amber """
 
-    def testSimple(self):
+    def test_simple(self):
         """ Tests converting standard Gromacs system into Amber prmtop """
         top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -98,7 +98,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         # Should recompress
         self.assertEqual(before_nbidx, [a.nb_idx for a in parm.atoms])
 
-    def testChamber(self):
+    def test_chamber(self):
         """ Tests converting standard Gromacs system into Chamber prmtop """
         top = load_file(get_fn('1aki.charmm27.solv.top'),
                         xyz=get_fn('1aki.charmm27.solv.gro'))
@@ -110,7 +110,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                                    relative_error=1e-8)
         )
 
-    def testGeometricCombiningRule(self):
+    def test_geometric_combining_rule(self):
         """ Tests converting geom. comb. rule from Gromacs to Amber """
         top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
@@ -125,7 +125,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         )
 
     @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
-    def testGeometricCombiningRuleEnergy(self):
+    def test_geometric_combining_rule_energy(self):
         """ Tests converting geom. comb. rule energy from Gromacs to Amber """
         top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
@@ -148,7 +148,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         self._check_energies(top, cong, parm, cona)
 
     @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
-    def testEnergySimple(self):
+    def test_energy_simple(self):
         """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
         top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
         gro = load_file(get_fn(os.path.join('03.AlaGlu', 'conf.gro')))
@@ -168,7 +168,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         self._check_energies(top, cong, parm, cona)
 
     @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
-    def testEnergyComplicated(self):
+    def test_energy_complicated(self):
         """ Check equal energies for Gmx -> Amber conversion of complex FF """
         warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(get_fn(os.path.join('12.DPPC', 'topol2.top')))
@@ -208,7 +208,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
 class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
     """ Tests converting Amber files to CHARMM """
 
-    def testSimple(self):
+    def test_simple(self):
         """ Tests converting simple Amber system to CHARMM PSF/parameters """
         parm = load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         parm.save(get_fn('amber_to_charmm.psf', written=True))
@@ -259,7 +259,7 @@ class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):
     Tests that OpenMM system/topology combo can be translated to other formats
     """
 
-    def testSimple(self):
+    def test_simple(self):
         """ Test OpenMM System/Topology -> Amber prmtop conversion """
         parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
@@ -296,7 +296,7 @@ class TestOpenMMToGromacs(FileIOTestCase, TestCaseRelative):
     Tests that OpenMM system/topology combo can be translated to other formats
     """
 
-    def testSimple(self):
+    def test_simple(self):
         """ Test OpenMM System/Topology -> Gromacs topology conversion """
         parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
