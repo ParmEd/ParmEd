@@ -1064,9 +1064,16 @@ class TestMol2File(FileIOTestCase):
     def testMol2SingleWriteStruct(self):
         """ Tests writing mol2 file of single-residue Structure """
         mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
-        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol2', written=True))
-        self.assertTrue(diff_files(get_fn('tripos9struct.mol2', written=True),
-                                   get_saved_fn('tripos9struct.mol2')))
+        self.assertIs(mol2.box, None)
+        fn = get_fn('tripos9struct.mol2', written=True)
+        formats.Mol2File.write(mol2, fn)
+        self.assertTrue(diff_files(fn, get_saved_fn('tripos9struct.mol2')))
+        self.assertIs(formats.Mol2File.parse(fn, structure=True).box, None)
+        # Now add a box
+        mol2.box = [10, 10, 10, 90, 90, 90]
+        formats.Mol2File.write(mol2, fn)
+        np.testing.assert_equal(formats.Mol2File.parse(fn, structure=True).box,
+                                [10, 10, 10, 90, 90, 90])
 
     def testMol3SingleWrite(self):
         """ Tests writing mol3 file of single ResidueTemplate """
