@@ -34,7 +34,7 @@ class PdbxReaderTests(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testException(self):
+    def test_exception(self):
         """ Test the PDBx/mmCIF parser exception """
         def tmp():
             raise PdbxSyntaxError(10, 'This is the error text')
@@ -44,7 +44,7 @@ class PdbxReaderTests(unittest.TestCase):
         except PdbxSyntaxError as e:
             self.assertEqual(str(e), '%ERROR - [at line: 10] This is the error text')
 
-    def testReadSmallDataFile(self): 
+    def test_read_small_data_file(self):
         """ Test reading small CIF file """
         try:
             #
@@ -57,7 +57,7 @@ class PdbxReaderTests(unittest.TestCase):
             traceback.print_exc(file=sys.stderr)
             self.fail()
 
-    def testReadBigDataFile(self): 
+    def test_read_big_data_file(self):
         """ Test reading large CIF file """
         try:
             #
@@ -70,7 +70,7 @@ class PdbxReaderTests(unittest.TestCase):
             traceback.print_exc(file=sys.stderr)
             self.fail()
 
-    def testReadSFDataFile(self): 
+    def test_read_sf_data_file(self):
         """read PDB structure factor data file and compute statistics on f/sig(f).
         """
         #
@@ -125,7 +125,7 @@ class PdbxWriterTests(FileIOTestCase):
         self.pathPdbxDataFile = get_fn("1kip.cif")
         self.pathOutputFile = get_fn("testOutputDataFile.cif", written=True)
 
-    def testWriteDataFile(self): 
+    def test_write_data_file(self):
         """ Test writing CIF file """
         myDataList=[]
         ofh = open(get_fn("test-output.cif", written=True), "w")
@@ -150,7 +150,7 @@ class PdbxWriterTests(FileIOTestCase):
         self.assertTrue(diff_files(get_saved_fn('test-output.cif'),
                                    get_fn('test-output.cif', written=True)))
 
-    def testUpdateDataFile(self): 
+    def test_update_data_file(self):
         """ Test writing another CIF file """
         # Create a initial data file --
         #
@@ -203,7 +203,7 @@ class PdbxWriterTests(FileIOTestCase):
         self.assertTrue(diff_files(get_saved_fn('test_write_1.txt'),
                                    get_fn('test_write_1.txt', written=True)))
 
-    def testReadDataFile(self): 
+    def test_read_data_file(self):
         """ Test reading a CIF file (... again?) """
         #
         myDataList=[]
@@ -212,7 +212,7 @@ class PdbxWriterTests(FileIOTestCase):
         pRd.read(myDataList)
         ifh.close()            
 
-    def testReadWriteDataFile(self):
+    def test_read_write_data_file(self):
         """Test case -  data file read write test
         """
         myDataList=[]
