@@ -132,6 +132,9 @@ class TestFileLoader(FileIOTestCase):
         for atom in mol2.atoms:
             self.assertEqual(atom.charge, 0)
             self.assertEqual(atom.residue.name, 'UNK')
+        # Check mol2 where last several columns do not exist in SUBSTRUCTURE
+        mol2 = formats.load_file(get_fn('tripos4.mol2'), structure=True)
+        self.assertIsInstance(mol2, Structure)
         # Check bad file detection
         fn = get_fn('junk_file', written=True)
         with open(fn, 'w') as f:
@@ -141,7 +144,11 @@ class TestFileLoader(FileIOTestCase):
             f.write('junkity junk junk\n')
             f.write('not a mol2 file\n')
         self.assertRaises(exceptions.Mol2Error, lambda:
-                formats.mol2.Mol2File.parse(fn))
+                formats.mol2.Mol2File.parse(fn)
+        )
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.mol2.Mol2File.parse(get_fn('error.mol2'))
+        )
 
     def test_mol2_box(self):
         """ Tests parsing Mol2 file with CRYSIN section """
@@ -918,6 +925,16 @@ class TestMol2File(FileIOTestCase):
         self.assertEqual(len(mol3.bonds), 35)
         self.assertIs(mol3.head, [a for a in mol3 if a.name == "N1'"][0])
         self.assertIs(mol3.tail, [a for a in mol3 if a.name == "C'"][0])
+        # Test bad mol3 file
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.Mol2File.parse(get_fn('error.mol3'))
+        )
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.Mol2File.parse(get_fn('error2.mol3'))
+        )
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.Mol2File.parse(get_fn('error3.mol3'))
+        )
 
     def testMol3File2(self):
         """ Tests parsing a Mol3 file with RESIDUECONNECT atoms """
@@ -999,6 +1016,25 @@ class TestMol2File(FileIOTestCase):
         formats.Mol2File.write(mol2, get_fn('test_multistruct.mol2', written=True))
         self.assertTrue(diff_files(get_fn('test_multistruct.mol2', written=True),
                                    get_saved_fn('test_multistruct.mol2')))
+        fn = get_fn('test_splitmultistruct.mol2', written=True)
+        formats.Mol2File.write(mol2, fn, split=True)
+        self.assertTrue(diff_files(fn, get_saved_fn('test_splitmultistruct.mol2')))
+        # Make residue names unrecognizable as amino or nucleic acids
+        for i, res in enumerate(mol2.residues):
+            res.name = '%03d' % i
+        fobj = StringIO()
+        formats.Mol2File.write(mol2, fobj)
+        fobj.seek(0)
+        self.assertIn('BIOPOLYMER', fobj.read())
+        # Now delete *some* of the coordinates -- mol2 should fill with 0s
+        fobj = StringIO()
+        del mol2.atoms[0].xx, mol2.atoms[1].xy, mol2.atoms[2].xz
+        formats.Mol2File.write(mol2, fobj)
+        fobj.seek(0)
+        read = formats.Mol2File.parse(fobj, structure=True)
+        self.assertEqual(read.atoms[0].xx, 0)
+        self.assertEqual(read.atoms[1].xy, 0)
+        self.assertEqual(read.atoms[2].xz, 0)
 
     def testMol3MultiWrite(self):
         """
@@ -1039,6 +1075,14 @@ class TestMol2File(FileIOTestCase):
                                mol3=True)
         self.assertTrue(diff_files(get_fn('tripos9.mol3', written=True),
                                    get_saved_fn('tripos9.mol3')))
+        # Now make sure it can write a ResidueTemplate with a connection
+        mol2.connections.append(mol2.atoms[2])
+        fobj = StringIO()
+        formats.Mol2File.write(mol2, fobj, mol3=True)
+        fobj.seek(0)
+        new = formats.Mol2File.parse(fobj)
+        self.assertEqual(len(new.connections), 1)
+        self.assertIs(new.atoms[2], new.connections[0])
 
     def testMol3SingleWriteStruct(self):
         """ Tests writing mol3 file of single-residue Structure """
