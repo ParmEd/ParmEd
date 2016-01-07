@@ -431,6 +431,12 @@ class Mol2File(object):
             else:
                 dest.write('USER_CHARGES\n')
                 printchg = True
+            # See if we want to print box info
+            if hasattr(struct, 'box') and struct.box is not None:
+                box = struct.box
+                dest.write('@<TRIPOS>CRYSIN\n')
+                dest.write('%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n' %
+                           (box[0], box[1], box[2], box[3], box[4], box[5]))
             # Now do ATOM section
             dest.write('@<TRIPOS>ATOM\n')
             j = 1
