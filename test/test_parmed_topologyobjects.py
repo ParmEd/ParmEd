@@ -279,6 +279,43 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a1.atomic_number, 7)
         self.assertEqual(a1.element, 7)
 
+        # Test L-J setters/getters
+        a = Atom()
+        self.assertEqual(a.rmin, 0)
+        self.assertEqual(a.sigma, 0)
+        self.assertEqual(a.epsilon, 0)
+        self.assertEqual(a.rmin_14, 0)
+        self.assertEqual(a.sigma_14, 0)
+        self.assertEqual(a.epsilon_14, 0)
+        a.rmin = 1.0
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 1)
+        self.assertEqual(a.sigma_14, 2**(5/6))
+        self.assertEqual(a.epsilon, 0)
+        self.assertEqual(a.epsilon_14, 0)
+        a.rmin_14 = 2.0
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 2)
+        self.assertEqual(a.sigma_14, 2*2**(5/6))
+        self.assertEqual(a.epsilon, 0)
+        self.assertEqual(a.epsilon_14, 0)
+        a.epsilon = 0.5
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 2)
+        self.assertEqual(a.sigma_14, 2*2**(5/6))
+        self.assertEqual(a.epsilon, 0.5)
+        self.assertEqual(a.epsilon_14, 0.5)
+        a.epsilon_14 = 0.25
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 2)
+        self.assertEqual(a.sigma_14, 2*2**(5/6))
+        self.assertEqual(a.epsilon, 0.5)
+        self.assertEqual(a.epsilon_14, 0.25)
+
     #=============================================
 
     def test_atom_type(self):
