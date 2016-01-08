@@ -674,8 +674,8 @@ class Atom(_ListItem):
 
     @epsilon_14.setter
     def epsilon_14(self, value):
-        """ The 1-4 Lennard-Jones Rmin/2 parameter """
-        self._rmin14 = value
+        """ The 1-4 Lennard-Jones epsilon parameter """
+        self._epsilon14 = value
 
     #===================================================
 
