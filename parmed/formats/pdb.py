@@ -7,10 +7,6 @@ from __future__ import division, print_function, absolute_import
 from contextlib import closing
 import io
 import ftplib
-try:
-    import gzip
-except ImportError:
-    gzip = None
 import numpy as np
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
@@ -112,7 +108,6 @@ class PDBFile(object):
                 elif line[:5] in ('ORIGX', 'SCALE', 'MTRIX'):
                     if line[5] not in '123':
                         return False
-                    continue
                 elif line[:6] in ('ATOM  ', 'HETATM'):
                     atnum, atname = line[6:11], line[12:16]
                     resname, resid = line[17:21], line[22:26]
@@ -141,13 +136,12 @@ class PDBFile(object):
                         except ValueError:
                             return False
                     if elem.strip():
-                        if len(elem) > 2:
-                            return False
                         if any(x.isdigit() for x in elem):
                             return False
                     return True
-                return False
-            return True
+                else:
+                    return False
+            return False
 
     #===================================================
 
@@ -188,10 +182,9 @@ class PDBFile(object):
 
         TypeError if pdb_id is not a 4-character string
         """
-        if gzip is None:
-            raise ImportError('Cannot import gzip module')
+        import gzip
         if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
-            raise TypeError('pdb_id must be the 4-letter PDB code')
+            raise ValueError('pdb_id must be the 4-letter PDB code')
 
         pdb_id = pdb_id.lower()
         ftp = ftplib.FTP('ftp.wwpdb.org', timeout=timeout)
@@ -382,8 +375,7 @@ class PDBFile(object):
                                 atom_overflow = True
                                 atnum = last_atom_added.number + 1
                             else:
-                                raise ValueError('Could not convert %s to int' %
-                                                 atnum)
+                                raise
                     elif atom_overflow:
                         atnum = last_atom_added.number + 1
                     else:
@@ -399,13 +391,18 @@ class PDBFile(object):
                     # It's possible that the residue number has cycled so much
                     # that it is now filled with ****'s. In that case, start a
                     # new residue if the current residue repeats the same atom
-                    # name as # the 'last' residue. Do not worry about atom
-                    # numbers going to *****'s, since that is >1M atoms.
+                    # name as # the 'last' residue.
                     if resid is None:
-                        for atom in struct.residues[-1]:
-                            if atom.name == atname:
-                                resid = last_resid + 1
-                                break
+                        # If the last residue is number 0xffff, then this is the
+                        # first residue that has overridden, so make it a new
+                        # residue
+                        if struct.residues[-1].number == 0xffff:
+                            resid = struct.residues[-1].number + 1
+                        else:
+                            for atom in struct.residues[-1]:
+                                if atom.name == atname:
+                                    resid = last_resid + 1
+                                    break
                     if resid is None:
                         # Still part of the last residue
                         resid = last_resid
@@ -871,8 +868,7 @@ class CIFFile(object):
 
         TypeError if pdb_id is not a 4-character string
         """
-        if gzip is None:
-            raise ImportError('Cannot import gzip module')
+        import gzip
         if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
             raise TypeError('pdb_id must be the 4-letter PDB code')
 

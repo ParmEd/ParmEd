@@ -221,7 +221,7 @@ class TestFileLoader(FileIOTestCase):
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberParm)
 
-class TestChemistryPDBStructure(FileIOTestCase):
+class TestPDBStructure(FileIOTestCase):
     
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
@@ -233,6 +233,52 @@ class TestChemistryPDBStructure(FileIOTestCase):
         self.format_test = get_fn('SCM_A.pdb')
         self.overflow2 = get_fn('overflow.pdb')
         FileIOTestCase.setUp(self)
+
+    def test_pdb_format_detection(self):
+        """ Tests PDB file detection from contents """
+        fn = get_fn('test.pdb', written=True)
+        pdbtext1 = """\
+%-5s%d    %10.6f%10.6f%10.6f     %10.5f
+ATOM  %5d %4s%1s%3s %1s%4d%1s   %8s%8s%8s%6s%6s          %-2s%2s
+"""
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
+                'A', 1, '', '   1.000', '   1.000', '   1.000', '  1.00',
+                '  1.00', '', ''))
+        self.assertTrue(formats.PDBFile.id_format(fn))
+        # ORIGX4 is not a valid keyword
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 4, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
+                'A', 1, '', '   1.000', '   1.000', '   1.000', '  1.00',
+                '  1.00', '', ''))
+        self.assertFalse(formats.PDBFile.id_format(fn))
+        # Safely catch if coordinates are not floats
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
+                'A', 1, '', '   a.000', '   1.000', '   1.000', '  1.00',
+                '  1.00', '', ''))
+        self.assertFalse(formats.PDBFile.id_format(fn))
+        # Safely catch if occupancy and b-factor are not floats
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
+                'A', 1, '', '   1.000', '   1.000', '   1.000', '  a.00',
+                '  1.00', '', ''))
+        self.assertFalse(formats.PDBFile.id_format(fn))
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
+                'A', 1, '', '   1.000', '   1.000', '   1.000', '  1.00',
+                '  a.00', '', ''))
+        self.assertFalse(formats.PDBFile.id_format(fn))
+        # Safely catch if element is wrong
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
+                'A', 1, '', '   1.000', '   1.000', '   1.000', '  1.00',
+                '  1.00', 'C1', ''))
+        self.assertFalse(formats.PDBFile.id_format(fn))
+        # Safely catch blank file
+        with open(fn, 'w') as f:
+            pass
+        self.assertFalse(formats.PDBFile.id_format(fn))
 
     def test_ascii(self):
         """ Test PDB file parsing """
@@ -247,6 +293,9 @@ class TestChemistryPDBStructure(FileIOTestCase):
     def test_download(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
+        # Check proper argument handling
+        self.assertRaises(ValueError, lambda: download_PDB('not a PDB ID'))
+        self.assertRaises(IOError, lambda: download_PDB('@#63'))
 
     def test_download_save(self):
         """ Tests downloading PDB files and saving a copy """
@@ -287,6 +336,138 @@ class TestChemistryPDBStructure(FileIOTestCase):
         for i, atom in enumerate(pdbfile.atoms):
             self.assertEqual(atom.number, i+1)
             self.assertEqual(atom.idx, i)
+
+    def test_residue_overflow(self):
+        """ Tests PDB file where residue number overflows """
+        fn = get_fn('test.pdb', written=True)
+        pdbtext = """\
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5d %4s%1s%3s %1s%4s%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+"""
+        with open(fn, 'w') as f:
+            f.write(pdbtext %
+                (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
+                 2, 'CA', ' ', 'RE2', 'A', hex(10000)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 3, 'CA', ' ', 'RE3', 'A', hex(10001)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 4, 'CA', ' ', 'RE4', 'A', hex(10002)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 5, 'CA', ' ', 'RE5', 'A', hex(10003)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 6, 'CA', ' ', 'RE6', 'A', 'ffff', '', 1, 1, 1, 1, 1, '', '',
+                 7, 'CA', ' ', 'RE7', 'A', '****', '', 1, 1, 1, 1, 1, '', '')
+            )
+        # Check the parsing
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
+        self.assertEqual(pdb.residues[0].number, 9999)
+        self.assertEqual(pdb.residues[1].number, 10000)
+        self.assertEqual(pdb.residues[2].number, 10001)
+        self.assertEqual(pdb.residues[3].number, 10002)
+        self.assertEqual(pdb.residues[4].number, 10003)
+        self.assertEqual(pdb.residues[5].number, 65535)
+        self.assertEqual(pdb.residues[6].number, 65536) # inferred
+        # Now check error raised if the overflow is not just ****
+        with open(fn, 'w') as f:
+            f.write(pdbtext %
+                (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
+                 2, 'CA', ' ', 'RE2', 'A', hex(10000)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 3, 'CA', ' ', 'RE3', 'A', hex(10001)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 4, 'CA', ' ', 'RE4', 'A', hex(10002)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 5, 'CA', ' ', 'RE5', 'A', hex(10003)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 6, 'CA', ' ', 'RE6', 'A', 'ffff', '', 1, 1, 1, 1, 1, '', '',
+                 7, 'CA', ' ', 'RE7', 'A', '>:-O', '', 1, 1, 1, 1, 1, '', '')
+            )
+        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        # Now check if the residue sequence field is simply expanded
+        with open(fn, 'w') as f:
+            f.write(pdbtext %
+                (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
+                 2, 'CA', ' ', 'RE2', 'A', 1000, '0', 1, 1, 1, 1, 1, '', '',
+                 3, 'CA', ' ', 'RE3', 'A', 1000, '1', 1, 1, 1, 1, 1, '', '',
+                 4, 'CA', ' ', 'RE4', 'A', 1000, '2', 1, 1, 1, 1, 1, '', '',
+                 5, 'CA', ' ', 'RE5', 'A', 9999, '9', 1, 1, 1, 1, 1, '', '',
+                 6, 'CA', ' ', 'RE6', 'A', 1000, '00', 1, 1, 1, 1, 1, '', '',
+                 7, 'CA', ' ', 'RE7', 'A', 1000, '01', 1, 1, 1, 1, 1, '', '')
+            )
+        # Check the parsing
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
+        self.assertEqual(pdb.residues[0].number, 9999)
+        self.assertEqual(pdb.residues[1].number, 10000)
+        self.assertEqual(pdb.residues[2].number, 10001)
+        self.assertEqual(pdb.residues[3].number, 10002)
+        self.assertEqual(pdb.residues[4].number, 99999)
+        self.assertEqual(pdb.residues[5].number, 100000)
+        self.assertEqual(pdb.residues[6].number, 100001)
+
+        # Check proper residue distinguishing for overflowed case. NR marks
+        # atoms that *should* be turned into a new residue because there's a
+        # name repeat or a new residue name
+        with open(fn, 'w') as f:
+            f.write(pdbtext %
+                (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
+                 2, 'CA', ' ', 'RE2', 'A', hex(10000)[2:], '', 1, 1, 1, 1, 1, '', '',
+                 3, 'CA', ' ', 'RE3', 'A', 'ffff', '', 1, 1, 1, 1, 1, '', '',
+                 4, 'CB', ' ', 'RE3', 'A', '****', '', 1, 1, 1, 1, 1, '', '',
+                 5, 'CB', ' ', 'RE3', 'A', '****', '', 1, 1, 1, 1, 1, '', '', # NR
+                 6, 'XX', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '', # NR
+                 7, 'CA', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '')
+            )
+        # Check the parsing
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 6)
+        self.assertEqual([len(r) for r in pdb.residues], [1, 1, 1, 1, 1, 2])
+
+    def test_atom_number_overflow(self):
+        """ Tests PDB file where residue number overflows """
+        fn = get_fn('test.pdb', written=True)
+        pdbtext = """\
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+ATOM  %5s %4s%1s%3s %1s%4d%-2s  %8.3f%8.3f%8.3f%6.2f%6.2f          %-2s%2s
+"""
+        with open(fn, 'w') as f:
+            f.write(pdbtext %
+                (99999, 'CA', ' ', 'RE1', 'A', 1, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100000)[2:], 'CA', ' ', 'RE2', 'A', 2, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100001)[2:], 'CA', ' ', 'RE3', 'A', 3, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100002)[2:], 'CA', ' ', 'RE4', 'A', 4, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100003)[2:], 'CA', ' ', 'RE5', 'A', 5, '', 1, 1, 1, 1, 1, '', '',
+                 'fffff', 'CA', ' ', 'RE6', 'A', 6, '', 1, 1, 1, 1, 1, '', '',
+                 '*****', 'CA', ' ', 'RE7', 'A', 7, '', 1, 1, 1, 1, 1, '', '')
+            )
+        # Check the parsing
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
+        self.assertEqual(pdb[0].number, 99999)
+        self.assertEqual(pdb[1].number, 100000)
+        self.assertEqual(pdb[2].number, 100001)
+        self.assertEqual(pdb[3].number, 100002)
+        self.assertEqual(pdb[4].number, 100003)
+        self.assertEqual(pdb[5].number, 1048575)
+        self.assertEqual(pdb[6].number, 1048576)
+        with open(fn, 'w') as f:
+            f.write(pdbtext %
+                (99999, 'CA', ' ', 'RE1', 'A', 1, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100000)[2:], 'CA', ' ', 'RE2', 'A', 2, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100001)[2:], 'CA', ' ', 'RE3', 'A', 3, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100002)[2:], 'CA', ' ', 'RE4', 'A', 4, '', 1, 1, 1, 1, 1, '', '',
+                 hex(100003)[2:], 'CA', ' ', 'RE5', 'A', 5, '', 1, 1, 1, 1, 1, '', '',
+                 'fffff', 'CA', ' ', 'RE6', 'A', 6, '', 1, 1, 1, 1, 1, '', '',
+                 '*a***', 'CA', ' ', 'RE7', 'A', 7, '', 1, 1, 1, 1, 1, '', '')
+            )
+        # Check the parsing
+        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
 
     def test_pdb_write_simple(self):
         """ Test PDB file writing on a very simple input structure """
@@ -491,6 +672,15 @@ class TestChemistryPDBStructure(FileIOTestCase):
             self.assertEqual(atom.residue.segid,
                              pdbfile.atoms[atom.idx].residue.segid)
 
+    def test_private_functions(self):
+        """ Tests the private helper functions in parmed/formats/pdb.py """
+        self.assertEqual(formats.pdb._standardize_resname('ASH'), 'ASP')
+        self.assertEqual(formats.pdb._standardize_resname('CYX'), 'CYS')
+        self.assertEqual(formats.pdb._standardize_resname('RA'), 'A')
+        self.assertEqual(formats.pdb._standardize_resname('DG'), 'DG')
+        self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
+
+    # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):
         # Now go through all atoms and compare their attributes
@@ -552,7 +742,6 @@ class TestChemistryPDBStructure(FileIOTestCase):
             if not reordered:
                 self.assertEqual(r1.number, r2.number)
 
-    # Private helper test functions
     def _check4lzt(self, obj, check_meta=True, has_altloc=True):
         self.assertEqual(obj.get_coordinates('all').shape[0], 1)
         np.testing.assert_allclose(obj.box,
@@ -654,7 +843,7 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(pqr.atoms[0].charge, -0.9526)
         self.assertEqual(pqr.atoms[-1].radii, 0.8)
 
-class TestChemistryCIFStructure(FileIOTestCase):
+class TestCIFStructure(FileIOTestCase):
 
     def setUp(self):
         self.lztpdb = get_fn('4lzt.pdb')
