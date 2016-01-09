@@ -435,10 +435,7 @@ class PDBFile(object):
                         try:
                             orig_atom = struct.atoms[atomno-1]
                         except IndexError:
-                            raise PDBError('Atom %d differs in MODEL %d [%s %s '
-                                           'vs. %s %s]' % (atomno, modelno,
-                                           atom.residue.name, atom.name,
-                                           resname, atname))
+                            raise PDBError('Extra atom in MODEL %d' % modelno)
                         if (orig_atom.residue.name != resname.strip()
                                 or orig_atom.name != atname.strip()):
                             raise PDBError('Atom %d differs in MODEL %d [%s %s '
@@ -497,7 +494,7 @@ class PDBFile(object):
                         raise PDBError('MODEL ended before any atoms read in')
                     modelno += 1
                     if len(struct.atoms)*3 != len(coordinates):
-                        raise ValueError(
+                        raise PDBError(
                                 'Inconsistent atom numbers in some PDB models')
                     all_coordinates.append(coordinates)
                     atomno = 0
@@ -508,8 +505,8 @@ class PDBFile(object):
                     if modelno == 1 and len(struct.atoms) == 0: continue
                     if len(coordinates) > 0:
                         if len(struct.atoms)*3 != len(coordinates):
-                            raise ValueError('Inconsistent atom numbers in '
-                                             'some PDB models')
+                            raise PDBError('Inconsistent atom numbers in '
+                                           'some PDB models')
                         warnings.warn('MODEL not explicitly ended', PDBWarning)
                         all_coordinates.append(coordinates)
                         coordinates = []
@@ -592,7 +589,7 @@ class PDBFile(object):
         struct.unchange()
         if coordinates:
             if len(coordinates) != 3*len(struct.atoms):
-                raise ValueError('bad number of atoms in some PDB models')
+                raise PDBError('bad number of atoms in some PDB models')
             all_coordinates.append(coordinates)
         struct._coordinates = np.array(all_coordinates).reshape(
                         (-1, len(struct.atoms), 3))
@@ -705,7 +702,7 @@ class PDBFile(object):
                         a = item
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
-            raise Exception("Should not be here!")
+            assert False, 'Should not be here'
         if standard_resnames:
             standardize = lambda x: _standardize_resname(x)[:reslen]
         else:
@@ -870,7 +867,7 @@ class CIFFile(object):
         """
         import gzip
         if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
-            raise TypeError('pdb_id must be the 4-letter PDB code')
+            raise ValueError('pdb_id must be the 4-letter PDB code')
 
         pdb_id = pdb_id.lower()
         ftp = ftplib.FTP('ftp.wwpdb.org', timeout=timeout)
@@ -1086,29 +1083,12 @@ class CIFFile(object):
                 resnum = int(row[resnumid])
                 inscode = row[inscodeid]
                 if inscode in '?.': inscode = ''
-                try:
-                    model = int(row[modelid])
-                except ValueError:
-                    model = 0
+                model = int(row[modelid])
                 if origmodel is None:
                     origmodel = lastmodel = model
                 x, y, z = float(row[xid]), float(row[yid]), float(row[zid])
-                try:
-                    occup = float(row[occupid])
-                except ValueError:
-                    occup = 0.0
-                try:
-                    bfactor = float(row[bfactorid])
-                except ValueError:
-                    bfactor = 0.0
-                charge = row[chargeid]
-                if not charge.strip() or charge.strip() in ('.', '?'):
-                    charge = 0
-                else:
-                    try:
-                        charge = float(charge)
-                    except TypeError:
-                        charge = 0.0
+                occup = float(row[occupid])
+                bfactor = float(row[bfactorid])
                 # Try to figure out the element
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
                 if elem[0] == ' ': elem = elem[1] + ' '
@@ -1125,7 +1105,7 @@ class CIFFile(object):
                     except KeyError:
                         try:
                             sym = atname.strip()[:2]
-                            sym = '%s%s' % (sym[0].upper(), sym[0].lower())
+                            sym = '%s%s' % (sym[0].upper(), sym[1].lower())
                             atomic_number = AtomicNum[sym]
                             mass = Mass[sym]
                         except KeyError:
@@ -1133,12 +1113,12 @@ class CIFFile(object):
                             mass = 0.0
                 if atname.startswith('EP') or atname.startswith('LP'):
                     atom = ExtraPoint(atomic_number=atomic_number, name=atname,
-                                charge=charge, mass=mass, occupancy=occup,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
+                                mass=mass, occupancy=occup, bfactor=bfactor,
+                                altloc=altloc, number=atnum)
                 else:
                     atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=charge, mass=mass, occupancy=occup,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
+                                mass=mass, occupancy=occup, bfactor=bfactor,
+                                altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
                 if (_compare_atoms(last_atom, atom, resname, resnum,
                                    chain, '')
@@ -1201,7 +1181,7 @@ class CIFFile(object):
                 if -1 in (atnumid, atnameid, altlocid, resnameid, chainid,
                           resnumid, u11id, u22id, u33id, u12id, u13id, u23id):
                     warnings.warn('Incomplete anisotropic B-factor CIF '
-                                  'section. Skipping')
+                                  'section. Skipping', PDBWarning)
                 else:
                     try:
                         for i in range(anisou.getRowCount()):
@@ -1231,7 +1211,7 @@ class CIFFile(object):
                         for key, atom in iteritems(atommap):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
-                                      'B-factors. Skipping')
+                                      'B-factors. Skipping', PDBWarning)
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
