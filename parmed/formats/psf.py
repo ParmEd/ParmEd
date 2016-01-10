@@ -90,8 +90,8 @@ class PSFFile(object):
         except AttributeError:
             ext = True
         own_handle = False
-        # Index the atoms and residues
-        if not hasattr(dest, 'write'):
+        # Index the atoms and residues TODO delete
+        if isinstance(dest, string_types):
             own_handle = True
             dest = genopen(dest, 'w')
 
