@@ -1063,7 +1063,6 @@ class CIFFile(object):
             zid = atoms.getAttributeIndex('Cartn_z')
             occupid = atoms.getAttributeIndex('occupancy')
             bfactorid = atoms.getAttributeIndex('B_iso_or_equiv')
-            chargeid = atoms.getAttributeIndex('pdbx_formal_charge')
             modelid = atoms.getAttributeIndex('pdbx_PDB_model_num')
             origmodel = None
             lastmodel = None

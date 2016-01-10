@@ -1080,9 +1080,164 @@ class TestPDBStructure(FileIOTestCase):
 class TestParmedPQRStructure(FileIOTestCase):
     """ Tests the PQR parser and writer """
 
+    def setUp(self):
+        self.ATOMLINE = "ATOM  %5s %4s %3s %1s %4s %7s %7s %7s %5s %5s\n"
+        self.ATOMLINE2 = "ATOM  %5s %4s %3s %1s %4s %7s %7s %7s %5s %5s   %s %s\n"
+        self.ATOMLINE3 = "ATOM  %5s %4s %3s %4s %7s %7s %7s %5s %5s\n"
+        warnings.filterwarnings('error', category=exceptions.PDBWarning)
+        FileIOTestCase.setUp(self)
+
+    def tearDown(self):
+        warnings.filterwarnings('always', category=exceptions.PDBWarning)
+        FileIOTestCase.tearDown()
+
     def test_pqr_parsing(self):
         """ Tests parsing a PQR file """
-        pqr = formats.PQRFile.parse(get_fn('adk_open.pqr'))
+        fn = get_fn('test.pqr', written=True)
+        self._check_adk_pqr(formats.PQRFile.parse(get_fn('adk_open.pqr')))
+        with open(get_fn('adk_open.pqr'), 'r') as f:
+            self._check_adk_pqr(formats.PQRFile.parse(f))
+        # Test some variants of PQR files
+        with open(fn, 'w') as f:
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', '', '')
+            )
+        self.assertRaises(ValueError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write(self.ATOMLINE3 % (1, 'H1', 'HOH', 1, '  0.000', '  0.000',
+                                      '  0.000', ' 0.500', ' 0.950'))
+            f.write(self.ATOMLINE3 % (2, 'H2', 'HOH', 1, '  1.000', '  0.000',
+                                      '  0.000', ' 0.500', ' 0.950'))
+            f.write(self.ATOMLINE3 % (3, 'O', 'HOH', 1, '  0.500', '  1.000',
+                                      '  0.000', ' 0.000', ' 1.500'))
+            f.write(self.ATOMLINE3 % (4, 'EP', 'HOH', 1, '  0.500', '  0.500',
+                                      '  0.000', '-1.000', ' 0.000'))
+        pqr = formats.PQRFile.parse(fn)
+        self.assertIsInstance(pqr.atoms[3], topologyobjects.ExtraPoint)
+
+    def test_pqr_with_cryst1(self):
+        """ Tests parsing PQR files with CRYST1 record """
+        fn = get_fn('test.pqr', written=True)
+        with open(fn, 'w') as f:
+            f.write('CRYST1   10.0   10.0   10.0   109.47  109.47   109.47\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+        pqr = formats.PQRFile.parse(fn)
+        np.testing.assert_equal(pqr.box, [10, 10, 10, 109.47, 109.47, 109.47])
+        with open(fn, 'w') as f:
+            f.write('CRYST1   10.0   10.0   10.0\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+        pqr = formats.PQRFile.parse(fn)
+        np.testing.assert_equal(pqr.box, [10, 10, 10, 90, 90, 90])
+
+    def test_pqr_parsing_with_models(self):
+        """ Tests parsing PQR files with multiple models """
+        fn = get_fn('test.pqr', written=True)
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+        pqr = formats.PQRFile.parse(fn)
+        self.assertEqual(pqr.get_coordinates().shape, (2, 1, 3))
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+        self.assertRaises(exceptions.PDBWarning, lambda:
+                formats.PQRFile.parse(fn))
+        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+        pqr = formats.PQRFile.parse(fn)
+        self.assertEqual(pqr.get_coordinates().shape, (2, 1, 3))
+        # Check some error catching
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
+                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
+                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CB', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write('ENDMDL\n')
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write('ENDMDL\n')
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
+                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write('MODEL   3\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
+                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write('MODEL   3\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+        with open(fn, 'w') as f:
+            f.write('MODEL   1\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
+                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write('MODEL   2\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
+                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
+                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write('MODEL   3\n')
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
+                                      '  2.000', ' -0.500', ' 1.200'))
+        self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
+
+    def _check_adk_pqr(self, pqr):
         self.assertIsInstance(pqr, Structure)
         self.assertEqual(len(pqr.atoms), 3341)
         self.assertEqual(len(pqr.residues), 214)
@@ -1098,15 +1253,15 @@ class TestParmedPQRStructure(FileIOTestCase):
     def test_pqr_writer(self):
         """ Tests writing a PQR file with charges and radii """
         parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        fn = get_fn('test.pqr', written=True)
         # Create multiple models
         coords = []
         coords.append(parm.coordinates)
         coords.append(parm.coordinates + 1)
         coords.append(parm.coordinates + 2)
         parm.coordinates = np.vstack(coords)
-        formats.PQRFile.write(parm, get_fn('test.pqr', written=True),
-                              renumber=True)
-        pqr = formats.PQRFile.parse(get_fn('test.pqr', written=True))
+        formats.PQRFile.write(parm, fn, renumber=True)
+        pqr = formats.PQRFile.parse(fn)
         self.assertEqual(len(parm.atoms), len(pqr.atoms))
         for a1, a2 in zip(parm.atoms, pqr.atoms):
             self.assertEqual(a1.name, a2.name)
@@ -1117,6 +1272,24 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(pqr.get_coordinates().shape[0], 3)
         np.testing.assert_allclose(pqr.get_coordinates(0),
                                    parm.get_coordinates(0), atol=2e-3)
+        # Pass coordinates explicitly
+        formats.PQRFile.write(parm, fn, coordinates=np.vstack(coords[:2]))
+        self.assertEqual(formats.PQRFile.parse(fn).get_coordinates().shape,
+                         (2, len(parm.atoms), 3))
+        self.assertRaises(TypeError, lambda:
+                formats.PQRFile.write(parm, fn, coordinates=[1, 2, 3])
+        )
+
+    def test_pqr_standard_resnames(self):
+        """ Test standard residue name replacement in PQR writing """
+        struct = Structure()
+        a = Atom(name='CA', atomic_number=6, charge=0.5, radii=1.2)
+        struct.add_atom(a, 'ASH', 2, 'A')
+        fobj = StringIO()
+        formats.PQRFile.write(struct, fobj, standard_resnames=True,
+                              coordinates=[1, 1, 1], renumber=False)
+        fobj.seek(0)
+        self.assertEqual(formats.PQRFile.parse(fobj).residues[0].name, 'ASP')
 
     def test_pqr_with_element(self):
         """ Tests reading a PQR file that has an element column """
@@ -1126,6 +1299,34 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(len(pqr.residues), 14)
         self.assertEqual(pqr.atoms[0].charge, -0.9526)
         self.assertEqual(pqr.atoms[-1].radii, 0.8)
+
+    def test_pqr_format_detection(self):
+        """ Tests PDB file detection from contents """
+        fn = get_fn('test.pdb', written=True)
+        pdbtext1 = "%s%d    %9.6f %9.6f %9.6f     %10.5f\n" + self.ATOMLINE
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', 'ALA',
+                'A', 1, '   1.000', '  1.000', '  1.000', '%.4f' % -0.5,
+                '%.4f' % 1.5))
+        self.assertTrue(formats.PQRFile.id_format(fn))
+        # Check failures
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 8, 10, 10, 10, 10, 1, 'CA', 'ALA',
+                'A', 1, '   1.000', '  1.000', '  1.000', '%.4f' % -0.5,
+                '%.4f' % 1.5))
+        self.assertFalse(formats.PQRFile.id_format(fn))
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', 'ALA',
+                'A', 1, '   1.000', '  1.000', '  1.000', '', ''))
+        self.assertFalse(formats.PQRFile.id_format(fn))
+        with open(fn, 'w') as f:
+            f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', 'ALA',
+                'A', 1, '   1.000', '  1.000', '  a.000', '%.4f' % -0.5,
+                '%.4f' % 1.5))
+        self.assertFalse(formats.PQRFile.id_format(fn))
+        with open(fn, 'w') as f:
+            pass
+        self.assertFalse(formats.PQRFile.id_format(fn))
 
 class TestCIFStructure(FileIOTestCase):
 
