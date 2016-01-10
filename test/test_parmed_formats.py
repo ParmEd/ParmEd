@@ -1089,7 +1089,7 @@ class TestParmedPQRStructure(FileIOTestCase):
 
     def tearDown(self):
         warnings.filterwarnings('always', category=exceptions.PDBWarning)
-        FileIOTestCase.tearDown()
+        FileIOTestCase.tearDown(self)
 
     def test_pqr_parsing(self):
         """ Tests parsing a PQR file """
