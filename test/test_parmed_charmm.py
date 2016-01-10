@@ -3,7 +3,7 @@ Tests for the parmed/charmm subpackage
 """
 from __future__ import division, print_function
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import numpy as np
 import os
 import parmed as pmd
@@ -1027,6 +1027,35 @@ class TestFileWriting(utils.FileIOTestCase):
             self.assertEqual(next(iter(stream)), lines[0][:lines[0].index('!')] + '\n')
         else:
             self.assertEqual(next(iter(stream)), lines[0])
+
+    def test_write_simple_psf(self):
+        """ Test writing simple PSF files """
+        cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        cpsf.flags = [f for f in cpsf.flags if f != 'EXT'] # NO EXT!
+        fn = get_fn('test.psf', written=True)
+        cpsf.write_psf(fn)
+        cpsf2 = psf.CharmmPsfFile(fn)
+
+    def test_eliminate_duplicate_dihedrals(self):
+        """ Test that duplicate torsions are eliminated in PSF writes """
+        def count_torsions(parm):
+            torsions = defaultdict(int)
+            for d in parm.dihedrals:
+                if d.improper: continue # Skip impropers
+                if d.atom1 > d.atom4:
+                    torsions[(d.atom4.idx, d.atom3.idx, d.atom2.idx, d.atom1.idx)] += 1
+                else:
+                    torsions[(d.atom1.idx, d.atom2.idx, d.atom3.idx, d.atom4.idx)] += 1
+            return torsions
+        fn = get_fn('test.psf', written=True)
+        parm = load_file(get_fn('trx.prmtop'))
+        ptorsions = count_torsions(parm)
+        parm.write_psf(fn)
+        cpsf = psf.CharmmPsfFile(fn)
+        ctorsions = count_torsions(cpsf)
+        self.assertGreater(max(ptorsions.values()), 1)
+        self.assertEqual(set(ctorsions.keys()), set(ptorsions.keys()))
+        self.assertEqual(max(ctorsions.values()), 1)
 
     def test_write_charmm(self):
         """ Test writing CHARMM-style PSF files """
