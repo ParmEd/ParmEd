@@ -10,7 +10,7 @@ from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
                     download_PDB, download_CIF, topologyobjects, Atom)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
-from parmed.utils.six import iteritems
+from parmed.utils.six import iteritems, add_metaclass
 from parmed.utils.six.moves import zip, StringIO
 import random
 import os
@@ -1892,6 +1892,30 @@ class TestMol2File(FileIOTestCase):
                     break
             else:
                 assert False, 'Expected line not found'
+
+class TestRegistry(FileIOTestCase):
+    """ Tests properties of the FileFormatType registry """
+
+    def test_file_format_type(self):
+        """ Tests the FileFormatType metaclass """
+        def create_metaclass():
+            @add_metaclass(formats.registry.FileFormatType)
+            class PDBFile(object):
+                def id_format(fname):
+                    return False
+                def parse(fname):
+                    raise NotImplementedError('Not implemented!')
+            return PDBFile
+
+        self.assertRaises(ValueError, create_metaclass)
+
+    def test_load_file_errors(self):
+        """ Test error handling in load_file """
+        fn = get_fn('test.file', written=True)
+        with open(fn, 'w') as f:
+            pass
+        os.chmod(fn, int('311', 8))
+        self.assertRaises(IOError, lambda: formats.load_file(fn))
 
 class TestFileDownloader(unittest.TestCase):
     """ Tests load_file with URLs for each format """
