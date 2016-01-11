@@ -65,7 +65,7 @@ class TestGromacsTop(utils.TestCaseRelative):
     def setUp(self):
         warnings.filterwarnings('always', category=GromacsWarning)
 
-    def testTiny(self):
+    def test_tiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('01.1water'), 'topol.top'),
@@ -87,7 +87,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.01)
 
-    def testVerySmall(self):
+    def test_very_small(self):
         """ Test very small Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('02.6water'), 'topol.top'),
@@ -112,7 +112,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    def testSmallPeptide(self):
+    def test_small_peptide(self):
         """ Test alanine dipeptide Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('04.Ala'), 'topol.top'),
@@ -138,7 +138,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    def testSmallDoublePeptide(self):
+    def test_small_double_peptide(self):
         """ Test interacting peptides Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
@@ -165,7 +165,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertLess(max_diff, 0.05)
 
     @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
-    def testJAC(self):
+    def test_jac(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'topol.top'),
@@ -193,7 +193,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertLess(max_diff, 0.5)
 
     @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
-    def testJACPME(self):
+    def test_jac_pme(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (PME) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('09.DHFR-PME'), 'topol.top'),
@@ -223,7 +223,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
 
-    def testPMESwitch(self):
+    def test_pme_switch(self):
         """ Tests the DHFR Gromacs system nrg and force (PME w/ switch) """
         # Load the top and gro files
         top = load_file(get_fn('ildn.solv.top'), xyz=get_fn('ildn.solv.gro'))
@@ -247,7 +247,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 101.92265, places=4)
         self.assertRelativeEqual(energies['nonbonded'], -18587.09715, places=4)
 
-    def testDPPC(self):
+    def test_dppc(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
         # We know what we're doing
         warnings.filterwarnings('ignore', category=GromacsWarning)
@@ -275,7 +275,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
 
-    def testOPLS(self):
+    def test_opls(self):
         """ Tests geometric combining rules with OPLS/AA in Gromacs topology """
         top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
@@ -294,7 +294,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['rb_torsion'], 55.603030624, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 327.954397827, places=4)
 
-    def testRoundTrip(self):
+    def test_round_trip(self):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """
         # Use DPPC to get RB-torsions tested. Also check that it initially fails
         # with the CustomNonbondedForce

@@ -13,15 +13,15 @@ from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 EnergyMinimizerReporter)
 from parmed.utils.six.moves import range, zip
 import unittest
-from utils import get_fn, mm, app, has_openmm, CPU, Reference, FileIOTestCase
+from utils import (get_fn, mm, app, has_openmm, CPU, Reference, FileIOTestCase,
+                   HAS_GROMACS)
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
-systemsolv = load_file(get_fn('ildn.solv.top'), xyz=get_fn('ildn.solv.gro'))
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestStateDataReporter(FileIOTestCase):
 
-    def testStateDataReporter(self):
+    def test_state_data_reporter(self):
         """ Test StateDataReporter with various options """
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
@@ -126,7 +126,7 @@ class TestStateDataReporter(FileIOTestCase):
                                        places=5)
         units.close()
 
-    def testProgressReporter(self):
+    def test_progress_reporter(self):
         """ Test ProgressReporter with various options """
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
@@ -149,10 +149,10 @@ class TestStateDataReporter(FileIOTestCase):
         self.assertTrue('Kinetic Energy' in text)
         self.assertTrue('Temperature' in text)
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestTrajRestartReporter(FileIOTestCase):
 
-    def testReporters(self):
+    def test_reporters(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (no PBC) """
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
@@ -243,8 +243,10 @@ class TestTrajRestartReporter(FileIOTestCase):
         np.testing.assert_allclose(ncrst.coordinates, f.coordinates, rtol=1e-4)
         np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-3)
 
-    def testReportersPBC(self):
+    @unittest.skipUnless(HAS_GROMACS, 'Cannot test without GROMACS')
+    def test_reporters_pbc(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (w/ PBC) """
+        systemsolv = load_file(get_fn('ildn.solv.top'), xyz=get_fn('ildn.solv.gro'))
         system = systemsolv.createSystem(nonbondedMethod=app.PME,
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
@@ -275,6 +277,3 @@ class TestTrajRestartReporter(FileIOTestCase):
                 self.assertAlmostEqual(x1, x2, places=3)
         self.assertEqual(len(nrst.box), 6)
         self.assertEqual(len(arst.box), 6)
-
-if __name__ == '__main__':
-    unittest.main()
