@@ -159,7 +159,6 @@ class TestReadParm(unittest.TestCase):
         
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
-        self._extensive_checks(parm)
         self.assertFalse(parm.chamber)
         self.assertFalse(parm.amoeba)
         self.assertRaises(KeyError, lambda: parm.parm_data['BOX_DIMENSIONS'])

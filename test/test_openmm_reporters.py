@@ -5,7 +5,7 @@ from __future__ import division, print_function
 
 import numpy as np
 import os
-from parmed import unit as u
+from parmed import unit as u, load_file
 from parmed.amber import (AmberParm, AmberMdcrd,
                 AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
 from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
@@ -16,7 +16,7 @@ import unittest
 from utils import get_fn, mm, app, has_openmm, CPU, Reference, FileIOTestCase
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
-amber_solv = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+systemsolv = load_file(get_fn('ildn.solv.top'), xyz=get_fn('ildn.solv.gro'))
 
 @unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
 class TestStateDataReporter(FileIOTestCase):
@@ -245,12 +245,12 @@ class TestTrajRestartReporter(FileIOTestCase):
 
     def testReportersPBC(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (w/ PBC) """
-        system = amber_solv.createSystem(nonbondedMethod=app.PME,
+        system = systemsolv.createSystem(nonbondedMethod=app.PME,
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(amber_solv.topology, system, integrator, Reference)
-        sim.context.setPositions(amber_solv.positions)
+        sim = app.Simulation(systemsolv.topology, system, integrator, Reference)
+        sim.context.setPositions(systemsolv.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj.nc', written=True), 1,
                                vels=True, frcs=True),
@@ -263,7 +263,7 @@ class TestTrajRestartReporter(FileIOTestCase):
         for reporter in sim.reporters: reporter.finalize()
         ntraj = NetCDFTraj.open_old(get_fn('traj.nc', written=True))
         atraj = AmberMdcrd(get_fn('traj.mdcrd', written=True),
-                           amber_solv.ptr('natom'), True, mode='r')
+                           len(systemsolv.atoms), True, mode='r')
         nrst = NetCDFRestart.open_old(get_fn('restart.ncrst', written=True))
         arst = AmberAsciiRestart(get_fn('restart.rst7', written=True), 'r')
         self.assertEqual(ntraj.frame, 5)

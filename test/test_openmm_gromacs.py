@@ -223,35 +223,29 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
 
-    def testJACPMESwitch(self):
+    def testPMESwitch(self):
         """ Tests the DHFR Gromacs system nrg and force (PME w/ switch) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('10.DHFR-PME-Switch'), 'topol.top'),
-                        xyz=os.path.join(get_fn('10.DHFR-PME-Switch'), 'conf.gro'))
+        top = load_file(get_fn('ildn.solv.top'), xyz=get_fn('ildn.solv.gro'))
         self.assertEqual(top.combining_rule, 'lorentz')
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem(nonbondedMethod=app.PME,
                                   constraints=app.HBonds,
+                                  flexibleConstraints=True,
                                   nonbondedCutoff=0.9*u.nanometers,
-                                  ewaldErrorTolerance=1.0e-5)
+                                  ewaldErrorTolerance=1.0e-5,
+                                  switchDistance=0.7*u.nanometers)
         context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
         # virtual sites, since OMM doesn't do this and Gromacs does.
-        self.assertAlmostEqual(energies['bond'], 1628.54739, places=3)
-        self.assertAlmostEqual(energies['angle'], 3604.58751, places=3)
-        self.assertAlmostEqual(energies['dihedral'], 6490.00844, delta=0.002)
-        self.assertRelativeEqual(energies['nonbonded'], 23616.457584, places=3)
-        gmxfrc = get_forces_from_xvg(
-                os.path.join(get_fn('10.DHFR-PME-Switch'), 'force.xvg'))
-        ommfrc = context.getState(getForces=True).getForces().value_in_unit(
-                    u.kilojoules_per_mole/u.nanometer)
-        zero_ep_frc(ommfrc, top)
-        max_diff = get_max_diff(gmxfrc, ommfrc)
-        self.assertLess(max_diff, 5)
+        self.assertAlmostEqual(energies['bond'], 399.925189, places=4)
+        self.assertAlmostEqual(energies['angle'], 36.18562, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 101.92265, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -18587.09715, places=4)
 
     def testDPPC(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
