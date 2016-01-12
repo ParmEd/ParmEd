@@ -7,7 +7,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     pyenv install pypy-4.0.1
     pyenv global pypy-4.0.1
 
-    pypy -m pip install nose coverage pyflakes nose-timer coverage
+    pypy -m pip install nose coverage pyflakes nose-timer
     which pyflakes
     pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
 else # Otherwise, CPython... go through conda
