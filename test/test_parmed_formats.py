@@ -929,32 +929,25 @@ class TestPDBStructure(FileIOTestCase):
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
-    @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
         pdbfile = read_PDB(self.overflow2)
         allsegids = set(['PROA', 'PROB', 'CARA', 'CARE', 'CARC', 'CARD', 'CARB',
                          'MEMB', 'TIP3', 'POT', 'CLA'])
         foundsegids = set()
-        for atom in pdbfile.atoms:
-            foundsegids.add(atom.residue.segid)
+        for residue in pdbfile.residues:
+            foundsegids.add(residue.segid)
         self.assertEqual(foundsegids, allsegids)
         self.assertEqual(pdbfile.atoms[0].residue.segid, 'PROA')
         self.assertEqual(pdbfile.atoms[5161].residue.segid, 'PROA')
         self.assertEqual(pdbfile.atoms[5162].residue.segid, 'PROB')
         self.assertEqual(pdbfile.atoms[-1].residue.segid, 'CLA')
-        f = get_fn('pdb_segid_test1.pdb', written=True)
-        f2 = get_fn('pdb_segid_test2.pdb', written=True)
-        pdbfile.write_pdb(f)
+        f = get_fn('pdb_segid_test.pdb', written=True)
+        pdbfile.write_pdb(f, charmm=True)
         pdbfile2 = read_PDB(f)
-        for atom in pdbfile2.atoms:
-            self.assertFalse(atom.residue.segid)
-        pdbfile.write_pdb(f2, charmm=True)
-        pdbfile3 = read_PDB(f2)
-        for atom in pdbfile3.atoms:
-            self.assertTrue(atom.residue.segid)
-            self.assertEqual(atom.residue.segid,
-                             pdbfile.atoms[atom.idx].residue.segid)
+        for residue in pdbfile2.residues:
+            self.assertTrue(residue.segid)
+            self.assertEqual(residue.segid, pdbfile.residues[residue.idx].segid)
 
     def test_private_functions(self):
         """ Tests the private helper functions in parmed/formats/pdb.py """

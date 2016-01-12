@@ -753,6 +753,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
     def test_interface_no_pbc(self):
         """ Testing all AmberParm.createSystem options (non-periodic) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        PT.changeRadii(parm, 'mbondi3').execute()
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,

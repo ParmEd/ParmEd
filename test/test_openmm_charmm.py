@@ -23,7 +23,7 @@ from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
                            CharmmParameterSet)
 from parmed.exceptions import CharmmWarning
 from parmed.openmm.utils import energy_decomposition
-from parmed import unit as u, openmm
+from parmed import unit as u, openmm, load_file
 from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
@@ -36,7 +36,7 @@ warnings.filterwarnings('ignore', category=CharmmWarning)
 
 # System
 charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
-charmm_gas_crds = app.PDBFile(get_fn('ala_ala_ala.pdb'))
+charmm_gas_crds = load_file(get_fn('ala_ala_ala.pdb'))
 charmm_nbfix = CharmmPsfFile(get_fn('ala3_solv.psf'))
 charmm_nbfix_crds = CharmmCrdFile(get_fn('ala3_solv.crd'))
 charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
