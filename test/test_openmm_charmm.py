@@ -34,29 +34,21 @@ import warnings
 # Suppress warning output from bad psf file... sigh.
 warnings.filterwarnings('ignore', category=CharmmWarning)
 
-if has_openmm:
-    # System
-    charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
-    charmm_gas_crds = app.PDBFile(get_fn('ala_ala_ala.pdb'))
-    charmm_solv = CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
-    charmm_solv_crds = CharmmCrdFile(get_fn('dhfr_min_charmm.crd'))
-    charmm_nbfix = CharmmPsfFile(get_fn('ala3_solv.psf'))
-    charmm_nbfix_crds = CharmmCrdFile(get_fn('ala3_solv.crd'))
+# System
+charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+charmm_gas_crds = app.PDBFile(get_fn('ala_ala_ala.pdb'))
+charmm_nbfix = CharmmPsfFile(get_fn('ala3_solv.psf'))
+charmm_nbfix_crds = CharmmCrdFile(get_fn('ala3_solv.crd'))
+charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
 
-    # Parameter sets
-    param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
-                                 get_fn('par_all22_prot.inp'))
-    param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                 get_fn('toppar_water_ions.str'))
+# Parameter sets
+param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                             get_fn('par_all22_prot.inp'))
+param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                             get_fn('toppar_water_ions.str'))
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestCharmmFiles(TestCaseRelative):
-
-    def setUp(self):
-        if charmm_solv.box is None:
-            charmm_solv.box = [95.387, 80.381, 80.225, 90, 90, 90]
-        if charmm_nbfix.box is None:
-            charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
 
     def testGasEnergy(self):
         """ Compare OpenMM and CHARMM gas phase energies """
@@ -245,47 +237,31 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -108.4858, places=4)
 
-    def testPME(self):
-        """ Compare OpenMM and CHARMM PME energies """
-        parm = charmm_solv
-        system = parm.createSystem(param22, nonbondedMethod=app.PME,
-                                   nonbondedCutoff=8*u.angstrom)
-        self.assertEqual(parm.combining_rule, 'lorentz')
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
-        sim.context.setPositions(charmm_solv_crds.positions)
-        energies = energy_decomposition(parm, sim.context)
-        self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
-        self.assertRelativeEqual(energies['angle'], 5018.3206306, places=5)
-        self.assertRelativeEqual(energies['urey_bradley'], 29.6489539, places=5)
-        self.assertRelativeEqual(energies['dihedral'], 740.9486106, places=5)
-        self.assertRelativeEqual(energies['improper'], 14.2418054, places=5)
-        self.assertRelativeEqual(energies['cmap'], -216.1422183, places=5)
-        self.assertRelativeEqual(energies['nonbonded'], -242262.368372, places=5)
-
     def testDispersionCorrection(self):
         """ Compare OpenMM and CHARMM PME energies w/out vdW correction """
-        parm = charmm_solv
-        system = parm.createSystem(param22, nonbondedMethod=app.PME,
+        parm = charmm_nbfix
+        system = parm.createSystem(param36, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,)
         self.assertEqual(parm.combining_rule, 'lorentz')
         for force in system.getForces():
             if isinstance(force, mm.NonbondedForce):
                 force.setUseDispersionCorrection(False)
+            elif isinstance(force, mm.CustomNonbondedForce):
+                force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
-        sim.context.setPositions(charmm_solv_crds.positions)
+        sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = energy_decomposition(parm, sim.context)
-        self.assertRelativeEqual(energies['bond'], 8578.9872739, places=5)
-        self.assertRelativeEqual(energies['angle'], 5018.3206306, places=5)
-        self.assertRelativeEqual(energies['urey_bradley'], 29.6489539, places=5)
-        self.assertRelativeEqual(energies['dihedral'], 740.9486106, places=5)
-        self.assertRelativeEqual(energies['improper'], 14.2418054, places=5)
-        self.assertRelativeEqual(energies['cmap'], -216.1422183, places=5)
-        self.assertRelativeEqual(energies['nonbonded'], -240681.958902, places=5)
+        self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)
+        self.assertAlmostEqual(energies['angle'], 1.06880188, places=4)
+        self.assertAlmostEqual(energies['urey_bradley'], 0.06142407, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 7.81143025, places=4)
+        self.assertAlmostEqual(energies['improper'], 0, places=4)
+        self.assertAlmostEqual(energies['cmap'], 0.126790, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], 6584.01821319, places=4)
 
     def testNBFIX(self):
-        """ Test energies of systems with NBFIX modifications """
+        """ Test PME energies of systems with NBFIX modifications """
         parm = charmm_nbfix
         system = parm.createSystem(param36, nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)

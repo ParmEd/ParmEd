@@ -27,9 +27,9 @@ get_saved_fn = utils.get_saved_fn
 diff_files = utils.diff_files
 
 gasparm = AmberParm(get_fn('trx.prmtop'))
-solvparm = AmberParm(get_fn('solv.prmtop'))
+solvparm = AmberParm(get_fn('solv2.parm7'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
-solvchamber = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'))
+solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
 
 class TestNonParmActions(unittest.TestCase):
@@ -1640,8 +1640,8 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         parm = copy(solvchamber)
         atoms = [atom for atom in parm.atoms] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atoms,atoms)]))
-        self.assertEqual(parm.ptr('IPTRES'), 159)
-        self.assertEqual(parm.ptr('NSPM'), 17857)
+        self.assertEqual(parm.ptr('IPTRES'), 3)
+        self.assertEqual(parm.ptr('NSPM'), 942)
         self.assertEqual(parm.ptr('NSPSOL'), 2)
         # To keep the output clean
         PT.setMolecules(parm).execute()
@@ -1807,7 +1807,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 
     def testSummary(self):
         """ Test summary action for ChamberParm """
-        parm = copy(solvchamber)
+        parm = load_file(get_fn('dhfr_cmap_pbc.parm7'))
         parm.load_rst7(get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
         self.assertTrue(utils.detailed_diff(str(act), saved.SUMMARYC1,
