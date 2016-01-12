@@ -323,7 +323,8 @@ class OpenMMParameterSet(ParameterSet):
 
         # Get the 1-4 scaling factors from the torsion list
         scee, scnb = set(), set()
-        for dt in self.dihedral_types:
+        for key in self.dihedral_types:
+            dt = self.dihedral_types[key]
             for t in dt:
                 if t.scee: scee.add(t.scee)
                 if t.scnb: scnb.add(t.scnb)
