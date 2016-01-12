@@ -649,7 +649,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
     def test_interface_pbc(self):
         """ Testing all AmberParm.createSystem options (periodic) """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
