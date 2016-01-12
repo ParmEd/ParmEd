@@ -36,4 +36,8 @@ script:
     - cd test
     - echo "Using `which nosetests`::"
     - which nosetests
-    - nosetests -vs .
+    - nosetests -vs . --with-coverage --cover-package parmed
+
+after_success:
+    - echo "after_success"
+    - coveralls

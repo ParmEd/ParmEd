@@ -7,7 +7,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     pyenv install pypy-4.0.1
     pyenv global pypy-4.0.1
 
-    pypy -m pip install nose coverage pyflakes
+    pypy -m pip install nose coverage pyflakes coveralls
     which pyflakes
     pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
 else # Otherwise, CPython... go through conda
@@ -33,4 +33,6 @@ else # Otherwise, CPython... go through conda
     fi
 
     source activate myenv
+    # for coverage report on https://coveralls.io
+    pip install coveralls
 fi # CPython
