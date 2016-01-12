@@ -415,6 +415,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
         self.assertEqual(energies[5][1], 0)
 
+    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def test_ewald(self):
         """ Compare Amber and OpenMM Ewald energies """
         parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
@@ -478,7 +479,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
     def test_shake(self):
         """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -493,7 +494,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
-        self.assertRelativeEqual(bond, 494.5578, places=4)
+        self.assertAlmostEqual(bond, 12.134943963951512, places=4)
 
     def test_nbfix(self):
         """ Compare Amber and OpenMM PME energies with NBFIX modifications """
@@ -649,7 +650,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
     def test_interface_pbc(self):
         """ Testing all AmberParm.createSystem options (periodic) """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
