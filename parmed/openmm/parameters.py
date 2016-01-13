@@ -169,8 +169,8 @@ class OpenMMParameterSet(ParameterSet):
         for name, atom_type in iteritems(self.atom_types):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             element = Element[atom_type.atomic_number]
-            dest.write('  <Type name="%s" element="%s" mass="%f"/>\n'
-                       % (name, element, atom_type.mass)
+            dest.write('  <Type name="%s" class="%s" element="%s" mass="%f"/>\n'
+                       % (name, name, element, atom_type.mass)
                        )
         dest.write(' </AtomTypes>\n')
 
