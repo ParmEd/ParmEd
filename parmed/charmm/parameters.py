@@ -330,7 +330,7 @@ class CharmmParameterSet(ParameterSet):
             if line.startswith('ANGLE') or line.startswith('THETA'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRAL') or line.startswith('PHI'):
+            if line.startswith('DIHEDRAL') or line.startswith('PHI') or line.startswith('DIHE'):
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER') or line.startswith('IMPHI'):
@@ -444,6 +444,7 @@ class CharmmParameterSet(ParameterSet):
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
                     raise CharmmError('Could not parse angles.')
+
                 angle_type = AngleType(k, theteq)
                 self.angle_types[(type1, type2, type3)] = angle_type
                 self.angle_types[(type3, type2, type1)] = angle_type
