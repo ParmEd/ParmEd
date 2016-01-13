@@ -12,7 +12,7 @@ from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Element
-#from parmed.topologyobjects import NoUreyBradley
+from parmed.topologyobjects import NoUreyBradley
 from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
@@ -143,6 +143,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_residues(dest)
             self._write_omm_bonds(dest)
             self._write_omm_angles(dest)
+            self._write_omm_urey_bradley(dest)
             self._write_omm_dihedrals(dest)
             self._write_omm_impropers(dest)
 #           self._write_omm_rb_torsions(dest)
@@ -286,6 +287,23 @@ class OpenMMParameterSet(ParameterSet):
             )
         dest.write(' </CustomTorsionForce>\n')
 
+    def _write_omm_urey_bradley(self, dest):
+        if not self.urey_bradley_types: return None
+        dest.write(' <!-- Urey-Bradley terms -->\n')
+        dest.write(' <AmoebaUreyBradleyForce>\n')
+        length_conv = u.angstroms.conversion_factor_to(u.nanometers)
+        _ambfrc = u.kilocalorie_per_mole/u.angstrom**2
+        _ommfrc = u.kilojoule_per_mole/u.nanometer**2
+        frc_conv = _ambfrc.conversion_factor_to(_ommfrc)
+        ureys_done = set()
+        for (a1, a2, a3), urey in iteritems(self.urey_bradley_types):
+            if (a1, a2, a3) in ureys_done: continue
+            if urey == NoUreyBradley: continue
+            dest.write('  <UreyBradley type1="%s" type2="%s" type3="%s" d="%f" k="%f"/>\n'
+                       % (a1, a2, a3, urey.req*length_conv, urey.k*frc_conv))
+
+        dest.write(' </AmoebaUreyBradleyForce>\n')
+
     def _write_omm_cmaps(self, dest):
         if not self.cmap_types: return
         dest.write(' <CmapTorsionForce>\n')
@@ -372,6 +390,6 @@ class OpenMMParameterSet(ParameterSet):
                                       'supported.')
         if len(self.nbfix_types) > 0:
             raise NotImplementedError('NBFIX not currently supported')
-        if self.urey_bradley_types:
-            raise NotImplementedError('Urey-Bradley angles not currently '
-                                      'supported.')
+        # if self.urey_bradley_types:
+        #     raise NotImplementedError('Urey-Bradley angles not currently '
+        #                               'supported.')
