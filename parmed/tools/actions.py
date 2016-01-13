@@ -1407,7 +1407,7 @@ class strip(Action):
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         self.nobox = arg_list.has_key('nobox')
-        self.num_atms = sum(self.mask.Selection())
+        self.num_atoms = sum(self.mask.Selection())
 
     def __str__(self):
         retstr = ["Removing mask '%s' (%d atoms) from the topology file." %
@@ -3539,17 +3539,19 @@ class deleteBond(Action):
         self.verbose = arg_list.has_key('verbose')
         # Go through each atom in mask1 and see if it forms a bond with any atom
         # in mask2.
-        self.del_bonds = set()
-        self.del_angles = set()
-        self.del_dihedrals = set()
-        self.del_urey_bradleys = set()
-        self.del_impropers = set()
-        self.del_cmaps = set()
-        self.del_trigonal_angles = set()
-        self.del_oopbends = set()
-        self.del_pi_torsions = set()
-        self.del_strbnds = set()
-        self.del_tortors = set()
+        bonds_to_delete = set()
+        self.del_bonds = []
+        self.del_angles = []
+        self.del_dihedrals = []
+        self.del_rbtorsions = []
+        self.del_urey_bradleys = []
+        self.del_impropers = []
+        self.del_cmaps = []
+        self.del_trigonal_angles = []
+        self.del_oopbends = []
+        self.del_pi_torsions = []
+        self.del_strbnds = []
+        self.del_tortors = []
         for i in self.mask1.Selected():
             ai = self.parm.atoms[i]
             for j in self.mask2.Selected():
@@ -3558,42 +3560,48 @@ class deleteBond(Action):
                 if ai is aj: continue
                 for bond in ai.bonds:
                     if aj not in bond: continue
-                    self.del_bonds.add(bond)
+                    bonds_to_delete.add(bond)
         # Find other valence terms we need to delete
-        for bond in self.del_bonds:
-            for angle in self.parm.angles:
+        for i, bond in enumerate(self.parm.bonds):
+            if bond in bonds_to_delete:
+                self.del_bonds.append(i)
+        for bond in bonds_to_delete:
+            for i, angle in enumerate(self.parm.angles):
                 if bond in angle:
-                    self.del_angles.add(angle)
-            for dihed in self.parm.dihedrals:
+                    self.del_angles.append(i)
+            for i, dihed in enumerate(self.parm.dihedrals):
                 if bond in dihed:
-                    self.del_dihedrals.add(dihed)
-            for urey in self.parm.urey_bradleys:
+                    self.del_dihedrals.append(i)
+            for i, dihed in enumerate(self.parm.rb_torsions):
+                if bond in dihed:
+                    self.del_rbtorsions.append(i)
+            for i, urey in enumerate(self.parm.urey_bradleys):
                 if bond in urey:
-                    self.del_urey_bradleys.add(urey)
-            for improper in self.parm.impropers:
+                    self.del_urey_bradleys.append(i)
+            for i, improper in enumerate(self.parm.impropers):
                 if bond in improper:
-                    self.del_impropers.add(improper)
-            for cmap in self.parm.cmaps:
+                    self.del_impropers.append(i)
+            for i, cmap in enumerate(self.parm.cmaps):
                 if bond in cmap:
-                    self.del_cmaps.add(cmap)
-            for trigonal_angle in self.parm.trigonal_angles:
+                    self.del_cmaps.append(i)
+            for i, trigonal_angle in enumerate(self.parm.trigonal_angles):
                 if bond in trigonal_angle:
-                    self.del_trigonal_angles.add(trigonal_angle)
-            for oopbend in self.parm.out_of_plane_bends:
+                    self.del_trigonal_angles.append(i)
+            for i, oopbend in enumerate(self.parm.out_of_plane_bends):
                 if bond in oopbend:
-                    self.del_oopbends.add(oopbend)
-            for pitor in self.parm.pi_torsions:
+                    self.del_oopbends.append(i)
+            for i, pitor in enumerate(self.parm.pi_torsions):
                 if bond in pitor:
-                    self.del_pi_torsions.add(pitor)
-            for strbnd in self.parm.stretch_bends:
+                    self.del_pi_torsions.append(i)
+            for i, strbnd in enumerate(self.parm.stretch_bends):
                 if bond in strbnd:
-                    self.del_strbnds.add(strbnd)
-            for tortor in self.parm.torsion_torsions:
+                    self.del_strbnds.append(i)
+            for i, tortor in enumerate(self.parm.torsion_torsions):
                 if bond in tortor:
-                    self.del_tortors.add(tortor)
+                    self.del_tortors.append(i)
 
     def __str__(self):
-        if not self.del_h_bonds and not self.del_noh_bonds:
+        if not self.del_bonds:
             return 'No bonds to delete'
         if not self.verbose:
             return 'Deleting the %d bonds found between %s and %s' % (
@@ -3607,13 +3615,14 @@ class deleteBond(Action):
                     a1.residue.name, a1.residue.idx+1, a1.name, a2.idx+1,
                     a2.residue.name, a2.residue.idx+1, a2.name)
         retstr += 'Deleting %d angles, ' % (len(self.del_angles))
-        if self.parm.chamber:
+        if self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
             retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
                         'and %d CMAPs' % (
                         len(self.del_urey_bradleys), len(self.del_impropers),
                         len(self.del_dihedrals), len(self.del_cmap))
             )
-        elif self.parm.amoeba:
+        elif self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
+                self.parm.stretch_bends or self.parm.torsion_torsions:
             retstr += ('%d Urey-Bradleys, %d trigonal angles,\n         '
                        '%d dihedrals, %d out-of-plane bends, %d stretch-bends\n'
                        '         and %d torsion-torsions' % (
@@ -3622,24 +3631,49 @@ class deleteBond(Action):
                         len(self.del_dihedrals), len(self.del_oopbends),
                         len(self.del_strbnds), len(self.del_tortors))
             )
+        elif self.parm.rb_torsions:
+            retstr += ('%d R-B torsions and %d dihedrals' %
+                    (len(self.del_rbtorsions), len(self.del_dihedrals)))
         else:
             retstr += 'and %d dihedrals' % (len(self.del_dihedrals))
         return retstr
 
     def execute(self):
         if not self.del_bonds: return
-        for bond in self.del_bonds: bond.delete()
-        for angle in self.del_angles: angle.delete()
-        for dihedral in self.del_dihedrals: dihedral.delete()
-        for urey in self.del_urey_bradleys: urey.delete()
-        for imp in self.del_impropers: imp.delete()
-        for cmap in self.del_cmaps: cmap.delete()
-        for trigang in self.del_trigonal_angles: trigang.delete()
-        for oopbend in self.del_oopbends: oopbend.delete()
-        for tortor in self.del_tortors: tortor.delete()
-        for strbnd in self.del_strbnds: strbnd.delete()
-        if isinstance(self.parm, AmberParm):
+        for i in reversed(self.del_bonds):
+            self.parm.bonds[i].delete()
+            del self.parm.bonds[i]
+        for i in reversed(self.del_angles):
+            self.parm.angles[i].delete()
+            del self.parm.angles[i]
+        for i in reversed(self.del_dihedrals):
+            self.parm.dihedrals[i].delete()
+            del self.parm.dihedrals[i]
+        for i in reversed(self.del_rbtorsions):
+            self.parm.rb_torsions[i].delete()
+            del self.parm.rb_torsions[i]
+        for i in reversed(self.del_urey_bradleys):
+            self.parm.urey_bradleys[i].delete()
+            del self.parm.urey_bradleys[i]
+        for i in reversed(self.del_impropers):
+            self.parm.impropers[i].delete()
+            del self.parm.impropers[i]
+        for i in reversed(self.del_cmaps):
+            self.parm.cmaps[i].delete()
+            del self.parm.cmaps[i]
+        for i in reversed(self.del_trigonal_angles):
+            del self.parm.trigonal_angles[i]
+        for i in reversed(self.del_oopbends):
+            del self.parm.out_of_plane_bends[i]
+        for i in reversed(self.del_tortors):
+            self.parm.torsion_torsions[i].delete()
+            del self.parm.torsion_torsions[i]
+        for i in reversed(self.del_strbnds):
+            del self.parm.stretch_bends[i]
+        try:
             self.parm.remake_parm()
+        except AttributeError:
+            self.parm.prune_empty_terms()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

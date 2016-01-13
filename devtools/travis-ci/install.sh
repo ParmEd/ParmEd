@@ -7,7 +7,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     pyenv install pypy-4.0.1
     pyenv global pypy-4.0.1
 
-    pypy -m pip install nose coverage pyflakes
+    pypy -m pip install nose coverage pyflakes nose-timer
     which pyflakes
     pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
 else # Otherwise, CPython... go through conda
@@ -25,11 +25,12 @@ else # Otherwise, CPython... go through conda
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
-            numpy scipy pandas nose openmm pyflakes
+            numpy scipy pandas nose openmm pyflakes coverage nose-timer
         conda update -y -n myenv --all
     else
         # Do not install the full numpy/scipy stack
-        conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes
+        conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes \
+            coverage nose-timer
     fi
 
     source activate myenv

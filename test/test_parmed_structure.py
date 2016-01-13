@@ -35,7 +35,7 @@ class TestStructureAPI(unittest.TestCase):
         s.add_atom(Atom(), 'GLY', 3, 'B')
         s.add_atom(Atom(), 'GLY', 3, 'B')
 
-    def testAddAtom(self):
+    def test_add_atom(self):
         """ Tests the Structure.add_atom method """
         # Check that we have the expected number of residues and atoms
         s = self.s
@@ -50,12 +50,12 @@ class TestStructureAPI(unittest.TestCase):
             self.assertEqual(residue.atoms[-1].idx - residue.atoms[0].idx + 1,
                              len(residue))
 
-    def testBool(self):
+    def test_bool(self):
         """ Tests bool-ness of Structure """
         self.assertTrue(bool(self.s))
         self.assertFalse(bool(structure.Structure()))
 
-    def testAddAtomToResidue(self):
+    def test_add_atom_to_residue(self):
         """ Tests the Structure.add_atom_to_residue method """
         s = self.s
         res = s.residues[1]
@@ -89,7 +89,7 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.atoms[5].name, 'TOK')
         self.assertEqual(s.atoms[-1].name, 'TOK2')
 
-    def testBoxHandling(self):
+    def test_box_handling(self):
         """ Tests that Structure.box is always the expected type """
         s = create_random_structure(parametrized=False)
         self.assertIs(s.box, None)
@@ -158,7 +158,7 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(box[1][5], 91)
         self.assertRaises(IndexError, lambda: s.get_box(3))
 
-    def testBadBoxHandling(self):
+    def test_bad_box_handling(self):
         """ Tests error handling when Structure.box is improperly assigned """
         s = create_random_structure(parametrized=True)
         def wrong_number_of_args():
@@ -179,7 +179,7 @@ class TestStructureAPI(unittest.TestCase):
                 s.box = box
             self.assertRaises(TypeError, func)
 
-    def testCoordinates(self):
+    def test_coordinates(self):
         """ Tests coordinate handling in Structure """
         s = create_random_structure(parametrized=False)
         self.assertIs(s.coordinates, None)
@@ -234,7 +234,7 @@ class TestStructureAPI(unittest.TestCase):
         diff = (old_crds - s.coordinates).ravel()**2
         self.assertGreater(diff.sum(), 0.01)
 
-    def testCoordinateSetToEmptyList(self):
+    def test_coordinate_set_to_empty_list(self):
         """ Tests behavior of setting coordinates to an empty iterable """
         s = create_random_structure(parametrized=True)
         xyz = np.random.random((len(s.atoms), 3))
@@ -253,7 +253,7 @@ class TestStructureAPI(unittest.TestCase):
             self.assertFalse(hasattr(atom, 'xy'))
             self.assertFalse(hasattr(atom, 'xz'))
 
-    def testStrip(self):
+    def test_strip(self):
         """ Tests the Structure.strip method """
         s = create_random_structure(parametrized=True)
         nres = len(s.residues)
@@ -261,7 +261,7 @@ class TestStructureAPI(unittest.TestCase):
         s.strip(':1-5')
         self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
 
-    def testStripWithCoords(self):
+    def test_strip_with_coords(self):
         """ Tests the Structure.strip method when it has coordinates """
         s = create_random_structure(parametrized=True)
         coords = np.random.rand(10, len(s.atoms), 3)
@@ -278,7 +278,7 @@ class TestStructureAPI(unittest.TestCase):
         n = sum(natom_per_res[:5])
         self.assertTrue((coords[:,n:,:] == s.get_coordinates()).all())
 
-    def testHelpers(self):
+    def test_helpers(self):
         """ Test private helper functions in parmed/structure.py """
         ang, deg = u.angstroms, u.degrees
         strip_units = structure._strip_box_units
@@ -503,7 +503,7 @@ class TestStructureAdd(unittest.TestCase):
         chk_valence(s.acceptors, s1.acceptors+s2.acceptors)
         chk_valence(s.groups, s1.groups+s2.groups)
 
-    def testAddParametrized(self):
+    def test_add_parametrized(self):
         """ Tests addition of two parametrized Structure instances """
         s1 = create_random_structure(parametrized=True)
         s2 = create_random_structure(parametrized=True)
@@ -517,14 +517,14 @@ class TestStructureAdd(unittest.TestCase):
         self._check_sum(s, s1, s2)
         self.assertEqual(s.get_coordinates('all').shape, (2, len(s.atoms), 3))
 
-    def testAddToEmptyStructure(self):
+    def test_add_to_empty_structure(self):
         """ Tests addition to empty Structure """
         s1 = create_random_structure(parametrized=True)
         s2 = structure.Structure()
         s2 += s1
         self._check_sum(s2, structure.Structure(), s1)
 
-    def testIAdd(self):
+    def test_iadd(self):
         """ Tests in-place addition of two Structure instances """
         s1 = create_random_structure(parametrized=True)
         s2 = create_random_structure(parametrized=True)
@@ -532,7 +532,7 @@ class TestStructureAdd(unittest.TestCase):
         s1 += s2
         self._check_sum(s1, s1cp, s2)
 
-    def testAddNotParametrized(self):
+    def test_add_not_parametrized(self):
         """ Tests addition of two non-parametrized Structure instances """
         s1 = create_random_structure(parametrized=False)
         s2 = create_random_structure(parametrized=False)
@@ -620,7 +620,7 @@ class TestStructureAdd(unittest.TestCase):
         chk_valence(s.acceptors, s1.acceptors+s2.acceptors)
         chk_valence(s.groups, s1.groups+s2.groups)
 
-    def testAddNoValence(self):
+    def test_add_no_valence(self):
         """ Tests addition of two minimal Structure instances """
         s1 = create_random_structure(parametrized=False, novalence=True)
         s2 = create_random_structure(parametrized=False, novalence=True)
@@ -659,7 +659,7 @@ class TestStructureAdd(unittest.TestCase):
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
 
-    def testMultiplyParametrized(self):
+    def test_multiply_parametrized(self):
         """ Tests replicating a parametrized Structure instance """
         s1 = create_random_structure(parametrized=True)
         multfac = random.randint(2, 5)
@@ -673,7 +673,7 @@ class TestStructureAdd(unittest.TestCase):
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
 
-    def testMultiplyNotParametrized(self):
+    def test_multiply_not_parametrized(self):
         """ Tests replicating a non-parametrized Structure instance """
         s1 = create_random_structure(parametrized=False)
         multfac = random.randint(2, 5)
@@ -687,7 +687,7 @@ class TestStructureAdd(unittest.TestCase):
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
 
-    def testMultNoValence(self):
+    def test_mult_no_valence(self):
         """ Tests addition of two minimal Structure instances """
         s1 = create_random_structure(parametrized=False, novalence=True)
         multfac = random.randint(2, 5)
@@ -751,7 +751,7 @@ class TestStructureSave(FileIOTestCase):
         warnings.filterwarnings('default', category=ParameterWarning)
         super(TestStructureSave, self).tearDown()
 
-    def testSavePDB(self):
+    def test_save_pdb(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.pdb', written=True))
         self.sys2.save(get_fn('test2.pdb', written=True))
@@ -763,7 +763,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
-    def testSaveCIF(self):
+    def test_save_cif(self):
         """ Test saving various Structure instances as a PDBx/mmCIF """
         self.sys1.save(get_fn('test.cif', written=True))
         self.sys2.save(get_fn('test2.cif', written=True))
@@ -775,7 +775,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
-    def testSaveMol2(self):
+    def test_save_mol2(self):
         """ Test saving various Structure instances as Mol2 files """
         self.sys1.save(get_fn('test.mol2', written=True))
         self.sys2.save(get_fn('test2.mol2', written=True))
@@ -790,7 +790,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
 
-    def testSaveMol3(self):
+    def test_save_mol3(self):
         """ Test saving various Structure instances as Mol3 files """
         self.sys1.save(get_fn('test.mol3', written=True))
         x1 = pmd.formats.Mol2File.parse(get_fn('test.mol3', written=True), structure=True)
@@ -803,7 +803,7 @@ class TestStructureSave(FileIOTestCase):
             else:
                 self.assertFalse(True)
 
-    def testSaveAmberParm(self):
+    def test_save_amber_parm(self):
         """ Test saving various Structure instances as Amber prmtop files """
         self.sys1.save(get_fn('test.parm7', written=True))
         self.sys2.save(get_fn('test2.parm7', written=True))
@@ -843,7 +843,7 @@ class TestStructureSave(FileIOTestCase):
             self.assertAlmostEqual(a1.rmin, a2.rmin)
             self.assertAlmostEqual(abs(a1.epsilon), abs(a2.epsilon))
 
-    def testSavePSF(self):
+    def test_save_psf(self):
         """ Test saving various Structure instances as CHARMM PSF files """
         self.sys1.save(get_fn('test.psf', written=True))
         self.sys2.save(get_fn('test2.psf', written=True))
@@ -892,7 +892,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
-    def testSaveCharmmCrd(self):
+    def test_save_charmm_crd(self):
         """ Test saving various Structure instances as CHARMM coord files """
         self.sys1.save(get_fn('test.crd', written=True))
         self.sys2.save(get_fn('test2.crd', written=True))
@@ -908,7 +908,7 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(self.sys3.coordinates,
                 x3.coordinates.reshape(self.sys3.coordinates.shape))
 
-    def testSaveGromacs(self):
+    def test_save_gromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
         warnings.filterwarnings('ignore', category=ParameterWarning)
         self.sys1.save(get_fn('test.top', written=True))
@@ -937,7 +937,12 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
-    def testSaveGRO(self):
+    def test_save_psf2(self):
+        """ Test saving PSF file for unparametrized system """
+        url = 'http://ambermd.org/tutorials/advanced/tutorial1/files/polyAT.pdb'
+        pmd.load_file(url).save(get_fn('test.psf', written=True))
+
+    def test_save_gro(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.gro', written=True))
         self.sys2.save(get_fn('test2.gro', written=True))
@@ -949,7 +954,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
-    def testSaveRst7(self):
+    def test_save_rst7(self):
         """ Test saving various Structure instances as Amber ASCII restarts """
         f1 = get_fn('test.rst7', written=True)
         f2 = get_fn('test1.restrt', written=True)
@@ -979,7 +984,7 @@ class TestStructureSave(FileIOTestCase):
                                    atol=1e-6)
 
     @unittest.skipIf(PYPY, 'NetCDF tests cannot run on pypy yet')
-    def testSaveNCRst7(self):
+    def test_save_ncrst7(self):
         """ Test saving various Structure instances as Amber NetCDF restarts """
         f1 = get_fn('test.ncrst', written=True)
         f2 = get_fn('test1.ncrst', written=True)
@@ -999,7 +1004,7 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(self.sys3.coordinates,
                                    pmd.load_file(f3).coordinates[0])
 
-    def testSavePQR(self):
+    def test_save_pqr(self):
         """ Test saving various Structure instances as PQR files """
         f1 = get_fn('test', written=True)
         f2 = get_fn('test.pqr', written=True)
@@ -1029,7 +1034,7 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(np.array([a.charge for a in self.sys3.atoms]),
                                    np.array([a.charge for a in x3.atoms]))
 
-    def testOverwrite(self):
+    def test_overwrite(self):
         """ Test overwrite option of Structure.save """
         open(get_fn('test.pdb', written=True), 'w').close()
         self.assertRaises(IOError, lambda:

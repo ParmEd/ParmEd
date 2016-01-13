@@ -36,4 +36,4 @@ script:
     - cd test
     - echo "Using `which nosetests`::"
     - which nosetests
-    - nosetests -vs .
+    - nosetests -vs --with-timer --timer-ok=5s --timer-warning=12s .
