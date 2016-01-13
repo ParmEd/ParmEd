@@ -187,10 +187,10 @@ class OpenMMParameterSet(ParameterSet):
                 dest.write('   <Bond atomName1="%s" atomName2="%s" />\n' %
                            (bond.atom1.name, bond.atom2.name))
             if residue.head is not None:
-                dest.write('   <ExternalBond atomName="%s">\n' %
+                dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.head.name)
             if residue.tail is not None:
-                dest.write('   <ExternalBond atomName="%s">\n' %
+                dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.tail.name)
             dest.write('  </Residue>\n')
         dest.write(' </Residues>\n')
@@ -205,7 +205,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond type1="%s" type2="%s", length="%f", k="%f"/>\n'
+            dest.write('  <Bond type1="%s" type2="%s" length="%f" k="%f"/>\n'
                        % (a1, a2, bond.req*lconv, bond.k*kconv))
         dest.write(' </HarmonicBondForce>\n')
 
@@ -342,7 +342,7 @@ class OpenMMParameterSet(ParameterSet):
         # Write NonbondedForce records.
         dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' %
                    (coulomb14scale, lj14scale))
-        dest.write('  <UseAttributeFromResidue name="charge">\n')
+        dest.write('  <UseAttributeFromResidue name="charge"/>\n')
         for name, atom_type in iteritems(self.atom_types):
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
                 sigma = atom_type.sigma * length_conv  # in md_unit_system
