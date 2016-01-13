@@ -135,13 +135,13 @@ class TestGromacsTop(FileIOTestCase):
         self._charmm27_checks(top)
 
     def _check_ff99sbildn(self, top):
-        self.assertEqual(len(top.atoms), 40560)
-        self.assertEqual(len(top.residues), 9779)
-        self.assertEqual(len([a for a in top.atoms if isinstance(a, ExtraPoint)]),
-                         9650)
-        self.assertEqual(len(top.bonds), 30934)
-        self.assertEqual(len(top.angles), 13197)
-        self.assertEqual(len(top.dihedrals), 5613)
+        self.assertEqual(len(top.atoms), 4235)
+        self.assertEqual(len(top.residues), 1046)
+        self.assertEqual(sum(1 for a in top.atoms if isinstance(a, ExtraPoint)),
+                         1042)
+        self.assertEqual(len(top.bonds), 3192)
+        self.assertEqual(len(top.angles), 1162)
+        self.assertEqual(len(top.dihedrals), 179)
 
     def _check_equal_structures(self, top1, top2):
         def cmp_atoms(a1, a2):
@@ -197,18 +197,17 @@ class TestGromacsTop(FileIOTestCase):
 
     def testReadAmber99SBILDN(self):
         """ Tests parsing a Gromacs topology with Amber99SBILDN and water """
-        top = load_file(get_fn('1aki.ff99sbildn.top'))
+        top = load_file(get_fn('ildn.solv.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
         self._check_ff99sbildn(top)
 
     def testWriteAmber99SBILDN(self):
         """ Tests writing a Gromacs topology with multiple molecules """
-        top = load_file(get_fn('1aki.ff99sbildn.top'))
+        top = load_file(get_fn('ildn.solv.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
-        GromacsTopologyFile.write(top,
-                get_fn('1aki.ff99sbildn.top', written=True),
-                combine=None)
-        top2 = load_file(get_fn('1aki.ff99sbildn.top', written=True))
+        fn = get_fn('ildn.solv.top', written=True)
+        GromacsTopologyFile.write(top, fn, combine=None)
+        top2 = load_file(fn)
         self._check_ff99sbildn(top2)
         self._check_equal_structures(top, top2)
 

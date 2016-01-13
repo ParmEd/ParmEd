@@ -415,30 +415,10 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
         self.assertEqual(energies[5][1], 0)
 
-    def test_rst7(self):
-        """ Test loading coordinates via the OpenMMRst7 class """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
-        self.assertEqual(parm.combining_rule, 'lorentz')
-        system = parm.createSystem() # Default, no cutoff
-        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
-        sim.context.setPositions(Rst7.open(get_fn('ash.rst7')).positions)
-        energies = energy_decomposition(parm, sim.context)
-#NSTEP =        0   TIME(PS) =       0.000  TEMP(K) =     0.00  PRESS =     0.0
-#Etot   =         2.4544  EKtot   =         0.0000  EPtot      =         2.4544
-#BOND   =         5.4435  ANGLE   =         2.8766  DIHED      =        24.3697
-#1-4 NB =         6.1446  1-4 EEL =        20.8049  VDWAALS    =        44.3715
-#EELEC  =      -101.5565  EGB     =         0.0000  RESTRAINT  =         0.0000
-        # Compare OpenMM energies with the Amber energies (above)
-        self.assertRelativeEqual(energies['bond'], 5.4435, places=4)
-        self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
-        self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
-        self.assertRelativeEqual(energies['nonbonded'], -30.2355, places=3)
-
-    @unittest.skipIf(skip_big_tests(), "Skipping long tests")
+    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
     def test_ewald(self):
         """ Compare Amber and OpenMM Ewald energies """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.Ewald,
                                    nonbondedCutoff=8*u.angstroms,
@@ -447,20 +427,14 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(parm.positions)
         energies = energy_decomposition(parm, sim.context)
-#NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
-#Etot   =    -91560.0534  EKtot   =         0.0000  EPtot      =    -91560.0534
-#BOND   =       495.0414  ANGLE   =      1268.9447  DIHED      =      1764.7201
-#1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     11213.7649
-#EELEC  =   -113177.5977  EHBOND  =         0.0000  RESTRAINT  =         0.0000
-#Ewald error estimate:   0.2347E-02
-        self.assertRelativeEqual(energies['bond'], 495.0414, 4)
-        self.assertRelativeEqual(energies['angle'], 1268.9447, 5)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201, 5)
-        self.assertRelativeEqual(energies['nonbonded'], -95078.7346, 4)
+        self.assertRelativeEqual(energies['bond'], 12.2920213, 4)
+        self.assertRelativeEqual(energies['angle'], 32.3453097, 5)
+        self.assertRelativeEqual(energies['dihedral'], 96.0811552, 5)
+        self.assertRelativeEqual(energies['nonbonded'], -12926.394844, 4)
 
     def test_pme(self):
         """ Compare Amber and OpenMM PME energies """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -469,20 +443,18 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = energy_decomposition(parm, sim.context)
-#NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
-#Etot   =    -91544.8269  EKtot   =         0.0000  EPtot      =    -91544.8269
-#BOND   =       495.0414  ANGLE   =      1268.9447  DIHED      =      1764.7201
-#1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     11213.7649
-#EELEC  =   -113162.3712  EHBOND  =         0.0000  RESTRAINT  =         0.0000
-#Ewald error estimate:   0.8352E-05
-        self.assertRelativeEqual(energies['bond'], 495.0414, places=4)
-        self.assertRelativeEqual(energies['angle'], 1268.9447, places=4)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=4)
-        self.assertRelativeEqual(energies['nonbonded'], -95073.5331, places=4)
+# Etot   =    -12785.6764  EKtot   =         0.0000  EPtot      =    -12785.6764
+# BOND   =        12.2920  ANGLE   =        32.3453  DIHED      =        96.0812
+# 1-4 NB =        39.1460  1-4 EEL =       420.5797  VDWAALS    =      2836.7832
+# EELEC  =    -16222.9037  EHBOND  =         0.0000  RESTRAINT  =         0.0000
+        self.assertRelativeEqual(energies['bond'], 12.2920213, 4)
+        self.assertRelativeEqual(energies['angle'], 32.3453097, 5)
+        self.assertRelativeEqual(energies['dihedral'], 96.0811552, 5)
+        self.assertRelativeEqual(energies['nonbonded'], -12926.394844, 4)
 
     def test_dispersion_correction(self):
         """ Compare Amber and OpenMM PME energies w/out vdW correction """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         sys.stdout.flush()
         system = parm.createSystem(nonbondedMethod=app.PME,
@@ -495,20 +467,19 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
         sim.context.setPositions(parm.positions)
         energies = energy_decomposition(parm, sim.context)
-#NSTEP =        0   TIME(PS) =     250.000  TEMP(K) =     0.00  PRESS =     0.0
-#Etot   =    -90623.3323  EKtot   =         0.0000  EPtot      =    -90623.3323
-#BOND   =       495.0414  ANGLE   =      1268.9447  DIHED      =      1764.7201
-#1-4 NB =       610.9632  1-4 EEL =      6264.1100  VDWAALS    =     12135.2596
-#EELEC  =   -113162.3712  EHBOND  =         0.0000  RESTRAINT  =         0.0000
-#Ewald error estimate:   0.8352E-05
-        self.assertRelativeEqual(energies['bond'], 495.0414, places=4)
-        self.assertRelativeEqual(energies['angle'], 1268.9447, places=4)
-        self.assertRelativeEqual(energies['dihedral'], 1764.7201, places=4)
-        self.assertRelativeEqual(energies['nonbonded'], -94152.0384, places=4)
+# Etot   =    -12682.5312  EKtot   =         0.0000  EPtot      =    -12682.5312
+# BOND   =        12.2920  ANGLE   =        32.3453  DIHED      =        96.0812
+# 1-4 NB =        39.1460  1-4 EEL =       420.5797  VDWAALS    =      2939.9284
+# EELEC  =    -16222.9037  EHBOND  =         0.0000  RESTRAINT  =         0.0000
+        lrc = 2836.7832 - 2939.9284
+        self.assertRelativeEqual(energies['bond'], 12.2920213, 4)
+        self.assertRelativeEqual(energies['angle'], 32.3453097, 5)
+        self.assertRelativeEqual(energies['dihedral'], 96.0811552, 5)
+        self.assertRelativeEqual(energies['nonbonded'], -12926.394844-lrc, 4)
 
     def test_shake(self):
         """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -523,7 +494,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         state = sim.context.getState(getEnergy=True, enforcePeriodicBox=True,
                                      groups=2**parm.BOND_FORCE_GROUP)
         bond = state.getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
-        self.assertRelativeEqual(bond, 494.5578, places=4)
+        self.assertAlmostEqual(bond, 12.134943963951512, places=4)
 
     def test_nbfix(self):
         """ Compare Amber and OpenMM PME energies with NBFIX modifications """
@@ -679,7 +650,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
     def test_interface_pbc(self):
         """ Testing all AmberParm.createSystem options (periodic) """
-        parm = AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -783,6 +754,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
     def test_interface_no_pbc(self):
         """ Testing all AmberParm.createSystem options (non-periodic) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        PT.changeRadii(parm, 'mbondi3').execute()
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
