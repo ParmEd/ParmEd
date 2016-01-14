@@ -234,7 +234,7 @@ class TestGromacsTop(FileIOTestCase):
         self.assertEqual(len(parm.atoms), len(parm2.atoms))
 
     def test_without_parametrize(self):
-        """ Tests the geometric combining rules in Gromacs with OPLS/AA """
+        """ Tests loading a Gromacs topology without parametrizing """
         parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                          xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'),
                          parametrize=False)
