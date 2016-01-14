@@ -870,7 +870,8 @@ class GromacsTopologyFile(Structure):
             else:
                 raise GromacsError("Can't add %d %s molecules" % (num, molname))
         self.itps = itplist
-        self.parametrize()
+        if parametrize:
+            self.parametrize()
 
     #===================================================
 
