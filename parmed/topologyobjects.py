@@ -1997,7 +1997,7 @@ class Dihedral(_FourAtomTerm):
                     DihedralTypeList):
                 return 9
             elif self.type is not None and isinstance(self.type, RBTorsionType):
-                return 5
+                return 3
             return 1
         return self._funct
 
