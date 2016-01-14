@@ -313,11 +313,10 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                 charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                           get_fn('top_all36_prot.rtf'))
         )
-        self.assertRaises(NotImplementedError, lambda:
         params.write(get_fn('charmm_conv.xml', written=True),
                      provenance=dict(
                          OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrell'
                      )
         )
-        )
+
