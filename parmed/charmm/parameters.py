@@ -330,7 +330,7 @@ class CharmmParameterSet(ParameterSet):
             if line.startswith('ANGLE') or line.startswith('THETA'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRAL') or line.startswith('PHI') or line.startswith('DIHE'):
+            if line.startswith('DIHE') or line.startswith('PHI'): 
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER') or line.startswith('IMPHI'):
