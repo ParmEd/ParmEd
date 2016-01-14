@@ -390,6 +390,3 @@ class OpenMMParameterSet(ParameterSet):
                                       'supported.')
         if len(self.nbfix_types) > 0:
             raise NotImplementedError('NBFIX not currently supported')
-        # if self.urey_bradley_types:
-        #     raise NotImplementedError('Urey-Bradley angles not currently '
-        #                               'supported.')
