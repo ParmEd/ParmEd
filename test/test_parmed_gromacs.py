@@ -6,6 +6,7 @@ from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed import gromacs as gmx
+from parmed.topologyobjects import _UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
@@ -170,6 +171,7 @@ class TestGromacsTop(FileIOTestCase):
                                                getattr(v2.type, attr), places=5)
                 else:
                     self.assertEqual(v1.type, v2.type)
+
         def cmp_dihedrals(dih1, dih2):
             self.assertEqual(len(dih1), len(dih2))
             for v1, v2 in zip(dih1, dih2):
@@ -230,6 +232,14 @@ class TestGromacsTop(FileIOTestCase):
         parm.write(get_fn('test.topol', written=True), combine='all')
         parm2 = load_file(get_fn('test.topol', written=True))
         self.assertEqual(len(parm.atoms), len(parm2.atoms))
+
+    def test_without_parametrize(self):
+        """ Tests the geometric combining rules in Gromacs with OPLS/AA """
+        parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'),
+                         parametrize=False)
+        assert isinstance(parm.atoms[0].atom_type, _UnassignedAtomType)
+        assert all(x.type is None for x in parm.bonds)
 
     def testMoleculeOrdering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """
