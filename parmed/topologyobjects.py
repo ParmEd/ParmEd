@@ -930,7 +930,7 @@ class Atom(_ListItem):
 
     def __getstate__(self):
         retval = dict(name=self.name, type=self.type, atom_type=self.atom_type,
-                      charge=self.charge, mass=self.mass, nb_idx=self.nb_idx,
+                      _charge=self._charge, mass=self.mass, nb_idx=self.nb_idx,
                       radii=self.radii, screen=self.screen, tree=self.tree,
                       join=self.join, irotat=self.irotat, bfactor=self.bfactor,
                       altloc=self.altloc, occupancy=self.occupancy,
@@ -4616,16 +4616,6 @@ class AtomType(object):
 
     def __str__(self):
         return self.name
-
-    # Comparisons are all based on number
-#   def __gt__(self, other):
-#       return self._member_number > other._member_number
-#   def __lt__(self, other):
-#       return self._member_number < other._member_number
-#   def __ge__(self, other):
-#       return self._member_number > other._member_number or self == other
-#   def __le__(self, other):
-#       return self._member_number < other._member_number or self == other
 
     def __copy__(self):
         cp = AtomType(self.name, self.number, self.mass, self.atomic_number,
