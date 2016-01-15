@@ -451,7 +451,7 @@ class Atom(_ListItem):
     #===================================================
 
     def __init__(self, list=None, atomic_number=0, name='', type='',
-                 charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
+                 charge=None, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
                  tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
                  bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
                  rmin14=None, epsilon14=None):
@@ -463,7 +463,7 @@ class Atom(_ListItem):
             self.type = type.strip()
         except AttributeError:
             self.type = type
-        self.charge = _strip_units(charge, u.elementary_charge)
+        self._charge = _strip_units(charge, u.elementary_charge)
         self.mass = _strip_units(mass, u.dalton)
         self.nb_idx = nb_idx
         self.radii = _strip_units(radii, u.angstrom)
@@ -591,8 +591,21 @@ class Atom(_ListItem):
 
     #===================================================
 
-    # Lennard-Jones parameters... can be taken from atom_type if it is set.
-    # Otherwise take it from _rmin and _epsilon attributes
+    # Various parameters that can be taken from the AtomType if not set on the
+    # atom directly.
+
+    @property
+    def charge(self):
+        if self._charge is None:
+            if (self.atom_type is UnassignedAtomType or
+                    self.atom_type.charge is None):
+                return 0.0
+            return self.atom_type.charge
+        return self._charge
+
+    @charge.setter
+    def charge(self, value):
+        self._charge = value
 
     @property
     def rmin(self):
@@ -4422,6 +4435,9 @@ class AtomType(object):
     bond_type : ``str``, optional
         If defined, this is the type name used to look up bonded parameters.
         Default is None (which falls back to ``name``)
+    charge : ``float``, optional
+        If defined, this is the partial atomic charge in elementary charge
+        units. Default is None
 
     Other Attributes
     ----------------
@@ -4465,7 +4481,8 @@ class AtomType(object):
     HA: 1
     """
 
-    def __init__(self, name, number, mass, atomic_number, bond_type=None):
+    def __init__(self, name, number, mass, atomic_number=-1, bond_type=None,
+                 charge=None):
         if number is None and name is not None:
             # If we were given an integer, assign it to number. Otherwise,
             # assign it to the name
@@ -4487,6 +4504,7 @@ class AtomType(object):
         self.nbfix = dict()
         self._idx = -1 # needed for some internal bookkeeping
         self._bond_type = bond_type
+        self.charge = charge
 
     def __eq__(self, other):
         """
@@ -4500,7 +4518,7 @@ class AtomType(object):
             # also equal
             has_all = True
             has_none = True
-            for attr in ('epsilon', 'rmin', 'epsilon_14', 'rmin_14'):
+            for attr in ('epsilon', 'rmin', 'epsilon_14', 'rmin_14', 'charge'):
                 if getattr(self, attr) is None and getattr(other, attr) is None:
                     has_all = False
                     continue
@@ -4611,7 +4629,7 @@ class AtomType(object):
 
     def __copy__(self):
         cp = AtomType(self.name, self.number, self.mass, self.atomic_number,
-                      bond_type=self._bond_type)
+                      bond_type=self._bond_type, charge=self.charge)
         cp.epsilon = self.epsilon
         cp.rmin = self.rmin
         cp.epsilon_14 = self.epsilon_14
