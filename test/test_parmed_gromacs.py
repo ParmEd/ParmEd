@@ -232,6 +232,8 @@ class TestGromacsTop(FileIOTestCase):
         parm.write(get_fn('test.topol', written=True), combine='all')
         parm2 = load_file(get_fn('test.topol', written=True))
         self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        # Check that the charge attribute is read correctly
+        self.assertEqual(parm.parameterset.atom_types['opls_001'].charge, 0.5)
 
     def test_without_parametrize(self):
         """ Tests loading a Gromacs topology without parametrizing """
