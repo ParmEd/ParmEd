@@ -621,7 +621,7 @@ class PDBFile(object):
             coordinates should line up with the atom order in the structure
             (not necessarily the order of the "original" PDB file if they
             differ)
-        altlocs : str, optional, defaul 'all'
+        altlocs : str, optional, default 'all'
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
 
