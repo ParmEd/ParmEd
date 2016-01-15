@@ -15,7 +15,7 @@ import parmed.tools as PT
 import sys
 import unittest
 from utils import (get_fn, CPU, Reference, mm, app, has_openmm, FileIOTestCase,
-        TestCaseRelative, get_saved_fn, skip_big_tests)
+        TestCaseRelative, get_saved_fn, run_all_tests)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -79,7 +79,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                 else:
                     self.assertAlmostEqual(x1, x2, delta=2e-2)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping long tests")
+    @unittest.skipUnless(run_all_tests, "Skipping long tests")
     def test_round_trip_ep(self):
         """ Test ParmEd -> OpenMM round trip with Amber EPs and PME """
         parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
@@ -415,7 +415,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
         self.assertEqual(energies[5][1], 0)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_ewald(self):
         """ Compare Amber and OpenMM Ewald energies """
         parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
@@ -1231,7 +1231,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], 0.12679, places=3)
         self.assertRelativeEqual(energies['nonbonded'], 6514.4460, places=3)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_big_pme(self):
         """ Compare OpenMM and CHAMBER PME energies on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1259,7 +1259,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -242263.9896, places=3)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_big_dispersion_correction(self):
         """ Compare OpenMM and CHAMBER w/out vdW corr on big system """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
@@ -1290,7 +1290,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertRelativeEqual(energies['cmap'], -216.2510, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -240681.6702, places=4)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping OMM tests on large systems")
+    @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_big_shake(self):
         """ Compare OpenMM and CHAMBER PME excluding SHAKEn bonds (big) """
         parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),

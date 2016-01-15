@@ -22,7 +22,7 @@ import saved_outputs as saved
 import unittest
 from utils import (get_fn, FileIOTestCase, equal_atoms,
                    create_random_structure, HAS_GROMACS,
-                   diff_files, get_saved_fn)
+                   diff_files, get_saved_fn, has_openmm)
 import warnings
 try:
     from string import letters
@@ -107,17 +107,39 @@ class TestReadParm(unittest.TestCase):
         parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
         self.assertEqual(parm.ptr('natom'), 864)
 
+    @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+    def test_change_detection(self):
+        """ Test the is_changed function on AmberParm """
+        parm = readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertFalse(parm.is_changed())
+        # Find the OpenMM Topology
+        top = parm.topology
+        # Delete the last bond
+        del parm.bonds[-1]
+        # Make sure our parm is changed
+        self.assertTrue(parm.is_changed())
+        # Make sure our OMM topology changes correspondingly
+        self.assertIsNot(top, parm.topology)
+
     def test_deprecations(self):
         """ Test proper deprecation of old/renamed AmberParm features """
         warnings.filterwarnings('error', category=DeprecationWarning)
         self.assertRaises(DeprecationWarning, lambda:
-                readparm.AmberParm(get_fn('trx.prmtop'),
-                                   rst7_name=get_fn('trx.inpcrd'))
+                readparm.AmberParm(get_fn('ash.parm7'),
+                                   rst7_name=get_fn('ash.rst7'))
         )
         self.assertRaises(DeprecationWarning, lambda:
-                readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'),
-                                   rst7_name=get_fn('trx.inpcrd'))
+                readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'),
+                                   rst7_name=get_fn('ash.rst7'))
         )
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        parm = readparm.AmberParm(get_fn('ash.parm7'),
+                                  rst7_name=get_fn('ash.rst7'))
+        warnings.filterwarnings('always', category=DeprecationWarning)
+        for atom in parm.atoms:
+            self.assertTrue(hasattr(atom, 'xx'))
+            self.assertTrue(hasattr(atom, 'xy'))
+            self.assertTrue(hasattr(atom, 'xz'))
 
     def test_molecule_error_detection(self):
         """ Tests noncontiguous molecule detection """
@@ -142,6 +164,20 @@ class TestReadParm(unittest.TestCase):
         self.assertFalse(parm.has_NBFIX())
         parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0.0
         self.assertTrue(parm.has_NBFIX())
+
+    def test_dihedral_reorder(self):
+        """ Tests dihedral reordering if first atom in 3rd or 4th spot """
+        parm = readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm.strip('@1-8')
+        parm.remake_parm()
+        # This will result in torsion terms in which the first atom in the
+        # system is the third atom in the torsion. So make sure that AmberParm
+        # recognizes this and reorders the indices appropriately to avoid a 0 in
+        # the 3rd or 4th locations
+        it = iter(parm.parm_data['DIHEDRALS_WITHOUT_HYDROGEN'])
+        for i, j, k, l, m in zip(it, it, it, it, it):
+            self.assertNotEqual(k, 0)
+            self.assertNotEqual(l, 0)
 
     def test_amber_gas_parm(self):
         """ Test the AmberParm class with a non-periodic (gas-phase) prmtop """
