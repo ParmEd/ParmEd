@@ -4518,7 +4518,7 @@ class AtomType(object):
             # also equal
             has_all = True
             has_none = True
-            for attr in ('epsilon', 'rmin', 'epsilon_14', 'rmin_14', 'charge'):
+            for attr in ('epsilon', 'rmin', 'epsilon_14', 'rmin_14'):
                 if getattr(self, attr) is None and getattr(other, attr) is None:
                     has_all = False
                     continue
@@ -4529,6 +4529,12 @@ class AtomType(object):
             assert (has_all and not has_none) or (has_none and not has_all), \
                     'Should have all or none at this point'
             if not has_all:
+                return True
+            # Check charges
+            if self.charge is None or other.charge is None:
+                if self.charge is not other.charge:
+                    return False
+            elif abs(self.charge - other.charge) > TINY:
                 return True
             # At this point, we have all the attributes we need to compare
             return (abs(self.epsilon - other.epsilon) < TINY and
