@@ -789,12 +789,12 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def testStrip(self):
         """ Test stripping of AmberParm """
         parm = copy(gasparm)
-        PT.strip(parm, ':1').execute()
+        act = PT.strip(parm, ':1')
+        act.execute()
         self.assertEqual(parm.ptr('natom'), 1641)
         self.assertEqual(len(parm.atoms), 1641)
-        # Good enough for here. The strip action is repeatedly tested in the
-        # core Amber test suite as part of the MM/PBSA tests via ante-MMPBSA.py
-        # and that part also tests that the energies come out correct as well
+        self.assertEqual(str(act), "Removing mask ':1' (%d atoms) "
+                         "from the topology file." % (len(gasparm.residues[0])))
 
     def testDefineSolvent(self):
         """ Test defineSolvent on AmberParm """

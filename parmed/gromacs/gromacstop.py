@@ -693,12 +693,12 @@ class GromacsTopologyFile(Structure):
                     mass = float(words[massidx])
                     if mass > 0 and atnum == -1:
                         atnum = AtomicNum[element_by_mass(mass)]
-#                   chg = float(words[3])
+                    chg = float(words[massidx+1])
                     ptype = words[ptypeidx]
                     sig = float(words[sigidx]) * u.nanometers
                     eps = float(words[sigidx+1]) * u.kilojoules_per_mole
                     typ = AtomType(attype, None, mass, atnum,
-                                   bond_type=bond_type)
+                                   bond_type=bond_type, charge=chg)
                     typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
                 elif current_section == 'nonbond_params':
@@ -870,7 +870,8 @@ class GromacsTopologyFile(Structure):
             else:
                 raise GromacsError("Can't add %d %s molecules" % (num, molname))
         self.itps = itplist
-        self.parametrize()
+        if parametrize:
+            self.parametrize()
 
     #===================================================
 

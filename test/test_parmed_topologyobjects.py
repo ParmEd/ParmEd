@@ -316,6 +316,17 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a.epsilon, 0.5)
         self.assertEqual(a.epsilon_14, 0.25)
 
+        # Test behavior of charge so that it falls back to the charge on the
+        # atom type if it's not set on the atom
+        a = Atom(name='CA', type='CX', mass=12.01, atomic_number=6)
+        self.assertEqual(a.charge, 0)
+        at = AtomType('CX', 1, 12.01, 6, charge=0.5)
+        a.atom_type = at
+        self.assertEqual(a.charge, 0.5)
+        a.charge = 0.3
+        self.assertEqual(a.charge, 0.3)
+        self.assertEqual(at.charge, 0.5)
+
     #=============================================
 
     def test_atom_type(self):
@@ -341,6 +352,11 @@ class TestTopologyObjects(unittest.TestCase):
         at3.sigma_14 = 1.0
         self.assertEqual(at3.sigma_14, 1.0)
         self.assertEqual(at3.rmin_14, 2**(-5/6))
+        # Check charge
+        at5 = AtomType('CX', 2, 12.01, 6, charge=0.5)
+        self.assertEqual(at5.charge, 0.5)
+        at4.charge = 0.3
+        self.assertEqual(at4.charge, 0.3)
 
     #=============================================
 

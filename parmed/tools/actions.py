@@ -1407,7 +1407,7 @@ class strip(Action):
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         self.nobox = arg_list.has_key('nobox')
-        self.num_atms = sum(self.mask.Selection())
+        self.num_atoms = sum(self.mask.Selection())
 
     def __str__(self):
         retstr = ["Removing mask '%s' (%d atoms) from the topology file." %
