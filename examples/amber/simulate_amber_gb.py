@@ -31,7 +31,7 @@ integrator = mm.LangevinIntegrator(
 
 # Define the platform to use; CUDA, OpenCL, CPU, or Reference. Or do not specify
 # the platform to use the default (fastest) platform
-platform = mm.Platform.getPlatformByName('Reference')
+platform = mm.Platform.getPlatformByName('CUDA')
 prop = dict(CudaPrecision='mixed') # Use mixed single/double precision
 
 # Create the Simulation object
