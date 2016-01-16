@@ -611,21 +611,21 @@ class PDBFile(object):
             method to which to write the PDB file. If it is a filename that
             ends with .gz or .bz2, a compressed version will be written using
             either gzip or bzip2, respectively.
-        renumber : bool, optional
+        renumber : bool, optional, default True
             If True, renumber the atoms and residues sequentially as they are
             stored in the structure.  If False, use the original numbering if
-            it was assigned previously. Default is True
+            it was assigned previously.
         coordinates : array-like of float, optional
             If provided, these coordinates will be written to the PDB file
             instead of the coordinates stored in the structure. These
             coordinates should line up with the atom order in the structure
             (not necessarily the order of the "original" PDB file if they
             differ)
-        altlocs : str, optional
+        altlocs : str, optional, default 'all'
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
 
-                - 'all' : (default) print all alternate locations
+                - 'all' : print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
@@ -634,16 +634,16 @@ class PDBFile(object):
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
-        write_anisou : bool, optional
+        write_anisou : bool, optional, default False
             If True, an ANISOU record is written for every atom that has one. If
-            False, ANISOU records are not written. Default is False
-        charmm : bool, optional
+            False, ANISOU records are not written.
+        charmm : bool, optional, default False
             If True, SEGID will be written in columns 73 to 76 of the PDB file
             in the typical CHARMM-style PDB output. This will be omitted for any
-            atom that does not contain a SEGID identifier. Default is False
-        standard_resnames : bool, optional
+            atom that does not contain a SEGID identifier.
+        standard_resnames : bool, optional, default False
             If True, common aliases for various amino and nucleic acid residues
-            will be converted into the PDB-standard values. Default is False
+            will be converted into the PDB-standard values.
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'

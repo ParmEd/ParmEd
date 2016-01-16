@@ -4482,7 +4482,7 @@ class AtomType(object):
     """
 
     def __init__(self, name, number, mass, atomic_number=-1, bond_type=None,
-                 charge=None):
+                 charge=0.0):
         if number is None and name is not None:
             # If we were given an integer, assign it to number. Otherwise,
             # assign it to the name
