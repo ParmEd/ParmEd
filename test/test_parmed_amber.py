@@ -13,7 +13,7 @@ from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
                           FortranFormat, titratable_residues)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError)
-from parmed import topologyobjects, load_file
+from parmed import topologyobjects, load_file, Structure
 import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip, StringIO
@@ -83,6 +83,55 @@ class TestReadParm(unittest.TestCase):
     def test_optimized_reader(self):
         """ Check that the optimized reader imports correctly """
         from parmed.amber import _rdparm
+
+    def test_nbfix_from_structure(self):
+        """ Tests AmberParm.from_structure with NBFIXes """
+        s = Structure()
+        at1 = topologyobjects.AtomType('A1', 1, 12.01, atomic_number=6)
+        at2 = topologyobjects.AtomType('A2', 2, 12.01, atomic_number=6)
+        at3 = topologyobjects.AtomType('A3', 3, 12.01, atomic_number=6)
+        at4 = topologyobjects.AtomType('A4', 4, 12.01, atomic_number=6)
+        at1.set_lj_params(0.5, 1.0)
+        at2.set_lj_params(0.6, 1.1)
+        at3.set_lj_params(0.7, 1.2)
+        at4.set_lj_params(0.8, 1.3)
+
+        # Add some NBFIXes
+        at1.add_nbfix('A2', 0.8, 4.0)
+        at2.add_nbfix('A1', 0.8, 4.0)
+        at3.add_nbfix('A4', 0.9, 4.1)
+        at4.add_nbfix('A3', 0.9, 4.1)
+
+        # Add a handful of atoms
+        s.add_atom(topologyobjects.Atom(name='AA', type='A1', atomic_number=6), 'LJR', 1)
+        s.add_atom(topologyobjects.Atom(name='AB', type='A2', atomic_number=6), 'LJR', 2)
+        s.add_atom(topologyobjects.Atom(name='AC', type='A3', atomic_number=6), 'LJR', 3)
+        s.add_atom(topologyobjects.Atom(name='AD', type='A4', atomic_number=6), 'LJR', 4)
+
+        # Assign the types
+        s[0].atom_type = at1
+        s[1].atom_type = at2
+        s[2].atom_type = at3
+        s[3].atom_type = at4
+
+        self.assertTrue(s.has_NBFIX())
+
+        # Convert to Amber topology file
+        parm = readparm.AmberParm.from_structure(s)
+
+        self.assertTrue(parm.has_NBFIX())
+        np.testing.assert_allclose(parm.parm_data['LENNARD_JONES_ACOEF'],
+                np.array([2048.0, 0.27487790694400016, 7713.001578629537,
+                    7605.122117724271, 14202.299844691719, 25564.24320523959,
+                    13860.025454471592, 25302.038907727154, 1.1579610995721004,
+                    76343.16532934578])
+        )
+        np.testing.assert_allclose(parm.parm_data['LENNARD_JONES_BCOEF'],
+                np.array([64.0, 2.097152000000001, 136.05588480000006,
+                    134.1529115728351, 191.8764421334576, 267.54416639999994,
+                    187.2522338751463, 264.8000511276929, 4.3578162,
+                    494.2652416000001])
+        )
 
     def test_load_parm(self):
         """ Test the arbitrary parm loader """
@@ -184,6 +233,8 @@ class TestReadParm(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         gasparm = readparm.AmberParm(get_fn('trx.prmtop'))
         gasparm.load_rst7(get_fn('trx.inpcrd'))
+        self.assertFalse(gasparm.chamber)
+        self.assertFalse(gasparm.has_cmap)
         self.assertEqual(gasparm.combining_rule, 'lorentz')
 
         self.assertEqual([a.xx for a in gasparm.atoms],
@@ -1104,6 +1155,10 @@ class TestParameterFiles(FileIOTestCase):
         a4 = topologyobjects.Atom(name='CD', type='CC')
         self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
         self.assertEqual(improper_key(a4, a3, a2, a1), ('CC', 'CD', 'CB', 'CA'))
+        # Check on AmberParm._truncate_array
+        parm = readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm._truncate_array('ATOM_NAME', 2)
+        self.assertEqual(len(parm.parm_data['ATOM_NAME']), 2)
 
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """

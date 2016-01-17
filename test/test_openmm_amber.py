@@ -1432,6 +1432,26 @@ class TestChamberParm(TestCaseRelative):
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
+    def test_interface_customforce(self):
+        """ Tests AmberParm.createSystem options with CustomNonbondedForce """
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0
+        self.assertTrue(parm.has_NBFIX())
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=1.2*u.nanometers)
+        # Get nonbonded forces
+        forces = []
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce):
+                forces.append(force)
+                self.assertEqual(force.getCutoffDistance(), 1.2*u.nanometers)
+                self.assertEqual(force.getNonbondedMethod(), force.PME)
+            elif isinstance(force, mm.CustomNonbondedForce):
+                forces.append(force)
+                self.assertEqual(force.getCutoffDistance(), 1.2*u.nanometers)
+                self.assertEqual(force.getNonbondedMethod(), force.CutoffPeriodic)
+        self.assertEqual(len(forces), 2)
+
     def test_interface_no_pbc(self):
         """Testing all ChamberParm.createSystem options (non-periodic)"""
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
