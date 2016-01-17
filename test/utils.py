@@ -28,8 +28,7 @@ try:
 except ImportError:
     from string import ascii_uppercase as uppercase
 
-def skip_big_tests():
-    return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+run_all_tests = os.getenv('PARMED_RUN_ALL_TESTS') is not None
 
 HAS_GROMACS = os.path.isdir(gromacs.GROMACS_TOPDIR)
 
