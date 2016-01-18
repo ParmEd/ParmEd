@@ -1757,7 +1757,9 @@ class AmberParm(AmberFormat, Structure):
         sigma_scale = 2**(-1/6) * length_conv
         for ii in range(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
-            if qq == 0 and (ss == 0 or ee == 0):
+            if qq.value_in_unit(u.elementary_charge**2) == 0 and (
+                    ss.value_in_unit(u.angstroms) == 0 or
+                    ee.value_in_unit(u.kilocalories_per_mole) == 0):
                 # Copy this exclusion as-is... no need to modify the nonbfrc
                 # exception parameters
                 customforce.addExclusion(i, j)
@@ -1814,6 +1816,8 @@ class AmberParm(AmberFormat, Structure):
         """
         # We need to figure out what 1-4 scaling term to use if we don't have
         # explicit exceptions
+        assert self.combining_rule in ('lorentz', 'geometric'), \
+                "Unrecognized combining rule"
         if not self.adjusts:
             scalings = defaultdict(int)
             for dih in self.dihedrals:
@@ -1841,8 +1845,6 @@ class AmberParm(AmberFormat, Structure):
                 comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
             elif self.combining_rule == 'geometric':
                 comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-            else:
-                assert False, "Unrecognized combining rule"
             fac = 2**(1/6)
             for dihedral in self.dihedrals:
                 if dihedral.ignore_end: continue
@@ -1885,8 +1887,6 @@ class AmberParm(AmberFormat, Structure):
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, 'Unrecognized combining rule. Should not be here'
         fac = 2**(1/6)
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue
@@ -2122,12 +2122,7 @@ class Rst7(object):
             try:
                 f = NetCDFRestart.open_old(filename)
                 self.natom = f.atom
-            except ImportError:
-                raise AmberError('Could not parse %s as an ASCII restart and '
-                                 'could not find any NetCDF-Python packages '
-                                 'to attempt to parse as a NetCDF Restart.'
-                                 % filename)
-            except RuntimeError:
+            except (TypeError, RuntimeError):
                 raise AmberError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates

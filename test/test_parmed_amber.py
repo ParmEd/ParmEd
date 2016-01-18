@@ -3,6 +3,7 @@ Tests the functionality in the parmed.amber package
 """
 from __future__ import print_function, division
 
+from copy import copy
 import glob
 import math
 import numpy as np
@@ -2291,6 +2292,34 @@ class TestAmberMdin(FileIOTestCase):
         mdin4 = mdin.Mdin(program='sander.APBS')
         mdin4.change('cntrl', 'igb', 10)
         mdin4.change('pb', 'bcfl', 1)
+
+class TestRst7Class(FileIOTestCase):
+    """ Test the Rst7 class """
+
+    def test_ascii(self):
+        """ Test the Rst7 class reading ASCII coordinates """
+        rst = readparm.Rst7.open(get_fn('ash.rst7'))
+        np.testing.assert_equal(rst.coordinates,
+                load_file(get_fn('ash.rst7')).coordinates)
+        np.testing.assert_equal(readparm.Rst7(get_fn('ash.rst7')).coordinates,
+                load_file(get_fn('ash.rst7')).coordinates)
+        rst2 = readparm.Rst7.copy_from(rst)
+        np.testing.assert_equal(rst.coordinates, rst2.coordinates)
+        rst3 = copy(rst)
+        np.testing.assert_equal(rst.coordinates, rst3.coordinates)
+        self.assertIsNot(rst, rst3)
+        self.assertIsNot(rst.coordinates, rst3.coordinates)
+
+    def test_netcdf(self):
+        """ Test the Rst7 class reading NetCDF coordinates """
+        rst = readparm.Rst7.open(get_fn('ncinpcrd.rst7'))
+        np.testing.assert_equal(rst.coordinates,
+                load_file(get_fn('ncinpcrd.rst7')).coordinates)
+        self.assertRaises(AmberError, lambda:
+                readparm.Rst7.open(get_fn('trx.prmtop')))
+        self.assertRaises(RuntimeError, lambda:
+                readparm.Rst7().write(get_fn('test.nc', written=True), netcdf=True)
+        )
 
 class TestAmberTitratableResidues(FileIOTestCase):
     """ Test Amber's titration module capabilities """
