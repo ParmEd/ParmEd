@@ -2113,11 +2113,17 @@ class Structure(object):
         """
         if not self.dihedrals: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.PeriodicTorsionForce()
-        force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        proper = mm.PeriodicTorsionForce()
+        improper = mm.PeriodicTorsionForce()
+        proper.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        improper.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for tor in self.dihedrals:
             if tor.type is None:
                 raise ParameterError('Cannot find torsion parameters')
+            if tor.improper:
+                force = improper
+            else:
+                force = proper
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx,
@@ -2129,7 +2135,12 @@ class Structure(object):
                                  tor.atom4.idx, int(tor.type.per),
                                  tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
-        return force
+        forces = []
+        if proper.getNumTorsions() > 0:
+            forces.append(proper)
+        if improper.getNumTorsions() > 0:
+            forces.append(improper)
+        return forces
 
     #===================================================
 
