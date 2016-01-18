@@ -803,12 +803,12 @@ class AmberParm(AmberFormat, Structure):
         This will undo any off-diagonal L-J modifications you may have made, so
         call this function with care.
         """
+        assert self.combining_rule in ('lorentz', 'geometric'), \
+                "Unrecognized combining rule"
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, "Unrecognized combining rule"
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
         fac = 2**(-1/6) * 2
@@ -846,8 +846,8 @@ class AmberParm(AmberFormat, Structure):
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, "Unrecognized combining rule"
+#       else:
+        assert self.combining_rule in ('lorentz', 'geometric'), "Unrecognized combining rule"
         fac = 2**(-1/6) * 2
         LJ_sigma = [x*fac for x in self.LJ_radius]
         pd = self.parm_data
@@ -1119,15 +1119,14 @@ class AmberParm(AmberFormat, Structure):
         force.setUseLongRangeCorrection(True)
         # Determine which nonbonded method we should use and transfer the
         # nonbonded cutoff
+        assert nonbondedMethod in (app.NoCutoff, app.CutoffNonPeriodic,
+                app.PME, app.Ewald, app.CutoffPeriodic), 'Bad nonbondedMethod'
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
-        else:
-            raise ValueError('Unsupported nonbonded method %s' %
-                             nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
 
         return nonbfrc, force

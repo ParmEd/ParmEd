@@ -15,7 +15,7 @@ from parmed.utils.six.moves import zip, StringIO
 import random
 import os
 import unittest
-from utils import (get_fn, diff_files, get_saved_fn, skip_big_tests,
+from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
                    HAS_GROMACS, FileIOTestCase)
 import warnings
 
@@ -326,7 +326,7 @@ class TestPDBStructure(FileIOTestCase):
         """ Test Bzipped-PDB file parsing """
         self._check4lzt(read_PDB(self.pdbbz2))
 
-    @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
+    @unittest.skipUnless(run_all_tests, 'Skipping large tests')
     def test_vmd_overflow(self):
         """ Test PDB file where atom and residue numbers overflow """
         pdbfile = read_PDB(self.overflow)
@@ -334,7 +334,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdbfile.residues), 35697)
         np.testing.assert_allclose(pdbfile.box, [0, 0, 0, 90, 90, 90])
 
-    @unittest.skipIf(skip_big_tests(), 'Skipping large tests')
+    @unittest.skipUnless(run_all_tests, 'Skipping large tests')
     def test_regular_overflow(self):
         """ Test PDB file where atom number goes to ***** after 99999 """
         pdbfile = read_PDB(self.overflow2)
@@ -2002,7 +2002,7 @@ class TestFileDownloader(unittest.TestCase):
         mol3 = formats.Mol2File.parse(self.url + 'tripos9.mol2')
         self.assertIsInstance(mol3, ResidueTemplate)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_download_gromacs_topology(self):
         """ Tests automatic loading of downloaded Gromacs topology file """
         self.assertTrue(gromacs.GromacsTopologyFile.id_format(self.url + '1aki.charmm27.top'))
@@ -2019,5 +2019,3 @@ class TestFileDownloader(unittest.TestCase):
         """ Tests that NetCDF files always fail when trying to download them """
         self.assertFalse(amber.NetCDFRestart.id_format(self.url + 'ncinpcrd.rst7'))
         self.assertFalse(amber.NetCDFTraj.id_format(self.url + 'tz2.truncoct.nc'))
-
-del skip_big_tests # Avoid fake testing this method :)
