@@ -2122,12 +2122,7 @@ class Rst7(object):
             try:
                 f = NetCDFRestart.open_old(filename)
                 self.natom = f.atom
-            except ImportError:
-                raise AmberError('Could not parse %s as an ASCII restart and '
-                                 'could not find any NetCDF-Python packages '
-                                 'to attempt to parse as a NetCDF Restart.'
-                                 % filename)
-            except RuntimeError:
+            except (TypeError, RuntimeError):
                 raise AmberError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
