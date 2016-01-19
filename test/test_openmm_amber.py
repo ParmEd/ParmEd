@@ -7,6 +7,7 @@ from collections import defaultdict
 from copy import copy
 from math import sqrt
 import os
+from parmed import Structure, topologyobjects
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
@@ -501,6 +502,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         # For now, long-range correction is not available
         parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
+        self.assertTrue(parm.has_NBFIX())
         PT.change(parm, 'CHARGE', ':*', 0).execute() # only check LJ energies
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
@@ -544,6 +546,74 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(energies['angle'], 0.9616, 4)
         self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
         self.assertAlmostEqual(energies['nonbonded'], 1168.06630486, 3)
+
+    def test_nbfix_exceptions(self):
+        """ Tests exception transfers when NBFIX present """
+        s = Structure()
+        at1 = topologyobjects.AtomType('A1', 1, 12.01, atomic_number=6)
+        at2 = topologyobjects.AtomType('A2', 2, 12.01, atomic_number=6)
+        at3 = topologyobjects.AtomType('A3', 3, 12.01, atomic_number=6)
+        at4 = topologyobjects.AtomType('A4', 4, 12.01, atomic_number=6)
+        at1.set_lj_params(0.5, 1.0)
+        at2.set_lj_params(0.6, 1.1)
+        at3.set_lj_params(0.7, 1.2)
+        at4.set_lj_params(0.8, 1.3)
+
+        # Add some NBFIXes
+        at1.add_nbfix('A4', 0.0, 0.0)
+        at4.add_nbfix('A1', 0.0, 0.0)
+        at3.add_nbfix('A2', 0.9, 4.1)
+        at2.add_nbfix('A3', 0.9, 4.1)
+
+        # Add a handful of atoms
+        s.add_atom(topologyobjects.Atom(name='AA', type='A1', atomic_number=6), 'LJR', 1)
+        s.add_atom(topologyobjects.Atom(name='AB', type='A2', atomic_number=6), 'LJR', 2)
+        s.add_atom(topologyobjects.Atom(name='AC', type='A3', atomic_number=6), 'LJR', 3)
+        s.add_atom(topologyobjects.Atom(name='AD', type='A4', atomic_number=6), 'LJR', 4)
+
+        # Assign the types
+        s[0].atom_type = at1
+        s[1].atom_type = at2
+        s[2].atom_type = at3
+        s[3].atom_type = at4
+
+        # Add bonds, angles, and the one dihedral
+        s.bond_types.append(topologyobjects.BondType(0, 1.0))
+        s.angle_types.append(topologyobjects.AngleType(0, 90))
+        s.dihedral_types.append(topologyobjects.DihedralType(0, 1, 0))
+        s.bond_types.claim()
+        s.angle_types.claim()
+        s.dihedral_types.claim()
+
+        s.bonds.append(topologyobjects.Bond(s[0], s[1], type=s.bond_types[0]))
+        s.bonds.append(topologyobjects.Bond(s[1], s[2], type=s.bond_types[0]))
+        s.bonds.append(topologyobjects.Bond(s[2], s[3], type=s.bond_types[0]))
+
+        s.angles.append(topologyobjects.Angle(s[0], s[1], s[2], type=s.angle_types[0]))
+        s.angles.append(topologyobjects.Angle(s[1], s[2], s[3], type=s.angle_types[0]))
+
+        s.dihedrals.append(
+                topologyobjects.Dihedral(s[0], s[1], s[2], s[3],
+                                         type=s.dihedral_types[0])
+        )
+
+        self.assertTrue(s.has_NBFIX())
+        s[0].xx, s[0].xy, s[0].xz = 0, 0, 0
+        s[1].xx, s[1].xy, s[1].xz = 0, 1, 0
+        s[2].xx, s[2].xy, s[2].xz = 1, 1, 0
+        s[3].xx, s[3].xy, s[3].xz = 1, 1, 1
+
+        # Convert to Amber topology file
+        parm = AmberParm.from_structure(s)
+        self.assertTrue(parm.has_NBFIX())
+        system = parm.createSystem()
+
+        # The energy should be zero
+        context = mm.Context(system, mm.VerletIntegrator(1*u.femtoseconds), CPU)
+        context.setPositions(parm.positions)
+        e = context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(
+                u.kilocalories_per_mole)
+        self.assertAlmostEqual(e, 0)
 
     def test_1264(self):
         """ Testing the 12-6-4 LJ potential in OpenMM """
@@ -750,6 +820,15 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
+
+    def test_dihedral_splitting(self):
+        """ Tests proper splitting of torsions into proper/improper groups """
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        prop, improp = parm.omm_dihedral_force(split=True)
+        self.assertEqual(improp.getNumTorsions(), 5)
+        self.assertEqual(prop.getNumTorsions(), len(parm.dihedrals)-5)
+        self.assertEqual(parm.omm_dihedral_force(split=False).getNumTorsions(),
+                         len(parm.dihedrals))
 
     def test_interface_no_pbc(self):
         """ Testing all AmberParm.createSystem options (non-periodic) """
