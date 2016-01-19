@@ -328,7 +328,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
-            dest.write('   <Torsion map="%d" type1="%s" type=2"%s" '
+            dest.write('   <Torsion map="%d" type1="%s" type2="%s" '
                        'type3="%s" type4="%s" type5="%s"/>\n' %
                        (maps[id(cmap)], a1, a2, a3, a4, a5)
             )
