@@ -6,8 +6,8 @@ import utils
 
 import numpy as np
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
-from parmed import (Structure, read_PDB, write_PDB, read_CIF, write_CIF,
-                    download_PDB, download_CIF, topologyobjects, Atom)
+from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
+                    topologyobjects, Atom, write_PDB, write_CIF)
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
 from parmed.utils.six import iteritems, add_metaclass
@@ -780,7 +780,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(pdbfile.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(pdbfile.atoms), 451)
         output = StringIO()
-        write_PDB(pdbfile, output)
+        pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile2 = read_PDB(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
@@ -807,7 +807,7 @@ class TestPDBStructure(FileIOTestCase):
         self._check4lzt(pdbfile2, check_meta=False)
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
         output = reset_stringio(output)
-        write_PDB(pdbfile, output)
+        pdbfile.write_pdb(output)
         output.seek(0)
         pdbfile3 = read_PDB(output)
         self._check4lzt(pdbfile3, check_meta=False)
@@ -842,7 +842,7 @@ class TestPDBStructure(FileIOTestCase):
         self._compareInputOutputPDBs(pdbfile, pdbfile3, altloc_option='first')
         # Check that the 'occupancy' option works
         output = reset_stringio(output)
-        write_PDB(pdbfile, output, renumber=False, altlocs='occupancy')
+        pdbfile.write_pdb(output, renumber=False, altlocs='occupancy')
         output.seek(0)
         pdbfile4 = read_PDB(output)
         self._check4lzt(pdbfile4, check_meta=False, has_altloc=False)
@@ -856,7 +856,7 @@ class TestPDBStructure(FileIOTestCase):
         """ Test PDB file writing converting to standard names """
         parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         output = StringIO()
-        write_PDB(parm, output, standard_resnames=True)
+        parm.write_pdb(output, standard_resnames=True)
         output.seek(0)
         pdb = read_PDB(output)
         for res in pdb.residues:
@@ -881,7 +881,7 @@ class TestPDBStructure(FileIOTestCase):
             self.assertEqual(x/10000, y)
 
     def test_anisou_write(self):
-        """ Tests that write_PDB properly writes ANISOU records """
+        """ Tests that write_pdb properly writes ANISOU records """
         def check_aniso(pdbfile):
             aniso1 = [2066, 1204, 1269, 44, 126, 191]
             aniso2 = [2090, 1182, 921, 46, 64, 60]
@@ -956,6 +956,16 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(formats.pdb._standardize_resname('RA'), 'A')
         self.assertEqual(formats.pdb._standardize_resname('DG'), 'DG')
         self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
+
+    def test_deprecations(self):
+        warnings.filterwarnings('error', category=DeprecationWarning)
+        fn = get_fn('blah', written=True)
+        try:
+            parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+            self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
+            self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
+        finally:
+            warnings.filterwarnings('always', category=DeprecationWarning)
 
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
@@ -1439,7 +1449,7 @@ class TestCIFStructure(FileIOTestCase):
         self.assertEqual(cif.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(cif.atoms), 451)
         output = StringIO()
-        write_CIF(cif, output)
+        cif.write_cif(output)
         output.seek(0)
         pdbfile2 = read_CIF(output)
         self.assertEqual(len(pdbfile2.atoms), 451)
@@ -1481,7 +1491,7 @@ class TestCIFStructure(FileIOTestCase):
         """ Test PDBx/mmCIF file writing converting to standard names """
         parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         output = StringIO()
-        write_CIF(parm, output, standard_resnames=True)
+        parm.write_cif(output, standard_resnames=True)
         output.seek(0)
         pdb = read_CIF(output)
         for res in pdb.residues:
