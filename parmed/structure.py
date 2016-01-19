@@ -1737,7 +1737,6 @@ class Structure(object):
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
                      verbose=False,
-                     forceNBFIX=False,
                      splitDihedrals=False):
         """
         Construct an OpenMM System representing the topology described by the
@@ -1800,10 +1799,6 @@ class Structure(object):
             of freedom will *still* be constrained).
         verbose : bool=False
             If True, the progress of this subroutine will be printed to stdout
-        forceNBFIX : bool=False
-            If True, the NBFIX code path will be executed even if no NBFIXes are
-            detected. Primarily for debugging, as this will be slower than
-            setting it to False.
         splitDihedrals : bool=False
             If True, the dihedrals will be split into two forces -- proper and
             impropers. This is primarily useful for debugging torsion parameter

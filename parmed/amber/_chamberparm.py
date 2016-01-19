@@ -193,10 +193,10 @@ class ChamberParm(AmberParm):
         inst.LJ_14_radius = [0 for i in range(ntyp)]
         inst.LJ_14_depth = [0 for i in range(ntyp)]
         for atom in inst.atoms:
-            inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
-            inst.LJ_14_radius[atom.nb_idx-1] = atom.atom_type.rmin_14
-            inst.LJ_14_depth[atom.nb_idx-1] = atom.atom_type.epsilon_14
+            inst.LJ_radius[atom.nb_idx-1] = atom.rmin
+            inst.LJ_depth[atom.nb_idx-1] = atom.epsilon
+            inst.LJ_14_radius[atom.nb_idx-1] = atom.rmin_14
+            inst.LJ_14_depth[atom.nb_idx-1] = atom.epsilon_14
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
@@ -692,8 +692,8 @@ class ChamberParm(AmberParm):
                 a1, a2 = pair.atom1, pair.atom2
                 i, j = sorted([a1.nb_idx - 1, a2.nb_idx - 1])
                 idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                eps = sqrt(a1.epsilon_14 * a2.epsilon_14)
-                rmin = a1.rmin_14 + a2.rmin_14
+                eps = pair.type.epsilon
+                rmin = pair.type.rmin
                 rmin6 = rmin * rmin * rmin * rmin * rmin * rmin
                 acoef = eps * rmin6*rmin6
                 bcoef = 2 * eps * rmin6
