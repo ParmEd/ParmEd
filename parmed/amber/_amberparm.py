@@ -1879,7 +1879,7 @@ class AmberParm(AmberFormat, Structure):
                     scee = scnb = 1e10
                 newtype = _copy.copy(dihedral.type)
                 newtype.scee = scee
-                newtype.scnb = scnb if not ignore_inconsistent_vdw else 1.0
+                newtype.scnb = scnb
                 dihedral.type = newtype
                 newtype.list = self.dihedral_types
                 self.dihedral_types.append(newtype)
