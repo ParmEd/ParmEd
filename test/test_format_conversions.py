@@ -123,6 +123,12 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         self.assertTrue(diff_files(get_fn('opls.parm7', written=True),
                                    get_saved_fn('opls.parm7'))
         )
+        # Make sure recalculate_LJ works
+        acoef = np.array(parm.parm_data['LENNARD_JONES_ACOEF'])
+        bcoef = np.array(parm.parm_data['LENNARD_JONES_BCOEF'])
+        parm.recalculate_LJ()
+        np.testing.assert_allclose(acoef, parm.parm_data['LENNARD_JONES_ACOEF'])
+        np.testing.assert_allclose(bcoef, parm.parm_data['LENNARD_JONES_BCOEF'])
 
     @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
     def test_geometric_combining_rule_energy(self):

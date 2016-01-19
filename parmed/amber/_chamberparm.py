@@ -729,9 +729,9 @@ class ChamberParm(AmberParm):
             if not needed_split:
                 break
             # The following should never happen
-            if ii > len(self.atoms):
-                raise RuntimeError("Could not resolve all exceptions. Some "
-                                   "unexpected problem with the algorithm")
+            assert ii <= len(self.atoms), 'Could not resolve all exceptions. ' \
+                    'Some unexpected problem with the algorithm'
+            # TODO delete
         # Now go through and change all None's to 0s, as these terms won't be
         # used for any exceptions, anyway
         for i, item in enumerate(data['LENNARD_JONES_14_ACOEF']):

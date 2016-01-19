@@ -24,7 +24,7 @@ import os
 import unittest
 import warnings
 from utils import (get_fn, CPU, has_openmm, mm, app, TestCaseRelative,
-                   skip_big_tests, Reference)
+                   run_all_tests, Reference)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -164,7 +164,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
+    @unittest.skipUnless(run_all_tests, "Skipping long-running tests")
     def test_jac(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (no PBC) """
         # Load the top and gro files
@@ -192,7 +192,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.5)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
+    @unittest.skipUnless(run_all_tests, "Skipping long-running tests")
     def test_jac_pme(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (PME) """
         # Load the top and gro files
