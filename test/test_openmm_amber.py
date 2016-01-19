@@ -821,6 +821,15 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
 
+    def test_dihedral_splitting(self):
+        """ Tests proper splitting of torsions into proper/improper groups """
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        prop, improp = parm.omm_dihedral_force(split=True)
+        self.assertEqual(improp.getNumTorsions(), 5)
+        self.assertEqual(prop.getNumTorsions(), len(parm.dihedrals)-5)
+        self.assertEqual(parm.omm_dihedral_force(split=False).getNumTorsions(),
+                         len(parm.dihedrals))
+
     def test_interface_no_pbc(self):
         """ Testing all AmberParm.createSystem options (non-periodic) """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))

@@ -1737,7 +1737,8 @@ class Structure(object):
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
                      verbose=False,
-                     forceNBFIX=False):
+                     forceNBFIX=False,
+                     splitDihedrals=False):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -1799,6 +1800,14 @@ class Structure(object):
             of freedom will *still* be constrained).
         verbose : bool=False
             If True, the progress of this subroutine will be printed to stdout
+        forceNBFIX : bool=False
+            If True, the NBFIX code path will be executed even if no NBFIXes are
+            detected. Primarily for debugging, as this will be slower than
+            setting it to False.
+        splitDihedrals : bool=False
+            If True, the dihedrals will be split into two forces -- proper and
+            impropers. This is primarily useful for debugging torsion parameter
+            assignments.
 
         Notes
         -----
@@ -1848,7 +1857,7 @@ class Structure(object):
                 self.omm_angle_force(constraints, flexibleConstraints)
         )
         if verbose: print('Adding dihedrals...')
-        self._add_force_to_system(system, self.omm_dihedral_force())
+        self._add_force_to_system(system, self.omm_dihedral_force(splitDihedrals))
         if verbose: print('Adding Ryckaert-Bellemans torsions...')
         self._add_force_to_system(system, self.omm_rb_torsion_force())
         if verbose: print('Adding Urey-Bradleys...')
@@ -2103,21 +2112,35 @@ class Structure(object):
     #===================================================
 
     @needs_openmm
-    def omm_dihedral_force(self):
+    def omm_dihedral_force(self, split=False):
         """ Creates the OpenMM PeriodicTorsionForce modeling dihedrals
+
+        Parameters
+        ----------
+        split : bool, optional, default=False
+            If True, separate PeriodicTorsionForce instances with the propers in
+            the first and impropers in the second return item. If no impropers
+            or propers are present, the instances with zero terms are not
+            returned.
 
         Returns
         -------
-        PeriodicTorsionForce
+        PeriodicTorsionForce[, PeriodicTorsionForce]
             Or None if no torsions are present in this system
         """
         if not self.dihedrals: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.PeriodicTorsionForce()
-        force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        proper = mm.PeriodicTorsionForce()
+        improper = mm.PeriodicTorsionForce()
+        proper.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        improper.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for tor in self.dihedrals:
             if tor.type is None:
                 raise ParameterError('Cannot find torsion parameters')
+            if split and tor.improper:
+                force = improper
+            else:
+                force = proper
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx,
@@ -2129,7 +2152,11 @@ class Structure(object):
                                  tor.atom4.idx, int(tor.type.per),
                                  tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
-        return force
+        if proper.getNumTorsions() == 0:
+            return improper
+        if improper.getNumTorsions() == 0:
+            return proper
+        return proper, improper
 
     #===================================================
 
