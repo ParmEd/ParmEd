@@ -842,12 +842,12 @@ class AmberParm(AmberFormat, Structure):
             If True, off-diagonal elements in the combined Lennard-Jones matrix
             exist. If False, they do not.
         """
+        assert self.combining_rule in ('lorentz', 'geometric'), \
+                "Unrecognized combining rule"
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-#       else:
-        assert self.combining_rule in ('lorentz', 'geometric'), "Unrecognized combining rule"
         fac = 2**(-1/6) * 2
         LJ_sigma = [x*fac for x in self.LJ_radius]
         pd = self.parm_data
@@ -978,6 +978,8 @@ class AmberParm(AmberFormat, Structure):
         hasnbfix = self.has_NBFIX()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
         if not hasnbfix and not has1264 and not has1012:
+            if self.chamber:
+                self._modify_nonb_exceptions(nonbfrc, None)
             return nonbfrc
 
         # If we have NBFIX, omm_nonbonded_force returned a tuple
@@ -1741,8 +1743,9 @@ class AmberParm(AmberFormat, Structure):
         exclusions. The exceptions on the nonbonded force might need to be
         adjusted if off-diagonal modifications on the L-J matrix are present
         """
-        # To get into this routine, we already needed to know that nbfix is
-        # present
+        # To get into this routine, either NBFIX is present OR this is a chamber
+        # prmtop and we need to pull the 1-4 L-J parameters from the
+        # LENNARD_JONES_14_A/BCOEF arrays
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         atoms = self.atoms
@@ -1762,7 +1765,8 @@ class AmberParm(AmberFormat, Structure):
                     ee.value_in_unit(u.kilocalories_per_mole) == 0):
                 # Copy this exclusion as-is... no need to modify the nonbfrc
                 # exception parameters
-                customforce.addExclusion(i, j)
+                if customforce is not None:
+                    customforce.addExclusion(i, j)
                 continue
             # Figure out what the 1-4 scaling parameters were for this pair...
             unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
@@ -1788,7 +1792,8 @@ class AmberParm(AmberFormat, Structure):
                 epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
-            customforce.addExclusion(i, j)
+            if customforce is not None:
+                customforce.addExclusion(i, j)
 
     #===================================================
 
@@ -1862,12 +1867,11 @@ class AmberParm(AmberFormat, Structure):
                         scee = 1e10
                     else:
                         scee = 1 / pair.type.chgscale
-                    if (abs(rref - pair.type.rmin) > SMALL and
+                    if ignore_inconsistent_vdw:
+                        scnb = 1.0
+                    elif (abs(rref - pair.type.rmin) > SMALL and
                             pair.type.epsilon != 0):
-                        if ignore_inconsistent_vdw:
-                            scnb = 1.0
-                        else:
-                            raise TypeError('Cannot translate exceptions')
+                        raise TypeError('Cannot translate exceptions')
                     if (abs(scnb - dihedral.type.scnb) < SMALL and
                             abs(scee - dihedral.type.scee) < SMALL):
                         continue
@@ -1875,7 +1879,7 @@ class AmberParm(AmberFormat, Structure):
                     scee = scnb = 1e10
                 newtype = _copy.copy(dihedral.type)
                 newtype.scee = scee
-                newtype.scnb = scnb
+                newtype.scnb = scnb if not ignore_inconsistent_vdw else 1.0
                 dihedral.type = newtype
                 newtype.list = self.dihedral_types
                 self.dihedral_types.append(newtype)
