@@ -2152,7 +2152,6 @@ class Structure(object):
                                  tor.atom4.idx, int(tor.type.per),
                                  tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
-        forces = []
         if proper.getNumTorsions() == 0:
             return improper
         if improper.getNumTorsions() == 0:
