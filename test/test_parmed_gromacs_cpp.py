@@ -23,8 +23,17 @@ class TestGromacsCpp(unittest.TestCase):
         pp = CPreProcessor(f) # no defines
         self.assertEqual(pp.read().strip(), 'MY_DEFINE is not set')
         f.seek(0)
+        self.assertEqual(f.tell(), 0)
+        self.assertEqual(pp.tell(), 0)
         pp = CPreProcessor(f, defines=dict(MY_DEFINE='SUCCESS'))
         self.assertEqual(pp.read().strip(), 'PPVAR is set to SUCCESS')
+
+    def test_not_implemented(self):
+        """ Test error catching for PP features not implemented """
+        f = StringIO('#define MYVAR 1\n#if (MYVAR == 1)\nCORRECT\n#endif')
+        pp = CPreProcessor(f)
+        self.assertRaises(NotImplementedError, lambda: pp.seek(10))
+        self.assertRaises(NotImplementedError, pp.read)
 
     def test_ifndef(self):
         """ Tests CPreProcessor #ifndef/#else#endif preprocessing """
@@ -123,6 +132,23 @@ line 4
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_VAR=1))
         self.assertEqual(pp.read().strip(), "line 1\nline 2")
+        f = StringIO("""
+#ifdef MY_VAR
+#   ifndef MY_VAR_2
+MY_VAR defined... MY_VAR_2 not
+#   else
+MY_VAR defined... MY_VAR_2 also
+#   endif
+#endif
+""")
+        pp = CPreProcessor(f)
+        self.assertEqual(pp.read().strip(), '')
+        f.seek(0)
+        pp = CPreProcessor(f, defines=dict(MY_VAR=1))
+        self.assertEqual(pp.read().strip(), '1 defined... MY_VAR_2 not')
+        f.seek(0)
+        pp = CPreProcessor(f, defines=dict(MY_VAR=1, MY_VAR_2=2))
+        self.assertEqual(pp.read().strip(), '1 defined... 2 also')
 
     def test_simple_include(self):
         """ Tests CPreProcessor simple #include directive """
@@ -177,6 +203,24 @@ pptest1 line 3""")
                      "MY_VAR2\n")
         pp = CPreProcessor(f)
         self.assertEqual(pp.read().strip(), 'replace1')
+
+    def test_close(self):
+        """ Test closing file object before deleting it """
+        pp = CPreProcessor(get_fn('pptest1/pptest1.h'))
+        pp.close()
+        del pp
+
+    def test_context_manager(self):
+        """ Test using CPreProcessor in a context manager """
+        with CPreProcessor(get_fn('pptest2/pptest1.h')) as pp:
+            self.assertEqual(pp.read().strip(), """\
+pptest1 line 1
+pptest2 line 1
+pptest3 line 1
+pptest1 line 2
+pptest1 line 3
+pptest3 line 1
+pptest1 line 4""")
 
     def test_bad_ifdef(self):
         """ Tests CPreProcessor error processing of bad #ifdef/#ifndef """
