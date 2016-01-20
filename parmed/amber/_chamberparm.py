@@ -684,7 +684,6 @@ class ChamberParm(AmberParm):
         for i in range(len(data['LENNARD_JONES_14_ACOEF'])):
             data['LENNARD_JONES_14_ACOEF'][i] = None
             data['LENNARD_JONES_14_BCOEF'][i] = None
-        atom_types_assigned_unique_idx = set()
         ii = 0
         while True:
             needed_split = False
