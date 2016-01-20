@@ -701,16 +701,7 @@ class ChamberParm(AmberParm):
                     if abs(data['LENNARD_JONES_14_ACOEF'][idx] - acoef) > SMALL:
                         # Need to split out another type
                         needed_split = True
-                        if a1.type in atom_types_assigned_unique_idx:
-                            if a2.type in atom_types_assigned_unique_idx:
-                                # Ugh. Split out this atom by itself
-                                mask = '@%d' % (a1.idx + 1)
-                            else:
-                                mask = '@%%%s' % a2.type
-                                atom_types_assigned_unique_idx.add(a2.type)
-                        else:
-                            atom_types_assigned_unique_idx.add(a1.type)
-                            mask = '@%%%s' % a1.type
+                        mask = '@%d' % (a1.idx + 1)
                         addLJType(self, mask, radius_14=0,
                                   epsilon_14=0).execute()
                         ntypes += 1
@@ -731,7 +722,6 @@ class ChamberParm(AmberParm):
             # The following should never happen
             assert ii <= len(self.atoms), 'Could not resolve all exceptions. ' \
                     'Some unexpected problem with the algorithm'
-            # TODO delete
         # Now go through and change all None's to 0s, as these terms won't be
         # used for any exceptions, anyway
         for i, item in enumerate(data['LENNARD_JONES_14_ACOEF']):
