@@ -328,6 +328,13 @@ class CPreProcessor(object):
         elif len(words) == 0:
             raise PreProcessorError('Nothing defined in #undef')
 
+    # Context manager protocol
+    def __exit__(self, type, value, traceback):
+        self.close()
+
+    def __enter__(self):
+        return self
+
     _ppcmdmap = {'if' : _pp_if, 'elif' : _pp_elif, 'ifdef' : _pp_ifdef,
                  'else' : _pp_else, 'define' : _pp_define, 'undef' : _pp_undef,
                  'include' : _pp_include, 'endif' : _pp_endif,
