@@ -330,7 +330,14 @@ class TestReadParm(unittest.TestCase):
         self._extensive_checks(parm)
         self.assertTrue(parm.chamber)
         self.assertTrue(parm.has_cmap)
+        self.assertFalse(parm.amoeba)
         self.assertEqual(parm.ptr('ifbox'), 0)
+        # Make sure that a corrupted data section is properly caught
+        fmt = readparm.AmberFormat(get_fn('ala_ala_ala.parm7'))
+        del fmt.parm_data['CHARMM_UREY_BRADLEY'][-1]
+        self.assertRaises(AmberError, lambda:
+                readparm.ChamberParm.from_rawdata(fmt)
+        )
 
     def test_chamber_solv_parm(self):
         """ Test the ChamberParm class with a periodic prmtop """
