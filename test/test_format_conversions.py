@@ -110,7 +110,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                            relative_error=1e-8)
         )
 
-    @unittest.skipUnless(False, 'disabled for now')
+    @unittest.skipUnless(HAS_OPENMM, 'Cannot test without OpenMM')
     def test_chamber_expanded_exclusions(self):
         """ Tests converting Gromacs to Chamber parm w/ modified exceptions """
         # Now let's modify an exception parameter so that it needs type
@@ -144,7 +144,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         acon.setPositions(top.positions)
         e3 = acon.getState(getEnergy=True).getPotentialEnergy()
         e3 = e3.value_in_unit(u.kilocalories_per_mole)
-        self.assertLess(abs(e1 - e3), 1e-2)
+        self.assertLess(abs(e2 - e3), 1e-2)
 
     @unittest.skipUnless(HAS_OPENMM, 'Cannot test without OpenMM')
     def test_chamber_energies(self):
