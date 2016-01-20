@@ -109,6 +109,9 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                 diff_files(fn, get_saved_fn('1aki.charmm27_fromgmx.parm7'),
                            relative_error=1e-8)
         )
+        parm.fill_LJ()
+        self.assertTrue(0 in parm.LJ_14_radius)
+        self.assertTrue(0 in parm.LJ_14_depth)
 
     @unittest.skipUnless(HAS_OPENMM, 'Cannot test without OpenMM')
     def test_chamber_expanded_exclusions(self):
