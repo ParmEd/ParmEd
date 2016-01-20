@@ -133,6 +133,7 @@ class TestFileLoader(FileIOTestCase):
         for atom in mol2.atoms:
             self.assertEqual(atom.charge, 0)
             self.assertEqual(atom.residue.name, 'UNK')
+            self.assertNotEqual(atom.atomic_number, 0)
         # Check mol2 where last several columns do not exist in SUBSTRUCTURE
         mol2 = formats.load_file(get_fn('tripos4.mol2'), structure=True)
         self.assertIsInstance(mol2, Structure)
