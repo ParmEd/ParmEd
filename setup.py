@@ -9,29 +9,34 @@ if sys.version_info < (2, 7):
 
 is_pypy = '__pypy__' in sys.builtin_module_names
 
+if sys.platform == 'darwin' and not is_pypy:
+    # You *need* to use clang and clang++ for ParmEd extensions on a Mac;
+    # Anaconda does annoying stuff that breaks this, since their distutils
+    # automatically tries to use "gcc", which would conflict with the MacPorts
+    # gcc... sigh.
+    os.environ['CXX'] = 'clang++'
+    os.environ['CC'] = 'clang'
+
 # parmed package and all its subpackages
 packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
-            'parmed.utils', 'parmed.gromacs', 'parmed.tools',
+            'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm
-if is_pypy:
-    sources = depends = include_dirs = extensions = []
-else:
-    sources = [os.path.join('src', '_rdparm.cpp'),
-               os.path.join('src', 'readparm.cpp')]
-    depends = [os.path.join('src', 'CompatabilityMacros.h'),
-               os.path.join('src', 'readparm.h')]
-    include_dirs = [os.path.join(os.path.abspath('.'), 'src')]
+sources = [os.path.join('src', '_rdparm.cpp'),
+           os.path.join('src', 'readparm.cpp')]
+depends = [os.path.join('src', 'CompatabilityMacros.h'),
+           os.path.join('src', 'readparm.h')]
+include_dirs = [os.path.join(os.path.abspath('.'), 'src')]
 
-    extensions = [Extension('parmed.amber._rdparm',
-                            sources=sources,
-                            include_dirs=include_dirs,
-                            depends=depends)
-    ]
+extensions = [Extension('parmed.amber._rdparm',
+                        sources=sources,
+                        include_dirs=include_dirs,
+                        depends=depends)
+]
 
 if __name__ == '__main__':
 
@@ -43,7 +48,7 @@ if __name__ == '__main__':
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
     from distutils import sysconfig
-    if is_pypy or not os.path.exists(
+    if not is_pypy and not os.path.exists(
             os.path.join(sysconfig.get_config_vars()['INCLUDEPY'], 'Python.h')):
         extensions = []
 

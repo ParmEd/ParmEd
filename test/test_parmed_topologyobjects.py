@@ -5,16 +5,20 @@ By Jason Swails
 """
 from __future__ import division
 
-from utils import get_fn
+import math
 from parmed.exceptions import MoleculeError, ParameterError
-import parmed.topologyobjects as topologyobjects
-from parmed.topologyobjects import _ListItem, _FourAtomTerm
-from parmed.topologyobjects import *
 from parmed.amber.readparm import AmberFormat
+import parmed.topologyobjects as topologyobjects
+from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
+from parmed.topologyobjects import *
+import parmed.unit as u
+from parmed.utils.six import PY3
 from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
+from utils import get_fn
 import random
+import warnings
 
 class TestTopologyObjects(unittest.TestCase):
     """
@@ -30,6 +34,7 @@ class TestTopologyObjects(unittest.TestCase):
         objects = [_ListItem() for i in range(100)]
         # Assign it a list container
         for obj in objects:
+            self.assertEqual(obj.idx, -1)
             obj.list = my_container
             my_container.append(obj)
         for i, obj in enumerate(my_container):
@@ -48,6 +53,16 @@ class TestTopologyObjects(unittest.TestCase):
         # updated
         for i, obj in enumerate(my_container):
             self.assertEqual(obj.idx, i)
+        # Test some corner cases
+        class NewList(list): pass
+        objects = NewList([_ListItem() for i in range(100)])
+        objects.needs_indexing = True
+        for i, obj in enumerate(objects):
+            obj.list = objects
+            self.assertEqual(i, obj.idx)
+        objects[-1].list = NewList()
+        objects[-1].list.needs_indexing = True
+        self.assertEqual(objects[-1].idx, -1)
 
     #=============================================
 
@@ -116,6 +131,11 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(a3, fat)
         self.assertIn(a4, fat)
         self.assertNotIn(a5, fat)
+        fat.delete()
+        self.assertIs(fat.atom1, None)
+        self.assertIs(fat.atom2, None)
+        self.assertIs(fat.atom3, None)
+        self.assertIs(fat.atom4, None)
 
     #=============================================
 
@@ -131,6 +151,7 @@ class TestTopologyObjects(unittest.TestCase):
                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
         a5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+        self.assertRaises(IndexError, a1.nonbonded_exclusions)
         # Make sure the atom attributes are transferred correctly (only check
         # the first atom)
         self.assertEqual(a1.atomic_number, 6)
@@ -215,6 +236,443 @@ class TestTopologyObjects(unittest.TestCase):
         for i, atom in enumerate(atoms):
             atom.list = atoms
             self.assertEqual(atom.idx, i)
+
+        # Test exception handling
+        atoms = AtomList()
+        atoms.extend([a1, a2, a3, a4, a5])
+        self.assertEqual(a1.nonbonded_exclusions(), [1, 2, 3, 4])
+        self.assertEqual(a2.nonbonded_exclusions(), [2, 3, 4])
+        self.assertEqual(a3.nonbonded_exclusions(), [3, 4])
+        self.assertEqual(a4.nonbonded_exclusions(), [4])
+        self.assertEqual(a5.nonbonded_exclusions(), [])
+        self.assertEqual(a5.nonbonded_exclusions(only_greater=False), [0, 1, 2, 3])
+
+        # Test L-J handling
+        lja1 = Atom(atomic_number=6, name='C1', type='CT', charge=-0.1,
+                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+        self.assertEqual(lja1.sigma, 0.0)
+        lja1.atom_type = AtomType('CT', 1, 12.01, 6)
+        lja1.atom_type.set_lj_params(1.0, 2.0, 1.1, 2.1)
+        self.assertEqual(lja1.epsilon, 1.0)
+        self.assertEqual(lja1.rmin, 2.0)
+        self.assertEqual(lja1.sigma, 2.0*2**(-1/6)*2)
+        lja2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
+                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+        lja2.sigma = 1.0
+        self.assertEqual(lja2.sigma, 1.0)
+        self.assertEqual(lja2.sigma_14, 1.0)
+        lja2.sigma_14 = 1.5
+        self.assertEqual(lja2.sigma_14, 1.5)
+        self.assertEqual(lja2.rmin_14, 1.5*2**(1/6)/2)
+        self.assertAlmostEqual(lja2.rmin, 2**(1/6)/2)
+        lja3 = Atom(atomic_number=6, name='C3', type='CT', charge=0.0,
+                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+        lja3.atom_type = AtomType('CX', 2, 12.01, 6)
+        lja3.atom_type.set_lj_params(2.0, 3.0)
+        self.assertEqual(lja3.sigma_14, 3*2**(-1/6)*2)
+#       lja4 = Atom(atomic_number=6, name='C4', type='CT', charge=-0.1,
+#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+#       lja5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
+#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+
+        a1.element = 7
+        self.assertEqual(a1.atomic_number, 7)
+        self.assertEqual(a1.element, 7)
+
+        # Test L-J setters/getters
+        a = Atom()
+        self.assertEqual(a.rmin, 0)
+        self.assertEqual(a.sigma, 0)
+        self.assertEqual(a.epsilon, 0)
+        self.assertEqual(a.rmin_14, 0)
+        self.assertEqual(a.sigma_14, 0)
+        self.assertEqual(a.epsilon_14, 0)
+        a.rmin = 1.0
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 1)
+        self.assertEqual(a.sigma_14, 2**(5/6))
+        self.assertEqual(a.epsilon, 0)
+        self.assertEqual(a.epsilon_14, 0)
+        a.rmin_14 = 2.0
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 2)
+        self.assertEqual(a.sigma_14, 2*2**(5/6))
+        self.assertEqual(a.epsilon, 0)
+        self.assertEqual(a.epsilon_14, 0)
+        a.epsilon = 0.5
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 2)
+        self.assertEqual(a.sigma_14, 2*2**(5/6))
+        self.assertEqual(a.epsilon, 0.5)
+        self.assertEqual(a.epsilon_14, 0.5)
+        a.epsilon_14 = 0.25
+        self.assertEqual(a.rmin, 1.0)
+        self.assertEqual(a.sigma, 2**(5/6))
+        self.assertEqual(a.rmin_14, 2)
+        self.assertEqual(a.sigma_14, 2*2**(5/6))
+        self.assertEqual(a.epsilon, 0.5)
+        self.assertEqual(a.epsilon_14, 0.25)
+
+        # Test behavior of charge so that it falls back to the charge on the
+        # atom type if it's not set on the atom
+        a = Atom(name='CA', type='CX', mass=12.01, atomic_number=6)
+        self.assertEqual(a.charge, 0)
+        at = AtomType('CX', 1, 12.01, 6, charge=0.5)
+        a.atom_type = at
+        self.assertEqual(a.charge, 0.5)
+        a.charge = 0.3
+        self.assertEqual(a.charge, 0.3)
+        self.assertEqual(at.charge, 0.5)
+
+    #=============================================
+
+    def test_atom_type(self):
+        """ Test the AtomType API """
+        at1 = AtomType(1, None, 12.01, 6)
+        at2 = AtomType(None, 1, 12.01, 6)
+        self.assertEqual(at1, at2)
+        self.assertEqual(at1, 1)
+        self.assertEqual(at2, 1)
+        at1.set_lj_params(0.5, 1.0)
+        self.assertNotEqual(at1, at2)
+        # Now check out strings
+        at3 = AtomType("CA", 1, 12.01, 6)
+        at4 = AtomType("CA", 1, 12.01, 6)
+        self.assertEqual(at3, 'CA')
+        self.assertEqual(at4, (1, 'CA'))
+        # bond_type -- this is like OpenMM "class"
+        self.assertEqual(at3.bond_type, 'CA')
+        at3.bond_type = 'CN'
+        self.assertEqual(at3.name, 'CA')
+        self.assertEqual(at3.bond_type, 'CN')
+        # Try the sigma_14 setter
+        at3.sigma_14 = 1.0
+        self.assertEqual(at3.sigma_14, 1.0)
+        self.assertEqual(at3.rmin_14, 2**(-5/6))
+        # Check charge
+        at5 = AtomType('CX', 2, 12.01, 6, charge=0.5)
+        self.assertEqual(at5.charge, 0.5)
+        at4.charge = 0.3
+        self.assertEqual(at4.charge, 0.3)
+
+    #=============================================
+
+    def test_extra_point(self):
+        """ Test ExtraPoint API and exclusion handling """
+        # Analyze the exception parameters for bonding pattern
+        #
+        # E1 -- A1 -- A2 -- A3 -- A4 -- A5 -- E5
+        #             |     |     |
+        #             E2    E3    E4
+
+        ep1 = ExtraPoint(name='E1', type='EP', atomic_number=0, weights=[1, 2])
+        ep2 = ExtraPoint(name='E2', type='EP', atomic_number=0)
+        ep3 = ExtraPoint(name='E3', type='EP', atomic_number=0)
+        ep4 = ExtraPoint(name='E4', type='EP', atomic_number=0)
+        ep5 = ExtraPoint(name='E5', type='EP', atomic_number=0)
+        self.assertIs(ep1.parent, None)
+        self.assertEqual(ep1.bond_partners, [])
+        self.assertEqual(ep1.angle_partners, [])
+        self.assertEqual(ep1.dihedral_partners, [])
+        self.assertEqual(ep1.tortor_partners, [])
+        self.assertEqual(ep1.exclusion_partners, [])
+        a1 = Atom(name='A1', type='AX', atomic_number=6)
+        a2 = Atom(name='A2', type='AY', atomic_number=6)
+        a3 = Atom(name='A3', type='AZ', atomic_number=7)
+        a4 = Atom(name='A4', type='AX', atomic_number=6)
+        a5 = Atom(name='A5', type='AY', atomic_number=6)
+        bond_type = BondType(10.0, 1.0)
+        bond_type2 = BondType(10.0, 2.0)
+        bond_type3 = BondType(10.0, 0.5)
+        bond_type4 = BondType(10.0, math.sqrt(2))
+        angle_type = AngleType(10.0, 90)
+        bonds = [Bond(a1, ep1, type=bond_type),
+                 Bond(ep2, a2, type=bond_type),
+                 Bond(a3, ep3, type=bond_type3),
+                 Bond(a4, ep4, type=bond_type)]
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a2, a1, a3, 1.0, 1.0)
+        )
+        bonds.extend([Bond(a1, a2, type=bond_type),
+                      Bond(a4, a3, type=bond_type4),
+                      Bond(a3, a2, type=bond_type4),
+                      Bond(a4, a5, type=bond_type2),
+                      Bond(a5, ep5, type=bond_type)])
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a2, a1, a3, 1.0, 1.0)
+        )
+        angles = [Angle(a1, a2, a3, type=angle_type),
+                  Angle(a2, a3, a4, type=angle_type),
+                  Angle(a3, a4, a5)]
+        dihedrals = [Dihedral(a1, a2, a3, a4), Dihedral(a2, a3, a4, a5)]
+        self.assertEqual(ep1.weights, [1, 2])
+        self.assertEqual(ep2.weights, None)
+        self.assertIs(ep1.parent, a1)
+        self.assertIs(ep2.parent, a2)
+        self.assertIs(ep3.parent, a3)
+        self.assertIs(ep4.parent, a4)
+        self.assertIs(ep5.parent, a5)
+        # Make sure exclusions are properly handled with EPs
+        # EP1
+        self.assertIn(a1, ep1.bond_partners)
+        self.assertIn(a2, ep1.bond_partners)
+        self.assertIn(ep2, ep1.bond_partners)
+        self.assertIn(a3, ep1.angle_partners)
+        self.assertIn(ep3, ep1.angle_partners)
+        self.assertIn(a4, ep1.dihedral_partners)
+        self.assertIn(ep4, ep1.dihedral_partners)
+        # A1
+        self.assertIn(ep1, a1.bond_partners)
+        self.assertIn(a2, a1.bond_partners)
+        self.assertIn(ep2, a1.bond_partners)
+        self.assertIn(a3, a1.angle_partners)
+        self.assertIn(ep3, a1.angle_partners)
+        self.assertIn(a4, a1.dihedral_partners)
+        self.assertIn(ep4, a1.dihedral_partners)
+        self.assertNotIn(ep3, a1.bond_partners)
+        self.assertNotIn(a5, a1.bond_partners+a1.angle_partners+a1.dihedral_partners)
+        self.assertNotIn(a5, a1.exclusion_partners)
+        # EP2
+        self.assertIn(ep1, ep2.bond_partners)
+        self.assertIn(a1, ep2.bond_partners)
+        self.assertIn(a2, ep2.bond_partners)
+        self.assertIn(a3, ep2.bond_partners)
+        self.assertIn(ep3, ep2.bond_partners)
+        self.assertIn(a4, ep2.angle_partners)
+        self.assertIn(ep4, ep2.angle_partners)
+        self.assertIn(a5, ep2.dihedral_partners)
+        self.assertIn(ep5, ep2.dihedral_partners)
+        # A2
+        self.assertIn(ep1, a2.bond_partners)
+        self.assertIn(ep2, a2.bond_partners)
+        self.assertIn(ep3, a2.bond_partners)
+        self.assertIn(a1, a2.bond_partners)
+        self.assertIn(a3, a2.bond_partners)
+        self.assertIn(a4, a2.angle_partners)
+        self.assertIn(ep4, a2.angle_partners)
+        self.assertIn(ep5, a2.dihedral_partners)
+        self.assertIn(a5, a2.dihedral_partners)
+        # EP3
+        self.assertIn(ep2, ep3.bond_partners)
+        self.assertIn(ep4, ep3.bond_partners)
+        self.assertIn(a2, ep3.bond_partners)
+        self.assertIn(a4, ep3.bond_partners)
+        self.assertIn(a3, ep3.bond_partners)
+        self.assertIn(ep1, ep3.angle_partners)
+        self.assertIn(a1, ep3.angle_partners)
+        self.assertIn(a5, ep3.angle_partners)
+        self.assertIn(ep5, ep3.angle_partners)
+        # A3
+        self.assertIn(ep2, a3.bond_partners)
+        self.assertIn(ep4, a3.bond_partners)
+        self.assertIn(a2, a3.bond_partners)
+        self.assertIn(a4, a3.bond_partners)
+        self.assertIn(ep3, a3.bond_partners)
+        self.assertIn(ep1, a3.angle_partners)
+        self.assertIn(a1, a3.angle_partners)
+        self.assertIn(a5, a3.angle_partners)
+        self.assertIn(ep5, a3.angle_partners)
+        # EP4
+        self.assertIn(ep3, ep4.bond_partners)
+        self.assertIn(a3, ep4.bond_partners)
+        self.assertIn(a4, ep4.bond_partners)
+        self.assertIn(a5, ep4.bond_partners)
+        self.assertIn(ep5, ep4.bond_partners)
+        self.assertIn(ep2, ep4.angle_partners)
+        self.assertIn(a2, ep4.angle_partners)
+        self.assertIn(ep1, ep4.dihedral_partners)
+        self.assertIn(a1, ep4.dihedral_partners)
+        # A4
+        self.assertIn(ep3, a4.bond_partners)
+        self.assertIn(a3, a4.bond_partners)
+        self.assertIn(ep4, a4.bond_partners)
+        self.assertIn(a5, a4.bond_partners)
+        self.assertIn(ep5, a4.bond_partners)
+        self.assertIn(ep2, a4.angle_partners)
+        self.assertIn(a2, a4.angle_partners)
+        self.assertIn(ep1, a4.dihedral_partners)
+        self.assertIn(a1, a4.dihedral_partners)
+        # EP5
+        self.assertIn(ep4, ep5.bond_partners)
+        self.assertIn(a4, ep5.bond_partners)
+        self.assertIn(a5, ep5.bond_partners)
+        self.assertIn(a3, ep5.angle_partners)
+        self.assertIn(ep3, ep5.angle_partners)
+        self.assertIn(a2, ep5.dihedral_partners)
+        self.assertIn(ep2, ep5.dihedral_partners)
+        # A5
+        self.assertIn(ep4, a5.bond_partners)
+        self.assertIn(a4, a5.bond_partners)
+        self.assertIn(ep5, a5.bond_partners)
+        self.assertIn(a3, a5.angle_partners)
+        self.assertIn(ep3, a5.angle_partners)
+        self.assertIn(a2, a5.dihedral_partners)
+        self.assertIn(ep2, a5.dihedral_partners)
+        # Test exclusions now
+        a1.exclude(a5)
+        self.assertIn(a1, a5.exclusion_partners)
+        self.assertIn(a5, a1.exclusion_partners)
+        self.assertIn(ep5, a1.exclusion_partners)
+        self.assertIn(ep1, a5.exclusion_partners)
+        self.assertIn(ep1, ep5.exclusion_partners)
+        self.assertIn(ep5, ep1.exclusion_partners)
+        self.assertIn(a1, ep5.exclusion_partners)
+        self.assertIn(a5, ep1.exclusion_partners)
+        # Test proper behavior of exclusion pruning
+        a1.exclude(a2)
+        self.assertIn(a1, a2._exclusion_partners)
+        self.assertIn(a2, a1._exclusion_partners)
+        a1.prune_exclusions()
+        a2.prune_exclusions()
+        self.assertNotIn(a2, a1._exclusion_partners)
+        self.assertNotIn(a1, a2._exclusion_partners)
+        # Now try TorsionTorsion
+        tortor = TorsionTorsion(a1, a2, a3, a4, a5)
+        self.assertIn(a1, a5.tortor_partners)
+        self.assertIn(a5, a1.tortor_partners)
+        self.assertIn(ep1, a5.tortor_partners)
+        self.assertIn(ep5, a1.tortor_partners)
+        self.assertIn(ep1, ep5.tortor_partners)
+        self.assertIn(a1, ep5.tortor_partners)
+        self.assertIn(a5, ep1.tortor_partners)
+        self.assertIn(ep5, ep1.tortor_partners)
+        # Exception handling
+        self.assertRaises(MoleculeError, lambda: a1.exclude(a1))
+
+        # Check the frame type. EP1 is TwoParticleExtraPointFrame
+        ft1 = ep1.frame_type
+        ft2 = ep2.frame_type
+        ft3 = ep3.frame_type
+        ft4 = ep4.frame_type
+        ft5 = ep5.frame_type
+        self.assertIsInstance(ft1, TwoParticleExtraPointFrame)
+        self.assertIsInstance(ft2, ThreeParticleExtraPointFrame)
+        self.assertIsInstance(ft3, ThreeParticleExtraPointFrame)
+        self.assertIsInstance(ft4, ThreeParticleExtraPointFrame)
+        self.assertIsInstance(ft5, TwoParticleExtraPointFrame)
+        self.assertTrue(ft1.inside)
+        self.assertFalse(ft2.inside)
+        self.assertFalse(ft3.inside)
+        self.assertFalse(ft4.inside)
+        self.assertTrue(ft5.inside)
+        # Now allow coordinates to dictate inside or outside. Make EP1 "outside"
+        # and EP5 "inside"
+        ep1.xx, ep1.xy, ep1.xz = -1.0, 0.0, 0.0
+        a1.xx, a1.xy, a1.xz = 0.0, 0.0, 0.0
+        a2.xx, a2.xy, a2.xz = 1.0, 0.0, 0.0
+        ep5.xx, ep5.xy, ep5.xz = 9.0, 0.0, 0.0
+        a5.xx, a5.xy, a5.xz = 10.0, 0.0, 0.0
+        a4.xx, a4.xy, a4.xz = 8.0, 0.0, 0.0
+        ep1._frame_type = ep5._frame_type = None
+        ft1 = ep1.frame_type
+        ft5 = ep5.frame_type
+        self.assertFalse(ft1.inside)
+        self.assertTrue(ft5.inside)
+        self.assertIsInstance(ft5, TwoParticleExtraPointFrame)
+        # Check the frame type API
+        self.assertEqual(ft1.get_atoms(), (a1, a2))
+        self.assertEqual(ft5.get_atoms(), (a5, a4))
+        self.assertEqual(ft1.get_weights(), (2, -1))
+        self.assertEqual(ft5.get_weights(), (0.5, 0.5))
+
+        # Make EP3 inside
+        a2.xx, a2.xy, a2.xz = 0.0, 0.0, 0.0
+        a3.xx, a3.xy, a3.xz = 1.0, 1.0, 0.0
+        a4.xx, a4.xy, a4.xz = 2.0, 0.0, 0.0
+        ep3.xx, ep3.xy, ep3.xz = 1.0, 0.5, 0.0
+        ep3._frame_type = None
+        self.assertTrue(ep3.frame_type.inside)
+        self.assertEqual(ep3.frame_type.get_atoms(), (a3, a4, a2))
+        w1, w2, w3 = ep3.frame_type.get_weights()
+        self.assertAlmostEqual(ep3.xx, a3.xx*w1+a2.xx*w2+a4.xx*w3)
+        self.assertAlmostEqual(ep3.xy, a3.xy*w1+a2.xy*w2+a4.xy*w3)
+        self.assertAlmostEqual(ep3.xz, a3.xz*w1+a2.xz*w2+a4.xz*w3)
+
+        # Make EP3 outside
+        ep3._frame_type = None
+        ep3.xx, ep3.xy, ep3.xz = 1.0, 1.5, 0.0
+        self.assertFalse(ep3.frame_type.inside)
+        self.assertEqual(ep3.frame_type.get_atoms(), (a3, a4, a2))
+        w1, w2, w3 = ep3.frame_type.get_weights()
+        self.assertAlmostEqual(ep3.xx, a3.xx*w1+a2.xx*w2+a4.xx*w3)
+        self.assertAlmostEqual(ep3.xy, a3.xy*w1+a2.xy*w2+a4.xy*w3)
+        self.assertAlmostEqual(ep3.xz, a3.xz*w1+a2.xz*w2+a4.xz*w3)
+
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3), 0.5
+        )
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3-0.1)
+        )
+
+        # Check error checking for EP frame bonding patterns
+        bonds.append(Bond(a1, a3))
+        # ft1 is outdated, and should fail now
+        self.assertRaises(RuntimeError, ft1.get_atoms)
+        self.assertRaises(ValueError, ft1.get_weights)
+        self.assertRaises(RuntimeError, ft3.get_atoms)
+        self.assertRaises(ValueError, ft3.get_weights)
+        # Create a duplicate bond and check ft5
+        duplicate_bond = Bond(a4, a5, type=bond_type2)
+        ep5._frame_type = None
+        del a5.xx
+        self.assertRaises(RuntimeError, lambda: ep5.frame_type)
+        # Delete the duplicate bonds
+        duplicate_bond.delete(); bonds.pop().delete()
+        # Check that from_weights works again
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3), 0.5
+        )
+        types = []
+        for bond in bonds:
+            types.append(bond.type)
+            bond.type = None
+        self.assertRaises(ParameterError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
+        )
+        for bond, type in zip(bonds, types):
+            if bond.atom1 is a3 and bond.atom2 is a2:
+                continue
+            bond.type = type
+        # Still missing 1 bond type
+        self.assertRaises(ParameterError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(a3, a2, a4, w2, w3)
+        )
+        for bond, type in zip(bonds, types):
+            bond.type = type
+        angles[1].type = None
+
+    #=============================================
+
+    def test_tip4p_ep_pattern(self):
+        """ Tests handling of typical TIP4P-style extra points """
+        o = Atom(name='O', atomic_number=8)
+        h1 = Atom(name='H1', atomic_number=1)
+        h2 = Atom(name='H2', atomic_number=1)
+        ep = ExtraPoint(name='EP', atomic_number=0)
+        bt = BondType(10.0, 1.0)
+        epbt = BondType(10.0, 0.5)
+        bonds = [Bond(o, h1, bt), Bond(o, h2, bt), Bond(o, ep, epbt), Bond(h1, h2)]
+        self.assertRaises(ParameterError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 1.0, 1.0)
+        )
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 0.5, 0.5,
+                                                          dp1=1.0, dp2=1.0, d12=1.0),
+                abs(math.cos(math.acos(0.5)*0.5))
+        )
+        self.assertAlmostEqual(
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 0.5, 0.5,
+                                                          dp1=1.0, dp2=1.0, theteq=45),
+                abs(math.cos(math.pi/8))
+        )
+        self.assertRaises(ValueError, lambda:
+                ThreeParticleExtraPointFrame.from_weights(o, h1, h2, 0.5, 0.5,
+                                                          dp1=1.0, dp2=1.1, theteq=45)
+        )
 
     #=============================================
 
@@ -301,6 +759,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertNotIn(a4, bond)
         self.assertIn(bond, a1.bonds)
         self.assertIn(bond, a2.bonds)
+        self.assertEqual(repr(bond), '<Bond %r--%r; type=None>' % (a1, a2))
         # Delete the bond and make sure it is deleted from the atoms, too
         bond.delete()
         self.assertEqual(len(a1.bonds), 0)
@@ -321,6 +780,7 @@ class TestTopologyObjects(unittest.TestCase):
         bond_types.append(BondType(10.0, 1.0, bond_types))
         bond_types.append(BondType(12.0, 1.1, bond_types))
         bond_types.append(BondType(10.0, 1.0, bond_types))
+        self.assertEqual(repr(bond_types[0]), '<BondType; k=10.000, req=1.000>')
         bond1 = Bond(a1, a2, bond_types[0])
         bond4 = Bond(a1, a2, bond_types[0])
         bond2.type = bond_types[1]
@@ -340,6 +800,9 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.idx, -1)
         self.assertEqual(cp.k, bond_types[0].k)
         self.assertEqual(cp.req, bond_types[0].req)
+        # Error handling
+        self.assertRaises(MoleculeError, lambda: Bond(a1, a1))
+        self.assertRaises(MoleculeError, lambda: a1.bond_to(a1))
 
     #=============================================
 
@@ -352,11 +815,13 @@ class TestTopologyObjects(unittest.TestCase):
         b4 = Bond(a4, a2)
         ang1 = Angle(a1, a2, a3)
         ang2 = Angle(a2, a3, a4)
+        self.assertEqual(repr(ang1), '<Angle %r--%r--%r; type=None>' % (a1, a2, a3))
         angle_types = TrackedList()
         # Make a set of angle types
         angle_types.append(AngleType(50.0, 109.5, angle_types))
         angle_types.append(AngleType(30.0, 120.0, angle_types))
         angle_types.append(AngleType(50.0, 109.5, angle_types))
+        self.assertEqual(repr(angle_types[0]), '<AngleType; k=50.000, theteq=109.500>')
         # Assign the angle types to the angles (assigning to one new one)
         ang3 = Angle(a3, a4, a2, angle_types[2])
         ang1.type = angle_types[0]
@@ -397,12 +862,15 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.idx, -1)
         self.assertEqual(cp.k, angle_types[0].k)
         self.assertEqual(cp.theteq, angle_types[0].theteq)
+        # Error handling
+        self.assertRaises(MoleculeError, lambda: Angle(a1, a2, a1))
+        self.assertRaises(MoleculeError, lambda: a1.angle_to(a1))
 
     #=============================================
 
     def test_dihedral(self):
         """ Tests the Dihedral and DihedralType classes """
-        atoms = TrackedList()
+        atoms = AtomList()
         atoms.extend([Atom(list=atoms) for i in range(10)])
         bonds = []
         # Sequential bonds
@@ -423,6 +891,15 @@ class TestTopologyObjects(unittest.TestCase):
                       type=dihed_types[1])
         d4 = Dihedral(atoms[1], atoms[2], atoms[3], atoms[4],
                       type=dihed_types[2])
+        self.assertTrue(d1.same_atoms([0, len(atoms)-1, 1, 2]))
+        self.assertFalse(d1.same_atoms([0, 1, 2, 3]))
+        self.assertRaises(TypeError, lambda: d1.same_atoms([0, 1, 2]))
+        self.assertEqual(repr(d1), '<Dihedral [imp]; %r--%r--%r--%r; type=%r>' %
+                (atoms[0], atoms[-1], atoms[1], atoms[2], dihed_types[3]))
+        self.assertEqual(repr(d2), '<Dihedral; %r--%r--%r--%r; type=%r>' %
+                (atoms[0], atoms[1], atoms[2], atoms[3], dihed_types[0]))
+        self.assertEqual(repr(d3), '<Dihedral [ign]; %r--%r--%r--%r; type=%r>' %
+                (atoms[0], atoms[1], atoms[2], atoms[3], dihed_types[1]))
         # Test container properties
         self.assertIn(bonds[-2], d1)
         self.assertIn(bonds[0], d1)
@@ -491,6 +968,10 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.phase, dihed_types[0].phase)
         self.assertEqual(cp.scee, dihed_types[0].scee)
         self.assertEqual(cp.scnb, dihed_types[0].scnb)
+        # Exception handling
+        self.assertRaises(MoleculeError, lambda:
+                Dihedral(atoms[0], atoms[1], atoms[2], atoms[0]))
+        self.assertRaises(MoleculeError, lambda: atoms[0].dihedral_to(atoms[0]))
 
     #=============================================
 
@@ -502,10 +983,16 @@ class TestTopologyObjects(unittest.TestCase):
         dihed_types[0].append(DihedralType(1.0, 3, 180.0, 1.2, 2.0))
         dihed_types[0].append(DihedralType(2.0, 4, 180.0, 1.2, 2.0))
         dihed_types[0].append(DihedralType(10.0, 1, 180.0, 0., 0.))
+        self.assertRaises(TypeError, lambda: dihed_types[0].append(Atom()))
+        self.assertRaises(ParameterError, lambda:
+                dihed_types[0].append(DihedralType(1.0, 2, 0.0, 1.2, 2.0))
+        )
         self.assertIs(dihed_types[0].list, dihed_types)
         self.assertEqual(len(dihed_types), 1)
         self.assertEqual(dihed_types[0].idx, 0)
         self.assertEqual(len(dihed_types[0]), 4)
+        self.assertEqual(repr(dihed_types[0]),
+                '<DihedralTypes %s>' % list.__repr__(dihed_types[0]))
         # Now test DihedralTypeList.__copy__
         cp = copy(dihed_types[0])
         self.assertIsNot(cp, dihed_types[0])
@@ -531,6 +1018,10 @@ class TestTopologyObjects(unittest.TestCase):
         rb_types.append(RBTorsionType(10, 20, 30, 40, 50, 60))
         rb_types.append(RBTorsionType(11, 21, 31, 41, 51, 61))
         rb_types.append(RBTorsionType(12, 22, 32, 42, 52, 62, list=rb_types))
+        self.assertEqual(repr(rb_types[0]),
+                '<RBTorsionType; c0=10.000; c1=20.000; c2=30.000; c3=40.000; c4=50.000;'
+                ' c5=60.000; scee=1.0; scnb=1.0>'
+        )
         rb_types.claim()
         for i, rb_typ in enumerate(rb_types):
             self.assertEqual(i, rb_typ.idx)
@@ -563,6 +1054,8 @@ class TestTopologyObjects(unittest.TestCase):
         b3 = Bond(atoms[0], atoms[2])
         a1 = Angle(atoms[0], atoms[1], atoms[2])
         u1 = UreyBradley(atoms[0], atoms[2], BondType(10.0, 1.0))
+        self.assertEqual(repr(u1), '<UreyBradley %r--%r; type=%r>' %
+                         (atoms[0], atoms[2], u1.type))
         # Test containers
         self.assertIn(atoms[0], u1)
         self.assertIn(atoms[2], u1)
@@ -572,13 +1065,15 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertNotIn(b3, u1)
         self.assertEqual(u1.type.k, 10)
         self.assertEqual(u1.type.req, 1)
+        # Test error checking
+        self.assertRaises(MoleculeError, lambda: UreyBradley(atoms[0], atoms[0]))
 
     #=============================================
 
     def test_improper(self):
         """ Tests the CHARMM improper torsion term and type """
-        atoms = TrackedList([Atom(), Atom(), Atom(), Atom()])
-        for atom in atoms: atom.list = atoms
+        atoms = AtomList()
+        atoms.extend([Atom(), Atom(), Atom(), Atom()])
         b1 = Bond(atoms[0], atoms[1])
         b2 = Bond(atoms[0], atoms[2])
         b3 = Bond(atoms[0], atoms[3])
@@ -587,6 +1082,8 @@ class TestTopologyObjects(unittest.TestCase):
         imp_types.append(ImproperType(10.0, 180.0, list=imp_types))
         imp = Improper(atoms[0], atoms[1], atoms[2], atoms[3], imp_types[0])
         imp2 = Improper(atoms[0], atoms[3], atoms[1], atoms[2], imp_types[1])
+        self.assertEqual(repr(imp), '<Improper; %r--(%r,%r,%r); type=%r>' %
+                         (atoms[0], atoms[1], atoms[2], atoms[3], imp_types[0]))
         for a in atoms:
             self.assertIn(a, imp)
         self.assertEqual(imp.type.idx, 0)
@@ -604,6 +1101,12 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.idx, -1)
         self.assertEqual(cp.psi_k, imp_types[0].psi_k)
         self.assertEqual(cp.psi_eq, imp_types[0].psi_eq)
+        # Now test that same_atoms detects *not-same* improper atoms
+        imp3 = Improper(atoms[1], atoms[0], atoms[2], atoms[3], imp_types[0])
+        self.assertFalse(imp.same_atoms(imp3))
+        self.assertFalse(imp3.same_atoms(imp))
+        self.assertRaises(MoleculeError, lambda:
+                imp3.same_atoms([0, 1, 2]))
 
     #=============================================
 
@@ -618,14 +1121,24 @@ class TestTopologyObjects(unittest.TestCase):
         cmap_types.append(CmapType(6, cg1, list=cmap_types))
         cmap_types.append(CmapType(6, cg2, list=cmap_types))
         cmap_types.append(CmapType(6, cg1[:], list=cmap_types))
-        cmap1 = Cmap(atoms[0], atoms[1], atoms[2], atoms[3], atoms[4],
-                     cmap_types[0])
+        cmap1 = Cmap.extended(atoms[0], atoms[1], atoms[2], atoms[3],
+                              atoms[1], atoms[2], atoms[3], atoms[4],
+                              cmap_types[0])
         cmap2 = Cmap(atoms[3], atoms[4], atoms[5], atoms[6], atoms[7],
                      cmap_types[1])
         cmap3 = Cmap(atoms[5], atoms[6], atoms[7], atoms[8], atoms[9],
                      cmap_types[2])
+        self.assertEqual(repr(cmap1), '<Cmap; %r--%r--%r--%r--%r; type=%r>' %
+                         tuple(atoms[:5] + [cmap_types[0]]))
         # Check illegal CmapType assignment
         self.assertRaises(TypeError, lambda: CmapType(5, cg1))
+        self.assertRaises(NotImplementedError, lambda:
+                Cmap.extended(atoms[0], atoms[1], atoms[2], atoms[3],
+                              atoms[4], atoms[5], atoms[6], atoms[7])
+        )
+        self.assertRaises(MoleculeError, lambda:
+                cmap1.same_atoms((1, 2, 3, 4))
+        )
         # Check container functionality
         for i, atom in enumerate(atoms):
             if 0 <= i < 5:
@@ -662,6 +1175,8 @@ class TestTopologyObjects(unittest.TestCase):
             self.assertEqual(transpose[i2, i1], val)
         # Transpose of the transpose should be the original
         self.assertEqual(transpose.T, cmap_types[0].grid)
+        # Check caching
+        self.assertIs(transpose, cmap_types[0].grid.T)
         # Check switch_range functionality
         sg = cmap_types[0].grid.switch_range()
         for i in range(6):
@@ -674,6 +1189,60 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.idx, -1)
         self.assertEqual(cp.resolution, cmap_types[0].resolution)
         self.assertEqual(cp.grid, cmap_types[0].grid)
+        # Check error handling
+        self.assertRaises(IndexError, lambda: cmap_types[0].grid[10,10])
+        def err():
+            cmap_types[0].grid[10, 10] = 10.0
+        self.assertRaises(IndexError, err)
+
+    #=============================================
+
+    def test_cmap_grid(self):
+        """ Tests the CmapGrid API """
+        raw = list(range(36))
+        cg1 = CmapType(6, list(range(36))).grid
+        for i in range(36):
+            self.assertEqual(cg1[i], i)
+        for i in range(6):
+            for j in range(6):
+                self.assertEqual(cg1[i,j], i*6+j)
+        # Now check *setting* elements
+        for i, j in enumerate(reversed(range(36))):
+            cg1[i] = j
+        for i in range(36):
+            self.assertEqual(cg1[i], 35-i)
+        for i in range(6):
+            for j in range(6):
+                cg1[i,j] = i*10+j*6
+        for i in range(6):
+            for j in range(6):
+                self.assertEqual(cg1[i,j], i*10+j*6)
+        # Now try setting slices
+        cg1[:10] = 0
+        for i in range(10):
+            self.assertEqual(cg1[i], 0)
+        for i in range(10, 36):
+            self.assertNotEqual(cg1[i], 0)
+        # Now set slice to an array (akin to numpy broadcasting)
+        cg1[:10] = [(x+4)*10 for x in range(10)]
+        for i in range(10):
+            self.assertEqual(cg1[i], i*10+40)
+        # Test error handling for improper broadcasting
+        def err():
+            cg1[:10] = [1, 2, 3]
+        self.assertRaises(ValueError, err)
+        # Test string methods
+        self.assertEqual(repr(cg1), '<_CmapGrid: 6x6>')
+
+        # Test comparison methods
+        cg2 = CmapType(7, list(range(49))).grid
+        self.assertNotEqual(cg1, cg2)
+        cg1[:] = list(range(36))
+        cg3 = copy(cg1)
+        self.assertEqual(cg1, cg3)
+        cg3[-1] += 0.01
+        self.assertNotEqual(cg1, cg3)
+        self.assertNotEqual(cg1, 1)
 
     #=============================================
 
@@ -692,6 +1261,15 @@ class TestTopologyObjects(unittest.TestCase):
         t1.type = AngleType(50.0, 90.0)
         self.assertIsNot(t1.type, t2.type)
         self.assertEqual(t1.type, t2.type)
+        self.assertIn(atoms[0], t1)
+        self.assertIn(atoms[1], t1)
+        self.assertIn(atoms[2], t1)
+        self.assertIn(atoms[3], t1)
+        self.assertIn(atoms[4], t2)
+        self.assertIn(atoms[5], t2)
+        self.assertIn(atoms[6], t2)
+        self.assertIn(atoms[7], t2)
+        self.assertIn(atoms[0], t1)
         self.assertIn(bonds[0], t1)
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
@@ -700,6 +1278,10 @@ class TestTopologyObjects(unittest.TestCase):
                           TrigonalAngle(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
         self.assertEqual(t1.type.theteq, 90.0)
+        self.assertEqual(repr(t1), '<TrigonalAngle; %r--(%r,%r,%r); type=%r>' %
+                (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
+        self.assertEqual(repr(t2), '<TrigonalAngle; %r--(%r,%r,%r); type=%r>' %
+                (atoms[5], atoms[4], atoms[6], atoms[7], t2.type))
 
     #=============================================
 
@@ -714,10 +1296,18 @@ class TestTopologyObjects(unittest.TestCase):
         bonds.append(Bond(atoms[0], atoms[2]))
         t1 = OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[3])
         t2 = OutOfPlaneBend(atoms[4], atoms[5], atoms[6], atoms[7],
-                            AngleType(50.0, 90.0))
-        t1.type = AngleType(50.0, 90.0)
+                            OutOfPlaneBendType(50.0))
+        t1.type = OutOfPlaneBendType(50.0)
         self.assertIsNot(t1.type, t2.type)
         self.assertEqual(t1.type, t2.type)
+        self.assertIn(atoms[0], t1)
+        self.assertIn(atoms[1], t1)
+        self.assertIn(atoms[2], t1)
+        self.assertIn(atoms[3], t1)
+        self.assertIn(atoms[4], t2)
+        self.assertIn(atoms[5], t2)
+        self.assertIn(atoms[6], t2)
+        self.assertIn(atoms[7], t2)
         self.assertIn(bonds[0], t1)
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
@@ -725,7 +1315,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertRaises(MoleculeError, lambda:
                           OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
-        self.assertEqual(t1.type.theteq, 90.0)
+        self.assertEqual(repr(t1), '<OutOfPlaneBend; %r--(%r,%r,%r); type=%r>' %
+                (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
 
     #=============================================
 
@@ -746,6 +1337,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(pit.type.phi_k, 10)
         self.assertEqual(pit.type.per, 2)
         self.assertEqual(pit.type.phase, 180)
+        self.assertEqual(repr(pit), '<PiTorsion; (%r,%r)--%r--%r--(%r,%r); type=%r>' %
+                tuple(atoms + [pit.type]))
 
     #=============================================
 
@@ -778,6 +1371,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.req1, 1.1)
         self.assertEqual(cp.req2, 1.2)
         self.assertEqual(cp.theteq, 109.0)
+        self.assertEqual(repr(strbnd), '<StretchBend; %r--%r--%r; type=%r>' %
+                tuple(atoms + [strbnd.type]))
 
     #=============================================
 
@@ -805,12 +1400,29 @@ class TestTopologyObjects(unittest.TestCase):
                     data[pre+'03_DFUNC_DANGLE2'],
                     data[pre+'03_D2FUNC_DANGLE1_DANGLE2'], list=tortor_types),
         ])
+        self.assertEqual(repr(tortor_types[0]), '<TorsionTorsionType; 25x25>')
         tortor1 = TorsionTorsion(atoms[0], atoms[1], atoms[2], atoms[3],
                                  atoms[4], type=tortor_types[0])
         tortor2 = TorsionTorsion(atoms[5], atoms[6], atoms[7], atoms[8],
                                  atoms[9], type=tortor_types[1])
         tortor3 = TorsionTorsion(atoms[10], atoms[11], atoms[12], atoms[13],
                                  atoms[14], type=tortor_types[2])
+        # Check some error handling
+        self.assertRaises(ValueError, lambda:
+                TorsionTorsionType((25,),
+                    data[pre+'03_ANGLE1'], data[pre+'03_ANGLE2'],
+                    data[pre+'03_FUNC'], data[pre+'03_DFUNC_DANGLE1'],
+                    data[pre+'03_DFUNC_DANGLE2'],
+                    data[pre+'03_D2FUNC_DANGLE1_DANGLE2']
+                )
+        )
+        self.assertRaises(ValueError, lambda:
+                TorsionTorsionType((26, 25),
+                    data[pre+'03_ANGLE1'], data[pre+'03_ANGLE2'],
+                    data[pre+'03_FUNC'], data[pre+'03_DFUNC_DANGLE1'],
+                    data[pre+'03_DFUNC_DANGLE2'],
+                    data[pre+'03_D2FUNC_DANGLE1_DANGLE2'])
+        )
 
         # Check the container properties of the torsion-torsion
         for i, atom in enumerate(atoms):
@@ -851,8 +1463,18 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(tortor2.type.idx, 1)
         self.assertEqual(tortor3.type.idx, 2)
         # Now check the _TorTorTable API
+        self.assertRaises(TypeError, lambda:
+                topologyobjects._TorTorTable([0, 90, 180], [0, 90, 180], [1, 2])
+        )
         self.assertEqual(tortor1.type.f, tortor2.type.f)
         self.assertNotEqual(tortor1.type.f, tortor3.type.f)
+        # Check the element accessors
+        c = 0
+        for a1 in data[pre+'01_ANGLE1']:
+            for a2 in data[pre+'01_ANGLE2']:
+                self.assertEqual(tortor1.type.f[(a1, a2)], data[pre+'01_FUNC'][c])
+                self.assertEqual(tortor1.type.f[a1, a2], data[pre+'01_FUNC'][c])
+                c += 1
         # Check the TorsionTorsionType.__copy__ method
         cp = copy(tortor_types[-1])
         self.assertIsNot(cp, tortor_types[-1])
@@ -863,6 +1485,19 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIsNot(cp.dfda2.data, tortor_types[-1].dfda2.data)
         self.assertIsNot(cp.d2fda1da2.data, tortor_types[-1].d2fda1da2.data)
         self.assertEqual(cp, tortor_types[-1])
+        # Exception handling
+        self.assertRaises(MoleculeError, lambda:
+                TorsionTorsion(atoms[0], atoms[1], atoms[2], atoms[3], atoms[0])
+        )
+        self.assertRaises(MoleculeError, lambda: atoms[0].tortor_to(atoms[0]))
+        # Make sure that if a torsion-torsion table has different angles, but
+        # same energies, it is considered non-equal
+        ttt = topologyobjects._TorTorTable(
+                [x+0.001 for x in data[pre+'01_ANGLE1']],
+                data[pre+'01_ANGLE2'], data[pre+'01_FUNC']
+        )
+        self.assertNotEqual(tortor1.type.f, ttt)
+        self.assertNotEqual(ttt, tortor1.type.f)
 
     #=============================================
 
@@ -877,6 +1512,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(atom2, cf1)
         self.assertIn(atom1, cf2)
         self.assertIn(atom2, cf2)
+        self.assertEqual(repr(cf1), '<ChiralFrame; %r--%r, direction=1>' % (atom1, atom2))
 
     #=============================================
 
@@ -890,9 +1526,9 @@ class TestTopologyObjects(unittest.TestCase):
 
     def test_residue(self):
         """ Tests the Residue object """
-        atoms = TrackedList()
-        atoms.extend([Atom(list=atoms) for i in range(10)])
-        res = Residue('ALA')
+        atoms = AtomList()
+        atoms.extend([Atom(name='CA') for i in range(10)])
+        res = Residue('ALA', segid='SYS')
         for atom in atoms:
             res.add_atom(atom)
         self.assertEqual(len(res), len(atoms))
@@ -902,6 +1538,29 @@ class TestTopologyObjects(unittest.TestCase):
             self.assertIs(x, y)
         for atom in atoms:
             self.assertIn(atom, res)
+
+        # Check segid assignment
+        self.assertEqual(res.segid, 'SYS')
+        # Deprecated behavior
+        warnings.filterwarnings('error', category=DeprecationWarning)
+        self.assertRaises(DeprecationWarning, lambda: res[0].segid)
+        def tmp():
+            res[0].segid = 'SYS1'
+        self.assertRaises(DeprecationWarning, tmp)
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        tmp()
+        self.assertEqual(res[0].segid, 'SYS1')
+        self.assertEqual(res.segid, 'SYS1')
+        warnings.filterwarnings('always', category=DeprecationWarning)
+
+        # __repr__ testing
+        self.assertEqual(repr(atoms[0]), '<Atom CA [0]; In ALA -1>')
+        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS1>')
+        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS1>')
+        res.chain = 'B'
+        res.insertion_code = 'B'
+        self.assertEqual(repr(res),
+                '<Residue ALA[-1]; chain=B; insertion_code=B; segid=SYS1>')
 
         # Try deleting all of our atoms
         while len(res):
@@ -922,7 +1581,9 @@ class TestTopologyObjects(unittest.TestCase):
         """ Tests the AtomList class """
         atoms = AtomList()
         res = Residue('ALA')
-        atoms.extend([Atom() for i in range(15)])
+        atoms.extend([Atom(name='CA') for i in range(15)])
+        # Test __repr__ before adding residue
+        self.assertEqual(repr(atoms[0]), '<Atom CA [0]>')
         for atom in atoms:
             res.add_atom(atom)
             self.assertIs(atom.list, atoms)
@@ -967,6 +1628,18 @@ class TestTopologyObjects(unittest.TestCase):
             self.assertEqual(atom.idx, i)
         self.assertEqual(atoms[2].name, 'TOK')
         self.assertEqual(atoms[-1].name, 'TOK2')
+        # Test atom comparisons
+        self.assertGreater(atoms[1], atoms[0])
+        self.assertLess(atoms[0], atoms[1])
+        self.assertGreaterEqual(atoms[0], atoms[0])
+        self.assertGreaterEqual(atoms[1], atoms[0])
+        self.assertLessEqual(atoms[0], atoms[0])
+        self.assertLessEqual(atoms[0], atoms[1])
+        # Check some error handling
+        self.assertRaises(ValueError, lambda: atoms.remove(atoms.pop()))
+        self.assertRaises(RuntimeError, atoms.assign_nbidx_from_types)
+        self.assertIs(atoms.__iadd__([Atom(), Atom()]), NotImplemented)
+        self.assertRaises(IndexError, lambda: atoms.find_original_index(1000))
 
     #=============================================
 
@@ -999,6 +1672,26 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(len(reslist), 3) # Got rid of empty residue.
         self.assertEqual(len(atoms), sum([len(r) for r in reslist]))
 
+        # Check ordering of residues
+        self.assertGreater(reslist[1], reslist[0])
+        self.assertFalse(reslist[1] > reslist[1])
+        self.assertLess(reslist[0], reslist[1])
+        self.assertFalse(reslist[0] < reslist[0])
+
+        self.assertGreaterEqual(reslist[0], reslist[0])
+        self.assertGreaterEqual(reslist[1], reslist[0])
+        self.assertFalse(reslist[0] >= reslist[1])
+        self.assertLessEqual(reslist[0], reslist[0])
+        self.assertLessEqual(reslist[0], reslist[1])
+        self.assertFalse(reslist[1] <= reslist[0])
+        # Delete a couple residues
+        del reslist[:2]
+        self.assertEqual(len(reslist), 1)
+        del reslist[0]
+        self.assertEqual(len(reslist), 0)
+        del reslist[10:20]
+        self.assertEqual(len(reslist), 0)
+
     #=============================================
 
     def test_tracked_list(self):
@@ -1019,6 +1712,11 @@ class TestTopologyObjects(unittest.TestCase):
         for atom in all_atoms:
             self.assertIsNot(atom.list, all_atoms)
             self.assertIn(atom, items)
+        # Test the repr
+        self.assertEqual(repr(items), 'TrackedList([\n\t' +
+                '\n\t'.join(repr(a) for a in items[:24]) + '\n\t...\n\t' +
+                '\n\t'.join(repr(a) for a in items[-5:]) + '\n])')
+        # Delete the whole list in random order
         while items:
             atom = items.pop(random.choice(range(len(items))))
             for item in items:
@@ -1033,6 +1731,76 @@ class TestTopologyObjects(unittest.TestCase):
         items.changed = False
         items.remove(items[0])
         self.assertTrue(items.changed)
+        # Delete slice
+        while all_atoms:
+            del all_atoms[:10]
+        self.assertEqual(len(all_atoms), 0)
+        # Try a tracked list of an immutable built-in type
+        ints = TrackedList(range(9))
+        ints.append(9)
+        self.assertTrue(ints.needs_indexing)
+        ints.claim()
+        self.assertFalse(ints.needs_indexing)
+        before_len = len(ints)
+        ints.prune_unused() # Should be a no-op
+        self.assertEqual(len(ints), before_len)
+        self.assertEqual(repr(ints), """TrackedList([
+\t0
+\t1
+\t2
+\t3
+\t4
+\t5
+\t6
+\t7
+\t8
+\t9
+])""")
 
-if __name__ == '__main__':
-    unittest.main()
+    #=============================================
+
+    def test_nonbonded_exception(self):
+        """ Tests the NonbondedException and NonbondedExceptionType objects """
+        a1 = Atom(name='CA', type='CX', atomic_number=6)
+        a2 = Atom(name='CB', type='CT', atomic_number=6)
+        a3 = Atom(name='DU', type='DU', atomic_number=0)
+        nbe = NonbondedException(a1, a2)
+        self.assertIn(a1, nbe)
+        self.assertIn(a2, nbe)
+        self.assertNotIn(a3, nbe)
+        self.assertEqual(repr(nbe), '<NonbondedException; %r and %r>' % (a1, a2))
+        # Now add the type
+        nbet = NonbondedExceptionType(1.0, 2.0, chgscale=3.0)
+        nbet2 = NonbondedExceptionType(1.1, 2.0, chgscale=3.0)
+        self.assertEqual(nbet.sigma, 2**(-1/6))
+        self.assertEqual(nbet, nbet)
+        self.assertNotEqual(nbet, nbet2)
+        nbet2.sigma = 1.0
+        self.assertEqual(nbet2.rmin*2**(-1/6), nbet2.sigma)
+        nbe.type = nbet
+        self.assertEqual(repr(nbe), '<NonbondedException; %r and %r, type=%r>' %
+                         (a1, a2, nbet))
+
+    #=============================================
+
+    def test_acceptor_donor(self):
+        """ Test the AcceptorDonor API """
+        a1 = Atom(name='O', atomic_number=8)
+        a2 = Atom(name='H', atomic_number=1)
+        a3 = Atom(name='H2', atomic_number=1)
+        ad = AcceptorDonor(a1, a2)
+        self.assertIn(a1, ad)
+        self.assertIn(a2, ad)
+        self.assertNotIn(a3, ad)
+        self.assertEqual(repr(ad), '<AcceptorDonor; %r %r>' % (a1, a2))
+
+    #=============================================
+
+    def test_helper_functions(self):
+        """ Test the helper private functions in topologyobjects.py """
+        self.assertEqual(_strip_units(10), 10)
+        self.assertAlmostEqual(_strip_units(math.pi*u.radians), 180)
+        self.assertAlmostEqual(_strip_units(1*u.kilojoule_per_mole), 1/4.184)
+        self.assertEqual(_strip_units(10*u.kilojoule_per_mole, u.kilocalorie_per_mole),
+                         10/4.184)
+        self.assertAlmostEqual(_strip_units(180*u.degree, u.radians), math.pi)

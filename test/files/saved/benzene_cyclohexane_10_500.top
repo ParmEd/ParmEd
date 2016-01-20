@@ -1,17 +1,17 @@
 ;
-;   File saved/benzene_cyclohexane_10_500.top was generated
-;   By user: swails (501)
-;   On host: Jasons-MBP
-;   At date: Mon. June  1 10:32:34 2015
+;   File /scratch2/swails/src/ParmEd/test/files/writes/benzene_cyclohexane_10_500.top was generated
+;   By user: swails (44411)
+;   On host: batman
+;   At date: Tue. October  2 12:54:43 2015
 ;
 ;   This is a standalone topology file
 ;
 ;   Created by:
-;   ParmEd:       , VERSION 15.1
-;   Executable:   
-;   Library dir:  /usr/local/share/gromacs/top
+;   ParmEd:       nosetests, VERSION 2.0.2
+;   Executable:   nosetests
+;   Library dir:  /usr/share/gromacs/top
 ;   Command line:
-;
+;     /scratch2/miniconda/envs/py27/bin/nosetests -vs test/test_format_conversions.py --pdb
 ;
 
 [ defaults ]
@@ -19,11 +19,11 @@
 1               2               yes             0.5     0.833333
 
 [ atomtypes ]
-; name    at.num    mass    charge ptype  sigma      espilon
-ca             6    0.00000   12.010000  A      0.339967      0.359824
-ha             1    0.00000    1.008000  A      0.259964       0.06276
-c3             6    0.00000   12.010000  A      0.339967       0.45773
-hc             1    0.00000    1.008000  A      0.264953     0.0656888
+; name    at.num    mass    charge ptype  sigma      epsilon
+ca             6   12.01000    0.000000  A      0.339967      0.359824
+ha             1    1.00800    0.000000  A      0.259964       0.06276
+c3             6   12.01000    0.000000  A      0.339967       0.45773
+hc             1    1.00800    0.000000  A      0.264953     0.0656888
 
 
 [ moleculetype ]

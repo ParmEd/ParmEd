@@ -5,6 +5,7 @@ which a selected atom is 1 and one that's not is 0.
 from __future__ import division, print_function
 
 from parmed.exceptions import MaskError
+from parmed.periodic_table import AtomicNum
 from parmed.utils.six.moves import range
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -149,10 +150,13 @@ class AmberMask(object):
                 if p in ['<','>']:
                     buffer = '([%s' % p
                     i += 1
-                    p = self.mask[i]
+                    try:
+                        p = self.mask[i]
+                    except IndexError:
+                        raise MaskError('Bad distance syntax [%s]' % self.mask)
                     buffer += p
                     flag = 3
-                    if not all(hasattr(a, 'xx') for a in self.parm.atoms):
+                    if self.parm.coordinates is None:
                         raise MaskError('<,> operators require coordinates')
                     if not p in [':','@']:
                         raise MaskError('Bad syntax [%s]' % self.mask)
@@ -270,7 +274,7 @@ class AmberMask(object):
                         P2 = self._priority(stack[len(stack)-1])
                     stack.append(p)
             else:
-                raise MaskError('Unknown symbol %s' % p)
+                raise MaskError('Unknown symbol %s' % p) # should not reach here
             i += 1
         # end while i < len(infix):
         return postfix
@@ -326,10 +330,13 @@ class AmberMask(object):
             pos += 1
         # end while i < len(postfix)
 
-        pmask = stack.pop()
+        try:
+            pmask = stack.pop()
+        except IndexError:
+            raise MaskError('Empty stack -- no available operands')
 
         if stack:
-            raise MaskError('There may be missing operands in the mask!')
+            raise MaskError('There may be missing operands in the mask')
 
         if prnlev > 7:
             stderr.write('%d atoms selected by %s' % (sum(pmask), self.mask))
@@ -352,18 +359,18 @@ class AmberMask(object):
         pmask = _mask(len(self.parm.atoms))
         # Determine if we want > or <
         if pmask1[0] == '<':
-            cmp = float.__lt__
+            cmp = lambda x, y: x < y
         elif pmask1[0] == '>':
-            cmp = float.__gt__
-        else:
+            cmp = lambda x, y: x > y
+        else: # Should never execute this
             raise MaskError('Unknown comparison criteria for distance mask: %s'
                             % pmask1[0])
         pmask1 = pmask1[1:]
-        if pmask1[0] not in ':@':
+        if pmask1[0] not in ':@': # Should never execute this
             raise MaskError('Bad distance criteria for mask: %s' % pmask1)
         try:
             distance = float(pmask1[1:])
-        except TypeError:
+        except (TypeError, ValueError):
             raise MaskError('Distance must be a number: %s' % pmask1[1:])
         distance *= distance # Faster to compare square of distance
         # First select all atoms that satisfy the distance. If we ended up
@@ -440,10 +447,7 @@ class AmberMask(object):
                 buffer += p
                 buffer_p += 1
                 if p == '*' and ptoken[pos-1] != "\\":
-                    if buffer_p == 0 and (pos == len(ptoken) - 1 or
-                                          ptoken[pos+1] == ','):
-                        atomlist = ALL
-                    elif atomlist == NUMLIST:
+                    if atomlist == NUMLIST:
                         atomlist = NAMELIST
                 elif p.isalpha() or p in '?*':
                     if atomlist == NUMLIST:
@@ -471,7 +475,7 @@ class AmberMask(object):
             pmask.select_all()
         elif ptoken[0] in ['<','>']:
             return ptoken
-        else:
+        else: # Should never reach here
             raise MaskError('Mask is missing : and @')
         # end if ':' in ptoken:
 
@@ -539,7 +543,7 @@ class AmberMask(object):
         Fills a _mask based on atom elements. For now it will just be Atom
         names, since elements are not stored in the prmtop anywhere.
         """
-        self._atom_namelist(self, buffer, mask, key='name')
+        self._atom_namelist(buffer, mask, key='element')
 
     #======================================================
 
@@ -557,7 +561,10 @@ class AmberMask(object):
                     at1 = int(buffer)
                     self._resnum_select(at1, at1, mask)
                 else:
-                    at2 = int(buffer)
+                    try:
+                        at2 = int(buffer)
+                    except ValueError:
+                        raise MaskError('Bad mask: error in integer conversion')
                     self._resnum_select(at1, at2, mask)
                     dash = 0
                 buffer = ''
@@ -565,9 +572,6 @@ class AmberMask(object):
                 at1 = int(buffer)
                 dash = 1
                 buffer = ''
-                if not (p.isdigit() or p in [',','-']):
-                    raise MaskError('Unknown symbol in residue number '
-                                    'parsing [%s]' % p)
             pos += 1
 
     #======================================================
@@ -613,6 +617,13 @@ class AmberMask(object):
             atname = int(atname) - 1
             for i, atom in enumerate(self.parm.atoms):
                 mask[i] = mask[i] | int(atname == i)
+        elif key == 'element':
+            try:
+                for i, atom in enumerate(self.parm.atoms):
+                    mask[i] = mask[i] | int(AtomicNum[atname] ==
+                                                atom.atomic_number)
+            except KeyError:
+                raise MaskError('Unknown element %s' % atname)
         else:
             for i, atom in enumerate(self.parm.atoms):
                 mask[i] = mask[i] | int(_nameMatch(atname, getattr(atom, key)))
@@ -680,10 +691,6 @@ def _nameMatch(atnam1, atnam2):
     atnam1 = atnam1.replace('\\+', R).replace('+',r'\+').replace(R, '+')
     # Now replace just the first instance of atnam2 in atnam2 with '', and
     # return *not* that
-    # DEBUG:
-#   print 'Comparing ==%s== with ==%s==' % (atnam1, atnam2)
-#   print not bool(re.sub(atnam1, '', atnam2, 1))
-    # END DEBUG
     return atnam1 == atnam2 or not bool(re.sub(atnam1, '', atnam2, 1))
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -726,7 +733,7 @@ class _mask(list):
     def Not(self):
         new_mask = _mask(self.natom)
         for i in range(self.natom):
-            new_mask[i] = int(not self[i])
+            new_mask[i] = 1 - self[i]
         return new_mask
 
     def select_all(self):

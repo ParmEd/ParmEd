@@ -101,9 +101,6 @@ class Mdin(object):
 
     def write(self, filename = 'mdin'):
       
-        if not self.check(): # check the validity of the parameters
-            raise InputError('mdin file failed sanity check')
-
         # open the file for writing and write the header and &cntrl namelist
         file = open(filename,'w')
         file.write(self.title + '\n')
@@ -285,9 +282,10 @@ class Mdin(object):
         """ Change the value of a variable without adding a new key-pair """
       
         variable = variable.lower()
-        if (value.startswith('"') and value.endswith('"')) or (
-               value.startswith("'") and value.endswith("'")):
-            value = value[1:-1]
+        if isinstance(value, string_types):
+            if (value.startswith('"') and value.endswith('"')) or (
+                   value.startswith("'") and value.endswith("'")):
+                value = value[1:-1]
       
         if namelist == "cntrl":
             if variable in self.cntrl_nml.keys():
@@ -349,7 +347,7 @@ class Mdin(object):
         self.change('cntrl','ntt', ntt)
         self.change('cntrl','temp0', temp)
         self.change('cntrl','tempi', temp)
-        self.change('cntrl','gamma_ln', gamma_ln)
+        self.change('cntrl','gamma_ln', gamma_ln if ntt==3 else 0)
         self.change('cntrl','ig', ig)
         self.change('cntrl','tautp', tautp)
 
@@ -408,7 +406,7 @@ class Mdin(object):
         self.change('cntrl','ntt', ntt)
         self.change('cntrl','tautp', tautp)
         self.change('cntrl','ig', ig)
-        self.change('cntrl','gamma_ln', gamma_ln)
+        self.change('cntrl','gamma_ln', gamma_ln if ntt==3 else 0)
 
     #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 

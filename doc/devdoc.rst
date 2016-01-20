@@ -23,9 +23,9 @@ is clearly not being run, or not being run correctly (which means there is no
 way that your test could prevent a breakage in the future).
 
 Once you have a failing test case, write code until the test case passes. Then
-add more test until the test case fails again. Then update the test case until
-it fails again. Rinse-and-repeat until the functionality you are adding is
-complete.
+add more test until the test case fails again. Then update the code until the
+test passes again. Rinse-and-repeat until the functionality you are adding is
+complete and fully-tested.
 
 Coding Style
 ------------
@@ -40,7 +40,7 @@ the following I consider very important (and will block any PRs):
     - Please make sure comments and docstrings are written in English
     - Use only absolute imports or *explicit* relative imports
     - Always use ``print`` as a function (via the ``print_function`` futures
-      import)
+      import) -- see below for why this is a hard requirement.
 
 Things I would like to see, but are not as important:
 
@@ -62,8 +62,8 @@ package, and all components should be imported from there.
 In particular, the ``range`` and ``zip`` builtins should be imported from
 ``parmed.utils.six.moves`` rather than relying on the standard versions. This is
 because in Python 3, ``range`` and ``zip`` return efficient iterators, while in
-Python 2 they return (sometimes *very* inefficient lists). The Python
-2-equivalent versions of the ``range`` and ``zip`` iterators are ``xrange`` and
+Python 2 they return potentially inefficient lists. The Python 2-equivalent
+versions of the ``range`` and ``zip`` iterators are ``xrange`` and
 ``itertools.izip``, respectively, which are the *actual* functions defined
 within ``parmed.utils.six.moves`` for Python 2.
 
@@ -108,14 +108,14 @@ Obviously in this case, ``test_parmed_structure.py`` is replaced with whichever
 test module you are working on. You can select *specific* tests using the ``-m``
 flag specifying a regex that matches the test case method.  For example::
 
-    nosetests -vs test/test_parmed_structure.py -m AddAtom
+    nosetests -vs test/test_parmed_structure.py -m add_atom
 
-will test both the ``tesAddAtom`` and ``testAddAtomToResidue`` methods. This is
-an easy way to run tests quickly while working on new methods *without* having
-to run ``python setup.py install`` after every change. Note that when you run
-tests from the root ParmEd directory, however, the imported ParmEd repository
-will not have any Python extensions installed (meaning that the tests relying on
-them -- like the test for the Amber optimized reader -- will fail).
+will test both the ``test_add_atom`` and ``test_add_atom_to_residue`` methods.
+This is an easy way to run tests quickly while working on new methods *without*
+having to run ``python setup.py install`` after every change. Note that when you
+run tests from the root ParmEd directory, however, the imported ParmEd
+repository will not have any Python extensions installed (meaning that the tests
+relying on them -- like the test for the Amber optimized reader -- will fail).
 
 ParmEd utilizes the Travis continuous integration server to perform automatic
 tests of all pull requests. Tests generally must pass these tests before being

@@ -44,7 +44,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
-from parmed.utils import tag_molecules
+from parmed.utils import tag_molecules, PYPY
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
@@ -92,6 +92,28 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     if old_atom.residue.number != resid: return False
     if old_atom.residue.chain != chain.strip(): return False
     return True
+
+def _strip_box_units(args):
+    new_args = []
+    for arg in args:
+        # Handle 3 types of arguments here: units, regular numbers, and
+        # iterables. Iterables have units removed recursively. But protect
+        # against strings, since you get infinite recursion that way
+        if u.is_quantity(arg):
+            if arg.unit.is_compatible(u.degree):
+                new_args.append(arg.value_in_unit(u.degree))
+            else:
+                new_args.append(arg.value_in_unit(u.angstroms))
+        elif isinstance(arg, string_types):
+            raise TypeError('Unit cell cannot have strings')
+        else:
+            try:
+                iter(arg)
+                arg = _strip_box_units(arg)
+            except TypeError:
+                pass
+            new_args.append(arg)
+    return new_args
 
 def _bondi(atom):
     if atom.atomic_number == 6: return 1.7
@@ -183,7 +205,7 @@ class Structure(object):
         List of all angles in the structure
     dihedrals : :class:`TrackedList` (:class:`Dihedral`)
         List of all dihedrals in the structure
-    rb_torsions : :class:`TrackedList` (:class:`RBTorsion`)
+    rb_torsions : :class:`TrackedList` (:class:`Dihedral`)
         List of all Ryckaert-Bellemans torsions in the structure
     urey_bradleys : :class:`TrackedList` (:class:`UreyBradley`)
         List of all Urey-Bradley angle bends in the structure
@@ -341,7 +363,7 @@ class Structure(object):
 
     #===================================================
 
-    def add_atom(self, atom, resname, resnum, chain='', inscode=''):
+    def add_atom(self, atom, resname, resnum, chain='', inscode='', segid=''):
         """
         Adds a new atom to the Structure, adding a new residue to `residues` if
         it has a different name or number as the last residue added and adding
@@ -359,13 +381,15 @@ class Structure(object):
             The chain ID character for this residue
         inscode : ``str``
             The insertion code ID character for this residue (it is stripped)
+        segid : ``str``
+            The segment identifier for this residue (it is stripped)
 
         Notes
         -----
         If the residue name and number differ from the last residue in this
         list, a new residue is added and the atom is added to that residue
         """
-        self.residues.add_atom(atom, resname, resnum, chain, inscode)
+        self.residues.add_atom(atom, resname, resnum, chain, inscode, segid)
         self.atoms.append(atom)
 
     #===================================================
@@ -622,8 +646,8 @@ class Structure(object):
                     AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
             )
         for g in self.groups:
-            c.groups.append(Group(g.bs, g.type, g.move))
-        c.box = copy(self.box)
+            c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
+        c._box = copy(self.box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
         return c
@@ -823,7 +847,15 @@ class Structure(object):
         self.unchange()
         # Slice out coordinates if present
         if self._coordinates is not None:
-            self._coordinates = self._coordinates[:, np.array(sel)==0]
+            if PYPY:
+                # numpypy does not currently support advanced indexing it seems
+                self._coordinates = np.array(
+                        [[[x, y, z] for i, (x, y, z) in enumerate(crd)
+                            if sel[i]==0] for crd in self._coordinates]
+                )
+            else:
+                # Pure numpy is faster in CPython, so do that when we can
+                self._coordinates = self._coordinates[:, np.array(sel)==0]
 
     #===================================================
 
@@ -885,7 +917,7 @@ class Structure(object):
             return selection
         sumsel = sum(selection)
         if sumsel == 0:
-            # No atoms selected. Return None
+            # No atoms selected. Return empty type
             return type(self)()
         # The cumulative sum of selection will give our index + 1 of each
         # selected atom into the new structure
@@ -985,7 +1017,7 @@ class Structure(object):
         copy_valence_terms(struct.acceptors, [], self.acceptors, [],
                            ['atom1', 'atom2'])
         copy_valence_terms(struct.groups, [], self.groups, [],
-                           ['bs', 'type', 'move'])
+                           ['atom', 'type', 'move'])
         return struct
 
     def _get_selection_array(self, selection):
@@ -1218,7 +1250,7 @@ class Structure(object):
             - PDBx/mmCIF (.cif, cif)
             - PQR (.pqr, pqr)
             - Amber topology file (.prmtop/.parm7, amber)
-            - CHARMM PSF file (.psf, charmm)
+            - CHARMM PSF file (.psf, psf)
             - CHARMM coordinate file (.crd, charmmcrd)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)
@@ -1301,7 +1333,8 @@ class Structure(object):
             elif format == 'PQR':
                 formats.PQRFile.write(self, fname, **kwargs)
             elif format == 'PSF':
-                self.write_psf(fname, **kwargs)
+                s = charmm.CharmmPsfFile.from_structure(self)
+                s.write_psf(fname, **kwargs)
             elif format == 'GRO':
                 gromacs.GromacsGroFile.write(self, fname, **kwargs)
             elif format == 'MOL2':
@@ -1549,7 +1582,9 @@ class Structure(object):
 
     @property
     def box(self):
-        return self._box
+        if self._box is None:
+            return None
+        return self._box[0]
 
     @box.setter
     def box(self, value):
@@ -1559,25 +1594,44 @@ class Structure(object):
             if isinstance(value, np.ndarray):
                 box = value
             else:
-                box = list(value)
-                if len(box) != 6:
-                    raise ValueError('Box information must be 6 floats')
-                if u.is_quantity(box[0]):
-                    box[0] = box[0].value_in_unit(u.angstroms)
-                if u.is_quantity(box[1]):
-                    box[1] = box[1].value_in_unit(u.angstroms)
-                if u.is_quantity(box[2]):
-                    box[2] = box[2].value_in_unit(u.angstroms)
-                if u.is_quantity(box[3]):
-                    box[3] = box[3].value_in_unit(u.degrees)
-                if u.is_quantity(box[4]):
-                    box[4] = box[4].value_in_unit(u.degrees)
-                if u.is_quantity(box[5]):
-                    box[5] = box[5].value_in_unit(u.degrees)
+                box = _strip_box_units(list(value))
             box = np.array(box, dtype=np.float64, copy=False, subok=True)
             if box.shape != (6,):
-                raise ValueError('Box information must be 6 floats')
-            self._box = box
+                if len(box.shape) != 2 or box.shape[-1] != 6:
+                    raise ValueError('Box information must be 6 floats')
+            self._box = box.reshape((-1, 6))
+
+    def get_box(self, frame='all'):
+        """
+        In some cases, multiple conformations may be stored in the Structure.
+        This function retrieves a particular frame's unit cell (box) dimensions
+
+        Parameters
+        ----------
+        frame : int or 'all', optional
+            The frame number whose coordinates should be retrieved. Default is
+            'all'
+
+        Returns
+        -------
+        box : np.ndarray, shape([#,] natom, 3) or None
+            If frame is 'all', all coordinates are returned with shape
+            (#, natom, 3). Otherwise the requested frame is returned with shape
+            (natom, 3). If no coordinates exist and 'all' is requested, None is
+            returned
+
+        Raises
+        ------
+        IndexError if there are fewer than ``frame`` unit cell dimensions
+        """
+        if self._box is None:
+            if frame != 'all':
+                raise IndexError('No unit cell frames present')
+            return None
+        elif frame == 'all':
+            return self._box
+        else:
+            return self._box[frame]
 
     #===================================================
 
@@ -1683,7 +1737,7 @@ class Structure(object):
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
                      verbose=False,
-                     forceNBFIX=False):
+                     splitDihedrals=False):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -1745,6 +1799,10 @@ class Structure(object):
             of freedom will *still* be constrained).
         verbose : bool=False
             If True, the progress of this subroutine will be printed to stdout
+        splitDihedrals : bool=False
+            If True, the dihedrals will be split into two forces -- proper and
+            impropers. This is primarily useful for debugging torsion parameter
+            assignments.
 
         Notes
         -----
@@ -1794,7 +1852,7 @@ class Structure(object):
                 self.omm_angle_force(constraints, flexibleConstraints)
         )
         if verbose: print('Adding dihedrals...')
-        self._add_force_to_system(system, self.omm_dihedral_force())
+        self._add_force_to_system(system, self.omm_dihedral_force(splitDihedrals))
         if verbose: print('Adding Ryckaert-Bellemans torsions...')
         self._add_force_to_system(system, self.omm_rb_torsion_force())
         if verbose: print('Adding Urey-Bradleys...')
@@ -2049,21 +2107,35 @@ class Structure(object):
     #===================================================
 
     @needs_openmm
-    def omm_dihedral_force(self):
+    def omm_dihedral_force(self, split=False):
         """ Creates the OpenMM PeriodicTorsionForce modeling dihedrals
+
+        Parameters
+        ----------
+        split : bool, optional, default=False
+            If True, separate PeriodicTorsionForce instances with the propers in
+            the first and impropers in the second return item. If no impropers
+            or propers are present, the instances with zero terms are not
+            returned.
 
         Returns
         -------
-        PeriodicTorsionForce
+        PeriodicTorsionForce[, PeriodicTorsionForce]
             Or None if no torsions are present in this system
         """
         if not self.dihedrals: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.PeriodicTorsionForce()
-        force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        proper = mm.PeriodicTorsionForce()
+        improper = mm.PeriodicTorsionForce()
+        proper.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        improper.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for tor in self.dihedrals:
             if tor.type is None:
                 raise ParameterError('Cannot find torsion parameters')
+            if split and tor.improper:
+                force = improper
+            else:
+                force = proper
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx,
@@ -2075,7 +2147,11 @@ class Structure(object):
                                  tor.atom4.idx, int(tor.type.per),
                                  tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
-        return force
+        if proper.getNumTorsions() == 0:
+            return improper
+        if improper.getNumTorsions() == 0:
+            return proper
+        return proper, improper
 
     #===================================================
 
@@ -2284,7 +2360,6 @@ class Structure(object):
         def exclude_to(origin, atom, level, end):
             if level >= end: return
             for partner in atom.bond_partners:
-                if isinstance(partner, ExtraPoint): continue # Handled later
                 if partner is origin: continue
                 force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
                 # Exclude EP children, too
@@ -2300,7 +2375,6 @@ class Structure(object):
                                            0.0, True)
                 exclude_to(origin, partner, level+1, end)
         for atom in self.atoms:
-            if isinstance(atom, ExtraPoint): continue # Handled separately
             exclude_to(atom, atom, 0, self.nrexcl)
         # Add the exceptions from the dihedral list IFF no explicit exceptions
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
@@ -2633,8 +2707,12 @@ class Structure(object):
             The dielectric constant of the water used in GB
         """
         from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
-                GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force,
-                convertParameters)
+                GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force)
+        try:
+            from simtk.openmm.app.internal.customgbforces import convertParameters
+        except ImportError:
+            # Unnecessary in newer versions of OpenMM
+            convertParameters = lambda params, choice: params
         if implicitSolvent is None: return None
         if useSASA:
             sasa = 'ACE'
@@ -3132,6 +3210,9 @@ class Structure(object):
     def __iadd__(self, other):
         if not isinstance(other, Structure):
             return NotImplemented
+        # Cache my coordinates, since changing the structure will destroy the
+        # coordinate list
+        mycrd = self.get_coordinates('all')
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3223,13 +3304,14 @@ class Structure(object):
         copy_valence_terms(other.acceptors, [], self.acceptors, [],
                            ['atom1', 'atom2'])
         copy_valence_terms(other.groups, [], self.groups, [],
-                           ['bs', 'type', 'move'])
-        if self._coordinates is None or other._coordinates is None:
-            self._coordinates = None
-        elif self._coordinates.shape[0] != other._coordinates.shape[0]:
+                           ['atom', 'type', 'move'])
+        if mycrd is None or other._coordinates is None:
             self._coordinates = None
         else:
-            np.concatenate((self._coordinates, other.coordinates))
+            ocrd = other.get_coordinates('all')
+            nframes = min(ocrd.shape[0], mycrd.shape[0])
+            self._coordinates = np.concatenate(
+                    (mycrd[:nframes,:,:], ocrd[:nframes,:,:]), axis=1)
         return self
 
     def __mul__(self, ncopies):
@@ -3320,7 +3402,7 @@ class Structure(object):
             copy_valence_terms(other.acceptors, aoffset, self.acceptors, [],
                                ['atom1', 'atom2'])
             copy_valence_terms(other.groups, aoffset, self.groups, [],
-                               ['bs', 'type', 'move'])
+                               ['atom', 'type', 'move'])
         if self._coordinates is not None:
             coords = np.tile(self._coordinates.ravel(), ncopies).reshape(
                     (-1, len(self.atoms), 3))
@@ -3365,6 +3447,213 @@ class Structure(object):
                 system.addForce(f)
             return
         system.addForce(force)
+
+    #===================================================
+
+    def __getstate__(self):
+        """ Serializes a structure """
+        retdict = dict(residues=self.residues,
+                       bond_types=self.bond_types,
+                       angle_types=self.angle_types,
+                       dihedral_types=self.dihedral_types,
+                       urey_bradley_types=self.urey_bradley_types,
+                       improper_types=self.improper_types,
+                       rb_torsion_types=self.rb_torsion_types,
+                       cmap_types=self.cmap_types,
+                       trigonal_angle_types=self.trigonal_angle_types,
+                       out_of_plane_bend_types=self.out_of_plane_bend_types,
+                       pi_torsion_types=self.pi_torsion_types,
+                       stretch_bend_types=self.stretch_bend_types,
+                       torsion_torsion_types=self.torsion_torsion_types,
+                       adjust_types=self.adjust_types,
+                       groups=self.groups,
+                       _coordinates=self._coordinates,
+                       _box=self._box,
+                       nrexcl=self.nrexcl,
+                       _combining_rule=self._combining_rule,
+        )
+        def idx(thing):
+            if thing is None: return None
+            return thing.idx
+        retdict['bonds'] = [(b.atom1.idx, b.atom2.idx, idx(b.type))
+                            for b in self.bonds]
+        retdict['angles'] = [(a.atom1.idx, a.atom2.idx, a.atom3.idx,
+                              idx(a.type)) for a in self.angles]
+        retdict['dihedrals'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                 d.atom4.idx, d.improper, d.ignore_end,
+                                 idx(d.type)) for d in self.dihedrals]
+        retdict['impropers'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                 d.atom4.idx, idx(d.type))
+                                for d in self.impropers]
+        retdict['rb_torsions'] = [(d.atom1.idx, d.atom2.idx, d.atom3.idx,
+                                   d.atom4.idx, idx(d.type))
+                                  for d in self.rb_torsions]
+        retdict['urey_bradleys'] = [(u.atom1.idx, u.atom2.idx, idx(u.type))
+                                    for u in self.urey_bradleys]
+        retdict['cmaps'] = [(c.atom1.idx, c.atom2.idx, c.atom3.idx,
+                             c.atom4.idx, c.atom5.idx, idx(c.type))
+                            for c in self.cmaps]
+        retdict['trigonal_angles'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
+                                       t.atom4.idx, idx(t.type))
+                                      for t in self.trigonal_angles]
+        retdict['out_of_plane_bends'] = [(o.atom1.idx, o.atom2.idx, o.atom3.idx,
+                                          o.atom4.idx, idx(o.type))
+                                         for o in self.out_of_plane_bends]
+        retdict['pi_torsions'] = [(p.atom1.idx, p.atom2.idx, p.atom3.idx,
+                                   p.atom4.idx, p.atom5.idx, p.atom6.idx,
+                                   idx(p.type)) for p in self.pi_torsions]
+        retdict['stretch_bends'] = [(s.atom1.idx, s.atom2.idx, s.atom3.idx,
+                                     idx(s.type)) for s in self.stretch_bends]
+        retdict['torsion_torsions'] = [(t.atom1.idx, t.atom2.idx, t.atom3.idx,
+                                        t.atom4.idx, t.atom5.idx, idx(t.type))
+                                       for t in self.torsion_torsions]
+        retdict['chiral_frames'] = [(c.atom1.idx, c.atom2.idx, c.chirality)
+                                    for c in self.chiral_frames]
+        retdict['multipole_frames'] = [(f.atom.idx, f.frame_pt_num, f.vectail,
+                                        f.vechead, f.nvec)
+                                       for f in self.multipole_frames]
+        retdict['adjusts'] = [(e.atom1.idx, e.atom2.idx, idx(e.type))
+                              for e in self.adjusts]
+        retdict['acceptors'] = [(a.atom1.idx, a.atom2.idx)
+                                for a in self.acceptors]
+        retdict['donors'] = [(d.atom1.idx, d.atom2.idx) for d in self.donors]
+        retdict['exclusions'] = [tuple(e.idx for e in a._exclusion_partners)
+                                 for a in self.atoms]
+
+        # Now the metadata stuff, if applicable
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries'):
+            try:
+                retdict[key] = getattr(self, key)
+            except AttributeError:
+                continue
+
+        return retdict
+
+    def __setstate__(self, d):
+        # Assign the type lists we need to just copy over, and make sure the
+        # attributes are claimed.
+        for attr in ('residues', 'bond_types', 'angle_types', 'dihedral_types',
+                     'urey_bradley_types', 'improper_types', 'rb_torsion_types',
+                     'cmap_types', 'trigonal_angle_types', 'adjust_types',
+                     'out_of_plane_bend_types', 'pi_torsion_types', 'groups',
+                     'stretch_bend_types', 'torsion_torsion_types'):
+            setattr(self, attr, d[attr])
+            getattr(self, attr).claim()
+        # Assign the possible metadata
+        for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
+                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'resolution', 'related_entries', '_coordinates', '_box',
+                    'nrexcl', '_combining_rule'):
+            if key in d:
+                setattr(self, key, d[key])
+
+        self.atoms = AtomList()
+        for r in self.residues: self.atoms.extend(r.atoms)
+
+        def assign_type(typelist, idx):
+            if idx is None:
+                return None
+            return typelist[idx]
+
+        # Set the topology arrays
+        self.bonds = TrackedList(
+                Bond(self.atoms[it[0]], self.atoms[it[1]],
+                     type=assign_type(self.bond_types, it[2]))
+                for it in d['bonds']
+        )
+        self.angles = TrackedList(
+                Angle(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
+                      type=assign_type(self.angle_types, it[3]))
+                for it in d['angles']
+        )
+        self.dihedrals = TrackedList(
+                Dihedral(self.atoms[it[0]], self.atoms[it[1]],
+                         self.atoms[it[2]], self.atoms[it[3]], improper=it[4],
+                         ignore_end=it[5],
+                         type=assign_type(self.dihedral_types, it[6]))
+                for it in d['dihedrals']
+        )
+        self.impropers = TrackedList(
+                Improper(self.atoms[it[0]], self.atoms[it[1]],
+                         self.atoms[it[2]], self.atoms[it[3]],
+                         type=assign_type(self.improper_types, it[4]))
+                for it in d['impropers']
+        )
+        self.urey_bradleys = TrackedList(
+                UreyBradley(self.atoms[it[0]], self.atoms[it[1]],
+                            type=assign_type(self.urey_bradley_types, it[2]))
+                for it in d['urey_bradleys']
+        )
+        self.rb_torsions = TrackedList(
+                Dihedral(self.atoms[it[0]], self.atoms[it[1]],
+                         self.atoms[it[2]], self.atoms[it[3]],
+                         type=assign_type(self.rb_torsion_types, it[4]))
+                for it in d['rb_torsions']
+        )
+        self.cmaps = TrackedList(
+                Cmap(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
+                     self.atoms[it[3]], self.atoms[it[4]],
+                     type=assign_type(self.cmap_types, it[5]))
+                for it in d['cmaps']
+        )
+        self.trigonal_angles = TrackedList(
+                TrigonalAngle(self.atoms[it[0]], self.atoms[it[1]],
+                              self.atoms[it[2]], self.atoms[it[3]],
+                              type=assign_type(self.trigonal_angle_types, it[4]))
+                for it in d['trigonal_angles']
+        )
+        self.out_of_plane_bends = TrackedList(
+                OutOfPlaneBend(self.atoms[it[0]], self.atoms[it[1]],
+                    self.atoms[it[2]], self.atoms[it[3]],
+                    type=assign_type(self.out_of_plane_bend_types, it[4]))
+                for it in d['out_of_plane_bends']
+        )
+        self.pi_torsions = TrackedList(
+                PiTorsion(self.atoms[it[0]], self.atoms[it[1]],
+                          self.atoms[it[2]], self.atoms[it[3]],
+                          self.atoms[it[4]], self.atoms[it[5]],
+                          type=assign_type(self.pi_torsion_types, it[6]))
+                for it in d['pi_torsions']
+        )
+        self.stretch_bends = TrackedList(
+                StretchBend(self.atoms[it[0]], self.atoms[it[1]],
+                            self.atoms[it[2]],
+                            type=assign_type(self.stretch_bend_types, it[3]))
+                for it in d['stretch_bends']
+        )
+        self.torsion_torsions = TrackedList(
+                TorsionTorsion(self.atoms[it[0]], self.atoms[it[1]],
+                        self.atoms[it[2]], self.atoms[it[3]], self.atoms[it[4]],
+                        type=assign_type(self.torsion_torsion_types, it[5]))
+                for it in d['torsion_torsions']
+        )
+        self.chiral_frames = TrackedList(
+                ChiralFrame(self.atoms[it[0]], self.atoms[it[1]], it[2])
+                for it in d['chiral_frames']
+        )
+        self.multipole_frames = TrackedList(
+                MultipoleFrame(self.atoms[it[0]], *it[1:])
+                for it in d['multipole_frames']
+        )
+        self.adjusts = TrackedList(
+                NonbondedException(self.atoms[it[0]], self.atoms[it[1]],
+                                   assign_type(self.adjust_types, it[2]))
+                for it in d['adjusts']
+        )
+        self.acceptors = TrackedList(
+                AcceptorDonor(self.atoms[it[0]], self.atoms[it[1]])
+                for it in d['acceptors']
+        )
+        self.donors = TrackedList(
+                AcceptorDonor(self.atoms[it[0]], self.atoms[it[1]])
+                for it in d['donors']
+        )
+        # Transfer the exclusions
+        for atom, excl in zip(self.atoms, d['exclusions']):
+            for idx in excl:
+                atom.exclude(self.atoms[idx])
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3607,5 +3896,8 @@ class StructureView(object):
     def __nonzero__(self):
         # For Python 2
         return self.__bool__()
+
+    def __iter__(self):
+        return iter(self.atoms)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

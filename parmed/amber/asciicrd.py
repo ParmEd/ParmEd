@@ -63,6 +63,8 @@ class _AmberAsciiCoordinateFile(object):
 
         self.natom = natom
         self.hasbox = hasbox
+        if self.CRDS_PER_LINE is None:
+            raise NotImplementedError('This object must be subclassed')
         self._full_lines_per_frame = self.natom * 3 // self.CRDS_PER_LINE
         self._nextras = self.natom * 3 - (self._full_lines_per_frame *
                                           self.CRDS_PER_LINE)
@@ -71,8 +73,6 @@ class _AmberAsciiCoordinateFile(object):
             self._parse()
         elif self._status == 'new':
             if title is None:
-                if self.DEFAULT_TITLE is None:
-                    raise NotImplemented('This object must be subclassed')
                 self._file.write('%s\n' % self.DEFAULT_TITLE)
             else:
                 self._file.write(title.rstrip() + '\n')
@@ -136,10 +136,16 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         lines = [f.readline() for i in range(5)]
         f.close()
         # Look for natom
-        try:
-            natom = int(lines[1].split()[0])
-        except (ValueError, IndexError):
+        words = lines[1].split()
+        if len(words) > 2 or len(words) < 1:
             return False
+        try:
+            natom = int(words[0])
+            float(words[1])
+        except ValueError:
+            return False
+        except IndexError:
+            pass
         # Next 3 lines, make sure we have %12.7f format. This only works if we
         # have at least 6 atoms. Any fewer than that means the restart file is
         # shorter than that.
@@ -222,7 +228,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             self.hasbox = self.hasvels = True
         else:
             raise RuntimeError('Badly formatted restart file. Has %d lines '
-                               'for %d atoms.' % (len(self.lines), self.natom))
+                               'for %d atoms.' % (len(lines), self.natom))
         self._coordinates = np.zeros((self.natom, 3))
         if self.hasvels:
             self._velocities = np.zeros((self.natom, 3))
@@ -295,7 +301,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Cannot set coordinates on an old restart')
         stuff = np.array(stuff, copy=False).ravel()
         if self.natom > 0 and len(stuff) != 3 * self.natom:
-            raise ValueError('Only got %d coordinates for %d atoms' %
+            raise ValueError('Got %d coordinates for %d atoms' %
                              (len(stuff), self.natom))
         if self._coords_written:
             raise RuntimeError('Coordinates have already been written.')
@@ -319,7 +325,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self._status == 'new' and not hasattr(self, '_velocities'):
             raise RuntimeError('Velocities not set yet')
         if not self.hasvels:
-            raise NameError('No velocities for %s' % self.fname)
+            return None
         return self._velocities
 
     @velocities.setter
@@ -348,14 +354,14 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             numwrit += 1
             if numwrit % 2 == 0: self._file.write('\n')
         if self.natom % 2 == 1: self._file.write('\n')
-        self._vels_written = True
+        self._vels_written = self.hasvels = True
 
     @property
     def cell_lengths(self):
         if self._status == 'new' and not hasattr(self, '_cell_lengths'):
             raise RuntimeError('Cell lengths not yet available')
         if not self.hasbox:
-            raise NameError('No box information for %s' % self.fname)
+            return None
         return self._cell_lengths
 
     @property
@@ -363,7 +369,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self._status == 'new' and not hasattr(self, '_cell_angles'):
             raise RuntimeError('Cell angles not yet available')
         if not self.hasbox:
-            raise NameError('No box information for %s' % self.fname)
+            return None
         return self._cell_angles
 
     @property
@@ -373,7 +379,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
                 hasattr(self, '_cell_angles')):
             raise RuntimeError('Cell parameters not yet set')
         if not self.hasbox:
-            raise NameError('%s has no periodic box information' % self.fname)
+            return None
         box = np.zeros(6)
         lengths, angles = self.cell_lengths, self.cell_angles
         box[0:3] = [lengths[0], lengths[1], lengths[2]]
@@ -405,7 +411,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self._cell_angles_written:
             raise RuntimeError('Can only write cell angles once')
         if len(stuff) != 3:
-            raise ValueError('Expected 3 numbers for cell lengths')
+            raise ValueError('Expected 3 numbers for cell angles')
         self._cell_angles = np.array(stuff, copy=False)
         self._file.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
         self._cell_angles_written = True

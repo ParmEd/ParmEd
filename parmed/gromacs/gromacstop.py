@@ -4,6 +4,12 @@ and building a Structure from it
 """
 from __future__ import print_function, division, absolute_import
 
+from collections import OrderedDict, defaultdict
+from contextlib import closing
+import copy
+from datetime import datetime
+import math
+import os
 from parmed.constants import TINY, DEG_TO_RAD
 from parmed.exceptions import GromacsError, GromacsWarning, ParameterWarning
 from parmed.formats.registry import FileFormatType
@@ -21,12 +27,6 @@ from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
-from collections import OrderedDict
-from contextlib import closing
-import copy
-from datetime import datetime
-import math
-import os
 import re
 try:
     from string import letters
@@ -113,6 +113,13 @@ class _Defaults(object):
         if idx == 3: return self.fudgeLJ
         if idx == 4: return self.fudgeQQ
         raise IndexError('Index %d out of range' % idx)
+
+    def __eq__(self, other):
+        return (self.nbfunc == other.nbfunc and
+                self.comb_rule == other.comb_rule and
+                self.gen_pairs == other.gen_pairs and
+                self.fudgeLJ == other.fudgeLJ and
+                self.fudgeQQ == other.fudgeQQ)
 
     def __setitem__(self, idx, value):
         if idx < 0: idx += 5
@@ -686,12 +693,12 @@ class GromacsTopologyFile(Structure):
                     mass = float(words[massidx])
                     if mass > 0 and atnum == -1:
                         atnum = AtomicNum[element_by_mass(mass)]
-#                   chg = float(words[3])
+                    chg = float(words[massidx+1])
                     ptype = words[ptypeidx]
                     sig = float(words[sigidx]) * u.nanometers
                     eps = float(words[sigidx+1]) * u.kilojoules_per_mole
                     typ = AtomType(attype, None, mass, atnum,
-                                   bond_type=bond_type)
+                                   bond_type=bond_type, charge=chg)
                     typ.set_lj_params(eps, sig*2**(1/6)/2)
                     params.atom_types[attype] = typ
                 elif current_section == 'nonbond_params':
@@ -863,7 +870,8 @@ class GromacsTopologyFile(Structure):
             else:
                 raise GromacsError("Can't add %d %s molecules" % (num, molname))
         self.itps = itplist
-        self.parametrize()
+        if parametrize:
+            self.parametrize()
 
     #===================================================
 
@@ -1092,6 +1100,43 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
+    def copy(self, cls, split_dihedrals=False):
+        """
+        Makes a copy of the current structure as an instance of a specified
+        subclass
+
+        Parameters
+        ----------
+        cls : Structure subclass
+            The returned object is a copy of this structure as a `cls` instance
+        split_dihedrals : ``bool``
+            If True, then the Dihedral entries will be split up so that each one
+            is paired with a single DihedralType (rather than a
+            DihedralTypeList)
+
+        Returns
+        -------
+        *cls* instance
+            The instance of the Structure subclass `cls` with a copy of the
+            current Structure's topology information
+        """
+        c = super(GromacsTopologyFile, self).copy(cls, split_dihedrals)
+        c.defaults = copy.copy(self.defaults)
+        return c
+
+    #===================================================
+
+    def __getitem__(self, selection):
+        """ See Structure.__getitem__ for documentation """
+        # Make sure defaults is properly copied
+        struct = super(GromacsTopologyFile, self).__getitem__(selection)
+        if isinstance(struct, Atom):
+            return struct
+        struct.defaults = copy.copy(self.defaults)
+        return struct
+
+    #===================================================
+
     @classmethod
     def from_structure(cls, struct, copy=False):
         """ Instantiates a GromacsTopologyFile instance from a Structure
@@ -1239,6 +1284,28 @@ class GromacsTopologyFile(Structure):
             raise ValueError('parameters must be "inline", a file name, or '
                              'a file-like object')
 
+        # Error-checking for combine
+        if combine is not None:
+            if isinstance(combine, string_types):
+                if combine.lower() != 'all':
+                    raise ValueError('combine must be None, list of indices, '
+                                     'or "all"')
+            else:
+                try:
+                    it = iter(combine)
+                except TypeError:
+                    raise TypeError('combine must be a list of molecule index '
+                                    'lists')
+                combine_lists = []
+                for indices in it:
+                    try:
+                        indices = sorted(set(indices))
+                    except TypeError:
+                        raise ValueError('combine must be a list of iterables')
+                    if any((indices[i+1] - indices[i]) != 1
+                                for i in range(len(indices)-1)):
+                        raise ValueError('Can only combine adjacent molecules')
+                    combine_lists.append(indices)
         try:
             # Write the header
             now = datetime.now()
@@ -1288,7 +1355,7 @@ class GromacsTopologyFile(Structure):
                 parfile.write('bond_type ')
             if print_atnum:
                 parfile.write('at.num    ')
-            parfile.write('mass    charge ptype  sigma      espilon\n')
+            parfile.write('mass    charge ptype  sigma      epsilon\n')
             econv = u.kilocalories.conversion_factor_to(u.kilojoules)
             for key, atom_type in iteritems(params.atom_types):
                 parfile.write('%-7s ' % atom_type)
@@ -1297,7 +1364,7 @@ class GromacsTopologyFile(Structure):
                 if print_atnum:
                     parfile.write('%8d ' % atom_type.atomic_number)
                 parfile.write('%10.5f  %10.6f  A %13.6g %13.6g\n' % (
-                              0, atom_type.mass, atom_type.sigma/10,
+                              atom_type.mass, atom_type.charge, atom_type.sigma/10,
                               atom_type.epsilon*econv))
             parfile.write('\n')
             # Print all parameter types unless we asked for inline
@@ -1469,8 +1536,105 @@ class GromacsTopologyFile(Structure):
                 dest.write('[ molecules ]\n; Compound       #mols\n')
                 dest.write('%-15s %6d\n' % ('system', 1))
             else:
-                raise NotImplementedError('Specialized molecule splitting is '
-                                          'not yet supported')
+                molecules = self.split()
+                nmols = sum(len(m[1]) for m in molecules)
+                moleculedict = dict()
+                # Hash our molecules by indices
+                for m, num in molecules:
+                    for i in num:
+                        moleculedict[i] = m
+                combined_molecules = []
+                for cl in combine_lists:
+                    counts = defaultdict(int)
+                    mols_in_mol = []
+                    for molid in cl:
+                        try:
+                            mol = moleculedict[molid]
+                        except KeyError:
+                            raise IndexError('Molecule ID out of range')
+                        counts[id(moleculedict[molid])] += 1
+                        if counts[id(moleculedict[molid])] == 1:
+                            mols_in_mol.append(mol)
+                    if counts[id(mols_in_mol[0])] > 1:
+                        combmol = mols_in_mol[0] * counts[id(mols_in_mol[0])]
+                    else:
+                        combmol = copy.copy(mols_in_mol[0])
+                    for i, mol in enumerate(mols_in_mol):
+                        if i == 0: continue
+                        assert id(mol) in counts and counts[id(mol)] > 0
+                        if counts[id(mol)] > 1:
+                            combmol += mol * counts[id(mol)]
+                        else:
+                            combmol += mol
+                    combined_molecules.append((combmol, cl[0], len(cl)))
+                    nmols -= (len(cl) - 1)
+                # combined_molecules now contains a list of tuples, and that
+                # tuple stores the combined molecule, first molecule index of
+                # the pre-combined molecule, and how many molecules were
+                # combined
+
+                # Sort combined molecules by starting location
+                combined_molecules.sort(key=lambda x: x[1])
+                new_molecules = []
+                counts = defaultdict(set)
+                cmc = 0 # Combined Molecule Counter
+                add = 0 # How many molecules to "skip" due to combining
+                for i in range(nmols):
+                    ii = i + add
+                    if (cmc < len(combined_molecules) and
+                            combined_molecules[cmc][1] == ii):
+                        new_molecules.append([combined_molecules[cmc][0],
+                                              set([i])])
+                        add += combined_molecules[cmc][2] - 1
+                        cmc += 1
+                    elif len(counts[id(moleculedict[ii])]) == 0:
+                        counts[id(moleculedict[ii])].add(i)
+                        new_molecules.append([moleculedict[ii],
+                                              counts[id(moleculedict[ii])]])
+                    else:
+                        counts[id(moleculedict[ii])].add(i)
+                sysnum = 1
+                names = []
+                nameset = set()
+                for molecule, num in new_molecules:
+                    if len(molecule.residues) == 1:
+                        title = molecule.residues[0].name
+                        if title in nameset:
+                            orig = title
+                            sfx = 2
+                            while title in nameset:
+                                title = '%s%d' % (orig, sfx)
+                                sfx += 1
+                    else:
+                        title = 'system%d' % sysnum
+                        sysnum += 1
+                    names.append(title)
+                    nameset.add(title)
+                    GromacsTopologyFile._write_molecule(molecule, dest, title,
+                                        params, parameters == 'inline')
+                # System
+                dest.write('[ system ]\n; Name\n')
+                if self.title:
+                    dest.write(self.title)
+                else:
+                    dest.write('Generic title')
+                dest.write('\n\n')
+                # Molecules
+                dest.write('[ molecules ]\n; Compound       #mols\n')
+                total_mols = sum(len(m[1]) for m in new_molecules)
+                i = 0
+                while i < total_mols:
+                    for j, (molecule, lst) in enumerate(new_molecules):
+                        if i in lst:
+                            break
+                    else:
+                        raise RuntimeError('Could not find molecule %d in list'
+                                           % i)
+                    ii = i
+                    while ii < total_mols and ii in lst:
+                        ii += 1
+                    dest.write('%-15s %6d\n' % (names[j], ii-i))
+                    i = ii
         finally:
             if own_handle:
                 dest.close()
@@ -1761,6 +1925,19 @@ class GromacsTopologyFile(Structure):
                     dest.write('  %d' % (a.idx+1))
                 dest.write('\n')
             dest.write('\n')
+
+    #===================================================
+
+    def __getstate__(self):
+        d = Structure.__getstate__(self)
+        d['parameterset'] = self.parameterset
+        d['defaults'] = self.defaults
+        return d
+
+    def __setstate__(self, d):
+        Structure.__setstate__(self, d)
+        self.parameterset = d['parameterset']
+        self.defaults = d['defaults']
 
 def _any_atoms_farther_than(structure, limit=3):
     """

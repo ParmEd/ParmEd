@@ -2,7 +2,7 @@
 Tests the functionality in the parmed.gromacs package
 """
 from __future__ import print_function, division
-from utils import get_fn, has_numpy
+from utils import get_fn
 from parmed.exceptions import PreProcessorError, PreProcessorWarning
 from parmed.gromacs._cpp import CPreProcessor
 from parmed.utils.six.moves import range, zip, StringIO

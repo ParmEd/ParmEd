@@ -2,7 +2,13 @@
 This module contains classes for reading various TINKER-style files
 """
 from parmed.exceptions import TinkerError
-from parmed.utils.six.moves import range
+from parmed.formats.registry import FileFormatType, load_file
+from parmed.periodic_table import element_by_name, AtomicNum
+from parmed.structure import Structure
+from parmed.topologyobjects import Atom, Bond, Residue
+from parmed.utils.io import genopen
+from parmed.utils.six import add_metaclass, string_types
+from parmed.utils.six.moves import range, zip
 
 class KeywordControlFile(object):
     """ Reads and processes a keyword control file for TINKER simulations """
@@ -33,56 +39,162 @@ class KeywordControlFile(object):
                                   'convert the value of %s into type %s' %
                                   (key, self._datatypes[key]))
 
-class XyzFile(object):
-    """ Reads and processes a Tinker XYZ file """
-    class _Atom(object):
+@add_metaclass(FileFormatType)
+class XyzFile(Structure):
+    """ Reads and processes a Tinker XYZ file
+
+    Parameters
+    ----------
+    fname : str or file-like
+        Name of the file, or the file object containing the XYZ file contents
+    seq : str, optional
+        Name of the file containing the residue (and chain) sequence. Default is
+        None (so every atom will be part of the same residue)
+    """
+
+    @staticmethod
+    def _check_atom_record(words):
+        """ Checks that the tokenized line is consistent with an atom record
+
+        Parameters
+        ----------
+        words : list of str
+            Result of line.split() on a line of the file
+
+        Returns
+        -------
+        is_atom : bool
+            If it is consistent with an atom record, return True. Otherwise,
+            False
         """
-        An atom object that stores the atomic information stored in the XyzFile
+        if len(words) < 6: return False
+        # First token is the atom index
+        try:
+            int(words[0])
+        except ValueError:
+            return False
+        # Second token is the atom name (NOT numeric)
+        try:
+            float(words[1])
+        except ValueError:
+            try:
+                int(words[1])
+            except ValueError:
+                pass
+            else:
+                return False
+        else:
+            return False
+        # Third, fourth, and fifth tokens are floats, but NOT integers
+        try:
+            [float(w) for w in words[2:5]]
+        except ValueError:
+            return False
+        else:
+            try:
+                [int(w) for w in words[2:5]]
+            except ValueError:
+                pass
+            else:
+                return False
+        # Remaining numbers are integers
+        try:
+            [int(w) for w in words[5:]]
+        except ValueError:
+            return False
+        return True
+
+    @staticmethod
+    def id_format(filename):
+        """ Identify the file as a Tinker XYZ file
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to test whether or not it is a mol2 file
+
+        Returns
+        -------
+        is_fmt : bool
+            True if it is a xyz file, False otherwise
         """
-        def __init__(self, name, x, y, z, type, bonded_partners):
-            self.name = str(name)
-            self.position = [float(x), float(y), float(z)]
-            self.type = int(type)
-            # index from 1
-            self.bonded_partners = [int(i) for i in bonded_partners]
+        f = genopen(filename, 'r')
+        words = f.readline().split() # natom and title
+        if not words:
+            return False
+        try:
+            natom = int(words[0])
+        except (ValueError, IndexError):
+            return False
+        else:
+            if natom <= 0:
+                return False
+        words = f.readline().split()
+        # Either a box line or a line with the first atom
+        if len(words) == 6:
+            try:
+                [float(w) for w in words]
+            except ValueError:
+                if XyzFile._check_atom_record(words):
+                    return True
+                return False
+            else:
+                # Next line needs to be an atom record
+                words = f.readline().split()
+        return XyzFile._check_atom_record(words)
 
-    class _AtomList(list):
-        " A list of _Atom objects "
-        def __init__(self):
-            super(XyzFile._AtomList, self).__init__()
-
-        def add(self, name, x, y, z, type, bonded_partners):
-            self.append(XyzFile._Atom(name, x, y, z, type, bonded_partners))
-
-        def append(self, thing):
-            if not isinstance(thing, XyzFile._Atom):
-                raise TypeError('XyzFile._AtomList can only append _Atom\'s')
-            super(XyzFile._AtomList, self).append(thing)
-
-        def extend(self, things):
-            for thing in things: self.append(thing)
-
-    def __init__(self, fname):
-        self.natom = 0
-        # Create the list of atoms
-        self.atom_list = XyzFile._AtomList()
-        f = open(fname, 'r')
-        for line in f:
-            if self.natom == 0:
-                self.natom = int(line.strip())
-                # Set up blank positions and connections arrays
-                self.connections = [[] for i in range(self.natom)]
-                continue
+    def __init__(self, fname, seq=None):
+        super(XyzFile, self).__init__()
+        if isinstance(fname, string_types):
+            fxyz = genopen(fname, 'r')
+            own_handle_xyz = True
+        else:
+            fxyz = fname
+            own_handle_xyz = False
+        if seq is not None:
+            seqstruct = load_file(seq)
+        # Now parse the file
+        try:
+            natom = int(fxyz.readline().split()[0])
+        except (ValueError, IndexError):
+            raise TinkerError('Bad XYZ file format; first line')
+        if seq is not None and natom != len(seqstruct.atoms):
+            raise ValueError('Sequence file %s # of atoms does not match the # '
+                             'of atoms in the XYZ file' % seq)
+        words = fxyz.readline().split()
+        if len(words) == 6 and not XyzFile._check_atom_record(words):
+            self.box = [float(w) for w in words]
+            words = fxyz.readline().split()
+        atom = Atom(atomic_number=AtomicNum[element_by_name(words[1])],
+                    name=words[1], type=words[5])
+        atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
+        residue = Residue('SYS')
+        residue.number = 1
+        residue._idx = 0
+        if seq is not None:
+            residue = seqstruct.residues[0]
+        self.add_atom(atom, residue.name, residue.number, residue.chain,
+                      residue.insertion_code, residue.segid)
+        bond_ids = [[int(w) for w in words[6:]]]
+        for i, line in enumerate(fxyz):
             words = line.split()
-            if len(words) == 6 and all([is_float(x) for x in words]):
-                # The first line after the number of atoms _could_ be the box
-                # information. So capture that here and store the info
-                self.box = [float(x) for x in words]
-                continue
-            self.atom_list.add(words[1], words[2], words[3],
-                               words[4], words[5], words[6:])
-        f.close()
-
+            atom = Atom(atomic_number=AtomicNum[element_by_name(words[1])],
+                        name=words[1], type=words[5])
+            atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
+            if seq is not None:
+                residue = seqstruct.atoms[i+1].residue
+            self.add_atom(atom, residue.name, residue.number, residue.chain,
+                          residue.insertion_code, residue.segid)
+            bond_ids.append([int(w) for w in words[6:]])
+        # All of the bonds are stored now -- go ahead and make them now
+        for atom, bonds in zip(self.atoms, bond_ids):
+            i = atom.idx + 1
+            for idx in bonds:
+                if idx > i:
+                    self.bonds.append(Bond(atom, self.atoms[idx-1]))
+        if own_handle_xyz:
+            fxyz.close()
+      
 class DynFile(object):
     """ Reads and processes a Tinker DYN file """
     def __init__(self, fname=None):

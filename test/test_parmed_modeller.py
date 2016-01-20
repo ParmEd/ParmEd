@@ -665,7 +665,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
             bs2.add(tuple(sorted([b2.atom1.idx, b2.atom2.idx])))
         self.assertEqual(bs1, bs2)
 
-class TestAmberOFFLibrary(unittest.TestCase):
+class TestAmberOFFLibrary(utils.FileIOTestCase):
     """ Tests the AmberOFFLibrary class """
 
     def testFromLibrary(self):
@@ -800,7 +800,7 @@ class TestAmberOFFLibrary(unittest.TestCase):
         for name, res in iteritems(offlib):
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
-            self.assertIs(res.head.name, 'N')
+            self.assertEqual(res.head.name, 'N')
             self.assertIs(res.type, PROTEIN)
 
     def testReadSolvents(self):
@@ -887,6 +887,18 @@ class TestAmberOFFLibrary(unittest.TestCase):
         AmberOFFLibrary.write(offlib, outfile)
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
+
+    def testBadOFFFiles(self):
+        """ Tests error checking in OFF library files """
+        self.assertRaises(ValueError, lambda:
+                AmberOFFLibrary.parse(get_fn('trx.prmtop')))
+        with open(get_fn('test.off', written=True), 'w') as f:
+            with open(get_fn('amino12.lib'), 'r') as ff:
+                for i in range(10):
+                    f.write(ff.readline())
+        self.assertRaises(RuntimeError, lambda:
+                AmberOFFLibrary.parse(get_fn('test.off', written=True))
+        )
 
     @unittest.skipIf(pd is None, "Cannot test without pandas")
     def testDataFrame(self):

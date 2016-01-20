@@ -576,3 +576,74 @@ Residue count:         ALA: 12, ARG: 11, ASN: 14, ASP: 7, CYS: 8, GLN: 3, GLU: 2
 System volume (ang^3): 25998.98
 System density (g/mL): 1.018244
 """
+
+AMOEBA_SMALL_MDIN = """\
+Input file for AMOEBA simulations.
+ &cntrl
+     ! Add whatever variables you need here
+     ntb=1, ntt=1, ntp=0, ! PBC, thermostat, barostat
+     irest=0, ntx=1,      ! restart flags
+ /
+ &amoeba
+     ! Some basic potential parameters. For better
+     ! energy conservation you need to adjust these
+     ! defaults
+     beeman_integrator=1,   ! Use Beeman integrator
+     dipole_scf_tol=0.01,   ! 10e-6 gives good NVE
+
+     ! You should not generally modify these variables:
+     do_valence=1, do_bond=1, do_ureyb=1,
+     do_reg_angle=1, do_trig_angle=1, do_opbend=1,
+     do_torsion=1, do_pi_torsion=1, do_strbend=1,
+     do_torsion_torsion=0,
+ /
+"""
+
+AS4_TITR_OUTPUT = """\
+AS4 	pKa =   4.0
+    ATOM     STATE 0     STATE 1     STATE 2     STATE 3     STATE 4
+       N     -0.4157     -0.4157     -0.4157     -0.4157     -0.4157
+       H      0.2719      0.2719      0.2719      0.2719      0.2719
+      CA      0.0341      0.0341      0.0341      0.0341      0.0341
+      HA      0.0864      0.0864      0.0864      0.0864      0.0864
+      CB     -0.1783     -0.0316     -0.0316     -0.0316     -0.0316
+     HB2     -0.0122      0.0488      0.0488      0.0488      0.0488
+     HB3     -0.0122      0.0488      0.0488      0.0488      0.0488
+      CG      0.7994      0.6462      0.6462      0.6462      0.6462
+     OD1     -0.8014     -0.5554     -0.5554     -0.6376     -0.6376
+     OD2     -0.8014     -0.6376     -0.6376     -0.5554     -0.5554
+    HD21      0.0000      0.4747      0.0000      0.0000      0.0000
+       C      0.5973      0.5973      0.5973      0.5973      0.5973
+       O     -0.5679     -0.5679     -0.5679     -0.5679     -0.5679
+    HD22      0.0000      0.0000      0.4747      0.0000      0.0000
+    HD11      0.0000      0.0000      0.0000      0.4747      0.0000
+    HD12      0.0000      0.0000      0.0000      0.0000      0.4747
+--------------------------------------------------------------------
+Prot Cnt           0           1           1           1           1
+--------------------------------------------------------------------
+Reference Energies (ES = Explicit solvent, IS = Implicit solvent)
+
+igb=1 IS     0.00000    26.92837    26.92837    26.92837    26.92837
+igb=2 IS     0.00000    32.38803    32.38803    32.38803    32.38803
+igb=5 IS     0.00000    32.09662    32.09662    32.09662    32.09662
+igb=7 IS     0.00000    28.91668    28.91668    28.91668    28.91668
+igb=8 IS     0.00000    31.84346    31.84346    31.84346    31.84346
+igb=1 IS     0.00000    26.92837    26.92837    26.92837    26.92837
+igb=2 ES     0.00000    38.75988    38.75988    38.75988    38.75988
+igb=5 ES     0.00000    32.09662    32.09662    32.09662    32.09662
+igb=7 IS     0.00000    28.91668    28.91668    28.91668    28.91668
+igb=8 ES     0.00000    31.84346    31.84346    31.84346    31.84346
+--------------------------------------------------------------------
+Reference Energies for Internal Dielectric of 2.0
+
+igb=1 IS     0.00000     Not Set     Not Set     Not Set     Not Set
+igb=2 IS     0.00000    18.17548    18.17548    18.17548    18.17548
+igb=5 IS     0.00000    18.58349    18.58349    18.58349    18.58349
+igb=7 IS     0.00000     Not Set     Not Set     Not Set     Not Set
+igb=8 IS     0.00000     Not Set     Not Set     Not Set     Not Set
+igb=1 IS     0.00000     Not Set     Not Set     Not Set     Not Set
+igb=2 ES     0.00000    18.17548    18.17548    18.17548    18.17548
+igb=5 ES     0.00000    18.58349    18.58349    18.58349    18.58349
+igb=7 IS     0.00000     Not Set     Not Set     Not Set     Not Set
+igb=8 ES     0.00000     Not Set     Not Set     Not Set     Not Set
+"""

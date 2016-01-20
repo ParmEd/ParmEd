@@ -56,7 +56,7 @@ class TestGenopen(FileIOTestCase):
 
     def testReadNormalURL(self):
         """ Tests genopen reading a remote file """
-        url = 'http://q4md-forcefieldtools.org/REDDB/projects/W-73/tripos1.mol2'
+        url = 'https://github.com/ParmEd/ParmEd/raw/master/test/files/tripos1.mol2'
         with closing(genopen(url, 'r')) as f:
             self.assertEqual(f.read(), open(get_fn('tripos1.mol2')).read())
 

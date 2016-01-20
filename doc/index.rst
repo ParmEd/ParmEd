@@ -151,9 +151,9 @@ A simple example demonstrating the file conversion capabilities is to convert a
 PDBx/mmCIF file into the more commonly supported PDB format::
 
     >>> import parmed as pmd
-    >>> pmd.write_PDB(pmd.download_CIF('4lzt'), '4lzt.pdb')
+    >>> pmd.download_CIF('4lzt').save('4lzt.pdb')
     >>> # Now read in the PDB file we just created
-    ... pmd.read_PDB('4lzt.pdb')
+    ... pmd.load_file('4lzt.pdb')
     <Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized>
 
 Program and API Reference

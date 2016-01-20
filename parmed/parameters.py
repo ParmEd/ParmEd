@@ -10,6 +10,7 @@ from __future__ import print_function, division
 from parmed.exceptions import ParameterError
 from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
                 AtomType, DihedralType)
+from parmed.utils import canonical_improper_order
 from parmed.utils.six.moves import range
 from parmed.utils.six import iteritems
 from collections import OrderedDict
@@ -411,32 +412,8 @@ class ParameterSet(object):
 
     @staticmethod
     def _periodic_improper_key(atom1, atom2, atom3, atom4):
-        """
-        Controls how improper torsion keys are generated from Structures.
-        Different programs have different conventions as far as where the
-        "central" atom is placed. This function should be overridden for each
-        subclass
-
-        The default is to *always* put the central atom first, and assume it
-        comes first already if no central atom is detected. A central atom is
-        defined as one that is bonded to the other 3
-        """
-        all_atoms = set([atom1, atom2, atom3, atom4])
-        for atom in all_atoms:
-            for atom2 in all_atoms:
-                if atom2 is atom: continue
-                if not atom2 in atom.bond_partners:
-                    break
-            else:
-                # We found our central atom
-                others = sorted(all_atoms - set([atom]))
-                key = (atom.type, others[0].type, others[1].type,
-                       others[2].type)
-                break
-        else:
-            # No atom identified as "central". Just assume that the third is
-            key = (atom1.type, atom2.type, atom3.type, atom4.type)
-        return key
+        a1, a2, a3, a4 = canonical_improper_order(atom1, atom2, atom3, atom4)
+        return (a1.type, a2.type, a3.type, a4.type)
 
     @property
     def combining_rule(self):

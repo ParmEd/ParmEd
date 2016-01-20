@@ -33,6 +33,15 @@ class _EmptyStringIterator(object):
     def __getitem__(self, idx):
         return ''
 
+def _typeconv(name):
+    if isinstance(name, integer_types):
+        return name
+    if name.upper() == name:
+        return name.replace('*', 'STR')
+    # Lowercase letters present -- decorate the type name with LTU --
+    # Lower To Upper
+    return ('%sLTU' % name.upper()).replace('*', 'STR')
+
 class CharmmParameterSet(ParameterSet):
     """
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
@@ -171,14 +180,6 @@ class CharmmParameterSet(ParameterSet):
             upper-case
         """
         new_params = cls()
-        def typeconv(name):
-            if isinstance(name, integer_types):
-                return name
-            if name.upper() == name:
-                return name
-            # Lowercase letters present -- decorate the type name with LTU --
-            # Lower To Upper
-            return '%sLTU' % name.upper()
         if copy:
             do_copy = lambda x: _copy(x)
         else:
@@ -187,9 +188,9 @@ class CharmmParameterSet(ParameterSet):
         id_typemap = dict()
         def copy_paramtype(key, typ, dict):
             if isinstance(key, string_types):
-                key = typeconv(key)
+                key = _typeconv(key)
             elif isinstance(key, tuple):
-                key = tuple(typeconv(k) for k in key)
+                key = tuple(_typeconv(k) for k in key)
             # NoUreyBradley should never be copied
             if typ is NoUreyBradley:
                 dict[key] = NoUreyBradley
@@ -201,13 +202,13 @@ class CharmmParameterSet(ParameterSet):
                 dict[key] = newtype
 
         for key, atom_type in iteritems(params.atom_types_tuple):
-            atom_type.name = typeconv(atom_type.name)
+            atom_type.name = _typeconv(atom_type.name)
             copy_paramtype(key, atom_type, new_params.atom_types_tuple)
         for typename, atom_type in iteritems(params.atom_types):
-            atom_type.name = typeconv(atom_type.name)
+            atom_type.name = _typeconv(atom_type.name)
             copy_paramtype(typename, atom_type, new_params.atom_types)
         for idx, atom_type in iteritems(params.atom_types_int):
-            atom_type.name = typeconv(atom_type.name)
+            atom_type.name = _typeconv(atom_type.name)
             copy_paramtype(idx, atom_type, new_params.atom_types_int)
 
         for key, typ in iteritems(params.bond_types):
@@ -224,10 +225,9 @@ class CharmmParameterSet(ParameterSet):
             copy_paramtype(key, typ, new_params.improper_types)
         for key, typ in iteritems(params.cmap_types):
             if len(key) == 8:
+                key = (key[0], key[1], key[2], key[3], key[7])
                 copy_paramtype(key, typ, new_params.cmap_types)
             elif len(key) == 5:
-                key = (key[0], key[1], key[2], key[3],
-                       key[1], key[2], key[3], key[4])
                 copy_paramtype(key, typ, new_params.cmap_types)
         for key, typ in iteritems(params.nbfix_types):
             copy_paramtype(key, typ, new_params.nbfix_types)
@@ -302,7 +302,7 @@ class CharmmParameterSet(ParameterSet):
             inst.read_topology_file(tfile)
         if pfile is not None:
             inst.read_parameter_file(pfile)
-        if isinstance(sfiles, str):
+        if isinstance(sfiles, string_types):
             # The API docstring requests a list, but allow for users to pass a
             # string with a single filename instead
             inst.read_stream_file(sfiles)
@@ -351,6 +351,7 @@ class CharmmParameterSet(ParameterSet):
         current_cmap_res = 0
         nonbonded_types = dict() # Holder
         parameterset = None
+        declared_geometric = False
         for i, line in enumerate(f):
             line = line.strip()
             try:
@@ -370,20 +371,20 @@ class CharmmParameterSet(ParameterSet):
             if line.startswith('BOND'):
                 section = 'BONDS'
                 continue
-            if line.startswith('ANGLE'):
+            if line.startswith('ANGLE') or line.startswith('THETA'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRAL'):
+            if line.startswith('DIHEDRAL') or line.startswith('PHI'):
                 section = 'DIHEDRALS'
                 continue
-            if line.startswith('IMPROPER'):
+            if line.startswith('IMPROPER') or line.startswith('IMPHI'):
                 section = 'IMPROPER'
                 continue
             if line.startswith('CMAP'):
                 section = 'CMAP'
                 continue
             if line.startswith('NONBONDED'):
-                read_first_nonbonded = False
+                read_first_nonbonded = declared_geometric = False
                 section = 'NONBONDED'
                 # Get nonbonded keywords
                 words = line.split()[1:]
@@ -400,8 +401,15 @@ class CharmmParameterSet(ParameterSet):
                         if self._declared_nbrules:
                             # We already specified it -- make sure it's the same
                             # as the one we specified before
-                            if abs(self.dihedral_types[0][0].scee-scee) > TINY:
+                            _, dt0 = next(iteritems(self.dihedral_types))
+                            diff = abs(dt0[0].scee - scee)
+                            if diff > TINY:
                                 raise CharmmError('Inconsistent 1-4 scalings')
+                        else:
+                            scee = 1 / scee
+                            for key, dtl in iteritems(self.dihedral_types):
+                                for dt in dtl:
+                                    dt.scee = scee
                     elif word.upper().startswith('GEOM'):
                         if (self._declared_nbrules and
                                 self.combining_rule != 'geometric'):
@@ -410,6 +418,7 @@ class CharmmParameterSet(ParameterSet):
                                     'different combining rules'
                             )
                         self.combining_rule = 'geometric'
+                        declared_geometric = True
                 continue
             if line.startswith('NBFIX'):
                 section = 'NBFIX'
@@ -442,8 +451,8 @@ class CharmmParameterSet(ParameterSet):
                 # The parameter file might or might not have an element name
                 try:
                     elem = words[4].upper()
-                    if len(elem) == 2:
-                        elem = elem[0] + elem[1].lower()
+                    if len(elem) in (1, 2):
+                        elem = elem.lower(); elem[0] = elem[0].upper()
                     atomic_number = AtomicNum[elem]
                 except (IndexError, KeyError):
                     # Figure it out from the mass
@@ -521,16 +530,6 @@ class CharmmParameterSet(ParameterSet):
                             if dtype != dihedral:
                                 warnings.warn('Replacing dihedral %r with %r' % 
                                               (dtype, dihedral))
-                            self.dihedral_types[key][i] = dihedral
-                            replaced = True
-                            break
-                    if not replaced:
-                        self.dihedral_types[key].append(dihedral)
-                    # Now do the other order
-                    replaced = False
-                    key = (type4, type3, type2, type1)
-                    for i, dtype in enumerate(self.dihedral_types[key]):
-                        if dtype.per == dihedral.per:
                             self.dihedral_types[key][i] = dihedral
                             replaced = True
                             break
@@ -656,9 +655,19 @@ class CharmmParameterSet(ParameterSet):
                                         'different combining rules'
                                 )
                             self.combining_rule = 'geometric'
+                            declared_geometric = True
                     continue
                 else:
-                    # OK, we've read our first nonbonded section for sure now
+                    # OK, we've read our first nonbonded section for sure now.
+                    # Make sure we did not try to read in a str file that did
+                    # not define GEOM if a previous file did, since
+                    # Lorentz-Berthelot and geometric combining rules are
+                    # incompatible
+                    if (self._declared_nbrules and
+                            self.combining_rule == 'geometric' and
+                            not declared_geometric):
+                        raise CharmmError('Cannot combine parameter files with '
+                                          'different combining rules')
                     read_first_nonbonded = True
                     self._declared_nbrules = True
                 # See if we have 1-4 parameters
@@ -990,9 +999,9 @@ class CharmmParameterSet(ParameterSet):
 
     def _write_str_to(self, f):
         """ Private method to write stream items to open file object """
-        f.write('read rtf card @app\n* Topology generated by ParmEd\n*\n')
+        f.write('read rtf card\n* Topology generated by ParmEd\n*\n')
         self._write_top_to(f, True)
-        f.write('\nread para card @app\n* Parameters generated by ParmEd\n*\n')
+        f.write('\nread para card\n* Parameters generated by ParmEd\n*\n')
         self._write_par_to(f)
 
     def _write_top_to(self, f, write_version):
@@ -1012,23 +1021,12 @@ class CharmmParameterSet(ParameterSet):
         # van der Waals scaling factors are
         scee, scnb = set(), set()
         for _, typ in iteritems(self.dihedral_types):
-            if isinstance(typ, DihedralTypeList):
-                for t in typ:
-                    if t.scee: scee.add(t.scee)
-                    if t.scnb: scnb.add(t.scnb)
-            else:
+            for t in typ:
                 if t.scee: scee.add(t.scee)
                 if t.scnb: scnb.add(t.scnb)
-        if len(scee) > 1 or len(scnb) > 1:
-            raise ValueError('Mixed 1-4 scaling not supported in CHARMM')
-        if scee:
-            scee = scee.pop()
-        else:
-            scee = 1.0
-        if scnb:
-            scnb = scnb.pop()
-        else:
-            scnb = 1.0
+        assert len(scee) == len(scnb) == 1, 'Mixed 1-4 scaling not supported'
+        scee = 1.0 if not scee else scee.pop()
+        scnb = 1.0 if not scnb else scnb.pop()
 
         f.write('ATOMS\n')
         self._write_top_to(f, False)
@@ -1051,34 +1049,19 @@ class CharmmParameterSet(ParameterSet):
         for key, typ in iteritems(self.dihedral_types):
             if key in written: continue
             written.add(key); written.add(tuple(reversed(key)))
-            if isinstance(typ, DihedralTypeList):
-                for t in typ:
-                    f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                            (key[0], key[1], key[2], key[3], t.phi_k,
-                             int(t.per), t.phase))
-            else:
+            for t in typ:
                 f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], typ.phi_k,
-                         int(typ.per), typ.phase))
+                        (key[0], key[1], key[2], key[3], t.phi_k,
+                         int(t.per), t.phase))
         f.write('\nIMPROPERS\n')
         written = set()
         for key, typ in iteritems(self.improper_periodic_types):
             sortkey = tuple(sorted(key))
             if sortkey in written: continue
             written.add(sortkey)
-            if isinstance(typ, DihedralTypeList):
-                for t in typ:
-                    if key[2] == 'X':
-                        key = (key[0], key[2], key[3], key[1])
-                    elif key[3] == 'X':
-                        key = (key[0], key[3], key[1], key[2])
-                    f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                            (key[0], key[1], key[2], key[3], t.phi_k,
-                             int(t.per), t.phase))
-            else:
-                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], typ.phi_k,
-                         int(typ.per), typ.phase))
+            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                    (key[0], key[1], key[2], key[3], typ.phi_k,
+                     int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
             if key[2] == 'X':
                 key = (key[0], key[2], key[3], key[1])
@@ -1110,16 +1093,18 @@ class CharmmParameterSet(ParameterSet):
                     i += 1
                     f.write(' %13.6f' % val)
                 f.write('\n\n\n')
-        f.write('NONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance '
+        f.write('\nNONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance '
                 'vfswitch -\ncutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 '
-                'e14fac %s wmin 1.5\n\n' % scee)
+                'e14fac %s wmin 1.5\n\n' % (1/scee))
         for key, typ in iteritems(self.atom_types):
             f.write('%-6s %14.6f %10.6f %14.6f' % (key, 0.0, -abs(typ.epsilon),
                     typ.rmin))
             if typ.epsilon == typ.epsilon_14 and typ.rmin == typ.rmin_14:
-                f.write('%10.6f %14.6f\n' % (-abs(typ.epsilon)/scnb, typ.rmin))
+                f.write('%10.6f %10.6f %14.6f\n' %
+                        (0, -abs(typ.epsilon)/scnb, typ.rmin))
             else:
-                f.write('%10.6f %14.6f\n' % (-abs(typ.epsilon_14), typ.rmin_14))
+                f.write('%10.6f %10.6f %14.6f\n' %
+                        (0, -abs(typ.epsilon_14), typ.rmin_14))
         f.write('\nEND\n')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

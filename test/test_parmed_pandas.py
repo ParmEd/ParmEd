@@ -100,7 +100,7 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertFalse(key.startswith('multipole'))
         self.assertNotIn('polarizability', df)
         self.assertNotIn('vdw_parent', df)
-        self.assertNotIn('segid', df)
+        self.assertIn('segid', df)
 
     def testStructureViewPandas(self):
         """ Tests creating a pandas DataFrame from a StructureView """
@@ -140,7 +140,7 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertFalse(key.startswith('multipole'))
         self.assertNotIn('polarizability', df)
         self.assertNotIn('vdw_parent', df)
-        self.assertNotIn('segid', df)
+        self.assertIn('segid', df)
 
     def testAmberParmPandas(self):
         """ Tests creating a pandas DataFrame from an AmberParm """
@@ -180,7 +180,7 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertFalse(key.startswith('multipole'))
         self.assertNotIn('polarizability', df)
         self.assertNotIn('vdw_parent', df)
-        self.assertNotIn('segid', df)
+        self.assertIn('segid', df)
 
     def testAmoebaParmPandas(self):
         """ Tests creating a pandas DataFrame from an AmoebaParm """
@@ -223,7 +223,7 @@ class TestStructureDataFrame(unittest.TestCase):
         self.assertNotIn('vx', df)
         self.assertNotIn('vy', df)
         self.assertNotIn('vz', df)
-        self.assertNotIn('segid', df)
+        self.assertIn('segid', df)
 
     def testCharmmPSFPandas(self):
         """ Tests creating a pandas DataFrame from a CharmmPsfFile """
@@ -249,7 +249,7 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertEqual(r1.chain, parm.atoms[i].residue.chain)
             self.assertEqual(r1.join, parm.atoms[i].join)
             self.assertEqual(r1.nb_idx, parm.atoms[i].nb_idx)
-            self.assertEqual(r1.segid, parm.atoms[i].segid)
+            self.assertEqual(r1.segid, parm.atoms[i].residue.segid)
 
         self.assertNotIn('xx', df)
         self.assertNotIn('xy', df)

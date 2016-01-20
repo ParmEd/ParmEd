@@ -6,6 +6,7 @@ from parmed.charmm import CharmmPsfFile
 # TODO -- move this functionality to a more centralized location
 from parmed.charmm.psf import set_molecules
 from parmed.formats.registry import FileFormatType
+from parmed.utils import canonical_improper_order
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
 from parmed.utils.six.moves import range
@@ -89,8 +90,8 @@ class PSFFile(object):
         except AttributeError:
             ext = True
         own_handle = False
-        # Index the atoms and residues
-        if not hasattr(dest, 'write'):
+        # Index the atoms and residues TODO delete
+        if isinstance(dest, string_types):
             own_handle = True
             dest = genopen(dest, 'w')
 
@@ -121,6 +122,7 @@ class PSFFile(object):
         dest.write(intfmt % len(struct.atoms) + ' !NATOM\n')
         # atmfmt1 is for CHARMM format (i.e., atom types are integers)
         # atmfmt is for XPLOR format (i.e., atom types are strings)
+        add = 0 if struct.residues[0].number > 0 else 1-struct.residues[0].number
         for i, atom in enumerate(struct.atoms):
             typ = atom.type
             if isinstance(atom.type, str):
@@ -128,11 +130,8 @@ class PSFFile(object):
                 if not atom.type: typ = atom.name
             else:
                 fmt = atmfmt1
-            if hasattr(atom, 'segid'):
-                segid = atom.segid
-            else:
-                segid = 'SYS'
-            atmstr = fmt % (i+1, segid, atom.residue.number,
+            segid = atom.residue.segid or 'SYS'
+            atmstr = fmt % (i+1, segid, atom.residue.number+add,
                             atom.residue.name, atom.name, typ,
                             atom.charge, atom.mass)
             if hasattr(atom, 'props'):
@@ -163,17 +162,32 @@ class PSFFile(object):
             dest.write('\n')
         dest.write('\n')
         # Dihedrals
-        # impropers need to be split off in the "improper" section. Find those
+        # impropers need to be split off in the "improper" section.
+        # PSF files need to have each dihedral listed *only* once. So count the
+        # number of unique dihedrals
+        nnormal = 0
+        torsions = set()
+        for dih in struct.dihedrals:
+            if dih.improper: continue
+            a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+            if (a1, a2, a3, a4) in torsions or (a4, a3, a2, a1) in torsions:
+                continue
+            nnormal += 1
+            torsions.add((a1, a2, a3, a4))
         nimprop = sum(1 for dih in struct.dihedrals if dih.improper)
-        nnormal = len(struct.dihedrals) - nimprop
         dest.write(intfmt % nnormal + ' !NPHI: dihedrals\n')
-        for i, dih in enumerate(dih for dih in struct.dihedrals
-                                    if not dih.improper):
-            dest.write((intfmt*4) % (dih.atom1.idx+1, dih.atom2.idx+1,
-                                     dih.atom3.idx+1, dih.atom4.idx+1)
-            )
-            if i % 2 == 1: # Write 2 dihedrals per line
+        torsions = set()
+        c = 0
+        for dih in struct.dihedrals:
+            if dih.improper: continue
+            a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+            if (a1, a2, a3, a4) in torsions or (a4, a3, a2, a1) in torsions:
+                continue
+            dest.write((intfmt*4) % (a1.idx+1, a2.idx+1, a3.idx+1, a4.idx+1))
+            torsions.add((a1, a2, a3, a4))
+            if c % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
+            c += 1
         # See if we need to terminate
         if nnormal % 2 != 0 or nnormal == 0:
             dest.write('\n')
@@ -183,14 +197,16 @@ class PSFFile(object):
         dest.write(intfmt % (nimprop) + ' !NIMPHI: impropers\n')
         def improp_gen(struct):
             for imp in struct.impropers:
-                yield imp
+                yield (imp.atom1, imp.atom2, imp.atom3, imp.atom4)
             for dih in struct.dihedrals:
                 if dih.improper:
-                    yield dih
-        for i, imp in enumerate(improp_gen(struct)):
-            dest.write((intfmt*4) % (imp.atom1.idx+1, imp.atom2.idx+1,
-                                     imp.atom3.idx+1, imp.atom4.idx+1)
-            )
+                    # Central atom first
+                    yield canonical_improper_order(
+                            dih.atom3, dih.atom1, dih.atom2,
+                            dih.atom4, center=1,
+                    )
+        for i, (a1, a2, a3, a4) in enumerate(improp_gen(struct)):
+            dest.write((intfmt*4) % (a1.idx+1, a2.idx+1, a3.idx+1, a4.idx+1))
             if i % 2 == 1: # Write 2 dihedrals per line
                 dest.write('\n')
         # See if we need to terminate
@@ -232,7 +248,7 @@ class PSFFile(object):
         dest.write(' !NGRP NST2\n')
         if struct.groups:
             for i, gp in enumerate(struct.groups):
-                dest.write((intfmt*3) % (gp.bs, gp.type, gp.move))
+                dest.write((intfmt*3) % (gp.atom.idx, gp.type, gp.move))
                 if i % 3 == 2: dest.write('\n')
             if len(struct.groups) % 3 != 0 or len(struct.groups) == 0:
                 dest.write('\n')

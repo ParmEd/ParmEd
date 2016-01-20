@@ -7,10 +7,6 @@ from __future__ import division, print_function, absolute_import
 from contextlib import closing
 import io
 import ftplib
-try:
-    import gzip
-except ImportError:
-    gzip = None
 import numpy as np
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
@@ -27,7 +23,7 @@ import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def _compare_atoms(old_atom, new_atom, resname, resid, chain):
+def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
     """
     Compares two atom instances, along with the residue name, number, and chain
     identifier, to determine if two atoms are actually the *same* atom, but
@@ -45,6 +41,8 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
         The number of the residue that the new atom would belong to
     chain : ``str``
         The chain identifier that the new atom would belong to
+    segid : ``str``
+        The segment identifier for the molecule
 
     Returns
     -------
@@ -54,6 +52,7 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain):
     if old_atom.residue.name != resname: return False
     if old_atom.residue.number != resid: return False
     if old_atom.residue.chain != chain.strip(): return False
+    if old_atom.residue.segid != segid.strip(): return False
     return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -109,7 +108,6 @@ class PDBFile(object):
                 elif line[:5] in ('ORIGX', 'SCALE', 'MTRIX'):
                     if line[5] not in '123':
                         return False
-                    continue
                 elif line[:6] in ('ATOM  ', 'HETATM'):
                     atnum, atname = line[6:11], line[12:16]
                     resname, resid = line[17:21], line[22:26]
@@ -119,10 +117,10 @@ class PDBFile(object):
                     # Check for various attributes. This is the first atom, so
                     # we can assume we haven't gotten into the regime of "weird"
                     # yet, like hexadecimal atom/residue indices.
-                    if not atnum.strip().isdigit(): return False
+                    if not atnum.strip().lstrip('-').isdigit(): return False
                     if atname.strip().isdigit(): return False
                     if not resname.strip(): return False
-                    if not resid.strip().isdigit(): return False
+                    if not resid.strip().lstrip('-').isdigit(): return False
                     try:
                         float(x), float(y), float(z)
                     except ValueError:
@@ -138,13 +136,12 @@ class PDBFile(object):
                         except ValueError:
                             return False
                     if elem.strip():
-                        if len(elem) > 2:
-                            return False
                         if any(x.isdigit() for x in elem):
                             return False
                     return True
-                return False
-            return True
+                else:
+                    return False
+            return False
 
     #===================================================
 
@@ -185,10 +182,9 @@ class PDBFile(object):
 
         TypeError if pdb_id is not a 4-character string
         """
-        if gzip is None:
-            raise ImportError('Cannot import gzip module')
+        import gzip
         if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
-            raise TypeError('pdb_id must be the 4-letter PDB code')
+            raise ValueError('pdb_id must be the 4-letter PDB code')
 
         pdb_id = pdb_id.lower()
         ftp = ftplib.FTP('ftp.wwpdb.org', timeout=timeout)
@@ -379,8 +375,7 @@ class PDBFile(object):
                                 atom_overflow = True
                                 atnum = last_atom_added.number + 1
                             else:
-                                raise ValueError('Could not convert %s to int' %
-                                                 atnum)
+                                raise
                     elif atom_overflow:
                         atnum = last_atom_added.number + 1
                     else:
@@ -396,13 +391,18 @@ class PDBFile(object):
                     # It's possible that the residue number has cycled so much
                     # that it is now filled with ****'s. In that case, start a
                     # new residue if the current residue repeats the same atom
-                    # name as # the 'last' residue. Do not worry about atom
-                    # numbers going to *****'s, since that is >1M atoms.
+                    # name as # the 'last' residue.
                     if resid is None:
-                        for atom in struct.residues[-1]:
-                            if atom.name == atname:
-                                resid = last_resid + 1
-                                break
+                        # If the last residue is number 0xffff, then this is the
+                        # first residue that has overridden, so make it a new
+                        # residue
+                        if struct.residues[-1].number == 0xffff:
+                            resid = struct.residues[-1].number + 1
+                        else:
+                            for atom in struct.residues[-1]:
+                                if atom.name == atname:
+                                    resid = last_resid + 1
+                                    break
                     if resid is None:
                         # Still part of the last residue
                         resid = last_resid
@@ -421,24 +421,21 @@ class PDBFile(object):
                                 charge=chg, mass=mass, occupancy=occupancy,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
-                    if segid: atom.segid = segid
-                    if (_compare_atoms(last_atom, atom, resname, resid, chain)
-                            and altloc):
+                    if (_compare_atoms(last_atom, atom, resname,
+                                       resid, chain, segid) and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
                         last_atom_added = atom
                         continue
                     last_atom = last_atom_added = atom
                     if modelno == 1:
-                        struct.add_atom(atom, resname, resid, chain, inscode)
+                        struct.add_atom(atom, resname, resid, chain,
+                                        inscode, segid)
                     else:
                         try:
                             orig_atom = struct.atoms[atomno-1]
                         except IndexError:
-                            raise PDBError('Atom %d differs in MODEL %d [%s %s '
-                                           'vs. %s %s]' % (atomno, modelno,
-                                           atom.residue.name, atom.name,
-                                           resname, atname))
+                            raise PDBError('Extra atom in MODEL %d' % modelno)
                         if (orig_atom.residue.name != resname.strip()
                                 or orig_atom.name != atname.strip()):
                             raise PDBError('Atom %d differs in MODEL %d [%s %s '
@@ -497,7 +494,7 @@ class PDBFile(object):
                         raise PDBError('MODEL ended before any atoms read in')
                     modelno += 1
                     if len(struct.atoms)*3 != len(coordinates):
-                        raise ValueError(
+                        raise PDBError(
                                 'Inconsistent atom numbers in some PDB models')
                     all_coordinates.append(coordinates)
                     atomno = 0
@@ -508,8 +505,8 @@ class PDBFile(object):
                     if modelno == 1 and len(struct.atoms) == 0: continue
                     if len(coordinates) > 0:
                         if len(struct.atoms)*3 != len(coordinates):
-                            raise ValueError('Inconsistent atom numbers in '
-                                             'some PDB models')
+                            raise PDBError('Inconsistent atom numbers in '
+                                           'some PDB models')
                         warnings.warn('MODEL not explicitly ended', PDBWarning)
                         all_coordinates.append(coordinates)
                         coordinates = []
@@ -592,7 +589,7 @@ class PDBFile(object):
         struct.unchange()
         if coordinates:
             if len(coordinates) != 3*len(struct.atoms):
-                raise ValueError('bad number of atoms in some PDB models')
+                raise PDBError('bad number of atoms in some PDB models')
             all_coordinates.append(coordinates)
         struct._coordinates = np.array(all_coordinates).reshape(
                         (-1, len(struct.atoms), 3))
@@ -614,21 +611,21 @@ class PDBFile(object):
             method to which to write the PDB file. If it is a filename that
             ends with .gz or .bz2, a compressed version will be written using
             either gzip or bzip2, respectively.
-        renumber : bool, optional
+        renumber : bool, optional, default True
             If True, renumber the atoms and residues sequentially as they are
             stored in the structure.  If False, use the original numbering if
-            it was assigned previously. Default is True
+            it was assigned previously.
         coordinates : array-like of float, optional
             If provided, these coordinates will be written to the PDB file
             instead of the coordinates stored in the structure. These
             coordinates should line up with the atom order in the structure
             (not necessarily the order of the "original" PDB file if they
             differ)
-        altlocs : str, optional
+        altlocs : str, optional, default 'all'
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
 
-                - 'all' : (default) print all alternate locations
+                - 'all' : print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
@@ -637,16 +634,16 @@ class PDBFile(object):
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
-        write_anisou : bool, optional
+        write_anisou : bool, optional, default False
             If True, an ANISOU record is written for every atom that has one. If
-            False, ANISOU records are not written. Default is False
-        charmm : bool, optional
+            False, ANISOU records are not written.
+        charmm : bool, optional, default False
             If True, SEGID will be written in columns 73 to 76 of the PDB file
             in the typical CHARMM-style PDB output. This will be omitted for any
-            atom that does not contain a SEGID identifier. Default is False
-        standard_resnames : bool, optional
+            atom that does not contain a SEGID identifier.
+        standard_resnames : bool, optional, default False
             If True, common aliases for various amino and nucleic acid residues
-            will be converted into the PDB-standard values. Default is False
+            will be converted into the PDB-standard values.
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -680,7 +677,7 @@ class PDBFile(object):
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
                     struct.box[4], struct.box[5], struct.space_group, ''))
         if coordinates is not None:
-            coords = np.asarray(coordinates, copy=False, subok=True)
+            coords = np.array(coordinates, copy=False, subok=True)
             try:
                 coords = coords.reshape((-1, len(struct.atoms), 3))
             except ValueError:
@@ -705,7 +702,7 @@ class PDBFile(object):
                         a = item
                 return a, dict(), [a.xx, a.xy, a.xz]
         else:
-            raise Exception("Should not be here!")
+            assert False, 'Should not be here'
         if standard_resnames:
             standardize = lambda x: _standardize_resname(x)[:reslen]
         else:
@@ -721,6 +718,10 @@ class PDBFile(object):
                     atoms = res.atoms
                 else:
                     atoms = sorted(res.atoms, key=lambda atom: atom.number)
+                if charmm:
+                    segid = (res.segid or res.chain)[:4]
+                else:
+                    segid = ''
                 for atom in atoms:
                     pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
@@ -739,10 +740,6 @@ class PDBFile(object):
                         aname = ' %-3s' % pa.name
                     else:
                         aname = pa.name[:4]
-                    if charmm and hasattr(pa, 'segid'):
-                        segid = pa.segid[:4]
-                    else:
-                        segid = ''
                     dest.write(atomrec % (anum , aname, pa.altloc,
                                standardize(res.name), res.chain[:1], rnum,
                                res.insertion_code[:1], x, y, z, pa.occupancy,
@@ -770,10 +767,6 @@ class PDBFile(object):
                             aname = ' %-3s' % oatom.name
                         else:
                             aname = oatom.name[:4]
-                        if charmm and hasattr(oatom, 'segid'):
-                            segid = oatom.segid[:4]
-                        else:
-                            segid = ''
                         dest.write(atomrec % (anum, aname, key,
                                    standardize(res.name), res.chain[:1], rnum,
                                    res.insertion_code[:1], x, y, z,
@@ -872,10 +865,9 @@ class CIFFile(object):
 
         TypeError if pdb_id is not a 4-character string
         """
-        if gzip is None:
-            raise ImportError('Cannot import gzip module')
+        import gzip
         if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
-            raise TypeError('pdb_id must be the 4-letter PDB code')
+            raise ValueError('pdb_id must be the 4-letter PDB code')
 
         pdb_id = pdb_id.lower()
         ftp = ftplib.FTP('ftp.wwpdb.org', timeout=timeout)
@@ -1071,7 +1063,6 @@ class CIFFile(object):
             zid = atoms.getAttributeIndex('Cartn_z')
             occupid = atoms.getAttributeIndex('occupancy')
             bfactorid = atoms.getAttributeIndex('B_iso_or_equiv')
-            chargeid = atoms.getAttributeIndex('pdbx_formal_charge')
             modelid = atoms.getAttributeIndex('pdbx_PDB_model_num')
             origmodel = None
             lastmodel = None
@@ -1091,29 +1082,12 @@ class CIFFile(object):
                 resnum = int(row[resnumid])
                 inscode = row[inscodeid]
                 if inscode in '?.': inscode = ''
-                try:
-                    model = int(row[modelid])
-                except ValueError:
-                    model = 0
+                model = int(row[modelid])
                 if origmodel is None:
                     origmodel = lastmodel = model
                 x, y, z = float(row[xid]), float(row[yid]), float(row[zid])
-                try:
-                    occup = float(row[occupid])
-                except ValueError:
-                    occup = 0.0
-                try:
-                    bfactor = float(row[bfactorid])
-                except ValueError:
-                    bfactor = 0.0
-                charge = row[chargeid]
-                if not charge.strip() or charge.strip() in ('.', '?'):
-                    charge = 0
-                else:
-                    try:
-                        charge = float(charge)
-                    except TypeError:
-                        charge = 0.0
+                occup = float(row[occupid])
+                bfactor = float(row[bfactorid])
                 # Try to figure out the element
                 elem = '%-2s' % elem # Make sure we have at least 2 characters
                 if elem[0] == ' ': elem = elem[1] + ' '
@@ -1130,7 +1104,7 @@ class CIFFile(object):
                     except KeyError:
                         try:
                             sym = atname.strip()[:2]
-                            sym = '%s%s' % (sym[0].upper(), sym[0].lower())
+                            sym = '%s%s' % (sym[0].upper(), sym[1].lower())
                             atomic_number = AtomicNum[sym]
                             mass = Mass[sym]
                         except KeyError:
@@ -1138,14 +1112,15 @@ class CIFFile(object):
                             mass = 0.0
                 if atname.startswith('EP') or atname.startswith('LP'):
                     atom = ExtraPoint(atomic_number=atomic_number, name=atname,
-                                charge=charge, mass=mass, occupancy=occup,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
+                                mass=mass, occupancy=occup, bfactor=bfactor,
+                                altloc=altloc, number=atnum)
                 else:
                     atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=charge, mass=mass, occupancy=occup,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
+                                mass=mass, occupancy=occup, bfactor=bfactor,
+                                altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
-                if (_compare_atoms(last_atom, atom, resname, resnum, chain)
+                if (_compare_atoms(last_atom, atom, resname, resnum,
+                                   chain, '')
                         and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
@@ -1205,7 +1180,7 @@ class CIFFile(object):
                 if -1 in (atnumid, atnameid, altlocid, resnameid, chainid,
                           resnumid, u11id, u22id, u33id, u12id, u13id, u23id):
                     warnings.warn('Incomplete anisotropic B-factor CIF '
-                                  'section. Skipping')
+                                  'section. Skipping', PDBWarning)
                 else:
                     try:
                         for i in range(anisou.getRowCount()):
@@ -1235,7 +1210,7 @@ class CIFFile(object):
                         for key, atom in iteritems(atommap):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
-                                      'B-factors. Skipping')
+                                      'B-factors. Skipping', PDBWarning)
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
@@ -1324,7 +1299,7 @@ class CIFFile(object):
             cell.append(struct.box[:])
             cont.append(cell)
         if coordinates is not None:
-            coords = np.asarray(coordinates, copy=False, subok=True)
+            coords = np.array(coordinates, copy=False, subok=True)
             try:
                 coords = coords.reshape((-1, len(struct.atoms), 3))
             except ValueError:

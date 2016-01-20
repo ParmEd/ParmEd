@@ -210,9 +210,9 @@ class TitratableResidue(object):
 
     def add_states(self, protcnts, charges, refenes):
         """ Add multiple titratable states for this titratable residue """
-        if len(protcnts) != len(charges) and len(protcnts) != len(refenes):
+        if len(protcnts) != len(charges) or len(protcnts) != len(refenes):
             raise AmberError('Inconsistent list of parameters for '
-                                   'TitratableResidue.add_states')
+                             'TitratableResidue.add_states')
         for i in range(len(protcnts)):
             self.add_state(protcnts[i], charges[i], refenes[i])
 
@@ -220,7 +220,7 @@ class TitratableResidue(object):
         """ Sets and returns the cpin info """
         if self.first_state == -1 or self.first_charge == -1:
             raise AmberError('Must set residue pointers before writing '
-                                    'cpin info!')
+                             'cpin info!')
         return {'FIRST_ATOM' : first_atom,
                 'FIRST_CHARGE' : self.first_charge,
                 'FIRST_STATE' : self.first_state,
@@ -231,14 +231,16 @@ class TitratableResidue(object):
         """ Sets the first state index """
         # Has the first state already been set?
         if self.first_state != -1:
-            return
+            if index != self.first_state:
+                raise AmberError('First state already set differently')
         self.first_state = index
 
     def set_first_charge(self, index):
         """ Sets the first charge index """
         # Has it already been set?
         if self.first_charge != -1:
-            return
+            if index != self.first_charge:
+                raise AmberError('First charge already set differently')
         self.first_charge = index
 
     def reset(self):
@@ -266,21 +268,6 @@ class TitratableResidue(object):
         if notset != len(self.states) - 1:
             warnings.warn('Not enough states are pKa-adjusted in %s' %
                           self.resname)
-
-    def __lt__(self, other):
-        return self.first_atom < other.first_atom
-
-    def __gt__(self, other):
-        return self.first_atom > other.first_atom
-
-    def __eq__(self, other):
-        return self.first_atom == other.first_atom
-
-    def __ge__(self, other):
-        return self.first_atom >= other.first_atom
-
-    def __le__(self, other):
-        return self.first_atom <= other.first_atom
 
 class TitratableResidueList(list):
     """ List of all titratable residues """
@@ -400,13 +387,13 @@ class TitratableResidueList(list):
         # Print the residue pointers
         buf.add_word(' ') # get a leading space
         for i, p in enumerate(pointers):
-            buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i,p['FIRST_ATOM']))
-            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, "
-                    % (i,p['FIRST_CHARGE']))
+            buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i, p['FIRST_ATOM']))
+            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, " %
+                         (i, p['FIRST_CHARGE']))
             buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " %
-                    (i,p['FIRST_STATE']))
-            buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i,p['NUM_ATOMS']))
-            buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i,p['NUM_STATES']))
+                         (i, p['FIRST_STATE']))
+            buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i, p['NUM_ATOMS']))
+            buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i, p['NUM_STATES']))
         buf.flush()
         # Print the reference energies
         buf.add_word(' STATENE=')
@@ -414,7 +401,7 @@ class TitratableResidueList(list):
             if energy is None:
                 raise AmberError("%d'th reference energy not known for "
                                  "igb = %d" % (i, igb))
-            buf.add_word('%s,' % energy)
+            buf.add_word('%.6f,' % energy)
         buf.flush()
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))

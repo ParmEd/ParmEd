@@ -14,7 +14,7 @@ from parmed.structure import Structure
 from parmed.formats.registry import load_file
 import parmed.gromacs as gromacs
 from parmed.amber import (AmberMask, AmberParm, ChamberParm, AmoebaParm,
-        HAS_NETCDF, NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
+        NetCDFTraj, NetCDFRestart, AmberMdcrd, AmberAsciiRestart)
 from parmed.amber._chamberparm import ConvertFromPSF
 from parmed.charmm import CharmmPsfFile, CharmmParameterSet
 from parmed.exceptions import ParmedError
@@ -210,8 +210,6 @@ class Action(lawsuit):
             except AttributeError:
                 usage = cmdname
             Action.stderr.write("Bad command %s:\n\t%s\n" % (cmdname, usage))
-            self.__str__ = Action.__str__
-            self.execute = Action.execute
             return
 
         # Check any unmarked commands
@@ -425,12 +423,8 @@ class writeCoordinates(Action):
         if self.filetype is None:
             if filename.endswith('.nc'):
                 self.filetype = 'NCTRAJ'
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
-            elif filename.endswith('.ncrst') and HAS_NETCDF:
+            elif filename.endswith('.ncrst'):
                 self.filetype = 'NCRESTART'
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
             elif filename.endswith('.pdb'):
                 self.filetype = 'PDB'
             elif filename.endswith('.cif'):
@@ -446,13 +440,9 @@ class writeCoordinates(Action):
                 self.filetype = 'RESTART'
         else:
             if self.filetype == 'netcdftraj':
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
                 self.filetype = 'NCTRAJ'
             elif self.filetype == 'netcdf':
                 self.filetype = 'NCRESTART'
-                if not HAS_NETCDF:
-                    raise InputError('NetCDF writing packages not present')
             elif self.filetype == 'pdb':
                 self.filetype = 'PDB'
             elif self.filetype == 'cif':
@@ -501,8 +491,8 @@ class writeCoordinates(Action):
             PDBFile.write(self.parm, self.filename, renumber=True)
         elif self.filetype == 'CIF':
             CIFFile.write(self.parm, self.filename, renumber=True)
-        elif self.filetype == 'Mol2':
-            Mol2File(self.parm, self.filename)
+        elif self.filetype == 'MOL2':
+            Mol2File.write(self.parm, self.filename)
         elif self.filetype == 'MDCRD':
             traj = AmberMdcrd(self.filename, natom=len(self.parm.atoms),
                               hasbox=self.parm.box is not None, mode='w')
@@ -1228,8 +1218,6 @@ class setMolecules(Action):
         solute_ions = arg_list.get_key_string('solute_ions', None)
         if solute_ions is None:
             self.solute_ions = arg_list.get_next_string(optional=True)
-        if solute_ions is None:
-            self.solute_ions = True
         elif solute_ions.lower() == 'true':
             self.solute_ions = True
         elif solute_ions.lower() == 'false':
@@ -1411,19 +1399,27 @@ class netCharge(Action):
 class strip(Action):
     """
     Deletes the atoms specified by <mask> from the topology file and rebuilds
-    the topology file according to the parameters that remain.
+    the topology file according to the parameters that remain. If nobox is
+    provided, the unit cell information is discarded (useful when stripping
+    solvent to run an aperiodic implicit solvent calculation).
     """
-    usage = '<mask>'
+    usage = '<mask> [nobox]'
     def init(self, arg_list):
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
-        self.num_atms = sum(self.mask.Selection())
+        self.nobox = arg_list.has_key('nobox')
+        self.num_atoms = sum(self.mask.Selection())
 
     def __str__(self):
-        return "Removing mask '%s' (%d atoms) from the topology file." % (
-                                    self.mask, self.num_atms)
+        retstr = ["Removing mask '%s' (%d atoms) from the topology file." %
+                    (self.mask, self.num_atoms)]
+        if self.nobox:
+            retstr.append('Deleting box info.')
+        return ' '.join(retstr)
 
     def execute(self):
         self.parm.strip(self.mask)
+        if self.nobox:
+            self.parm.box = None
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2881,6 +2877,7 @@ class interpolate(Action):
         parm1.load_atom_info()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 def _split_range(chunksize, start, stop):
     '''split a given range to n_chunks. taken from pytraj.
 
@@ -2929,7 +2926,7 @@ class summary(Action):
         for res in self.parm.residues:
             if RNAResidue.has(res.name) or DNAResidue.has(res.name):
                 nnuc += 1
-            elif AminoAcidResidue.has(res.name):
+            elif res.name in AminoAcidResidue._all_residues_by_abbr:
                 namin += 1
             elif res.name in SOLVENT_NAMES:
                 nwat += 1
@@ -2943,38 +2940,42 @@ class summary(Action):
         tmass = sum(atom.mass for atom in self.parm.atoms)
         tchg = sum(atom.charge for atom in self.parm.atoms)
 
-        retval = ('Amino Acid Residues:   %d\n'
-                  'Nucleic Acid Residues: %d\n'
-                  'Number of cations:     %d\n'
-                  'Number of anions:      %d\n'
-                  'Num. of solvent mols:  %d\n' 
-                  'Num. of unknown res:   %d\n'
-                  'Total charge (e-):     %.4f\n'
-                  'Total mass (amu):      %.4f\n'
-                  'Number of atoms:       %d\n'
-                  'Number of residues:    %d\n' %
-                  (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
-                   len(self.parm.atoms), len(self.parm.residues))
+        retval = [('Amino Acid Residues:   %d\n'
+                   'Nucleic Acid Residues: %d\n'
+                   'Number of cations:     %d\n'
+                   'Number of anions:      %d\n'
+                   'Num. of solvent mols:  %d\n'
+                   'Num. of unknown res:   %d\n'
+                   'Total charge (e-):     %.4f\n'
+                   'Total mass (amu):      %.4f\n'
+                   'Number of atoms:       %d\n'
+                   'Number of residues:    %d' %
+                   (namin, nnuc, ncion, naion, nwat, nunk, tchg, tmass,
+                    len(self.parm.atoms), len(self.parm.residues))
+        )]
+
+        rset = ", ".join(sorted(set(res.name for res in self.parm.residues)))
+        retval.append(
+                _reformat_long_sentence(rset, 'Residue set:           ',
+                                        offset=None, n_words=7)
         )
-
-        _rset = ", ".join(sorted(set(res.name for res in self.parm.residues))) +  '\n'
-        _rcount = str(Counter(res.name for res in self.parm.residues))
-        _rcount = _rcount.replace('Counter({', ' ').replace('})', '').replace("'", "")
-        _rcount = ','.join((sorted(_rcount.split(',')))) + '\n'
-
-        residue_set = _reformat_long_sentence(_rset, 'Residue set:           ',
-                                              offset=None, n_words=7)
-        residue_count = _reformat_long_sentence(_rcount, 'Residue count:         ',
-                                                offset=-1, n_words=7)
-        retval += residue_set + residue_count
-
+        rcount = ','.join('%s: %d' % (x, y)
+                           for x, y in iteritems(
+                               Counter(res.name for res in self.parm.residues)
+                           )
+        )
+        retval.append(
+                _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
+                                        'Residue count:         ',
+                                        offset=None, n_words=7)
+        )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
             v = a * b * c
             # Get the total volume (and density) of orthorhombic box
-            retval += ('System volume (ang^3): %.2f\n' 
-                       'System density (g/mL): %f\n' %
-                       (v, tmass / (v * 0.602204))
+            retval.append('System volume (ang^3): %.2f\n'
+                          'System density (g/mL): %f' %
+                          (v, tmass / (v * 0.602204))
             )
         elif self.parm.box is not None:
             # General triclinic cell
@@ -2985,11 +2986,11 @@ class summary(Action):
             cosg = math.cos(gamma * math.pi / 180)
             v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg +
                                       2 * cosa*cosb*cosg)
-            retval += ('System volume (ang^3): %.2f\n' 
-                       'System density (g/mL): %f\n' %
-                       (v, tmass / (v * 0.602204))
+            retval.append('System volume (ang^3): %.2f\n'
+                          'System density (g/mL): %f' %
+                          (v, tmass / (v * 0.602204))
             )
-        return retval
+        return '%s\n' % '\n'.join(retval)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3260,14 +3261,13 @@ class add12_6_4(Action):
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
 
     def init(self, arg_list):
-        import os
         self.mask = AmberMask(self.parm,
                         arg_list.get_next_mask(optional=True, default=':ZN'))
         self.c4file = arg_list.get_key_string('c4file', None)
         self.watermodel = arg_list.get_key_string('watermodel', None)
         self.polfile = arg_list.get_key_string('polfile',
-                            os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
-                            'parm', 'lj_1264_pol.dat'))
+                            os.path.join(os.getenv('AMBERHOME') or '', 'dat',
+                            'leap', 'parm', 'lj_1264_pol.dat'))
         self.tunfactor = arg_list.get_key_float('tunfactor', 1.0)
 
         if self.c4file is None:
@@ -3539,17 +3539,19 @@ class deleteBond(Action):
         self.verbose = arg_list.has_key('verbose')
         # Go through each atom in mask1 and see if it forms a bond with any atom
         # in mask2.
-        self.del_bonds = set()
-        self.del_angles = set()
-        self.del_dihedrals = set()
-        self.del_urey_bradleys = set()
-        self.del_impropers = set()
-        self.del_cmaps = set()
-        self.del_trigonal_angles = set()
-        self.del_oopbends = set()
-        self.del_pi_torsions = set()
-        self.del_strbnds = set()
-        self.del_tortors = set()
+        bonds_to_delete = set()
+        self.del_bonds = []
+        self.del_angles = []
+        self.del_dihedrals = []
+        self.del_rbtorsions = []
+        self.del_urey_bradleys = []
+        self.del_impropers = []
+        self.del_cmaps = []
+        self.del_trigonal_angles = []
+        self.del_oopbends = []
+        self.del_pi_torsions = []
+        self.del_strbnds = []
+        self.del_tortors = []
         for i in self.mask1.Selected():
             ai = self.parm.atoms[i]
             for j in self.mask2.Selected():
@@ -3558,42 +3560,48 @@ class deleteBond(Action):
                 if ai is aj: continue
                 for bond in ai.bonds:
                     if aj not in bond: continue
-                    self.del_bonds.add(bond)
+                    bonds_to_delete.add(bond)
         # Find other valence terms we need to delete
-        for bond in self.del_bonds:
-            for angle in self.parm.angles:
+        for i, bond in enumerate(self.parm.bonds):
+            if bond in bonds_to_delete:
+                self.del_bonds.append(i)
+        for bond in bonds_to_delete:
+            for i, angle in enumerate(self.parm.angles):
                 if bond in angle:
-                    self.del_angles.add(angle)
-            for dihed in self.parm.dihedrals:
+                    self.del_angles.append(i)
+            for i, dihed in enumerate(self.parm.dihedrals):
                 if bond in dihed:
-                    self.del_dihedrals.add(dihed)
-            for urey in self.parm.urey_bradleys:
+                    self.del_dihedrals.append(i)
+            for i, dihed in enumerate(self.parm.rb_torsions):
+                if bond in dihed:
+                    self.del_rbtorsions.append(i)
+            for i, urey in enumerate(self.parm.urey_bradleys):
                 if bond in urey:
-                    self.del_urey_bradleys.add(urey)
-            for improper in self.parm.impropers:
+                    self.del_urey_bradleys.append(i)
+            for i, improper in enumerate(self.parm.impropers):
                 if bond in improper:
-                    self.del_impropers.add(improper)
-            for cmap in self.parm.cmaps:
+                    self.del_impropers.append(i)
+            for i, cmap in enumerate(self.parm.cmaps):
                 if bond in cmap:
-                    self.del_cmaps.add(cmap)
-            for trigonal_angle in self.parm.trigonal_angles:
+                    self.del_cmaps.append(i)
+            for i, trigonal_angle in enumerate(self.parm.trigonal_angles):
                 if bond in trigonal_angle:
-                    self.del_trigonal_angles.add(trigonal_angle)
-            for oopbend in self.parm.out_of_plane_bends:
+                    self.del_trigonal_angles.append(i)
+            for i, oopbend in enumerate(self.parm.out_of_plane_bends):
                 if bond in oopbend:
-                    self.del_oopbends.add(oopbend)
-            for pitor in self.parm.pi_torsions:
+                    self.del_oopbends.append(i)
+            for i, pitor in enumerate(self.parm.pi_torsions):
                 if bond in pitor:
-                    self.del_pi_torsions.add(pitor)
-            for strbnd in self.parm.stretch_bends:
+                    self.del_pi_torsions.append(i)
+            for i, strbnd in enumerate(self.parm.stretch_bends):
                 if bond in strbnd:
-                    self.del_strbnds.add(strbnd)
-            for tortor in self.parm.torsion_torsions:
+                    self.del_strbnds.append(i)
+            for i, tortor in enumerate(self.parm.torsion_torsions):
                 if bond in tortor:
-                    self.del_tortors.add(tortor)
+                    self.del_tortors.append(i)
 
     def __str__(self):
-        if not self.del_h_bonds and not self.del_noh_bonds:
+        if not self.del_bonds:
             return 'No bonds to delete'
         if not self.verbose:
             return 'Deleting the %d bonds found between %s and %s' % (
@@ -3607,13 +3615,14 @@ class deleteBond(Action):
                     a1.residue.name, a1.residue.idx+1, a1.name, a2.idx+1,
                     a2.residue.name, a2.residue.idx+1, a2.name)
         retstr += 'Deleting %d angles, ' % (len(self.del_angles))
-        if self.parm.chamber:
+        if self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
             retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
                         'and %d CMAPs' % (
                         len(self.del_urey_bradleys), len(self.del_impropers),
                         len(self.del_dihedrals), len(self.del_cmap))
             )
-        elif self.parm.amoeba:
+        elif self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
+                self.parm.stretch_bends or self.parm.torsion_torsions:
             retstr += ('%d Urey-Bradleys, %d trigonal angles,\n         '
                        '%d dihedrals, %d out-of-plane bends, %d stretch-bends\n'
                        '         and %d torsion-torsions' % (
@@ -3622,24 +3631,49 @@ class deleteBond(Action):
                         len(self.del_dihedrals), len(self.del_oopbends),
                         len(self.del_strbnds), len(self.del_tortors))
             )
+        elif self.parm.rb_torsions:
+            retstr += ('%d R-B torsions and %d dihedrals' %
+                    (len(self.del_rbtorsions), len(self.del_dihedrals)))
         else:
             retstr += 'and %d dihedrals' % (len(self.del_dihedrals))
         return retstr
 
     def execute(self):
         if not self.del_bonds: return
-        for bond in self.del_bonds: bond.delete()
-        for angle in self.del_angles: angle.delete()
-        for dihedral in self.del_dihedrals: dihedral.delete()
-        for urey in self.del_urey_bradleys: urey.delete()
-        for imp in self.del_impropers: imp.delete()
-        for cmap in self.del_cmaps: cmap.delete()
-        for trigang in self.del_trigonal_angles: trigang.delete()
-        for oopbend in self.del_oopbends: oopbend.delete()
-        for tortor in self.del_tortors: tortor.delete()
-        for strbnd in self.del_strbnds: strbnd.delete()
-        if isinstance(self.parm, AmberParm):
+        for i in reversed(self.del_bonds):
+            self.parm.bonds[i].delete()
+            del self.parm.bonds[i]
+        for i in reversed(self.del_angles):
+            self.parm.angles[i].delete()
+            del self.parm.angles[i]
+        for i in reversed(self.del_dihedrals):
+            self.parm.dihedrals[i].delete()
+            del self.parm.dihedrals[i]
+        for i in reversed(self.del_rbtorsions):
+            self.parm.rb_torsions[i].delete()
+            del self.parm.rb_torsions[i]
+        for i in reversed(self.del_urey_bradleys):
+            self.parm.urey_bradleys[i].delete()
+            del self.parm.urey_bradleys[i]
+        for i in reversed(self.del_impropers):
+            self.parm.impropers[i].delete()
+            del self.parm.impropers[i]
+        for i in reversed(self.del_cmaps):
+            self.parm.cmaps[i].delete()
+            del self.parm.cmaps[i]
+        for i in reversed(self.del_trigonal_angles):
+            del self.parm.trigonal_angles[i]
+        for i in reversed(self.del_oopbends):
+            del self.parm.out_of_plane_bends[i]
+        for i in reversed(self.del_tortors):
+            self.parm.torsion_torsions[i].delete()
+            del self.parm.torsion_torsions[i]
+        for i in reversed(self.del_strbnds):
+            del self.parm.stretch_bends[i]
+        try:
             self.parm.remake_parm()
+        except AttributeError:
+            self.parm.prune_empty_terms()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

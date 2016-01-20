@@ -1,28 +1,36 @@
 """
 Useful functions for the test cases
 """
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
 import os
-from os.path import join, split, abspath
+import numpy as np
 import random
 import unittest
 import warnings
+from os.path import join, split, abspath
+from parmed import gromacs
+from parmed.utils.six import string_types
+from parmed.utils.six.moves import zip
 warnings.filterwarnings('error', category=DeprecationWarning)
 
 try:
-    from simtk import openmm
-    openmm_version = tuple([int(x) for x in openmm.__version__.split('.')])
+    from simtk import openmm as mm
+    from simtk.openmm import app
+    openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
+    CPU = mm.Platform.getPlatformByName('CPU')
+    Reference = mm.Platform.getPlatformByName('Reference')
+    has_openmm = True
 except ImportError:
-    openmm_version = None
+    has_openmm = False
+    app = openmm_version = CPU = Reference = mm = None
 
 try:
     from string import uppercase
 except ImportError:
     from string import ascii_uppercase as uppercase
 
-def skip_big_tests():
-    return os.getenv('PARMED_SKIP_BIG_TESTS') is not None
+run_all_tests = os.getenv('PARMED_RUN_ALL_TESTS') is not None
+
+HAS_GROMACS = os.path.isdir(gromacs.GROMACS_TOPDIR)
 
 class TestCaseRelative(unittest.TestCase):
 
@@ -109,40 +117,9 @@ def get_saved_fn(filename):
     """
     return join(split(abspath(__file__))[0], 'files', 'saved', filename)
 
-def has_scipy():
-    try:
-        import scipy.io.netcdf as nc
-        return True
-    except ImportError:
-        return False
-
-def has_netcdf4():
-    try:
-        import netCDF4
-        return True
-    except ImportError:
-        return False
-
-def has_scientific():
-    try:
-        from Scientific.IO.NetCDF import NetCDFFile
-        return True
-    except ImportError:
-        return False
-
-def has_pynetcdf():
-    try:
-        import pynetcdf
-        return True
-    except ImportError:
-        return False
-
-def has_numpy():
-    return True
-
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,
-               comment=None):
+               comment=None, spacechar=None):
     """
     Compares 2 files line-by-line
 
@@ -162,6 +139,9 @@ def diff_files(file1, file2, ignore_whitespace=True,
         trigger failures. Cannot be used with absolute_error
     comment : str or None
         The character to identify comments in this file
+    spacechar : str or None
+        A collection of characters to turn into spaces (to facilitate proper
+        tokenization)
 
     Returns
     -------
@@ -211,7 +191,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1,l2,absolute_error,relative_error):
+                    if not detailed_diff(l1,l2,absolute_error,relative_error,spacechar):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -228,7 +208,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
                         l1 = f1.readline()
                         l2 = f2.readline()
                         continue
-                    if not detailed_diff(l1,l2,absolute_error,relative_error):
+                    if not detailed_diff(l1,l2,absolute_error,relative_error,spacechar):
                         same = False
                         record_diffs(i, file1, file2, l1, l2)
                 l1 = f1.readline()
@@ -248,13 +228,17 @@ def record_diffs(i, f1, f2, l1, l2):
     f.write('< %s> %s' % (l1, l2))
     f.close()
 
-def detailed_diff(l1, l2, absolute_error=None, relative_error=None):
+def detailed_diff(l1, l2, absolute_error=None, relative_error=None, spacechar=None):
     """
     Check individual fields to make sure numbers are numerically equal if the
     lines differ. Also ignore fields that appear to be a file name, since those
     will be system-dependent
     """
     fdir = os.path.split(get_fn('writes'))[0]
+    if spacechar is not None:
+        for char in spacechar:
+            l1 = l1.replace(char, ' ')
+            l2 = l2.replace(char, ' ')
     w1 = l1.split()
     w2 = l2.split()
     if len(w1) != len(w2): return False
@@ -472,7 +456,7 @@ def create_random_structure(parametrized, novalence=False):
     for i in range(random.randint(5, 10)):
         struct.acceptors.append(AcceptorDonor(*random.sample(struct.atoms, 2)))
         struct.donors.append(AcceptorDonor(*random.sample(struct.atoms, 2)))
-        struct.groups.append(Group(*random.sample(range(1, 11), 3)))
+        struct.groups.append(Group(random.choice(struct.atoms), 2, 0))
         struct.chiral_frames.append(ChiralFrame(*random.sample(struct.atoms, 2),
                                                 chirality=random.choice([-1, 1])))
         struct.multipole_frames.append(MultipoleFrame(random.choice(struct.atoms),
@@ -485,3 +469,45 @@ def create_random_structure(parametrized, novalence=False):
     struct.unchange()
     struct.update_dihedral_exclusions()
     return struct
+
+def equal_atoms(tester, a1, a2):
+    """ Tests equality of two atoms based on properties
+
+    Parameters
+    ----------
+    tester : unittest.TestCase
+        TestCase instance
+    a1 : Atom
+        First atom to compare
+    a2 : Atom
+        Second atom to compare
+    """
+    tester.assertEqual(a1.atomic_number, a2.atomic_number)
+    tester.assertEqual(a1.screen, a2.screen)
+    tester.assertEqual(a1.name, a2.name)
+    tester.assertEqual(a1.type, a2.type)
+    tester.assertEqual(a1.atom_type, a2.atom_type)
+    tester.assertEqual(a1.charge, a2.charge)
+    tester.assertEqual(a1.mass, a2.mass)
+    tester.assertEqual(a1.nb_idx, a2.nb_idx)
+    tester.assertEqual(a1.radii, a2.radii)
+    tester.assertEqual(a1.tree, a2.tree)
+    tester.assertEqual(a1.join, a2.join)
+    tester.assertEqual(a1.irotat, a2.irotat)
+    tester.assertEqual(a1.occupancy, a2.occupancy)
+    tester.assertEqual(a1.bfactor, a2.bfactor)
+    tester.assertEqual(a1.rmin, a2.rmin)
+    tester.assertEqual(a1.epsilon, a2.epsilon)
+    tester.assertEqual(a1.rmin_14, a2.rmin_14)
+    tester.assertEqual(a1.epsilon_14, a2.epsilon_14)
+    for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles',
+                'type_idx', 'class_idx', 'polarizability', 'vdw_weight'):
+        if hasattr(a2, key):
+            if isinstance(getattr(a2, key), np.ndarray):
+                np.testing.assert_equal(
+                        getattr(a1, key), getattr(a2, key)
+                )
+            else:
+                tester.assertEqual(getattr(a1, key), getattr(a2, key))
+        else:
+            tester.assertFalse(hasattr(a1, key))

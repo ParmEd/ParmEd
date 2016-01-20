@@ -1,18 +1,20 @@
 """
 Tests the functionality in the parmed.gromacs package
 """
-import utils
+import copy
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed import gromacs as gmx
+from parmed.topologyobjects import _UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
-from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase
+from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
+import utils
 import warnings
 
-@unittest.skipIf(not os.path.exists(gmx.GROMACS_TOPDIR), "Cannot run GROMACS tests without Gromacs")
+@unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 
@@ -115,7 +117,7 @@ class TestGromacsTop(FileIOTestCase):
         self.assertIs(top.adjusts[5105].atom2, top.atoms[1953])
         self.assertEqual(top.adjusts[5105].funct, 1)
 
-    def testCharmm27Top(self):
+    def test_charmm27_top(self):
         """ Tests parsing a Gromacs topology with CHARMM 27 FF """
         top = GromacsTopologyFile(get_fn('1aki.charmm27.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -124,7 +126,7 @@ class TestGromacsTop(FileIOTestCase):
                                     'charmm27.ff/ions.itp'])
         self._charmm27_checks(top)
 
-    def testWriteCharmm27Top(self):
+    def test_write_charmm27_top(self):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
         top = load_file(get_fn('1aki.charmm27.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -134,13 +136,13 @@ class TestGromacsTop(FileIOTestCase):
         self._charmm27_checks(top)
 
     def _check_ff99sbildn(self, top):
-        self.assertEqual(len(top.atoms), 40560)
-        self.assertEqual(len(top.residues), 9779)
-        self.assertEqual(len([a for a in top.atoms if isinstance(a, ExtraPoint)]),
-                         9650)
-        self.assertEqual(len(top.bonds), 30934)
-        self.assertEqual(len(top.angles), 13197)
-        self.assertEqual(len(top.dihedrals), 5613)
+        self.assertEqual(len(top.atoms), 4235)
+        self.assertEqual(len(top.residues), 1046)
+        self.assertEqual(sum(1 for a in top.atoms if isinstance(a, ExtraPoint)),
+                         1042)
+        self.assertEqual(len(top.bonds), 3192)
+        self.assertEqual(len(top.angles), 1162)
+        self.assertEqual(len(top.dihedrals), 179)
 
     def _check_equal_structures(self, top1, top2):
         def cmp_atoms(a1, a2):
@@ -169,6 +171,7 @@ class TestGromacsTop(FileIOTestCase):
                                                getattr(v2.type, attr), places=5)
                 else:
                     self.assertEqual(v1.type, v2.type)
+
         def cmp_dihedrals(dih1, dih2):
             self.assertEqual(len(dih1), len(dih2))
             for v1, v2 in zip(dih1, dih2):
@@ -194,24 +197,23 @@ class TestGromacsTop(FileIOTestCase):
         cmp_valence(top1.angles, top2.angles, ['k', 'theteq'])
         cmp_dihedrals(top1.dihedrals, top2.dihedrals)
 
-    def testReadAmber99SBILDN(self):
+    def test_read_amber99SBILDN(self):
         """ Tests parsing a Gromacs topology with Amber99SBILDN and water """
-        top = load_file(get_fn('1aki.ff99sbildn.top'))
+        top = load_file(get_fn('ildn.solv.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
         self._check_ff99sbildn(top)
 
-    def testWriteAmber99SBILDN(self):
+    def test_write_amber99SBILDN(self):
         """ Tests writing a Gromacs topology with multiple molecules """
-        top = load_file(get_fn('1aki.ff99sbildn.top'))
+        top = load_file(get_fn('ildn.solv.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
-        GromacsTopologyFile.write(top,
-                get_fn('1aki.ff99sbildn.top', written=True),
-                combine=None)
-        top2 = load_file(get_fn('1aki.ff99sbildn.top', written=True))
+        fn = get_fn('ildn.solv.top', written=True)
+        GromacsTopologyFile.write(top, fn, combine=None)
+        top2 = load_file(fn)
         self._check_ff99sbildn(top2)
         self._check_equal_structures(top, top2)
 
-    def testDuplicateSystemNames(self):
+    def test_duplicate_system_names(self):
         """ Tests that Gromacs topologies never have duplicate moleculetypes """
         parm = load_file(get_fn('phenol.prmtop'))
         parm = parm * 20 + load_file(get_fn('biphenyl.prmtop')) * 20
@@ -221,7 +223,7 @@ class TestGromacsTop(FileIOTestCase):
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
         self.assertEqual(len(top.residues), 40)
 
-    def testOPLS(self):
+    def test_OPLS(self):
         """ Tests the geometric combining rules in Gromacs with OPLS/AA """
         parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                          xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
@@ -230,8 +232,18 @@ class TestGromacsTop(FileIOTestCase):
         parm.write(get_fn('test.topol', written=True), combine='all')
         parm2 = load_file(get_fn('test.topol', written=True))
         self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        # Check that the charge attribute is read correctly
+        self.assertEqual(parm.parameterset.atom_types['opls_001'].charge, 0.5)
 
-    def testMoleculeOrdering(self):
+    def test_without_parametrize(self):
+        """ Tests loading a Gromacs topology without parametrizing """
+        parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'),
+                         parametrize=False)
+        assert isinstance(parm.atoms[0].atom_type, _UnassignedAtomType)
+        assert all(x.type is None for x in parm.bonds)
+
+    def test_molecule_ordering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """
         warnings.filterwarnings('ignore', category=GromacsWarning)
         parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
@@ -245,10 +257,66 @@ class TestGromacsTop(FileIOTestCase):
                 self.assertEqual(a1.name, a2.name)
                 self.assertEqual(a1.type, a2.type)
 
+    def test_copying_defaults(self):
+        """ Tests that copying GromacsTopologyFile copies Defaults too """
+        parm = load_file(get_fn('159.top'))
+        newfile = StringIO()
+        copy.copy(parm).write(newfile)
+        newfile.seek(0)
+        newparm = GromacsTopologyFile(newfile)
+        self.assertEqual(parm.defaults, newparm.defaults)
+
+    def test_getitem_defaults(self):
+        """ Tests that GromacsTopologyFile[] sets Defaults correctly """
+        parm = load_file(get_fn('159.top'))
+        newfile = StringIO()
+        parm[0,:].write(newfile)
+        newfile.seek(0)
+        newparm = GromacsTopologyFile(newfile)
+        self.assertEqual(parm.defaults, newparm.defaults)
+
+    def test_molecule_combine(self):
+        """ Tests selective molecule combination in Gromacs topology files """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
+        fname = get_fn('combined.top', written=True)
+        # Make sure that combining non-adjacent molecules fails
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine=[[1, 3]]))
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine='joey'))
+        self.assertRaises(ValueError, lambda:
+                parm.write(fname, combine=[1, 2, 3]))
+        self.assertRaises(TypeError, lambda:
+                parm.write(fname, combine=1))
+        parm.write(fname, combine=[[3, 4], [126, 127, 128, 129, 130]])
+        with open(fname, 'r') as f:
+            for line in f:
+                if line.startswith('[ molecules ]'):
+                    break
+            molecule_list = []
+            for line in f:
+                if line[0] == ';': continue
+                words = line.split()
+                molecule_list.append((words[0], int(words[1])))
+        parm2 = load_file(fname)
+        self.assertEqual(molecule_list, [('DPPC', 3), ('system1', 1),
+                         ('SOL', 121), ('system2', 1), ('SOL', 121)])
+        self.assertEqual(len(parm2.atoms), len(parm.atoms))
+        self.assertEqual(len(parm2.residues), len(parm2.residues))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self._equal_atoms(a1, a2)
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
+
+    _equal_atoms = utils.equal_atoms
+
 class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
 
-    def testReadGroFile(self):
+    def test_read_gro_file(self):
         """ Tests reading GRO file """
         gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
         self.assertIsInstance(gro, Structure)
@@ -270,7 +338,7 @@ class TestGromacsGro(FileIOTestCase):
         self.assertEqual(gro.atoms[0].atomic_number, 7)
         self.assertEqual(gro.atoms[0].mass, 14.0067)
 
-    def testWriteGroFile(self):
+    def test_write_gro_file(self):
         """ Tests writing GRO file """
         gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
         GromacsGroFile.write(gro, get_fn('1aki.ff99sbildn.gro', written=True))
@@ -291,7 +359,7 @@ class TestGromacsGro(FileIOTestCase):
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
 
-    def testReadWriteHighPrecisionGroFile(self):
+    def test_read_write_high_precision_gro_file(self):
         """ Tests reading/writing high-precision GRO files """
         gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
         GromacsGroFile.write(gro, get_fn('1aki.ff99sbildn_highprec.gro',
