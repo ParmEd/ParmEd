@@ -36,4 +36,6 @@ script:
     - cd test
     - echo "Using `which nosetests`::"
     - which nosetests
-    - nosetests -vs --with-timer --timer-ok=5s --timer-warning=12s --timer-filter=warning,error .
+    - nosetests -vs --with-timer --timer-ok=5s --timer-warning=12s --timer-filter=warning,error --with-coverage --cover-package=parmed .
+    - ./run_scripts.sh
+    - coverage report -m
