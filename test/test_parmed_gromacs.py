@@ -5,6 +5,7 @@ import copy
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
+from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import gromacs as gmx
 from parmed.topologyobjects import _UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
@@ -125,6 +126,47 @@ class TestGromacsTop(FileIOTestCase):
                                     'charmm27.ff/tip3p.itp',
                                     'charmm27.ff/ions.itp'])
         self._charmm27_checks(top)
+
+    def test_gromacs_file(self):
+        """ Test GromacsFile helper class """
+        f = StringIO('This is the first line \\\n  this is still the first line'
+                     '\nThis is the second line')
+        gf = GromacsFile(f)
+        self.assertEqual(gf.readline(), 'This is the first line   this is '
+                         'still the first line\n')
+        self.assertEqual(gf.readline(), 'This is the second line')
+        self.assertEqual(gf.readline(), '')
+        f.seek(0)
+        lines = [line for line in gf]
+        self.assertEqual(lines[0], 'This is the first line   this is '
+                         'still the first line\n')
+        self.assertEqual(lines[1], 'This is the second line')
+
+        # Try with comments now
+        f = StringIO('This is the first line \\\n  this is still the first line'
+                     ' ; and this is a comment\nThis is the second line ; and '
+                     'this is also a comment')
+        gf = GromacsFile(f)
+        self.assertEqual(gf.readline(), 'This is the first line   this is still'
+                         ' the first line \n')
+        self.assertEqual(gf.readline(), 'This is the second line \n')
+        f.seek(0)
+        lines = [line for line in gf]
+        self.assertEqual(lines[0], 'This is the first line   this is still'
+                         ' the first line \n')
+        self.assertEqual(lines[1], 'This is the second line \n')
+        f.seek(0)
+        lines = gf.readlines()
+        self.assertEqual(lines[0], 'This is the first line   this is still'
+                         ' the first line \n')
+        self.assertEqual(lines[1], 'This is the second line \n')
+        f.seek(0)
+        self.assertEqual(gf.read(), 'This is the first line   this is still'
+                         ' the first line \nThis is the second line \n')
+
+        # Error handling
+        self.assertRaises(IOError, lambda:
+                GromacsFile('some_file that does_not exist'))
 
     def test_write_charmm27_top(self):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
