@@ -23,8 +23,20 @@ class TestGromacsCpp(unittest.TestCase):
         pp = CPreProcessor(f) # no defines
         self.assertEqual(pp.read().strip(), 'MY_DEFINE is not set')
         f.seek(0)
+        self.assertEqual(f.tell(), 0)
+        self.assertEqual(pp.tell(), 0)
         pp = CPreProcessor(f, defines=dict(MY_DEFINE='SUCCESS'))
         self.assertEqual(pp.read().strip(), 'PPVAR is set to SUCCESS')
+
+    def test_not_implemented(self):
+        """ Test error catching for PP features not implemented """
+        f = StringIO('#define MYVAR 1\n#if (MYVAR == 1)\nCORRECT\n#endif')
+        pp = CPreProcessor(f)
+        self.assertRaises(NotImplementedError, lambda: pp.seek(10))
+        self.assertRaises(NotImplementedError, pp.read)
+        f = StringIO('#ifdef MYVAR\n#elif defined(NOTMYVAR)\n#else\nline\#endif')
+        pp = CPreProcessor(f)
+        self.assertRaises(NotImplementedError, pp.read)
 
     def test_ifndef(self):
         """ Tests CPreProcessor #ifndef/#else#endif preprocessing """
@@ -47,6 +59,15 @@ class TestGromacsCpp(unittest.TestCase):
         pp = CPreProcessor(f)
         self.assertEqual(pp.read().strip(),
                          'MY_DEFINE is not set\nPPVAR is set to SUCCESS')
+        warnings.filterwarnings('error', category=PreProcessorWarning)
+        f = StringIO('#define MYVAR something\nMYVAR\n#define MYVAR '
+                     'something_else\nMYVAR')
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorWarning, pp.read)
+        warnings.filterwarnings('ignore', category=PreProcessorWarning)
+        f.seek(0)
+        with CPreProcessor(f) as pp:
+            self.assertEqual(pp.read().strip(), 'something\nsomething_else')
 
     def test_undef(self):
         """ Tests CPreProcessor #undef preprocessing """
@@ -55,6 +76,11 @@ class TestGromacsCpp(unittest.TestCase):
                      "#undef MY_DEFINE\nMY_DEFINE\n#undef NO_VARIABLE\n")
         pp = CPreProcessor(f)
         self.assertEqual(pp.read().strip(), "MY_DEFINE\nChanged\nMY_DEFINE")
+        # Make sure undef does not occur where it shouldn't
+        f = StringIO('#define MYVAR something\n#ifdef NOVAR\n#undef MYVAR\n'
+                     '#endif\nMYVAR')
+        with CPreProcessor(f) as pp:
+            self.assertEqual(pp.read().strip(), 'something')
 
     def test_multiword_define(self):
         """ Tests CPreProcessor #define with multiple words """
@@ -123,6 +149,23 @@ line 4
         f.seek(0)
         pp = CPreProcessor(f, defines=dict(MY_VAR=1))
         self.assertEqual(pp.read().strip(), "line 1\nline 2")
+        f = StringIO("""
+#ifdef MY_VAR
+#   ifndef MY_VAR_2
+MY_VAR defined... MY_VAR_2 not
+#   else
+MY_VAR defined... MY_VAR_2 also
+#   endif
+#endif
+""")
+        pp = CPreProcessor(f)
+        self.assertEqual(pp.read().strip(), '')
+        f.seek(0)
+        pp = CPreProcessor(f, defines=dict(MY_VAR=1))
+        self.assertEqual(pp.read().strip(), '1 defined... MY_VAR_2 not')
+        f.seek(0)
+        pp = CPreProcessor(f, defines=dict(MY_VAR=1, MY_VAR_2=2))
+        self.assertEqual(pp.read().strip(), '1 defined... 2 also')
 
     def test_simple_include(self):
         """ Tests CPreProcessor simple #include directive """
@@ -178,24 +221,61 @@ pptest1 line 3""")
         pp = CPreProcessor(f)
         self.assertEqual(pp.read().strip(), 'replace1')
 
+    def test_close(self):
+        """ Test closing file object before deleting it """
+        pp = CPreProcessor(get_fn('pptest1/pptest1.h'))
+        pp.close()
+        del pp
+
+    def test_warnings(self):
+        """ Test CPreProcessor warnings """
+        warnings.filterwarnings('error', category=PreProcessorWarning)
+        f = StringIO('#ifndef MYVAR extra tokens\nline\n#endif')
+        with CPreProcessor(f) as f:
+            self.assertRaises(PreProcessorWarning, f.read)
+
+    def test_context_manager(self):
+        """ Test using CPreProcessor in a context manager """
+        with CPreProcessor(get_fn('pptest2/pptest1.h')) as pp:
+            self.assertEqual(pp.read().strip(), """\
+pptest1 line 1
+pptest2 line 1
+pptest3 line 1
+pptest1 line 2
+pptest1 line 3
+pptest3 line 1
+pptest1 line 4""")
+
     def test_bad_ifdef(self):
         """ Tests CPreProcessor error processing of bad #ifdef/#ifndef """
         f = StringIO("#ifdef\n#endif")
-        pp = CPreProcessor(f)
-        self.assertRaises(PreProcessorError, lambda: pp.read())
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)
         f = StringIO("#ifndef\n#endif")
-        pp = CPreProcessor(f)
-        self.assertRaises(PreProcessorError, lambda: pp.read())
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)
         f = StringIO("#ifdef SOME_VAR\ndangling ifdef\n\n\n")
-        pp = CPreProcessor(f)
-        self.assertRaises(PreProcessorError, lambda: pp.read())
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)
         warnings.filterwarnings('error', category=PreProcessorWarning)
         f = StringIO("#ifdef SOME_VAR misplaced comments\n#endif\n")
-        pp = CPreProcessor(f)
-        self.assertRaises(PreProcessorWarning, lambda: pp.read())
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorWarning, pp.read)
         f = StringIO("#ifdef SOME_VAR\n#endif misplaced comments\n")
-        pp = CPreProcessor(f)
-        self.assertRaises(PreProcessorWarning, lambda: pp.read())
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorWarning, pp.read)
+        f = StringIO('#else\nNOVAR\n#endif')
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)
+        f = StringIO('#ifdef MYVAR\nline1\n#else extra tokens\nline2\n#endif')
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorWarning, pp.read)
+        f = StringIO('#ifdef MYVAR\nline1\n#else\nline2\n#else\nline3\n#endif')
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)
+        f = StringIO('#endif\nline1\nline2')
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)
 
     def test_bad_define_undef(self):
         """ Tests CPreProcessor error processing of bad #define/#undef """
@@ -219,3 +299,9 @@ pptest1 line 3""")
         f.seek(0)
         pp = CPreProcessor(f, notfound_fatal=False)
         self.assertRaises(PreProcessorWarning, lambda: pp.read())
+
+    def test_bad_include(self):
+        """ Tests bad #include syntax in CPreProcessor """
+        f = StringIO('#include bad syntax gremlin\nline 1')
+        with CPreProcessor(f) as pp:
+            self.assertRaises(PreProcessorError, pp.read)

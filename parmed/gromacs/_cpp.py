@@ -328,6 +328,13 @@ class CPreProcessor(object):
         elif len(words) == 0:
             raise PreProcessorError('Nothing defined in #undef')
 
+    # Context manager protocol
+    def __exit__(self, type, value, traceback):
+        self.close()
+
+    def __enter__(self):
+        return self
+
     _ppcmdmap = {'if' : _pp_if, 'elif' : _pp_elif, 'ifdef' : _pp_ifdef,
                  'else' : _pp_else, 'define' : _pp_define, 'undef' : _pp_undef,
                  'include' : _pp_include, 'endif' : _pp_endif,
@@ -340,7 +347,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input-file', dest='input', metavar='FILE',
                 required=True, help='''Input file to pre-process. Either a file
-                name or, if '--' is given, from standard input.''')
+                name or, if '-' is given, from standard input.''')
     parser.add_argument('-o', '--output-file', dest='output', metavar='FILE',
                 default=None, help='''Output file with preprocessed results.
                 Default is standard output''')
@@ -361,15 +368,19 @@ if __name__ == '__main__':
             val = '1'
         defines[define] = val
 
-    if opt.input == '--':
+    if opt.input == '-':
         f = sys.stdin
     else:
         f = opt.input
     pp = CPreProcessor(f, defines=defines, includes=opt.includes)
     if opt.output is None:
         output = sys.stdout
+        own_handle = False
     else:
         output = genopen(opt.output, 'w')
+        own_handle = True
 
     for line in pp:
         output.write(line)
+    if own_handle:
+        output.close()
