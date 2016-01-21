@@ -2,6 +2,8 @@
 Tests the functionality in the parmed.gromacs package
 """
 import copy
+import numpy as np
+import os
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
@@ -9,7 +11,6 @@ from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import gromacs as gmx
 from parmed.topologyobjects import _UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
-import os
 import unittest
 from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
 import utils
@@ -132,13 +133,13 @@ class TestGromacsTop(FileIOTestCase):
         f = StringIO('This is the first line \\\n  this is still the first line'
                      '\nThis is the second line')
         gf = GromacsFile(f)
-        self.assertEqual(gf.readline(), 'This is the first line   this is '
+        self.assertEqual(gf.readline(), 'This is the first line    this is '
                          'still the first line\n')
         self.assertEqual(gf.readline(), 'This is the second line')
         self.assertEqual(gf.readline(), '')
         f.seek(0)
         lines = [line for line in gf]
-        self.assertEqual(lines[0], 'This is the first line   this is '
+        self.assertEqual(lines[0], 'This is the first line    this is '
                          'still the first line\n')
         self.assertEqual(lines[1], 'This is the second line')
 
@@ -147,21 +148,21 @@ class TestGromacsTop(FileIOTestCase):
                      ' ; and this is a comment\nThis is the second line ; and '
                      'this is also a comment')
         gf = GromacsFile(f)
-        self.assertEqual(gf.readline(), 'This is the first line   this is still'
+        self.assertEqual(gf.readline(), 'This is the first line    this is still'
                          ' the first line \n')
         self.assertEqual(gf.readline(), 'This is the second line \n')
         f.seek(0)
         lines = [line for line in gf]
-        self.assertEqual(lines[0], 'This is the first line   this is still'
+        self.assertEqual(lines[0], 'This is the first line    this is still'
                          ' the first line \n')
         self.assertEqual(lines[1], 'This is the second line \n')
         f.seek(0)
         lines = gf.readlines()
-        self.assertEqual(lines[0], 'This is the first line   this is still'
+        self.assertEqual(lines[0], 'This is the first line    this is still'
                          ' the first line \n')
         self.assertEqual(lines[1], 'This is the second line \n')
         f.seek(0)
-        self.assertEqual(gf.read(), 'This is the first line   this is still'
+        self.assertEqual(gf.read(), 'This is the first line    this is still'
                          ' the first line \nThis is the second line \n')
 
         # Error handling
@@ -358,6 +359,28 @@ class TestGromacsTop(FileIOTestCase):
 class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
 
+    def test_gro_velocities(self):
+        """ Test parsing and writing GROMACS GRO files with velocities """
+        gro = load_file(get_fn('1aki.ff99sbildn.gro'))
+        self.assertIsInstance(gro, Structure)
+        vel = np.random.rand(len(gro.atoms), 3)
+        gro.velocities = vel
+        fn = get_fn('test.gro', written=True)
+        gro.save(fn)
+        self.assertTrue(GromacsGroFile.id_format(fn))
+        gro.save(fn, overwrite=True, precision=8)
+        self.assertTrue(GromacsGroFile.id_format(fn))
+        with open(fn) as f:
+            tmp = GromacsGroFile.parse(f)
+        np.testing.assert_allclose(vel, tmp.velocities, atol=1e-8)
+
+    def test_gro_detection(self):
+        """ Tests automatic detection of GROMACS GRO files """
+        fn = get_fn('candidate.gro', written=True)
+        with open(fn, 'w') as f:
+            f.write('Some title\n 1000\n    aISNot a valid format\n')
+        self.assertFalse(GromacsGroFile.id_format(fn))
+
     def test_read_gro_file(self):
         """ Tests reading GRO file """
         gro = GromacsGroFile.parse(get_fn('1aki.ff99sbildn.gro'))
@@ -400,6 +423,19 @@ class TestGromacsGro(FileIOTestCase):
         self.assertAlmostEqual(gro.box[3], 70.52882666)
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
+
+    def test_write_gro_file_nobox(self):
+        """ Test GROMACS GRO file writing without a box """
+        parm = load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        self.assertIs(parm.box, None)
+        fn = get_fn('test.gro', written=True)
+        parm.save(fn)
+        # Make sure it has a box
+        gro = load_file(fn)
+        self.assertIsNot(gro.box, None)
+        parm.save(fn, nobox=True, overwrite=True)
+        gro = load_file(fn)
+        self.assertIs(gro.box, None)
 
     def test_read_write_high_precision_gro_file(self):
         """ Tests reading/writing high-precision GRO files """

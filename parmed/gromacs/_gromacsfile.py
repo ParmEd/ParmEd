@@ -55,7 +55,7 @@ class GromacsFile(object):
                 if line.rstrip('\r\n').endswith('\\'):
                     chars = list(reversed(line.rstrip('\r\n')))
                     del chars[chars.index('\\')]
-                    parts.append(''.join(reversed(chars)))
+                    parts.append('%s ' % ''.join(reversed(chars)))
                 elif parts:
                     parts.append(line)
                     yield ''.join(parts)
@@ -85,7 +85,7 @@ class GromacsFile(object):
                 if line.rstrip('\r\n').endswith('\\'):
                     chars = list(reversed(line.rstrip('\r\n')))
                     del chars[chars.index('\\')]
-                    parts.append(''.join(reversed(chars)))
+                    parts.append('%s ' % ''.join(reversed(chars)))
                 elif parts:
                     parts.append(line)
                     return ''.join(parts)
