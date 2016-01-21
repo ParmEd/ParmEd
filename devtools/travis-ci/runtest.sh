@@ -21,4 +21,4 @@ else
               --cover-package=parmed .
 fi
 ./run_scripts.sh
-coverage report -m
+test -z `which coverage 2>/dev/null` || coverage report -m
