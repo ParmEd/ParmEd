@@ -5,7 +5,7 @@ import copy
 import numpy as np
 import os
 from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
-from parmed.exceptions import GromacsWarning
+from parmed.exceptions import GromacsWarning, GromacsError
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import gromacs as gmx
@@ -380,6 +380,9 @@ class TestGromacsGro(FileIOTestCase):
         with open(fn, 'w') as f:
             f.write('Some title\n 1000\n    aISNot a valid format\n')
         self.assertFalse(GromacsGroFile.id_format(fn))
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
+        f = StringIO('Gromacs title line\n notanumber\nsome line\n')
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(f))
 
     def test_read_gro_file(self):
         """ Tests reading GRO file """
@@ -402,6 +405,18 @@ class TestGromacsGro(FileIOTestCase):
         # Check atomic number and mass assignment
         self.assertEqual(gro.atoms[0].atomic_number, 7)
         self.assertEqual(gro.atoms[0].mass, 14.0067)
+        fn = get_fn('test.gro', written=True)
+        # Test bad GRO files
+        with open(fn, 'w') as wf, open(get_fn('1aki.charmm27.solv.gro')) as f:
+            for i in range(1000):
+                wf.write(f.readline())
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
+        with open(get_fn('1aki.ff99sbildn.gro')) as f:
+            lines = f.readlines()
+        lines[-1] = 'not a legal box line\n'
+        with open(fn, 'w') as f:
+            f.write(''.join(lines))
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
 
     def test_write_gro_file(self):
         """ Tests writing GRO file """
@@ -423,6 +438,7 @@ class TestGromacsGro(FileIOTestCase):
         self.assertAlmostEqual(gro.box[3], 70.52882666)
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
+        self.assertRaises(TypeError, lambda: GromacsGroFile.write(gro, 10))
 
     def test_write_gro_file_nobox(self):
         """ Test GROMACS GRO file writing without a box """
