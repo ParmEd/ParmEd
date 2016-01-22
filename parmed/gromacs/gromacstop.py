@@ -321,18 +321,8 @@ class GromacsTopologyFile(Structure):
                     self._parse_dihedrals(line, dihedral_types,
                                           proper_multiterm_dihedrals, molecule)
                 elif current_section == 'cmap':
-                    words = line.split()
-                    i, j, k, l, m = (int(w)-1 for w in words[:5])
-                    funct = int(words[5])
-                    if funct != 1:
-                        warnings.warn('cmap funct != 1; unknown functional',
-                                      GromacsWarning)
-                        self.unknown_functional = True
-                    cmap = Cmap(molecule.atoms[i], molecule.atoms[j],
-                                molecule.atoms[k], molecule.atoms[l],
-                                molecule.atoms[m])
+                    cmap = self._parse_cmaps(line, molecule.atoms)
                     molecule.cmaps.append(cmap)
-                    molecule.cmaps[-1].funct = funct
                 elif current_section == 'system':
                     self.title = line
                 elif current_section == 'defaults':
@@ -355,34 +345,10 @@ class GromacsTopologyFile(Structure):
                     # (or other 3-atom molecules), GROMACS uses a "settles"
                     # section to specify the constraint geometry. We have to
                     # translate that into bonds.
-                    natoms = len([a for a in molecule.atoms
-                                    if not isinstance(a, ExtraPoint)])
-                    if natoms != 3:
-                        raise GromacsError("Cannot SETTLE a %d-atom molecule" %
-                                           natoms)
-                    try:
-                        oxy, = [atom for atom in molecule.atoms
-                                    if atom.atomic_number == 8]
-                        hyd1, hyd2 = [atom for atom in molecule.atoms
-                                        if atom.atomic_number == 1]
-                    except ValueError:
-                        raise GromacsError('Can only SETTLE water; Could not '
-                                           'detect 2 hydrogens and 1 oxygen')
-                    #TODO see if there's a bond_type entry in the parameter set
-                    #     that we can fill in
-                    try:
-                        i, funct, doh, dhh = line.split()
-                        doh, dhh = float(doh), float(dhh)
-                    except ValueError:
-                        raise GromacsError('Bad [ settles ] line')
-                    bt_oh = BondType(5e5*u.kilojoules_per_mole/u.nanometers**2,
-                                     doh*u.nanometers, list=molecule.bond_types)
-                    bt_hh = BondType(5e5*u.kilojoules_per_mole/u.nanometers**2,
-                                     dhh*u.nanometers, list=molecule.bond_types)
-                    molecule.bond_types.extend([bt_oh, bt_hh])
-                    molecule.bonds.append(Bond(oxy, hyd1, bt_oh))
-                    molecule.bonds.append(Bond(oxy, hyd2, bt_oh))
-                    molecule.bonds.append(Bond(hyd1, hyd2, bt_hh))
+                    bnds, bndts = self._parse_settles(molecule.atoms, line)
+                    molecule.bonds.extend(bnds)
+                    molecule.bond_types.extend(bndts)
+                    molecule.bond_types.claim()
                 elif current_section in ('virtual_sites3', 'dummies3'):
                     words = line.split()
                     vsite = molecule.atoms[int(words[0])-1]
@@ -800,35 +766,19 @@ class GromacsTopologyFile(Structure):
                 ub.type = NoUreyBradley
         return ang, ub, angt, ubt
 
-    def _parse_dihedrals(self, line, dihedral_types, proper_multiterm_dihedrals,
-                         molecule):
+    def _parse_dihedrals(self, line, dihedral_types, PMD, molecule):
         """ Processes a dihedrals line, returns None """
         words = line.split()
         i, j, k, l = [int(x)-1 for x in words[:4]]
         funct = int(words[4])
-        if funct in (1, 4, 9):
+        if funct in (1, 4) or (funct == 9 and len(words) < 8):
             dih, diht = self._process_normal_dihedral(words, molecule.atoms, i,
                                                       j, k, l, dihedral_types,
-                                                      funct==4, funct==9)
-            if funct == 9 and len(words) >= 8:
-                key = dih.atom1, dih.atom2, dih.atom3, dih.atom4
-                if key in proper_multiterm_dihedrals:
-                    # In this case, all this line does is add another term
-                    diht = proper_multiterm_dihedrals[key]
-                    dih.delete()
-                    dih = None
-                    self._process_dihedral_series(words, dih, diht)
-                else:
-                    diht = self._process_dihedral_series(words, dih, diht)
-                    proper_multiterm_dihedrals[key] = diht
-                    proper_multiterm_dihedrals[tuple(reversed(key))] = diht
-                if dih is not None:
-                    dih.type = diht
-            if dih is not None:
-                molecule.dihedrals.append(dih)
-                if diht is not None:
-                    molecule.dihedral_types.append(diht)
-                    diht.list = molecule.dihedral_types
+                                                      funct==4)
+            molecule.dihedrals.append(dih)
+            if diht is not None:
+                molecule.dihedral_types.append(diht)
+                diht.list = molecule.dihedral_types
         elif funct == 2:
             dih, impt = self._process_improper(words, i, j, k, l,
                                                molecule.atoms, dihedral_types)
@@ -843,6 +793,21 @@ class GromacsTopologyFile(Structure):
             if rbt is not None:
                 molecule.rb_torsion_types.append(rbt)
                 rbt.list = molecule.rb_torsion_types
+        elif funct == 9:
+            # in-line parameters, since len(words) must be >= 8
+            key = (molecule.atoms[i], molecule.atoms[j],
+                   molecule.atoms[k], molecule.atoms[l])
+            if key in PMD:
+                diht = PMD[key]
+                self._process_dihedral_series(words, diht)
+                dih = None
+            else:
+                dih = Dihedral(*key)
+                diht = self._process_dihedral_series(words)
+                dih.type = PMD[key] = PMD[tuple(reversed(key))] = diht
+                molecule.dihedrals.append(dih)
+                molecule.dihedral_types.append(diht)
+                diht.list = molecule.dihedral_types
         else:
             # ??? unknown funct
             warnings.warn('torsions funct != 1, 2, 3, 4, 9; unknown'
@@ -855,11 +820,47 @@ class GromacsTopologyFile(Structure):
         if dih is not None:
             dih.funct = funct
 
+    def _parse_cmaps(self, line, atoms):
+        """ Parses cmap terms, returns cmap """
+        words = line.split()
+        i, j, k, l, m = (int(w)-1 for w in words[:5])
+        funct = int(words[5])
+        if funct != 1:
+            warnings.warn('cmap funct != 1; unknown functional',
+                          GromacsWarning)
+            self.unknown_functional = True
+        cmap = Cmap(atoms[i], atoms[j], atoms[k], atoms[l], atoms[m])
+        cmap.funct = funct
+        return cmap
+
+    def _parse_settles(self, atoms, line):
+        """ Parses settles line; returns list of Bonds, list of BondTypes """
+        natoms = len([a for a in atoms if not isinstance(a, ExtraPoint)])
+        if natoms != 3:
+            raise GromacsError("Cannot SETTLE a %d-atom molecule" % natoms)
+        try:
+            oxy, = [atom for atom in atoms if atom.atomic_number == 8]
+            hyd1, hyd2 = [atom for atom in atoms if atom.atomic_number == 1]
+        except ValueError:
+            raise GromacsError('Can only SETTLE water; wrong atoms')
+        #TODO see if there's a bond_type entry in the parameter set
+        #     that we can fill in
+        try:
+            i, funct, doh, dhh = line.split()
+            doh, dhh = float(doh), float(dhh)
+        except ValueError:
+            raise GromacsError('Bad [ settles ] line')
+        nm = u.nanometers
+        bt_oh = BondType(5e5*u.kilojoules_per_mole/nm**2, doh*nm)
+        bt_hh = BondType(5e5*u.kilojoules_per_mole/nm**2, dhh*nm)
+        return [Bond(oxy, hyd1, bt_oh), Bond(oxy, hyd2, bt_oh),
+                Bond(hyd1, hyd2, bt_hh)], [bt_oh, bt_hh]
+
     def _process_normal_dihedral(self, words, atoms, i, j, k, l,
-                                 dihedral_types, imp, multiterm):
+                                 dihedral_types, imp):
         dih = Dihedral(atoms[i], atoms[j], atoms[k], atoms[l], improper=imp)
         diht = None
-        if not multiterm and len(words) >= 8:
+        if len(words) >= 8:
             phase, phi_k, per = (float(x) for x in words[5:8])
             if (phase, phi_k, per) in dihedral_types:
                 dih.type = dihedral_types[(phase, phi_k, per)]
@@ -871,7 +872,7 @@ class GromacsTopologyFile(Structure):
                 dihedral_types[(phase, phi_k, per)] = dih.type = diht
         return dih, diht
 
-    def _process_dihedral_series(self, words, dih, dihtype):
+    def _process_dihedral_series(self, words, dihtype=None):
         phase, phi_k, per = (float(x) for x in words[5:8])
         dt = DihedralType(phi_k*u.kilojoule_per_mole,
                           per, phase*u.degrees,
