@@ -142,7 +142,9 @@ class _Defaults(object):
         elif idx == 4:
             if float(value) < 0:
                 raise ValueError('fudgeQQ must be non-negative')
-            self.fudgeLJ = value
+            self.fudgeQQ = value
+        else:
+            raise IndexError('Index %d out of range' % idx)
 
 @add_metaclass(FileFormatType)
 class GromacsTopologyFile(Structure):
@@ -233,8 +235,8 @@ class GromacsTopologyFile(Structure):
             if xyz is not None:
                 if isinstance(xyz, string_types):
                     f = load_file(xyz)
-                    if (not hasattr(f, 'coordinates') or
-                            f.coordinates is None):
+                    if not hasattr(f, 'coordinates') or f.coordinates is None:
+                        # TODO delete
                         raise TypeError('File %s does not have coordinates' %
                                         xyz)
                     self.coordinates = f.coordinates
@@ -288,35 +290,7 @@ class GromacsTopologyFile(Structure):
                     dihedral_types = dict()
                     exc_types = dict()
                 elif current_section == 'atoms':
-                    words = line.split()
-                    try:
-                        attype = params.atom_types[words[1]]
-                    except KeyError:
-                        attype = None
-                    if len(words) < 8:
-                        if attype is not None:
-                            mass = attype.mass
-                            atomic_number = attype.atomic_number
-                        else:
-                            mass = -1
-                            atomic_number = -1
-                    else:
-                        mass = float(words[7])
-                        if attype is not None and attype.atomic_number >= 0:
-                            atomic_number = attype.atomic_number
-                        else:
-                            atomic_number = AtomicNum[element_by_mass(mass)]
-                    if len(words) < 7:
-                        charge = None
-                    else:
-                        charge = float(words[6])
-                    if atomic_number == 0:
-                        atom = ExtraPoint(name=words[4], type=words[1],
-                                          charge=charge)
-                    else:
-                        atom = Atom(atomic_number=atomic_number, name=words[4],
-                                    type=words[1], charge=charge, mass=mass)
-                    molecule.add_atom(atom, words[3], int(words[2]))
+                    molecule.add_atom(*self._parse_atoms(line, params))
                 elif current_section == 'bonds':
                     words = line.split()
                     i, j = int(words[0])-1, int(words[1])-1
@@ -872,6 +846,40 @@ class GromacsTopologyFile(Structure):
         self.itps = itplist
         if parametrize:
             self.parametrize()
+
+    #===================================================
+
+    def _parse_atoms(self, line, params):
+        """ Parses an atom line. Returns an Atom, resname, resnum """
+        words = line.split()
+        try:
+            attype = params.atom_types[words[1]]
+        except KeyError:
+            attype = None
+        if len(words) < 8:
+            if attype is not None:
+                mass = attype.mass
+                atomic_number = attype.atomic_number
+            else:
+                mass = -1
+                atomic_number = -1
+        else:
+            mass = float(words[7])
+            if attype is not None and attype.atomic_number >= 0:
+                atomic_number = attype.atomic_number
+            else:
+                atomic_number = AtomicNum[element_by_mass(mass)]
+        if len(words) < 7:
+            charge = None
+        else:
+            charge = float(words[6])
+        if atomic_number == 0:
+            atom = ExtraPoint(name=words[4], type=words[1],
+                              charge=charge)
+        else:
+            atom = Atom(atomic_number=atomic_number, name=words[4],
+                        type=words[1], charge=charge, mass=mass)
+        return atom, words[3], int(words[2])
 
     #===================================================
 
