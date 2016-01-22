@@ -9,7 +9,7 @@ from parmed.exceptions import GromacsWarning, GromacsError
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import gromacs as gmx
-from parmed.topologyobjects import _UnassignedAtomType
+from parmed.topologyobjects import UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
 import unittest
 from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
@@ -127,6 +127,16 @@ class TestGromacsTop(FileIOTestCase):
                                     'charmm27.ff/tip3p.itp',
                                     'charmm27.ff/ions.itp'])
         self._charmm27_checks(top)
+
+    def test_gromacs_top_detection(self):
+        """ Tests automatic file detection of GROMACS topology files """
+        fn = get_fn('test.top', written=True)
+        with open(fn, 'w') as f:
+            f.write('# not a gromacs topology file\n')
+        self.assertFalse(GromacsTopologyFile.id_format(fn))
+        with open(fn, 'w') as f:
+            pass
+        self.assertFalse(GromacsTopologyFile.id_format(fn))
 
     def test_gromacs_file(self):
         """ Test GromacsFile helper class """
@@ -277,14 +287,47 @@ class TestGromacsTop(FileIOTestCase):
         self.assertEqual(len(parm.atoms), len(parm2.atoms))
         # Check that the charge attribute is read correctly
         self.assertEqual(parm.parameterset.atom_types['opls_001'].charge, 0.5)
+        # Check the xyz argument in the constructor being coordinates
+        parm2 = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                          xyz=parm.coordinates, box=[10, 10, 10, 90, 90, 90])
+        np.testing.assert_equal(parm2.coordinates, parm.coordinates)
+        np.testing.assert_equal(parm2.box, [10, 10, 10, 90, 90, 90])
 
     def test_without_parametrize(self):
         """ Tests loading a Gromacs topology without parametrizing """
         parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                          xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'),
                          parametrize=False)
-        assert isinstance(parm.atoms[0].atom_type, _UnassignedAtomType)
-        assert all(x.type is None for x in parm.bonds)
+        self.assertIs(parm.atoms[0].atom_type, UnassignedAtomType)
+        self.assertTrue(all(x.type is None for x in parm.bonds))
+
+    def test_bad_top_loads(self):
+        """ Test error catching in GromacsTopologyFile reading """
+        fn = os.path.join(get_fn('03.AlaGlu'), 'topol.top')
+        self.assertRaises(TypeError, lambda: load_file(fn, xyz=fn))
+        self.assertRaises(ValueError, lambda: GromacsTopologyFile(xyz=1, box=1))
+        wfn = os.path.join(get_fn('gmxtops'), 'duplicated_topol.top')
+        self.assertRaises(GromacsError, lambda: GromacsTopologyFile(wfn))
+
+    def test_top_parsing_missing_types(self):
+        """ Test GROMACS topology files with missing types """
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        top = GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
+                                  'missing_atomtype.top'), parametrize=False)
+        self.assertIs(top[0].atom_type, UnassignedAtomType)
+        self.assertEqual(top[0].mass, -1)
+        self.assertEqual(top[0].atomic_number, -1)
+        self.assertEqual(top[1].atomic_number, 1)  # taken from atom_type
+        self.assertEqual(top[-1].atomic_number, 1) # taken from atom_type
+        self.assertEqual(top[-1].charge, 0) # removed
+        self.assertEqual(top.bonds[0].funct, 2)
+        self.assertTrue(top.unknown_functional)
+        warnings.filterwarnings('error', category=GromacsWarning)
+        self.assertRaises(GromacsWarning, lambda:
+                GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
+                                    'missing_atomtype.top'), parametrize=False)
+        )
+        warnings.filterwarnings('always', category=GromacsWarning)
 
     def test_molecule_ordering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """
@@ -353,6 +396,58 @@ class TestGromacsTop(FileIOTestCase):
             self.assertEqual(len(r1), len(r2))
             for a1, a2 in zip(r1, r2):
                 self._equal_atoms(a1, a2)
+
+    def test_private_functions(self):
+        """ Tests private helper functions for GromacsTopologyFile """
+        Defaults = gmx.gromacstop._Defaults
+        self.assertRaises(ValueError, lambda: Defaults(nbfunc=3))
+        self.assertRaises(ValueError, lambda: Defaults(comb_rule=4))
+        self.assertRaises(ValueError, lambda: Defaults(gen_pairs='nada'))
+        self.assertRaises(ValueError, lambda: Defaults(fudgeLJ=-1.0))
+        self.assertRaises(ValueError, lambda: Defaults(fudgeQQ=-1.0))
+        repr(Defaults()) # To make sure it doesn't crash
+        defaults = Defaults(nbfunc=2, comb_rule=3, gen_pairs='no', fudgeLJ=2.0,
+                            fudgeQQ=1.5)
+        self.assertEqual(defaults[0], 2)
+        self.assertEqual(defaults[1], 3)
+        self.assertEqual(defaults[2], 'no')
+        self.assertEqual(defaults[3], 2.0)
+        self.assertEqual(defaults[4], 1.5)
+        self.assertEqual(defaults[-1], 1.5)
+        self.assertEqual(defaults[-2], 2.0)
+        self.assertEqual(defaults[-3], 'no')
+        self.assertEqual(defaults[-4], 3)
+        self.assertEqual(defaults[-5], 2)
+        self.assertRaises(IndexError, lambda: defaults[-6])
+        self.assertRaises(IndexError, lambda: defaults[5])
+        # Try setting as an array
+        defaults[0] = defaults[1] = 1
+        defaults[2] = 'yes'
+        defaults[3] = 1.5
+        defaults[4] = 2.0
+        self.assertEqual(defaults.nbfunc, 1)
+        self.assertEqual(defaults.comb_rule, 1)
+        self.assertEqual(defaults.gen_pairs, 'yes')
+        self.assertEqual(defaults.fudgeLJ, 1.5)
+        self.assertEqual(defaults.fudgeQQ, 2.0)
+        defaults[-5] = defaults[-4] = 1
+        defaults[-3] = 'yes'
+        defaults[-2] = 1.5
+        defaults[-1] = 2.0
+        self.assertEqual(defaults.nbfunc, 1)
+        self.assertEqual(defaults.comb_rule, 1)
+        self.assertEqual(defaults.gen_pairs, 'yes')
+        self.assertEqual(defaults.fudgeLJ, 1.5)
+        self.assertEqual(defaults.fudgeQQ, 2.0)
+        # Error checking
+        def setter(idx, val):
+            defaults[idx] = val
+        self.assertRaises(ValueError, lambda: setter(0, 0))
+        self.assertRaises(ValueError, lambda: setter(1, 0))
+        self.assertRaises(ValueError, lambda: setter(2, 'nada'))
+        self.assertRaises(ValueError, lambda: setter(3, -1))
+        self.assertRaises(ValueError, lambda: setter(4, -1))
+        self.assertRaises(IndexError, lambda: setter(5, 0))
 
     _equal_atoms = utils.equal_atoms
 

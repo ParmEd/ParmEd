@@ -100,7 +100,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
 
     def test_chamber(self):
         """ Tests converting standard Gromacs system into Chamber prmtop """
-        fn = get_fn('1aki.charmm27_fromgmx.parm7')
+        fn = get_fn('1aki.charmm27_fromgmx.parm7', written=True)
         top = load_file(get_fn('1aki.charmm27.solv.top'),
                         xyz=get_fn('1aki.charmm27.solv.gro'))
         parm = amber.ChamberParm.from_structure(top)
