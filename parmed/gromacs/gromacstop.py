@@ -21,7 +21,7 @@ from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
-            NonbondedExceptionType)
+            NonbondedExceptionType, UnassignedAtomType)
 from parmed.periodic_table import element_by_mass, AtomicNum
 from parmed import unit as u
 from parmed.utils.io import genopen
@@ -345,84 +345,19 @@ class GromacsTopologyFile(Structure):
                     # (or other 3-atom molecules), GROMACS uses a "settles"
                     # section to specify the constraint geometry. We have to
                     # translate that into bonds.
-                    bnds, bndts = self._parse_settles(molecule.atoms, line)
+                    bnds, bndts = self._parse_settles(line, molecule.atoms)
                     molecule.bonds.extend(bnds)
                     molecule.bond_types.extend(bndts)
                     molecule.bond_types.claim()
                 elif current_section in ('virtual_sites3', 'dummies3'):
-                    words = line.split()
-                    vsite = molecule.atoms[int(words[0])-1]
-                    atoms = [molecule.atoms[int(i)-1] for i in words[1:4]]
-                    funct = int(words[4])
-                    if funct == 1:
-                        a, b = float(words[5]), float(words[6])
-                        if abs(a - b) > TINY:
-                            raise GromacsError('Cannot handle virtual site '
-                                               'frames with different weights')
-                    else:
-                        raise GromacsError('Only 3-point virtual site type "1" '
-                                           'is supported')
-                    # We need to know the geometry of the frame in order to
-                    # determine the bond length between the virtual site and its
-                    # parent atom
-                    parent = atoms[0]
-                    foundt = False
-                    kws = dict()
-                    for bond in parent.bonds:
-                        if atoms[1] in bond:
-                            if bond.type is None:
-                                key = (parent.type, atoms[1].type)
-                                if key not in params.bond_types:
-                                    raise GromacsError(
-                                            'Cannot determine geometry of '
-                                            'virtual site without bond types'
-                                    )
-                                kws['dp1'] = params[key].req
-                        if atoms[2] in bond:
-                            if bond.type is None:
-                                key = (_gettype(bond.atom1),
-                                       _gettype(bond.atom2))
-                                if key not in params.bond_types:
-                                    raise GromacsError(
-                                            'Cannot determine geometry of '
-                                            'virtual site without bond types'
-                                    )
-                                kws['dp2'] = params.bond_types[key].req
-                    for angle in parent.angles:
-                        if parent is not angle.atom2: continue
-                        if atoms[0] not in angle or atoms[1] not in angle:
-                            continue
-                        foundt = True
-                        if angle.type is None:
-                            key = (_gettype(angle.atom1), _gettype(angle.atom2),
-                                   _gettype(angle.atom3))
-                            if key not in params.angle_types:
-                                raise GromacsError(
-                                        'Cannot determine geometry of '
-                                        'virtual site without bond types'
-                                )
-                            kws['theteq'] = params.angle_types[key].theteq
-                    if not foundt:
-                        for bond in atoms[1].bonds:
-                            if atoms[2] in bond:
-                                if bond.type is None:
-                                    key = (_gettype(bond.atom1),
-                                           _gettype(bond.atom2))
-                                    if key not in params.bond_types:
-                                        raise GromacsError(
-                                            'Cannot determine geometry of '
-                                            'virtual site without bond types'
-                                        )
-                                    kws['d12'] = params.bond_types[key].req
-                    bondlen = ThreeParticleExtraPointFrame.from_weights(parent,
-                            atoms[1], atoms[2], a, b, **kws)
-                    bt_vs = BondType(0, bondlen*u.angstroms,
-                                     list=molecule.bond_types)
-                    if vsite in parent.bond_partners:
-                        raise GromacsError('Unexpected bond b/w virtual site '
-                                           'and its parent')
-                    molecule.bonds.append(Bond(vsite, parent, bt_vs))
-                    molecule.bond_types.append(bt_vs)
+                    try:
+                        b, bt = self._parse_vsites3(line, molecule.atoms, params)
+                    except KeyError:
+                        raise GromacsError('Cannot determine vsite geometry'
+                                           'without parameter types')
+                    molecule.bonds.append(b)
+                    molecule.bond_types.append(bt)
+                    bt.list = molecule.bond_types
                 elif current_section == 'exclusions':
                     atoms = [molecule.atoms[int(w)-1] for w in line.split()]
                     for a in atoms[1:]:
@@ -833,7 +768,7 @@ class GromacsTopologyFile(Structure):
         cmap.funct = funct
         return cmap
 
-    def _parse_settles(self, atoms, line):
+    def _parse_settles(self, line, atoms):
         """ Parses settles line; returns list of Bonds, list of BondTypes """
         natoms = len([a for a in atoms if not isinstance(a, ExtraPoint)])
         if natoms != 3:
@@ -855,6 +790,49 @@ class GromacsTopologyFile(Structure):
         bt_hh = BondType(5e5*u.kilojoules_per_mole/nm**2, dhh*nm)
         return [Bond(oxy, hyd1, bt_oh), Bond(oxy, hyd2, bt_oh),
                 Bond(hyd1, hyd2, bt_hh)], [bt_oh, bt_hh]
+
+    def _parse_vsites3(self, line, all_atoms, params):
+        """ Parse vsites3/dummy3 line; returns Bond, BondType """
+        words = line.split()
+        vsite = all_atoms[int(words[0])-1]
+        atoms = [all_atoms[int(i)-1] for i in words[1:4]]
+        funct = int(words[4])
+        if funct == 1:
+            a, b = float(words[5]), float(words[6])
+            if abs(a - b) > TINY:
+                raise GromacsError("No vsite frames with different weights")
+        else:
+            raise GromacsError('Only 3-point vsite type 1 is supported')
+        # We need to know the geometry of the frame in order to
+        # determine the bond length between the virtual site and its
+        # parent atom
+        parent = atoms[0]
+        kws = dict()
+        for bond in parent.bonds:
+            if atoms[1] in bond:
+                key = (_gettype(parent), _gettype(atoms[1]))
+                kws['dp1'] = (bond.type or params[key]).req
+            if atoms[2] in bond:
+                key = (_gettype(bond.atom1), _gettype(bond.atom2))
+                kws['dp2'] = (bond.type or params.bond_types[key]).req
+        for angle in parent.angles:
+            if parent is not angle.atom2: continue
+            if atoms[0] not in angle or atoms[1] not in angle: continue
+            key = (_gettype(angle.atom1), _gettype(angle.atom2),
+                   _gettype(angle.atom3))
+            kws['theteq'] = (angle.type or params.angle_types[key]).theteq
+            break
+        else: # Did not break, no theta found
+            for bond in atoms[1].bonds:
+                if atoms[2] in bond:
+                    key = (_gettype(bond.atom1), _gettype(bond.atom2))
+                    kws['d12'] = (bond.type or params.bond_types[key]).req
+        bondlen = ThreeParticleExtraPointFrame.from_weights(parent, atoms[1],
+                                                    atoms[2], a, b, **kws)
+        bt_vs = BondType(0, bondlen*u.angstroms)
+        if vsite in parent.bond_partners:
+            raise GromacsError('Unexpected bond b/w vsite and its parent')
+        return Bond(vsite, parent, bt_vs), bt_vs
 
     def _process_normal_dihedral(self, words, atoms, i, j, k, l,
                                  dihedral_types, imp):
@@ -2053,6 +2031,6 @@ def _diff_diheds(dt1, dt2):
     return True
 
 def _gettype(atom):
-    if atom.atom_type is not None:
+    if atom.atom_type not in (None, UnassignedAtomType):
         return atom.atom_type.bond_type
     return atom.type
