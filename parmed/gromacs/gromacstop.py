@@ -292,203 +292,34 @@ class GromacsTopologyFile(Structure):
                 elif current_section == 'atoms':
                     molecule.add_atom(*self._parse_atoms(line, params))
                 elif current_section == 'bonds':
-                    words = line.split()
-                    i, j = int(words[0])-1, int(words[1])-1
-                    funct = int(words[2])
-                    if funct != 1:
-                        warnings.warn('bond funct != 1; unknown functional',
-                                      GromacsWarning)
-                        self.unknown_functional = True
-                    molecule.bonds.append(Bond(molecule.atoms[i],
-                                               molecule.atoms[j]))
-                    molecule.bonds[-1].funct = funct
-                    if len(words) >= 5 and funct == 1:
-                        req, k = (float(x) for x in words[3:5])
-                        if (req, k) in bond_types:
-                            bt = bond_types[(req, k)]
-                        else:
-                            bt = BondType(
-                                    k*u.kilojoule_per_mole/u.nanometer**2/2,
-                                    req*u.nanometer, list=molecule.bond_types
-                            )
-                            molecule.bond_types.append(bt)
-                            bond_types[(req, k)] = bt
-                        molecule.bonds[-1].type= bt
+                    bond, bond_type = self._parse_bonds(line, bond_types,
+                                                        molecule.atoms)
+                    molecule.bonds.append(bond)
+                    if bond_type is not None:
+                        molecule.bond_types.append(bond_type)
+                        bond_type.list = molecule.bond_types
                 elif current_section == 'pairs':
-                    words = line.split()
-                    i, j = int(words[0])-1, int(words[1])-1
-                    funct = int(words[2])
-                    if funct != 1:
-                        # This is not even supported in Gromacs
-                        warnings.warn('pairs funct != 1; unknown functional',
-                                      GromacsWarning)
-                        self.unknown_functional = True
-                    molecule.adjusts.append(
-                            NonbondedException(molecule.atoms[i],
-                                               molecule.atoms[j])
-                    )
-                    molecule.adjusts[-1].funct = funct
-                    if funct == 1 and len(words) >= 5:
-                        sig = float(words[3]) * 2**(1/6)
-                        eps = float(words[4])
-                        if (sig, eps) in exc_types:
-                            nt = exc_types[(sig, eps)]
-                        else:
-                            nt = NonbondedExceptionType(
-                                    sig*u.nanometers,
-                                    eps*u.kilojoules_per_mole,
-                                    self.defaults.fudgeQQ,
-                                    list=molecule.adjust_types
-                            )
-                            molecule.adjust_types.append(nt)
-                            exc_types[(sig, eps)] = nt
-                        molecule.adjusts[-1].type = nt
+                    nbe, nbet = self._parse_pairs(line, exc_types,
+                                                  molecule.atoms)
+                    molecule.adjusts.append(nbe)
+                    if nbet is not None:
+                        molecule.adjust_types.append(nbet)
+                        nbet.list = molecule.adjust_types
                 elif current_section == 'angles':
-                    words = line.split()
-                    i, j, k = [int(w)-1 for w in words[:3]]
-                    funct = int(words[3])
-                    if funct not in (1, 5):
-                        warnings.warn('angles funct != 1 or 5; unknown '
-                                      'functional', GromacsWarning)
-                        self.unknown_functional = True
-                    molecule.angles.append(
-                            Angle(molecule.atoms[i], molecule.atoms[j],
-                                  molecule.atoms[k])
-                    )
-                    if funct == 5:
-                        molecule.urey_bradleys.append(
-                                UreyBradley(molecule.atoms[i],molecule.atoms[k])
-                        )
-                    molecule.angles[-1].funct = funct
-                    if funct == 1 and len(words) >= 6:
-                        theteq, k = (float(x) for x in words[4:6])
-                        if (theteq, k) in angle_types:
-                            at = angle_types[(theteq, k)]
-                        else:
-                            at = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
-                                    theteq*u.degree, list=molecule.angle_types)
-                            molecule.angle_types.append(at)
-                            angle_types[(theteq, k)] = at
-                        molecule.angles[-1].type = at
-                    elif funct == 5 and len(words) >= 8:
-                        theteq, k, ubreq, ubk = (float(x) for x in words[4:8])
-                        at = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
-                                theteq*u.degree, list=molecule.angle_types)
-                        molecule.angle_types.append(at)
-                        molecule.angles[-1].type = at
-                        if ubreq > 0 and ubk > 0:
-                            if (ubreq, ubk) in ub_types:
-                                ubt = ub_types[(ubreq, ubk)]
-                            else:
-                                ubt = BondType(
-                                    ubk*u.kilojoule_per_mole/u.nanometer**2/2,
-                                    ubreq*u.nanometer,
-                                    list=molecule.urey_bradley_types
-                                )
-                                molecule.urey_bradley_types.append(ubt)
-                                ub_types[(ubreq, ubk)] = ubt
-                        else:
-                            ubt = NoUreyBradley
-                        molecule.urey_bradleys[-1].type = ubt
+                    ang, ub, angt, ubt = self._parse_angles(line, angle_types,
+                                                     ub_types, molecule.atoms)
+                    molecule.angles.append(ang)
+                    if ub is not None:
+                        molecule.urey_bradleys.append(ub)
+                    if angt is not None:
+                        molecule.angle_types.append(angt)
+                        angt.list = molecule.angle_types
+                    if ubt is not None:
+                        molecule.urey_bradley_types.append(ubt)
+                        ubt.list = molecule.urey_bradley_types
                 elif current_section == 'dihedrals':
-                    words = line.split()
-                    i, j, k, l = [int(x)-1 for x in words[:4]]
-                    funct = int(words[4])
-                    if funct in (1, 4) or (funct == 9 and len(words) < 8):
-                        # Normal dihedral
-                        improper = funct == 4
-                        dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
-                                       molecule.atoms[k], molecule.atoms[l],
-                                       improper=improper)
-                        molecule.dihedrals.append(dih)
-                        molecule.dihedrals[-1].funct = funct
-                    elif funct == 9:
-                        atoms = tuple(molecule.atoms[int(x)-1]
-                                      for x in words[:4])
-                        phase, phi_k, per = (float(x) for x in words[5:8])
-                        dt = DihedralType(phi_k*u.kilojoule_per_mole,
-                                          per, phase*u.degrees,
-                                          scee=1/self.defaults.fudgeQQ,
-                                          scnb=1/self.defaults.fudgeLJ)
-                        if atoms in proper_multiterm_dihedrals:
-                            for edt in proper_multiterm_dihedrals[atoms]:
-                                if edt.per == dt.per:
-                                    raise GromacsError(
-                                        'duplicate periodicity term found '
-                                        'in inline dihedral parameter for '
-                                        'atoms [%s]' % ', '.join(words[:4])
-                                    )
-                            proper_multiterm_dihedrals[atoms].append(dt)
-                        else:
-                            dt = DihedralType(phi_k*u.kilojoule_per_mole,
-                                              per, phase*u.degrees,
-                                              scee=1/self.defaults.fudgeQQ,
-                                              scnb=1/self.defaults.fudgeLJ)
-                            dtl = DihedralTypeList()
-                            dtl.append(dt)
-                            dtl.list = molecule.dihedral_types
-                            molecule.dihedral_types.append(dtl)
-                            dih = Dihedral(*atoms, improper=False, type=dtl)
-                            molecule.dihedrals.append(dih)
-                            proper_multiterm_dihedrals[atoms] = dtl
-                            proper_multiterm_dihedrals[tuple(reversed(atoms))] = dtl
-                    elif funct == 2:
-                        # Improper
-                        imp = Improper(molecule.atoms[i], molecule.atoms[j],
-                                       molecule.atoms[k], molecule.atoms[l])
-                        molecule.impropers.append(imp)
-                        molecule.impropers[-1].funct = funct
-                    elif funct == 3:
-                        rb = Dihedral(molecule.atoms[i], molecule.atoms[j],
-                                      molecule.atoms[k], molecule.atoms[l])
-                        molecule.rb_torsions.append(rb)
-                        molecule.rb_torsions[-1].funct = funct
-                    else:
-                        # ??? unknown
-                        warnings.warn('torsions funct != 1, 2, 3, 4, 9; unknown'
-                                      ' functional', GromacsWarning)
-                        dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
-                                       molecule.atoms[k], molecule.atoms[l])
-                        molecule.dihedrals.append(dih)
-                        molecule.dihedrals[-1].funct == funct
-                        self.unknown_functional = True
-                    if funct in (1, 4) and len(words) >= 8:
-                        phase, phi_k, per = (float(x) for x in words[5:8])
-                        if (phase, phi_k, per) in dihedral_types:
-                            dt = dihedral_types[(phase, phi_k, per)]
-                        else:
-                            dt = DihedralType(phi_k*u.kilojoule_per_mole,
-                                              per, phase*u.degrees,
-                                              scee=1/self.defaults.fudgeQQ,
-                                              scnb=1/self.defaults.fudgeLJ,
-                                              list=molecule.dihedral_types)
-                            molecule.dihedral_types.append(dt)
-                            dihedral_types[(phase, phi_k, per)] = dt
-                        molecule.dihedrals[-1].type = dt
-                    elif funct == 2 and len(words) >= 7:
-                        psieq, k = (float(x) for x in words[5:7])
-                        if (psieq, k) in dihedral_types:
-                            dt = dihedral_types[(psieq, k)]
-                        else:
-                            dt = ImproperType(k*u.kilojoule_per_mole/u.radian**2/2,
-                                    psieq*u.degree, list=molecule.improper_types)
-                            molecule.improper_types.append(dt)
-                            dihedral_types[(psieq, k)] = dt
-                        molecule.impropers[-1].type = dt
-                    elif funct == 3 and len(words) >= 11:
-                        c0, c1, c2, c3, c4, c5 = (float(x) for x in words[5:11])
-                        if (c0, c1, c2, c3, c4, c5) in dihedral_types:
-                            dt = dihedral_types[(c0, c1, c2, c3, c4, c5)]
-                        else:
-                            kjpm = u.kilojoules_per_mole
-                            dt = RBTorsionType(c0*kjpm, c1*kjpm, c2*kjpm,
-                                               c3*kjpm, c4*kjpm, c5*kjpm,
-                                               scee=1/self.defaults.fudgeQQ,
-                                               scnb=1/self.defaults.fudgeLJ,
-                                               list=molecule.rb_torsion_types)
-                            molecule.rb_torsion_types.append(dt)
-                            dihedral_types[(c0, c1, c2, c3, c4, c5)] = dt
-                        molecule.rb_torsions[-1].type = dt
+                    self._parse_dihedrals(line, dihedral_types,
+                                          proper_multiterm_dihedrals, molecule)
                 elif current_section == 'cmap':
                     words = line.split()
                     i, j, k, l, m = (int(w)-1 for w in words[:5])
@@ -847,7 +678,7 @@ class GromacsTopologyFile(Structure):
         if parametrize:
             self.parametrize()
 
-    #===================================================
+    # Private parsing helper functions
 
     def _parse_atoms(self, line, params):
         """ Parses an atom line. Returns an Atom, resname, resnum """
@@ -880,6 +711,221 @@ class GromacsTopologyFile(Structure):
             atom = Atom(atomic_number=atomic_number, name=words[4],
                         type=words[1], charge=charge, mass=mass)
         return atom, words[3], int(words[2])
+
+    def _parse_bonds(self, line, bond_types, atoms):
+        """ Parses a bond line. Returns a Bond, BondType/None """
+        words = line.split()
+        i, j = int(words[0])-1, int(words[1])-1
+        funct = int(words[2])
+        if funct != 1:
+            warnings.warn('bond funct != 1; unknown functional',
+                          GromacsWarning)
+            self.unknown_functional = True
+        bond = Bond(atoms[i], atoms[j])
+        bond.funct = funct
+        bond_type = None
+        if len(words) >= 5 and funct == 1:
+            req, k = (float(x) for x in words[3:5])
+            if (req, k) in bond_types:
+                bond.type = bond_types[(req, k)]
+            else:
+                bond_type = BondType(
+                        k*u.kilojoule_per_mole/u.nanometer**2/2,
+                        req*u.nanometer
+                )
+                bond_types[(req, k)] = bond.type = bond_type
+        return bond, bond_type
+
+    def _parse_pairs(self, line, exc_types, atoms):
+        """ Parses a pairs line. Returns NonbondedException, NEType/None """
+        words = line.split()
+        i, j = int(words[0])-1, int(words[1])-1
+        funct = int(words[2])
+        if funct != 1:
+            # This is not even supported in Gromacs
+            warnings.warn('pairs funct != 1; unknown functional',
+                          GromacsWarning)
+            self.unknown_functional = True
+        nbe = NonbondedException(atoms[i], atoms[j])
+        nbe.funct = funct
+        nbet = None
+        if funct == 1 and len(words) >= 5:
+            sig = float(words[3]) * 2**(1/6)
+            eps = float(words[4])
+            if (sig, eps) in exc_types:
+                nbe.type = exc_types[(sig, eps)]
+            else:
+                nbet = NonbondedExceptionType(
+                        sig*u.nanometers,
+                        eps*u.kilojoules_per_mole,
+                        self.defaults.fudgeQQ,
+                )
+                exc_types[(sig, eps)] = nbe.type = nbet
+        return nbe, nbet
+
+    def _parse_angles(self, line, angle_types, ub_types, atoms):
+        """ Parse an angles line, Returns Angle, UB/None, and types """
+        words = line.split()
+        i, j, k = [int(w)-1 for w in words[:3]]
+        funct = int(words[3])
+        if funct not in (1, 5):
+            warnings.warn('angles funct != 1 or 5; unknown '
+                          'functional', GromacsWarning)
+            self.unknown_functional = True
+        angt = ub = ubt = None
+        ang = Angle(atoms[i], atoms[j], atoms[k])
+        if funct == 5:
+            ub = UreyBradley(atoms[i], atoms[k])
+        ang.funct = funct
+        if (funct == 1 and len(words) >= 6) or (funct == 5 and len(words) >= 8):
+            theteq, k = (float(x) for x in words[4:6])
+            if (theteq, k) in angle_types:
+                ang.type = angle_types[(theteq, k)]
+            else:
+                angt = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
+                                 theteq*u.degree)
+                angle_types[(theteq, k)] = ang.type = angt
+        if funct == 5 and len(words) >= 8:
+            ubreq, ubk = (float(x) for x in words[6:8])
+            if ubreq > 0 and ubk > 0:
+                if (ubreq, ubk) in ub_types:
+                    ub.type = ub_types[(ubreq, ubk)]
+                else:
+                    ubt = BondType(
+                        ubk*u.kilojoule_per_mole/u.nanometer**2/2,
+                        ubreq*u.nanometer,
+                    )
+                    ub_types[(ubreq, ubk)] = ub.type = ubt
+            else:
+                ub.type = NoUreyBradley
+        return ang, ub, angt, ubt
+
+    def _parse_dihedrals(self, line, dihedral_types, proper_multiterm_dihedrals,
+                         molecule):
+        """ Processes a dihedrals line, returns None """
+        words = line.split()
+        i, j, k, l = [int(x)-1 for x in words[:4]]
+        funct = int(words[4])
+        if funct in (1, 4, 9):
+            dih, diht = self._process_normal_dihedral(words, molecule.atoms, i,
+                                                      j, k, l, dihedral_types,
+                                                      funct==4, funct==9)
+            if funct == 9 and len(words) >= 8:
+                key = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+                if key in proper_multiterm_dihedrals:
+                    # In this case, all this line does is add another term
+                    diht = proper_multiterm_dihedrals[key]
+                    dih.delete()
+                    dih = None
+                    self._process_dihedral_series(words, dih, diht)
+                else:
+                    diht = self._process_dihedral_series(words, dih, diht)
+                    proper_multiterm_dihedrals[key] = diht
+                    proper_multiterm_dihedrals[tuple(reversed(key))] = diht
+                if dih is not None:
+                    dih.type = diht
+            if dih is not None:
+                molecule.dihedrals.append(dih)
+                if diht is not None:
+                    molecule.dihedral_types.append(diht)
+                    diht.list = molecule.dihedral_types
+        elif funct == 2:
+            dih, impt = self._process_improper(words, i, j, k, l,
+                                               molecule.atoms, dihedral_types)
+            molecule.impropers.append(dih)
+            if impt is not None:
+                molecule.improper_types.append(impt)
+                impt.list = molecule.improper_types
+        elif funct == 3:
+            dih, rbt = self._process_rbtorsion(words, i, j, k, l, molecule.atoms,
+                                              dihedral_types)
+            molecule.rb_torsions.append(dih)
+            if rbt is not None:
+                molecule.rb_torsion_types.append(rbt)
+                rbt.list = molecule.rb_torsion_types
+        else:
+            # ??? unknown funct
+            warnings.warn('torsions funct != 1, 2, 3, 4, 9; unknown'
+                          ' functional', GromacsWarning)
+            dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
+                           molecule.atoms[k], molecule.atoms[l])
+            molecule.dihedrals.append(dih)
+            self.unknown_functional = True
+
+        if dih is not None:
+            dih.funct = funct
+
+    def _process_normal_dihedral(self, words, atoms, i, j, k, l,
+                                 dihedral_types, imp, multiterm):
+        dih = Dihedral(atoms[i], atoms[j], atoms[k], atoms[l], improper=imp)
+        diht = None
+        if not multiterm and len(words) >= 8:
+            phase, phi_k, per = (float(x) for x in words[5:8])
+            if (phase, phi_k, per) in dihedral_types:
+                dih.type = dihedral_types[(phase, phi_k, per)]
+            else:
+                diht = DihedralType(phi_k*u.kilojoule_per_mole,
+                                    per, phase*u.degrees,
+                                    scee=1/self.defaults.fudgeQQ,
+                                    scnb=1/self.defaults.fudgeLJ)
+                dihedral_types[(phase, phi_k, per)] = dih.type = diht
+        return dih, diht
+
+    def _process_dihedral_series(self, words, dih, dihtype):
+        phase, phi_k, per = (float(x) for x in words[5:8])
+        dt = DihedralType(phi_k*u.kilojoule_per_mole,
+                          per, phase*u.degrees,
+                          scee=1/self.defaults.fudgeQQ,
+                          scnb=1/self.defaults.fudgeLJ)
+        if dihtype is not None:
+            for edt in dihtype:
+                if edt.per == dt.per:
+                    raise GromacsError(
+                        'duplicate periodicity term found '
+                        'in inline dihedral parameter for '
+                        'atoms [%s]' % ', '.join(words[:4])
+                    )
+            dihtype.append(dt)
+            dtl = None
+        else:
+            dt = DihedralType(phi_k*u.kilojoule_per_mole,
+                              per, phase*u.degrees,
+                              scee=1/self.defaults.fudgeQQ,
+                              scnb=1/self.defaults.fudgeLJ)
+            dtl = DihedralTypeList()
+            dtl.append(dt)
+        return dtl
+
+    def _process_improper(self, words, i, j, k, l, atoms, dihedral_types):
+        """ Processes an improper, returns Improper, ImproperType """
+        # Improper
+        imp = Improper(atoms[i], atoms[j], atoms[k], atoms[l])
+        impt = None
+        if len(words) >= 7:
+            psieq, k = (float(x) for x in words[5:7])
+            if (psieq, k) in dihedral_types:
+                imp.type = dihedral_types[(psieq, k)]
+            else:
+                impt = ImproperType(k*u.kilojoule_per_mole/u.radian**2/2,
+                                    psieq*u.degree)
+                imp.type = dihedral_types[(psieq, k)] = impt
+        return imp, impt
+
+    def _process_rbtorsion(self, words, i, j, k, l, atoms, dihedral_types):
+        rb = Dihedral(atoms[i], atoms[j], atoms[k], atoms[l])
+        rbt = None
+        if len(words) >= 11:
+            c0, c1, c2, c3, c4, c5 = (float(x) for x in words[5:11])
+            if (c0, c1, c2, c3, c4, c5) in dihedral_types:
+                rb.type = dihedral_types[(c0, c1, c2, c3, c4, c5)]
+            else:
+                kjpm = u.kilojoules_per_mole
+                rbt = RBTorsionType(c0*kjpm, c1*kjpm, c2*kjpm,
+                                    c3*kjpm, c4*kjpm, c5*kjpm,
+                                    scee=1/self.defaults.fudgeQQ,
+                                    scnb=1/self.defaults.fudgeLJ)
+                dihedral_types[(c0, c1, c2, c3, c4, c5)] = rb.type = rbt
+        return rb, rbt
 
     #===================================================
 
