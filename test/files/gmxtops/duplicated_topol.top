@@ -208,6 +208,7 @@ Protein_chain_1     3
     9    17    15    16     4 
    15    19    17    18     4 
 
+#ifndef NODUP
 [ moleculetype ]
 ; Name            nrexcl
 Protein_chain_1     3
@@ -398,6 +399,8 @@ Protein_chain_1     3
     9    17    15    16     4 
    15    19    17    18     4 
 
+#endif
+
 ; Include Position restraint file
 #ifdef POSRES
 #include "posre.itp"
@@ -422,4 +425,12 @@ Protein
 
 [ molecules ]
 ; Compound        #mols
+#ifdef NODUP
+#   ifdef BADNUM
+Protein_chain_1    -1 
+#   else
+Protein_chain_1     0
+#   endif
+#else
 Protein_chain_1     1
+#endif

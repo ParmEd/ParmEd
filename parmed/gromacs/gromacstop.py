@@ -81,7 +81,7 @@ _sectionre = re.compile(r'\[ (\w+) \]\s*$')
 
 class _Defaults(object):
     """ Global properties of force fields as implemented in GROMACS """
-    def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='yes',
+    def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='no',
                  fudgeLJ=1.0, fudgeQQ=1.0):
         if int(nbfunc) not in (1, 2):
             raise ValueError('nbfunc must be 1 (L-J) or 2 (Buckingham)')
@@ -228,7 +228,7 @@ class GromacsTopologyFile(Structure):
         from parmed import load_file
         super(GromacsTopologyFile, self).__init__()
         self.parameterset = None
-        self.defaults = _Defaults()
+        self.defaults = _Defaults(gen_pairs='yes') # make ParmEd's default yes
         if fname is not None:
             self.read(fname, defines, parametrize)
             # Fill in coordinates and unit cell information if appropriate
@@ -326,7 +326,7 @@ class GromacsTopologyFile(Structure):
                     self.title = line
                 elif current_section == 'defaults':
                     words = line.split()
-                    if len(words) < 4:
+                    if len(words) < 2: # 3, 4, and 5 fields are optional
                         raise GromacsError('Too few fields in [ defaults ]')
                     if words[0] != '1':
                         warnings.warn('Unsupported nonbonded type; unknown '
@@ -668,11 +668,13 @@ class GromacsTopologyFile(Structure):
         # determine the bond length between the virtual site and its
         # parent atom
         parent = atoms[0]
+        if vsite in parent.bond_partners:
+            raise GromacsError('Unexpected bond b/w vsite and its parent')
         kws = dict()
         for bond in parent.bonds:
             if atoms[1] in bond:
                 key = (_gettype(parent), _gettype(atoms[1]))
-                kws['dp1'] = (bond.type or params[key]).req
+                kws['dp1'] = (bond.type or params.bond_types[key]).req
             if atoms[2] in bond:
                 key = (_gettype(bond.atom1), _gettype(bond.atom2))
                 kws['dp2'] = (bond.type or params.bond_types[key]).req
@@ -691,8 +693,6 @@ class GromacsTopologyFile(Structure):
         bondlen = ThreeParticleExtraPointFrame.from_weights(parent, atoms[1],
                                                     atoms[2], a, b, **kws)
         bt_vs = BondType(0, bondlen*u.angstroms)
-        if vsite in parent.bond_partners:
-            raise GromacsError('Unexpected bond b/w vsite and its parent')
         return Bond(vsite, parent, bt_vs), bt_vs
 
     def _parse_atomtypes(self, line):
