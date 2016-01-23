@@ -401,31 +401,12 @@ class GromacsTopologyFile(Structure):
                         params.rb_torsion_types[key] = t
                         params.rb_torsion_types[rkey] = t
                 elif current_section == 'cmaptypes':
-                    words = line.split()
-                    a1, a2, a3, a4, a5 = words[:5]
-#                   funct = int(words[5]) # ... unused
-                    res1, res2 = int(words[6]), int(words[7])
-                    grid = [float(w) for w in words[8:]] * u.kilojoules_per_mole
-                    if len(grid) != res1 * res2:
-                        raise GromacsError('CMAP grid dimensions do not match '
-                                           'resolution')
-                    if res1 != res2:
-                        raise GromacsError('Only square CMAPs are supported')
-                    cmaptype = CmapType(res1, grid)
-                    params.cmap_types[(a1, a2, a3, a4, a5)] = cmaptype
-                    params.cmap_types[(a5, a4, a3, a2, a1)] = cmaptype
+                    a1, a2, a3, a4, a5, t = self._parse_cmaptypes(line)
+                    params.cmap_types[(a1, a2, a3, a4, a5)] = t
+                    params.cmap_types[(a5, a4, a3, a2, a1)] = t
                 elif current_section == 'pairtypes':
-                    words = line.split()
-                    a1, a2 = words[:2]
-#                   funct = int(words[2]) # ... unused
-                    cs6, cs12 = (float(x) for x in words[3:5])
-                    cs6 *= u.nanometers * 2**(1/6)
-                    cs12 *= u.kilojoules_per_mole
-                    pairtype = NonbondedExceptionType(cs6, cs12,
-                                self.defaults.fudgeQQ, list=self.adjust_types)
-                    self.adjust_types.append(pairtype)
-                    params.pair_types[(a1, a2)] = pairtype
-                    params.pair_types[(a2, a1)] = pairtype
+                    a, b, t = self._parse_pairtypes(line)
+                    params.pair_types[(a, b)] = params.pair_types[(b, a)] = t
             itplist = f.included_files
 
         # Combine first, then parametrize. That way, we don't have to create
@@ -453,6 +434,8 @@ class GromacsTopologyFile(Structure):
         self.itps = itplist
         if parametrize:
             self.parametrize()
+
+    #===================================================
 
     # Private parsing helper functions
 
@@ -843,6 +826,30 @@ class GromacsTopologyFile(Structure):
                                   scnb=1/self.defaults.fudgeLJ)
         return (a1, a2, a3, a4), dtype, ptype, replace
 
+    def _parse_cmaptypes(self, line):
+        words = line.split()
+        a1, a2, a3, a4, a5 = words[:5]
+#       funct = int(words[5]) # ... unused
+        res1, res2 = int(words[6]), int(words[7])
+        grid = [float(w) for w in words[8:]] * u.kilojoules_per_mole
+        if len(grid) != res1 * res2:
+            raise GromacsError('CMAP grid dimensions do not match '
+                               'resolution')
+        if res1 != res2:
+            raise GromacsError('Only square CMAPs are supported')
+        return a1, a2, a3, a4, a5, CmapType(res1, grid)
+
+    def _parse_pairtypes(self, line):
+        words = line.split()
+        a1, a2 = words[:2]
+#       funct = int(words[2]) # ... unused
+        cs6, cs12 = (float(x) for x in words[3:5])
+        cs6 *= u.nanometers * 2**(1/6)
+        cs12 *= u.kilojoules_per_mole
+        return a1, a2, NonbondedExceptionType(cs6, cs12, self.defaults.fudgeQQ)
+
+    #===================================================
+
     # Internal Dihedral processing routines for different kinds of dihedrals
 
     def _process_normal_dihedral(self, words, atoms, i, j, k, l,
@@ -953,14 +960,14 @@ class GromacsTopologyFile(Structure):
                 pair.type = params.pair_types[key]
                 pair.type.used = True
             elif self.defaults.gen_pairs:
+                assert self.combining_rule in ('geometric', 'lorentz'), \
+                        'Unrecognized combining rule'
                 if self.combining_rule == 'geometric':
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
                     sig = math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
                 elif self.combining_rule == 'lorentz':
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
                     sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
-                else:
-                    assert False, 'Unrecognized combining rule'
                 eps *= self.defaults.fudgeLJ
                 pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
                             self.defaults.fudgeQQ, list=self.adjust_types)
