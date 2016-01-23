@@ -1433,6 +1433,21 @@ class GromacsTopologyFile(Structure):
                         parfile.write('%-5s %-5s    1   %.5f   %f\n' % (key[0],
                                       key[1], param.req/10, param.k*conv))
                     parfile.write('\n')
+                if params.pair_types and self.defaults.gen_pairs == 'no':
+                    parfile.write('[ pairtypes ]\n')
+                    parfile.write('; i j   func    sigma1-4    epsilon1-4 ;'
+                                  ' ; THESE ARE 1-4 INTERACTIONS\n')
+                    econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
+                    lconv = u.angstrom.conversion_factor_to(u.nanometer)
+                    used_keys = set()
+                    for key, param in iteritems(params.pair_types):
+                        if key in used_keys: continue
+                        used_keys.add(key)
+                        used_keys.add(tuple(reversed(key)))
+                        parfile.write('%-5s %-5s  1  %.5f    %.5f\n' %
+                                      (key[0], key[1], param.epsilon*econv,
+                                       param.sigma*lconv))
+                    parfile.write('\n')
                 if params.angle_types:
                     parfile.write('[ angletypes ]\n')
                     parfile.write(';  i    j    k  func       th0       cth '
@@ -1752,9 +1767,19 @@ class GromacsTopologyFile(Structure):
             dest.write('[ pairs ]\n')
             dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
                        'funct', 'c0', 'c1', 'c2', 'c3'))
+            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
+            lconv = u.angstroms.conversion_factor_to(u.nanometer)
             for adjust in struct.adjusts:
-                dest.write('%7d %6d %5d\n' % (adjust.atom1.idx+1,
+                key = (_gettype(adjust.atom1), _gettype(adjust.atom2))
+                dest.write('%7d %6d %5d' % (adjust.atom1.idx+1,
                            adjust.atom2.idx+1, adjust.funct))
+                if struct.defaults.gen_pairs == 'no' and (writeparams or
+                        key not in params.pair_types or
+                        adjust.type != params.pair_types[key]) and \
+                        adjust.type is not None:
+                    dest.write('  %.5f  %.5f' % (adjust.type.sigma*lconv,
+                                                 adjust.type.epsilon*econv))
+                dest.write('\n')
             dest.write('\n')
         elif struct.dihedrals:
             dest.write('[ pairs ]\n')
