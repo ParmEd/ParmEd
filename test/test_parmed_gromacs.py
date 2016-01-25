@@ -548,6 +548,7 @@ class TestGromacsTop(FileIOTestCase):
 
     _equal_atoms = utils.equal_atoms
 
+@unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsMissingParameters(FileIOTestCase):
     """ Test handling of missing parameters """
 
