@@ -3284,8 +3284,8 @@ class Structure(object):
                 kws = dict()
                 if otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
-                elif val.type is NoUreyBradley: # special-case singleton
-                    kws['type'] = NoUreyBradley
+                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
@@ -3381,8 +3381,8 @@ class Structure(object):
                 kws = dict()
                 if styp and val.type is not None:
                     kws['type'] = styp[val.type.idx]
-                elif val.type is NoUreyBradley: # special-case singleton
-                    kws['type'] = NoUreyBradley
+                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
