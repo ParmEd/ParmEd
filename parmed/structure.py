@@ -38,11 +38,11 @@ from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
 from parmed.residue import SOLVENT_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
-        DihedralTypeList, DihedralType, Bond, Angle, Dihedral, UreyBradley,
-        Improper, Cmap, TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend,
-        TorsionTorsion, NonbondedException, AcceptorDonor, Group, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, Atom)
+        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
+        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
+        NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
+        TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules, PYPY
 from parmed.utils.decorators import needs_openmm
