@@ -436,7 +436,7 @@ class TestGromacsTop(FileIOTestCase):
                 parm.write(fname, combine=[[1, 3]]))
         self.assertRaises(ValueError, lambda:
                 parm.write(fname, combine='joey'))
-        self.assertRaises(ValueError, lambda:
+        self.assertRaises(TypeError, lambda:
                 parm.write(fname, combine=[1, 2, 3]))
         self.assertRaises(TypeError, lambda:
                 parm.write(fname, combine=1))
