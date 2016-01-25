@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 echo "Checking parmed source with pyflakes linter"
 if [ "$PYTHON_VERSION" = "pypy" ]; then
