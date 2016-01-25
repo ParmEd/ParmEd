@@ -58,6 +58,7 @@ class TestCaseRelative(unittest.TestCase):
 class FileIOTestCase(unittest.TestCase):
 
     def setUp(self):
+        self._empty_writes()
         try:
             os.makedirs(get_fn('writes'))
         except OSError:
