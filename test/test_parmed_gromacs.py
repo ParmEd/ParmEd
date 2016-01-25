@@ -6,7 +6,8 @@ import numpy as np
 import os
 from parmed import (load_file, Structure, ExtraPoint, DihedralTypeList, Atom,
                     ParameterSet, Bond, NonbondedException, DihedralType,
-                    RBTorsionType, Improper, Cmap)
+                    RBTorsionType, Improper, Cmap, UreyBradley,
+                    NonbondedExceptionType)
 from parmed.exceptions import GromacsWarning, GromacsError, ParameterError
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
@@ -376,6 +377,11 @@ class TestGromacsTop(FileIOTestCase):
 
     def test_top_parsing_missing_types(self):
         """ Test GROMACS topology files with missing types """
+        warnings.filterwarnings('error', category=GromacsWarning)
+        self.assertRaises(GromacsWarning, lambda:
+                GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
+                                    'missing_atomtype.top'), parametrize=False)
+        )
         warnings.filterwarnings('ignore', category=GromacsWarning)
         top = GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
                                   'missing_atomtype.top'), parametrize=False)
@@ -387,12 +393,6 @@ class TestGromacsTop(FileIOTestCase):
         self.assertEqual(top[-1].charge, 0) # removed
         self.assertEqual(top.bonds[0].funct, 2)
         self.assertTrue(top.unknown_functional)
-        warnings.filterwarnings('error', category=GromacsWarning)
-        self.assertRaises(GromacsWarning, lambda:
-                GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
-                                    'missing_atomtype.top'), parametrize=False)
-        )
-        warnings.filterwarnings('always', category=GromacsWarning)
 
     def test_molecule_ordering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """
@@ -478,7 +478,56 @@ class TestGromacsTop(FileIOTestCase):
         f = StringIO()
         self.assertRaises(ValueError, lambda: top.write(f, parameters=10))
         # Write parameters and topology to same filename
-        fn = get_fn('test.top')#, written=True)
+        fn = get_fn('test.top', written=True)
+        top.write(fn, parameters=fn)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try passing open files
+        with open(fn, 'w') as f:
+            top.write(f, parameters=f)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try separate parameter/topology file
+        fn2 = get_fn('test.itp', written=True)
+        top.write(fn, parameters=fn2)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now force writing pair types... but first we have to provide pair
+        # types
+        top.defaults.gen_pairs = 'no'
         top.write(fn, parameters=fn)
         top2 = load_file(fn)
         self.assertEqual(len(top2.atoms), len(top.atoms))
@@ -712,6 +761,14 @@ class TestGromacsMissingParameters(FileIOTestCase):
     def test_missing_cmaps(self):
         """ Test handling of missing cmaptypes """
         self.top.cmaps.append(Cmap(*tuple(self.top.atoms[:5])))
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_missing_ureybradleys(self):
+        """ Test handling of missing Urey-Bradley types """
+        self.top.angles[0].funct = 5
+        self.top.urey_bradleys.append(
+                UreyBradley(self.top.angles[0].atom1, self.top.angles[0].atom3)
+        )
         self.assertRaises(ParameterError, self.top.parametrize)
 
 class TestGromacsTopHelperFunctions(FileIOTestCase):

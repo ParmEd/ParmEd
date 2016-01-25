@@ -1314,9 +1314,6 @@ class GromacsTopologyFile(Structure):
                 own_parfile_handle = True
                 parfile = genopen(parameters, 'w')
                 include_parfile = parameters
-        elif parameters is dest:
-            # This is also OK -- we'll just write to the same file object
-            pass
         elif hasattr(parameters, 'write'):
             parfile = parameters
         else:
@@ -1765,12 +1762,20 @@ class GromacsTopologyFile(Structure):
             dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
                        'funct', 'c0', 'c1', 'c2', 'c3'))
             # Get the 1-4 pairs from the dihedral list
+            struct.update_dihedral_exclusions()
+            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
+            lconv = u.angstroms.conversion_factor_to(u.nanometer)
             for dihed in struct.dihedrals:
                 if dihed.ignore_end or dihed.improper: continue
                 a1, a2 = dihed.atom1, dihed.atom4
                 if a1 in a2.bond_partners or a1 in a2.angle_partners:
                     continue
-                dest.write('%7d %6d %5d\n' % (a1.idx+1, a2.idx+1, 1))
+                dest.write('%7d %6d %5d' % (a1.idx+1, a2.idx+1, 1))
+                if struct.defaults.gen_pairs == 'no':
+                    dest.write('  %.5f  %.5f' %
+                               (0.5*(a1.sigma_14+a2.sigma_14)*lconv,
+                                math.sqrt(a1.epsilon_14*a2.epsilon_14)*econv))
+                dest.write('\n')
             dest.write('\n')
         # Angles
         if struct.angles:
