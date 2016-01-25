@@ -11,7 +11,7 @@ from datetime import datetime
 import math
 import os
 from parmed.constants import TINY, DEG_TO_RAD
-from parmed.exceptions import GromacsError, GromacsWarning, ParameterWarning
+from parmed.exceptions import GromacsError, GromacsWarning, ParameterError
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.gromacs._gromacsfile import GromacsFile
@@ -833,8 +833,7 @@ class GromacsTopologyFile(Structure):
         res1, res2 = int(words[6]), int(words[7])
         grid = [float(w) for w in words[8:]] * u.kilojoules_per_mole
         if len(grid) != res1 * res2:
-            raise GromacsError('CMAP grid dimensions do not match '
-                               'resolution')
+            raise GromacsError('CMAP grid dimensions do not match resolution')
         if res1 != res2:
             raise GromacsError('Only square CMAPs are supported')
         return a1, a2, a3, a4, a5, CmapType(res1, grid)
@@ -875,13 +874,6 @@ class GromacsTopologyFile(Structure):
                           scee=1/self.defaults.fudgeQQ,
                           scnb=1/self.defaults.fudgeLJ)
         if dihtype is not None:
-            for edt in dihtype:
-                if edt.per == dt.per:
-                    raise GromacsError(
-                        'duplicate periodicity term found '
-                        'in inline dihedral parameter for '
-                        'atoms [%s]' % ', '.join(words[:4])
-                    )
             dihtype.append(dt)
             dtl = None
         else:
@@ -959,7 +951,7 @@ class GromacsTopologyFile(Structure):
             if key in params.pair_types:
                 pair.type = params.pair_types[key]
                 pair.type.used = True
-            elif self.defaults.gen_pairs:
+            elif self.defaults.gen_pairs == 'yes':
                 assert self.combining_rule in ('geometric', 'lorentz'), \
                         'Unrecognized combining rule'
                 if self.combining_rule == 'geometric':
@@ -975,8 +967,7 @@ class GromacsTopologyFile(Structure):
                 pair.type = pairtype
                 pair.type.used = True
             else:
-                warnings.warn('Not all pair parameters can be found',
-                              ParameterWarning)
+                raise ParameterError('Not all pair parameters can be found')
         update_typelist_from(params.pair_types, self.adjust_types)
         # This is the list of 1-4 pairs determined from the bond graph.
         # If this is different from what's in [ pairs ], we print a warning
@@ -1001,8 +992,7 @@ class GromacsTopologyFile(Structure):
                 bond.type = params.bond_types[key]
                 bond.type.used = True
             else:
-                warnings.warn('Not all bond parameters found',
-                              ParameterWarning)
+                raise ParameterError('Not all bond parameters found')
         if len(true_14 - gmx_pair) > 0:
             zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0,
                                                    list=self.adjust_types)
@@ -1029,8 +1019,7 @@ class GromacsTopologyFile(Structure):
                 angle.type = params.angle_types[key]
                 angle.type.used = True
             else:
-                warnings.warn('Not all angle parameters found',
-                              ParameterWarning)
+                raise ParameterError('Not all angle parameters found')
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
@@ -1040,8 +1029,7 @@ class GromacsTopologyFile(Structure):
                 if ub.type is not NoUreyBradley:
                     ub.type.used = True
             else:
-                warnings.warn('Not all urey-bradley parameters found',
-                              ParameterWarning)
+                raise ParameterError('Not all urey-bradley parameters found')
         # Now strip out all of the Urey-Bradley terms whose parameters are 0
         for i in reversed(range(len(self.urey_bradleys))):
             if self.urey_bradleys[i].type is NoUreyBradley:
@@ -1070,8 +1058,7 @@ class GromacsTopologyFile(Structure):
                     t.type = params.dihedral_types[wckey]
                     t.type.used = True
                 else:
-                    warnings.warn('Not all torsion parameters found',
-                                  ParameterWarning)
+                    raise ParameterError('Not all torsion parameters found')
             else:
                 if key in params.improper_periodic_types:
                     t.type = params.improper_periodic_types[key]
@@ -1086,8 +1073,8 @@ class GromacsTopologyFile(Structure):
                             t.type.used = True
                             break
                     else:
-                        warnings.warn('Not all improper torsion parameters '
-                                      'found', ParameterWarning)
+                        raise ParameterError('Not all improper torsion '
+                                             'parameters found')
         update_typelist_from(params.dihedral_types, self.dihedral_types)
         update_typelist_from(params.improper_periodic_types, self.dihedral_types)
         for t in self.rb_torsions:
@@ -1112,8 +1099,7 @@ class GromacsTopologyFile(Structure):
                 t.type = params.rb_torsion_types[wckey]
                 t.type.used = True
             else:
-                warnings.warn('Not all R-B torsion parameters found',
-                              ParameterWarning)
+                raise ParameterError('Not all R-B torsion parameters found')
         update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
         self.update_dihedral_exclusions()
         for t in self.impropers:
@@ -1135,8 +1121,7 @@ class GromacsTopologyFile(Structure):
                 t.type.used = True
                 break
             else:
-                warnings.warn('Not all quadratic improper parameters found',
-                              ParameterWarning)
+                raise ParameterError('Not all improper parameters found')
         update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
             if c.type is not None: continue
@@ -1146,7 +1131,7 @@ class GromacsTopologyFile(Structure):
                 c.type = params.cmap_types[key]
                 c.type.used = True
             else:
-                warnings.warn('Not all cmap parameters found', ParameterWarning)
+                raise ParameterError('Not all cmap parameters found')
         update_typelist_from(params.cmap_types, self.cmap_types)
 
     #===================================================
@@ -1209,6 +1194,7 @@ class GromacsTopologyFile(Structure):
         gmxtop = cls()
         if copy:
             struct = _copy(struct)
+            struct.join_dihedrals()
         gmxtop.atoms = struct.atoms
         gmxtop.residues = struct.residues
         gmxtop.bonds = struct.bonds
@@ -1235,8 +1221,7 @@ class GromacsTopologyFile(Structure):
                 struct.torsion_torsions or
                 struct.chiral_frames or
                 struct.multipole_frames):
-            raise TypeError('GromacsTopologyFile does not support Amoeba '
-                            'potential terms')
+            raise TypeError('GromacsTopologyFile does not support Amoeba FF')
         # Now check what the 1-4 scaling factors should be
         if hasattr(struct, 'defaults') and isinstance(struct.defaults,
                                                       _Defaults):
@@ -1273,6 +1258,7 @@ class GromacsTopologyFile(Structure):
         if gmxtop.combining_rule == 'geometric':
             gmxtop.defaults.comb_rule = 3
 
+        gmxtop.parameterset = ParameterSet.from_structure(struct)
         return gmxtop
 
     #===================================================
@@ -1306,7 +1292,7 @@ class GromacsTopologyFile(Structure):
         from parmed import __version__
         own_handle = False
         fname = ''
-        params = ParameterSet.from_structure(self)
+        params = self.parameterset or ParameterSet.from_structure(self)
         if isinstance(dest, string_types):
             fname = '%s ' % dest
             dest = genopen(dest, 'w')
@@ -1342,17 +1328,9 @@ class GromacsTopologyFile(Structure):
                     raise ValueError('combine must be None, list of indices, '
                                      'or "all"')
             else:
-                try:
-                    it = iter(combine)
-                except TypeError:
-                    raise TypeError('combine must be a list of molecule index '
-                                    'lists')
                 combine_lists = []
-                for indices in it:
-                    try:
-                        indices = sorted(set(indices))
-                    except TypeError:
-                        raise ValueError('combine must be a list of iterables')
+                for indices in combine:
+                    indices = sorted(set(indices))
                     if any((indices[i+1] - indices[i]) != 1
                                 for i in range(len(indices)-1)):
                         raise ValueError('Can only combine adjacent molecules')
@@ -1454,7 +1432,7 @@ class GromacsTopologyFile(Structure):
                                   '   rub         kub\n')
                     used_keys = set()
                     conv = (u.kilocalorie/u.radian**2).conversion_factor_to(
-                                u.kilojoule/u.nanometer**2) * 2
+                                u.kilojoule/u.radian**2) * 2
                     bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
                                 u.kilojoule/u.nanometer**2) * 2
                     for key, param in iteritems(params.angle_types):
@@ -1479,16 +1457,15 @@ class GromacsTopologyFile(Structure):
                                   'pn\n')
                     used_keys = set()
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-                    fmt = '%-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
+                    fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
                     for key, param in iteritems(params.dihedral_types):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         if isinstance(param, DihedralTypeList):
-                            funct = 9
                             for dt in param:
                                 parfile.write(fmt % (key[0], key[1], key[2],
-                                              key[3], funct, dt.phase,
+                                              key[3], 9, dt.phase,
                                               dt.phi_k*conv, int(dt.per)))
                         else:
                             funct = 1
@@ -1502,7 +1479,7 @@ class GromacsTopologyFile(Structure):
                                   'pn\n')
                     used_keys = set()
                     conv = u.kilojoules.conversion_factor_to(u.kilocalories)
-                    fmt = '%-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
+                    fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
                     for key, param in iteritems(params.improper_periodic_types):
                         if key in used_keys: continue
                         used_keys.add(key)
@@ -1856,17 +1833,18 @@ class GromacsTopologyFile(Structure):
                 if writeparams or key not in typedict or \
                         _diff_diheds(dihed.type, typedict[key]):
                     if isinstance(dihed.type, DihedralTypeList):
-                        dest.write('  %.5f  %.5f  %d\n' % (dihed.type[0].phase,
+                        dest.write('  %.5f  %.5f  %d' % (dihed.type[0].phase,
                             dihed.type[0].phi_k*conv, int(dihed.type[0].per)))
                         for dt in dihed.type[1:]:
-                            dest.write('%7d %6d %6d %6d %5d  %.5f  %.5f  %d\n' %
+                            dest.write('\n%7d %6d %6d %6d %5d  %.5f  %.5f  %d' %
                                     (dihed.atom1.idx+1, dihed.atom2.idx+1,
                                      dihed.atom3.idx+1, dihed.atom4.idx+1,
                                      dihed.funct, dt.phase, dt.phi_k*conv,
                                      int(dt.per)))
                     else:
-                        dest.write('  %.5f  %.5f  %d\n' % (dihed.type.phase,
+                        dest.write('  %.5f  %.5f  %d' % (dihed.type.phase,
                             dihed.type.phi_k*conv, int(dihed.type.per)))
+                dest.write('\n')
             dest.write('\n')
         # RB-torsions
         if struct.rb_torsions:
@@ -2067,7 +2045,7 @@ def _diff_diheds(dt1, dt2):
     be a DihedralTypeList.  This returns True if dt1 == dt2 *or* dt1 is equal to
     the only element of dt2
     """
-    if dt1 == dt2:
+    if type(dt1) is type(dt2) and dt1 == dt2:
         return False
     if isinstance(dt2, DihedralTypeList) and isinstance(dt1, DihedralType):
         if len(dt2) == 1 and dt2[0] == dt1: return False
