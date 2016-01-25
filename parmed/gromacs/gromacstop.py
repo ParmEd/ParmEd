@@ -534,6 +534,8 @@ class GromacsTopologyFile(Structure):
         angt = ub = ubt = None
         ang = Angle(atoms[i], atoms[j], atoms[k])
         ang.funct = funct
+        if funct == 5:
+            ub = UreyBradley(atoms[i], atoms[k])
         if (funct == 1 and len(words) >= 6) or (funct == 5 and len(words) >= 8):
             theteq, k = (float(x) for x in words[4:6])
             if (theteq, k) in angle_types:
@@ -544,8 +546,7 @@ class GromacsTopologyFile(Structure):
                 angle_types[(theteq, k)] = ang.type = angt
         if funct == 5 and len(words) >= 8:
             ubreq, ubk = (float(x) for x in words[6:8])
-            if ubreq > 0 and ubk > 0:
-                ub = UreyBradley(ang.atom1, ang.atom3)
+            if ubk > 0:
                 if (ubreq, ubk) in ub_types:
                     ub.type = ub_types[(ubreq, ubk)]
                 else:
@@ -554,6 +555,8 @@ class GromacsTopologyFile(Structure):
                         ubreq*u.nanometer,
                     )
                     ub_types[(ubreq, ubk)] = ub.type = ubt
+            else:
+                ub.type = NoUreyBradley
         return ang, ub, angt, ubt
 
     def _parse_dihedrals(self, line, dihedral_types, PMD, molecule):
