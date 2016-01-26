@@ -47,11 +47,6 @@ $run_cmd -m parmed.gromacs._cpp -i - < files/pptest1/pptest1.h \
 evaluate_test $? cpptest1
 ###### END TESTS ######
 
-if [ "$has_coverage" = "yes" ]; then
-    coverage combine .coverage*
-    echo "Coverage data combined. Run 'coverage report' to get the report"
-fi
-
 # Clean up if everything passed
 if [ $failures -eq 0 ]; then
     /bin/rm -fr files/writes
