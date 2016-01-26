@@ -2,6 +2,7 @@
 set -e
 
 do_coverage() {
+    echo "Combining coverage data and reporting"
     coverage combine .
     coverage report -m
 }
@@ -29,4 +30,6 @@ else
              --timer-filter=warning,error .
 fi
 test -z `which coverage 2>/dev/null` || do_coverage
+echo "Running coveralls"
 test -z `which coveralls` || coveralls
+echo "Done!"
