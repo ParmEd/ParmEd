@@ -320,7 +320,7 @@ class OpenMMParameterSet(ParameterSet):
                 dest.write('  ')
                 base = i * cmap.resolution
                 for j in range(cmap.resolution):
-                    dest.write(' %f' % (grid[base+j]*econv))
+                    dest.write(' %s' % (grid[base+j]*econv))
                 dest.write('\n')
             dest.write('  </Map>\n')
         used_torsions = set()
