@@ -9,7 +9,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
 
     pypy -m pip install nose pyflakes nose-timer
     which pyflakes
-    pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git
+    pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git@pypy-4.0.1
 else # Otherwise, CPython... go through conda
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         wget http://repo.continuum.io/miniconda/Miniconda-3.7.0-MacOSX-x86_64.sh -O miniconda.sh;
