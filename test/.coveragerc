@@ -1,14 +1,14 @@
 [run]
-    source = parmed
+source = parmed
+omit =
+    */parmed/utils/fortranformat/*
+    */parmed/utils/six.py
+    */parmed/format/pdbx/*
+    */parmed/vec3.py
+    */parmed/utils/netcdf.py
+    */parmed/tinker/*
+    */parmed/rosetta/*
 
 [report]
     show_missing = True
     skip_covered = True
-    omit =
-        */parmed/utils/fortranformat/*
-        */parmed/utils/six.py
-        */parmed/format/pdbx/*
-        */parmed/vec3.py
-        */parmed/utils/netcdf.py
-        */parmed/tinker/*
-        */parmed/rosetta/*
