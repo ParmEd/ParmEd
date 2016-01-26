@@ -94,6 +94,7 @@ class ParameterSet(object):
         self.parametersets = []
         self._combining_rule = 'lorentz'
         self.residues = OrderedDict()
+        self.default_scee = self.default_scnb = 1.0
 
     def __copy__(self):
         other = type(self)()

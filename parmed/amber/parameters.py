@@ -201,6 +201,8 @@ class AmberParameterSet(ParameterSet):
 
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
+        self.default_scee = 1.2
+        self.default_scnb = 2.0
         self.titles = []
         for filename in filenames:
             if isinstance(filename, string_types):

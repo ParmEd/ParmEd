@@ -107,6 +107,8 @@ class OpenMMParameterSet(ParameterSet):
         new_params.parametersets = params.parametersets
         new_params._combining_rule = params.combining_rule
         new_params.residues = params.residues
+        new_params.default_scee = params.default_scee
+        new_params.default_scnb = params.default_scnb
 
         return new_params
 
@@ -335,6 +337,7 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </CmapTorsionForce>\n')
 
     def _write_omm_nonbonded(self, dest):
+        if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
@@ -354,8 +357,14 @@ class OpenMMParameterSet(ParameterSet):
             raise NotImplementedError('Cannot currently handle mixed 1-4 '
                     'scaling: L-J Scaling factors %s detected' %
                     (', '.join([str(x) for x in scnb])))
-        coulomb14scale = 1.0 / scee.pop()
-        lj14scale = 1.0 / scnb.pop()
+        if len(scee) > 0:
+            coulomb14scale = 1.0 / scee.pop()
+        else:
+            coulomb14scale = 1.0 / self.default_scee
+        if len(scnb) > 0:
+            lj14scale = 1.0 / scnb.pop()
+        else:
+            lj14scale = 1.0 / self.default_scnb
 
         # Write NonbondedForce records.
         dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' %
