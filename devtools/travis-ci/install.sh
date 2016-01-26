@@ -26,12 +26,12 @@ else # Otherwise, CPython... go through conda
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
             numpy scipy pandas nose openmm pyflakes coverage nose-timer \
-            coveralls
+            python-coveralls
         conda update -y -n myenv --all
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes \
-            coverage nose-timer coveralls
+            coverage nose-timer python-coveralls
     fi
 
     source activate myenv
