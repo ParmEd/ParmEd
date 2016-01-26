@@ -9,3 +9,6 @@ omit =
     */parmed/tinker/*
     */parmed/rosetta/*
     */parmed/unit/*
+[paths]
+source =
+    */site-packages/
