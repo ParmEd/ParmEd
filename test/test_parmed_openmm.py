@@ -17,20 +17,20 @@ class TestOpenMM(FileIOTestCase):
         self.ffxml = os.path.join(os.path.split(app.__file__)[0], 'data',
                                   'amber99sbildn.xml')
 
-    def testFormatID(self):
+    def test_format_id(self):
         """ Tests automatic format determination of OpenMM XML files """
         self.assertTrue(openmm.XmlFile.id_format(get_fn('system_974wat.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('state_974wat.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('integrator.xml')))
         self.assertTrue(openmm.XmlFile.id_format(self.ffxml))
 
-    def testDeserializeSystem(self):
+    def test_deserialize_system(self):
         """ Tests automatic deserialization of a System XML file """
         system = openmm.XmlFile.parse(get_fn('system_974wat.xml'))
         self.assertIsInstance(system, mm.System)
         self.assertEqual(system.getNumParticles(), 6638)
 
-    def testDeserializeState(self):
+    def test_deserialize_state(self):
         """ Tests automatic deserialization of a State XML file """
         state = openmm.XmlFile.parse(get_fn('state_974wat.xml'))
         self.assertEqual(state.coordinates.shape, (1, 6638, 3))
@@ -40,18 +40,18 @@ class TestOpenMM(FileIOTestCase):
         self.assertAlmostEqual(state.time, 20000.000003615783)
         self.assertIs(state.energy, None)
 
-    def testDeserializeIntegrator(self):
+    def test_deserialize_integrator(self):
         """ Tests automatic deserialization of an Integrator XML file """
         integrator = openmm.XmlFile.parse(get_fn('integrator.xml'))
         self.assertIsInstance(integrator, mm.Integrator)
         self.assertIsInstance(integrator, mm.LangevinIntegrator)
 
-    def testDeserializeForceField(self):
+    def test_deserialize_force_field(self):
         """ Tests automatic deserialization of an OpenMM ForceField XML file """
         ff = openmm.XmlFile.parse(self.ffxml)
         self.assertIsInstance(ff, app.ForceField)
 
-    def testLoadTopology(self):
+    def test_load_topology(self):
         """ Tests loading an OpenMM Topology and System instance """
         import warnings
         warnings.filterwarnings('error', category=exceptions.OpenMMWarning)
@@ -67,7 +67,7 @@ class TestOpenMM(FileIOTestCase):
 class TestWriteParameters(FileIOTestCase):
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
-    def testWriteXMLParameters(self):
+    def test_write_xml_parameters(self):
         """ Test writing XML parameters loaded from Amber files """
         leaprc = StringIO("""\
 logFile leap.log
@@ -289,7 +289,7 @@ CHIS = CHIE
 
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
-    def testWriteXMLParametersGAFF(self):
+    def test_write_xml_parameters_gaff(self):
         """ Test writing XML parameters loaded from Amber GAFF parameter files """
         leaprc = StringIO("""\
 parm10 = loadamberparams gaff.dat
@@ -306,7 +306,14 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                      Reference=citations)
         )
 
-    def testWriteXMLParametersCharmm(self):
+    def test_write_xml_small_amber(self):
+        """ Test writing small XML modifications """
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                load_file(os.path.join(get_fn('parm'), 'frcmod.constph'))
+        )
+        params.write(get_fn('test.xml', written=True))
+
+    def test_write_xml_parameters_charmm(self):
         """ Test writing XML parameter files from Charmm parameter files"""
 
         params = openmm.OpenMMParameterSet.from_parameterset(
