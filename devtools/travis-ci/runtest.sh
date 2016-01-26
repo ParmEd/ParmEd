@@ -10,7 +10,7 @@ fi
 sh devtools/travis-ci/pyflakes_check.sh
 cd test
 echo "Using nosetests...:"
-which nosetests
+./run_scripts.sh
 if [ "$PYTHON_VERSION" = "pypy" ]; then
     # Disable coverage with pyflakes, since it multiplies the time taken by 6 or
     # something ridiculous like that
@@ -21,5 +21,5 @@ else
               --timer-filter=warning,error --with-coverage \
               --cover-package=parmed .
 fi
-./run_scripts.sh
 test -z `which coverage 2>/dev/null` || coverage report -m
+test -z `which coveralls` || coveralls
