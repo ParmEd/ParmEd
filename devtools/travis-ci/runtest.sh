@@ -3,7 +3,7 @@ set -e
 
 do_coverage() {
     echo "Combining coverage data"
-    coverage combine .
+    coverage combine
     echo "Reporting..."
     coverage report -m
 }
