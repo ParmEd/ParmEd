@@ -149,7 +149,6 @@ class GromacsGroFile(object):
                 natom = int(fileobj.readline().strip())
             except ValueError:
                 raise GromacsError('Could not parse %s as GRO file' % filename)
-            digits = None
             line_parser = _AtomLineParser()
             for i, line in enumerate(fileobj):
                 if i == natom: break
