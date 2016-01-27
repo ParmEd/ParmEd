@@ -5,7 +5,7 @@ if [ -z "`which coverage 2>/dev/null`" ]; then
     has_coverage="no"
     echo "No coverage module found..."
 else
-    run_cmd="coverage run --parallel-mode --source=parmed"
+    run_cmd="coverage run --parallel-mode"
     has_coverage="yes"
     echo "coverage found and will be used..."
 fi
@@ -46,11 +46,6 @@ $run_cmd -m parmed.gromacs._cpp -i - < files/pptest1/pptest1.h \
         -Ifiles/pptest1 > files/writes/cpptest1 || exit
 evaluate_test $? cpptest1
 ###### END TESTS ######
-
-if [ "$has_coverage" = "yes" ]; then
-    coverage combine .coverage*
-    echo "Coverage data combined. Run 'coverage report' to get the report"
-fi
 
 # Clean up if everything passed
 if [ $failures -eq 0 ]; then
