@@ -434,8 +434,8 @@ class CharmmParameterSet(ParameterSet):
                     # See if the existing bond type list has a different value and replaces it with a warning
                     if self.bond_types[key] != bond_type:
                         # Replace. Warn if they are differen
-                        warnings.warn('Replacing bond %r with %r' %
-                                              (self.bond_types[key], bond_type))
+                        warnings.warn('Replacing bond %r, %r with %r' %
+                                              (key, self.bond_types[key], bond_type))
                         self.bond_types[(type1, type2)] = bond_type
                         self.bond_types[(type2, type1)] = bond_type
                 else: # key not present
