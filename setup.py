@@ -1,4 +1,15 @@
-from distutils.core import setup, Extension
+try:
+    from setuptools import setup, Extension
+    kws = dict(entry_points={
+            'console_scripts' : ['parmed = parmed.scripts:clapp'],
+            'gui_scripts' : ['xparmed = parmed.scripts:guiapp']}
+    )
+except ImportError:
+    from distutils.core import setup, Extension
+    kws = {'scripts' : [os.path.join('scripts', 'parmed'),
+                        os.path.join('scripts', 'xparmed')]
+    }
+
 import os
 import sys
 
@@ -40,8 +51,6 @@ extensions = [Extension('parmed.amber._rdparm',
 
 if __name__ == '__main__':
 
-    from distutils.command.build_py import build_py
-    from distutils.command.build_scripts import build_scripts
     import shutil
     import parmed
 
@@ -101,18 +110,14 @@ if __name__ == '__main__':
         if os.path.exists(pmdc): delfile(pmdc)
         if os.path.exists(xpmdc): delfile(xpmdc)
 
-    scripts = [os.path.join('scripts', 'parmed'),
-               os.path.join('scripts', 'xparmed')]
-
     setup(name='ParmEd',
           version=parmed.__version__,
           description='Amber parameter file editor',
           author='Jason Swails',
           author_email='jason.swails -at- gmail.com',
           url='http://jswails.wikidot.com/parmed',
-          license='GPL v2 or later',
+          license='LGPL (or GPL if released with AmberTools)',
           packages=packages,
           ext_modules=extensions,
-          cmdclass={'build_py' : build_py},
-          scripts=scripts,
+          **kws
     )
