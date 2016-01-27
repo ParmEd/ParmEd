@@ -6,14 +6,15 @@ by Jason Swails
 """
 from __future__ import division, print_function, absolute_import
 
-from parmed.exceptions import MoleculeError, ParameterError
+from copy import copy
+import math
+from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 import parmed.unit as u
 from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import zip, range
-from copy import copy
-import math
+import warnings
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
@@ -451,7 +452,7 @@ class Atom(_ListItem):
     #===================================================
 
     def __init__(self, list=None, atomic_number=0, name='', type='',
-                 charge=0.0, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
+                 charge=None, mass=0.0, nb_idx=0, radii=0.0, screen=0.0,
                  tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
                  bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
                  rmin14=None, epsilon14=None):
@@ -463,7 +464,7 @@ class Atom(_ListItem):
             self.type = type.strip()
         except AttributeError:
             self.type = type
-        self.charge = _strip_units(charge, u.elementary_charge)
+        self._charge = _strip_units(charge, u.elementary_charge)
         self.mass = _strip_units(mass, u.dalton)
         self.nb_idx = nb_idx
         self.radii = _strip_units(radii, u.angstrom)
@@ -591,8 +592,21 @@ class Atom(_ListItem):
 
     #===================================================
 
-    # Lennard-Jones parameters... can be taken from atom_type if it is set.
-    # Otherwise take it from _rmin and _epsilon attributes
+    # Various parameters that can be taken from the AtomType if not set on the
+    # atom directly.
+
+    @property
+    def charge(self):
+        if self._charge is None:
+            if (self.atom_type is UnassignedAtomType or
+                    self.atom_type.charge is None):
+                return 0.0
+            return self.atom_type.charge
+        return self._charge
+
+    @charge.setter
+    def charge(self, value):
+        self._charge = value
 
     @property
     def rmin(self):
@@ -917,7 +931,7 @@ class Atom(_ListItem):
 
     def __getstate__(self):
         retval = dict(name=self.name, type=self.type, atom_type=self.atom_type,
-                      charge=self.charge, mass=self.mass, nb_idx=self.nb_idx,
+                      _charge=self._charge, mass=self.mass, nb_idx=self.nb_idx,
                       radii=self.radii, screen=self.screen, tree=self.tree,
                       join=self.join, irotat=self.irotat, bfactor=self.bfactor,
                       altloc=self.altloc, occupancy=self.occupancy,
@@ -1997,7 +2011,7 @@ class Dihedral(_FourAtomTerm):
                     DihedralTypeList):
                 return 9
             elif self.type is not None and isinstance(self.type, RBTorsionType):
-                return 5
+                return 3
             return 1
         return self._funct
 
@@ -2329,7 +2343,7 @@ class DihedralTypeList(list, _ListItem):
                 return False
         return True
 
-    def append(self, other):
+    def append(self, other, override=False):
         """ Adds a DihedralType to the DihedralTypeList
 
         Parameters
@@ -2337,23 +2351,34 @@ class DihedralTypeList(list, _ListItem):
         other : :class:`DihedralType`
             The DihedralType instance to add to this list. It cannot have the
             same periodicity as any other DihedralType in the list
+        override : bool, optional, default=False
+            If True, this will override an existing torsion, but will raise a
+            warning if it does so
 
         Raises
         ------
         TypeError if other is not an instance of :class:`DihedralTypeList`
 
         ParameterError if other has the same periodicity as another member in
-        this list
+        this list and override is False
+
+        ParameterWarning if other has same periodicit as another member in this
+        list and override is True
         """
         if not isinstance(other, DihedralType):
             raise TypeError('Can only add DihedralType to DihedralTypeList')
-        for existing in self:
+        for i, existing in enumerate(self):
             if existing.per == other.per:
                 # Do not add duplicate periodicities
                 if existing == other: return
-                raise ParameterError('Cannot add two DihedralType instances '
-                                     'with the same periodicity to the same '
-                                     'DihedralTypeList')
+                if override:
+                    warnings.warn('Overriding DihedralType in DihedralTypeList '
+                                  'with same periodicity', ParameterWarning)
+                    self[i] = other
+                else:
+                    raise ParameterError('Cannot add two DihedralType '
+                                         'instances with the same periodicity '
+                                         'to the same DihedralTypeList')
         list.append(self, other)
 
     @property
@@ -4422,6 +4447,9 @@ class AtomType(object):
     bond_type : ``str``, optional
         If defined, this is the type name used to look up bonded parameters.
         Default is None (which falls back to ``name``)
+    charge : ``float``, optional
+        If defined, this is the partial atomic charge in elementary charge
+        units. Default is None
 
     Other Attributes
     ----------------
@@ -4465,7 +4493,8 @@ class AtomType(object):
     HA: 1
     """
 
-    def __init__(self, name, number, mass, atomic_number, bond_type=None):
+    def __init__(self, name, number, mass, atomic_number=-1, bond_type=None,
+                 charge=0.0):
         if number is None and name is not None:
             # If we were given an integer, assign it to number. Otherwise,
             # assign it to the name
@@ -4487,6 +4516,7 @@ class AtomType(object):
         self.nbfix = dict()
         self._idx = -1 # needed for some internal bookkeeping
         self._bond_type = bond_type
+        self.charge = charge
 
     def __eq__(self, other):
         """
@@ -4511,6 +4541,12 @@ class AtomType(object):
             assert (has_all and not has_none) or (has_none and not has_all), \
                     'Should have all or none at this point'
             if not has_all:
+                return True
+            # Check charges
+            if self.charge is None or other.charge is None:
+                if self.charge is not other.charge:
+                    return False
+            elif abs(self.charge - other.charge) > TINY:
                 return True
             # At this point, we have all the attributes we need to compare
             return (abs(self.epsilon - other.epsilon) < TINY and
@@ -4599,19 +4635,9 @@ class AtomType(object):
     def __str__(self):
         return self.name
 
-    # Comparisons are all based on number
-#   def __gt__(self, other):
-#       return self._member_number > other._member_number
-#   def __lt__(self, other):
-#       return self._member_number < other._member_number
-#   def __ge__(self, other):
-#       return self._member_number > other._member_number or self == other
-#   def __le__(self, other):
-#       return self._member_number < other._member_number or self == other
-
     def __copy__(self):
         cp = AtomType(self.name, self.number, self.mass, self.atomic_number,
-                      bond_type=self._bond_type)
+                      bond_type=self._bond_type, charge=self.charge)
         cp.epsilon = self.epsilon
         cp.rmin = self.rmin
         cp.epsilon_14 = self.epsilon_14

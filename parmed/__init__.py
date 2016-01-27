@@ -6,7 +6,7 @@ between standard and amber file formats, manipulate structures, etc.
 # Version format should be "major.minor.patch". For beta releases, attach
 # "-beta#" to the end. The beta number will be turned into another number in the
 # version tuple
-__version__ = '2.1.4'
+__version__ = '2.1.11'
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
@@ -23,11 +23,12 @@ from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker
 from parmed import formats
 from parmed.vec3 import Vec3
 from parmed.parameters import ParameterSet
+from parmed.utils.decorators import deprecated as _deprecated
 load_file = formats.load_file
 read_PDB = formats.PDBFile.parse
 read_CIF = formats.CIFFile.parse
-write_PDB = formats.PDBFile.write
-write_CIF = formats.CIFFile.write
+write_PDB = _deprecated(formats.PDBFile.write)
+write_CIF = _deprecated(formats.CIFFile.write)
 load_rosetta = rosetta.RosettaPose.load
 
 download_PDB = formats.PDBFile.download

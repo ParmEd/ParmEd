@@ -40,8 +40,8 @@ from parmed.residue import SOLVENT_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
-        NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
+        NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
+        TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
 from parmed import unit as u
 from parmed.utils import tag_molecules, PYPY
@@ -647,7 +647,7 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
-        c._box = copy(self.box)
+        c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
         return c
@@ -1379,6 +1379,44 @@ class Structure(object):
 
     #===================================================
 
+    def join_dihedrals(self):
+        """
+        Joins multi-term torsions into a single term and makes all of the
+        parameters DihedralTypeList instances. If any dihedrals are *already*
+        DihedralTypeList instances, or any are not parametrized, or there are no
+        dihedral_types, this method returns without doing anything
+        """
+        if not self.dihedral_types:
+            return # nothing to do
+        if any(isinstance(t, DihedralTypeList) for t in self.dihedral_types):
+            return # already done
+        if any(d.type is None for d in self.dihedrals):
+            return # Not fully parametrized
+        dihedrals_to_delete = list()
+        dihedrals_processed = dict()
+        new_dihedral_types = TrackedList()
+        for i, d in enumerate(self.dihedrals):
+            if d.atom1 < d.atom4:
+                key = (d.atom1, d.atom2, d.atom3, d.atom4)
+            else:
+                key = (d.atom4, d.atom3, d.atom2, d.atom1)
+            if key in dihedrals_processed:
+                dihedrals_processed[key].append(d.type)
+                dihedrals_to_delete.append(i)
+            else:
+                dihedrals_processed[key] = dtl = DihedralTypeList()
+                dtl.append(d.type)
+                new_dihedral_types.append(dtl)
+                d.type = dtl
+        # Now drop the new dihedral types into place
+        self.dihedral_types = new_dihedral_types
+        # Remove the "duplicate" dihedrals
+        for i in reversed(dihedrals_to_delete):
+            self.dihedrals[i].delete()
+            del self.dihedrals[i]
+
+    #===================================================
+
     @property
     def combining_rule(self):
         return self._combining_rule
@@ -1737,7 +1775,7 @@ class Structure(object):
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
                      verbose=False,
-                     forceNBFIX=False):
+                     splitDihedrals=False):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -1799,6 +1837,10 @@ class Structure(object):
             of freedom will *still* be constrained).
         verbose : bool=False
             If True, the progress of this subroutine will be printed to stdout
+        splitDihedrals : bool=False
+            If True, the dihedrals will be split into two forces -- proper and
+            impropers. This is primarily useful for debugging torsion parameter
+            assignments.
 
         Notes
         -----
@@ -1848,7 +1890,7 @@ class Structure(object):
                 self.omm_angle_force(constraints, flexibleConstraints)
         )
         if verbose: print('Adding dihedrals...')
-        self._add_force_to_system(system, self.omm_dihedral_force())
+        self._add_force_to_system(system, self.omm_dihedral_force(splitDihedrals))
         if verbose: print('Adding Ryckaert-Bellemans torsions...')
         self._add_force_to_system(system, self.omm_rb_torsion_force())
         if verbose: print('Adding Urey-Bradleys...')
@@ -2103,21 +2145,35 @@ class Structure(object):
     #===================================================
 
     @needs_openmm
-    def omm_dihedral_force(self):
+    def omm_dihedral_force(self, split=False):
         """ Creates the OpenMM PeriodicTorsionForce modeling dihedrals
+
+        Parameters
+        ----------
+        split : bool, optional, default=False
+            If True, separate PeriodicTorsionForce instances with the propers in
+            the first and impropers in the second return item. If no impropers
+            or propers are present, the instances with zero terms are not
+            returned.
 
         Returns
         -------
-        PeriodicTorsionForce
+        PeriodicTorsionForce[, PeriodicTorsionForce]
             Or None if no torsions are present in this system
         """
         if not self.dihedrals: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.PeriodicTorsionForce()
-        force.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        proper = mm.PeriodicTorsionForce()
+        improper = mm.PeriodicTorsionForce()
+        proper.setForceGroup(self.DIHEDRAL_FORCE_GROUP)
+        improper.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for tor in self.dihedrals:
             if tor.type is None:
                 raise ParameterError('Cannot find torsion parameters')
+            if split and tor.improper:
+                force = improper
+            else:
+                force = proper
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx,
@@ -2129,7 +2185,11 @@ class Structure(object):
                                  tor.atom4.idx, int(tor.type.per),
                                  tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
-        return force
+        if proper.getNumTorsions() == 0:
+            return improper
+        if improper.getNumTorsions() == 0:
+            return proper
+        return proper, improper
 
     #===================================================
 
@@ -3224,6 +3284,8 @@ class Structure(object):
                 kws = dict()
                 if otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
+                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
@@ -3319,6 +3381,8 @@ class Structure(object):
                 kws = dict()
                 if styp and val.type is not None:
                     kws['type'] = styp[val.type.idx]
+                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
