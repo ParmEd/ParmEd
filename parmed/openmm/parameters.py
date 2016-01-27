@@ -172,7 +172,7 @@ class OpenMMParameterSet(ParameterSet):
         for name, atom_type in iteritems(self.atom_types):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             element = Element[atom_type.atomic_number]
-            dest.write('  <Type name="%s" class="%s" element="%s" mass="%f"/>\n'
+            dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
                        % (name, name, element, atom_type.mass)
                        )
         dest.write(' </AtomTypes>\n')
@@ -184,10 +184,10 @@ class OpenMMParameterSet(ParameterSet):
                 continue
             dest.write('  <Residue name="%s">\n' % residue.name)
             for atom in residue.atoms:
-                dest.write('   <Atom name="%s" type="%s" charge="%f"/>\n' %
+                dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
             for bond in residue.bonds:
-                dest.write('   <Bond atomName1="%s" atomName2="%s" />\n' %
+                dest.write('   <Bond atomName1="%s" atomName2="%s"/>\n' %
                            (bond.atom1.name, bond.atom2.name))
             if residue.head is not None:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
@@ -208,7 +208,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond type1="%s" type2="%s" length="%f" k="%f"/>\n'
+            dest.write('  <Bond type1="%s" type2="%s" length="%s" k="%s"/>\n'
                        % (a1, a2, bond.req*lconv, bond.k*kconv))
         dest.write(' </HarmonicBondForce>\n')
 
@@ -246,7 +246,7 @@ class OpenMMParameterSet(ParameterSet):
                        'type4="%s"' % (nowild(a1), a2, a3, nowild(a4)))
             for i, term in enumerate(dihed):
                 i += 1
-                dest.write(' periodicity%d="%d" phase%d="%f" k%d="%f"' %
+                dest.write(' periodicity%d="%d" phase%d="%s" k%d="%s"' %
                            (i, term.per, i, term.phase*pconv, i,
                             term.phi_k*kconv))
             dest.write('/>\n')
@@ -266,7 +266,7 @@ class OpenMMParameterSet(ParameterSet):
                 # Single wild-card entries put the wild-card in position 2
                 a2, a3 = a3, a2
             dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s" periodicity1="%d" phase1="%f" k1="%f"/>\n' %
+                       'type4="%s" periodicity1="%d" phase1="%s" k1="%s"/>\n' %
                        (a1, nowild(a2), nowild(a3), nowild(a4), improp.per,
                         improp.phase*pconv, improp.phi_k*kconv)
             )
@@ -283,7 +283,7 @@ class OpenMMParameterSet(ParameterSet):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
             dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s" k="%f" theta0="%f"/>\n' %
+                       'type4="%s" k="%s" theta0="%s"/>\n' %
                        (nowild(a1), nowild(a2), nowild(a3), nowild(a4),
                        improp.psi_k*kconv, improp.psi_eq*tconv)
             )
@@ -301,7 +301,7 @@ class OpenMMParameterSet(ParameterSet):
         for (a1, a2, a3), urey in iteritems(self.urey_bradley_types):
             if (a1, a2, a3) in ureys_done: continue
             if urey == NoUreyBradley: continue
-            dest.write('  <UreyBradley type1="%s" type2="%s" type3="%s" d="%f" k="%f"/>\n'
+            dest.write('  <UreyBradley type1="%s" type2="%s" type3="%s" d="%s" k="%s"/>\n'
                        % (a1, a2, a3, urey.req*length_conv, urey.k*frc_conv))
 
         dest.write(' </AmoebaUreyBradleyForce>\n')
@@ -322,7 +322,7 @@ class OpenMMParameterSet(ParameterSet):
                 dest.write('  ')
                 base = i * cmap.resolution
                 for j in range(cmap.resolution):
-                    dest.write(' %f' % (grid[base+j]*econv))
+                    dest.write(' %s' % (grid[base+j]*econv))
                 dest.write('\n')
             dest.write('  </Map>\n')
         used_torsions = set()
@@ -367,7 +367,7 @@ class OpenMMParameterSet(ParameterSet):
             lj14scale = 1.0 / self.default_scnb
 
         # Write NonbondedForce records.
-        dest.write(' <NonbondedForce coulomb14scale="%f" lj14scale="%f">\n' %
+        dest.write(' <NonbondedForce coulomb14scale="%s" lj14scale="%s">\n' %
                    (coulomb14scale, lj14scale))
         dest.write('  <UseAttributeFromResidue name="charge"/>\n')
         for name, atom_type in iteritems(self.atom_types):
@@ -387,7 +387,7 @@ class OpenMMParameterSet(ParameterSet):
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
 
-            dest.write('  <Atom type="%s" sigma="%f" epsilon="%f"/>\n' %
+            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
                        (name, sigma, epsilon))
         dest.write(' </NonbondedForce>\n')
 
