@@ -6,14 +6,15 @@ by Jason Swails
 """
 from __future__ import division, print_function, absolute_import
 
-from parmed.exceptions import MoleculeError, ParameterError
+from copy import copy
+import math
+from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 import parmed.unit as u
 from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import zip, range
-from copy import copy
-import math
+import warnings
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
@@ -2342,7 +2343,7 @@ class DihedralTypeList(list, _ListItem):
                 return False
         return True
 
-    def append(self, other):
+    def append(self, other, override=False):
         """ Adds a DihedralType to the DihedralTypeList
 
         Parameters
@@ -2350,23 +2351,34 @@ class DihedralTypeList(list, _ListItem):
         other : :class:`DihedralType`
             The DihedralType instance to add to this list. It cannot have the
             same periodicity as any other DihedralType in the list
+        override : bool, optional, default=False
+            If True, this will override an existing torsion, but will raise a
+            warning if it does so
 
         Raises
         ------
         TypeError if other is not an instance of :class:`DihedralTypeList`
 
         ParameterError if other has the same periodicity as another member in
-        this list
+        this list and override is False
+
+        ParameterWarning if other has same periodicit as another member in this
+        list and override is True
         """
         if not isinstance(other, DihedralType):
             raise TypeError('Can only add DihedralType to DihedralTypeList')
-        for existing in self:
+        for i, existing in enumerate(self):
             if existing.per == other.per:
                 # Do not add duplicate periodicities
                 if existing == other: return
-                raise ParameterError('Cannot add two DihedralType instances '
-                                     'with the same periodicity to the same '
-                                     'DihedralTypeList')
+                if override:
+                    warnings.warn('Overriding DihedralType in DihedralTypeList '
+                                  'with same periodicity', ParameterWarning)
+                    self[i] = other
+                else:
+                    raise ParameterError('Cannot add two DihedralType '
+                                         'instances with the same periodicity '
+                                         'to the same DihedralTypeList')
         list.append(self, other)
 
     @property

@@ -19,8 +19,8 @@ class GromacsFile(object):
 
     Parameters
     ----------
-    fname : str
-        Name of the file to parse
+    fname : str or file-like
+        Name of the file to parse or file-like object to parse
     defines : dict{str : str}, optional
         List of defines for the preprocessed file, if any
     includes : list of str, optional
@@ -47,15 +47,15 @@ class GromacsFile(object):
                 if not parts:
                     yield '%s\n' % line[:idx]
                 else:
-                    parts.append(line)
+                    parts.append('%s' % line[:idx])
                     yield '%s\n' % ''.join(parts)
                     parts = []
             except ValueError:
                 # There is no comment...
                 if line.rstrip('\r\n').endswith('\\'):
-                    chars = list(reversed(line))
+                    chars = list(reversed(line.rstrip('\r\n')))
                     del chars[chars.index('\\')]
-                    parts.append(''.join(reversed(chars)))
+                    parts.append('%s ' % ''.join(reversed(chars)))
                 elif parts:
                     parts.append(line)
                     yield ''.join(parts)
@@ -78,14 +78,14 @@ class GromacsFile(object):
                 if not parts:
                     return '%s\n' % line[:idx]
                 else:
-                    parts.append(line)
+                    parts.append('%s' % line[:idx])
                     return '%s\n' % ''.join(parts)
             except ValueError:
                 # There is no comment...
                 if line.rstrip('\r\n').endswith('\\'):
-                    chars = list(reversed(line))
+                    chars = list(reversed(line.rstrip('\r\n')))
                     del chars[chars.index('\\')]
-                    parts.append(''.join(reversed(chars)))
+                    parts.append('%s ' % ''.join(reversed(chars)))
                 elif parts:
                     parts.append(line)
                     return ''.join(parts)

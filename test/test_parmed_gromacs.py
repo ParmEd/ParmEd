@@ -2,25 +2,35 @@
 Tests the functionality in the parmed.gromacs package
 """
 import copy
-from parmed import load_file, Structure, ExtraPoint, DihedralTypeList
-from parmed.exceptions import GromacsWarning
-from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
-from parmed import gromacs as gmx
-from parmed.topologyobjects import _UnassignedAtomType
-from parmed.utils.six.moves import range, zip, StringIO
+import numpy as np
 import os
+from parmed import (load_file, Structure, ExtraPoint, DihedralTypeList, Atom,
+                    ParameterSet, Bond, NonbondedException, DihedralType,
+                    RBTorsionType, Improper, Cmap, UreyBradley,
+                    NonbondedExceptionType)
+from parmed.exceptions import GromacsWarning, GromacsError, ParameterError
+from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
+from parmed.gromacs._gromacsfile import GromacsFile
+from parmed import gromacs as gmx
+from parmed.topologyobjects import UnassignedAtomType
+from parmed.utils.six.moves import range, zip, StringIO
 import unittest
-from utils import get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS
+from utils import (get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS,
+                   create_random_structure)
 import utils
 import warnings
 
-@unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
+@unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 
     def setUp(self):
         warnings.filterwarnings('error', category=GromacsWarning)
         FileIOTestCase.setUp(self)
+
+    def tearDown(self):
+        warnings.filterwarnings('always', category=GromacsWarning)
+        FileIOTestCase.tearDown(self)
 
     def _charmm27_checks(self, top):
         # Check that the number of terms are correct
@@ -126,6 +136,57 @@ class TestGromacsTop(FileIOTestCase):
                                     'charmm27.ff/ions.itp'])
         self._charmm27_checks(top)
 
+    def test_gromacs_top_detection(self):
+        """ Tests automatic file detection of GROMACS topology files """
+        fn = get_fn('test.top', written=True)
+        with open(fn, 'w') as f:
+            f.write('# not a gromacs topology file\n')
+        self.assertFalse(GromacsTopologyFile.id_format(fn))
+        with open(fn, 'w') as f:
+            pass
+        self.assertFalse(GromacsTopologyFile.id_format(fn))
+
+    def test_gromacs_file(self):
+        """ Test GromacsFile helper class """
+        f = StringIO('This is the first line \\\n  this is still the first line'
+                     '\nThis is the second line')
+        gf = GromacsFile(f)
+        self.assertEqual(gf.readline(), 'This is the first line    this is '
+                         'still the first line\n')
+        self.assertEqual(gf.readline(), 'This is the second line')
+        self.assertEqual(gf.readline(), '')
+        f.seek(0)
+        lines = [line for line in gf]
+        self.assertEqual(lines[0], 'This is the first line    this is '
+                         'still the first line\n')
+        self.assertEqual(lines[1], 'This is the second line')
+
+        # Try with comments now
+        f = StringIO('This is the first line \\\n  this is still the first line'
+                     ' ; and this is a comment\nThis is the second line ; and '
+                     'this is also a comment')
+        gf = GromacsFile(f)
+        self.assertEqual(gf.readline(), 'This is the first line    this is still'
+                         ' the first line \n')
+        self.assertEqual(gf.readline(), 'This is the second line \n')
+        f.seek(0)
+        lines = [line for line in gf]
+        self.assertEqual(lines[0], 'This is the first line    this is still'
+                         ' the first line \n')
+        self.assertEqual(lines[1], 'This is the second line \n')
+        f.seek(0)
+        lines = gf.readlines()
+        self.assertEqual(lines[0], 'This is the first line    this is still'
+                         ' the first line \n')
+        self.assertEqual(lines[1], 'This is the second line \n')
+        f.seek(0)
+        self.assertEqual(gf.read(), 'This is the first line    this is still'
+                         ' the first line \nThis is the second line \n')
+
+        # Error handling
+        self.assertRaises(IOError, lambda:
+                GromacsFile('some_file that does_not exist'))
+
     def test_write_charmm27_top(self):
         """ Tests writing a Gromacs topology file with CHARMM 27 FF """
         top = load_file(get_fn('1aki.charmm27.top'))
@@ -208,10 +269,16 @@ class TestGromacsTop(FileIOTestCase):
         top = load_file(get_fn('ildn.solv.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
         fn = get_fn('ildn.solv.top', written=True)
-        GromacsTopologyFile.write(top, fn, combine=None)
+        top.write(fn, combine=None)
         top2 = load_file(fn)
         self._check_ff99sbildn(top2)
         self._check_equal_structures(top, top2)
+        # Turn off gen_pairs and write another version
+        top.defaults.gen_pairs = 'no'
+        top.write(fn)
+        top3 = load_file(fn)
+        self._check_ff99sbildn(top3)
+        self._check_equal_structures(top, top3)
 
     def test_duplicate_system_names(self):
         """ Tests that Gromacs topologies never have duplicate moleculetypes """
@@ -222,6 +289,20 @@ class TestGromacsTop(FileIOTestCase):
         top.write(get_fn('phenol_biphenyl.top', written=True))
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
         self.assertEqual(len(top.residues), 40)
+
+    def test_gromacs_top_from_structure(self):
+        """ Tests the GromacsTopologyFile.from_structure constructor """
+        struct = create_random_structure(True)
+        self.assertRaises(TypeError, lambda:
+                GromacsTopologyFile.from_structure(struct))
+        parm = load_file(get_fn('ash.parm7'))
+        parm.dihedrals[0].type.scee = 8.0
+        self.assertRaises(GromacsError, lambda:
+                GromacsTopologyFile.from_structure(parm))
+        for dt in parm.dihedral_types: dt.scee = dt.scnb = 0
+        top = GromacsTopologyFile.from_structure(parm)
+        self.assertEqual(top.defaults.fudgeLJ, 1.0)
+        self.assertEqual(top.defaults.fudgeQQ, 1.0)
 
     def test_OPLS(self):
         """ Tests the geometric combining rules in Gromacs with OPLS/AA """
@@ -234,14 +315,84 @@ class TestGromacsTop(FileIOTestCase):
         self.assertEqual(len(parm.atoms), len(parm2.atoms))
         # Check that the charge attribute is read correctly
         self.assertEqual(parm.parameterset.atom_types['opls_001'].charge, 0.5)
+        # Check the xyz argument in the constructor being coordinates
+        parm2 = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
+                          xyz=parm.coordinates, box=[10, 10, 10, 90, 90, 90])
+        np.testing.assert_equal(parm2.coordinates, parm.coordinates)
+        np.testing.assert_equal(parm2.box, [10, 10, 10, 90, 90, 90])
+        # Check the copy constructor
+        p2 = GromacsTopologyFile.from_structure(parm, copy=True)
+        self.assertEqual(p2.combining_rule, 'geometric')
+        self.assertEqual(p2.defaults.comb_rule, 3)
+        self.assertEqual(len(p2.atoms), len(parm.atoms))
+        for a1, a2 in zip(p2.atoms, parm.atoms):
+            self.assertIsNot(a1, a2)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+            self.assertEqual(a1.mass, a2.mass)
+        np.testing.assert_equal(p2.box, parm.box)
 
     def test_without_parametrize(self):
         """ Tests loading a Gromacs topology without parametrizing """
         parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                          xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'),
                          parametrize=False)
-        assert isinstance(parm.atoms[0].atom_type, _UnassignedAtomType)
-        assert all(x.type is None for x in parm.bonds)
+        self.assertIs(parm.atoms[0].atom_type, UnassignedAtomType)
+        self.assertTrue(all(x.type is None for x in parm.bonds))
+
+    def test_bad_top_loads(self):
+        """ Test error catching in GromacsTopologyFile reading """
+        fn = os.path.join(get_fn('03.AlaGlu'), 'topol.top')
+        self.assertRaises(TypeError, lambda: load_file(fn, xyz=fn))
+        self.assertRaises(ValueError, lambda: GromacsTopologyFile(xyz=1, box=1))
+        wfn = os.path.join(get_fn('gmxtops'), 'duplicated_topol.top')
+        self.assertRaises(GromacsError, lambda: GromacsTopologyFile(wfn))
+        f = StringIO('\n[ defaults ]\n; not enough data\n 1\n\n')
+        self.assertRaises(GromacsError, lambda: GromacsTopologyFile(f))
+        f = StringIO('\n[ defaults ]\n; unsupported function type\n 2 1 yes\n')
+        self.assertRaises(GromacsWarning, lambda: GromacsTopologyFile(f))
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        f.seek(0)
+        self.assertTrue(GromacsTopologyFile(f).unknown_functional)
+        warnings.filterwarnings('error', category=GromacsWarning)
+        fn = os.path.join(get_fn('gmxtops'), 'bad_vsites3.top')
+        self.assertRaises(GromacsError, lambda: load_file(fn))
+        self.assertRaises(ValueError, lambda: load_file(fn, defines=dict()))
+        f = StringIO('\n[ defaults ]\n1 1 yes\n\n[ system ]\nname\n'
+                     '[ molecules ]\nNOMOL  2\n')
+        self.assertRaises(GromacsError, lambda: GromacsTopologyFile(f))
+        fn = os.path.join(get_fn('gmxtops'), 'bad_nrexcl.top')
+        self.assertRaises(GromacsWarning, lambda:
+                GromacsTopologyFile(fn, defines=dict(SMALL_NREXCL=1))
+        )
+        self.assertRaises(GromacsWarning, lambda: GromacsTopologyFile(fn))
+        self.assertRaises(GromacsWarning, lambda:
+                GromacsTopologyFile(wfn, defines=dict(NODUP=1))
+        )
+        self.assertRaises(GromacsError, lambda:
+                GromacsTopologyFile(wfn, defines=dict(NODUP=1, BADNUM=1))
+        )
+        self.assertRaises(RuntimeError, GromacsTopologyFile().parametrize)
+
+    def test_top_parsing_missing_types(self):
+        """ Test GROMACS topology files with missing types """
+        warnings.filterwarnings('error', category=GromacsWarning)
+        self.assertRaises(GromacsWarning, lambda:
+                GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
+                                    'missing_atomtype.top'), parametrize=False)
+        )
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        top = GromacsTopologyFile(os.path.join(get_fn('gmxtops'),
+                                  'missing_atomtype.top'), parametrize=False)
+        self.assertIs(top[0].atom_type, UnassignedAtomType)
+        self.assertEqual(top[0].mass, -1)
+        self.assertEqual(top[0].atomic_number, -1)
+        self.assertEqual(top[1].atomic_number, 1)  # taken from atom_type
+        self.assertEqual(top[-1].atomic_number, 1) # taken from atom_type
+        self.assertEqual(top[-1].charge, 0) # removed
+        self.assertEqual(top.bonds[0].funct, 2)
+        self.assertTrue(top.unknown_functional)
 
     def test_molecule_ordering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """
@@ -285,7 +436,7 @@ class TestGromacsTop(FileIOTestCase):
                 parm.write(fname, combine=[[1, 3]]))
         self.assertRaises(ValueError, lambda:
                 parm.write(fname, combine='joey'))
-        self.assertRaises(ValueError, lambda:
+        self.assertRaises(TypeError, lambda:
                 parm.write(fname, combine=[1, 2, 3]))
         self.assertRaises(TypeError, lambda:
                 parm.write(fname, combine=1))
@@ -311,10 +462,483 @@ class TestGromacsTop(FileIOTestCase):
             for a1, a2 in zip(r1, r2):
                 self._equal_atoms(a1, a2)
 
+    def test_gromacs_top_write(self):
+        """ Tests the GromacsTopologyFile writer """
+        def total_diheds(dlist):
+            n = 0
+            for d in dlist:
+                if isinstance(d.type, DihedralTypeList):
+                    n += len(d.type)
+                elif not d.improper:
+                    n += 1
+            return n
+        parm = load_file(get_fn('ash.parm7'))
+        top = GromacsTopologyFile.from_structure(parm)
+        self.assertRaises(TypeError, lambda: top.write(10))
+        f = StringIO()
+        self.assertRaises(ValueError, lambda: top.write(f, parameters=10))
+        # Write parameters and topology to same filename
+        fn = get_fn('test.top', written=True)
+        top.write(fn, parameters=fn)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try passing open files
+        with open(fn, 'w') as f:
+            top.write(f, parameters=f)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try separate parameter/topology file
+        fn2 = get_fn('test.itp', written=True)
+        top.write(fn, parameters=fn2)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now force writing pair types... but first we have to provide pair
+        # types
+        top.defaults.gen_pairs = 'no'
+        top.write(fn, parameters=fn)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+
+    def test_private_functions(self):
+        """ Tests private helper functions for GromacsTopologyFile """
+        Defaults = gmx.gromacstop._Defaults
+        self.assertRaises(ValueError, lambda: Defaults(nbfunc=3))
+        self.assertRaises(ValueError, lambda: Defaults(comb_rule=4))
+        self.assertRaises(ValueError, lambda: Defaults(gen_pairs='nada'))
+        self.assertRaises(ValueError, lambda: Defaults(fudgeLJ=-1.0))
+        self.assertRaises(ValueError, lambda: Defaults(fudgeQQ=-1.0))
+        repr(Defaults()) # To make sure it doesn't crash
+        defaults = Defaults(nbfunc=2, comb_rule=3, gen_pairs='no', fudgeLJ=2.0,
+                            fudgeQQ=1.5)
+        self.assertEqual(defaults[0], 2)
+        self.assertEqual(defaults[1], 3)
+        self.assertEqual(defaults[2], 'no')
+        self.assertEqual(defaults[3], 2.0)
+        self.assertEqual(defaults[4], 1.5)
+        self.assertEqual(defaults[-1], 1.5)
+        self.assertEqual(defaults[-2], 2.0)
+        self.assertEqual(defaults[-3], 'no')
+        self.assertEqual(defaults[-4], 3)
+        self.assertEqual(defaults[-5], 2)
+        self.assertRaises(IndexError, lambda: defaults[-6])
+        self.assertRaises(IndexError, lambda: defaults[5])
+        # Try setting as an array
+        defaults[0] = defaults[1] = 1
+        defaults[2] = 'yes'
+        defaults[3] = 1.5
+        defaults[4] = 2.0
+        self.assertEqual(defaults.nbfunc, 1)
+        self.assertEqual(defaults.comb_rule, 1)
+        self.assertEqual(defaults.gen_pairs, 'yes')
+        self.assertEqual(defaults.fudgeLJ, 1.5)
+        self.assertEqual(defaults.fudgeQQ, 2.0)
+        defaults[-5] = defaults[-4] = 1
+        defaults[-3] = 'yes'
+        defaults[-2] = 1.5
+        defaults[-1] = 2.0
+        self.assertEqual(defaults.nbfunc, 1)
+        self.assertEqual(defaults.comb_rule, 1)
+        self.assertEqual(defaults.gen_pairs, 'yes')
+        self.assertEqual(defaults.fudgeLJ, 1.5)
+        self.assertEqual(defaults.fudgeQQ, 2.0)
+        # Error checking
+        def setter(idx, val):
+            defaults[idx] = val
+        self.assertRaises(ValueError, lambda: setter(0, 0))
+        self.assertRaises(ValueError, lambda: setter(1, 0))
+        self.assertRaises(ValueError, lambda: setter(2, 'nada'))
+        self.assertRaises(ValueError, lambda: setter(3, -1))
+        self.assertRaises(ValueError, lambda: setter(4, -1))
+        self.assertRaises(IndexError, lambda: setter(5, 0))
+
     _equal_atoms = utils.equal_atoms
+
+@unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
+class TestGromacsMissingParameters(FileIOTestCase):
+    """ Test handling of missing parameters """
+
+    def setUp(self):
+        self.top = load_file(get_fn('ildn.solv.top'), parametrize=False)
+        warnings.filterwarnings('error', category=GromacsWarning)
+        FileIOTestCase.setUp(self)
+
+    def tearDown(self):
+        warnings.filterwarnings('always', category=GromacsWarning)
+        FileIOTestCase.tearDown(self)
+
+    def test_missing_pairtypes(self):
+        """ Tests handling of missing pairtypes parameters """
+        self.top.defaults.gen_pairs = 'no'
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_missing_bondtypes(self):
+        """ Tests handling of missing bondtypes parameters """
+        b1 = self.top.bonds[0]
+        del self.top.parameterset.bond_types[(b1.atom1.type, b1.atom2.type)]
+        del self.top.parameterset.bond_types[(b1.atom2.type, b1.atom1.type)]
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_extra_pairs(self):
+        """ Tests warning if "extra" exception pair found """
+        self.top.adjusts.append(NonbondedException(self.top[0], self.top[-1]))
+        self.assertRaises(GromacsWarning, self.top.parametrize)
+
+    def test_missing_angletypes(self):
+        """ Tests handling of missing angletypes parameters """
+        a1 = self.top.angles[0]
+        key = (a1.atom1.type, a1.atom2.type, a1.atom3.type)
+        del self.top.parameterset.angle_types[key]
+        if key != tuple(reversed(key)):
+            del self.top.parameterset.angle_types[tuple(reversed(key))]
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_missing_wildcard_dihedraltypes(self):
+        """ Tests handling of wild-card dihedraltypes parameters """
+        def get_key(d, wc=None):
+            if wc is None:
+                return (d.atom1.type, d.atom2.type, d.atom3.type, d.atom4.type)
+            if wc == 0:
+                return ('X', d.atom2.type, d.atom3.type, d.atom4.type)
+            if wc == 3:
+                return (d.atom1.type, d.atom2.type, d.atom3.type, 'X')
+            else:
+                return ('X', d.atom2.type, d.atom3.type, 'X')
+        d1 = self.top.dihedrals[0]
+        for d in self.top.dihedrals:
+            if get_key(d) == get_key(d1): continue
+            if get_key(d, 0) == get_key(d1, 0): continue
+            if get_key(d, 3) == get_key(d1, 3): continue
+            if get_key(d, 0) == get_key(d1, 3): continue
+            if get_key(d1, 0) == get_key(d, 3): continue
+            if d.improper: continue
+            if d.type is not None: continue
+            d2 = d
+            break
+        else:
+            assert False, 'Bad test parm'
+        # Now make sure the two dihedrals match where only one wild-card is
+        # present
+        params = self.top.parameterset
+        if get_key(d1) in params.dihedral_types:
+            del params.dihedral_types[get_key(d1)]
+            del params.dihedral_types[tuple(reversed(get_key(d1)))]
+        if get_key(d2) in params.dihedral_types:
+            del params.dihedral_types[get_key(d2)]
+            del params.dihedral_types[tuple(reversed(get_key(d2)))]
+        dt1 = DihedralTypeList([DihedralType(10, 180, 1)])
+        dt2 = DihedralTypeList([DihedralType(11, 0, 2)])
+        params.dihedral_types[get_key(d1, 0)] = dt1
+        params.dihedral_types[tuple(reversed(get_key(d1, 0)))] = dt1
+        params.dihedral_types[get_key(d2, 3)] = dt2
+        params.dihedral_types[tuple(reversed(get_key(d2, 3)))] = dt2
+
+        self.top.parametrize()
+        self.assertEqual(d1.type, dt1)
+        self.assertEqual(d2.type, dt2)
+
+    def test_missing_dihedraltypes(self):
+        """ Tests handling of missing dihedraltypes parameters """
+        def get_key(d, wc=None):
+            if wc is None:
+                return (d.atom1.type, d.atom2.type, d.atom3.type, d.atom4.type)
+            if wc == 0:
+                return ('X', d.atom2.type, d.atom3.type, d.atom4.type)
+            if wc == 3:
+                return (d.atom1.type, d.atom2.type, d.atom3.type, 'X')
+            else:
+                return ('X', d.atom2.type, d.atom3.type, 'X')
+        for d in self.top.dihedrals:
+            if d.type is not None: continue
+            break
+        params = self.top.parameterset
+        if get_key(d) in params.dihedral_types:
+            del params.dihedral_types[get_key(d)]
+            del params.dihedral_types[tuple(reversed(get_key(d)))]
+        if get_key(d, wc=100) in params.dihedral_types:
+            del params.dihedral_types[get_key(d, wc=100)]
+            del params.dihedral_types[tuple(reversed(get_key(d, wc=100)))]
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_missing_impropertypes(self):
+        """ Tests handling of missing improper type """
+        for key in set(self.top.parameterset.improper_periodic_types.keys()):
+            del self.top.parameterset.improper_periodic_types[key]
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_wildcard_rbtorsions(self):
+        """ Tests handling of missing and wild-cards with R-B torsion types """
+        def get_key(d, wc=None):
+            if wc is None:
+                return (d.atom1.type, d.atom2.type, d.atom3.type, d.atom4.type)
+            if wc == 0:
+                return ('X', d.atom2.type, d.atom3.type, d.atom4.type)
+            if wc == 3:
+                return (d.atom1.type, d.atom2.type, d.atom3.type, 'X')
+            else:
+                return ('X', d.atom2.type, d.atom3.type, 'X')
+        for i, d1 in enumerate(self.top.dihedrals):
+            if not d1.improper and d1.type is None:
+                break
+        else:
+            assert False, 'Bad topology file for test'
+        del self.top.dihedrals[i]
+        for i, d2 in enumerate(self.top.dihedrals):
+            if get_key(d1) == get_key(d2): continue
+            if get_key(d1, 0) == get_key(d2, 0): continue
+            if get_key(d1, 3) == get_key(d2, 3): continue
+            if get_key(d1, 0) == get_key(d2, 3): continue
+            if get_key(d2, 0) == get_key(d1, 3): continue
+            if not d2.improper and d2.type is None:
+                break
+        else:
+            assert False, 'Bad topology file for test'
+        del self.top.dihedrals[i]
+        self.top.rb_torsions.extend([d1, d2])
+        self.assertRaises(ParameterError, self.top.parametrize)
+        # Now assign wild-cards
+        params = self.top.parameterset
+        rbt = RBTorsionType(1, 2, 3, 4, 5, 6)
+        params.rb_torsion_types[get_key(d1, 0)] = rbt
+        params.rb_torsion_types[tuple(reversed(get_key(d1, 0)))] = rbt
+        rbt2 = RBTorsionType(2, 3, 4, 5, 6, 7)
+        params.rb_torsion_types[get_key(d2, 1)] = rbt2
+        params.rb_torsion_types[tuple(reversed(get_key(d2, 1)))] = rbt2
+
+        self.top.parametrize()
+
+        self.assertEqual(d1.type, rbt)
+        self.assertEqual(d2.type, rbt2)
+
+    def test_missing_impropers(self):
+        """ Test handling of missing impropers """
+        self.top.impropers.append(Improper(*tuple(self.top.atoms[:4])))
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_missing_cmaps(self):
+        """ Test handling of missing cmaptypes """
+        self.top.cmaps.append(Cmap(*tuple(self.top.atoms[:5])))
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+    def test_missing_ureybradleys(self):
+        """ Test handling of missing Urey-Bradley types """
+        self.top.angles[0].funct = 5
+        self.top.urey_bradleys.append(
+                UreyBradley(self.top.angles[0].atom1, self.top.angles[0].atom3)
+        )
+        self.assertRaises(ParameterError, self.top.parametrize)
+
+class TestGromacsTopHelperFunctions(FileIOTestCase):
+    """ Test GROMACS helper functions """
+
+    def setUp(self):
+        self.top = GromacsTopologyFile()
+        self.top.add_atom(Atom(name='C1'), 'ABC', 1)
+        self.top.add_atom(Atom(name='C1'), 'DEF', 2)
+        self.top.add_atom(Atom(name='C1'), 'GHI', 3)
+        self.top.add_atom(Atom(name='C1'), 'JKL', 4)
+        self.top.add_atom(Atom(name='C1'), 'MNO', 5)
+        self.top.add_atom(Atom(name='C1'), 'PQR', 5)
+        warnings.filterwarnings('error', category=GromacsWarning)
+        FileIOTestCase.setUp(self)
+
+    def test_parse_pairs(self):
+        """ Test GromacsTopologyFile._parse_pairs """
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_pairs('1  2  3\n', dict(), self.top.atoms))
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_pairs('1  2  3\n', dict(), self.top.atoms)
+        self.assertTrue(self.top.unknown_functional)
+
+    def test_parse_angles(self):
+        """ Test GromacsTopologyFile._parse_angles """
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_angles('1  2  3  2\n', dict(), dict(),
+                                       self.top.atoms)
+        )
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_angles('1  2  3  2\n', dict(), dict(), self.top.atoms)
+        self.assertTrue(self.top.unknown_functional)
+
+    def test_parse_dihedrals(self):
+        """ Test GromacsTopologyFile._parse_dihedrals """
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_dihedrals('1 2 3 4 100\n', dict(), dict(),
+                                          self.top)
+        )
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_dihedrals('1 2 3 4 100\n', dict(), dict(), self.top)
+        self.assertTrue(self.top.unknown_functional)
+        self.assertEqual(len(self.top.dihedrals), 1)
+        dih = self.top.dihedrals[0]
+        self.assertIs(dih.atom1, self.top[0])
+        self.assertIs(dih.atom2, self.top[1])
+        self.assertIs(dih.atom3, self.top[2])
+        self.assertIs(dih.atom4, self.top[3])
+        self.assertIs(dih.type, None)
+        # Test multi-term dihedrals
+        dt = dict()
+        PMD = dict()
+        self.top._parse_dihedrals('1 2 3 4 9 180 50 1', dt, PMD, self.top)
+        self.assertIn(tuple(self.top.atoms[:4]), PMD)
+        self.top._parse_dihedrals('1 2 3 4 9 180 40 2', dt, PMD, self.top)
+        self.assertEqual(len(PMD[tuple(self.top.atoms[:4])]), 2)
+
+    def test_parse_cmaps(self):
+        """ Test GromacsTopologyFile._parse_cmaps """
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_cmaps('1 2 3 4 5 2\n', self.top.atoms))
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_cmaps('1 2 3 4 5 2\n', self.top.atoms)
+        self.assertTrue(self.top.unknown_functional)
+
+    def test_parse_settles(self):
+        """ Test GromacsTopologyFile._parse_settles """
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_settles('whatever', self.top.atoms))
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_settles('whatever', self.top.atoms[:3]))
+        self.top[0].atomic_number = 8
+        self.top[1].atomic_number = self.top[2].atomic_number = 1
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_settles('1 2 nofloat nofloat\n',
+                                        self.top.atoms[:3])
+        )
+
+    def test_parse_vsite3(self):
+        """ Test GromacsTopologyFile._parse_vsites3 """
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_vsites3('1 2 3 4 1 1.2 1.3\n', self.top.atoms,
+                                        ParameterSet())
+        )
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_vsites3('1 2 3 4 2 1.2 1.3\n', self.top.atoms,
+                                        ParameterSet())
+        )
+        bond = Bond(self.top[0], self.top[1])
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_vsites3('1 2 3 4 1 1.2 1.2', self.top.atoms,
+                                        ParameterSet())
+        )
+
+    def test_parse_atomtypes(self):
+        """ Test GromacsTopologyFile._parse_atomtypes """
+        name, typ = self.top._parse_atomtypes('CX 12.01 0 A 0.1 2.0')
+        self.assertEqual(name, 'CX')
+        self.assertEqual(typ.atomic_number, 6)
+        self.assertEqual(typ.charge, 0)
+        self.assertEqual(typ.epsilon, 2.0/4.184)
+        self.assertEqual(typ.sigma, 1)
+
+    def test_parse_bondtypes(self):
+        """ Test GromacsTopologyFile._parse_bondtypes """
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_bondtypes('CA CB 2 0.1 5000'))
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_bondtypes('CA CB 2 0.1 5000')
+        self.assertTrue(self.top.unknown_functional)
+
+    def test_parse_angletypes(self):
+        """ Test GromacsTopologyFile._parse_angletypes """
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_angletypes('CA CB CC 2 120 5000'))
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_angletypes('CA CB CC 2 120 5000')
+        self.assertTrue(self.top.unknown_functional)
+
+    def test_parse_dihedraltypes(self):
+        """ Test GromacsTopologyFile._parse_dihedraltypes """
+        key, dtype, ptype, replace = self.top._parse_dihedraltypes(
+                                        'CA CA 9 180 50.0 2')
+        self.assertEqual(key, ('X', 'CA', 'CA', 'X'))
+        self.assertEqual(dtype, 'normal')
+        self.assertFalse(replace)
+        self.assertEqual(ptype.phase, 180)
+        self.assertEqual(ptype.phi_k, 50/4.184)
+        self.assertEqual(ptype.per, 2)
+        self.assertRaises(GromacsWarning, lambda:
+                self.top._parse_dihedraltypes('CX CA CA CX 10 180 50.0 2'))
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        self.top._parse_dihedraltypes('CX CA CA CX 10 180 50.0 2')
+        self.assertTrue(self.top.unknown_functional)
+
+    def test_parse_cmaptypes(self):
+        """ Test GromacsTopologyFile._parse_cmaptypes """
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_cmaptypes('C1 C2 C3 C4 C5 1 24 24 1 2 3 4 5'))
+        self.assertRaises(GromacsError, lambda:
+                self.top._parse_cmaptypes('C1 C2 C3 C4 C5 1 2 3 1 2 3 4 5 6'))
 
 class TestGromacsGro(FileIOTestCase):
     """ Tests the Gromacs GRO file parser """
+
+    def test_gro_velocities(self):
+        """ Test parsing and writing GROMACS GRO files with velocities """
+        gro = load_file(get_fn('1aki.ff99sbildn.gro'))
+        self.assertIsInstance(gro, Structure)
+        vel = np.random.rand(len(gro.atoms), 3)
+        gro.velocities = vel
+        fn = get_fn('test.gro', written=True)
+        gro.save(fn)
+        self.assertTrue(GromacsGroFile.id_format(fn))
+        gro.save(fn, overwrite=True, precision=8)
+        self.assertTrue(GromacsGroFile.id_format(fn))
+        with open(fn) as f:
+            tmp = GromacsGroFile.parse(f)
+        np.testing.assert_allclose(vel, tmp.velocities, atol=1e-8)
+
+    def test_gro_detection(self):
+        """ Tests automatic detection of GROMACS GRO files """
+        fn = get_fn('candidate.gro', written=True)
+        with open(fn, 'w') as f:
+            f.write('Some title\n 1000\n    aISNot a valid format\n')
+        self.assertFalse(GromacsGroFile.id_format(fn))
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
+        f = StringIO('Gromacs title line\n notanumber\nsome line\n')
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(f))
 
     def test_read_gro_file(self):
         """ Tests reading GRO file """
@@ -337,6 +961,18 @@ class TestGromacsGro(FileIOTestCase):
         # Check atomic number and mass assignment
         self.assertEqual(gro.atoms[0].atomic_number, 7)
         self.assertEqual(gro.atoms[0].mass, 14.0067)
+        fn = get_fn('test.gro', written=True)
+        # Test bad GRO files
+        with open(fn, 'w') as wf, open(get_fn('1aki.charmm27.solv.gro')) as f:
+            for i in range(1000):
+                wf.write(f.readline())
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
+        with open(get_fn('1aki.ff99sbildn.gro')) as f:
+            lines = f.readlines()
+        lines[-1] = 'not a legal box line\n'
+        with open(fn, 'w') as f:
+            f.write(''.join(lines))
+        self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
 
     def test_write_gro_file(self):
         """ Tests writing GRO file """
@@ -358,6 +994,20 @@ class TestGromacsGro(FileIOTestCase):
         self.assertAlmostEqual(gro.box[3], 70.52882666)
         self.assertAlmostEqual(gro.box[4], 109.47126278)
         self.assertAlmostEqual(gro.box[5], 70.52875398)
+        self.assertRaises(TypeError, lambda: GromacsGroFile.write(gro, 10))
+
+    def test_write_gro_file_nobox(self):
+        """ Test GROMACS GRO file writing without a box """
+        parm = load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        self.assertIs(parm.box, None)
+        fn = get_fn('test.gro', written=True)
+        parm.save(fn)
+        # Make sure it has a box
+        gro = load_file(fn)
+        self.assertIsNot(gro.box, None)
+        parm.save(fn, nobox=True, overwrite=True)
+        gro = load_file(fn)
+        self.assertIs(gro.box, None)
 
     def test_read_write_high_precision_gro_file(self):
         """ Tests reading/writing high-precision GRO files """

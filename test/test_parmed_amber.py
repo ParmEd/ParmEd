@@ -141,9 +141,12 @@ class TestReadParm(unittest.TestCase):
         self.assertIs(parm.view_as(readparm.AmberParm), parm)
         for key in parm.parm_data:
             self.assertEqual(parm.parm_data[key], parm2.parm_data[key])
+        parm.box = [2*u.nanometer, 2*u.nanometer, 2*u.nanometer,
+                    math.pi/2*u.radian, math.pi/2*u.radian, math.pi/2*u.radian]
+        np.testing.assert_allclose(parm.box, [20, 20, 20, 90, 90, 90])
         # Now check that the box info is set properly
-        crd3 = load_file(get_fn('solv.rst7'))
-        parm3 = readparm.LoadParm(get_fn('solv.prmtop'), xyz=crd3.coordinates)
+        crd3 = load_file(get_fn('solv2.rst7'))
+        parm3 = readparm.LoadParm(get_fn('solv2.parm7'), xyz=crd3.coordinates)
         np.testing.assert_equal(parm3.box[:3], parm3.parm_data['BOX_DIMENSIONS'][1:])
         self.assertEqual(parm3.box[3], parm3.parm_data['BOX_DIMENSIONS'][0])
 
@@ -330,7 +333,14 @@ class TestReadParm(unittest.TestCase):
         self._extensive_checks(parm)
         self.assertTrue(parm.chamber)
         self.assertTrue(parm.has_cmap)
+        self.assertFalse(parm.amoeba)
         self.assertEqual(parm.ptr('ifbox'), 0)
+        # Make sure that a corrupted data section is properly caught
+        fmt = readparm.AmberFormat(get_fn('ala_ala_ala.parm7'))
+        del fmt.parm_data['CHARMM_UREY_BRADLEY'][-1]
+        self.assertRaises(AmberError, lambda:
+                readparm.ChamberParm.from_rawdata(fmt)
+        )
 
     def test_chamber_solv_parm(self):
         """ Test the ChamberParm class with a periodic prmtop """
@@ -680,7 +690,7 @@ class TestReadParm(unittest.TestCase):
         np.testing.assert_allclose(parm2.velocities, parm.velocities)
         np.testing.assert_allclose(parm2.box, parm.box)
 
-    @unittest.skipIf(not HAS_GROMACS, 'Cannot test without Gromacs')
+    @unittest.skipUnless(HAS_GROMACS, 'Cannot test without Gromacs')
     def test_amber_parm_from_structure(self):
         """ Tests AmberParm.from_structure """
         aparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
@@ -755,6 +765,9 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.dihedral_types[0].phi_k, 0)
         self.assertEqual(parm.dihedral_types[0].phase,
                          tmp.dihedral_types[0][0].phase)
+        def assign_box_badly():
+            readparm.AmberParm(get_fn('ash.parm7')).box = [1, 2, 3, 4]
+        self.assertRaises(ValueError, assign_box_badly)
 
     def test_old_parm_format(self):
         """ Test reading old Amber prmtop file format """
