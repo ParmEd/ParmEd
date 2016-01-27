@@ -458,7 +458,6 @@ class CharmmParameterSet(ParameterSet):
                 if (type1, type2, type3) in self.angle_types:
                     # See if the existing angle type list has a different value and replaces it with a warning
                     if self.angle_types[(type1, type2, type3)] != angle_type:
-                        print(type1, type2, type3)
                         # Replace. Warn if they are differen
                         warnings.warn('Replacing angle %r, %r with %r' %
                                               ([(type1, type2, type3)], self.angle_types[(type1, type2, type3)], angle_type))
