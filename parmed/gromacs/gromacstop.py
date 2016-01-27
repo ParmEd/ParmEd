@@ -402,8 +402,8 @@ class GromacsTopologyFile(Structure):
                         params.rb_torsion_types[rkey] = t
                 elif current_section == 'cmaptypes':
                     a1, a2, a3, a4, a5, t = self._parse_cmaptypes(line)
-                    params.cmap_types[(a1, a2, a3, a4, a5)] = t
-                    params.cmap_types[(a5, a4, a3, a2, a1)] = t
+                    params.cmap_types[(a1, a2, a3, a4, a2, a3, a4, a5)] = t
+                    params.cmap_types[(a5, a4, a3, a2, a4, a3, a2, a1)] = t
                 elif current_section == 'pairtypes':
                     a, b, t = self._parse_pairtypes(line)
                     params.pair_types[(a, b)] = params.pair_types[(b, a)] = t
