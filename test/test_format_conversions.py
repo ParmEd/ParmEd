@@ -7,12 +7,12 @@ from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed.utils.six.moves import zip, range
-from parmed import unit as u
+from parmed import unit as u, topologyobjects as to
 from parmed.tools import addLJType
 import unittest
 from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
                    FileIOTestCase, HAS_GROMACS, CPU, has_openmm as HAS_OPENMM,
-                   mm, app, equal_atoms)
+                   mm, app, equal_atoms, Reference)
 import warnings
 
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
@@ -55,7 +55,7 @@ class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
         np.testing.assert_allclose(gro.box, parm.box)
         np.testing.assert_allclose(top.box, parm.box)
 
-@unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+@unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
 class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
     """ Tests converting Gromacs top/gro files to Amber """
 
@@ -100,15 +100,81 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
 
     def test_chamber(self):
         """ Tests converting standard Gromacs system into Chamber prmtop """
+        fn = get_fn('1aki.charmm27_fromgmx.parm7', written=True)
         top = load_file(get_fn('1aki.charmm27.solv.top'),
                         xyz=get_fn('1aki.charmm27.solv.gro'))
+        self.assertGreater(len(top.urey_bradleys), 0)
+        self.assertGreater(len(top.urey_bradley_types), 0)
         parm = amber.ChamberParm.from_structure(top)
-        parm.write_parm(get_fn('1aki.charmm27_fromgmx.parm7', written=True))
-        self.assertTrue(diff_files(get_fn('1aki.charmm27_fromgmx.parm7',
-                                          written=True),
-                                   get_saved_fn('1aki.charmm27_fromgmx.parm7'),
-                                   relative_error=1e-8)
+        parm.write_parm(fn)
+        self.assertTrue(
+                diff_files(fn, get_saved_fn('1aki.charmm27_fromgmx.parm7'),
+                           relative_error=1e-8)
         )
+        parm.fill_LJ()
+        self.assertTrue(0 in parm.LJ_14_radius)
+        self.assertTrue(0 in parm.LJ_14_depth)
+
+    @unittest.skipUnless(HAS_OPENMM, 'Cannot test without OpenMM')
+    def test_chamber_expanded_exclusions(self):
+        """ Tests converting Gromacs to Chamber parm w/ modified exceptions """
+        # Now let's modify an exception parameter so that it needs type
+        # expansion, and ensure that it is handled correctly
+        top = load_file(get_fn('1aki.charmm27.solv.top'),
+                        xyz=get_fn('1aki.charmm27.solv.gro'))
+        gsystem1 = top.createSystem(nonbondedCutoff=8*u.angstroms,
+                                    nonbondedMethod=app.PME)
+        gcon1 = mm.Context(gsystem1, mm.VerletIntegrator(1*u.femtosecond),
+                           Reference)
+        gcon1.setPositions(top.positions)
+        top.adjust_types.append(to.NonbondedExceptionType(0, 0, 1))
+        top.adjust_types.claim()
+        top.adjusts[10].type = top.adjust_types[-1]
+        gsystem2 = top.createSystem(nonbondedCutoff=8*u.angstroms,
+                                    nonbondedMethod=app.PME)
+        gcon2 = mm.Context(gsystem2, mm.VerletIntegrator(1*u.femtosecond),
+                           Reference)
+        gcon2.setPositions(top.positions)
+        e1 = gcon1.getState(getEnergy=True).getPotentialEnergy()
+        e1 = e1.value_in_unit(u.kilocalories_per_mole)
+        e2 = gcon2.getState(getEnergy=True).getPotentialEnergy()
+        e2 = e2.value_in_unit(u.kilocalories_per_mole)
+        self.assertGreater(abs(e2 - e1), 1e-2)
+        # Convert to chamber now
+        parm = amber.ChamberParm.from_structure(top)
+        asystem = parm.createSystem(nonbondedCutoff=8*u.angstroms,
+                                    nonbondedMethod=app.PME)
+        acon = mm.Context(asystem, mm.VerletIntegrator(1*u.femtosecond),
+                          Reference)
+        acon.setPositions(top.positions)
+        e3 = acon.getState(getEnergy=True).getPotentialEnergy()
+        e3 = e3.value_in_unit(u.kilocalories_per_mole)
+        self.assertLess(abs(e2 - e3), 1e-2)
+
+    @unittest.skipUnless(HAS_OPENMM, 'Cannot test without OpenMM')
+    def test_chamber_energies(self):
+        """ Tests converting Gromacs to Chamber parm calculated energies """
+        # Now let's modify an exception parameter so that it needs type
+        # expansion, and ensure that it is handled correctly
+        top = load_file(get_fn('1aki.charmm27.solv.top'),
+                        xyz=get_fn('1aki.charmm27.solv.gro'))
+        gsystem = top.createSystem(nonbondedCutoff=8*u.angstroms,
+                                   nonbondedMethod=app.PME)
+        gcon = mm.Context(gsystem, mm.VerletIntegrator(1*u.femtosecond),
+                          Reference)
+        gcon.setPositions(top.positions)
+        eg = gcon.getState(getEnergy=True).getPotentialEnergy()
+        eg = eg.value_in_unit(u.kilocalories_per_mole)
+        # Convert to chamber now
+        parm = amber.ChamberParm.from_structure(top)
+        asystem = parm.createSystem(nonbondedCutoff=8*u.angstroms,
+                                    nonbondedMethod=app.PME)
+        acon = mm.Context(asystem, mm.VerletIntegrator(1*u.femtosecond),
+                          Reference)
+        acon.setPositions(top.positions)
+        ea = acon.getState(getEnergy=True).getPotentialEnergy()
+        ea = ea.value_in_unit(u.kilocalories_per_mole)
+        self.assertLess(abs(eg - ea), 1e-2)
 
     def test_geometric_combining_rule(self):
         """ Tests converting geom. comb. rule from Gromacs to Amber """
@@ -130,7 +196,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         np.testing.assert_allclose(acoef, parm.parm_data['LENNARD_JONES_ACOEF'])
         np.testing.assert_allclose(bcoef, parm.parm_data['LENNARD_JONES_BCOEF'])
 
-    @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_geometric_combining_rule_energy(self):
         """ Tests converting geom. comb. rule energy from Gromacs to Amber """
         top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
@@ -153,7 +219,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         
         self._check_energies(top, cong, parm, cona)
 
-    @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_simple(self):
         """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
         top = load_file(get_fn(os.path.join('03.AlaGlu', 'topol.top')))
@@ -173,7 +239,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
 
         self._check_energies(top, cong, parm, cona)
 
-    @unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_complicated(self):
         """ Check equal energies for Gmx -> Amber conversion of complex FF """
         warnings.filterwarnings('ignore', category=GromacsWarning)
@@ -259,7 +325,7 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
         # Make sure that written psf only contains unique torsions.
         self.assertEqual(nnormal+nimp, len(psf.dihedrals))
 
-@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+@unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
 class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
@@ -296,7 +362,7 @@ class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative):
             else:
                 self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
-@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
+@unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
 class TestOpenMMToGromacs(FileIOTestCase, TestCaseRelative):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
