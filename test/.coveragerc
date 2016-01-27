@@ -12,3 +12,11 @@ omit =
 [paths]
 source =
     */site-packages/
+
+[report]
+exclude_lines =
+    # Re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about defensive assertion code
+    raise AssertionError

@@ -1,13 +1,15 @@
 """
 Tests the functionality in the parmed.gromacs package
 """
+from contextlib import closing
 import copy
 import numpy as np
 import os
 from parmed import (load_file, Structure, ExtraPoint, DihedralTypeList, Atom,
                     ParameterSet, Bond, NonbondedException, DihedralType,
-                    RBTorsionType, Improper, Cmap, UreyBradley,
-                    NonbondedExceptionType)
+                    RBTorsionType, Improper, Cmap, UreyBradley, BondType,
+                    UnassignedAtomType, NonbondedExceptionType, NoUreyBradley)
+from parmed.charmm import CharmmParameterSet
 from parmed.exceptions import GromacsWarning, GromacsError, ParameterError
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
@@ -290,6 +292,23 @@ class TestGromacsTop(FileIOTestCase):
         top2 = GromacsTopologyFile(get_fn('phenol_biphenyl.top', written=True))
         self.assertEqual(len(top.residues), 40)
 
+        # Now test this when we use "combine"
+        warnings.filterwarnings('ignore', category=GromacsWarning)
+        parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
+        fn = get_fn('samename.top', written=True)
+        parm.residues[3].name = 'SOL' # Rename a DPPC to SOL
+        parm.write(fn, combine=[[0, 1]])
+        parm2 = load_file(fn)
+        self.assertEqual(len(parm2.atoms), len(parm.atoms))
+        self.assertEqual(len(parm2.residues), len(parm2.residues))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self._equal_atoms(a1, a2)
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            self.assertEqual(r1.name, r2.name)
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
+
     def test_gromacs_top_from_structure(self):
         """ Tests the GromacsTopologyFile.from_structure constructor """
         struct = create_random_structure(True)
@@ -333,6 +352,28 @@ class TestGromacsTop(FileIOTestCase):
             self.assertEqual(a1.mass, a2.mass)
         np.testing.assert_equal(p2.box, parm.box)
 
+    def test_write_settles(self):
+        """ Tests that settles is only written for water """
+        fn = get_fn('blah.top', written=True)
+        parm = load_file(os.path.join(get_fn('01.1water'), 'topol.top'))
+        parm[0].atomic_number = parm[0].atom_type.atomic_number = 7
+        parm.write(fn)
+        with closing(GromacsFile(fn)) as f:
+            for line in f:
+                self.assertNotIn('settles', line)
+
+    def test_write_extra_points(self):
+        """ Test writing of GROMACS files with virtual sites """
+        f = StringIO('; TIP4Pew water molecule\n#include "amber99sb.ff/forcefield.itp"\n'
+                     '#include "amber99sb.ff/tip4pew.itp"\n[ system ]\nWATER\n'
+                     '[ molecules ]\nSOL 1\n')
+        parm = GromacsTopologyFile(f)
+        fn = get_fn('test.top', written=True)
+        parm.write(fn)
+        parm2 = load_file(fn)
+        self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        self.assertEqual(len(parm.bonds), len(parm2.bonds))
+
     def test_without_parametrize(self):
         """ Tests loading a Gromacs topology without parametrizing """
         parm = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
@@ -340,6 +381,15 @@ class TestGromacsTop(FileIOTestCase):
                          parametrize=False)
         self.assertIs(parm.atoms[0].atom_type, UnassignedAtomType)
         self.assertTrue(all(x.type is None for x in parm.bonds))
+        # Now try writing it out again
+        fn = get_fn('test.top', written=True)
+        parm.write(fn)
+
+        parm = load_file(os.path.join(get_fn('04.Ala'), 'topol.top'),
+                         parametrize=False)
+        # Add an improper
+        parm.impropers.append(Improper(*parm.atoms[:4]))
+        parm.write(fn)
 
     def test_bad_top_loads(self):
         """ Test error catching in GromacsTopologyFile reading """
@@ -461,6 +511,28 @@ class TestGromacsTop(FileIOTestCase):
             self.assertEqual(len(r1), len(r2))
             for a1, a2 in zip(r1, r2):
                 self._equal_atoms(a1, a2)
+        # Now combine multiple DPPC and multiple waters in the same molecule
+        parm.write(fname, combine=[[2, 3, 4, 5], [128, 129, 130, 131]])
+        with open(fname, 'r') as f:
+            for line in f:
+                if line.startswith('[ molecules ]'):
+                    break
+            molecule_list = []
+            for line in f:
+                if line[0] == ';': continue
+                words = line.split()
+                molecule_list.append((words[0], int(words[1])))
+        self.assertEqual(molecule_list, [('DPPC', 2), ('system1', 1),
+                         ('SOL', 120), ('DPPC', 2), ('system2', 1), ('SOL', 120)])
+        parm2 = load_file(fname)
+        self.assertEqual(len(parm2.atoms), len(parm.atoms))
+        self.assertEqual(len(parm2.residues), len(parm2.residues))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self._equal_atoms(a1, a2)
+        for r1, r2 in zip(parm.residues, parm2.residues):
+            self.assertEqual(len(r1), len(r2))
+            for a1, a2 in zip(r1, r2):
+                self._equal_atoms(a1, a2)
 
     def test_gromacs_top_write(self):
         """ Tests the GromacsTopologyFile writer """
@@ -525,8 +597,7 @@ class TestGromacsTop(FileIOTestCase):
             self.assertEqual(a1.type, a2.type)
             self.assertEqual(set(a.name for a in a1.bond_partners),
                              set(a.name for a in a2.bond_partners))
-        # Now force writing pair types... but first we have to provide pair
-        # types
+        # Now force writing pair types...
         top.defaults.gen_pairs = 'no'
         top.write(fn, parameters=fn)
         top2 = load_file(fn)
@@ -542,6 +613,49 @@ class TestGromacsTop(FileIOTestCase):
             self.assertEqual(a1.type, a2.type)
             self.assertEqual(set(a.name for a in a1.bond_partners),
                              set(a.name for a in a2.bond_partners))
+
+        # Now force writing pair types to [ pairtypes ] (instead of in-line)
+        fn2 = get_fn('testpairtypes.top', written=True)
+        top2.write(fn2, parameters=fn2)
+        top3 = load_file(fn2)
+        self.assertEqual(top3.defaults.gen_pairs, 'no')
+        self.assertEqual(len(top2.atoms), len(top3.atoms))
+        self.assertEqual(len(top2.bonds), len(top3.bonds))
+        self.assertEqual(len(top2.angles), len(top3.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top3.dihedrals))
+        for a1, a2 in zip(top2.atoms, top3.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        self.assertEqual(len(top2.adjusts), len(top3.adjusts))
+        for adj1, adj2 in zip(top2.adjusts, top3.adjusts):
+            self.assertEqual({adj1.atom1.idx, adj1.atom2.idx},
+                             {adj2.atom1.idx, adj2.atom2.idx})
+            self.assertEqual(adj1.type, adj2.type)
+
+        # We can't combine molecules that don't exist
+        self.assertRaises(IndexError, lambda: top.write(fn, combine=[[1, 2]]))
+        # Now change all angle types to urey-bradleys and make sure they're
+        # written with 0s for those parameters
+        psf = load_file(get_fn('ala_ala_ala.psf'))
+        psf.load_parameters(
+                CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                                   get_fn('par_all22_prot.inp'))
+        )
+        for atom in psf.atoms:
+            self.assertIsNot(atom.atom_type, UnassignedAtomType)
+        ctop = GromacsTopologyFile.from_structure(psf)
+        for atom in ctop.atoms:
+            self.assertIsNot(atom.atom_type, UnassignedAtomType)
+            self.assertIsInstance(atom.type, str)
+        ctop.write(fn, parameters=fn)
+        top2 = load_file(fn)
+        self.assertGreater(len(top2.urey_bradleys), 0)
+        self.assertEqual(len(top2.urey_bradleys), len(top2.angles))
 
     def test_private_functions(self):
         """ Tests private helper functions for GromacsTopologyFile """

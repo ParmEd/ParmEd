@@ -481,7 +481,6 @@ class CharmmPsfFile(Structure):
             try:
                 if isinstance(atom.type, int):
                     atype = parmset.atom_types_int[atom.type]
-                    types_are_int = True # if we have to change back
                 else:
                     atype = parmset.atom_types_str[atom.type]
             except KeyError:
@@ -636,9 +635,6 @@ class CharmmPsfFile(Structure):
             cmap.type.used = True
             self.cmap_types.append(cmap.type)
             cmap.type.list = self.cmap_types
-        # If the types started out as integers, change them back
-        if types_are_int:
-            for atom in self.atoms: atom.type = int(atom.atom_type)
 
     #===================================================
 

@@ -313,7 +313,7 @@ class GromacsTopologyFile(Structure):
                     if angt is not None:
                         molecule.angle_types.append(angt)
                         angt.list = molecule.angle_types
-                    if ubt is not None:
+                    if ubt is not None and ubt is not NoUreyBradley:
                         molecule.urey_bradley_types.append(ubt)
                         ubt.list = molecule.urey_bradley_types
                 elif current_section == 'dihedrals':
@@ -1274,8 +1274,8 @@ class GromacsTopologyFile(Structure):
         combine : 'all', None, or list of iterables, optional
             If None, no molecules are combined into a single moleculetype. If
             'all', all molecules are combined into a single moleculetype.
-            Otherwise, the list of molecule indices will control which atoms are
-            combined into single moleculetype's. Default is None
+            Otherwise, the list of molecule indices (start from 0) will control
+            which atoms are combined into single moleculetype's. Default is None
         parameters : 'inline' or str or file-like object, optional
             This specifies where parameters should be printed. If 'inline'
             (default), the parameters are written on the same lines as the
@@ -1293,8 +1293,7 @@ class GromacsTopologyFile(Structure):
         from parmed import __version__
         own_handle = False
         fname = ''
-        params = self.parameterset or ParameterSet.from_structure(self,
-                allow_unequal_duplicates=True)
+        params = ParameterSet.from_structure(self, allow_unequal_duplicates=True)
         if isinstance(dest, string_types):
             fname = '%s ' % dest
             dest = genopen(dest, 'w')
@@ -1422,8 +1421,8 @@ class GromacsTopologyFile(Structure):
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         parfile.write('%-5s %-5s  1  %.5f    %.5f\n' %
-                                      (key[0], key[1], param.epsilon*econv,
-                                       param.sigma*lconv))
+                                      (key[0], key[1], param.sigma*lconv,
+                                       param.epsilon*econv))
                     parfile.write('\n')
                 if params.angle_types:
                     parfile.write('[ angletypes ]\n')
@@ -1461,16 +1460,10 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        if isinstance(param, DihedralTypeList):
-                            for dt in param:
-                                parfile.write(fmt % (key[0], key[1], key[2],
-                                              key[3], 9, dt.phase,
-                                              dt.phi_k*conv, int(dt.per)))
-                        else:
-                            funct = 1
-                            parfile.write(fmt % (key[0], key[1], key[2], key[3],
-                                          funct, param.phase, param.phi_k*conv,
-                                          int(param.per)))
+                        for dt in param:
+                            parfile.write(fmt % (key[0], key[1], key[2],
+                                          key[3], 9, dt.phase,
+                                          dt.phi_k*conv, int(dt.per)))
                     parfile.write('\n')
                 if params.improper_periodic_types:
                     parfile.write('[ dihedraltypes ]\n')
@@ -1558,8 +1551,8 @@ class GromacsTopologyFile(Structure):
                         if i in lst:
                             break
                     else:
-                        raise RuntimeError('Could not find molecule %d in list'
-                                           % i)
+                        raise AssertionError('Could not find molecule %d '
+                                             'in list' % i)
                     ii = i
                     while ii < total_mols and ii in lst:
                         ii += 1
@@ -1572,7 +1565,7 @@ class GromacsTopologyFile(Structure):
                 if self.title:
                     dest.write(self.title)
                 else:
-                    dest.write('Generic title')
+                    dest.write('Generic title') # pragma: no cover
                 dest.write('\n\n')
                 # Molecules
                 dest.write('[ molecules ]\n; Compound       #mols\n')
@@ -1659,7 +1652,7 @@ class GromacsTopologyFile(Structure):
                 if self.title:
                     dest.write(self.title)
                 else:
-                    dest.write('Generic title')
+                    dest.write('Generic title') # pragma: no cover
                 dest.write('\n\n')
                 # Molecules
                 dest.write('[ molecules ]\n; Compound       #mols\n')
@@ -1670,8 +1663,8 @@ class GromacsTopologyFile(Structure):
                         if i in lst:
                             break
                     else:
-                        raise RuntimeError('Could not find molecule %d in list'
-                                           % i)
+                        raise AssertionError('Could not find molecule %d '
+                                             'in list' % i)
                     ii = i
                     while ii < total_mols and ii in lst:
                         ii += 1
@@ -1725,12 +1718,12 @@ class GromacsTopologyFile(Structure):
             for bond in struct.bonds:
                 if (isinstance(bond.atom1, ExtraPoint) or
                         isinstance(bond.atom2, ExtraPoint)):
-                    continue
+                    continue # pragma: no cover
                 dest.write('%7d %6d %5d' % (bond.atom1.idx+1,
                            bond.atom2.idx+1, bond.funct))
                 if bond.type is None:
                     dest.write('\n')
-                    continue
+                    continue # pragma: no cover
                 key = (_gettype(bond.atom1), _gettype(bond.atom2))
                 if writeparams or key not in params.bond_types or \
                         bond.type != params.bond_types[key]:
@@ -1769,7 +1762,7 @@ class GromacsTopologyFile(Structure):
                 if dihed.ignore_end or dihed.improper: continue
                 a1, a2 = dihed.atom1, dihed.atom4
                 if a1 in a2.bond_partners or a1 in a2.angle_partners:
-                    continue
+                    continue # pragma: no cover
                 dest.write('%7d %6d %5d' % (a1.idx+1, a2.idx+1, 1))
                 if struct.defaults.gen_pairs == 'no':
                     dest.write('  %.5f  %.5f' %
@@ -1918,19 +1911,13 @@ class GromacsTopologyFile(Structure):
             dest.write('; i     funct   doh     dhh\n')
             for b in oxy.bonds:
                 if hyd1 in b:
-                    if b.type is None:
-                        # Use default values for TIPnP
-                        doh = 0.09572
-                    else:
-                        doh = b.type.req / 10
+                    # Use default values for TIPnP if no type exists
+                    doh = 0.09572 if b.type is None else b.type.req / 10
                     break
             for b in hyd1.bonds:
                 if hyd2 in b:
-                    if b.type is None:
-                        # Use default values for TIPnP
-                        dhh = 0.15139
-                    else:
-                        dhh = b.type.req / 10
+                    # Use default values for TIPnP if no type exists
+                    dhh = 0.15139 if b.type is None else b.type.req / 10
                     break
             else:
                 for a in oxy.angles:
@@ -1939,7 +1926,7 @@ class GromacsTopologyFile(Structure):
                         dhh = math.sqrt(2*doh*doh - 2*doh*doh*math.cos(theteq))
                         break
                 else:
-                    raise GromacsError('Cannot determine SETTLE geometry')
+                    raise GromacsError('Cannot determine SETTLE geometry') # pragma: no cover
             dest.write('1     1   %.5f   %.5f\n\n#endif\n\n' % (doh, dhh))
         # Virtual sites
         if EPs:
