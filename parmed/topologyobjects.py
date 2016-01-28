@@ -1751,7 +1751,7 @@ class BondType(_ListItem, _ParameterType):
         self._idx = -1
 
     def __eq__(self, other):
-        return abs(self.k - other.k) > TINY and abs(self.req - other.req) > TINY
+        return abs(self.k - other.k) < TINY and abs(self.req - other.req) < TINY
 
     def __repr__(self):
         return '<%s; k=%.3f, req=%.3f>' % (type(self).__name__,
