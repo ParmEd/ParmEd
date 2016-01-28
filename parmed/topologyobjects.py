@@ -3961,7 +3961,7 @@ class TrackedList(list):
     @_changes
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... """
-        self.__delitem__(slice(start, stop))
+        self.__delitem__(slice(start, stop)) # pragma: no cover
 
     @_changes
     def pop(self, idx=-1):

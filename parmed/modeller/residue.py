@@ -7,10 +7,6 @@ from collections import OrderedDict
 import copy as _copy
 import numpy as np
 import os
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
@@ -363,9 +359,7 @@ class ResidueTemplate(object):
             - vy : float (y-coordinate velocity)
             - vz : float (z-coordinate velocity)
         """
-        if pd is None:
-            raise ImportError('pandas is not available; cannot create a pandas '
-                              'DataFrame from this Structure')
+        import pandas as pd
         ret = pd.DataFrame()
 
         ret['number'] = [atom.number for atom in self.atoms]
