@@ -8,10 +8,6 @@ from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six.moves import range
 from math import isnan, isinf
-try:
-    from simtk import openmm as mm
-except ImportError:
-    pass
 from time import time
 VELUNIT = u.angstrom / u.picosecond
 FRCUNIT = u.kilocalorie_per_mole / u.angstrom
@@ -29,7 +25,7 @@ class StateDataReporter(object):
 
     Most of this code is copied from the OpenMM StateDataReporter class, with
     the above-mentioned changes made.
-    
+
     Parameters
     ----------
     f : str or file-like
@@ -205,6 +201,7 @@ class StateDataReporter(object):
         simulation : Simulation
             The simulation to generate a report for
         """
+        import simtk.openmm as mm
         system = simulation.system
         frclist = system.getForces()
         if self._temperature:
@@ -549,7 +546,7 @@ class RestartReporter(object):
         Write velocities to the restart file. You can turn this off for passing
         in, for instance, a minimized structure.
     """
-   
+
     @needs_openmm
     def __init__(self, file, reportInterval, write_multiple=False, netcdf=False,
                  write_velocities=True):
@@ -723,7 +720,7 @@ class ProgressReporter(StateDataReporter):
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
         return (steps, False, False, False, self._needEnergy)
-   
+
     def report(self, simulation, state):
         """
         Generate a report and predict the time to completion (and
@@ -839,7 +836,7 @@ class ProgressReporter(StateDataReporter):
             values['density'] = dens.value_in_unit(self._densityUnit)
 
         return values
-   
+
     def __del__(self):
         """ We already closed the file. """
 

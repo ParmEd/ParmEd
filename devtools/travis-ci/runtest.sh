@@ -32,7 +32,7 @@ else
 fi
 test -z `which coverage 2>/dev/null` || do_coverage
 echo "Running coveralls"
-if [ -z "$MINIMAL_PACKAGES" ]; then
+if [ -z "$MINIMAL_PACKAGES" -a "$PYTHON_VERSION" != 'pypy' ]; then
     # Only run coveralls on builds that test everything
     coveralls
 fi
