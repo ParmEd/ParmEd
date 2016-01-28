@@ -655,7 +655,7 @@ class TestGromacsTop(FileIOTestCase):
         ctop.write(fn, parameters=fn)
         top2 = load_file(fn)
         self.assertGreater(len(top2.urey_bradleys), 0)
-        self.assertEqual(len(top2.urey_bradleys), len(top2.angles))
+        self.assertEqual(len(top2.urey_bradleys), len(ctop.urey_bradleys))
 
     def test_private_functions(self):
         """ Tests private helper functions for GromacsTopologyFile """
