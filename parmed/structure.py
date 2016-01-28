@@ -564,10 +564,12 @@ class Structure(object):
                 )
                 c.dihedrals[-1]._funct = d._funct
         for ub in self.urey_bradleys:
-            if ub.type is NoUreyBradley: continue
+            if ub.type is NoUreyBradley:
+                typ = NoUreyBradley
+            else:
+                typ = ub.type and c.urey_bradley_types[ub.type.idx]
             c.urey_bradleys.append(
-                    UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
-                                ub.type and c.urey_bradley_types[ub.type.idx])
+                    UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx], typ)
             )
         for i in self.impropers:
             c.impropers.append(
@@ -955,6 +957,8 @@ class Structure(object):
                 if otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
                     used_types[val.type.idx] = True
+                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
                 for i, at in enumerate(ats):
                     if isinstance(at, Atom):
                         ats[i] = struct.atoms[scan[at.idx]-1]

@@ -7,27 +7,27 @@ import os
 import unittest
 from utils import get_fn, mm, app, has_openmm
 
-@unittest.skipIf(not has_openmm, "Cannot test without OpenMM")
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestOpenMM(unittest.TestCase):
 
     def setUp(self):
         # Take one of the distributed OpenMM FF XML files as a test
         self.ffxml = os.path.join(os.path.split(app.__file__)[0], 'data',
                                   'amber99sbildn.xml')
-    def testFormatID(self):
+    def test_format_id(self):
         """ Tests automatic format determination of OpenMM XML files """
         self.assertTrue(openmm.XmlFile.id_format(get_fn('system_974wat.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('state_974wat.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('integrator.xml')))
         self.assertTrue(openmm.XmlFile.id_format(self.ffxml))
 
-    def testDeserializeSystem(self):
+    def test_deserialize_system(self):
         """ Tests automatic deserialization of a System XML file """
         system = openmm.XmlFile.parse(get_fn('system_974wat.xml'))
         self.assertIsInstance(system, mm.System)
         self.assertEqual(system.getNumParticles(), 6638)
 
-    def testDeserializeState(self):
+    def test_deserialize_state(self):
         """ Tests automatic deserialization of a State XML file """
         state = openmm.XmlFile.parse(get_fn('state_974wat.xml'))
         self.assertEqual(state.coordinates.shape, (1, 6638, 3))
@@ -37,18 +37,18 @@ class TestOpenMM(unittest.TestCase):
         self.assertAlmostEqual(state.time, 20000.000003615783)
         self.assertIs(state.energy, None)
 
-    def testDeserializeIntegrator(self):
+    def test_deserialize_integrator(self):
         """ Tests automatic deserialization of an Integrator XML file """
         integrator = openmm.XmlFile.parse(get_fn('integrator.xml'))
         self.assertIsInstance(integrator, mm.Integrator)
         self.assertIsInstance(integrator, mm.LangevinIntegrator)
 
-    def testDeserializeForceField(self):
+    def test_deserialize_force_field(self):
         """ Tests automatic deserialization of an OpenMM ForceField XML file """
         ff = openmm.XmlFile.parse(self.ffxml)
         self.assertIsInstance(ff, app.ForceField)
 
-    def testLoadTopology(self):
+    def test_load_topology(self):
         """ Tests loading an OpenMM Topology and System instance """
         import warnings
         warnings.filterwarnings('error', category=exceptions.OpenMMWarning)
