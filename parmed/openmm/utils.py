@@ -5,10 +5,6 @@ from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range, zip, map
-try:
-    from simtk import openmm as mm
-except ImportError:
-    mm = None
 
 def energy_decomposition(structure, context, nrg=u.kilocalories_per_mole):
     """
@@ -31,7 +27,7 @@ def energy_decomposition(structure, context, nrg=u.kilocalories_per_mole):
     dict {str:float}
         A dictionary mapping the name of the force group (taken from the
         attribute names of the format XXX_FORCE_GROUP in the structure object)
-        with the energy of that group in 
+        with the energy of that group in
     """
     all_names = dict()
     force_group_names = dict()
@@ -81,6 +77,7 @@ def energy_decomposition_system(structure, system, platform=None,
         Each entry is a tuple with the name of the force followed by its
         contribution
     """
+    import simtk.openmm as mm
     # First get all of the old force groups so we can restore them
     old_groups = [f.getForceGroup() for f in system.getForces()]
     old_recip_group = []

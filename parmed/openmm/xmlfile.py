@@ -12,11 +12,6 @@ from parmed.utils.decorators import needs_openmm
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
 from parmed.utils.six.moves import StringIO
-try:
-    from simtk import openmm as mm
-    from simtk.openmm import app
-except ImportError:
-    mm = None
 import re
 
 _xmlre = re.compile('<(.*?)/?>')
@@ -84,11 +79,13 @@ class XmlFile(object):
         OpenMM requires the entire contents of this file read into memory. As a
         result, this function may require a significant amount of memory.
         """
+        import simtk.openmm as mm
+        from simtk.openmm import app
         if isinstance(filename, string_types):
             with closing(genopen(filename, 'r')) as f:
                 contents = f.read()
         else:
-            contents = f.read()
+            contents = filename.read()
         # ForceField is not handled by XmlSerializer
         if '<ForceField' in contents:
             obj = StringIO()
@@ -97,11 +94,9 @@ class XmlFile(object):
             return app.ForceField(obj)
 
         obj = mm.XmlSerializer.deserialize(contents)
-        if isinstance(obj, (mm.System, mm.Integrator)):
-            return obj
-        elif isinstance(obj, mm.State):
+        if isinstance(obj, mm.State):
             return _OpenMMStateContents(obj)
-        return 
+        return obj
 
 class _OpenMMStateContents(object):
     """
