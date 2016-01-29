@@ -168,6 +168,7 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </Info>\n')
 
     def _write_omm_atom_types(self, dest):
+        if not self.atom_types: return
         dest.write(' <AtomTypes>\n')
         for name, atom_type in iteritems(self.atom_types):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
@@ -178,6 +179,7 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </AtomTypes>\n')
 
     def _write_omm_residues(self, dest):
+        if not self.residues: return
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
             if not isinstance(residue, ResidueTemplate):
