@@ -877,7 +877,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         """ Tests warning when overwriting parameters"""
         warnings.filterwarnings('error', category=exceptions.ParameterWarning)
         self.assertRaises(exceptions.ParameterWarning, lambda: parameters.CharmmParameterSet(
-                #get_fn('toppar_all36_prot_aldehydes.str'),
+                get_fn('toppar_all36_prot_aldehydes.str'),
                 get_fn('toppar_all36_na_modifications.str')))
 
 
