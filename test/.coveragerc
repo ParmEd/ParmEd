@@ -11,7 +11,7 @@ omit =
     */parmed/unit/*
 [paths]
 source =
-    */site-packages/
+    /home/*/site-packages/ParmEd-*.egg/
 
 [report]
 exclude_lines =

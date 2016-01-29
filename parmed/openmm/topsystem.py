@@ -21,10 +21,6 @@ from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import range
-try:
-    import simtk.openmm as mm
-except ImportError:
-    mm = None
 import warnings
 
 @needs_openmm
@@ -76,6 +72,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
     NBFIX (off-diagonal L-J modifications) and the 12-6-4 potential, will not be
     processed and will result in an unknown functional form
     """
+    import simtk.openmm as mm
     struct = Structure()
     atommap = dict()
     for c in topology.chains():
@@ -230,7 +227,7 @@ def _process_angle(struct, force):
 def _process_urey_bradley(struct, force):
     """ Adds Urey-Bradley parameters to the structure """
     if not struct.angles:
-        warnings.warn('Adding what seems to be Urey-Bradley terms before '
+        warnings.warn('Adding what seems to be Urey-Bradley terms before ' # pragma: no cover
                       'Angles. This is unexpected, but the parameters will '
                       'all be present in one form or another.', OpenMMWarning)
     typemap = dict()
@@ -239,7 +236,7 @@ def _process_urey_bradley(struct, force):
         ai, aj = struct.atoms[i], struct.atoms[j]
         key = (req._value, k._value)
         if struct.angles and ai not in aj.angle_partners:
-            warnings.warn('Adding what seems to be Urey-Bradley terms, but '
+            warnings.warn('Adding what seems to be Urey-Bradley terms, but ' # pragma: no cover
                           'atoms %d and %d do not appear to be angled to each '
                           'other. Parameters will all be present, but may not '
                           'be in expected places.' % (ai.idx, aj.idx),
@@ -284,10 +281,10 @@ def _process_rbtorsion(struct, force):
         try:
             key = (c0._value, c1._value, c2._value,
                    c3._value, c4._value, c5._value)
-            f = 1
-        except AttributeError:
-            key = (c0, c1, c2, c3, c4, c5)
-            f = u.kilojoules_per_mole
+            f = 1                          # pragma: no cover
+        except AttributeError:             # pragma: no cover
+            key = (c0, c1, c2, c3, c4, c5) # pragma: no cover
+            f = u.kilojoules_per_mole      # pragma: no cover
         if key in typemap:
             dihed_type = typemap[key]
         else:
@@ -344,9 +341,9 @@ def _process_cmap(struct, force):
         size, grid = force.getMapParameters(ii)
         # Future-proof in case units start getting added to these maps
         if u.is_quantity(grid):
-            typ = CmapType(size, grid)
+            typ = CmapType(size, grid)                       # pragma: no cover
         else:
-            typ = CmapType(size, grid*u.kilojoules_per_mole)
+            typ = CmapType(size, grid*u.kilojoules_per_mole) # pragma: no cover
         cmap_types.append(typ)
         typ.grid = typ.grid.T.switch_range()
         typ.used = False
@@ -354,9 +351,9 @@ def _process_cmap(struct, force):
     for ii in range(force.getNumTorsions()):
         mapidx, ii, ij, ik, il, ji, jj, jk, jl = force.getTorsionParameters(ii)
         if ij != ji or ik != jj or il != jk:
-            warnings.warn('Non-continuous CMAP torsions detected. Not '
+            warnings.warn('Non-continuous CMAP torsions detected. Not ' # pragma: no cover
                           'supported.', OpenMMWarning)
-            continue
+            continue # pragma: no cover
         ai, aj, ak = struct.atoms[ii], struct.atoms[ij], struct.atoms[ik]
         al, am = struct.atoms[il], struct.atoms[jl]
         cmap_type = cmap_types[mapidx]
@@ -382,8 +379,8 @@ def _process_nonbonded(struct, force):
         else:
             element_typemap[atype_name] += 1
             atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
-            atom_type = AtomType(atype_name, None, atom.mass,
-                                 atom.atomic_number)
+            typemap[key] = atom_type = AtomType(atype_name, None, atom.mass,
+                                                atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)
         rmin = sig.value_in_unit(u.angstroms) * 2**(1/6) / 2 # to rmin/2
         eps = eps.value_in_unit(u.kilocalories_per_mole)
@@ -426,7 +423,7 @@ def _process_nonbonded(struct, force):
     # Check that all of our exceptions are accounted for
     for ai, exceptions in iteritems(bond_graph_exceptions):
         if exceptions - explicit_exceptions[ai]:
+            struct.unknown_functional = True
             warnings.warn('Detected incomplete exceptions. Not supported.',
                           OpenMMWarning)
-            struct.unknown_functional = True
             break
