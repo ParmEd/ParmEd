@@ -278,8 +278,8 @@ class AmberParameterSet(ParameterSet):
                 chars.append(char)
                 i += 1
             atom_types_str = ''.join(chars).strip()
-        for _, name, symb, hyb in _atomtypere.findall(atom_types_str):
-            if addAtomTypes:
+        if addAtomTypes:
+            for _, name, symb, hyb in _atomtypere.findall(atom_types_str):
                 if symb not in AtomicNum:
                     raise ParameterError('%s is not a recognized element' % symb)
                 if name in params.atom_types:
