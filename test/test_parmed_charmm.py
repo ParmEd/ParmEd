@@ -17,8 +17,12 @@ import random
 import unittest
 import utils
 from utils import HAS_GROMACS
+import warnings
 
+# Suppress warning from overwriting parameters
+warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
 get_fn = utils.get_fn
+
 
 class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
@@ -868,6 +872,14 @@ class TestCharmmParameters(utils.FileIOTestCase):
             self.assertEqual(typ1, typ2)
         self.assertEqual(len(from_gmx2.nbfix_types), 1)
         self.assertEqual(from_gmx2.nbfix_types[('X', 'Y')], (2.0, 3.0))
+
+    def test_warning(self):
+        """ Tests warning when overwriting parameters"""
+        warnings.filterwarnings('error', category=exceptions.ParameterWarning)
+        self.assertRaises(exceptions.ParameterWarning, lambda: parameters.CharmmParameterSet(
+                get_fn('toppar_all36_prot_aldehydes.str'),
+                get_fn('toppar_all36_na_modifications.str')))
+
 
     def _check_uppercase_types(self, params):
         for aname, atom_type in iteritems(params.atom_types):
