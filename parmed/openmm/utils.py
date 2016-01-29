@@ -96,7 +96,7 @@ def energy_decomposition_system(structure, system, platform=None,
             con = mm.Context(system, mm.VerletIntegrator(0.001))
         else:
             con = mm.Context(system, mm.VerletIntegrator(0.001),
-                                 mm.Platform.getPlatformByName(platform))
+                             mm.Platform.getPlatformByName(platform))
         con.setPositions(structure.positions)
         if structure.box is not None:
             con.setPeriodicBoxVectors(*structure.box_vectors)

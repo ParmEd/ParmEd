@@ -415,6 +415,18 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies[3][1], -30.238225, places=3)
         self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
         self.assertEqual(energies[5][1], 0)
+        energies = energy_decomposition_system(parm, system, platform='CPU')
+        self.assertRelativeEqual(energies[0][1], 5.4435, places=4)
+        self.assertRelativeEqual(energies[1][1], 2.8766, places=4)
+        self.assertRelativeEqual(energies[2][1], 24.3697, places=4)
+        self.assertRelativeEqual(energies[3][1], -30.238225, places=3)
+        self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
+        self.assertEqual(energies[5][1], 0)
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms)
+        energies = energy_decomposition_system(parm, system,
+                                               platform='Reference')
 
     @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_ewald(self):
@@ -961,7 +973,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
 @unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
 class TestChamberParm(TestCaseRelative):
-    
+
     def test_gas_energy(self):
         """ Compare OpenMM and CHAMBER gas phase energies """
         parm = ChamberParm(get_fn('ala_ala_ala.parm7'),

@@ -205,7 +205,7 @@ class ParameterSet(object):
                         params.bond_types[key] != bond.type):
                     raise ParameterError('Unequal bond types defined between '
                                          '%s and %s' % key)
-                continue
+                continue # pragma: no cover
             typ = copy(bond.type)
             key = (bond.atom1.type, bond.atom2.type)
             params.bond_types[key] = typ
@@ -218,7 +218,7 @@ class ParameterSet(object):
                         params.angle_types[key] != angle.type):
                     raise ParameterError('Unequal angle types defined between '
                                          '%s, %s, and %s' % key)
-                continue
+                continue # pragma: no cover
             typ = copy(angle.type)
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
             params.angle_types[key] = typ
@@ -241,7 +241,7 @@ class ParameterSet(object):
                             params.improper_periodic_types[key] != dihedral.type):
                         raise ParameterError('Unequal dihedral types defined '
                                         'between %s, %s, %s, and %s' % key)
-                    continue
+                    continue # pragma: no cover
                 typ = copy(dihedral.type)
                 params.improper_periodic_types[key] = typ
             else:
@@ -263,7 +263,7 @@ class ParameterSet(object):
                                 raise ParameterError('Unequal dihedral types '
                                         'defined between %s, %s, %s, and %s' %
                                         key)
-                    continue
+                    continue # pragma: no cover
                 elif key in params.dihedral_types:
                     # We have one term of a potentially multi-term dihedral.
                     if isinstance(dihedral.type, DihedralTypeList):
@@ -316,7 +316,7 @@ class ParameterSet(object):
                         params.improper_types[key] != improper.type):
                     raise ParameterError('Unequal improper types defined '
                             'between %s, %s, %s, and %s' % key)
-                continue
+                continue # pragma: no cover
             params.improper_types[key] = copy(improper.type)
         for cmap in struct.cmaps:
             if cmap.type is None: continue
@@ -327,7 +327,7 @@ class ParameterSet(object):
                         cmap.type != params.cmap_types[key]):
                     raise ParameterError('Unequal CMAP types defined between '
                             '%s, %s, %s, %s, and %s' % key)
-                continue
+                continue # pragma: no cover
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
             params.cmap_types[tuple(reversed(key))] = typ
@@ -348,7 +348,7 @@ class ParameterSet(object):
                         params.pair_types[key] != adjust.type):
                     raise ParameterError('Unequal pair types defined between '
                                          '%s and %s' % key)
-                continue
+                continue # pragma: no cover
             typ = copy(adjust.type)
             params.pair_types[key] = typ
             params.pair_types[tuple(reversed(key))] = typ
