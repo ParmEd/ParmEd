@@ -5,6 +5,7 @@ from __future__ import division, print_function, absolute_import
 
 from contextlib import closing
 import numpy as np
+from parmed.vec3 import Vec3
 from parmed.formats.registry import FileFormatType
 from parmed.geometry import box_vectors_to_lengths_and_angles
 import parmed.unit as u
@@ -165,4 +166,4 @@ class _OpenMMStateContents(object):
 
     @property
     def positions(self):
-        return [mm.Vec3(*xyz) for xyz in self.coordinates[0]]
+        return [Vec3(*xyz) for xyz in self.coordinates[0]]
