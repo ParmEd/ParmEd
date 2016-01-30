@@ -17,7 +17,8 @@ import random
 import string
 import os
 import unittest
-from utils import create_random_structure, get_fn, FileIOTestCase
+from utils import (create_random_structure, get_fn, FileIOTestCase,
+                   has_openmm, app)
 import warnings
 
 class TestStructureAPI(unittest.TestCase):
@@ -88,6 +89,10 @@ class TestStructureAPI(unittest.TestCase):
                              len(residue))
         self.assertEqual(s.atoms[5].name, 'TOK')
         self.assertEqual(s.atoms[-1].name, 'TOK2')
+
+        # Error handling
+        self.assertRaises(ValueError, lambda:
+                s.add_atom_to_residue(Atom(name='AXE'), Residue('ALA')))
 
     def test_box_handling(self):
         """ Tests that Structure.box is always the expected type """
@@ -260,6 +265,20 @@ class TestStructureAPI(unittest.TestCase):
         natom_per_res = [len(res) for res in s.residues]
         s.strip(':1-5')
         self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
+        # Bad usage of strip
+        mask = pmd.amber.AmberMask(create_random_structure(parametrized=True), ':1')
+        self.assertRaises(TypeError, lambda: s.strip(mask))
+        self.assertRaises(TypeError, lambda: s.strip(10))
+
+    def test_strip_array(self):
+        """ Tests Structure.strip with a mask array """
+        s = create_random_structure(parametrized=True)
+        natom = len(s.atoms)
+        maskarray = [random.choice([0, 1]) for i in range(natom)]
+        s.strip(maskarray)
+        self.assertEqual(len(s.atoms), natom-sum(maskarray))
+        # Error checking
+        self.assertRaises(ValueError, lambda: s.strip([1, 0]))
 
     def test_strip_with_coords(self):
         """ Tests the Structure.strip method when it has coordinates """
@@ -287,6 +306,62 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(strip_units([1*ang, 90*deg]), [1, 90])
         self.assertEqual(strip_units([[1*ang, 90*deg], [2*ang, 109*deg]]),
                          [[1, 90], [2, 109]])
+        self.assertRaises(TypeError, lambda: strip_units(['this', 'is', 'bad']))
+
+    def test_radii_assignment(self):
+        """ Test radius assignment in Structure """
+        parm = pmd.load_file(get_fn('trx.prmtop'))
+        criteria_satisfied = [0, 0, 0, 0, 0, 0]
+        for atom in parm.atoms:
+            if atom.atomic_number == 1:
+                oa = atom.bond_partners[0]
+                an, mass = oa.atomic_number, oa.mass
+                oa.atomic_number = 8
+                oa.mass = pmd.periodic_table.Mass['O']
+                self.assertEqual(structure._mbondi(atom), 0.8)
+                oa.atomic_number = 2
+                oa.mass = pmd.periodic_table.Mass['He']
+                self.assertEqual(structure._mbondi(atom), 1.2)
+                oa.atomic_number = an
+                oa.mass = mass
+                criteria_satisfied[0] = 1
+            if atom.name.startswith('OD') and atom.residue.name == 'ASP':
+                self.assertEqual(structure._mbondi3(atom), 1.4)
+                criteria_satisfied[1] = 1
+            if atom.name.startswith('OXT'):
+                self.assertEqual(structure._mbondi3(atom), 1.4)
+                criteria_satisfied[2] = 1
+            if atom.name.startswith('OE') and atom.residue.name == 'GLU':
+                self.assertEqual(structure._mbondi3(atom), 1.4)
+                criteria_satisfied[3] = 1
+            if atom.name.startswith('HH') and atom.residue.name == 'ARG':
+                self.assertEqual(structure._mbondi3(atom), 1.17)
+                criteria_satisfied[4] = 1
+            if atom.name.startswith('HE') and atom.residue.name == 'ARG':
+                self.assertEqual(structure._mbondi3(atom), 1.17)
+                criteria_satisfied[5] = 1
+        # Make sure we ran all checks
+        self.assertEqual(set(criteria_satisfied), {1})
+
+    @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+    def test_screen_assignment(self):
+        """ Testing screen parameter assignment """
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=9), app.GBn2)[1],
+                0.88
+        )
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=15), app.GBn2)[1],
+                0.86
+        )
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=16), app.GBn2)[1],
+                0.96
+        )
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=2), app.GBn2)[1],
+                0.8
+        )
 
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """

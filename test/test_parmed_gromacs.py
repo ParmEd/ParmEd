@@ -137,6 +137,7 @@ class TestGromacsTop(FileIOTestCase):
                                     'charmm27.ff/tip3p.itp',
                                     'charmm27.ff/ions.itp'])
         self._charmm27_checks(top)
+        self.assertEqual(len(top[:5,:].residues), 5)
 
     def test_gromacs_top_detection(self):
         """ Tests automatic file detection of GROMACS topology files """

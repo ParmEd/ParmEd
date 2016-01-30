@@ -9,6 +9,7 @@ omit =
     */parmed/tinker/*
     */parmed/rosetta/*
     */parmed/unit/*
+    */parmed/tools/gui/*
 [paths]
 source =
     /home/*/site-packages/ParmEd-*.egg/

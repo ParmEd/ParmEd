@@ -33,12 +33,13 @@ def energy_decomposition(parm, context):
         ret[key] = val
     return ret
 
-@unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
 class TestAmberParm(FileIOTestCase, TestCaseRelative):
 
     def test_ep_energy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
         parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+        repr(parm) # Make sure it doesn't crash
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,

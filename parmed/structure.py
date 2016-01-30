@@ -28,10 +28,6 @@ from copy import copy
 import math
 import numpy as np
 import os
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
@@ -55,43 +51,12 @@ try:
     from simtk.openmm import app
     from simtk import openmm as mm
     from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
-except ImportError:
-    app = mm = None
+except ImportError:  # pragma: no cover
+    app = mm = None  # pragma: no cover
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Private attributes and methods
-
-relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
-
-def _compare_atoms(old_atom, new_atom, resname, resid, chain):
-    """
-    Compares two atom instances, along with the residue name, number, and chain
-    identifier, to determine if two atoms are actually the *same* atom, but
-    simply different conformations
-
-    Parameters
-    ----------
-    old_atom : :class:`Atom`
-        The original atom that has been added to the structure already
-    new_atom : :class:`Atom`
-        The new atom that we want to see if it is the same as the old atom
-    resname : ``str``
-        The name of the residue that the new atom would belong to
-    resid : ``int``
-        The number of the residue that the new atom would belong to
-    chain : ``str``
-        The chain identifier that the new atom would belong to
-
-    Returns
-    -------
-    True if they are the same atom, False otherwise
-    """
-    if old_atom.name != new_atom.name: return False
-    if old_atom.residue.name != resname: return False
-    if old_atom.residue.number != resid: return False
-    if old_atom.residue.chain != chain.strip(): return False
-    return True
 
 def _strip_box_units(args):
     new_args = []
@@ -838,7 +803,7 @@ class Structure(object):
                 sel = list(selection)
             except TypeError:
                 raise TypeError('Selection not a supported type [%s]' %
-                                type(selection))
+                                type(selection).__name__)
             if len(sel) != len(self.atoms):
                 raise ValueError('Selection iterable wrong length')
         atomlist = sorted([i for i, s in enumerate(sel) if s])
@@ -851,7 +816,7 @@ class Structure(object):
         if self._coordinates is not None:
             if PYPY:
                 # numpypy does not currently support advanced indexing it seems
-                self._coordinates = np.array(
+                self._coordinates = np.array( # pragma: no cover
                         [[[x, y, z] for i, (x, y, z) in enumerate(crd)
                             if sel[i]==0] for crd in self._coordinates]
                 )
@@ -954,11 +919,11 @@ class Structure(object):
                     continue
                 # Add the type if applicable
                 kws = dict()
-                if otypcp and val.type is not None:
+                if hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
+                elif otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
                     used_types[val.type.idx] = True
-                elif hasattr(val, 'type') and val.type is NoUreyBradley:
-                    kws['type'] = NoUreyBradley # special-case singleton
                 for i, at in enumerate(ats):
                     if isinstance(at, Atom):
                         ats[i] = struct.atoms[scan[at.idx]-1]
@@ -3286,10 +3251,10 @@ class Structure(object):
                     if isinstance(at, Atom):
                         ats[i] = self.atoms[at.idx+aoffset]
                 kws = dict()
-                if otypcp and val.type is not None:
-                    kws['type'] = otypcp[val.type.idx]
-                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                if hasattr(val, 'type') and val.type is NoUreyBradley:
                     kws['type'] = NoUreyBradley # special-case singleton
+                elif otypcp and val.type is not None:
+                    kws['type'] = otypcp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
@@ -3383,10 +3348,10 @@ class Structure(object):
                     if isinstance(at, Atom):
                         ats[i] = self.atoms[at.idx+aoffset]
                 kws = dict()
-                if styp and val.type is not None:
-                    kws['type'] = styp[val.type.idx]
-                elif hasattr(val, 'type') and val.type is NoUreyBradley:
+                if hasattr(val, 'type') and val.type is NoUreyBradley:
                     kws['type'] = NoUreyBradley # special-case singleton
+                elif styp and val.type is not None:
+                    kws['type'] = styp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
