@@ -265,6 +265,10 @@ class TestGromacsTop(FileIOTestCase):
         top = load_file(get_fn('ildn.solv.top'))
         self.assertEqual(top.combining_rule, 'lorentz')
         self._check_ff99sbildn(top)
+        dts = top.dihedral_types[:]
+        top.join_dihedrals()
+        for dt1, dt2 in zip(dts, top.dihedral_types):
+            self.assertIs(dt1, dt2)
 
     def test_write_amber99SBILDN(self):
         """ Tests writing a Gromacs topology with multiple molecules """

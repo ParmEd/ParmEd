@@ -1,8 +1,10 @@
 """ Tests some OpenMM-specific functionality """
 from __future__ import print_function, division, absolute_import
 
+import math
 import numpy as np
 import os
+import parmed as pmd
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 import unittest
 from utils import get_fn, mm, app, has_openmm, FileIOTestCase
@@ -140,3 +142,104 @@ class TestOpenMM(FileIOTestCase):
                                    nonbondedCutoff=8*u.angstroms)
         top = openmm.load_topology(parm.topology, system)
         np.testing.assert_allclose(parm.box, top.box)
+
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+class TestSystemCreation(unittest.TestCase):
+    """ Test various aspect of System creation """
+
+    def test_two_particle_vsite(self):
+        """ Tests assignment of 2-particle virtual site """
+        struct = pmd.Structure()
+        struct.add_atom(pmd.Atom(name='C', atomic_number=6), 'RES', 1)
+        struct.add_atom(pmd.Atom(name='C', atomic_number=6), 'RES', 1)
+        struct.add_atom(pmd.ExtraPoint(name='EP', atomic_number=0), 'RES', 1)
+        struct.bond_types.append(pmd.BondType(10, 1.0))
+        struct.bond_types.append(pmd.BondType(10, 0.5))
+        struct.bond_types.claim()
+        struct.bonds.append(pmd.Bond(struct[0], struct[1],
+                                     type=struct.bond_types[0])
+        )
+        struct.bonds.append(pmd.Bond(struct[1], struct[2],
+                                     type=struct.bond_types[1])
+        )
+        # This should be a two-particle virtual site
+        struct.coordinates = [[0, 0, 0], [0, 0, 1], [0, 0, 1.5]]
+        system = mm.System()
+        system.addParticle(struct[0].mass)
+        system.addParticle(struct[1].mass)
+        system.addParticle(struct[2].mass)
+        struct.omm_set_virtual_sites(system)
+        # Make sure the third atom is a virtual site
+        self.assertTrue(system.isVirtualSite(2))
+        self.assertIsInstance(system.getVirtualSite(2), mm.TwoParticleAverageSite)
+
+    def test_ep_exceptions(self):
+        """ Test Nonbonded exception handling with virtual sites """
+        # Analyze the exception parameters for bonding pattern
+        #
+        # E1 -- A1 -- A2 -- A3 -- A4 -- A5 -- E5
+        #             |     |     |
+        #             E2    E3    E4
+        struct = pmd.Structure()
+        ep1 = ExtraPoint(name='E1', type='EP', atomic_number=0, weights=[1, 2])
+        ep2 = ExtraPoint(name='E2', type='EP', atomic_number=0)
+        ep3 = ExtraPoint(name='E3', type='EP', atomic_number=0)
+        ep4 = ExtraPoint(name='E4', type='EP', atomic_number=0)
+        ep5 = ExtraPoint(name='E5', type='EP', atomic_number=0)
+        self.assertIs(ep1.parent, None)
+        self.assertEqual(ep1.bond_partners, [])
+        self.assertEqual(ep1.angle_partners, [])
+        self.assertEqual(ep1.dihedral_partners, [])
+        self.assertEqual(ep1.tortor_partners, [])
+        self.assertEqual(ep1.exclusion_partners, [])
+        a1 = pmd.Atom(name='A1', type='AX', charge=0.1, atomic_number=6)
+        a2 = pmd.Atom(name='A2', type='AY', charge=0.1, atomic_number=6)
+        a3 = pmd.Atom(name='A3', type='AZ', charge=0.1, atomic_number=7)
+        a4 = pmd.Atom(name='A4', type='AX', charge=0.1, atomic_number=6)
+        a5 = pmd.Atom(name='A5', type='AY', charge=0.1, atomic_number=6)
+        a1.rmin = a2.rmin = a3.rmin = a4.rmin = a5.rmin = 0.5
+        a1.epsilon = a2.epsilon = a3.epsilon = a4.epsilon = a5.epsilon = 1.0
+        bond_type = pmd.BondType(10.0, 1.0)
+        bond_type2 = pmd.BondType(10.0, 2.0)
+        bond_type3 = pmd.BondType(10.0, 0.5)
+        bond_type4 = pmd.BondType(10.0, math.sqrt(2))
+        angle_type = pmd.AngleType(10.0, 90)
+        dihedral_type = pmd.DihedralType(10.0, 2, 0)
+        struct.add_atom(a1, 'RES', 1)
+        struct.add_atom(a2, 'RES', 1)
+        struct.add_atom(a3, 'RES', 1)
+        struct.add_atom(a4, 'RES', 1)
+        struct.add_atom(a5, 'RES', 1)
+        struct.add_atom(ep1, 'RES', 1)
+        struct.add_atom(ep2, 'RES', 1)
+        struct.add_atom(ep3, 'RES', 1)
+        struct.add_atom(ep4, 'RES', 1)
+        struct.add_atom(ep5, 'RES', 1)
+        struct.bonds.extend(
+                [pmd.Bond(a1, ep1, type=bond_type),
+                 pmd.Bond(ep2, a2, type=bond_type),
+                 pmd.Bond(a3, ep3, type=bond_type3),
+                 pmd.Bond(a4, ep4, type=bond_type)]
+        )
+        struct.bonds.extend(
+                [pmd.Bond(a1, a2, type=bond_type),
+                 pmd.Bond(a4, a3, type=bond_type4),
+                 pmd.Bond(a3, a2, type=bond_type4),
+                 pmd.Bond(a4, a5, type=bond_type2),
+                 pmd.Bond(a5, ep5, type=bond_type)]
+        )
+        struct.angles.extend(
+                [pmd.Angle(a1, a2, a3, type=angle_type),
+                 pmd.Angle(a2, a3, a4, type=angle_type),
+                 pmd.Angle(a3, a4, a5, type=angle_type)]
+        )
+        struct.dihedrals.extend(
+                [pmd.Dihedral(a1, a2, a3, a4, type=dihedral_type),
+                 pmd.Dihedral(a2, a3, a4, a5, type=dihedral_type)]
+        )
+        struct.bond_types.extend([bond_type, bond_type3, bond_type2, bond_type4])
+        struct.angle_types.append(angle_type)
+        struct.dihedral_types.append(dihedral_type)
+        # Test exclusions now
+        a1.exclude(a5)
+        system = struct.createSystem()
