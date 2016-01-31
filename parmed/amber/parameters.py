@@ -94,13 +94,7 @@ class AmberParameterSet(ParameterSet):
         is_fmt : bool
             True if it is an Amber-style parameter file. False otherwise.
         """
-        if isinstance(filename, string_types):
-            f = genopen(filename, 'r')
-            own_handle = True
-        else:
-            f = filename
-            own_handle = False
-        try:
+        with closing(genopen(filename, 'r')) as f:
             f.readline()
             line = f.readline()
             if not line.strip(): # Must be an frcmod file
@@ -197,11 +191,6 @@ class AmberParameterSet(ParameterSet):
                     return True
             else:
                 return True
-        finally:
-            if own_handle:
-                f.close()
-            else:
-                f.seek(0)
 
     #===================================================
 
@@ -211,22 +200,19 @@ class AmberParameterSet(ParameterSet):
         self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
-                if self.id_format(filename): # dat or frcmod file
-                    self.load_parameters(filename)
-                else: # assume it's a lib or off file
+                if AmberOFFLibrary.id_format(filename):
                     self.residues.update(AmberOFFLibrary.parse(filename))
+                else:
+                    self.load_parameters(filename)
             elif isinstance(filename, Sequence):
                 for fname in filename:
-                    if self.id_format(filename):
-                        self.load_parameters(fname)
+                    if AmberOFFLibrary.id_format(fname):
+                        self.residues.update(AmberOFFLibrary.parse(fname))
                     else:
-                        self.residues.update(AmberOFFLibrary.parse(filename))
+                        self.load_parameters(fname)
             else:
                 # Assume open file object
-                if self.id_format(filename):
-                    self.load_parameters(filename)
-                else:
-                    self.residues.update(AmberOFFLibrary.parse(filename))
+                self.load_parameters(filename)
 
     #===================================================
 
