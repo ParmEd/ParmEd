@@ -1665,6 +1665,7 @@ class TestChamberParm(TestCaseRelative):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
 
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
 class TestChamberParm(TestCaseRelative):
     """ Tests some of the OMM integration with the AmoebaParm classes """
 
