@@ -94,7 +94,13 @@ class AmberParameterSet(ParameterSet):
         is_fmt : bool
             True if it is an Amber-style parameter file. False otherwise.
         """
-        with closing(genopen(filename, 'r')) as f:
+        if isinstance(filename, string_types):
+            f = genopen(filename, 'r')
+            own_handle = True
+        else:
+            f = filename
+            own_handle = False
+        try:
             f.readline()
             line = f.readline()
             if not line.strip(): # Must be an frcmod file
@@ -191,6 +197,11 @@ class AmberParameterSet(ParameterSet):
                     return True
             else:
                 return True
+        finally:
+            if own_handle:
+                f.close()
+            else:
+                f.seek(0)
 
     #===================================================
 
@@ -200,13 +211,22 @@ class AmberParameterSet(ParameterSet):
         self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
-                self.load_parameters(filename)
+                if self.id_format(filename): # dat or frcmod file
+                    self.load_parameters(filename)
+                else: # assume it's a lib or off file
+                    self.residues.update(AmberOFFLibrary.parse(filename))
             elif isinstance(filename, Sequence):
                 for fname in filename:
-                    self.load_parameters(fname)
+                    if self.id_format(filename):
+                        self.load_parameters(fname)
+                    else:
+                        self.residues.update(AmberOFFLibrary.parse(filename))
             else:
                 # Assume open file object
-                self.load_parameters(filename)
+                if self.id_format(filename):
+                    self.load_parameters(filename)
+                else:
+                    self.residues.update(AmberOFFLibrary.parse(filename))
 
     #===================================================
 
