@@ -38,14 +38,13 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
         TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
 from parmed import unit as u
 from parmed.utils import tag_molecules, PYPY
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
-import re
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
@@ -1030,6 +1029,7 @@ class Structure(object):
                         isinstance(ressel, integer_types) and
                         isinstance(atomsel, integer_types)):
                     # Special-case single-atom selection for efficiency
+                    chainmap = dict(chainmap) # no longer defaultdict
                     try:
                         return chainmap[chainsel][ressel][atomsel]
                     except KeyError:
@@ -1179,29 +1179,16 @@ class Structure(object):
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
                     for a1, a2 in zip(struct.atoms, sel):
-                        if a1.residue is None:
-                            if a2.residue is not None:
-                                break
-                        elif a2.residue is None:
-                            break
-                        elif a1.residue.name != a2.residue.name:
-                            break
-                        if not a1.type and not a2.type:
-                            if a1.name != a2.name: break
-                        else:
-                            if a1.type != a2.type: break
+                        assert None not in (a1.residue, a2.residue), \
+                                'Residues must all be set'
+                        if a1.residue.name != a2.residue.name: break
+                        if a1.name != a2.name: break
                     else:
                         counts[j].add(i)
                         is_duplicate = True
                         break
             if not is_duplicate:
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
-                if isinstance(mol, Atom):
-                    s = type(self)()
-                    s.add_atom(copy(mol), mol.residue.name,
-                               mol.residue.number, mol.residue.chain,
-                               mol.residue.insertion_code)
-                    mol = s
                 structs.append(mol)
                 counts.append(set([i]))
         return list(zip(structs, counts))
@@ -1279,7 +1266,8 @@ class Structure(object):
             raise IOError('%s exists; not overwriting' % fname)
         all_ints = True
         for atom in self.atoms:
-            if isinstance(atom.type, integer_types):
+            if (isinstance(atom.type, integer_types) and
+                    atom.atom_type is not UnassignedAtomType):
                 atom.type = str(atom.atom_type)
             else:
                 all_ints = False
@@ -1287,9 +1275,9 @@ class Structure(object):
             if format is not None:
                 format = format.upper()
             else:
-                _, ext = os.path.splitext(fname)
+                base, ext = os.path.splitext(fname)
                 if ext in ('.bz2', '.gz'):
-                    ext = os.path.splitext(ext)[1]
+                    ext = os.path.splitext(base)[1]
                 try:
                     format = extmap[ext]
                 except KeyError:
@@ -1332,7 +1320,7 @@ class Structure(object):
                         if 'Cannot translate exceptions' in str(e):
                             s = amber.ChamberParm.from_structure(self)
                         else:
-                            raise
+                            raise # pragma: no cover
                     s.write_parm(fname, **kwargs)
             elif format in ('RST7', 'NCRST'):
                 rst7 = amber.Rst7(natom=len(self.atoms), **kwargs)
@@ -1722,7 +1710,7 @@ class Structure(object):
         A = A.value_in_unit(u.degrees)
         B = B.value_in_unit(u.degrees)
         G = G.value_in_unit(u.degrees)
-        self._box = np.array([a, b, c, A, B, G], dtype=np.float64)
+        self._box = np.array([[a, b, c, A, B, G]], dtype=np.float64)
 
     #===================================================
 
@@ -1977,7 +1965,7 @@ class Structure(object):
             method
         """
         if system.getNumParticles() != len(self.atoms):
-            raise ValueError('OpenMM System does not correspond to Structure')
+            raise ValueError('OpenMM System does not correspond to Structure') # pragma: no cover
         for atom in self.atoms:
             if not isinstance(atom, ExtraPoint): continue
             # This is a virtual site... get its frame type
@@ -2042,8 +2030,8 @@ class Structure(object):
         if (hasattr(self.bond_types, 'degree') and
                 hasattr(self.bond_types, 'coeffs')):
             force = mm.AmoebaBondForce()
-            force.setGlobalBondCubic(self.bond_types.coeffs[3]/length_conv)
-            force.setGlobalBondQuartic(self.bond_types.coeffs[4]/length_conv**2)
+            force.setAmoebaGlobalBondCubic(self.bond_types.coeffs[3]/length_conv)
+            force.setAmoebaGlobalBondQuartic(self.bond_types.coeffs[4]/length_conv**2)
         else:
             force = mm.HarmonicBondForce()
         force.setForceGroup(self.BOND_FORCE_GROUP)
@@ -2102,7 +2090,7 @@ class Structure(object):
             num_h = (angle.atom1.element == 1) + (angle.atom3.element == 1)
             if constraints is app.HAngles and (num_h == 2 or (num_h == 1 and
                     angle.atom2.element == 8) and not flexibleConstraints):
-                continue
+                continue # pragma: no cover
             if angle.type is None:
                 raise ParameterError('Cannot find angle parameters')
             force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
@@ -2228,8 +2216,7 @@ class Structure(object):
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for imp in self.impropers:
             if imp.type is None:
-                raise ParameterError('Cannot find improper torsion '
-                                       'parameters')
+                raise ParameterError('Cannot find improper torsion parameters')
             force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
                              imp.atom4.idx, (imp.type.psi_k*frc_conv,
                              imp.type.psi_eq*DEG_TO_RAD))
@@ -2568,8 +2555,8 @@ class Structure(object):
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         else:
-            raise ValueError('Unrecognized nonbonded method [%s]' %
-                             nonbondedMethod)
+            raise AssertionError('Unrecognized nonbonded method [%s]' %
+                                 nonbondedMethod)
         # Add the particles
         for i in lj_idx_list:
             force.addParticle((i-1,))
@@ -2590,8 +2577,8 @@ class Structure(object):
         elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         else:
-            raise ValueError('Unsupported nonbonded method %s' %
-                             nonbondedMethod)
+            raise AssertionError('Unsupported nonbonded method %s' %
+                                 nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -2807,7 +2794,7 @@ class Structure(object):
         if (not hasattr(self.trigonal_angle_types, 'degree') or not
                 hasattr(self.trigonal_angle_types, 'coeffs')):
             raise ParameterError('Do not have the trigonal angle force '
-                                   'table parameters')
+                                 'table parameters')
         force = mm.AmoebaInPlaneAngleForce()
         c = self.trigonal_angle_types.coeffs
         force.setAmoebaGlobalInPlaneAngleCubic(c[3])
