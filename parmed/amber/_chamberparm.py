@@ -705,11 +705,11 @@ class ChamberParm(AmberParm):
                                 a2 not in replaced_atoms)
                         # Only add each atom as a new type ONCE
                         if a1 in replaced_atoms:
-                            mask = '@%d' % (a1.idx+1)
-                            replaced_atoms.add(a1)
-                        else:
                             mask = '@%d' % (a2.idx+1)
                             replaced_atoms.add(a2)
+                        else:
+                            mask = '@%d' % (a1.idx+1)
+                            replaced_atoms.add(a1)
                         addLJType(self, mask, radius_14=0,
                                   epsilon_14=0).execute()
                         ntypes += 1
