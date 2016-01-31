@@ -7,7 +7,7 @@ from collections import defaultdict
 from copy import copy
 from math import sqrt
 import os
-from parmed import Structure, topologyobjects
+from parmed import Structure, topologyobjects, load_file
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
@@ -40,6 +40,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         """ Tests AmberParm handling of extra points in TIP4P water """
         parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
         repr(parm) # Make sure it doesn't crash
+        parm.join_dihedrals() # Make sure join_dihedrals doesn't do anything w/ no dihedrals
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -187,6 +188,22 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRelativeEqual(energies['angle'], 2.8766, places=4)
         self.assertRelativeEqual(energies['dihedral'], 24.3697, places=4)
         self.assertRelativeEqual(energies['nonbonded'], -30.2355, places=3)
+
+    def test_improper_dihedrals(self):
+        """ Test splitting improper/proper dihedrals in AmberParm """
+        to_delete = []
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        for i, d in enumerate(parm.dihedrals):
+            if d.improper:
+                continue
+            to_delete.append(i)
+        for i in reversed(to_delete):
+            parm.dihedrals[i].delete()
+            del parm.dihedrals[i]
+        self.assertGreater(len(parm.dihedrals), 0)
+        f = parm.omm_dihedral_force(split=True)
+        self.assertIsInstance(f, mm.PeriodicTorsionForce)
+        self.assertEqual(f.getNumTorsions(), len(parm.dihedrals))
 
     def test_round_trip(self):
         """ Test ParmEd -> OpenMM round trip with Amber gas phase """
@@ -833,6 +850,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=0))
         self.assertRaises(ValueError, lambda: parm.createSystem(constraints=0))
+        self.assertRaises(ValueError, lambda: parm.createSystem(hydrogenMass=-1))
 
     def test_dihedral_splitting(self):
         """ Tests proper splitting of torsions into proper/improper groups """
@@ -972,7 +990,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod='cat'))
 
-@unittest.skipIf(not has_openmm, 'Cannot test without OpenMM')
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
 class TestChamberParm(TestCaseRelative):
 
     def test_gas_energy(self):
@@ -1646,3 +1664,13 @@ class TestChamberParm(TestCaseRelative):
                 parm.createSystem(nonbondedMethod=app.CutoffPeriodic))
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=app.Ewald))
+
+class TestChamberParm(TestCaseRelative):
+    """ Tests some of the OMM integration with the AmoebaParm classes """
+
+    def test_amoeba_forces(self):
+        """ Test creation of some AMOEBA forces """
+        parm = load_file(get_fn('amoeba.parm7'))
+        self.assertIsInstance(parm.omm_bond_force(rigidWater=False),
+                              mm.AmoebaBondForce)
+        self.assertIsInstance(parm.omm_angle_force(), mm.AmoebaAngleForce)
