@@ -1675,7 +1675,7 @@ class Structure(object):
         """
         typemap = dict()
         for a in self.atoms:
-            if a.atom_type is None: continue
+            if a.atom_type is UnassignedAtomType: continue
             typemap[str(a.atom_type)] = a.atom_type
         # Now we have a map of all atom types that we have defined in our
         # system. Look through all of the atom types and see if any of their
@@ -1965,7 +1965,7 @@ class Structure(object):
             method
         """
         if system.getNumParticles() != len(self.atoms):
-            raise ValueError('OpenMM System does not correspond to Structure') # pragma: no cover
+            raise ValueError('OpenMM System does not correspond to Structure')
         for atom in self.atoms:
             if not isinstance(atom, ExtraPoint): continue
             # This is a virtual site... get its frame type
@@ -2397,7 +2397,7 @@ class Structure(object):
                 try:
                     rij, wdij, rij14, wdij14 = dih.atom1.atom_type.nbfix[
                                                     str(dih.atom4.atom_type)]
-                except KeyError:
+                except (KeyError, AttributeError):
                     epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
                     sigprod = comb_sig(dih.atom1.sigma_14, dih.atom4.sigma_14)

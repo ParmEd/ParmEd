@@ -73,6 +73,9 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         )
         pf = pstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
         sf = sstate.getForces().value_in_unit(u.kilocalorie_per_mole/u.angstrom)
+        # Error checking on omm_set_virtual_sites
+        self.assertRaises(ValueError, lambda:
+                parm.omm_set_virtual_sites(mm.System()))
 
         for p, s in zip(pf, sf):
             for x1, x2 in zip(p, s):

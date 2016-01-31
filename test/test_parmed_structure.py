@@ -1294,6 +1294,7 @@ class TestStructureSave(FileIOTestCase):
         """ Tests handling of bad input """
         self.assertRaises(ValueError, lambda:
                 self.sys1.save('somefile', format='NOFMT'))
+        self.assertRaises(ValueError, lambda: self.sys1.save('somefile.nofmt'))
 
     def test_overwrite(self):
         """ Test overwrite option of Structure.save """
