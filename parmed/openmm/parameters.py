@@ -145,7 +145,7 @@ class OpenMMParameterSet(ParameterSet):
         if self.atom_types:
             try:
                 self.typeify_templates()
-            except:
+            except KeyError:
                 warnings.warn('Some residue templates are using unavailable ' 
                               'AtomTypes')
         try:
