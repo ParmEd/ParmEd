@@ -142,8 +142,8 @@ class OpenMMParameterSet(ParameterSet):
             try:
                 self.typeify_templates()
             except:
-                warnings.warn("Some residue templates are using
-                unavailable AtomTypes!")
+                warnings.warn('Some residue templates are using unavailable ' 
+                              'AtomTypes')
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
