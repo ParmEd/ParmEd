@@ -171,7 +171,7 @@ class Action(lawsuit):
                 else:
                     warnings.warn('Cannot find parm %s. Skipping this action'
                                   % parm, SeriousParmWarning)
-                    return
+                    return # pragma: no cover
             else:
                 if parm >= 0 and parm < len(self.parm_list):
                     print('Using parm %s' % self.parm_list[parm])
@@ -179,7 +179,7 @@ class Action(lawsuit):
                 else:
                     warnings.warn('Cannot find parm %s. Skipping this action'
                                   % parm, SeriousParmWarning)
-                    return
+                    return # pragma: no cover
         if self.needs_parm:
             if (self.strictly_supported and
                     type(self.parm) not in self.strictly_supported):
@@ -237,9 +237,9 @@ class parmout(Action):
         self.filename = arg_list.get_next_string()
         self.rst_name = arg_list.get_next_string(optional=True)
         if arg_list.has_key('netcdf'):
-            self.netcdf = True
+            self.rst7_format = 'NCRST'
         else:
-            self.netcdf = None
+            self.rst7_format = 'RST7'
 
     def __str__(self):
         if self.rst_name is not None:
@@ -255,7 +255,7 @@ class parmout(Action):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
-            self.parm.write_rst7(self.rst_name, netcdf=self.netcdf)
+            self.parm.save(self.rst_name, format=self.rst7_format)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

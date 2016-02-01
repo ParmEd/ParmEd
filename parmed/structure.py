@@ -1325,6 +1325,7 @@ class Structure(object):
             elif format in ('RST7', 'NCRST'):
                 rst7 = amber.Rst7(natom=len(self.atoms), **kwargs)
                 rst7.coordinates = self.coordinates
+                rst7.vels = self.velocities
                 rst7.box = self.box
                 rst7.write(fname, netcdf=(format == 'NCRST'))
             else:

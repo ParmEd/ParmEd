@@ -5,12 +5,12 @@ from __future__ import division, print_function
 
 import utils
 from utils import HAS_GROMACS
-from parmed import periodic_table, gromacs, load_file
+from parmed import periodic_table, gromacs, load_file, amber
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
-from parmed.utils.six.moves import range, zip
+from parmed.utils.six.moves import range, zip, StringIO
 from copy import copy
 import numpy as np
 import os
@@ -31,6 +31,19 @@ solvparm = AmberParm(get_fn('solv2.parm7'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
+warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+
+# Make some new action subclasses
+class NewActionNoUsage(PT.Action):
+    needs_parm = False
+    def init(self, arg_list):
+        raise exc.NoArgument()
+
+class NewActionWithUsage(PT.Action):
+    needs_parm = False
+    usage = '<some_argument>'
+    def init(self, arg_list):
+        raise exc.NoArgument()
 
 class TestActionAPI(unittest.TestCase):
     """ Tests the Action API """
@@ -43,6 +56,12 @@ class TestActionAPI(unittest.TestCase):
         """ Test error handling in Action initializer """
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeRadii(None, 'mbondi2'))
+        self.assertFalse(NewActionNoUsage(None).valid)
+        self.assertFalse(NewActionWithUsage(None).valid)
+        warnings.filterwarnings('error', category=exc.UnhandledArgumentWarning)
+        self.assertRaises(exc.UnhandledArgumentWarning, lambda:
+                PT.changeRadii(gasparm, 'mbondi2', 'extra', 'arguments'))
+        str(NewActionNoUsage(None)) # Make sure it doesn't crash
 
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
@@ -321,6 +340,11 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertTrue(diff_files(get_fn('trx.inpcrd'),
                                    get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
+        self._empty_writes()
+        # Now try NetCDF format
+        PT.outparm(parm, get_fn('test.parm7', written=True),
+                   get_fn('test.ncrst', written=True), 'netcdf').execute()
+        self.assertTrue(amber.NetCDFRestart.id_format(get_fn('test.ncrst', written=True)))
 
     def test_write_frcmod(self):
         """ Test writeFrcmod on AmberParm """
@@ -687,6 +711,15 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         """ Test printDetails on AmberParm """
         act = PT.printDetails(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DETAILS)
+        # Check out different ways of selecting parms
+        act = PT.printDetails(gasparm, '@1', parm=0)
+        self.assertEqual(str(act), saved.PRINT_DETAILS)
+        act = PT.printDetails(gasparm, '@1', parm=str(gasparm))
+        self.assertEqual(str(act), saved.PRINT_DETAILS)
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.printDetails(gasparm, '@1', parm='DNE'))
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.printDetails(gasparm, '@1', parm=10))
 
     def test_print_flags(self):
         """ Test printFlags on AmberParm """
@@ -1523,6 +1556,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
                     self.assertAlmostEqual(datatype(i), j, places=4)
                 else:
                     self.assertEqual(datatype(i), j)
+        # Check this on non-AmberParm Structure classes
+        self.assertRaises(exc.ParmError, lambda:
+                PT.printInfo(load_file(get_fn('2koc.pdb'))))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on ChamberParm """

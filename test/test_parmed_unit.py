@@ -623,7 +623,7 @@ class TestUnits(utils.QuantityTestCase):
         self.assertEqual(str(u.meters*u.meters), 'meter**2')
         self.assertEqual(str(u.meter*u.meter), 'meter**2')
 
-class TestNumpyUnits(QuantityTestCase):
+class TestNumpyUnits(utils.QuantityTestCase):
 
     def testNumpyQuantity(self):
         """ Tests that numpy arrays can form Quantity values """

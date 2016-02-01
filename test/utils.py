@@ -81,12 +81,12 @@ class FileIOTestCase(unittest.TestCase):
         except OSError:
             pass
 
-    def tearDown(self):
-        self._empty_writes()
-        try:
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+#   def tearDown(self):
+#       self._empty_writes()
+#       try:
+#           os.rmdir(get_fn('writes'))
+#       except OSError:
+#           pass
 
     def _empty_writes(self):
         """ Empty the "writes" directory """
