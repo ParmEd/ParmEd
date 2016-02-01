@@ -17,6 +17,7 @@ from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
+import warnings
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -137,7 +138,12 @@ class OpenMMParameterSet(ParameterSet):
             own_handle = True
         else:
             own_handle = False
-#       self.typeify_templates()
+        if self.atom_types:
+            try:
+                self.typeify_templates()
+            except:
+                warnings.warn("Some residue templates are using
+                unavailable AtomTypes!")
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
@@ -184,11 +190,6 @@ class OpenMMParameterSet(ParameterSet):
         for name, residue in iteritems(self.residues):
             if not isinstance(residue, ResidueTemplate):
                 continue
-            # if AtomTypes are available, this will throw an exception if the
-            # residue is claiming a Type that doesn't exist
-            if self.atom_types:
-                for atom in residue:
-                    atom.atom_type = self.atom_types[atom.type]
             dest.write('  <Residue name="%s">\n' % residue.name)
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
