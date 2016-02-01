@@ -200,10 +200,16 @@ class AmberParameterSet(ParameterSet):
         self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
-                self.load_parameters(filename)
+                if AmberOFFLibrary.id_format(filename):
+                    self.residues.update(AmberOFFLibrary.parse(filename))
+                else:
+                    self.load_parameters(filename)
             elif isinstance(filename, Sequence):
                 for fname in filename:
-                    self.load_parameters(fname)
+                    if AmberOFFLibrary.id_format(fname):
+                        self.residues.update(AmberOFFLibrary.parse(fname))
+                    else:
+                        self.load_parameters(fname)
             else:
                 # Assume open file object
                 self.load_parameters(filename)

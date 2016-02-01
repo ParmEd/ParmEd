@@ -1177,6 +1177,33 @@ class TestParameterFiles(FileIOTestCase):
         parm._truncate_array('ATOM_NAME', 2)
         self.assertEqual(len(parm.parm_data['ATOM_NAME']), 2)
 
+    def test_load_lib(self):
+        """ Test parsing Amber .lib files within a set of parameter files """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm10.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff14SB'),
+                os.path.join(get_fn('amino12.lib')),
+                os.path.join(get_fn('aminoct12.lib'))
+        )
+        self.assertTrue(params.atom_types)
+        self.assertTrue(params.bond_types)
+        self.assertTrue(params.angle_types)
+        self.assertTrue(params.dihedral_types)
+        self.assertTrue(params.improper_periodic_types)
+        self.assertTrue(params.residues)
+        params = parameters.AmberParameterSet(
+                [os.path.join(get_fn('parm'), 'parm10.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff14SB')],
+                [os.path.join(get_fn('amino12.lib')),
+                os.path.join(get_fn('aminoct12.lib'))]
+        )
+        self.assertTrue(params.atom_types)
+        self.assertTrue(params.bond_types)
+        self.assertTrue(params.angle_types)
+        self.assertTrue(params.dihedral_types)
+        self.assertTrue(params.improper_periodic_types)
+        self.assertTrue(params.residues)
+
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
 
