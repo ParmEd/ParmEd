@@ -1182,8 +1182,8 @@ class TestParameterFiles(FileIOTestCase):
         params = parameters.AmberParameterSet(
                 os.path.join(get_fn('parm'), 'parm10.dat'),
                 os.path.join(get_fn('parm'), 'frcmod.ff14SB'),
-                os.path.join(get_fn('amino12.lib')),
-                os.path.join(get_fn('aminoct12.lib'))
+                get_fn('amino12.lib'),
+                get_fn('aminoct12.lib')
         )
         self.assertTrue(params.atom_types)
         self.assertTrue(params.bond_types)
@@ -1194,8 +1194,8 @@ class TestParameterFiles(FileIOTestCase):
         params = parameters.AmberParameterSet(
                 [os.path.join(get_fn('parm'), 'parm10.dat'),
                 os.path.join(get_fn('parm'), 'frcmod.ff14SB')],
-                [os.path.join(get_fn('amino12.lib')),
-                os.path.join(get_fn('aminoct12.lib'))]
+                [get_fn('amino12.lib'),
+                get_fn('aminoct12.lib')]
         )
         self.assertTrue(params.atom_types)
         self.assertTrue(params.bond_types)
