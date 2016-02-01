@@ -2445,13 +2445,6 @@ class Structure(object):
         # exclusions/exceptions
         for a2 in atom.exclusion_partners:
             force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
-            for c1 in atom.children:
-                force.addException(c1.idx, a2.idx, 0.0, 0.5, 0.0, True)
-            for c2 in a2.children:
-                force.addException(atom.idx, c2.idx, 0.0, 0.5, 0.0, True)
-            for c1 in atom.children:
-                for c2 in a2.children:
-                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
 
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
@@ -2624,8 +2617,8 @@ class Structure(object):
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         else:
-            raise ValueError('Unrecognized nonbonded method [%s]' %
-                             nonbondedMethod)
+            raise AssertionError('Unrecognized nonbonded method [%s]' %
+                                 nonbondedMethod)
         # Add the particles
         for atom in self.atoms:
             eps = math.sqrt(atom.epsilon*ene_conv) * 2
@@ -2648,8 +2641,8 @@ class Structure(object):
         elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         else:
-            raise ValueError('Unsupported nonbonded method %s' %
-                             nonbondedMethod)
+            raise AssertionError('Unsupported nonbonded method %s' %
+                                 nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -2759,8 +2752,8 @@ class Structure(object):
             force = GBSAGBn2Force(solventDielectric, soluteDielectric, sasa,
                                   cutoff, kappa=implicitSolventKappa)
         else:
-            raise ValueError('Unexpected implicit solvent model... '
-                             'should not be here')
+            raise AssertionError('Unexpected implicit solvent model... '
+                                 'should not be here')
         for atom, parms in zip(self.atoms, gb_parms):
             force.addParticle([atom.charge] + list(parms))
         # Set cutoff method
@@ -2799,7 +2792,7 @@ class Structure(object):
         c = self.trigonal_angle_types.coeffs
         force.setAmoebaGlobalInPlaneAngleCubic(c[3])
         force.setAmoebaGlobalInPlaneAngleQuartic(c[4])
-        force.setAmoebaGlobalInPlaneAngleQuintic(c[5])
+        force.setAmoebaGlobalInPlaneAnglePentic(c[5])
         force.setAmoebaGlobalInPlaneAngleSextic(c[6])
         force.setForceGroup(self.TRIGONAL_ANGLE_FORCE_GROUP)
         for ang in self.trigonal_angles:
@@ -2831,7 +2824,7 @@ class Structure(object):
         c = self.out_of_plane_bend_types.coeffs
         force.setAmoebaGlobalOutOfPlaneBendCubic(c[3])
         force.setAmoebaGlobalOutOfPlaneBendQuartic(c[4])
-        force.setAmoebaGlobalOutOfPlaneBendQuintic(c[5])
+        force.setAmoebaGlobalOutOfPlaneBendPentic(c[5])
         force.setAmoebaGlobalOutOfPlaneBendSextic(c[6])
         force.setForceGroup(self.OUT_OF_PLANE_BEND_FORCE_GROUP)
         for ang in self.out_of_plane_bends:
@@ -2886,8 +2879,9 @@ class Structure(object):
                 raise ParameterError("Missing stretch-bend parameters")
             force.addStretchBend(strbnd.atom1.idx, strbnd.atom2.idx,
                                  strbnd.atom3.idx, strbnd.type.req1*length_conv,
-                                 strbnd.type.req2*length_conv,
-                                 strbnd.type.k*frc_conv)
+                                 strbnd.type.req2*length_conv, strbnd.type.theteq*math.pi/180,
+                                 strbnd.type.k1*frc_conv, strbnd.type.k2*frc_conv)
+        return force
 
     #===================================================
 
@@ -3402,9 +3396,7 @@ class Structure(object):
             copy_valence_terms(other.groups, aoffset, self.groups, [],
                                ['atom', 'type', 'move'])
         if self._coordinates is not None:
-            coords = np.tile(self._coordinates.ravel(), ncopies).reshape(
-                    (-1, len(self.atoms), 3))
-            self._coordinates = coords
+            self._coordinates = np.hstack([self._coordinates for i in range(ncopies)])
         return self
 
     #===================================================
@@ -3429,9 +3421,7 @@ class Structure(object):
                     self.pi_torsion_types or self.torsion_torsion_types or
                     self.adjust_types)
 
-    def __nonzero__(self):
-        # For Python 2
-        return self.__bool__()
+    __nonzero__ = __bool__ # for Python 2
 
     #===================================================
 
@@ -3891,9 +3881,7 @@ class StructureView(object):
         retstr.append('; %d bonds>' % nbond)
         return ''.join(retstr)
 
-    def __nonzero__(self):
-        # For Python 2
-        return self.__bool__()
+    __nonzero__ = __bool__ # For Python 2
 
     def __iter__(self):
         return iter(self.atoms)
