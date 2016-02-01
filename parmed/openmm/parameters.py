@@ -18,6 +18,7 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 import warnings
+from parmed.modeller import ResidueTemplate
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -107,9 +108,12 @@ class OpenMMParameterSet(ParameterSet):
         new_params.pair_types = params.pair_types
         new_params.parametersets = params.parametersets
         new_params._combining_rule = params.combining_rule
-        new_params.residues = params.residues
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
+        # add only ResidueTemplate instances (no ResidueTemplateContainers)
+        for name, residue in iteritems(params.residues):
+            if isinstance(residue, ResidueTemplate):
+                new_params.residues[name] = residue
 
         return new_params
 
