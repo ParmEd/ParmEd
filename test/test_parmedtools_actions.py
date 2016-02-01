@@ -32,6 +32,18 @@ gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
 
+class TestActionAPI(unittest.TestCase):
+    """ Tests the Action API """
+
+    def test_argument_types(self):
+        """ Test argument type handling of Action subclass """
+        self.assertRaises(TypeError, lambda: PT.actions.Action(10))
+
+    def test_error_handling(self):
+        """ Test error handling in Action initializer """
+        self.assertRaises(exc.ParmError, lambda:
+                PT.changeRadii(None, 'mbondi2'))
+
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
 
@@ -50,7 +62,7 @@ class TestNonParmActions(unittest.TestCase):
         a.execute()
         self.assertTrue(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are overwritable')
-    
+
     def test_list_parms(self):
         """ Test listing of the prmtop files in the ParmEd interpreter """
         a = PT.listParms(self.parm)
@@ -241,7 +253,7 @@ class TestNonParmActions(unittest.TestCase):
                          parm.parm_data['ATOM_NAME'])
         self.assertEqual([a.type[:4] for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
-    
+
     def _extensive_checks(self, parm):
         # Check the __contains__ methods of the various topologyobjects
         atoms = parm.atoms
@@ -272,7 +284,7 @@ class TestNonParmActions(unittest.TestCase):
 
 class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
-    
+
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
@@ -810,7 +822,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = copy(gasparm)
         in_exclusions_before = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -819,7 +831,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         PT.addExclusions(parm, ':1', ':1').execute()
         in_exclusions_after = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                                 atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -833,7 +845,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = AmberParm.from_rawdata(parm)
         in_exclusions_before = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -1162,7 +1174,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
 
 class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
-    
+
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions for ChamberParm """
         self._empty_writes()
@@ -1684,7 +1696,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         parm = copy(gascham)
         in_exclusions_before = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -1693,7 +1705,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         PT.addExclusions(parm, ':1', ':1').execute()
         in_exclusions_after = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -1979,7 +1991,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 
 class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
-    
+
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()

@@ -152,15 +152,10 @@ class Action(lawsuit):
         elif arg_list is None:
             arg_list = ArgumentList('')
         # If our arg_list is a string, convert it to an ArgumentList
-        # (but coerce to string if it is string-like)
-        try:
-            arg_list = arg_list.decode()
+        if isinstance(arg_list, string_types):
             arg_list = ArgumentList(arg_list)
-        except AttributeError:
-            if isinstance(arg_list, string_types):
-                arg_list = ArgumentList(arg_list)
-            else:
-                arg_list = ArgumentList(str(arg_list))
+        else:
+            arg_list = ArgumentList(str(arg_list))
         # Now that we have the argument list, see if we have requested a
         # specific parm. If so, set self.parm equal to that object, instead
         parm = arg_list.get_key_string('parm', None)
