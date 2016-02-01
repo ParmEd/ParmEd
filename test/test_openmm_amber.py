@@ -8,6 +8,7 @@ from copy import copy
 from math import sqrt
 import os
 from parmed import Structure, topologyobjects, load_file
+from parmed.exceptions import ParameterError
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
@@ -16,7 +17,7 @@ import parmed.tools as PT
 import sys
 import unittest
 from utils import (get_fn, CPU, Reference, mm, app, has_openmm, FileIOTestCase,
-        TestCaseRelative, get_saved_fn, run_all_tests)
+        TestCaseRelative, get_saved_fn, run_all_tests, QuantityTestCase)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -34,7 +35,7 @@ def energy_decomposition(parm, context):
     return ret
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
-class TestAmberParm(FileIOTestCase, TestCaseRelative):
+class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_ep_energy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
@@ -579,6 +580,20 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(energies['angle'], 0.9616, 4)
         self.assertAlmostEqual(energies['dihedral'], -5.4917, 4)
         self.assertAlmostEqual(energies['nonbonded'], 1168.06630486, 3)
+        # Now make sure that if we use a switching function, that gets
+        # propagated to the CustomNonbondedForce
+        system = parm.createSystem(nonbondedMethod=app.PME,
+                                   nonbondedCutoff=8*u.angstroms,
+                                   switchDistance=6*u.angstroms)
+        n = 0
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce) or isinstance(force,
+                    mm.CustomNonbondedForce):
+                self.assertTrue(force.getUseSwitchingFunction())
+                self.assertAlmostEqualQuantities(force.getSwitchingDistance(),
+                                                 6*u.angstroms)
+                n += 1
+        self.assertEqual(n, 2)
 
     def test_nbfix_exceptions(self):
         """ Tests exception transfers when NBFIX present """
@@ -959,6 +974,20 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
         for f in system.getForces():
             if isinstance(f, (mm.NonbondedForce, mm.CustomNonbondedForce)):
                 self.assertEqual(f.getNonbondedMethod(), 0)
+        # Using ACE SASA method
+        system = parm.createSystem(nonbondedMethod=app.NoCutoff,
+                                   implicitSolvent=app.GBn2,
+                                   solventDielectric=80, soluteDielectric=4,
+                                   temperature=300.0*u.kelvin,
+                                   implicitSolventSaltConc=0.1*u.molar,
+                                   useSASA=True)
+        frc = parm.omm_gbsa_force(app.GBn2 ,nonbondedCutoff=1.5,
+                                  nonbondedMethod=app.CutoffNonPeriodic)
+        self.assertEqual(frc.getCutoffDistance(), 1.5*u.nanometers)
+        frc = parm.omm_gbsa_force(app.GBn2 ,nonbondedCutoff=1.5,
+                                  nonbondedMethod=app.CutoffPeriodic)
+        self.assertEqual(frc.getCutoffDistance(), 1.5*u.nanometers)
+        self.assertEqual(frc.getNonbondedMethod(), frc.CutoffPeriodic)
         # Check when CustomNonbondedForce is required that the cutoff methods
         # get appropriately transferred.
         parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0.0
@@ -992,6 +1021,8 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative):
                 parm.createSystem(nonbondedMethod=app.Ewald))
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod='cat'))
+        self.assertRaises(ValueError, lambda:
+                parm.createSystem(implicitSolvent='No model'))
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
 class TestChamberParm(TestCaseRelative):
@@ -1611,7 +1642,7 @@ class TestChamberParm(TestCaseRelative):
                 self.assertEqual(f.getNonbondedMethod(), 0)
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    implicitSolvent=app.OBC2,
-                                   implicitSolventKappa=0.8)
+                                   implicitSolventKappa=0.8*u.nanometers**-1)
         for f in system.getForces():
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
@@ -1669,7 +1700,7 @@ class TestChamberParm(TestCaseRelative):
                 parm.createSystem(nonbondedMethod=app.Ewald))
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
-class TestChamberParm(TestCaseRelative):
+class TestAmoebaParm(TestCaseRelative):
     """ Tests some of the OMM integration with the AmoebaParm classes """
 
     def test_amoeba_forces(self):
@@ -1678,3 +1709,33 @@ class TestChamberParm(TestCaseRelative):
         self.assertIsInstance(parm.omm_bond_force(rigidWater=False),
                               mm.AmoebaBondForce)
         self.assertIsInstance(parm.omm_angle_force(), mm.AmoebaAngleForce)
+        self.assertIsInstance(parm.omm_trigonal_angle_force(),
+                              mm.AmoebaInPlaneAngleForce)
+        self.assertIsInstance(parm.omm_out_of_plane_bend_force(),
+                              mm.AmoebaOutOfPlaneBendForce)
+        self.assertIsInstance(parm.omm_pi_torsion_force(),
+                              mm.AmoebaPiTorsionForce)
+        self.assertIsInstance(parm.omm_stretch_bend_force(),
+                              mm.AmoebaStretchBendForce)
+
+        # Now some error handling
+        # Trigonal angles
+        old_deg = parm.trigonal_angle_types.degree
+        del parm.trigonal_angle_types.degree
+        self.assertRaises(ParameterError, parm.omm_trigonal_angle_force)
+        parm.trigonal_angle_types.degree = old_deg
+        parm.trigonal_angles[0].type = None
+        self.assertRaises(ParameterError, parm.omm_trigonal_angle_force)
+        # Out-of-plane bends
+        old_deg = parm.out_of_plane_bend_types.degree
+        del parm.out_of_plane_bend_types.degree
+        self.assertRaises(ParameterError, parm.omm_out_of_plane_bend_force)
+        parm.out_of_plane_bend_types.degree = old_deg
+        parm.out_of_plane_bends[0].type = None
+        self.assertRaises(ParameterError, parm.omm_out_of_plane_bend_force)
+        # Pi-torsion parameters
+        parm.pi_torsions[0].type = None
+        self.assertRaises(ParameterError, parm.omm_pi_torsion_force)
+        # stretch-bend parameters
+        parm.stretch_bends[0].type = None
+        self.assertRaises(ParameterError, parm.omm_stretch_bend_force)
