@@ -449,7 +449,7 @@ class ParameterSet(object):
         for name, residue in iteritems(self.residues):
             if isinstance(residue, ResidueTemplateContainer):
                 for res in residue:
-                    for atom in residue:
+                    for atom in res:
                         atom.atom_type = self.atom_types[atom.type]
             else:
                 assert isinstance(residue, ResidueTemplate), 'Wrong type!'
