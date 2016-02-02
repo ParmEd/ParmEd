@@ -76,7 +76,7 @@ class TestNonParmActions(unittest.TestCase):
     def test_overwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
         a = PT.setOverwrite(self.parm, False)
-        self.assertTrue(PT.Action.overwrite)
+        self.assertFalse(PT.Action.overwrite)
         a.execute()
         self.assertFalse(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are NOT overwritable')
@@ -565,10 +565,10 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         # Make sure the A and B coefficient matrices are what I expect them to
         # be
         indexes = sorted([ntype, htype])
-        acoef = parm.parm_data['LENNARD_JONES_ACOEF']
-        bcoef = parm.parm_data['LENNARD_JONES_BCOEF']
-        refa = gasparm.parm_data['LENNARD_JONES_ACOEF']
-        refb = gasparm.parm_data['LENNARD_JONES_BCOEF']
+        acoef = parm.parm_data['LENNARD_JONES_ACOEF'][:]
+        bcoef = parm.parm_data['LENNARD_JONES_BCOEF'][:]
+        refa = gasparm.parm_data['LENNARD_JONES_ACOEF'][:]
+        refb = gasparm.parm_data['LENNARD_JONES_BCOEF'][:]
         ntypes = parm.ptr('ntypes')
         for i in range(ntypes):
             for j in range(i, ntypes):
@@ -579,6 +579,16 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                 else:
                     self.assertEqual(acoef[idx-1], refa[idx-1])
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
+        # Check handling with no atoms
+        PT.changeLJPair(parm, '@NONE', '@%H', 1.0, 1.0).execute()
+        # Make sure nothing changed
+        np.testing.assert_equal(acoef, parm.parm_data['LENNARD_JONES_ACOEF'])
+        np.testing.assert_equal(bcoef, parm.parm_data['LENNARD_JONES_BCOEF'])
+        # Check error handling
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJPair(parm, ':*', '@%H', 1.0, 1.0).execute())
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJPair(parm, '@%H', ':*', 1.0, 1.0).execute())
 
     def test_change_lj_14_pair(self):
         """ Check that changeLJ14Pair fails on AmberParm """
@@ -589,7 +599,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_change(self):
         """ Test change on AmberParm with all properties """
         parm = copy(gasparm)
-        PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet').execute()
+        act = PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet')
+        act.execute()
+        self.assertEqual(len(str(act).split('\n')), 1)
         for flag in parm.parm_data:
             if flag != 'CHARGE':
                 self.assertEqual(parm.parm_data[flag], gasparm.parm_data[flag])
@@ -599,7 +611,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                 self.assertEqual(atom.charge, 0)
             else:
                 self.assertEqual(atom.charge, gasparm.atoms[i].charge)
-        PT.change(parm, 'MASS', ':GLY', 10.0).execute()
+        act = PT.change(parm, 'MASS', ':GLY', 10.0)
+        self.assertGreater(len(str(act).split('\n')), 1)
+        act.execute()
         for i, atom in enumerate(parm.atoms):
             self.assertEqual(parm.parm_data['MASS'][i], atom.mass)
             if atom.residue.name == 'GLY':
@@ -648,6 +662,17 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                              parm.parm_data['TREE_CHAIN_CLASSIFICATION'][i])
             if atom.residue.idx < 2:
                 self.assertEqual(atom.tree, 'ABC')
+        # Check if we try to add strings that are too long
+        warnings.filterwarnings('error', category=exc.ParmWarning)
+        self.assertRaises(exc.ParmWarning, lambda:
+                PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute())
+        warnings.filterwarnings('ignore', category=exc.ParmWarning)
+        # Make sure the strings get truncated
+        PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute()
+        for atom in parm.atoms:
+            self.assertEqual(atom.name, 'LALA')
+            self.assertEqual(parm.parm_data['ATOM_NAME'][atom.idx], 'LALA')
+        warnings.filterwarnings('always', category=exc.ParmWarning)
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
@@ -1299,6 +1324,12 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         # Make sure overwriting is correctly handled
         self.assertRaises(exc.FileExists, act.execute)
 
+    def test_check_validity(self):
+        """ Tests the checkValidity test """
+        act = PT.checkValidity(gasparm)
+        str(act)
+        act.execute()
+
 class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
 
@@ -1545,7 +1576,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     def test_change_lj_14_pair(self):
         """ Test changeLJ14Pair for ChamberParm """
         parm = copy(gascham)
-        PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute()
+        act = PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0)
+        act.execute()
+        str(act)
         # Figure out what type numbers each atom type belongs to
         ntype = htype = 0
         for atom in parm.atoms:
@@ -1570,6 +1603,16 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
                 else:
                     self.assertEqual(acoef[idx-1], refa[idx-1])
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
+        # Check handling with no atoms
+        PT.changeLJ14Pair(parm, '@NONE', '@%H', 1.0, 1.0).execute()
+        # Make sure nothing changed
+        np.testing.assert_equal(acoef, parm.parm_data['LENNARD_JONES_14_ACOEF'])
+        np.testing.assert_equal(bcoef, parm.parm_data['LENNARD_JONES_14_BCOEF'])
+        # Check error handling
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJ14Pair(parm, ':*', '@%H', 1.0, 1.0).execute())
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJ14Pair(parm, '@%H', ':*', 1.0, 1.0).execute())
 
     def test_change(self):
         """ Test change on ChamberParm with all properties """

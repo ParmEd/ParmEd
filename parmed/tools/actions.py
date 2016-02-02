@@ -615,9 +615,7 @@ class changeLJ14Pair(Action):
     strictly_supported = (ChamberParm,)
     def init(self, arg_list):
         # Make sure this is a chamber prmtop
-        if not self.parm.chamber:
-            raise ChangeLJPairError('Changing 1-4 NB pairs makes no sense for '
-                                    'non-chamber created prmtops!')
+        assert self.parm.chamber, 'Chamber-style prmtop required!'
         # If not, initiate instance data
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -625,11 +623,9 @@ class changeLJ14Pair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        if self.parm.chamber:
-            return ('Setting LJ 1-4 %s-%s pairwise interaction to have '
-                    '1-4 Rmin = %16.5f and 1-4 Epsilon = %16.5f' %
-                    (self.mask1, self.mask2, self.rmin, self.eps))
-        return 'Not a chamber topology. Nothing to do.'
+        return ('Setting LJ 1-4 %s-%s pairwise interaction to have '
+                '1-4 Rmin = %16.5f and 1-4 Epsilon = %16.5f' %
+                (self.mask1, self.mask2, self.rmin, self.eps))
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -702,6 +698,7 @@ class change(Action):
         self.quiet = arg_list.has_key('quiet')
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
         self.prop = arg_list.get_next_string().upper()
+        self.add_flag = False
         if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'MASS'):
             self.new_val = arg_list.get_next_float()
             self.new_val_str = '%.4f' % self.new_val
@@ -731,11 +728,11 @@ class change(Action):
                 # AmoebaParm can have an AMOEBA_ATOMIC_NUMBER section instead of
                 # ATOMIC_NUMBER. So see which of them is available and change
                 # that one
-                if 'ATOMIC_NUMBER' not in self.parm.flag_list:
-                    if 'AMOEBA_ATOMIC_NUMBER' not in self.parm.flag_list:
-                        raise ParmedChangeError('Could not find %s in Amoeba '
-                                                'prmtop.' % self.prop)
+                if self.parm.amoeba:
                     self.prop = 'AMOEBA_ATOMIC_NUMBER'
+                if self.prop not in self.parm.parm_data:
+                    # Add it
+                    self.add_flag = True
 
     def __str__(self):
         atnums = self.mask.Selection()
@@ -773,6 +770,8 @@ class change(Action):
                 setattr(atom, prop, self.new_val)
         # Update the raw data for any Amber topologies
         if isinstance(self.parm, AmberParm):
+            if self.add_flag:
+                addAtomicNumber(self.parm).execute()
             for i, atom in enumerate(self.parm.atoms):
                 self.parm.parm_data[self.prop][i] = getattr(atom, prop)
 
@@ -2013,7 +2012,10 @@ class addAtomicNumber(Action):
     """
     supported_subclasses = (AmberParm,)
     def init(self, arg_list):
-        self.present = 'ATOMIC_NUMBER' in self.parm.flag_list
+        if self.parm.amoeba:
+            self.present = 'AMOEBA_ATOMIC_NUMBER' in self.parm.flag_list
+        else:
+            self.present = 'ATOMIC_NUMBER' in self.parm.flag_list
 
     def __str__(self):
         if self.present:
@@ -2022,8 +2024,12 @@ class addAtomicNumber(Action):
 
     def execute(self):
         if self.present: return
-        self.parm.add_flag('ATOMIC_NUMBER', '10I8',
-                           num_items=len(self.parm.atoms))
+        if self.parm.amoeba:
+            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8',
+                               num_items=len(self.parm.atoms))
+        else:
+            self.parm.add_flag('ATOMIC_NUMBER', '10I8',
+                               num_items=len(self.parm.atoms))
         for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
 
