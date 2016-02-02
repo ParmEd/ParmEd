@@ -32,7 +32,7 @@ except ImportError:
 
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
-    
+
     def tearDown(self):
         warnings.filterwarnings('always', category=DeprecationWarning)
 
@@ -247,7 +247,7 @@ class TestReadParm(unittest.TestCase):
                          [a.xy for a in parm.atoms])
         self.assertEqual([a.xz for a in gasparm.atoms],
                          [a.xz for a in parm.atoms])
-        
+
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
         self.assertFalse(parm.chamber)
@@ -262,6 +262,9 @@ class TestReadParm(unittest.TestCase):
         for i, atom in enumerate(gasparm.atoms):
             np.testing.assert_allclose(coords[0,i], [atom.xx, atom.xy, atom.xz])
             np.testing.assert_allclose(vels[0,i], [atom.vx, atom.vy, atom.vz])
+        # Check join_dihedrals when one DT does not exist
+        parm.dihedrals[-1].type = None
+        parm.join_dihedrals()
 
     def test_amber_mdin(self):
         """ Tests the Amber Mdin class """
@@ -1174,9 +1177,36 @@ class TestParameterFiles(FileIOTestCase):
         parm._truncate_array('ATOM_NAME', 2)
         self.assertEqual(len(parm.parm_data['ATOM_NAME']), 2)
 
+    def test_load_lib(self):
+        """ Test parsing Amber .lib files within a set of parameter files """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parm10.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff14SB'),
+                get_fn('amino12.lib'),
+                get_fn('aminoct12.lib')
+        )
+        self.assertTrue(params.atom_types)
+        self.assertTrue(params.bond_types)
+        self.assertTrue(params.angle_types)
+        self.assertTrue(params.dihedral_types)
+        self.assertTrue(params.improper_periodic_types)
+        self.assertTrue(params.residues)
+        params = parameters.AmberParameterSet(
+                [os.path.join(get_fn('parm'), 'parm10.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff14SB')],
+                [get_fn('amino12.lib'),
+                get_fn('aminoct12.lib')]
+        )
+        self.assertTrue(params.atom_types)
+        self.assertTrue(params.bond_types)
+        self.assertTrue(params.angle_types)
+        self.assertTrue(params.dihedral_types)
+        self.assertTrue(params.improper_periodic_types)
+        self.assertTrue(params.residues)
+
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
-    
+
     def test_mdcrd(self):
         """ Test the ASCII trajectory file parsing """
         mdcrd = asciicrd.AmberMdcrd(get_fn('tz2.truncoct.crd'),
@@ -1442,7 +1472,7 @@ class TestCoordinateFiles(FileIOTestCase):
 
 class TestAmberMask(unittest.TestCase):
     """ Test the Amber mask parser """
-    
+
     def test_mask(self):
         """ Test the Amber mask parser """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
@@ -1765,7 +1795,7 @@ class TestAmberMask(unittest.TestCase):
                 self.assertEqual(sel[atom.idx], within)
 
 class TestWriteFiles(FileIOTestCase):
-    
+
     def test_write_amber_parm(self):
         """ Test writing an AmberParm file """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
@@ -1854,11 +1884,11 @@ class TestWriteFiles(FileIOTestCase):
         crd.add_coordinates(list(range(54)))
         crd.add_box(box)
         crd.add_coordinates([x+1 for x in range(54)])
-        crd.add_box(box)                          
+        crd.add_box(box)
         crd.add_coordinates([x+2 for x in range(54)])
-        crd.add_box(box)                          
+        crd.add_box(box)
         crd.add_coordinates([x+3 for x in range(54)])
-        crd.add_box(box)                          
+        crd.add_box(box)
         crd.add_coordinates([x+4 for x in range(54)])
         crd.add_box(box)
         crd.close()

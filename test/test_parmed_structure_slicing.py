@@ -16,7 +16,7 @@ pdb2 = pmd.load_file(utils.get_fn('1kip.cif'))
 class TestStructureSlicing(unittest.TestCase):
     """ Tests the fancy slicing/indexing of Structure """
 
-    def testIntIndex(self):
+    def test_int_index(self):
         """ Tests simple Structure indexing (integer) """
         for i, atom in enumerate(parm.atoms):
             self.assertIs(atom, parm[i])
@@ -25,7 +25,15 @@ class TestStructureSlicing(unittest.TestCase):
         for i, atom in enumerate(pdb2.atoms):
             self.assertIs(atom, pdb2[i])
 
-    def testTwoIntIndex(self):
+    def test_ub_select(self):
+        """ Tests selection when "blank" Urey-Bradley terms present """
+        struct = utils.create_random_structure(parametrized=True)
+        struct.urey_bradleys[0].type = pmd.NoUreyBradley
+        s = struct[:]
+        self.assertEqual(len(s.urey_bradleys), len(struct.urey_bradleys))
+        self.assertIs(s.urey_bradleys[0].type, pmd.NoUreyBradley)
+
+    def test_two_int_index(self):
         """ Tests simple Structure indexing w/ residue and atom (int, int) """
         for i, res in enumerate(parm.residues):
             for j, atom in enumerate(res):
@@ -37,7 +45,7 @@ class TestStructureSlicing(unittest.TestCase):
             for j, atom in enumerate(res):
                 self.assertIs(res[j], pdb2[i,j])
 
-    def testThreeSimpleIndex(self):
+    def test_three_simple_index(self):
         """ Tests simple indexing with chain, residue, and atom ID """
         chains = defaultdict(pmd.TrackedList)
         for res in pdb2.residues:
@@ -46,8 +54,9 @@ class TestStructureSlicing(unittest.TestCase):
             for i, res in enumerate(chain):
                 for j, atom in enumerate(res):
                     self.assertIs(atom, pdb2[chain_name, i, j])
+        self.assertRaises(IndexError, lambda: pdb2['Z', 0, 0])
 
-    def testSingleAtomSlice(self):
+    def test_single_atom_slice(self):
         """ Test that non-trivial, single-atom selections give a Structure """
         sel1 = parm['@1']
         sel2 = parm[:1]
@@ -56,7 +65,7 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertEqual(len(sel1.atoms), 1)
         self.assertEqual(len(sel2.atoms), 1)
 
-    def testEmptyStructure(self):
+    def test_empty_structure(self):
         """ Tests empty selection of a Structure (view) """
         sel1 = parm[10000000:]
         sel2 = pdb1['@NOTHING']
@@ -71,7 +80,7 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertIsInstance(sel3, pmd.Structure)
         self.assertIsInstance(sel4, pmd.amber.AmberParm)
 
-    def testSimpleSlice(self):
+    def test_simple_slice(self):
         """ Tests simple atom slicing """
         sl11 = parm[:10]
         sl21 = pdb1[:10]
@@ -129,7 +138,7 @@ class TestStructureSlicing(unittest.TestCase):
             self.assertEqual(patom.xy, atom.xy)
             self.assertEqual(patom.xz, atom.xz)
 
-    def testMaskArray(self):
+    def test_mask_array(self):
         """ Tests Structure selection using a mask array """
         mask = [a.name in ('CA', 'CB') for a in parm.atoms]
         sel = parm[mask]
@@ -137,7 +146,7 @@ class TestStructureSlicing(unittest.TestCase):
         for atom in sel.atoms:
             self.assertIn(atom.name, ('CA', 'CB'))
 
-    def testSelectionArray(self):
+    def test_selection_array(self):
         """ Tests Structure selection using indices array """
         indices = [random.randint(0, len(pdb1.atoms)-1) for i in range(100)]
         sel = pdb1[indices]
@@ -149,7 +158,7 @@ class TestStructureSlicing(unittest.TestCase):
             self.assertEqual(sel.atoms[i].xy, pdb1.atoms[val].xy)
             self.assertEqual(sel.atoms[i].xz, pdb1.atoms[val].xz)
 
-    def testResidueAtomSelection(self):
+    def test_residue_atom_selection(self):
         """ Tests combined residue,atom slicing/selections """
         sel = pdb1[10:20,:5] # First five atoms of residues 10-19
         self.assertEqual(len(sel.atoms), 49) # 1 residue has only 4 atoms
@@ -197,7 +206,7 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertEqual(nalagly, len(sel.residues))
         self.assertEqual(natom, len(sel.atoms))
 
-    def testChainResidueAtomSelection(self):
+    def test_chain_residue_atom_selection(self):
         """ Tests combined chain,residue,atom slicing/selections """
         sel = pdb2['A',:,:] # All of chain A
         for a in sel.atoms:
@@ -206,16 +215,31 @@ class TestStructureSlicing(unittest.TestCase):
         chainA = pdb2['A',:,:]
         chainB = pdb2['B',:,:]
         chainC = pdb2['C',:,:]
+        for r in chainB.residues:
+            self.assertEqual(r.chain, 'B')
+        for r in chainC.residues:
+            self.assertEqual(r.chain, 'C')
+        self.assertEqual(len(pdb2.atoms),
+                         len(chainA.atoms)+len(chainB.atoms)+len(chainC.atoms))
+        chainAB = pdb2[:2,:,:]
+        self.assertEqual(len(chainAB.atoms),
+                         len(chainA.atoms)+len(chainB.atoms))
+        self.assertFalse(pdb2[10:,:,:])
         # Now try some different kinds of indexing
         sel = pdb2['B',0,0]
         self.assertIs(sel, pdb2.atoms[826])
         sel = pdb2[['A','B'], :10:2, 0]
         self.assertEqual(len(sel.atoms), 2*5*1)
+        self.assertEqual(len(pdb2[:,0,[0,1]].atoms), 6) # 3 total chains
+        # Now try a bad selector
+        self.assertRaises(ValueError, lambda:
+                pdb2[list(range(len(pdb2.atoms)+1))])
+        self.assertRaises(ValueError, lambda: pdb2[[0,len(pdb2.atoms)]])
 
 class TestStructureViewSlicing(unittest.TestCase):
     """ Tests the fancy slicing/indexing of Structure """
 
-    def testIntIndex(self):
+    def test_int_index(self):
         """ Tests simple Structure indexing (integer) (view) """
         for i, atom in enumerate(parm.atoms):
             self.assertIs(atom, parm.view[i])
@@ -224,7 +248,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         for i, atom in enumerate(pdb2.atoms):
             self.assertIs(atom, pdb2.view[i])
 
-    def testTwoIntIndex(self):
+    def test_two_int_index(self):
         """ Tests simple Structure view w/ residue and atom (int, int) """
         for i, res in enumerate(parm.residues):
             for j, atom in enumerate(res):
@@ -236,7 +260,7 @@ class TestStructureViewSlicing(unittest.TestCase):
             for j, atom in enumerate(res):
                 self.assertIs(res[j], pdb2.view[i,j])
 
-    def testThreeSimpleIndex(self):
+    def test_three_simple_index(self):
         """ Tests simple indexing with chain, residue, and atom ID (view) """
         chains = defaultdict(pmd.TrackedList)
         for res in pdb2.residues:
@@ -246,7 +270,7 @@ class TestStructureViewSlicing(unittest.TestCase):
                 for j, atom in enumerate(res):
                     self.assertIs(atom, pdb2.view[chain_name, i, j])
 
-    def testSingleAtomSlice(self):
+    def test_single_atom_slice(self):
         """ Test that non-trivial, single-atom selections give StructureView """
         sel1 = parm.view['@1']
         sel2 = parm.view[:1]
@@ -257,7 +281,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         self.assertIs(sel1.atoms[0], parm.atoms[0])
         self.assertIs(sel2.atoms[0], parm.atoms[0])
 
-    def testEmptyStructure(self):
+    def test_empty_structure(self):
         """ Tests empty selection of a Structure (view) """
         sel1 = parm.view[10000000:]
         sel2 = pdb1.view['@NOTHING']
@@ -272,7 +296,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         self.assertIsInstance(sel3, pmd.structure.StructureView)
         self.assertIsInstance(sel4, pmd.structure.StructureView)
 
-    def testSimpleSlice(self):
+    def test_simple_slice(self):
         """ Tests simple atom slicing (view) """
         sl11 = parm.view[:10]
         sl21 = pdb1.view[:10]
@@ -329,7 +353,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         for atom in sl11:
             self.assertIs(atom, parm.atoms[atom.idx])
 
-    def testMaskArray(self):
+    def test_mask_array(self):
         """ Tests Structure selection using a mask array (view) """
         mask = [a.name in ('CA', 'CB') for a in parm.atoms]
         sel = parm.view[mask]
@@ -338,7 +362,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         for atom in sel.atoms:
             self.assertIn(atom.name, ('CA', 'CB'))
 
-    def testSelectionArray(self):
+    def test_selection_array(self):
         """ Tests Structure selection using indices array (view) """
         indices = [random.randint(0, len(pdb1.atoms)-1) for i in range(100)]
         sel = pdb1.view[indices]
@@ -347,7 +371,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         for i, val in enumerate(sorted(set(indices))):
             self.assertIs(sel.atoms[i], pdb1.atoms[sel.atoms[i].idx])
 
-    def testResidueAtomSelection(self):
+    def test_residue_atom_selection(self):
         """ Tests combined residue,atom slicing/selections (view) """
         sel = pdb1.view[10:20,:5] # First five atoms of residues 10-19
         self.assertIsInstance(sel, pmd.structure.StructureView)
@@ -388,7 +412,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         self.assertEqual(nalagly, len(sel.residues))
         self.assertEqual(natom, len(sel.atoms))
 
-    def testChainResidueAtomSelection(self):
+    def test_chain_residue_atom_selection(self):
         """ Tests combined chain,residue,atom slicing/selections (view) """
         sel = pdb2.view['A',:,:] # All of chain A
         self.assertIsInstance(sel, pmd.structure.StructureView)

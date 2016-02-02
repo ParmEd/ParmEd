@@ -21,16 +21,16 @@ from __future__ import division, print_function, absolute_import
 from parmed.amber.readparm import Rst7
 from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
                            CharmmParameterSet)
-from parmed.exceptions import CharmmWarning
+from parmed.exceptions import CharmmWarning, ParameterError
 from parmed.openmm.utils import energy_decomposition
-from parmed import unit as u, openmm, load_file
+from parmed import unit as u, openmm, load_file, UreyBradley
 from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest
 from utils import get_fn, TestCaseRelative, mm, app, has_openmm, CPU, Reference
 import warnings
-    
+
 # Suppress warning output from bad psf file... sigh.
 warnings.filterwarnings('ignore', category=CharmmWarning)
 
@@ -50,7 +50,7 @@ param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'),
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestCharmmFiles(TestCaseRelative):
 
-    def testGasEnergy(self):
+    def test_gas_energy(self):
         """ Compare OpenMM and CHARMM gas phase energies """
         parm = charmm_gas
         system = parm.createSystem(param22)
@@ -67,7 +67,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 9.2210, places=4)
 
-    def testRoundTrip(self):
+    def test_round_trip(self):
         """ Test ParmEd -> OpenMM round trip with CHARMM gas phase """
         parm = charmm_gas
         system = parm.createSystem(param22)
@@ -87,7 +87,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], energies2['cmap'])
         self.assertRelativeEqual(energies['nonbonded'], energies2['nonbonded'])
 
-    def testGB1Energy(self): # HCT (uses mbondi radii internally)
+    def test_gb1_energy(self): # HCT (uses mbondi radii internally)
         """ Compare OpenMM and CHARMM GB (igb=1) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.HCT)
@@ -117,7 +117,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -102.5012873, places=5)
 
-    def testGB2Energy(self): # OBC1 (uses mbondi2 radii internally)
+    def test_gb2_energy(self): # OBC1 (uses mbondi2 radii internally)
         """ Compare OpenMM and CHARMM GB (igb=2) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC1)
@@ -147,7 +147,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -108.2129, places=4)
 
-    def testGB5Energy(self): # OBC2 (uses mbondi2 radii internally)
+    def test_gb5_energy(self): # OBC2 (uses mbondi2 radii internally)
         """ Compare OpenMM and CHARMM GB (igb=5) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.OBC2)
@@ -177,7 +177,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -103.9603, places=4)
 
-    def testGB7Energy(self): # GBn (uses bondi radii internally)
+    def test_gb7_energy(self): # GBn (uses bondi radii internally)
         """ Compare OpenMM and CHARMM GB (igb=7) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn)
@@ -207,7 +207,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -109.8465917, places=5)
 
-    def testGB8Energy(self): # GBn2 (uses mbondi3 radii internally)
+    def test_gb8_energy(self): # GBn2 (uses mbondi3 radii internally)
         """ Compare OpenMM and CHARMM GB (igb=8) energies """
         parm = charmm_gas
         system = parm.createSystem(param22, implicitSolvent=app.GBn2)
@@ -237,7 +237,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], -0.5239, places=3)
         self.assertRelativeEqual(energies['nonbonded'], -108.4858, places=4)
 
-    def testDispersionCorrection(self):
+    def test_dispersion_correction(self):
         """ Compare OpenMM and CHARMM PME energies w/out vdW correction """
         parm = charmm_nbfix
         system = parm.createSystem(param36, nonbondedMethod=app.PME,
@@ -260,7 +260,7 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['cmap'], 0.126790, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 6584.01821319, places=4)
 
-    def testNBFIX(self):
+    def test_nbfix(self):
         """ Test PME energies of systems with NBFIX modifications """
         parm = charmm_nbfix
         system = parm.createSystem(param36, nonbondedMethod=app.PME,
@@ -277,3 +277,28 @@ class TestCharmmFiles(TestCaseRelative):
         self.assertAlmostEqual(energies['improper'], 0, places=4)
         self.assertAlmostEqual(energies['cmap'], 0.126790, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 6514.283116, places=4)
+
+    def test_no_parameters(self):
+        """ Test proper error handling when parameters not present """
+        parm = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        parm.rb_torsions.append(parm.dihedrals.pop())
+        parm.urey_bradleys.append(UreyBradley(parm.angles[0].atom1, parm.angles[0].atom3))
+        self.assertRaises(ParameterError, parm.omm_bond_force)
+        self.assertRaises(ParameterError, parm.omm_angle_force)
+        self.assertRaises(ParameterError, parm.omm_dihedral_force)
+        self.assertRaises(ParameterError, parm.omm_rb_torsion_force)
+        self.assertRaises(ParameterError, parm.omm_urey_bradley_force)
+        self.assertRaises(ParameterError, parm.omm_improper_force)
+        self.assertRaises(ParameterError, parm.omm_cmap_force)
+
+    def test_bad_system(self):
+        """ Test error handling of impossible systems """
+        parm = copy(charmm_gas)
+        parm.load_parameters(param22)
+        for d in parm.dihedral_types:
+            try:
+                for dt in d:
+                    dt.scee = 0
+            except TypeError:
+                d.scee = 0
+        self.assertRaises(ValueError, parm.createSystem)

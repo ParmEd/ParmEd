@@ -1,3 +1,7 @@
+"""
+This module contains a handful of extra reporter classes for OpenMM
+simulations
+"""
 from __future__ import division, print_function
 
 from parmed.amber.asciicrd import AmberMdcrd
@@ -8,10 +12,6 @@ from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six.moves import range
 from math import isnan, isinf
-try:
-    from simtk import openmm as mm
-except ImportError:
-    pass
 from time import time
 VELUNIT = u.angstrom / u.picosecond
 FRCUNIT = u.kilocalorie_per_mole / u.angstrom
@@ -29,7 +29,7 @@ class StateDataReporter(object):
 
     Most of this code is copied from the OpenMM StateDataReporter class, with
     the above-mentioned changes made.
-    
+
     Parameters
     ----------
     f : str or file-like
@@ -205,6 +205,7 @@ class StateDataReporter(object):
         simulation : Simulation
             The simulation to generate a report for
         """
+        import simtk.openmm as mm
         system = simulation.system
         frclist = system.getForces()
         if self._temperature:
@@ -264,9 +265,9 @@ class StateDataReporter(object):
         if self._needEnergy:
             energy = state.getKineticEnergy() + state.getPotentialEnergy()
             if isnan(energy._value):
-                raise ValueError('Energy is NaN')
+                raise ValueError('Energy is NaN') # pragma: no cover
             if isinf(energy._value):
-                raise ValueError('Energy is infinite')
+                raise ValueError('Energy is infinite') # pragma: no cover
 
     def __del__(self):
         if hasattr(self, '_openedFile') and self._openedFile:
@@ -277,8 +278,8 @@ class StateDataReporter(object):
         try:
             if self._out is not None and self._openedFile:
                 self._out.close()
-        except AttributeError:
-            pass
+        except AttributeError: # pragma: no cover
+            pass               # pragma: no cover
 
 class NetCDFReporter(object):
     """ NetCDFReporter prints a trajectory in NetCDF format """
@@ -306,9 +307,9 @@ class NetCDFReporter(object):
                              'or forces in a NetCDFReporter')
         # Control flags
         self.crds, self.vels, self.frcs = crds, vels, frcs
-        if not (crds or vels or frcs):
-            raise ValueError('Cannot write a trajectory without coordinates, '
-                             'velocities, or forces! Pick at least one.')
+#       if not (crds or vels or frcs): TODO delete
+#           raise ValueError('Cannot write a trajectory without coordinates, '
+#                            'velocities, or forces! Pick at least one.')
         self._reportInterval = reportInterval
         self._out = None # not written yet
         self.fname = file
@@ -393,8 +394,8 @@ class NetCDFReporter(object):
         try:
             if self._out is not None:
                 self._out.close()
-        except AttributeError:
-            pass
+        except AttributeError: # pragma: no cover
+            pass               # pragma: no cover
 
 class MdcrdReporter(object):
     """
@@ -526,8 +527,8 @@ class MdcrdReporter(object):
         try:
             if self._out is not None:
                 self._out.close()
-        except AttributeError:
-            pass
+        except AttributeError: # pragma: no cover
+            pass               # pragma: no cover
 
 class RestartReporter(object):
     """
@@ -549,7 +550,7 @@ class RestartReporter(object):
         Write velocities to the restart file. You can turn this off for passing
         in, for instance, a minimized structure.
     """
-   
+
     @needs_openmm
     def __init__(self, file, reportInterval, write_multiple=False, netcdf=False,
                  write_velocities=True):
@@ -723,7 +724,7 @@ class ProgressReporter(StateDataReporter):
         stepsleft = simulation.currentStep % self._reportInterval
         steps = self._reportInterval - stepsleft
         return (steps, False, False, False, self._needEnergy)
-   
+
     def report(self, simulation, state):
         """
         Generate a report and predict the time to completion (and
@@ -757,14 +758,7 @@ class ProgressReporter(StateDataReporter):
         remaining_steps = self._totalSteps - values['step'] + self._firstStep
         etc = partial_time / self._reportInterval * remaining_steps
 
-        if etc > 3600:
-            etc /= 3600
-            unitstr = 'hr.'
-        elif etc > 60:
-            etc /= 60
-            unitstr = 'min.'
-        else:
-            unitstr = 'sec.'
+        etc, unitstr = _format_time(etc)
 
         # Write the values.
         with open(self.fname, 'w') as f:
@@ -839,7 +833,7 @@ class ProgressReporter(StateDataReporter):
             values['density'] = dens.value_in_unit(self._densityUnit)
 
         return values
-   
+
     def __del__(self):
         """ We already closed the file. """
 
@@ -859,13 +853,13 @@ class EnergyMinimizerReporter(StateDataReporter):
     """
 
     def __init__(self, f, volume=False, **kwargs):
-        StateDataReporter.__init__(self, f, **kwargs)
+        super(EnergyMinimizerReporter, self).__init__(f, 1, **kwargs)
         self._volume = volume
 
     def describeNextReport(self, *args, **kwargs):
         """ Disable this reporter inside MD """
-        raise NotImplemented('EnergyMinimizerReporter is not intended to be '
-                             'used for reporting on molecular dynamics')
+        raise NotImplementedError('EnergyMinimizerReporter is not intended for '
+                                  'use in reporting on molecular dynamics')
 
     def report(self, simulation, frame=None):
         """ Print out the current energy """
@@ -888,5 +882,18 @@ class EnergyMinimizerReporter(StateDataReporter):
         try:
             if self._out is not None:
                 self._out.close()
-        except AttributeError:
-            pass
+        except AttributeError: # pragma: no cover
+            pass               # pragma: no cover
+
+# Private helper functions
+def _format_time(etc):
+    """ Formats how time is printed in ProgressReporter """
+    if etc > 3600:
+        etc /= 3600
+        unitstr = 'hr.'
+    elif etc > 60:
+        etc /= 60
+        unitstr = 'min.'
+    else:
+        unitstr = 'sec.'
+    return etc, unitstr

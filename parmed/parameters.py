@@ -9,7 +9,7 @@ from __future__ import print_function, division
 
 from parmed.exceptions import ParameterError
 from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
-                AtomType, DihedralType)
+                AtomType, DihedralType, UnassignedAtomType)
 from parmed.utils import canonical_improper_order
 from parmed.utils.six.moves import range
 from parmed.utils.six import iteritems
@@ -200,10 +200,9 @@ class ParameterSet(object):
         params = cls()
         found_dihed_type_list = dict()
         for atom in struct.atoms:
-            if atom.atom_type is None:
-                bond_type = atom.atom_type._bond_type
+            if atom.atom_type in (UnassignedAtomType, None):
                 atom_type = AtomType(atom.type, None, atom.mass,
-                                     atom.atomic_number, bond_type=bond_type)
+                                     atom.atomic_number)
                 atom_type.set_lj_params(atom.epsilon, atom.rmin,
                                         atom.epsilon_14, atom.rmin_14)
                 params.atom_types[atom.type] = atom_type
@@ -222,7 +221,7 @@ class ParameterSet(object):
                         params.bond_types[key] != bond.type):
                     raise ParameterError('Unequal bond types defined between '
                                          '%s and %s' % key)
-                continue
+                continue # pragma: no cover
             typ = copy(bond.type)
             key = (bond.atom1.type, bond.atom2.type)
             params.bond_types[key] = typ
@@ -235,7 +234,7 @@ class ParameterSet(object):
                         params.angle_types[key] != angle.type):
                     raise ParameterError('Unequal angle types defined between '
                                          '%s, %s, and %s' % key)
-                continue
+                continue # pragma: no cover
             typ = copy(angle.type)
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
             params.angle_types[key] = typ
@@ -258,7 +257,7 @@ class ParameterSet(object):
                             params.improper_periodic_types[key] != dihedral.type):
                         raise ParameterError('Unequal dihedral types defined '
                                         'between %s, %s, %s, and %s' % key)
-                    continue
+                    continue # pragma: no cover
                 typ = copy(dihedral.type)
                 params.improper_periodic_types[key] = typ
             else:
@@ -280,7 +279,7 @@ class ParameterSet(object):
                                 raise ParameterError('Unequal dihedral types '
                                         'defined between %s, %s, %s, and %s' %
                                         key)
-                    continue
+                    continue # pragma: no cover
                 elif key in params.dihedral_types:
                     # We have one term of a potentially multi-term dihedral.
                     if isinstance(dihedral.type, DihedralTypeList):
@@ -333,7 +332,7 @@ class ParameterSet(object):
                         params.improper_types[key] != improper.type):
                     raise ParameterError('Unequal improper types defined '
                             'between %s, %s, %s, and %s' % key)
-                continue
+                continue # pragma: no cover
             params.improper_types[key] = copy(improper.type)
         for cmap in struct.cmaps:
             if cmap.type is None: continue
@@ -346,7 +345,7 @@ class ParameterSet(object):
                     raise ParameterError('Unequal CMAP types defined between '
                             '%s, %s, %s, %s, and %s' % (key[0], key[1], key[2],
                                 key[3], key[7]))
-                continue
+                continue # pragma: no cover
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
             params.cmap_types[tuple(reversed(key))] = typ
@@ -359,6 +358,18 @@ class ParameterSet(object):
             typ = copy(urey.type)
             params.urey_bradley_types[key] = typ
             params.urey_bradley_types[tuple(reversed(key))] = typ
+        for adjust in struct.adjusts:
+            if adjust.type is None: continue
+            key = (adjust.atom1.type, adjust.atom2.type)
+            if key in params.pair_types:
+                if (not allow_unequal_duplicates and
+                        params.pair_types[key] != adjust.type):
+                    raise ParameterError('Unequal pair types defined between '
+                                         '%s and %s' % key)
+                continue # pragma: no cover
+            typ = copy(adjust.type)
+            params.pair_types[key] = typ
+            params.pair_types[tuple(reversed(key))] = typ
         # Trap for Amoeba potentials
         if (struct.trigonal_angles or struct.out_of_plane_bends or
                 struct.torsion_torsions or struct.stretch_bends or
