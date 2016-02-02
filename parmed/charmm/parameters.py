@@ -12,7 +12,7 @@ from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
                     DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed.constants import TINY
-from parmed.exceptions import CharmmError
+from parmed.exceptions import CharmmError, ParameterWarning
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
@@ -430,8 +430,17 @@ class CharmmParameterSet(ParameterSet):
                     raise CharmmError('Could not parse bonds.')
                 key = (min(type1, type2), max(type1, type2))
                 bond_type = BondType(k, req)
-                self.bond_types[(type1, type2)] = bond_type
-                self.bond_types[(type2, type1)] = bond_type
+                if key in self.bond_types:
+                    # See if the existing bond type list has a different value and replaces it with a warning
+                    if self.bond_types[key] != bond_type:
+                        # Replace. Warn if they are different
+                        warnings.warn('Replacing bond %r, %r with %r' %
+                                              (key, self.bond_types[key], bond_type), ParameterWarning)
+                        self.bond_types[(type1, type2)] = bond_type
+                        self.bond_types[(type2, type1)] = bond_type
+                else: # key not present
+                    self.bond_types[(type1, type2)] = bond_type
+                    self.bond_types[(type2, type1)] = bond_type
                 bond_type.penalty = penalty
                 continue
             if section == 'ANGLES':
@@ -446,8 +455,18 @@ class CharmmParameterSet(ParameterSet):
                     raise CharmmError('Could not parse angles.')
 
                 angle_type = AngleType(k, theteq)
-                self.angle_types[(type1, type2, type3)] = angle_type
-                self.angle_types[(type3, type2, type1)] = angle_type
+                key = (type1, type2, type3)
+                if key in self.angle_types:
+                    # See if the existing angle type list has a different value and replaces it with a warning
+                    if self.angle_types[key] != angle_type:
+                        # Replace. Warn if they are different
+                        warnings.warn('Replacing angle %r, %r with %r' %
+                                      (key, self.angle_types[key], angle_type), ParameterWarning)
+                        self.bond_types[(type1, type2, type3)] = angle_type
+                        self.bond_types[(type3, type2, type1)] = angle_type
+                else: # key not present
+                    self.angle_types[(type1, type2, type3)] = angle_type
+                    self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
                 try:
                     ubk = conv(words[5], float, 'Urey-Bradley force constant')
@@ -485,8 +504,8 @@ class CharmmParameterSet(ParameterSet):
                         if dtype.per == dihedral.per:
                             # Replace. Warn if they are different
                             if dtype != dihedral:
-                                warnings.warn('Replacing dihedral %r with %r' % 
-                                              (dtype, dihedral))
+                                warnings.warn('Replacing dihedral %r with %r' %
+                                              (dtype, dihedral), ParameterWarning)
                             self.dihedral_types[key][i] = dihedral
                             replaced = True
                             break

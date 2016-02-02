@@ -17,6 +17,7 @@ from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
+import warnings
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -106,9 +107,12 @@ class OpenMMParameterSet(ParameterSet):
         new_params.pair_types = params.pair_types
         new_params.parametersets = params.parametersets
         new_params._combining_rule = params.combining_rule
-        new_params.residues = params.residues
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
+        # add only ResidueTemplate instances (no ResidueTemplateContainers)
+        for name, residue in iteritems(params.residues):
+            if isinstance(residue, ResidueTemplate):
+                new_params.residues[name] = residue
 
         return new_params
 
@@ -137,7 +141,12 @@ class OpenMMParameterSet(ParameterSet):
             own_handle = True
         else:
             own_handle = False
-        self.typeify_templates()
+        if self.atom_types:
+            try:
+                self.typeify_templates()
+            except KeyError:
+                warnings.warn('Some residue templates are using unavailable ' 
+                              'AtomTypes')
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
@@ -168,6 +177,7 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </Info>\n')
 
     def _write_omm_atom_types(self, dest):
+        if not self.atom_types: return
         dest.write(' <AtomTypes>\n')
         for name, atom_type in iteritems(self.atom_types):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
@@ -178,6 +188,7 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </AtomTypes>\n')
 
     def _write_omm_residues(self, dest):
+        if not self.residues: return
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
             if not isinstance(residue, ResidueTemplate):
