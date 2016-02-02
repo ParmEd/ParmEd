@@ -145,7 +145,7 @@ class OpenMMParameterSet(ParameterSet):
             try:
                 self.typeify_templates()
             except KeyError:
-                warnings.warn('Some residue templates are using unavailable ' 
+                warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes')
         try:
             dest.write('<ForceField>\n')
@@ -181,7 +181,10 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' <AtomTypes>\n')
         for name, atom_type in iteritems(self.atom_types):
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
-            element = Element[atom_type.atomic_number]
+            if atom_type.atomic_number == 0:
+                element = ""
+            else:
+                element = Element[atom_type.atomic_number]
             dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
                        % (name, name, element, atom_type.mass)
                        )
