@@ -206,10 +206,16 @@ class AmberParameterSet(ParameterSet):
         self.titles = []
         for filename in filenames:
             if isinstance(filename, string_types):
-                self.load_parameters(filename)
+                if AmberOFFLibrary.id_format(filename):
+                    self.residues.update(AmberOFFLibrary.parse(filename))
+                else:
+                    self.load_parameters(filename)
             elif isinstance(filename, Sequence):
                 for fname in filename:
-                    self.load_parameters(fname)
+                    if AmberOFFLibrary.id_format(fname):
+                        self.residues.update(AmberOFFLibrary.parse(fname))
+                    else:
+                        self.load_parameters(fname)
             else:
                 # Assume open file object
                 self.load_parameters(filename)
@@ -250,13 +256,21 @@ class AmberParameterSet(ParameterSet):
         text = ''.join(lines)
         if own_handle: f.close()
         lowertext = text.lower() # commands are case-insensitive
+        # Now process the parameter files
+        for fname in _loadparamsre.findall(text):
+            params.load_parameters(_find_amber_file(fname))
+        # Now process the library file
+        for fname in _loadoffre.findall(text):
+            params.residues.update(
+                    AmberOFFLibrary.parse(_find_amber_file(fname))
+            )
+        # Now process the addAtomTypes
         try:
             idx = lowertext.index('addatomtypes')
         except ValueError:
             # Does not exist in this file
             atom_types_str = ''
         else:
-            # Now process the addAtomTypes
             i = idx + len('addatomtypes')
             while i < len(text) and text[i] != '{':
                 if text[i] not in '\r\n\t ':
@@ -287,18 +301,6 @@ class AmberParameterSet(ParameterSet):
                 raise ParameterError('%s is not a recognized element' % symb)
             if name in params.atom_types:
                 params.atom_types[name].atomic_number = AtomicNum[symb]
-            else:
-                params.atom_types[name] = \
-                        AtomType(name, len(params.atom_types)+1, Mass[symb],
-                                 AtomicNum[symb])
-        # Now process the parameter files
-        for fname in _loadparamsre.findall(text):
-            params.load_parameters(_find_amber_file(fname))
-        # Now process the library file
-        for fname in _loadoffre.findall(text):
-            params.residues.update(
-                    AmberOFFLibrary.parse(_find_amber_file(fname))
-            )
         return params
 
     #===================================================
@@ -547,6 +549,9 @@ class AmberParameterSet(ParameterSet):
             raise ParameterError('Error parsing MASS line. Not enough tokens')
         if words[0] in self.atom_types:
             self.atom_types[words[0]].mass = mass
+        elif words[0] in ('EP', 'LP'):
+            atype = AtomType(words[0], len(self.atom_types)+1, mass, 0)
+            self.atom_types[words[0]] = atype
         else:
             atype = AtomType(words[0], len(self.atom_types)+1, mass,
                              AtomicNum[element_by_mass(mass)])

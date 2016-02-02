@@ -26,7 +26,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group', 'AtomType',
            'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
-           'RBTorsionType']
+           'RBTorsionType', 'UnassignedAtomType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -1751,7 +1751,7 @@ class BondType(_ListItem, _ParameterType):
         self._idx = -1
 
     def __eq__(self, other):
-        return self.k == other.k and self.req == other.req
+        return abs(self.k - other.k) < TINY and abs(self.req - other.req) < TINY
 
     def __repr__(self):
         return '<%s; k=%.3f, req=%.3f>' % (type(self).__name__,
@@ -3961,7 +3961,7 @@ class TrackedList(list):
     @_changes
     def __delslice__(self, start, stop):
         """ Python 2 still uses __delslice__... """
-        self.__delitem__(slice(start, stop))
+        self.__delitem__(slice(start, stop)) # pragma: no cover
 
     @_changes
     def pop(self, idx=-1):

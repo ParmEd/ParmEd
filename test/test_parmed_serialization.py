@@ -48,7 +48,7 @@ class TestParmedSerialization(unittest.TestCase):
         pickle.dump(atom, fobj)
         fobj.seek(0)
         unpickled = pickle.load(fobj)
-        
+
         self.assertIsInstance(unpickled, pmd.Atom)
         self._equal_atoms(unpickled, atom)
 
@@ -235,7 +235,7 @@ class TestParmedSerialization(unittest.TestCase):
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacstop_serialization(self):
         """ Tests the serialization of a GromacsTopologyFile """
         structure = pmd.load_file(os.path.join(utils.get_fn('03.AlaGlu'),
@@ -249,7 +249,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._compare_parametersets(structure.parameterset,
                                     unpickled.parameterset)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacscharmm_serialization(self):
         """ Tests the serialization of a CHARMM FF Gromacs topology """
         structure = pmd.load_file(utils.get_fn('1aki.charmm27.solv.top'))
