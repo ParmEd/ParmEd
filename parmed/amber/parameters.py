@@ -211,7 +211,7 @@ class AmberParameterSet(ParameterSet):
     #===================================================
 
     @classmethod
-    def from_leaprc(cls, fname, addAtomTypes=True):
+    def from_leaprc(cls, fname):
         """ Load a parameter set from a leaprc file
 
         Parameters
@@ -219,10 +219,6 @@ class AmberParameterSet(ParameterSet):
         fname : str or file-like
             Name of the file or open file-object from which a leaprc-style file
             will be read
-        addAtomTypes : bool
-            If False, the addAtomTypes section of the leaprc is ignored
-            (useful when one does not want to create extra AtomType's which may
-            be called in the leaprc, but not defined in the parameter files)
 
         Notes
         -----
@@ -278,16 +274,16 @@ class AmberParameterSet(ParameterSet):
                 chars.append(char)
                 i += 1
             atom_types_str = ''.join(chars).strip()
-        if addAtomTypes:
-            for _, name, symb, hyb in _atomtypere.findall(atom_types_str):
-                if symb not in AtomicNum:
-                    raise ParameterError('%s is not a recognized element' % symb)
-                if name in params.atom_types:
-                    params.atom_types[name].atomic_number = AtomicNum[symb]
-                else:
-                    params.atom_types[name] = \
-                            AtomType(name, len(params.atom_types)+1, Mass[symb],
-                                     AtomicNum[symb])
+        for _, name, symb, hyb in _atomtypere.findall(atom_types_str):
+            if symb not in AtomicNum:
+                raise ParameterError('%s is not a recognized element' % symb)
+            if name in params.atom_types:
+                params.atom_types[name].atomic_number = AtomicNum[symb]
+            else:
+                params.atom_types[name] = \
+                        AtomType(name, len(params.atom_types)+1, Mass[symb],
+                                 AtomicNum[symb])
+
         # Now process the parameter files
         for fname in _loadparamsre.findall(text):
             params.load_parameters(_find_amber_file(fname))
