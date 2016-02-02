@@ -20,6 +20,7 @@ from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
                                     DihedralTypeList)
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
+from parmed.utils.six.moves import map
 import re
 
 # parameter file regexes
@@ -64,7 +65,7 @@ class AmberParameterSet(ParameterSet):
 
     Parameters
     ----------
-    filenames : str, list of str, file-like, or list of file-like
+    filenames : str, list of str, file-like, or list of file-like; optional
         Either the name of a file or a list of filenames from which parameters
         should be parsed.
 
@@ -74,6 +75,10 @@ class AmberParameterSet(ParameterSet):
     in the order they are provided, and any parameters that are specified in
     multiple places are overwritten (that is, the *last* occurrence is the
     parameter type that is used)
+
+    See Also
+    --------
+    :class:`parmed.parameters.ParameterSet`
     """
 
     #===================================================
@@ -196,8 +201,9 @@ class AmberParameterSet(ParameterSet):
 
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
+        self.default_scee = 1.2
+        self.default_scnb = 2.0
         self.titles = []
-        self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
                 if AmberOFFLibrary.id_format(filename):
@@ -245,7 +251,9 @@ class AmberParameterSet(ParameterSet):
             own_handle = False
         # To make parsing easier, and because leaprc files are usually quite
         # short, I'll read the whole file into memory
-        text = f.read()
+        lines = map(lambda line:
+                line if '#' not in line else line[:line.index('#')], f)
+        text = ''.join(lines)
         if own_handle: f.close()
         lowertext = text.lower() # commands are case-insensitive
         # Now process the parameter files

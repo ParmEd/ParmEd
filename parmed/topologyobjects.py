@@ -2184,7 +2184,7 @@ class DihedralType(_ListItem, _ParameterType):
         _ParameterType.__init__(self)
         self.locked = True
         self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
-        self.per = per
+        self.per = int(per)
         self.phase = _strip_units(phase, u.degrees)
         self.scee = scee
         self.scnb = scnb
