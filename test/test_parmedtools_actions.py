@@ -310,6 +310,9 @@ class TestNonParmActions(unittest.TestCase):
 class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
@@ -695,11 +698,15 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                     self.assertAlmostEqual(datatype(i), j, places=4)
                 else:
                     self.assertEqual(datatype(i), j)
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                repr(PT.printInfo(gasparm, 'NOTAFLAG')))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on AmberParm """
         parm = copy(gasparm)
-        PT.addLJType(parm, '@1').execute()
+        act = PT.addLJType(parm, '@1')
+        act.execute()
+        str(act) # Make sure it doesn't crash
         self.assertEqual(parm.ptr('ntypes'), gasparm.ptr('ntypes') + 1)
         self.assertEqual(parm.atoms[0].nb_idx, parm.ptr('ntypes'))
         ntypes = parm.ptr('ntypes')
@@ -1332,6 +1339,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
 
 class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
+
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
@@ -2170,6 +2180,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
 
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()
@@ -2267,6 +2280,17 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
             else:
                 self.assertEqual(atom.type,
                                  amoebaparm.parm_data['AMBER_ATOM_TYPE'][i])
+        # Change atomic number
+        PT.change(parm, 'ATOMIC_NUMBER', '@1', 10).execute()
+        self.assertEqual(parm.atoms[0].atomic_number, 10)
+        self.assertEqual(parm.parm_data['AMOEBA_ATOMIC_NUMBER'][0], 10)
+        # Now make sure it adds the AMOEBA_ATOMIC_NUMBER section
+        parm.delete_flag('AMOEBA_ATOMIC_NUMBER')
+        PT.change(parm, 'ATOMIC_NUMBER', '@1', 1).execute()
+        self.assertIn('AMOEBA_ATOMIC_NUMBER', parm.parm_data)
+        self.assertEqual(parm[0].atomic_number, 1)
+        self.assertEqual(parm.parm_data['AMOEBA_ATOMIC_NUMBER'][0], 1)
+        # Check some error-handling
         self.assertRaises(exc.ParmedChangeError, lambda:
                 PT.change(parm, 'ATOM_TYPE_INDEX', '@1', 4).execute())
         self.assertRaises(exc.ParmedChangeError, lambda:
@@ -2276,6 +2300,12 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
+        # Make sure string casting always works
+        act = PT.change(parm, 'MASS', '@NOTHING', 0, 'quiet')
+        str(act)
+        previous_masses = parm.parm_data['MASS'][:]
+        act.execute()
+        np.testing.assert_equal(previous_masses, parm.parm_data['MASS'])
 
     def test_print_info(self):
         """ Test printInfo for all flags of AmoebaParm """
@@ -2435,10 +2465,9 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     def test_add_atomic_number(self):
         """ Test addAtomicNumber for AmoebaParm """
         parm = copy(amoebaparm)
-        self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
         atomic_numbers = [atom.atomic_number for atom in parm.atoms]
         PT.addAtomicNumber(parm).execute()
-        self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
+        self.assertEqual(parm.parm_data['AMOEBA_ATOMIC_NUMBER'], atomic_numbers)
 
     def test_print_lj_matrix(self):
         """ Check that printLJMatrix fails for AmoebaParm """
@@ -2630,6 +2659,9 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 
 class TestOtherParm(unittest.TestCase):
     """ Tests the use of other parms as the main parm """
+
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
 
     def test_summary(self):
         """ Tests the use of a PDB file with the summary action """

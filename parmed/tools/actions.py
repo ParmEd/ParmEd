@@ -631,7 +631,7 @@ class changeLJ14Pair(Action):
         selection1 = self.mask1.Selection()
         selection2 = self.mask2.Selection()
         if sum(selection1) == 0 or sum(selection2) == 0:
-            Action.stderr.write('Skipping empty masks in changeLJ14Pair')
+            Action.stderr.write('Skipping empty masks in changeLJ14Pair\n')
             return None
         # Make sure we only selected 1 atom type, and figure out what it is
         attype1 = None
@@ -697,7 +697,7 @@ class change(Action):
     def init(self, arg_list):
         self.quiet = arg_list.has_key('quiet')
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
-        self.prop = arg_list.get_next_string().upper()
+        self.prop = self.flag_name = arg_list.get_next_string().upper()
         self.add_flag = False
         if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'MASS'):
             self.new_val = arg_list.get_next_float()
@@ -729,7 +729,7 @@ class change(Action):
                 # ATOMIC_NUMBER. So see which of them is available and change
                 # that one
                 if self.parm.amoeba:
-                    self.prop = 'AMOEBA_ATOMIC_NUMBER'
+                    self.flag_name = 'AMOEBA_ATOMIC_NUMBER'
                 if self.prop not in self.parm.parm_data:
                     # Add it
                     self.add_flag = True
@@ -773,7 +773,7 @@ class change(Action):
             if self.add_flag:
                 addAtomicNumber(self.parm).execute()
             for i, atom in enumerate(self.parm.atoms):
-                self.parm.parm_data[self.prop][i] = getattr(atom, prop)
+                self.parm.parm_data[self.flag_name][i] = getattr(atom, prop)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -789,21 +789,21 @@ class printInfo(Action):
         if not self.flag in self.parm.flag_list:
             warnings.warn('%%FLAG %s not found!' % self.flag,
                           SeriousParmWarning)
-            self.found = False
+            self.found = False # pragma: no cover
         else:
             if self.parm.formats[self.flag].type is float:
                 self.format = '%16.5f '
             else:
                 self.format = '%-16s '
-
             self.found = True
 
     def __repr__(self):
         ret_str = []
-        for i, item in enumerate(self.parm.parm_data[self.flag]):
-            ret_str.append(self.format % item)
-            if i % 5 == 4:
-                ret_str.append('\n')
+        if self.found:
+            for i, item in enumerate(self.parm.parm_data[self.flag]):
+                ret_str.append(self.format % item)
+                if i % 5 == 4:
+                    ret_str.append('\n')
 
         return ''.join(ret_str)
 
@@ -2024,14 +2024,14 @@ class addAtomicNumber(Action):
 
     def execute(self):
         if self.present: return
-        if self.parm.amoeba:
-            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8',
-                               num_items=len(self.parm.atoms))
+        if self.parm.amoeba: # FIXME
+            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+            flag = 'AMOEBA_ATOMIC_NUMBER'
         else:
-            self.parm.add_flag('ATOMIC_NUMBER', '10I8',
-                               num_items=len(self.parm.atoms))
+            self.parm.add_flag('ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+            flag = 'ATOMIC_NUMBER'
         for i, atm in enumerate(self.parm.atoms):
-            self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
+            self.parm.parm_data[flag][i] = atm.atomic_number
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
