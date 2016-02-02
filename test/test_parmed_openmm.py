@@ -463,7 +463,7 @@ HIS = HIE
 CHIS = CHIE
 """)
         params = openmm.OpenMMParameterSet.from_parameterset(
-                amber.AmberParameterSet.from_leaprc(leaprc)
+                pmd.amber.AmberParameterSet.from_leaprc(leaprc)
         )
         params.write(get_fn('amber_conv.xml', written=True),
                      provenance=dict(OriginalFile='leaprc.ff14SB',
@@ -478,7 +478,7 @@ CHIS = CHIE
 parm10 = loadamberparams gaff.dat
 """)
         params = openmm.OpenMMParameterSet.from_parameterset(
-                amber.AmberParameterSet.from_leaprc(leaprc)
+                pmd.amber.AmberParameterSet.from_leaprc(leaprc)
         )
         citations = """\
 Wang, J., Wang, W., Kollman P. A.; Case, D. A. "Automatic atom type and bond type perception in molecular mechanical calculations". Journal of Molecular Graphics and Modelling , 25, 2006, 247260.
@@ -500,7 +500,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         """ Test writing XML parameter files from Charmm parameter files"""
 
         params = openmm.OpenMMParameterSet.from_parameterset(
-                charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                           get_fn('top_all36_prot.rtf'))
         )
         params.write(get_fn('charmm_conv.xml', written=True),
