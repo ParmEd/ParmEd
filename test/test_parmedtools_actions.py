@@ -5,6 +5,7 @@ from __future__ import division, print_function
 
 import utils
 from utils import HAS_GROMACS
+import parmed as pmd
 from parmed import periodic_table, gromacs, load_file, amber
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
 from parmed.charmm import CharmmPsfFile
@@ -32,6 +33,9 @@ gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
 warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+
+# Make sure default overwrite is False
+PT.Action.overwrite = False
 
 # Make some new action subclasses
 class NewActionNoUsage(PT.Action):
@@ -71,7 +75,6 @@ class TestNonParmActions(unittest.TestCase):
 
     def test_overwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
-        self.assertTrue(PT.Action.overwrite)
         a = PT.setOverwrite(self.parm, False)
         self.assertTrue(PT.Action.overwrite)
         a.execute()
@@ -81,6 +84,9 @@ class TestNonParmActions(unittest.TestCase):
         a.execute()
         self.assertTrue(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are overwritable')
+        PT.setOverwrite(None, False).execute() # Turn it back off
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.setOverwrite(None, 'badarg'))
 
     def test_list_parms(self):
         """ Test listing of the prmtop files in the ParmEd interpreter """
@@ -308,12 +314,14 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
         parm = copy(gasparm)
-        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
+        lract = PT.loadRestrt(parm, get_fn('trx.inpcrd'))
+        lract.execute()
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
-        PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
+        act = PT.parmout(parm, get_fn('test.parm7', written=True))
+        act.execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(diff_files(get_fn('trx.prmtop'),
                                    get_fn('test.parm7', written=True)))
@@ -342,30 +350,57 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                                    absolute_error=0.0001))
         self._empty_writes()
         # Now try NetCDF format
-        PT.outparm(parm, get_fn('test.parm7', written=True),
-                   get_fn('test.ncrst', written=True), 'netcdf').execute()
-        self.assertTrue(amber.NetCDFRestart.id_format(get_fn('test.ncrst', written=True)))
+        act2 = PT.outparm(parm, get_fn('test.parm7', written=True),
+                          get_fn('test.ncrst', written=True), 'netcdf')
+        act2.execute()
+        self.assertTrue(
+                amber.NetCDFRestart.id_format(get_fn('test.ncrst', written=True)))
+        # Now make sure the string methods work
+        str(act2); str(act); str(lract)
+        # Make sure overwriting does not work
+        self.assertRaises(exc.FileExists, act2.execute)
+        # Delete the prmtop and make sure it still raises
+        os.unlink(get_fn('test.parm7', written=True))
+        self.assertRaises(exc.FileExists, act2.execute)
 
     def test_write_frcmod(self):
         """ Test writeFrcmod on AmberParm """
         parm = gasparm
-        PT.writeFrcmod(parm, get_fn('test.frcmod', written=True)).execute()
+        act = PT.writeFrcmod(parm, get_fn('test.frcmod', written=True))
+        act.execute()
         self.assertTrue(diff_files(get_saved_fn('test.frcmod'),
                                    get_fn('test.frcmod', written=True)))
+        self.assertRaises(exc.FileExists, act.execute)
+        # Make sure 10-12 prmtops fail
+        parm = load_file(get_fn('ff91.parm7'))
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.writeFrcmod(load_file(get_fn('ff91.parm7')),
+                               get_fn('test2.frcmod', written=True))
+        )
+        # Make sure string does not error
+        str(act)
 
     def test_write_off_load_restrt(self):
         """ Test writeOFF on AmberParm """
         parm = copy(gasparm)
+        parm.coordinates = None
+        self.assertRaises(exc.ParmError, lambda:
+                PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
-        PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
+        act = PT.writeOFF(parm, get_fn('test.off', written=True))
+        act.execute()
         self.assertTrue(diff_files(get_saved_fn('test.off'),
                                    get_fn('test.off', written=True),
                                    absolute_error=0.0001))
+        str(act)
+        self.assertRaises(exc.FileExists, act.execute)
 
     def test_change_radii(self):
         """ Test changeRadii on AmberParm """
         parm = copy(gasparm)
-        PT.changeRadii(parm, 'amber6').execute()
+        act = PT.changeRadii(parm, 'amber6')
+        act.execute()
+        str(act) # Make sure it doesn't fail
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'amber6 modified Bondi radii (amber6)')
         for i, atom in enumerate(parm.atoms):
@@ -393,6 +428,10 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             else:
                 self.assertEqual(radii, 1.5)
 
+        # Make sure it adds back all necessary flags
+        parm.delete_flag('RADIUS_SET')
+        parm.delete_flag('RADII')
+        parm.delete_flag('SCREEN')
         PT.changeRadii(parm, 'bondi').execute()
         self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'Bondi radii (bondi)')
         for atom in parm.atoms:
@@ -506,11 +545,16 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         # Now test bad input
         self.assertRaises(exc.ChangeRadiiError, lambda:
                           PT.changeRadii(parm, 'mbondi6').execute())
+        # Test that it works on non-Amber topologies
+        act = PT.changeRadii(pmd.load_file(get_fn('ala_ala_ala.psf')), 'mbondi3')
+        act.execute()
 
     def test_change_lj_pair(self):
         """ Test changeLJPair on AmberParm """
         parm = copy(gasparm)
-        PT.changeLJPair(parm, '@%N', '@%H', 1.0, 1.0).execute()
+        act = PT.changeLJPair(parm, '@%N', '@%H', 1.0, 1.0)
+        act.execute()
+        str(act)
         # Figure out what type numbers each atom type belongs to
         ntype = htype = 0
         for atom in parm.atoms:
@@ -1205,14 +1249,66 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
                          saved.PRINTLJMATRIX_NACLMG)
 
+    def test_write_coordinates(self):
+        """ Test writeCoordinates method """
+        parm = copy(gasparm)
+        PT.loadCoordinates(parm, get_fn('trx.inpcrd')).execute()
+        basefn = get_fn('test', written=True)
+        # NetCDF trajectory
+        act = PT.writeCoordinates(parm, basefn + '.nc')
+        act.execute()
+        str(act) # Make sure it doesn't fail
+        self.assertTrue(pmd.amber.NetCDFTraj.id_format(basefn + '.nc'))
+        PT.writeCoordinates(parm, basefn + '_nc', 'netcdftraj').execute()
+        self.assertTrue(pmd.amber.NetCDFTraj.id_format(basefn + '_nc'))
+        # NetCDF restart
+        PT.writeCoordinates(parm, basefn + '.ncrst').execute()
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(basefn + '.ncrst'))
+        PT.writeCoordinates(parm, basefn + '_ncrst', 'netcdf').execute()
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(basefn + '_ncrst'))
+        # PDB
+        PT.writeCoordinates(parm, basefn + '.pdb').execute()
+        self.assertTrue(pmd.formats.PDBFile.id_format(basefn + '.pdb'))
+        PT.writeCoordinates(parm, basefn + '_pdb', 'pdb').execute()
+        self.assertTrue(pmd.formats.PDBFile.id_format(basefn + '_pdb'))
+        # CIF
+        PT.writeCoordinates(parm, basefn + '.cif').execute()
+        self.assertTrue(pmd.formats.CIFFile.id_format(basefn + '.cif'))
+        PT.writeCoordinates(parm, basefn + '_cif', 'CIF').execute()
+        self.assertTrue(pmd.formats.CIFFile.id_format(basefn + '_cif'))
+        # ASCII restart
+        PT.writeCoordinates(parm, basefn + '.rst7').execute()
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(basefn + '.rst7'))
+        PT.writeCoordinates(parm, basefn + '_rst7', 'restart').execute()
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(basefn + '_rst7'))
+        # ASCII trajectory
+        PT.writeCoordinates(parm, basefn + '.mdcrd').execute()
+        self.assertTrue(pmd.amber.AmberMdcrd.id_format(basefn + '.mdcrd'))
+        PT.writeCoordinates(parm, basefn + '_mdcrd', 'mdcrd').execute()
+        self.assertTrue(pmd.amber.AmberMdcrd.id_format(basefn + '_mdcrd'))
+        # Mol2 file
+        PT.writeCoordinates(parm, basefn + '.mol2').execute()
+        self.assertTrue(pmd.formats.Mol2File.id_format(basefn + '.mol2'))
+        PT.writeCoordinates(parm, basefn + '_mol2', 'mol2').execute()
+        self.assertTrue(pmd.formats.Mol2File.id_format(basefn + '_mol2'))
+        # ASCII restart by default
+        PT.writeCoordinates(parm, basefn + '.noext').execute()
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(basefn + '.noext'))
+        self.assertRaises(exc.InputError, lambda:
+                PT.writeCoordinates(parm, basefn, 'noformat').execute())
+        # Make sure overwriting is correctly handled
+        self.assertRaises(exc.FileExists, act.execute)
+
 class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     """ Tests actions on Amber prmtop files """
 
     def test_parmout_outparm_load_restrt(self):
-        """ Test parmout, outparm, and loadRestrt actions for ChamberParm """
+        """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
         self._empty_writes()
         parm = copy(gascham)
-        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        act = PT.loadCoordinates(parm, get_fn('ala_ala_ala.rst7'))
+        act.execute()
+        str(act) # Make sure it doesn't fail
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
@@ -1248,6 +1344,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
                                    get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
+        # Check loadCoordinates error handling
+        self.assertRaises(exc.ParmError, lambda:
+                PT.loadCoordinates(parm, get_fn('trx.prmtop')).execute())
 
     def test_write_frcmod(self):
         """ Check that writeFrcmod fails for ChamberParm """

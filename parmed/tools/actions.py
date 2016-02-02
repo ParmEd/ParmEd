@@ -255,7 +255,7 @@ class parmout(Action):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
-            self.parm.save(self.rst_name, format=self.rst7_format)
+            self.parm.save(self.rst_name, format=self.rst7_format, overwrite=Action.overwrite)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -305,9 +305,9 @@ class writeFrcmod(Action):
                     self.parm.parm_data['HBCUT'][idx-1] > 0):
                     warnings.warn('Frcmod dumping does not work with 10-12 '
                                   'prmtops', SeriousParmWarning)
-                    break
+                    break # pragma: no cover
         except IndexError:
-            pass # FIXME should we warn here, too?
+            pass # pragma: no cover
 
     def __str__(self):
         return 'Dumping FRCMOD file %s with parameters from %s' % (
@@ -372,13 +372,10 @@ class loadCoordinates(Action):
         crd = load_file(self.filename, natom=len(self.parm.atoms),
                         hasbox=self.parm.box is not None)
         try:
-            self.parm.coordinates = copy.copy(crd.coordinates)
+            self.parm.coordinates = crd.coordinates.copy()
         except AttributeError:
             raise ParmError('Cannot get coordinates from %s' % self.filename)
-        if crd.box is None or len(crd.box.shape) == 1:
-            self.parm.box = copy.copy(crd.box)
-        else:
-            self.parm.box = copy.copy(crd.box[0])
+        self.parm.box = copy.copy(crd.box)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -414,8 +411,8 @@ class writeCoordinates(Action):
              'mol2]')
     def init(self, arg_list):
         self.filename = filename = arg_list.get_next_string()
-        self.filetype = arg_list.get_next_string(optional=True, default=None)
-        if self.filetype is None:
+        self.filetype = arg_list.get_next_string(optional=True, default='').lower()
+        if not self.filetype:
             if filename.endswith('.nc'):
                 self.filetype = 'NCTRAJ'
             elif filename.endswith('.ncrst'):
@@ -458,28 +455,24 @@ class writeCoordinates(Action):
     def execute(self):
         if not Action.overwrite and os.path.exists(self.filename):
             raise FileExists('%s exists; not overwriting' % self.filename)
-        coordinates = []
-        velocities = []
-        for atom in self.parm.atoms:
-            coordinates.extend([atom.xx, atom.xy, atom.xz])
-            if hasattr(atom, 'vx'):
-                velocities.extend([atom.vx, atom.vy, atom.vz])
+        coordinates = self.parm.coordinates
+        velocities = self.parm.velocities
         if self.filetype == 'NCTRAJ':
             traj = NetCDFTraj.open_new(self.filename,
                     natom=len(self.parm.atoms), box=self.parm.box is not None,
-                    vels=bool(velocities))
+                    vels=velocities is not None)
             traj.add_time(0)
             traj.add_coordinates(coordinates)
-            if velocities: traj.add_velocities(velocities)
-            if self.parm.box: traj.add_box(self.parm.box)
+            if velocities is not None: traj.add_velocities(velocities)
+            if self.parm.box is not None: traj.add_box(self.parm.box)
             traj.close()
         elif self.filetype == 'NCRESTART':
             rst = NetCDFRestart.open_new(self.filename,
                     natom=len(self.parm.atoms), box=self.parm.box is not None,
-                    vels=bool(velocities))
+                    vels=velocities is not None)
             rst.coordinates = coordinates
-            if velocities: rst.velocities = velocities
-            if self.parm.box: rst.box = self.parm.box
+            if velocities is not None: rst.velocities = velocities
+            if self.parm.box is not None: rst.box = self.parm.box
             rst.time = 0
             rst.close()
         elif self.filetype == 'PDB':
@@ -498,12 +491,12 @@ class writeCoordinates(Action):
             rst = AmberAsciiRestart(self.filename, natom=len(self.parm.atoms),
                                     mode='w', hasbox=self.parm.box is not None)
             rst.coordinates = coordinates
-            if velocities: rst.velocities = velocities
+            if velocities is not None: rst.velocities = velocities
             if self.parm.box is not None: rst.box = self.parm.box
             rst.close()
         else:
-            raise RuntimeError('Should not be here. Unrecognized coordinate '
-                               'file format type.')
+            raise AssertionError('Should not be here. Unrecognized coordinate '
+                                 'file format type.')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -581,7 +574,7 @@ class changeLJPair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        return ('Setting LJ %s-%s pairwise interaction to have ' +
+        return ('Setting LJ %s-%s pairwise interaction to have '
                 'Rmin = %16.5f and Epsilon = %16.5f') % (self.mask1, self.mask2,
                 self.rmin, self.eps)
 
