@@ -1097,13 +1097,13 @@ class TestParameterFiles(FileIOTestCase):
         )
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
-        self.assertEqual(params.atom_types['K+'].atomic_number, 19)
+        self.assertEqual(params.atom_types['EP'].atomic_number, 0)
         self.assertTrue(params.residues)
         with open(os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd', 'leaprc.ff14SB')) as f:
             params = parameters.AmberParameterSet.from_leaprc(f)
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
-        self.assertEqual(params.atom_types['K+'].atomic_number, 19)
+        self.assertEqual(params.atom_types['EP'].atomic_number, 0)
         self.assertTrue(params.residues)
 
     def test_parm_set_parsing(self):
