@@ -2118,7 +2118,7 @@ class deleteDihedral(Action):
                               'duplicate atoms!' %
                               (atnum1, atnum2, atnum3, atnum4),
                               SeriousParmWarning)
-                continue
+                continue # pragma: no cover
             # Now search through our dihedral list to see which indexes (if any)
             # we have to remove. Keep tabs of them so we can pop them in reverse
             # order (so we don't have to re-figure indices) afterwards

@@ -1042,6 +1042,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         act = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1')
         n = act.execute()
         str(act)
+        str(PT.deleteDihedral(parm, '@NONE', '@NONE', '@NONE', '@NONE'))
         parm.remake_parm()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
@@ -1100,6 +1101,13 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertRaises(exc.SetParamError, lambda:
                 PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1,
                     10).execute())
+        self.assertRaises(exc.DeleteDihedralError, lambda:
+                PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
+        self.assertRaises(exc.SeriousParmWarning,
+                PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5',
+                    '@6-7').execute)
+        self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35',
+            '@45').execute(), 0)
 
     def test_set_bond(self):
         """ Test setBond on AmberParm """
@@ -1167,6 +1175,8 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_print_lj_matrix(self):
         """ Test printLJMatrix on AmberParm """
         act = PT.printLJMatrix(gasparm, '@1')
+        self.assertEqual(str(act), saved.PRINT_LJMATRIX)
+        act = PT.printLJMatrix(gasparm, gasparm[0].nb_idx)
         self.assertEqual(str(act), saved.PRINT_LJMATRIX)
 
     def test_delete_bond(self):
