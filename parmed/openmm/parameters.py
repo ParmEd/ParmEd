@@ -132,6 +132,7 @@ class OpenMMParameterSet(ParameterSet):
         clean_params : bool
             If True, any atom types which are not used in the residue templates
             and any parameters using those atom types will not be written
+
         Notes
         -----
         The generated XML file will have the XML tag ``DateGenerated`` added to
@@ -437,4 +438,7 @@ class OpenMMParameterSet(ParameterSet):
             raise NotImplementedError('Geometric combining rule not currently '
                                       'supported.')
         if len(self.nbfix_types) > 0:
-            raise NotImplementedError('NBFIX not currently supported')
+            for (a1, a2), nbfix in iteritems(self.nbfix_types):
+                if any((a in self.skip_types for a in (a1, a2))): continue
+                else:
+                    raise NotImplementedError('NBFIX not currently supported')

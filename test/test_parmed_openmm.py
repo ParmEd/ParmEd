@@ -489,6 +489,23 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                      Reference=citations)
         )
 
+    def test_write_xml_parameters_amber_clean_params(self):
+        """ Test writing XML parameters loaded from part of the ff14SB ForceField
+        files, with clean_params = False and clean_params = True"""
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.amber.AmberParameterSet(get_fn('amino12.lib'),
+                os.path.join(get_fn('parm'), 'parm10.dat'),
+                os.path.join(get_fn('parm'), 'frcmod.ff14SB'))
+        )
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 2178)
+        ffxml = StringIO()
+        params.write(ffxml, clean_params=True)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 1646)
+
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -509,4 +526,3 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                          Reference='MacKerrell'
                      )
         )
-

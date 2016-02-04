@@ -524,7 +524,8 @@ class AmberParameterSet(ParameterSet):
         # Now assign all of the equivalenced atoms
         for atyp, otyp in iteritems(equivalent_ljtypes):
             otyp = self.atom_types[otyp]
-            self.atom_types[atyp].set_lj_params(otyp.epsilon, otyp.rmin)
+            if atyp in self.atom_types:
+                self.atom_types[atyp].set_lj_params(otyp.epsilon, otyp.rmin)
         line = next(fiter).strip()
         if line == 'LJEDIT':
             rawline = next(fiter)
