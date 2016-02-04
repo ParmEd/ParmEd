@@ -877,7 +877,7 @@ class printLJTypes(Action):
     Prints the Lennard Jones type index for the given atom mask or, if no value
     is given, the LJ type index for each atom.
     """
-    usage = '[<mask>|<type name>]'
+    usage = '[<mask>|<type idx>]'
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Compile the list of indices
@@ -901,12 +901,15 @@ class printLJTypes(Action):
             for field in type_fields:
                 if len(field.strip()) == 0: continue
                 if '-' in field:
-                    begin = int(field.split('-')[0])
+                    begin = int(field.split('-')[0]) # FIXME
                     end = min(int(field.split('-')[1]), self.parm.ptr('ntypes'))
-                    if begin < 0 or end < begin:
+                    if begin <= 0 or end < begin or begin > self.parm.ptr('ntypes'):
                         raise ParmError('printLJTypes: Bad atom type range')
                     self.type_list.extend([i for i in range(begin, end+1)])
                 else:
+                    idx = int(field)
+                    if idx <= 0 or idx > self.parm.ptr('ntypes'):
+                        raise ParmError('printLJTypes: Bad atom type index')
                     self.type_list.append(int(field))
 
     def __str__(self):
@@ -918,9 +921,9 @@ class printLJTypes(Action):
             selection = self.mask.Selection()
         elif self.type_list:
             selection = [0 for atom in self.parm.atoms]
-            for item in self.type_list:
-                selection[item-1] = 1
-        else:
+            for i, atom in enumerate(self.parm.atoms): # FIXME
+                if atom.nb_idx in self.type_list: selection[i] = 1
+        if sum(selection) == 0:
             return 'Nothing to do for printLJTypes'
 
         indices = set()
@@ -1212,7 +1215,7 @@ class setMolecules(Action):
         else:
             warnings.warn("Value of solute_ions is unrecognized [%s]! "
                           "Assuming True" % solute_ions, SeriousParmWarning)
-            self.solute_ions = True
+            self.solute_ions = True # pragma: no cover
 
     def __str__(self):
         return ("Setting MOLECULE properties of the prmtop (SOLVENT_POINTERS "
@@ -1426,7 +1429,7 @@ class defineSolvent(Action):
             self.res_list = res_list[:len(res_list)-1]
         else:
             self.res_list = res_list
-        residue.SOLVENT_NAMES = res_list.split(',')
+        residue.SOLVENT_NAMES = self.res_list.split(',')
 
     def __str__(self):
         return "Residues %s are now considered to be solvent" % self.res_list
@@ -1639,31 +1642,45 @@ class printDihedrals(Action):
                 if isinstance(self.parm, AmoebaParm):
                     char = ' '
                     scee = scnb = 'N/A'
-                elif dihedral.signs[1] < 0:
+                    k = '%10.4f' % dihedral.type.phi_k
+                    per = '%10.4f' % dihedral.type.per
+                    phase = '%10.4f' % dihedral.type.phase
+                elif dihedral.improper:
                     char = 'I'
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
-                elif dihedral.signs[0] < 0 and isinstance(self.parm, AmberParm):
+                        scee = scnb = k = per = phase = 'N/A'
+                elif dihedral.ignore_end:
                     char = 'M'
-                    scee = '%10.4f' % dihedral.type.scee
-                    scnb = '%10.4f' % dihedral.type.scnb
+                    if dihedral.type is not None:
+                        scee = '%10.4f' % dihedral.type.scee
+                        scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
+                    else:
+                        scee = scnb = k = per = phase = 'N/A'
                 else:
                     char = ' '
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
+                        scee = scnb = k = per = phase = 'N/A'
                 retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           ' %7d %4s (%4s) %10s %10s %10s %10s %10s\n' %
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                            dihedral.type.phi_k, dihedral.type.per,
-                            dihedral.type.phase, scee, scnb)
+                            k, per, phase, scee, scnb)
                 )
         else:
             atomsel = set(self.mask.Selected())
@@ -1688,41 +1705,46 @@ class printDihedrals(Action):
                 if isinstance(self.parm, AmoebaParm):
                     char = ' '
                     scee = scnb = 'N/A'
+                    k = '%10.4f' % dihedral.type.phi_k
+                    per = '%10.4f' % dihedral.type.per
+                    phase = '%10.4f' % dihedral.type.phase
                 elif dihedral.improper:
                     char = 'I'
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
-                elif dihedral.signs[0] < 0 and isinstance(self.parm, AmberParm):
+                        scee = scnb = k = per = phase = 'N/A'
+                elif dihedral.ignore_end:
                     char = 'M'
-                    scee = '%10.4f' % dihedral.type.scee
-                    scnb = '%10.4f' % dihedral.type.scnb
+                    if dihedral.type is not None:
+                        scee = '%10.4f' % dihedral.type.scee
+                        scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
+                    else:
+                        scee = scnb = k = per = phase = 'N/A'
                 else:
                     char = ' '
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
-                if dihedral.type is not None:
-                    retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
-                           '(%4s)  %7d %4s (%4s) %10.4f %10.4f %10.4f %10s '
+                        scee = scnb = k = per = phase = 'N/A'
+                retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
+                           '(%4s)  %7d %4s (%4s) %10s %10s %10s %10s '
                            '%10s\n' % (char, atom1.idx+1, atom1.name,
                             atom1.type, atom2.idx+1, atom2.name, atom2.type,
                             atom3.idx+1, atom3.name, atom3.type, atom4.idx+1,
-                            atom4.name, atom4.type, dihedral.type.phi_k,
-                            dihedral.type.per, dihedral.type.phase, scee, scnb)
-                    )
-                else:
-                    retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
-                           '(%4s)  %7d %4s (%4s) %-10s %-10s %-10s %10s %10s\n'%
-                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
-                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                            'N/A', 'N/A', 'N/A', scee, scnb)
-                    )
+                            atom4.name, atom4.type, k, per, phase, scee, scnb)
+                )
 
         return ''.join(retstr)
 
