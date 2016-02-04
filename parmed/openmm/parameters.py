@@ -40,7 +40,6 @@ class OpenMMParameterSet(ParameterSet):
     --------
     :class:`parmed.parameters.ParameterSet`
     """
-
     @staticmethod
     def id_format(filename):
         """
@@ -113,10 +112,11 @@ class OpenMMParameterSet(ParameterSet):
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
                 new_params.residues[name] = residue
+        new_params.skip_types = []
 
         return new_params
 
-    def write(self, dest, provenance=None):
+    def write(self, dest, provenance=None, clean_params=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -128,7 +128,9 @@ class OpenMMParameterSet(ParameterSet):
             If present, the XML file will be tagged with the available fields.
             The keys of this dictionary are turned into the XML tags, and the
             values become the contents of that tag. Default is no provenance
-
+        clean_params : bool
+            If True, any atom types which are not used in the residue templates
+            and any parameters using those atom types will not be written
         Notes
         -----
         The generated XML file will have the XML tag ``DateGenerated`` added to
@@ -141,12 +143,18 @@ class OpenMMParameterSet(ParameterSet):
             own_handle = True
         else:
             own_handle = False
+        typeified = False
         if self.atom_types:
             try:
                 self.typeify_templates()
+                typeified = True
             except KeyError:
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes')
+        if clean_params:
+            assert typeified, """Typification of the templates was not successful.
+                              Cannot proceed with clean_params = True"""
+            self._clean_params()
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
@@ -166,6 +174,13 @@ class OpenMMParameterSet(ParameterSet):
             if own_handle:
                 dest.close()
 
+    def _clean_params(self):
+        keep_types = set()
+        for name, residue in iteritems(self.residues):
+            for atom in residue.atoms:
+                keep_types.add(atom.type)
+        self.skip_types = [typ for typ in self.atom_types if typ not in keep_types]
+
     def _write_omm_provenance(self, dest, provenance):
         dest.write(' <Info>\n')
         dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
@@ -180,6 +195,7 @@ class OpenMMParameterSet(ParameterSet):
         if not self.atom_types: return
         dest.write(' <AtomTypes>\n')
         for name, atom_type in iteritems(self.atom_types):
+            if name in self.skip_types: continue
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             if atom_type.atomic_number == 0:
                 element = ""
@@ -219,6 +235,7 @@ class OpenMMParameterSet(ParameterSet):
         lconv = u.angstroms.conversion_factor_to(u.nanometers)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) / lconv**2 * 2
         for (a1, a2), bond in iteritems(self.bond_types):
+            if any((a in self.skip_types for a in (a1, a2))): continue
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
@@ -233,6 +250,7 @@ class OpenMMParameterSet(ParameterSet):
         tconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) * 2
         for (a1, a2, a3), angle in iteritems(self.angle_types):
+            if any((a in self.skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
@@ -253,6 +271,7 @@ class OpenMMParameterSet(ParameterSet):
         def nowild(name):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), dihed in iteritems(self.dihedral_types):
+            if any((a in self.skip_types for a in (a1, a2, a3, a4))): continue
             if (a1, a2, a3, a4) in diheds_done: continue
             diheds_done.add((a1, a2, a3, a4))
             diheds_done.add((a4, a3, a2, a1))
@@ -270,6 +289,7 @@ class OpenMMParameterSet(ParameterSet):
         # in CHARMM parameter files). But CHARMM parameter files don't have
         # periodic impropers, so we don't have to worry about that here.
         for (a2, a3, a1, a4), improp in iteritems(self.improper_periodic_types):
+            if any((a in self.skip_types for a in (a1, a2, a3, a4))): continue
             # Try to make the wild-cards in the middle
             if a4 == 'X':
                 if a2 != 'X':
@@ -296,6 +316,7 @@ class OpenMMParameterSet(ParameterSet):
         def nowild(name):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
+            if any((a in self.skip_types for a in (a1, a2, a3, a4))): continue
             dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
                        'type4="%s" k="%s" theta0="%s"/>\n' %
                        (nowild(a1), nowild(a2), nowild(a3), nowild(a4),
@@ -313,6 +334,7 @@ class OpenMMParameterSet(ParameterSet):
         frc_conv = _ambfrc.conversion_factor_to(_ommfrc)
         ureys_done = set()
         for (a1, a2, a3), urey in iteritems(self.urey_bradley_types):
+            if any((a in self.skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in ureys_done: continue
             if urey == NoUreyBradley: continue
             dest.write('  <UreyBradley type1="%s" type2="%s" type3="%s" d="%s" k="%s"/>\n'
@@ -341,6 +363,7 @@ class OpenMMParameterSet(ParameterSet):
             dest.write('  </Map>\n')
         used_torsions = set()
         for (a1, a2, a3, a4, _, _, _, a5), cmap in iteritems(self.cmap_types):
+            if any((a in self.skip_types for a in (a1, a2, a3, a4, a5))): continue
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
@@ -385,6 +408,7 @@ class OpenMMParameterSet(ParameterSet):
                    (coulomb14scale, lj14scale))
         dest.write('  <UseAttributeFromResidue name="charge"/>\n')
         for name, atom_type in iteritems(self.atom_types):
+            if name in self.skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
                 sigma = atom_type.sigma * length_conv  # in md_unit_system
                 epsilon = atom_type.epsilon * ene_conv # in md_unit_system
