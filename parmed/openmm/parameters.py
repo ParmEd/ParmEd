@@ -40,6 +40,7 @@ class OpenMMParameterSet(ParameterSet):
     --------
     :class:`parmed.parameters.ParameterSet`
     """
+
     @staticmethod
     def id_format(filename):
         """
