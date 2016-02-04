@@ -223,7 +223,7 @@ class AmberParameterSet(ParameterSet):
     #===================================================
 
     @classmethod
-    def from_leaprc(cls, fname):
+    def from_leaprc(cls, fname, ions=True, solvents=True):
         """ Load a parameter set from a leaprc file
 
         Parameters
@@ -231,6 +231,13 @@ class AmberParameterSet(ParameterSet):
         fname : str or file-like
             Name of the file or open file-object from which a leaprc-style file
             will be read
+        ions :  bool
+            If False, loadOffs of ion templates (atomic_ions.lib, ions94.lib, 
+            ions91.lib) are ignored. The names of ignored files are current as of 
+            Amber14/AmberTools15
+        solvents : bool
+            If False, loadOffs of the solvent templates (solvents.lib). The name 
+            of the ignored file is current as of Amber14/AmberTool15       
 
         Notes
         -----
@@ -260,7 +267,13 @@ class AmberParameterSet(ParameterSet):
         for fname in _loadparamsre.findall(text):
             params.load_parameters(_find_amber_file(fname))
         # Now process the library file
-        for fname in _loadoffre.findall(text):
+        lib_files = _loadoffre.findall(text)
+        if not ions:
+            lib_files = [fname for fname in lib_files if fname not in 
+            ('atomic_ions.lib', 'ions94.lib', 'ions91.lib')]
+        if not solvents:
+            lib_files = [fname for fname in lib_files if fname != 'solvents.lib']    
+        for fname in lib_files:
             params.residues.update(
                     AmberOFFLibrary.parse(_find_amber_file(fname))
             )
