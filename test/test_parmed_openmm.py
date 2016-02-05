@@ -489,9 +489,9 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                      Reference=citations)
         )
 
-    def test_write_xml_parameters_amber_clean_params(self):
+    def test_write_xml_parameters_amber_write_unused(self):
         """ Test writing XML parameters loaded from part of the ff14SB ForceField
-        files, with clean_params = False and clean_params = True"""
+        files, using the write_unused argument"""
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.amber.AmberParameterSet(get_fn('amino12.lib'),
                 os.path.join(get_fn('parm'), 'parm10.dat'),
@@ -502,7 +502,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 2178)
         ffxml = StringIO()
-        params.write(ffxml, clean_params=True)
+        params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 1646)
 
