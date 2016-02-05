@@ -25,14 +25,14 @@ import re
 
 # parameter file regexes
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
-_bondre = re.compile(r'(..?)-(..?) *%(FLOATRE)s *%(FLOATRE)s' % subs)
-_anglere = re.compile(r'(..?)-(..?)-(..?) ' '*%(FLOATRE)s *%(FLOATRE)s' % subs)
-_dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?) *%(FLOATRE)s '
-                      '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
-_sceere = re.compile(r'SCEE=%(FLOATRE)s' % subs)
-_scnbre = re.compile(r'SCNB=%(FLOATRE)s' % subs)
-_impropre = re.compile(r'(..?)-(..?)-(..?)-(..?) '
-                       '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
+_bondre = re.compile(r'(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_anglere = re.compile(r'(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+'
+                      '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_sceere = re.compile(r'SCEE=\s*%(FLOATRE)s' % subs)
+_scnbre = re.compile(r'SCNB=\s*%(FLOATRE)s' % subs)
+_impropre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+'
+                       '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 del subs
 
 # Leaprc regexes

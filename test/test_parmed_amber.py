@@ -897,9 +897,9 @@ class TestParameterFiles(FileIOTestCase):
         params = parameters.AmberParameterSet(
                 os.path.join(get_fn('parm'), 'all_modrna08.frcmod')
         )
-        self.assertEqual(len(params.atom_types), 42)
+        self.assertEqual(len(params.atom_types), 38) # Ugh! Duplicates??  Really??
         self.assertEqual(params.bond_types[('C', 'CM')],
-                         topologyobjects.BondType(449.9, 1.461))
+                         topologyobjects.BondType(449.9, 1.466)) # OVERWRITING IN THE SAME FILE??
 
     def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
