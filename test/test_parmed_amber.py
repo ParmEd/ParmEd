@@ -892,6 +892,15 @@ class TestParameterFiles(FileIOTestCase):
                 )
         )
 
+    def test_frcmod_with_tabstops(self):
+        """ Test parsing an Amber frcmod file with tabs instead of spaces """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'all_modrna08.frcmod')
+        )
+        self.assertEqual(len(params.atom_types), 42)
+        self.assertEqual(params.bond_types[('C', 'CM')],
+                         topologyobjects.BondType(449.9, 1.461))
+
     def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
         self.assertEqual(_num_unique_types(params.bond_types), 0)
