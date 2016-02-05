@@ -18,6 +18,7 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 import warnings
+from parmed.exceptions import ParameterWarning
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -151,12 +152,15 @@ class OpenMMParameterSet(ParameterSet):
                 typeified = True
             except KeyError:
                 warnings.warn('Some residue templates are using unavailable '
-                              'AtomTypes')
+                              'AtomTypes', ParameterWarning)
         if not write_unused:
             if not typeified:
                 warnings.warn('Typification of the templates was not successful. '
-                              'Proceeding with write_unused=False is not advised')
-            skip_types = _find_unused_types()
+                              'Proceeding with write_unused=False is not advised',
+                               ParameterWarning)
+            skip_types = self._find_unused_types()
+        else:
+            skip_types = set()
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
