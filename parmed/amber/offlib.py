@@ -181,6 +181,9 @@ class AmberOFFLibrary(object):
                 templ = ResidueTemplate(name)
             templ.add_atom(atom)
             line = fileobj.readline()
+            # Skip blank lines
+            while line and not line.strip():
+                line = fileobj.readline()
         container.append(templ)
         if nres > 1:
             start_atoms = []
