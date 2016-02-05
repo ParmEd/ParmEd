@@ -312,6 +312,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        utils.FileIOTestCase.setUp(self)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
@@ -1494,11 +1495,12 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         str(act)
         act.execute()
 
-class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
+class TestChamberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        utils.FileIOTestCase.setUp(self)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
@@ -2351,11 +2353,12 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
+class TestAmoebaParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        utils.FileIOTestCase.setUp(self)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
