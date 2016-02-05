@@ -11,7 +11,7 @@ import os
 import re
 import sys
 from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
-                          FortranFormat, titratable_residues)
+                          FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError)
 from parmed import topologyobjects, load_file, Structure
@@ -1212,6 +1212,19 @@ class TestParameterFiles(FileIOTestCase):
         self.assertTrue(params.dihedral_types)
         self.assertTrue(params.improper_periodic_types)
         self.assertTrue(params.residues)
+
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def test_load_lib_with_blank_lines(self):
+        """ Tests parsing of .lib files with blank lines """
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                          'all_aminoAM1.lib')
+        self.assertTrue(AmberOFFLibrary.id_format(fn))
+        lib = AmberOFFLibrary.parse(fn)
+        self.assertEqual(len(lib), 27)
+        self.assertEqual(lib['ALA'].atoms[1].name, 'H')
+        self.assertEqual(lib['ALA'].atoms[1].charge, 0.423221)
+        self.assertEqual(lib['VAL'].atoms[8].name, 'HG12')
+        self.assertEqual(lib['VAL'].atoms[8].charge, 0.062124)
 
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
