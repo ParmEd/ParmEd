@@ -12,6 +12,7 @@ from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
 from parmed.utils.six.moves import range, zip, StringIO
+from parmed.utils.six import string_types
 from copy import copy
 import numpy as np
 import os
@@ -1406,13 +1407,40 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_ti_merge(self):
         """ Tests the tiMerge action on AmberParm """
         parm = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
+        parm2 = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
         PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute()
-        parm.write_parm(get_fn('abs_merged.prmtop', written=True))
-        parm.write_rst7(get_fn('abs_merged.inpcrd', written=True))
-        self.assertTrue(diff_files(get_fn('abs_merged.prmtop', written=True),
-                                   get_saved_fn('abs_merged.prmtop')))
-        self.assertTrue(diff_files(get_fn('abs_merged.inpcrd', written=True),
-                                   get_saved_fn('abs_merged.inpcrd')))
+        parm.save(get_fn('abs_merged.prmtop', written=True))
+        parm.save(get_fn('abs_merged.inpcrd', written=True))
+        new_parm = pmd.load_file(get_fn('abs_merged.prmtop', written=True))
+        new_crd = pmd.load_file(get_fn('abs_merged.inpcrd', written=True))
+        self.assertEqual(len(parm.parm_data), len(new_parm.parm_data))
+        for key in parm.parm_data:
+            if len(parm.parm_data[key]) == 0:
+                self.assertEqual(len(new_parm.parm_data[key]), 0)
+            elif isinstance(parm.parm_data[key][0], string_types):
+                self.assertEqual(parm.parm_data[key], new_parm.parm_data[key])
+            else:
+                np.testing.assert_allclose(parm.parm_data[key],
+                        new_parm.parm_data[key], atol=1e-6)
+        np.testing.assert_allclose(new_crd.coordinates[0], parm.coordinates,
+                atol=1e-5)
+        # The extra 2 masks are simply informational, so results should be the
+        # same
+        PT.tiMerge(parm2, ':1-3', ':4-6', ':2', ':5', ':7', ':8').execute()
+        for key in parm.parm_data:
+            if len(parm.parm_data[key]) == 0:
+                self.assertEqual(len(new_parm.parm_data[key]), 0)
+            elif isinstance(parm.parm_data[key][0], string_types):
+                self.assertEqual(parm.parm_data[key], new_parm.parm_data[key])
+            else:
+                np.testing.assert_allclose(parm.parm_data[key],
+                        new_parm.parm_data[key], atol=1e-6)
+        np.testing.assert_allclose(new_crd.coordinates[0], parm.coordinates,
+                atol=1e-5)
+        # Error checking
+        parm = AmberParm(get_fn('abs.prmtop'))
+        self.assertRaises(exc.TiMergeError, lambda:
+                PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
     def test_add12_6_4(self):
         """ Test the add12_6_4 action on AmberParm """
