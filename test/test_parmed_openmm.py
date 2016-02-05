@@ -490,7 +490,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
 
     def test_write_xml_parameters_amber_write_unused(self):
-        """ Test writing XML parameters loaded from part of the ff14SB ForceField
+        """ Test writing XML parameters loaded from part of the ff14SB forcefield
         files, using the write_unused argument"""
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.amber.AmberParameterSet(get_fn('amino12.lib'),
