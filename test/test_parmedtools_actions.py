@@ -11,6 +11,7 @@ from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
+from parmed.utils import PYPY
 from parmed.utils.six.moves import range, zip, StringIO
 from parmed.utils.six import string_types
 from copy import copy
@@ -315,6 +316,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
         utils.FileIOTestCase.setUp(self)
 
+    @unittest.skipIf(PYPY, 'Cannot test with NetCDF on pypy')
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
