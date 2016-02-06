@@ -1469,6 +1469,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
                          saved.PRINTLJMATRIX_NACLMG)
 
+    @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
     def test_write_coordinates(self):
         """ Test writeCoordinates method """
         parm = copy(gasparm)
