@@ -1228,6 +1228,28 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(lib['VAL'].atoms[8].name, 'HG12')
         self.assertEqual(lib['VAL'].atoms[8].charge, 0.062124)
 
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def test_lib_without_residueconnect(self):
+        """ Test parsing OFF library files without RESIDUECONNECT """
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                          'lipid14.lib')
+        self.assertTrue(AmberOFFLibrary.id_format(fn))
+        lib = AmberOFFLibrary.parse(fn)
+        self.assertEqual(len(lib), 15)
+        self.assertIs(lib['AR'].head, lib['AR'].tail) # weird...
+        # Nucleic acid caps
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                          'cph_nucleic_caps.lib')
+        self.assertTrue(AmberOFFLibrary.id_format(fn))
+        lib = AmberOFFLibrary.parse(fn)
+        self.assertEqual(len(lib), 2)
+
+    def test_glycam_parsing(self):
+        """ Tests reading GLYCAM parameter files (weird dihedrals) """
+        fn = os.path.join(get_fn('parm'), 'GLYCAM_06j.dat')
+        params = parameters.AmberParameterSet(fn)
+        self.assertEqual(len(params.dihedral_types[('Oy', 'Cy', 'Os', 'CT')]), 3)
+
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """
 

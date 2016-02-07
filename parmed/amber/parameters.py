@@ -29,6 +29,8 @@ _bondre = re.compile(r'(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _anglere = re.compile(r'(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+'
                       '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_dihed2re = re.compile(r'\s*%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s\s+'
+                       '%(FLOATRE)s' % subs)
 _sceere = re.compile(r'SCEE=\s*%(FLOATRE)s' % subs)
 _scnbre = re.compile(r'SCNB=\s*%(FLOATRE)s' % subs)
 _impropre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+'
@@ -387,6 +389,7 @@ class AmberParameterSet(ParameterSet):
             for l in f: yield l
         section = None
         finished_diheds = defaultdict(lambda: True)
+        key = None
         for line in fiter():
             line = line.rstrip()
             if not line: continue
@@ -419,7 +422,7 @@ class AmberParameterSet(ParameterSet):
             elif section == 'ANGLE':
                 self._process_angle_line(line)
             elif section == 'DIHEDRAL':
-                self._process_dihedral_line(line, finished_diheds)
+                key = self._process_dihedral_line(line, finished_diheds, key)
             elif section == 'IMPROPER':
                 self._process_improper_line(line)
             elif section == 'NONBOND':
@@ -465,11 +468,12 @@ class AmberParameterSet(ParameterSet):
             rawline = next(fiter)
         # Process the dihedrals
         rawline = next(fiter)
+        key = None
         while rawline:
             line = rawline.strip()
             if not line:
                 break
-            self._process_dihedral_line(line, finished_diheds)
+            key = self._process_dihedral_line(line, finished_diheds, key)
             rawline = next(fiter)
         # Process the impropers
         rawline = next(fiter)
@@ -579,30 +583,65 @@ class AmberParameterSet(ParameterSet):
         self.angle_types[(a1, a2, a3)] = typ
         self.angle_types[(a3, a2, a1)] = typ
 
-    def _process_dihedral_line(self, line, finished_diheds):
+    def _process_dihedral_line(self, line, finished_diheds, last_key):
+        """ Processes a dihedral line, possibly part of a multi-term dihedral
+
+        Parameters
+        ----------
+        line : str
+            Line of the file that contains a dihedral term
+        finished_diheds : dict
+            Dictionary of dihedral parameters whose final term has been read in
+            already (which means additional terms will overwrite, not add)
+        last_key : str or None
+            If not None, this is the key for the last dihedral type that should
+            be implied if the atom types are missing. Atom types seem to only be
+            required for the first term in a multi-term torsion definition
+
+        Returns
+        -------
+        key or None
+            If a negative periodicity indicates another term is coming, the
+            current key is returned so it can be passed as key to the next
+            _process_dihedral_call
+        """
         rematch = _dihedre.match(line)
-        if not rematch:
+        if not rematch and last_key is None:
             raise ParameterError('Could not understand DIHEDRAL line '
                                  '[%s]' % line)
-        a1, a2, a3, a4, div, k, phi, per = rematch.groups()
+        elif not rematch:
+            rematch = _dihed2re.match(line)
+            if not rematch:
+                raise ParameterError('Could not understand DIHEDRAL line '
+                                     '[%s]' % line)
+            div, k, phi, per = rematch.groups()
+            key = last_key
+            rkey = tuple(reversed(key))
+            assert key in finished_diheds
+            if finished_diheds[key]:
+                raise AssertionError('Cannot have an implied torsion that '
+                                     'has already finished!')
+        else:
+            a1, a2, a3, a4, div, k, phi, per = rematch.groups()
+            a1, a2, a3, a4 =  a1.strip(), a2.strip(), a3.strip(), a4.strip()
+            key = (a1, a2, a3, a4)
+            rkey = (a4, a3, a2, a1)
         scee = [float(x) for x in _sceere.findall(line)] or [1.2]
         scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
-        a1 = a1.strip(); a2 = a2.strip();
-        a3 = a3.strip(); a4 = a4.strip()
         per = float(per)
         typ = DihedralType(float(k)/float(div), abs(per), float(phi),
                            scee[0], scnb[0])
-        key = (a1, a2, a3, a4)
-        rkey = (a4, a3, a2, a1)
         if finished_diheds[key]:
-            # This dihedral is already finished its definition, which means we
-            # go ahead and add a new one to override it
+            # This dihedral is already finished its definition, which means
+            # we go ahead and add a new one to override it
             typs = DihedralTypeList()
             typs.append(typ)
             self.dihedral_types[key] = self.dihedral_types[rkey] = typs
         else:
             self.dihedral_types[key].append(typ)
         finished_diheds[key] = finished_diheds[rkey] = per >= 0
+        if per < 0:
+            return key
 
     def _process_improper_line(self, line):
         rematch = _impropre.match(line)
