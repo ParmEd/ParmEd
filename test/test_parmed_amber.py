@@ -1231,6 +1231,7 @@ class TestParameterFiles(FileIOTestCase):
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
         """ Test parsing OFF library files without RESIDUECONNECT """
+        warnings.filterwarnings('ignore', category=AmberWarning)
         fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
                           'lipid14.lib')
         self.assertTrue(AmberOFFLibrary.id_format(fn))
@@ -1243,6 +1244,7 @@ class TestParameterFiles(FileIOTestCase):
         self.assertTrue(AmberOFFLibrary.id_format(fn))
         lib = AmberOFFLibrary.parse(fn)
         self.assertEqual(len(lib), 2)
+        warnings.filterwarnings('default', category=AmberWarning)
 
     def test_glycam_parsing(self):
         """ Tests reading GLYCAM parameter files (weird dihedrals) """
