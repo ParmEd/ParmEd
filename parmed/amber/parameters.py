@@ -62,8 +62,8 @@ def _find_amber_file(fname, search_oldff):
     if search_oldff:
         if os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname)):
             return os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname))
-        if os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname)):
-            return os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname))
+#       if os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname)):
+#           return os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname))
     raise ValueError('Cannot find Amber file %s' % fname)
 
 @add_metaclass(FileFormatType)

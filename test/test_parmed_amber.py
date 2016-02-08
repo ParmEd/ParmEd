@@ -855,11 +855,18 @@ def _num_unique_dtypes(dct):
 class TestParameterFiles(FileIOTestCase):
     """ Tests Amber parameter and frcmod files """
 
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_find_amber_files(self):
         """ Tests the Amber file finder helper function """
         finder = parameters._find_amber_file
-        self.assertEqual(finder(__file__), __file__)
-        self.assertRaises(ValueError, lambda: finder('nofile'))
+        self.assertEqual(finder(__file__, False), __file__)
+        self.assertRaises(ValueError, lambda: finder('nofile', False))
+        # Check looking in oldff
+        self.assertRaises(ValueError, lambda: finder('rna.amberua.lib', False))
+        self.assertEqual(finder('rna.amberua.lib', True),
+                os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                             'oldff', 'rna.amberua.lib')
+        )
 
     def test_file_detection_frcmod(self):
         """ Tests the detection of Amber frcmod files """
