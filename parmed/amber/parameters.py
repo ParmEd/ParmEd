@@ -43,7 +43,7 @@ _atomtypere = re.compile(r"""({\s*["']([\w\+\-]+)["']\s*["'](\w+)["']\s*"""
 _loadparamsre = re.compile(r'loadamberparams (\S*)', re.I)
 _loadoffre = re.compile(r'loadoff (\S*)', re.I)
 
-def _find_amber_file(fname):
+def _find_amber_file(fname, search_oldff):
     """
     Finds an Amber file. Looks in the current directory, then the following
     locations:
@@ -59,6 +59,11 @@ def _find_amber_file(fname):
         return os.path.join(leapdir, 'lib', fname)
     if os.path.exists(os.path.join(leapdir, 'parm', fname)):
         return os.path.join(leapdir, 'parm', fname)
+    if search_oldff:
+        if os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname)):
+            return os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname))
+        if os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname)):
+            return os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname))
     raise ValueError('Cannot find Amber file %s' % fname)
 
 @add_metaclass(FileFormatType)
@@ -225,7 +230,7 @@ class AmberParameterSet(ParameterSet):
     #===================================================
 
     @classmethod
-    def from_leaprc(cls, fname):
+    def from_leaprc(cls, fname, search_oldff=False):
         """ Load a parameter set from a leaprc file
 
         Parameters
@@ -233,6 +238,10 @@ class AmberParameterSet(ParameterSet):
         fname : str or file-like
             Name of the file or open file-object from which a leaprc-style file
             will be read
+
+        search_oldff : bool, optional, default=False
+            If True, search the oldff directories in the main Amber leap
+            folders. Default is False
 
         Notes
         -----
@@ -260,11 +269,11 @@ class AmberParameterSet(ParameterSet):
         lowertext = text.lower() # commands are case-insensitive
         # Now process the parameter files
         for fname in _loadparamsre.findall(text):
-            params.load_parameters(_find_amber_file(fname))
+            params.load_parameters(_find_amber_file(fname, search_oldff))
         # Now process the library file
         for fname in _loadoffre.findall(text):
             params.residues.update(
-                    AmberOFFLibrary.parse(_find_amber_file(fname))
+                    AmberOFFLibrary.parse(_find_amber_file(fname, search_oldff))
             )
         # Now process the addAtomTypes
         try:
