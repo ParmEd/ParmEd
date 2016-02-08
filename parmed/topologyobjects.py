@@ -1911,7 +1911,8 @@ class AngleType(_ListItem, _ParameterType):
         self.list = list
 
     def __eq__(self, other):
-        return self.k == other.k and self.theteq == other.theteq
+        return (abs(self.k - other.k) < TINY and
+                abs(self.theteq - other.theteq) < TINY)
 
     def __repr__(self):
         return '<%s; k=%.3f, theteq=%.3f>' % (type(self).__name__,
@@ -2195,9 +2196,11 @@ class DihedralType(_ListItem, _ParameterType):
     #===================================================
 
     def __eq__(self, other):
-        return (self.phi_k == other.phi_k and self.per == other.per and 
-                self.phase == other.phase and self.scee == other.scee and
-                self.scnb == other.scnb)
+        return (abs(self.phi_k - other.phi_k) < TINY and
+                self.per == other.per and
+                abs(self.phase - other.phase) < TINY and
+                abs(self.scee - other.scee) < TINY and
+                abs(self.scnb - other.scnb) < TINY)
 
     def __repr__(self):
         retstr = ['<%s; phi_k=%.3f, per=%d, phase=%.3f, ' %
@@ -2289,9 +2292,12 @@ class RBTorsionType(_ListItem, _ParameterType):
     #===================================================
 
     def __eq__(self, other):
-        return (self.c0 == other.c0 and self.c1 == other.c1 and
-                self.c2 == other.c2 and self.c3 == other.c3 and
-                self.c4 == other.c4 and self.c5 == other.c5)
+        return (abs(self.c0 - other.c0) < TINY and
+                abs(self.c1 - other.c1) < TINY and
+                abs(self.c2 - other.c2) < TINY and
+                abs(self.c3 - other.c3) < TINY and
+                abs(self.c4 - other.c4) < TINY and
+                abs(self.c5 - other.c5) < TINY)
 
     def __copy__(self):
         return RBTorsionType(self.c0, self.c1, self.c2, self.c3, self.c4,
@@ -2658,7 +2664,8 @@ class ImproperType(_ListItem, _ParameterType):
         self._idx = -1
 
     def __eq__(self, other):
-        return self.psi_k == other.psi_k and self.psi_eq == other.psi_eq
+        return (abs(self.psi_k - other.psi_k) < TINY and
+                abs(self.psi_eq - other.psi_eq) < TINY)
 
     def __repr__(self):
         return '<%s; psi_k=%.3f, psi_eq=%.3f>' % (type(self).__name__,
@@ -2905,7 +2912,7 @@ class CmapType(_ListItem, _ParameterType):
 
     def __eq__(self, other):
         return (self.resolution == other.resolution and
-                all([abs(i - j) < TINY for i, j in zip(self.grid, other.grid)]))
+                all(abs(i - j) < TINY for i, j in zip(self.grid, other.grid)))
 
     def __repr__(self):
         return '<%s; resolution=%d>' % (type(self).__name__, self.resolution)
@@ -3185,7 +3192,7 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
         self.list = list
 
     def __eq__(self, other):
-        return self.k == other.k
+        return abs(self.k - other.k) < TINY
 
     def __repr__(self):
         return '<%s; k=%.3f>' % (type(self).__name__, self.k)
@@ -3367,9 +3374,11 @@ class StretchBendType(_ListItem, _ParameterType):
         self.list = list
 
     def __eq__(self, other):
-        return (self.k1 == other.k1 and self.k2 == other.k2 and
-                self.req1 == other.req1 and self.req2 == other.req2 and
-                self.theteq == other.theteq)
+        return (abs(self.k1 - other.k1) < TINY and
+                abs(self.k2 - other.k2) < TINY and
+                abs(self.req1 - other.req1) < TINY and
+                abs(self.req2 - other.req2) < TINY and
+                abs(self.theteq - other.theteq) < TINY)
 
     def __repr__(self):
         return '<%s; req1=%.3f, req2=%.3f, theteq=%.3f, k1=%.3f, k2=%.3f>' \
@@ -4371,8 +4380,9 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
                 type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
     def __eq__(self, other):
-        return (self.rmin == other.rmin and self.epsilon == other.epsilon and
-                self.chgscale == other.chgscale)
+        return (abs(self.rmin - other.rmin) < TINY and
+                abs(self.epsilon - other.epsilon) < TINY and
+                abs(self.chgscale - other.chgscale) < TINY)
 
     __getstate__ = _getstate_with_exclusions()
 
@@ -4414,11 +4424,11 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
         self.list = list
 
     def __eq__(self, other):
-        return (self.vdw_weight == other.vdw_weight and
-                self.multipole_weight == other.multipole_weight and
-                self.direct_weight == other.direct_weight and
-                self.polar_weight == other.polar_weight and
-                self.mutual_weight == other.mutual_weight)
+        return (abs(self.vdw_weight - other.vdw_weight) < TINY and
+                abs(self.multipole_weight - other.multipole_weight) < TINY and
+                abs(self.direct_weight - other.direct_weight) < TINY and
+                abs(self.polar_weight - other.polar_weight) < TINY and
+                abs(self.mutual_weight - other.mutual_weight) < TINY)
 
     def __copy__(self):
         return AmoebaNonbondedExceptionType(self.vdw_weight,

@@ -11,7 +11,7 @@ import os
 import re
 import sys
 from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
-                          FortranFormat, titratable_residues)
+                          FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError)
 from parmed import topologyobjects, load_file, Structure
@@ -855,11 +855,18 @@ def _num_unique_dtypes(dct):
 class TestParameterFiles(FileIOTestCase):
     """ Tests Amber parameter and frcmod files """
 
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_find_amber_files(self):
         """ Tests the Amber file finder helper function """
         finder = parameters._find_amber_file
-        self.assertEqual(finder(__file__), __file__)
-        self.assertRaises(ValueError, lambda: finder('nofile'))
+        self.assertEqual(finder(__file__, False), __file__)
+        self.assertRaises(ValueError, lambda: finder('nofile', False))
+        # Check looking in oldff
+        self.assertRaises(ValueError, lambda: finder('rna.amberua.lib', False))
+        self.assertEqual(finder('rna.amberua.lib', True),
+                os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                             'oldff', 'rna.amberua.lib')
+        )
 
     def test_file_detection_frcmod(self):
         """ Tests the detection of Amber frcmod files """
@@ -891,6 +898,15 @@ class TestParameterFiles(FileIOTestCase):
                     os.path.join(get_fn('parm'), 'frcmod.1')
                 )
         )
+
+    def test_frcmod_with_tabstops(self):
+        """ Test parsing an Amber frcmod file with tabs instead of spaces """
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'all_modrna08.frcmod')
+        )
+        self.assertEqual(len(params.atom_types), 38) # Ugh! Duplicates??  Really??
+        self.assertEqual(params.bond_types[('C', 'CM')],
+                         topologyobjects.BondType(449.9, 1.466)) # OVERWRITING IN THE SAME FILE??
 
     def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
@@ -1099,8 +1115,16 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['EP'].atomic_number, 0)
         self.assertTrue(params.residues)
-        with open(os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd', 'leaprc.ff14SB')) as f:
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
+                          'cmd', 'leaprc.ff14SB')
+        with open(fn) as f:
             params = parameters.AmberParameterSet.from_leaprc(f)
+        self.assertEqual(params.atom_types['H'].atomic_number, 1)
+        self.assertEqual(params.atom_types['3C'].atomic_number, 6)
+        self.assertEqual(params.atom_types['EP'].atomic_number, 0)
+        self.assertTrue(params.residues)
+        # Now make sure it accepts search_oldff=True
+        params = parameters.AmberParameterSet.from_leaprc(fn, search_oldff=True)
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['EP'].atomic_number, 0)
@@ -1203,6 +1227,43 @@ class TestParameterFiles(FileIOTestCase):
         self.assertTrue(params.dihedral_types)
         self.assertTrue(params.improper_periodic_types)
         self.assertTrue(params.residues)
+
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def test_load_lib_with_blank_lines(self):
+        """ Tests parsing of .lib files with blank lines """
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                          'all_aminoAM1.lib')
+        self.assertTrue(AmberOFFLibrary.id_format(fn))
+        lib = AmberOFFLibrary.parse(fn)
+        self.assertEqual(len(lib), 27)
+        self.assertEqual(lib['ALA'].atoms[1].name, 'H')
+        self.assertEqual(lib['ALA'].atoms[1].charge, 0.423221)
+        self.assertEqual(lib['VAL'].atoms[8].name, 'HG12')
+        self.assertEqual(lib['VAL'].atoms[8].charge, 0.062124)
+
+    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    def test_lib_without_residueconnect(self):
+        """ Test parsing OFF library files without RESIDUECONNECT """
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                          'lipid14.lib')
+        self.assertTrue(AmberOFFLibrary.id_format(fn))
+        lib = AmberOFFLibrary.parse(fn)
+#       self.assertEqual(len(lib), 15) # keeps getting added to...
+        self.assertIs(lib['LA'].head, lib['LA'].tail) # weird...
+        # Nucleic acid caps
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
+                          'cph_nucleic_caps.lib')
+        self.assertTrue(AmberOFFLibrary.id_format(fn))
+        lib = AmberOFFLibrary.parse(fn)
+        self.assertEqual(len(lib), 2)
+        warnings.filterwarnings('default', category=AmberWarning)
+
+    def test_glycam_parsing(self):
+        """ Tests reading GLYCAM parameter files (weird dihedrals) """
+        fn = os.path.join(get_fn('parm'), 'GLYCAM_06j.dat')
+        params = parameters.AmberParameterSet(fn)
+        self.assertEqual(len(params.dihedral_types[('Oy', 'Cy', 'Os', 'CT')]), 3)
 
 class TestCoordinateFiles(FileIOTestCase):
     """ Tests the various coordinate file classes """

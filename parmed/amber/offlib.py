@@ -181,6 +181,9 @@ class AmberOFFLibrary(object):
                 templ = ResidueTemplate(name)
             templ.add_atom(atom)
             line = fileobj.readline()
+            # Skip blank lines
+            while line and not line.strip():
+                line = fileobj.readline()
         container.append(templ)
         if nres > 1:
             start_atoms = []
@@ -327,9 +330,11 @@ class AmberOFFLibrary(object):
                                (rematch.groups()[0], name))
         for i in range(nres):
             c1,c2,c3,c4,c5,c6 = (int(x) for x in fileobj.readline().split())
-            if templ.head is not None and templ.head is not templ[c1-1]:
+            if (c1 > 0 and templ.head is not None and
+                    templ.head is not templ[c1-1]):
                 raise RuntimeError('HEAD atom is not connect0')
-            if templ.tail is not None and templ.tail is not templ[c2-1]:
+            if (c2 > 0 and templ.tail is not None and
+                    templ.tail is not templ[c2-1]):
                 raise RuntimeError('TAIL atom is not connect1')
             for i in (c3, c4, c5, c6):
                 if i == 0: continue
