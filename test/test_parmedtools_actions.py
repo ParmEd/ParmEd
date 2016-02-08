@@ -3,31 +3,28 @@ Tests for the various actions in ParmEd
 """
 from __future__ import division, print_function
 
-import utils
-from utils import HAS_GROMACS
+from copy import copy
+import numpy as np
+import os
 import parmed as pmd
 from parmed import periodic_table, gromacs, load_file, amber
-from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
+from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat, AmberMask
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
 from parmed.utils import PYPY
 from parmed.utils.six.moves import range, zip, StringIO
 from parmed.utils.six import string_types
-from copy import copy
-import numpy as np
-import os
 import parmed.tools as PT
 from parmed.tools import exceptions as exc
 from parmed.tools import parmlist
+import re
 import saved_outputs as saved
 import sys
 import unittest
+from utils import (HAS_GROMACS, get_fn, get_saved_fn, diff_files,
+        FileIOTestCase, TestCaseRelative, detailed_diff)
 import warnings
-
-get_fn = utils.get_fn
-get_saved_fn = utils.get_saved_fn
-diff_files = utils.diff_files
 
 gasparm = AmberParm(get_fn('trx.prmtop'))
 solvparm = AmberParm(get_fn('solv2.parm7'))
@@ -309,12 +306,12 @@ class TestNonParmActions(unittest.TestCase):
                 self.assertEqual(sum([a in cmap for a in atoms]), 5)
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
-class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
+class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        utils.FileIOTestCase.setUp(self)
+        FileIOTestCase.setUp(self)
 
     @unittest.skipIf(PYPY, 'Cannot test with NetCDF on pypy')
     def test_parmout_outparm_load_restrt(self):
@@ -1406,43 +1403,108 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-    def test_ti_merge(self):
-        """ Tests the tiMerge action on AmberParm """
-        parm = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
-        parm2 = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
-        PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute()
-        parm.save(get_fn('abs_merged.prmtop', written=True))
-        parm.save(get_fn('abs_merged.inpcrd', written=True))
-        new_parm = pmd.load_file(get_fn('abs_merged.prmtop', written=True))
-        new_crd = pmd.load_file(get_fn('abs_merged.inpcrd', written=True))
-        self.assertEqual(len(parm.parm_data), len(new_parm.parm_data))
-        for key in parm.parm_data:
-            if len(parm.parm_data[key]) == 0:
-                self.assertEqual(len(new_parm.parm_data[key]), 0)
-            elif isinstance(parm.parm_data[key][0], string_types):
-                self.assertEqual(parm.parm_data[key], new_parm.parm_data[key])
-            else:
-                np.testing.assert_allclose(parm.parm_data[key],
-                        new_parm.parm_data[key], atol=1e-6)
-        np.testing.assert_allclose(new_crd.coordinates[0], parm.coordinates,
-                atol=1e-5)
-        # The extra 2 masks are simply informational, so results should be the
-        # same
-        PT.tiMerge(parm2, ':1-3', ':4-6', ':2', ':5', ':7', ':8').execute()
-        for key in parm.parm_data:
-            if len(parm.parm_data[key]) == 0:
-                self.assertEqual(len(new_parm.parm_data[key]), 0)
-            elif isinstance(parm.parm_data[key][0], string_types):
-                self.assertEqual(parm.parm_data[key], new_parm.parm_data[key])
-            else:
-                np.testing.assert_allclose(parm.parm_data[key],
-                        new_parm.parm_data[key], atol=1e-6)
-        np.testing.assert_allclose(new_crd.coordinates[0], parm.coordinates,
-                atol=1e-5)
-        # Error checking
-        parm = AmberParm(get_fn('abs.prmtop'))
+    def test_ti_merge1(self):
+        """ Tests the tiMerge action on AmberParm with gas-phase parm """
+        timask1re = re.compile(r'''timask1 *= *["']([\d,@:]+)["']''', re.I)
+        timask2re = re.compile(r'''timask2 *= *["']([\d,@:]+)["']''', re.I)
+        scmask1re = re.compile(r'''scmask1 *= *["']([\d,@:]+)["']''', re.I)
+        scmask2re = re.compile(r'''scmask2 *= *["']([\d,@:]+)["']''', re.I)
+        def get_masks(info):
+            return dict(timask1=timask1re.findall(info)[0],
+                        timask2=timask2re.findall(info)[0],
+                        scmask1=scmask1re.findall(info)[0],
+                        scmask2=scmask2re.findall(info)[0])
+
+        output = StringIO()
+        PT.tiMerge.output = output
+        parm = AmberParm(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7'))
+        act = PT.tiMerge(parm, ':1-5', ':6-10', ':3', ':8')
+        str(act)
+        # Make sure topology objects are the same
+        a = parm[0]
+        act.execute()
+        self.assertIs(a, parm[0])
+        output.seek(0)
+        info = output.read()
+        masks = get_masks(info)
+        # Make sure the timasks are what we expect them to be
+        timask1 = AmberMask(parm, masks['timask1'])
+        timask2 = AmberMask(parm, masks['timask2'])
+        scmask1 = AmberMask(parm, masks['scmask1'])
+        scmask2 = AmberMask(parm, masks['scmask2'])
+        self.assertEqual(timask1.Selection(),
+                         [int(a.residue.idx == 2) for a in parm.atoms])
+        self.assertEqual(timask2.Selection(),
+                         [int(a.residue.idx == 5) for a in parm.atoms])
+        self.assertEqual(scmask1.Selection(),
+                         [int(a.residue.idx == 2) for a in parm.atoms])
+        self.assertEqual(scmask2.Selection(),
+                         [int(a.residue.idx == 5) for a in parm.atoms])
+        self.assertEqual(len(parm.residues), 6) # Kept first 5 and mutant ALA
+
+        output.truncate() # Reset the buffer for the next test
+
+        # Check some error processing
         self.assertRaises(exc.TiMergeError, lambda:
-                PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
+                PT.tiMerge(load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7')),
+                           ':1-5', ':6-10', ':8', ':8').execute())
+        self.assertRaises(exc.TiMergeError, lambda:
+                PT.tiMerge(load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7')),
+                           ':1-5', ':6-10', ':3', ':3').execute())
+        self.assertRaises(exc.TiMergeError, lambda:
+                PT.tiMerge(load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7')),
+                           ':1-5', ':5-10', ':3', ':8').execute())
+        self.assertRaises(exc.TiMergeError,
+                PT.tiMerge(load_file(get_fn('ava_aaa.parm7')), ':1-5', ':6-10',
+                    ':3', ':8').execute)
+        parm = load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7'))
+        parm.residues[5][0].xx += 1 # Move away so it's not recognized as same
+        self.assertRaises(exc.TiMergeError, lambda:
+                PT.tiMerge(parm, ':1-5', ':6-10', ':3', ':8').execute())
+
+    def test_ti_merge2(self):
+        """ Tests the tiMerge action on AmberParm with solvated parm """
+        parm = AmberParm(get_fn('ava_aaa.solv.parm7'), get_fn('ava_aaa.solv.rst7'))
+        timask1re = re.compile(r'''timask1 *= *["']([\d,@:]+)["']''', re.I)
+        timask2re = re.compile(r'''timask2 *= *["']([\d,@:]+)["']''', re.I)
+        scmask1re = re.compile(r'''scmask1 *= *["']([\d,@:]+)["']''', re.I)
+        scmask2re = re.compile(r'''scmask2 *= *["']([\d,@:]+)["']''', re.I)
+        def get_masks(info):
+            return dict(timask1=timask1re.findall(info)[0],
+                        timask2=timask2re.findall(info)[0],
+                        scmask1=scmask1re.findall(info)[0],
+                        scmask2=scmask2re.findall(info)[0])
+
+        output = StringIO()
+        PT.tiMerge.output = output
+        act = PT.tiMerge(parm, ':1-5', ':6-10', ':3', ':8', ':11', ':12')
+        str(act)
+        # Make sure topology objects are the same
+        a = parm[0]
+        act.execute()
+        self.assertIs(a, parm[0])
+        output.seek(0)
+        info = output.read()
+        masks = get_masks(info)
+        # Make sure the timasks are what we expect them to be
+        timask1 = AmberMask(parm, masks['timask1'])
+        timask2 = AmberMask(parm, masks['timask2'])
+        scmask1 = AmberMask(parm, masks['scmask1'])
+        scmask2 = AmberMask(parm, masks['scmask2'])
+        self.assertEqual(timask1.Selection(),
+                         [int(a.residue.idx in (2, 6)) for a in parm.atoms])
+        self.assertEqual(timask2.Selection(),
+                         [int(a.residue.idx in (5, 7)) for a in parm.atoms])
+        self.assertEqual(scmask1.Selection(),
+                         [int(a.residue.idx in (2, 6)) for a in parm.atoms])
+        self.assertEqual(scmask2.Selection(),
+                         [int(a.residue.idx in (5, 7)) for a in parm.atoms])
+
+        output.truncate() # Reset the buffer for the next test
+        # Error handling checking
+        parm = AmberParm(get_fn('ava_aaa.solv.parm7'), get_fn('ava_aaa.solv.rst7'))
+        self.assertRaises(exc.TiMergeError, lambda:
+                PT.tiMerge(parm, ':1-5', ':11', ':3', ':11').execute())
 
     def test_add12_6_4(self):
         """ Test the add12_6_4 action on AmberParm """
@@ -1526,12 +1588,12 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         str(act)
         act.execute()
 
-class TestChamberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
+class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        utils.FileIOTestCase.setUp(self)
+        FileIOTestCase.setUp(self)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
@@ -1593,7 +1655,24 @@ class TestChamberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                 PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
 
     def test_ti_merge(self):
-        """ Check that tiMerge fails for ChamberParm """
+        """ Check that tiMerge joins CHARMM-specific terms in ChamberParm """
+        timask1re = re.compile(r'''timask1 *= *["']([\d,@:]+)["']''', re.I)
+        timask2re = re.compile(r'''timask2 *= *["']([\d,@:]+)["']''', re.I)
+        scmask1re = re.compile(r'''scmask1 *= *["']([\d,@:]+)["']''', re.I)
+        scmask2re = re.compile(r'''scmask2 *= *["']([\d,@:]+)["']''', re.I)
+        def get_masks(info):
+            return dict(timask1=timask1re.findall(info)[0],
+                        timask2=timask2re.findall(info)[0],
+                        scmask1=scmask1re.findall(info)[0],
+                        scmask2=scmask2re.findall(info)[0])
+        # First convert from CHARMM-GUI PSF file
+        a = PT.chamber(parmlist.ParmList(), '-psf', get_fn('ava_aaa.psf'),
+                '-top', get_fn('top_all36_prot.rtf'), '-param',
+                get_fn('par_all36_prot.prm'), '-crd', get_fn('ava_full.pdb'))
+        a.execute()
+        PT.tiMerge(a.parm, ':1-3', ':4-6', ':2', ':5').execute()
+        self.assertEqual(len(a.parm.residues), 4) # Removed 2 redundant res.
+        # Error checking
         parm = copy(gascham)
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
@@ -2218,8 +2297,7 @@ class TestChamberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = load_file(get_fn('dhfr_cmap_pbc.parm7'))
         parm.load_rst7(get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
-        self.assertTrue(utils.detailed_diff(str(act), saved.SUMMARYC1,
-                                            relative_error=1e-6))
+        self.assertTrue(detailed_diff(str(act), saved.SUMMARYC1, relative_error=1e-6))
 
     def test_scale(self):
         """ Test scale action for ChamberParm """
@@ -2384,12 +2462,12 @@ class TestChamberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestAmoebaParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
+class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        utils.FileIOTestCase.setUp(self)
+        FileIOTestCase.setUp(self)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """

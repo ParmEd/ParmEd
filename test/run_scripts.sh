@@ -32,6 +32,8 @@ evaluate_test() {
     fi
 }
 ######   TESTS   ######
+
+# Gromacs CPP tests
 printf "Running test python -m parmed.gromacs._cpp test 1..."
 $run_cmd -m parmed.gromacs._cpp -i files/pptest1/pptest1.h > files/writes/cpptest1
 evaluate_test $? cpptest1
@@ -45,6 +47,10 @@ printf "Running test python -m parmed.gromacs._cpp test 3..."
 $run_cmd -m parmed.gromacs._cpp -i - < files/pptest1/pptest1.h \
         -Ifiles/pptest1 > files/writes/cpptest1 || exit
 evaluate_test $? cpptest1
+
+# parmed CL tests
+# TODO: source, parm, ls, cd
+
 ###### END TESTS ######
 
 # Clean up if everything passed

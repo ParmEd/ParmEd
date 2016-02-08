@@ -23,7 +23,7 @@ from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
 from parmed.residue import (SOLVENT_NAMES, CATION_NAMES, ANION_NAMES,
         AminoAcidResidue, RNAResidue, DNAResidue)
-from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
+from parmed.utils.six import iteritems, string_types, add_metaclass
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
 from parmed.tools.argumentlist import ArgumentList
@@ -901,9 +901,10 @@ class printLJTypes(Action):
             for field in type_fields:
                 if len(field.strip()) == 0: continue
                 if '-' in field:
-                    begin = int(field.split('-')[0]) # FIXME
+                    begin = int(field.split('-')[0])
                     end = min(int(field.split('-')[1]), self.parm.ptr('ntypes'))
-                    if begin <= 0 or end < begin or begin > self.parm.ptr('ntypes'):
+                    if (begin <= 0 or end < begin or
+                            begin > self.parm.ptr('ntypes')):
                         raise ParmError('printLJTypes: Bad atom type range')
                     self.type_list.extend([i for i in range(begin, end+1)])
                 else:
@@ -921,8 +922,9 @@ class printLJTypes(Action):
             selection = self.mask.Selection()
         elif self.type_list:
             selection = [0 for atom in self.parm.atoms]
-            for i, atom in enumerate(self.parm.atoms): # FIXME
-                if atom.nb_idx in self.type_list: selection[i] = 1
+            for i, atom in enumerate(self.parm.atoms):
+                if atom.nb_idx in self.type_list:
+                    selection[i] = 1
         if sum(selection) == 0:
             return 'Nothing to do for printLJTypes'
 
@@ -2278,8 +2280,6 @@ class tiMerge(Action):
             self.molmask2N = None
 
     def __str__(self):
-        if not self.molmask1 or not self.molmask2:
-            return 'No molecules specified to merge'
         return ('Merging molecules [%s] [%s] with sc mask [%s] [%s]' % (
                self.molmask1, self.molmask2, self.mask1, self.mask2 )
         )
@@ -2398,7 +2398,7 @@ class tiMerge(Action):
             atm_j = mol2common[i]
             diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
             if (np.abs(diff) > self.tol).any():
-                raise TiMergeError('Common (nonsoftcore) atoms must have the '
+                raise TiMergeError('Common (nonsoftcore) atoms must have the ' # pragma: no cover
                                    'same coordinates.')
 
         for j in range(natom):
@@ -2553,7 +2553,7 @@ class tiMerge(Action):
                     atmi not in new_sc_atm2_int and
                     atml not in new_sc_atm1_int and
                     atml not in new_sc_atm2_int):
-                    raise TiMergeError(
+                    raise TiMergeError( # pragma: no cover
                             'Cannot have dihedral cross through softcore '
                             'region. (DIHED : %d %d %d %d). Usually this means '
                             'you have defined the softcore region in a way '
@@ -2594,7 +2594,7 @@ class source(Action):
         This is a no-op, since a separate command interpreter for this file is
         launched inside parmed_cmd.py
         """
-        pass
+        pass # pragma: no cover
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2727,9 +2727,9 @@ class ls(Action):
         process = Popen(['/bin/ls', '-C'] + self.args, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate('')
         process.wait()
-        if PY3:
-            return (out + err).decode('UTF-8')
-        return out + err
+#       if PY3: TODO: delete
+#           return (out + err).decode('UTF-8') TODO: delete
+        return (out + err).decode('UTF-8')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
