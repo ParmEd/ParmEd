@@ -1,7 +1,7 @@
 """
 Provides a class for parsing CHARMM-style coordinate files, namely CHARMM .crd
 (coordinate) files and CHARMM .rst (restart) file. Uses CharmmFile class in
-_charmmfile.py for reading files 
+_charmmfile.py for reading files
 
 Author: Jason Deckman
 Contributors: Jason Swails
@@ -63,21 +63,21 @@ class CharmmCrdFile(object):
         """
         with closing(io.genopen(filename)) as f:
             line = f.readline()
-            while len(line.strip()) == 0:   # Skip whitespace, as a precaution
+            while line and len(line.strip()) == 0:   # Skip whitespace
                 line = f.readline()
 
             intitle = True
             while intitle:
-                line = f.readline().strip()
-                if len(line) == 0:
+                line = f.readline()
+                if len(line.strip()) == 0:
                     intitle = False
                 elif line[0] != '*':
                     intitle = False
                 else:
                     intitle = True
 
-            while len(line) == 0:      # Skip whitespace
-                line = f.readline().strip()
+            while line and len(line.strip()) == 0:      # Skip whitespace
+                line = f.readline()
 
             try:
                 natom = int(line.split()[0])
@@ -140,12 +140,12 @@ class CharmmCrdFile(object):
                     intitle = False
                 elif line[0] != '*':
                     intitle = False
-                else: 
+                else:
                     intitle = True
 
             while len(line) == 0:      # Skip whitespace
                 line = crdfile.readline().strip()
-            
+
             try:
                 self.natom = int(line.split()[0])
                 for row in range(self.natom):
@@ -253,7 +253,7 @@ class CharmmRstFile(object):
         self.coordsold = []
         self.coords = []
         self.vels = []
-        
+
         self.ff_version = 0
         self.natom = 0
         self.npriv = 0
@@ -294,14 +294,14 @@ class CharmmRstFile(object):
     def _parse(self, fname):
 
         with closing(io.genopen(fname, 'r')) as crdfile:
-            readingHeader = True 
+            readingHeader = True
             while readingHeader:
                 line = crdfile.readline()
                 if not len(line):
                     raise CharmmError('Premature end of file')
                 line = line.strip()
                 words = line.split()
-                if len(line) != 0:  
+                if len(line) != 0:
                     if words[0] == 'ENERGIES' or words[0] == '!ENERGIES':
                         readingHeader = False
                     else:
@@ -315,10 +315,10 @@ class CharmmRstFile(object):
                     if line[0][0:5] == 'NATOM' or line[0][0:6] == '!NATOM':
                         try:
                             line = self.header[row+1].strip().split()
-                            self.natom = int(line[0])     
+                            self.natom = int(line[0])
                             self.npriv = int(line[1])     # num. previous steps
-                            self.nstep = int(line[2])     # num. steps in file  
-                            self.nsavc = int(line[3])     # coord save frequency 
+                            self.nstep = int(line[2])     # num. steps in file
+                            self.nsavc = int(line[3])     # coord save frequency
                             self.nsavv = int(line[4])     # velocities "
                             self.jhstrt = int(line[5])    # Num total steps?
                             break
@@ -363,11 +363,11 @@ class CharmmRstFile(object):
             if len(line) < 3*CHARMLEN:
                 raise CharmmError("Less than 3 coordinates present in "
                                   "coordinate row or coords may be "
-                                  "truncated.") 
+                                  "truncated.")
 
             line = line.replace('D','E')     # CHARMM uses 'D' for exponentials
 
             # CHARMM uses fixed format (len = CHARMLEN = 22) for crds in .rst's
-            crds.append(float(line[0:CHARMLEN]))  
+            crds.append(float(line[0:CHARMLEN]))
             crds.append(float(line[CHARMLEN:2*CHARMLEN]))
             crds.append(float(line[2*CHARMLEN:3*CHARMLEN]))
