@@ -216,8 +216,14 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
 
         cong.setPositions(top.positions)
         cona.setPositions(top.positions)
-        
+
         self._check_energies(top, cong, parm, cona)
+
+        # Make an NBFIX
+        self.assertFalse(parm.has_NBFIX())
+        parm.parm_data['LENNARD_JONES_ACOEF'][-4] = 10.0
+        self.assertTrue(parm.has_NBFIX())
+        parm.createSystem()
 
     @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_simple(self):

@@ -152,15 +152,10 @@ class Action(lawsuit):
         elif arg_list is None:
             arg_list = ArgumentList('')
         # If our arg_list is a string, convert it to an ArgumentList
-        # (but coerce to string if it is string-like)
-        try:
-            arg_list = arg_list.decode()
+        if isinstance(arg_list, string_types):
             arg_list = ArgumentList(arg_list)
-        except AttributeError:
-            if isinstance(arg_list, string_types):
-                arg_list = ArgumentList(arg_list)
-            else:
-                arg_list = ArgumentList(str(arg_list))
+        else:
+            arg_list = ArgumentList(str(arg_list))
         # Now that we have the argument list, see if we have requested a
         # specific parm. If so, set self.parm equal to that object, instead
         parm = arg_list.get_key_string('parm', None)
@@ -176,7 +171,7 @@ class Action(lawsuit):
                 else:
                     warnings.warn('Cannot find parm %s. Skipping this action'
                                   % parm, SeriousParmWarning)
-                    return
+                    return # pragma: no cover
             else:
                 if parm >= 0 and parm < len(self.parm_list):
                     print('Using parm %s' % self.parm_list[parm])
@@ -184,7 +179,7 @@ class Action(lawsuit):
                 else:
                     warnings.warn('Cannot find parm %s. Skipping this action'
                                   % parm, SeriousParmWarning)
-                    return
+                    return # pragma: no cover
         if self.needs_parm:
             if (self.strictly_supported and
                     type(self.parm) not in self.strictly_supported):
@@ -242,9 +237,9 @@ class parmout(Action):
         self.filename = arg_list.get_next_string()
         self.rst_name = arg_list.get_next_string(optional=True)
         if arg_list.has_key('netcdf'):
-            self.netcdf = True
+            self.rst7_format = 'NCRST'
         else:
-            self.netcdf = None
+            self.rst7_format = 'RST7'
 
     def __str__(self):
         if self.rst_name is not None:
@@ -260,7 +255,7 @@ class parmout(Action):
                 raise FileExists('%s exists; not overwriting.' % self.rst_name)
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
-            self.parm.write_rst7(self.rst_name, netcdf=self.netcdf)
+            self.parm.save(self.rst_name, format=self.rst7_format, overwrite=Action.overwrite)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -310,9 +305,9 @@ class writeFrcmod(Action):
                     self.parm.parm_data['HBCUT'][idx-1] > 0):
                     warnings.warn('Frcmod dumping does not work with 10-12 '
                                   'prmtops', SeriousParmWarning)
-                    break
+                    break # pragma: no cover
         except IndexError:
-            pass # FIXME should we warn here, too?
+            pass # pragma: no cover
 
     def __str__(self):
         return 'Dumping FRCMOD file %s with parameters from %s' % (
@@ -377,13 +372,10 @@ class loadCoordinates(Action):
         crd = load_file(self.filename, natom=len(self.parm.atoms),
                         hasbox=self.parm.box is not None)
         try:
-            self.parm.coordinates = copy.copy(crd.coordinates)
+            self.parm.coordinates = crd.coordinates.copy()
         except AttributeError:
             raise ParmError('Cannot get coordinates from %s' % self.filename)
-        if crd.box is None or len(crd.box.shape) == 1:
-            self.parm.box = copy.copy(crd.box)
-        else:
-            self.parm.box = copy.copy(crd.box[0])
+        self.parm.box = copy.copy(crd.box)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -419,8 +411,8 @@ class writeCoordinates(Action):
              'mol2]')
     def init(self, arg_list):
         self.filename = filename = arg_list.get_next_string()
-        self.filetype = arg_list.get_next_string(optional=True, default=None)
-        if self.filetype is None:
+        self.filetype = arg_list.get_next_string(optional=True, default='').lower()
+        if not self.filetype:
             if filename.endswith('.nc'):
                 self.filetype = 'NCTRAJ'
             elif filename.endswith('.ncrst'):
@@ -463,28 +455,24 @@ class writeCoordinates(Action):
     def execute(self):
         if not Action.overwrite and os.path.exists(self.filename):
             raise FileExists('%s exists; not overwriting' % self.filename)
-        coordinates = []
-        velocities = []
-        for atom in self.parm.atoms:
-            coordinates.extend([atom.xx, atom.xy, atom.xz])
-            if hasattr(atom, 'vx'):
-                velocities.extend([atom.vx, atom.vy, atom.vz])
+        coordinates = self.parm.coordinates
+        velocities = self.parm.velocities
         if self.filetype == 'NCTRAJ':
             traj = NetCDFTraj.open_new(self.filename,
                     natom=len(self.parm.atoms), box=self.parm.box is not None,
-                    vels=bool(velocities))
+                    vels=velocities is not None)
             traj.add_time(0)
             traj.add_coordinates(coordinates)
-            if velocities: traj.add_velocities(velocities)
-            if self.parm.box: traj.add_box(self.parm.box)
+            if velocities is not None: traj.add_velocities(velocities)
+            if self.parm.box is not None: traj.add_box(self.parm.box)
             traj.close()
         elif self.filetype == 'NCRESTART':
             rst = NetCDFRestart.open_new(self.filename,
                     natom=len(self.parm.atoms), box=self.parm.box is not None,
-                    vels=bool(velocities))
+                    vels=velocities is not None)
             rst.coordinates = coordinates
-            if velocities: rst.velocities = velocities
-            if self.parm.box: rst.box = self.parm.box
+            if velocities is not None: rst.velocities = velocities
+            if self.parm.box is not None: rst.box = self.parm.box
             rst.time = 0
             rst.close()
         elif self.filetype == 'PDB':
@@ -503,12 +491,12 @@ class writeCoordinates(Action):
             rst = AmberAsciiRestart(self.filename, natom=len(self.parm.atoms),
                                     mode='w', hasbox=self.parm.box is not None)
             rst.coordinates = coordinates
-            if velocities: rst.velocities = velocities
+            if velocities is not None: rst.velocities = velocities
             if self.parm.box is not None: rst.box = self.parm.box
             rst.close()
         else:
-            raise RuntimeError('Should not be here. Unrecognized coordinate '
-                               'file format type.')
+            raise AssertionError('Should not be here. Unrecognized coordinate '
+                                 'file format type.')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -586,7 +574,7 @@ class changeLJPair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        return ('Setting LJ %s-%s pairwise interaction to have ' +
+        return ('Setting LJ %s-%s pairwise interaction to have '
                 'Rmin = %16.5f and Epsilon = %16.5f') % (self.mask1, self.mask2,
                 self.rmin, self.eps)
 
@@ -627,9 +615,7 @@ class changeLJ14Pair(Action):
     strictly_supported = (ChamberParm,)
     def init(self, arg_list):
         # Make sure this is a chamber prmtop
-        if not self.parm.chamber:
-            raise ChangeLJPairError('Changing 1-4 NB pairs makes no sense for '
-                                    'non-chamber created prmtops!')
+        assert self.parm.chamber, 'Chamber-style prmtop required!'
         # If not, initiate instance data
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
@@ -637,17 +623,15 @@ class changeLJ14Pair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        if self.parm.chamber:
-            return ('Setting LJ 1-4 %s-%s pairwise interaction to have '
-                    '1-4 Rmin = %16.5f and 1-4 Epsilon = %16.5f' %
-                    (self.mask1, self.mask2, self.rmin, self.eps))
-        return 'Not a chamber topology. Nothing to do.'
+        return ('Setting LJ 1-4 %s-%s pairwise interaction to have '
+                '1-4 Rmin = %16.5f and 1-4 Epsilon = %16.5f' %
+                (self.mask1, self.mask2, self.rmin, self.eps))
 
     def execute(self):
         selection1 = self.mask1.Selection()
         selection2 = self.mask2.Selection()
         if sum(selection1) == 0 or sum(selection2) == 0:
-            Action.stderr.write('Skipping empty masks in changeLJ14Pair')
+            Action.stderr.write('Skipping empty masks in changeLJ14Pair\n')
             return None
         # Make sure we only selected 1 atom type, and figure out what it is
         attype1 = None
@@ -713,7 +697,8 @@ class change(Action):
     def init(self, arg_list):
         self.quiet = arg_list.has_key('quiet')
         self.mask = AmberMask(self.parm, arg_list.get_next_mask())
-        self.prop = arg_list.get_next_string().upper()
+        self.prop = self.flag_name = arg_list.get_next_string().upper()
+        self.add_flag = False
         if self.prop in ('CHARGE', 'RADII', 'SCREEN', 'MASS'):
             self.new_val = arg_list.get_next_float()
             self.new_val_str = '%.4f' % self.new_val
@@ -743,11 +728,11 @@ class change(Action):
                 # AmoebaParm can have an AMOEBA_ATOMIC_NUMBER section instead of
                 # ATOMIC_NUMBER. So see which of them is available and change
                 # that one
-                if 'ATOMIC_NUMBER' not in self.parm.flag_list:
-                    if 'AMOEBA_ATOMIC_NUMBER' not in self.parm.flag_list:
-                        raise ParmedChangeError('Could not find %s in Amoeba '
-                                                'prmtop.' % self.prop)
-                    self.prop = 'AMOEBA_ATOMIC_NUMBER'
+                if self.parm.amoeba:
+                    self.flag_name = 'AMOEBA_ATOMIC_NUMBER'
+                if self.prop not in self.parm.parm_data:
+                    # Add it
+                    self.add_flag = True
 
     def __str__(self):
         atnums = self.mask.Selection()
@@ -785,8 +770,10 @@ class change(Action):
                 setattr(atom, prop, self.new_val)
         # Update the raw data for any Amber topologies
         if isinstance(self.parm, AmberParm):
+            if self.add_flag:
+                addAtomicNumber(self.parm).execute()
             for i, atom in enumerate(self.parm.atoms):
-                self.parm.parm_data[self.prop][i] = getattr(atom, prop)
+                self.parm.parm_data[self.flag_name][i] = getattr(atom, prop)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -802,21 +789,21 @@ class printInfo(Action):
         if not self.flag in self.parm.flag_list:
             warnings.warn('%%FLAG %s not found!' % self.flag,
                           SeriousParmWarning)
-            self.found = False
+            self.found = False # pragma: no cover
         else:
             if self.parm.formats[self.flag].type is float:
                 self.format = '%16.5f '
             else:
                 self.format = '%-16s '
-
             self.found = True
 
     def __repr__(self):
         ret_str = []
-        for i, item in enumerate(self.parm.parm_data[self.flag]):
-            ret_str.append(self.format % item)
-            if i % 5 == 4:
-                ret_str.append('\n')
+        if self.found:
+            for i, item in enumerate(self.parm.parm_data[self.flag]):
+                ret_str.append(self.format % item)
+                if i % 5 == 4:
+                    ret_str.append('\n')
 
         return ''.join(ret_str)
 
@@ -890,7 +877,7 @@ class printLJTypes(Action):
     Prints the Lennard Jones type index for the given atom mask or, if no value
     is given, the LJ type index for each atom.
     """
-    usage = '[<mask>|<type name>]'
+    usage = '[<mask>|<type idx>]'
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Compile the list of indices
@@ -914,12 +901,15 @@ class printLJTypes(Action):
             for field in type_fields:
                 if len(field.strip()) == 0: continue
                 if '-' in field:
-                    begin = int(field.split('-')[0])
+                    begin = int(field.split('-')[0]) # FIXME
                     end = min(int(field.split('-')[1]), self.parm.ptr('ntypes'))
-                    if begin < 0 or end < begin:
+                    if begin <= 0 or end < begin or begin > self.parm.ptr('ntypes'):
                         raise ParmError('printLJTypes: Bad atom type range')
                     self.type_list.extend([i for i in range(begin, end+1)])
                 else:
+                    idx = int(field)
+                    if idx <= 0 or idx > self.parm.ptr('ntypes'):
+                        raise ParmError('printLJTypes: Bad atom type index')
                     self.type_list.append(int(field))
 
     def __str__(self):
@@ -931,9 +921,9 @@ class printLJTypes(Action):
             selection = self.mask.Selection()
         elif self.type_list:
             selection = [0 for atom in self.parm.atoms]
-            for item in self.type_list:
-                selection[item-1] = 1
-        else:
+            for i, atom in enumerate(self.parm.atoms): # FIXME
+                if atom.nb_idx in self.type_list: selection[i] = 1
+        if sum(selection) == 0:
             return 'Nothing to do for printLJTypes'
 
         indices = set()
@@ -1225,7 +1215,7 @@ class setMolecules(Action):
         else:
             warnings.warn("Value of solute_ions is unrecognized [%s]! "
                           "Assuming True" % solute_ions, SeriousParmWarning)
-            self.solute_ions = True
+            self.solute_ions = True # pragma: no cover
 
     def __str__(self):
         return ("Setting MOLECULE properties of the prmtop (SOLVENT_POINTERS "
@@ -1439,7 +1429,7 @@ class defineSolvent(Action):
             self.res_list = res_list[:len(res_list)-1]
         else:
             self.res_list = res_list
-        residue.SOLVENT_NAMES = res_list.split(',')
+        residue.SOLVENT_NAMES = self.res_list.split(',')
 
     def __str__(self):
         return "Residues %s are now considered to be solvent" % self.res_list
@@ -1652,31 +1642,45 @@ class printDihedrals(Action):
                 if isinstance(self.parm, AmoebaParm):
                     char = ' '
                     scee = scnb = 'N/A'
-                elif dihedral.signs[1] < 0:
+                    k = '%10.4f' % dihedral.type.phi_k
+                    per = '%10.4f' % dihedral.type.per
+                    phase = '%10.4f' % dihedral.type.phase
+                elif dihedral.improper:
                     char = 'I'
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
-                elif dihedral.signs[0] < 0 and isinstance(self.parm, AmberParm):
+                        scee = scnb = k = per = phase = 'N/A'
+                elif dihedral.ignore_end:
                     char = 'M'
-                    scee = '%10.4f' % dihedral.type.scee
-                    scnb = '%10.4f' % dihedral.type.scnb
+                    if dihedral.type is not None:
+                        scee = '%10.4f' % dihedral.type.scee
+                        scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
+                    else:
+                        scee = scnb = k = per = phase = 'N/A'
                 else:
                     char = ' '
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
+                        scee = scnb = k = per = phase = 'N/A'
                 retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           ' %7d %4s (%4s) %10.4f %10.4f %10.4f %10s %10s\n' %
+                           ' %7d %4s (%4s) %10s %10s %10s %10s %10s\n' %
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                            dihedral.type.phi_k, dihedral.type.per,
-                            dihedral.type.phase, scee, scnb)
+                            k, per, phase, scee, scnb)
                 )
         else:
             atomsel = set(self.mask.Selected())
@@ -1701,41 +1705,46 @@ class printDihedrals(Action):
                 if isinstance(self.parm, AmoebaParm):
                     char = ' '
                     scee = scnb = 'N/A'
+                    k = '%10.4f' % dihedral.type.phi_k
+                    per = '%10.4f' % dihedral.type.per
+                    phase = '%10.4f' % dihedral.type.phase
                 elif dihedral.improper:
                     char = 'I'
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
-                elif dihedral.signs[0] < 0 and isinstance(self.parm, AmberParm):
+                        scee = scnb = k = per = phase = 'N/A'
+                elif dihedral.ignore_end:
                     char = 'M'
-                    scee = '%10.4f' % dihedral.type.scee
-                    scnb = '%10.4f' % dihedral.type.scnb
+                    if dihedral.type is not None:
+                        scee = '%10.4f' % dihedral.type.scee
+                        scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
+                    else:
+                        scee = scnb = k = per = phase = 'N/A'
                 else:
                     char = ' '
                     if dihedral.type is not None:
                         scee = '%10.4f' % dihedral.type.scee
                         scnb = '%10.4f' % dihedral.type.scnb
+                        k = '%10.4f' % dihedral.type.phi_k
+                        per = '%10.4f' % dihedral.type.per
+                        phase = '%10.4f' % dihedral.type.phase
                     else:
-                        scee = scnb = 'N/A'
-                if dihedral.type is not None:
-                    retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
-                           '(%4s)  %7d %4s (%4s) %10.4f %10.4f %10.4f %10s '
+                        scee = scnb = k = per = phase = 'N/A'
+                retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
+                           '(%4s)  %7d %4s (%4s) %10s %10s %10s %10s '
                            '%10s\n' % (char, atom1.idx+1, atom1.name,
                             atom1.type, atom2.idx+1, atom2.name, atom2.type,
                             atom3.idx+1, atom3.name, atom3.type, atom4.idx+1,
-                            atom4.name, atom4.type, dihedral.type.phi_k,
-                            dihedral.type.per, dihedral.type.phase, scee, scnb)
-                    )
-                else:
-                    retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
-                           '(%4s)  %7d %4s (%4s) %-10s %-10s %-10s %10s %10s\n'%
-                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
-                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                            'N/A', 'N/A', 'N/A', scee, scnb)
-                    )
+                            atom4.name, atom4.type, k, per, phase, scee, scnb)
+                )
 
         return ''.join(retstr)
 
@@ -2025,7 +2034,10 @@ class addAtomicNumber(Action):
     """
     supported_subclasses = (AmberParm,)
     def init(self, arg_list):
-        self.present = 'ATOMIC_NUMBER' in self.parm.flag_list
+        if self.parm.amoeba:
+            self.present = 'AMOEBA_ATOMIC_NUMBER' in self.parm.flag_list
+        else:
+            self.present = 'ATOMIC_NUMBER' in self.parm.flag_list
 
     def __str__(self):
         if self.present:
@@ -2034,10 +2046,14 @@ class addAtomicNumber(Action):
 
     def execute(self):
         if self.present: return
-        self.parm.add_flag('ATOMIC_NUMBER', '10I8',
-                           num_items=len(self.parm.atoms))
+        if self.parm.amoeba: # FIXME
+            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+            flag = 'AMOEBA_ATOMIC_NUMBER'
+        else:
+            self.parm.add_flag('ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+            flag = 'ATOMIC_NUMBER'
         for i, atm in enumerate(self.parm.atoms):
-            self.parm.parm_data['ATOMIC_NUMBER'][i] = atm.atomic_number
+            self.parm.parm_data[flag][i] = atm.atomic_number
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2102,7 +2118,7 @@ class deleteDihedral(Action):
                               'duplicate atoms!' %
                               (atnum1, atnum2, atnum3, atnum4),
                               SeriousParmWarning)
-                continue
+                continue # pragma: no cover
             # Now search through our dihedral list to see which indexes (if any)
             # we have to remove. Keep tabs of them so we can pop them in reverse
             # order (so we don't have to re-figure indices) afterwards

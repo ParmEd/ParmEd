@@ -28,15 +28,55 @@ class TestStructureAPI(unittest.TestCase):
 
     def setUp(self):
         s = self.s = structure.Structure()
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'GLY', 2, 'A')
-        s.add_atom(Atom(), 'GLY', 3, 'A')
-        s.add_atom(Atom(), 'GLY', 3, 'B')
-        s.add_atom(Atom(), 'GLY', 3, 'B')
-        s.add_atom(Atom(), 'GLY', 3, 'B')
+        s.add_atom(Atom(atomic_number=6), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=1), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=7), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=8), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=16), 'GLY', 2, 'A')
+        s.add_atom(Atom(atomic_number=99), 'GLY', 3, 'A')
+        s.add_atom(Atom(atomic_number=6), 'GLY', 3, 'B')
+        s.add_atom(Atom(atomic_number=6), 'GLY', 3, 'B')
+        s.add_atom(Atom(atomic_number=6), 'GLY', 3, 'B')
+
+    @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+    def test_gb_assignment(self):
+        """ Tests GB parameter assignment """
+        # GBneck1
+        params = self.s._get_gb_parameters(app.GBn)
+        # Radii are assigned elsewhere -- check screen
+        self.assertEqual(params[0][1], 0.48435382330)
+        self.assertEqual(params[1][1], 1.09085413633)
+        self.assertEqual(params[2][1], 0.700147318409)
+        self.assertEqual(params[3][1], 1.06557401132)
+        self.assertEqual(params[4][1], 0.602256336067)
+        self.assertEqual(params[5][1], 0.5)
+        # GBneck2
+        self.s.bonds.append(Bond(self.s[0], self.s[1]))
+        params = self.s._get_gb_parameters(app.GBn2)
+        self.assertEqual(params[0][1], 1.058554)
+        self.assertEqual(params[0][2], 0.733756)
+        self.assertEqual(params[0][3], 0.506378)
+        self.assertEqual(params[0][4], 0.205844)
+        self.assertEqual(params[1][1], 1.425952)
+        self.assertEqual(params[1][2], 0.788440)
+        self.assertEqual(params[1][3], 0.798699)
+        self.assertEqual(params[1][4], 0.437334)
+        self.assertEqual(params[2][1], 0.733599)
+        self.assertEqual(params[2][2], 0.503364)
+        self.assertEqual(params[2][3], 0.316828)
+        self.assertEqual(params[2][4], 0.192915)
+        self.assertEqual(params[3][1], 1.061039)
+        self.assertEqual(params[3][2], 0.867814)
+        self.assertEqual(params[3][3], 0.876635)
+        self.assertEqual(params[3][4], 0.387882)
+        self.assertEqual(params[4][1], -0.703469)
+        self.assertEqual(params[4][2], 0.867814)
+        self.assertEqual(params[4][3], 0.876635)
+        self.assertEqual(params[4][4], 0.387882)
+        self.assertEqual(params[5][1], 0.5)
+        self.assertEqual(params[5][2], 1.0)
+        self.assertEqual(params[5][3], 0.8)
+        self.assertEqual(params[5][4], 4.85)
 
     def test_combining_rule(self):
         """ Tests the Structure.combining_rule attribute """
@@ -488,6 +528,85 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(len(s[0].dihedral_partners), 3)
         self.assertEqual(len(s[0].dihedrals), 1)
 
+    def test_prune_empty(self):
+        """ Tests the prune_empty_terms function """
+        s = create_random_structure(parametrized=True)
+        # Bonds
+        nterms = len(s.bonds)
+        s.bonds[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.bonds), nterms-1)
+        # Angles
+        nterms = len(s.angles)
+        s.angles[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.angles), nterms-1)
+        # Dihedrals
+        nterms = len(s.dihedrals)
+        s.dihedrals[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.dihedrals), nterms-1)
+        # R-B torsions
+        nterms = len(s.rb_torsions)
+        s.rb_torsions[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.rb_torsions), nterms-1)
+        # Urey-Bradleys
+        nterms = len(s.urey_bradleys)
+        s.urey_bradleys[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.urey_bradleys), nterms-1)
+        # Impropers
+        nterms = len(s.impropers)
+        s.impropers[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.impropers), nterms-1)
+        # CMAPs
+        nterms = len(s.cmaps)
+        s.cmaps[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.cmaps), nterms-1)
+        # Trigonal angles
+        nterms = len(s.trigonal_angles)
+        s.trigonal_angles[-1].atom1 = s.trigonal_angles[-1].atom2 = \
+                s.trigonal_angles[-1].atom3 = s.trigonal_angles[-1].atom4 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.trigonal_angles), nterms-1)
+        # OOP bends
+        nterms = len(s.out_of_plane_bends)
+        s.out_of_plane_bends[-1].atom1 = s.out_of_plane_bends[-1].atom2 = \
+                s.out_of_plane_bends[-1].atom3 = s.out_of_plane_bends[-1].atom4 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.out_of_plane_bends), nterms-1)
+        # Pi-torsions
+        nterms = len(s.pi_torsions)
+        s.pi_torsions[-1].atom1 = s.pi_torsions[-1].atom2 = \
+                s.pi_torsions[-1].atom3 = s.pi_torsions[-1].atom4 = \
+                s.pi_torsions[-1].atom5 = s.pi_torsions[-1].atom6 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.pi_torsions), nterms-1)
+        # Stretch-bends
+        nterms = len(s.stretch_bends)
+        s.stretch_bends[-1].atom1 = s.stretch_bends[-1].atom2 = \
+                s.stretch_bends[-1].atom3 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.stretch_bends), nterms-1)
+        # Torsion-torsions
+        nterms = len(s.torsion_torsions)
+        s.torsion_torsions[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.torsion_torsions), nterms-1)
+        # Chiral frames
+        nterms = len(s.chiral_frames)
+        s.chiral_frames[-1].atom1 = s.chiral_frames[-1].atom2 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.chiral_frames), nterms-1)
+        # Adjusts
+        nterms = len(s.adjusts)
+        s.adjusts[-1].atom1 = s.adjusts[-1].atom2 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.adjusts), nterms-1)
+
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
 
@@ -872,6 +991,11 @@ class TestStructureAdd(unittest.TestCase):
         self.assertIsNot(s1, s3)
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
+        # Check when coordinates exist
+        crd = np.random.rand(5, len(s1.atoms), 3)
+        s1.coordinates = crd
+        np.testing.assert_equal((s1*multfac).get_coordinates(),
+                                np.hstack([crd for i in range(multfac)]))
 
     def test_multiply_not_parametrized(self):
         """ Tests replicating a non-parametrized Structure instance """

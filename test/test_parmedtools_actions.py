@@ -5,12 +5,15 @@ from __future__ import division, print_function
 
 import utils
 from utils import HAS_GROMACS
-from parmed import periodic_table, gromacs, load_file
+import parmed as pmd
+from parmed import periodic_table, gromacs, load_file, amber
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat
 from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
-from parmed.utils.six.moves import range, zip
+from parmed.utils import PYPY
+from parmed.utils.six.moves import range, zip, StringIO
+from parmed.utils.six import string_types
 from copy import copy
 import numpy as np
 import os
@@ -31,6 +34,40 @@ solvparm = AmberParm(get_fn('solv2.parm7'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
+warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+
+# Make sure default overwrite is False
+PT.Action.overwrite = False
+
+# Make some new action subclasses
+class NewActionNoUsage(PT.Action):
+    needs_parm = False
+    def init(self, arg_list):
+        raise exc.NoArgument()
+
+class NewActionWithUsage(PT.Action):
+    needs_parm = False
+    usage = '<some_argument>'
+    def init(self, arg_list):
+        raise exc.NoArgument()
+
+class TestActionAPI(unittest.TestCase):
+    """ Tests the Action API """
+
+    def test_argument_types(self):
+        """ Test argument type handling of Action subclass """
+        self.assertRaises(TypeError, lambda: PT.actions.Action(10))
+
+    def test_error_handling(self):
+        """ Test error handling in Action initializer """
+        self.assertRaises(exc.ParmError, lambda:
+                PT.changeRadii(None, 'mbondi2'))
+        self.assertFalse(NewActionNoUsage(None).valid)
+        self.assertFalse(NewActionWithUsage(None).valid)
+        warnings.filterwarnings('error', category=exc.UnhandledArgumentWarning)
+        self.assertRaises(exc.UnhandledArgumentWarning, lambda:
+                PT.changeRadii(gasparm, 'mbondi2', 'extra', 'arguments'))
+        str(NewActionNoUsage(None)) # Make sure it doesn't crash
 
 class TestNonParmActions(unittest.TestCase):
     """ Tests all actions that do not require a prmtop instance """
@@ -40,9 +77,8 @@ class TestNonParmActions(unittest.TestCase):
 
     def test_overwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
-        self.assertTrue(PT.Action.overwrite)
         a = PT.setOverwrite(self.parm, False)
-        self.assertTrue(PT.Action.overwrite)
+        self.assertFalse(PT.Action.overwrite)
         a.execute()
         self.assertFalse(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are NOT overwritable')
@@ -50,7 +86,10 @@ class TestNonParmActions(unittest.TestCase):
         a.execute()
         self.assertTrue(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are overwritable')
-    
+        PT.setOverwrite(None, False).execute() # Turn it back off
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.setOverwrite(None, 'badarg'))
+
     def test_list_parms(self):
         """ Test listing of the prmtop files in the ParmEd interpreter """
         a = PT.listParms(self.parm)
@@ -241,7 +280,7 @@ class TestNonParmActions(unittest.TestCase):
                          parm.parm_data['ATOM_NAME'])
         self.assertEqual([a.type[:4] for a in parm.atoms],
                          parm.parm_data['AMBER_ATOM_TYPE'])
-    
+
     def _extensive_checks(self, parm):
         # Check the __contains__ methods of the various topologyobjects
         atoms = parm.atoms
@@ -272,17 +311,24 @@ class TestNonParmActions(unittest.TestCase):
 
 class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
-    
+
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        utils.FileIOTestCase.setUp(self)
+
+    @unittest.skipIf(PYPY, 'Cannot test with NetCDF on pypy')
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
         self._empty_writes()
         parm = copy(gasparm)
-        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
+        lract = PT.loadRestrt(parm, get_fn('trx.inpcrd'))
+        lract.execute()
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
-        PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
+        act = PT.parmout(parm, get_fn('test.parm7', written=True))
+        act.execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
         self.assertTrue(diff_files(get_fn('trx.prmtop'),
                                    get_fn('test.parm7', written=True)))
@@ -309,27 +355,59 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertTrue(diff_files(get_fn('trx.inpcrd'),
                                    get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
+        self._empty_writes()
+        # Now try NetCDF format
+        act2 = PT.outparm(parm, get_fn('test.parm7', written=True),
+                          get_fn('test.ncrst', written=True), 'netcdf')
+        act2.execute()
+        self.assertTrue(
+                amber.NetCDFRestart.id_format(get_fn('test.ncrst', written=True)))
+        # Now make sure the string methods work
+        str(act2); str(act); str(lract)
+        # Make sure overwriting does not work
+        self.assertRaises(exc.FileExists, act2.execute)
+        # Delete the prmtop and make sure it still raises
+        os.unlink(get_fn('test.parm7', written=True))
+        self.assertRaises(exc.FileExists, act2.execute)
 
     def test_write_frcmod(self):
         """ Test writeFrcmod on AmberParm """
         parm = gasparm
-        PT.writeFrcmod(parm, get_fn('test.frcmod', written=True)).execute()
+        act = PT.writeFrcmod(parm, get_fn('test.frcmod', written=True))
+        act.execute()
         self.assertTrue(diff_files(get_saved_fn('test.frcmod'),
                                    get_fn('test.frcmod', written=True)))
+        self.assertRaises(exc.FileExists, act.execute)
+        # Make sure 10-12 prmtops fail
+        parm = load_file(get_fn('ff91.parm7'))
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.writeFrcmod(load_file(get_fn('ff91.parm7')),
+                               get_fn('test2.frcmod', written=True))
+        )
+        # Make sure string does not error
+        str(act)
 
     def test_write_off_load_restrt(self):
         """ Test writeOFF on AmberParm """
         parm = copy(gasparm)
+        parm.coordinates = None
+        self.assertRaises(exc.ParmError, lambda:
+                PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
         PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
-        PT.writeOFF(parm, get_fn('test.off', written=True)).execute()
+        act = PT.writeOFF(parm, get_fn('test.off', written=True))
+        act.execute()
         self.assertTrue(diff_files(get_saved_fn('test.off'),
                                    get_fn('test.off', written=True),
                                    absolute_error=0.0001))
+        str(act)
+        self.assertRaises(exc.FileExists, act.execute)
 
     def test_change_radii(self):
         """ Test changeRadii on AmberParm """
         parm = copy(gasparm)
-        PT.changeRadii(parm, 'amber6').execute()
+        act = PT.changeRadii(parm, 'amber6')
+        act.execute()
+        str(act) # Make sure it doesn't fail
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'amber6 modified Bondi radii (amber6)')
         for i, atom in enumerate(parm.atoms):
@@ -357,6 +435,10 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             else:
                 self.assertEqual(radii, 1.5)
 
+        # Make sure it adds back all necessary flags
+        parm.delete_flag('RADIUS_SET')
+        parm.delete_flag('RADII')
+        parm.delete_flag('SCREEN')
         PT.changeRadii(parm, 'bondi').execute()
         self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'Bondi radii (bondi)')
         for atom in parm.atoms:
@@ -470,11 +552,16 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         # Now test bad input
         self.assertRaises(exc.ChangeRadiiError, lambda:
                           PT.changeRadii(parm, 'mbondi6').execute())
+        # Test that it works on non-Amber topologies
+        act = PT.changeRadii(pmd.load_file(get_fn('ala_ala_ala.psf')), 'mbondi3')
+        act.execute()
 
     def test_change_lj_pair(self):
         """ Test changeLJPair on AmberParm """
         parm = copy(gasparm)
-        PT.changeLJPair(parm, '@%N', '@%H', 1.0, 1.0).execute()
+        act = PT.changeLJPair(parm, '@%N', '@%H', 1.0, 1.0)
+        act.execute()
+        str(act)
         # Figure out what type numbers each atom type belongs to
         ntype = htype = 0
         for atom in parm.atoms:
@@ -485,10 +572,10 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         # Make sure the A and B coefficient matrices are what I expect them to
         # be
         indexes = sorted([ntype, htype])
-        acoef = parm.parm_data['LENNARD_JONES_ACOEF']
-        bcoef = parm.parm_data['LENNARD_JONES_BCOEF']
-        refa = gasparm.parm_data['LENNARD_JONES_ACOEF']
-        refb = gasparm.parm_data['LENNARD_JONES_BCOEF']
+        acoef = parm.parm_data['LENNARD_JONES_ACOEF'][:]
+        bcoef = parm.parm_data['LENNARD_JONES_BCOEF'][:]
+        refa = gasparm.parm_data['LENNARD_JONES_ACOEF'][:]
+        refb = gasparm.parm_data['LENNARD_JONES_BCOEF'][:]
         ntypes = parm.ptr('ntypes')
         for i in range(ntypes):
             for j in range(i, ntypes):
@@ -499,6 +586,16 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                 else:
                     self.assertEqual(acoef[idx-1], refa[idx-1])
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
+        # Check handling with no atoms
+        PT.changeLJPair(parm, '@NONE', '@%H', 1.0, 1.0).execute()
+        # Make sure nothing changed
+        np.testing.assert_equal(acoef, parm.parm_data['LENNARD_JONES_ACOEF'])
+        np.testing.assert_equal(bcoef, parm.parm_data['LENNARD_JONES_BCOEF'])
+        # Check error handling
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJPair(parm, ':*', '@%H', 1.0, 1.0).execute())
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJPair(parm, '@%H', ':*', 1.0, 1.0).execute())
 
     def test_change_lj_14_pair(self):
         """ Check that changeLJ14Pair fails on AmberParm """
@@ -509,7 +606,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_change(self):
         """ Test change on AmberParm with all properties """
         parm = copy(gasparm)
-        PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet').execute()
+        act = PT.change(parm, 'CHARGE', ':ALA', 0, 'quiet')
+        act.execute()
+        self.assertEqual(len(str(act).split('\n')), 1)
         for flag in parm.parm_data:
             if flag != 'CHARGE':
                 self.assertEqual(parm.parm_data[flag], gasparm.parm_data[flag])
@@ -519,7 +618,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                 self.assertEqual(atom.charge, 0)
             else:
                 self.assertEqual(atom.charge, gasparm.atoms[i].charge)
-        PT.change(parm, 'MASS', ':GLY', 10.0).execute()
+        act = PT.change(parm, 'MASS', ':GLY', 10.0)
+        self.assertGreater(len(str(act).split('\n')), 1)
+        act.execute()
         for i, atom in enumerate(parm.atoms):
             self.assertEqual(parm.parm_data['MASS'][i], atom.mass)
             if atom.residue.name == 'GLY':
@@ -568,6 +669,17 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                              parm.parm_data['TREE_CHAIN_CLASSIFICATION'][i])
             if atom.residue.idx < 2:
                 self.assertEqual(atom.tree, 'ABC')
+        # Check if we try to add strings that are too long
+        warnings.filterwarnings('error', category=exc.ParmWarning)
+        self.assertRaises(exc.ParmWarning, lambda:
+                PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute())
+        warnings.filterwarnings('ignore', category=exc.ParmWarning)
+        # Make sure the strings get truncated
+        PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute()
+        for atom in parm.atoms:
+            self.assertEqual(atom.name, 'LALA')
+            self.assertEqual(parm.parm_data['ATOM_NAME'][atom.idx], 'LALA')
+        warnings.filterwarnings('always', category=exc.ParmWarning)
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
@@ -590,11 +702,15 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                     self.assertAlmostEqual(datatype(i), j, places=4)
                 else:
                     self.assertEqual(datatype(i), j)
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                repr(PT.printInfo(gasparm, 'NOTAFLAG')))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on AmberParm """
         parm = copy(gasparm)
-        PT.addLJType(parm, '@1').execute()
+        act = PT.addLJType(parm, '@1')
+        act.execute()
+        str(act) # Make sure it doesn't crash
         self.assertEqual(parm.ptr('ntypes'), gasparm.ptr('ntypes') + 1)
         self.assertEqual(parm.atoms[0].nb_idx, parm.ptr('ntypes'))
         ntypes = parm.ptr('ntypes')
@@ -657,12 +773,60 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
             self.assertTrue(words[2].startswith('N'))
             self.assertTrue(words[3].startswith('N'))
             self.assertEqual(words[7], '1')
+        # Integer
+        act = PT.printLJTypes(gasparm, 1)
+        for line in str(act).split('\n'):
+            if not line.startswith('ATOM'):
+                continue
+            words = line.split()
+            self.assertTrue(words[2].startswith('N'))
+            self.assertTrue(words[3].startswith('N'))
+            self.assertEqual(words[7], '1')
+        # Integer tuple
+        act = PT.printLJTypes(gasparm, '1,2')
+        for line in str(act).split('\n'):
+            if not line.startswith('ATOM'):
+                continue
+            words = line.split()
+            self.assertIn(words[2][0], 'NH')
+            self.assertIn(words[3][0], 'NH')
+            self.assertIn(words[7], ('1', '2'))
+        # Default prints out every atom
+        i = 0
+        for line in str(PT.printLJTypes(gasparm)).split('\n'):
+            if not line.startswith('ATOM'):
+                continue
+            i += 1
+        self.assertEqual(i, len(gasparm.atoms))
+        # Now check ranges and such
+        act = PT.printLJTypes(gasparm, '1-3,5')
+        it = (a for a in gasparm.atoms if a.nb_idx in (1, 2, 3, 5))
+        for line in str(act).split('\n'):
+            if not line.startswith('ATOM'):
+                continue
+            words = line.split()
+            a = next(it)
+            self.assertEqual(int(words[1]), a.idx+1)
+            self.assertEqual(words[2], a.name)
+            self.assertEqual(words[3], a.type)
+            self.assertEqual(int(words[7]), a.nb_idx)
+            i += 1
+        # Check that it still works when nothing selected
+        str(PT.printLJTypes(gasparm, '@NOATOM'))
+        # Check illegal selections
+        self.assertRaises(exc.ParmError, lambda:
+                PT.printLJTypes(gasparm, 0))
+        self.assertRaises(exc.ParmError, lambda:
+                PT.printLJTypes(gasparm, '0-0'))
 
     def test_scee_scnb(self):
         """ Test scee and scnb actions on AmberParm """
         parm = copy(gasparm)
-        PT.scee(parm, 1.0).execute()
-        PT.scnb(parm, 1.0).execute()
+        act1 = PT.scee(parm, 1.0)
+        act2 = PT.scnb(parm, 1.0)
+        act1.execute()
+        act2.execute()
+        str(act1), str(act2)
         for dih in parm.dihedrals:
             self.assertEqual(dih.type.scee, 1.0)
             self.assertEqual(dih.type.scnb, 1.0)
@@ -675,6 +839,15 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         """ Test printDetails on AmberParm """
         act = PT.printDetails(gasparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DETAILS)
+        # Check out different ways of selecting parms
+        act = PT.printDetails(gasparm, '@1', parm=0)
+        self.assertEqual(str(act), saved.PRINT_DETAILS)
+        act = PT.printDetails(gasparm, '@1', parm=str(gasparm))
+        self.assertEqual(str(act), saved.PRINT_DETAILS)
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.printDetails(gasparm, '@1', parm='DNE'))
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.printDetails(gasparm, '@1', parm=10))
 
     def test_print_flags(self):
         """ Test printFlags on AmberParm """
@@ -754,6 +927,11 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertEqual(str(act), saved.PRINT_DIHEDRALS_4MASKS)
         act = PT.printDihedrals(gasparm, '@14', '@12', ':1@CA', '@7')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALS_4MASKS)
+        # Now make sure other combos all work
+        str(PT.printDihedrals(gasparm, ':*'))
+        str(PT.printDihedrals(gasparm, ':1-10', ':2-11'))
+        str(PT.printDihedrals(gasparm, ':*', ':1-10', ':1-10', ':*'))
+        str(PT.printDihedrals(gasparm, ':*', ':*', ':1-10', ':1-10'))
 
     def test_set_molecules(self):
         """ Test setMolecules on AmberParm """
@@ -775,8 +953,19 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
         PT.setMolecules(parm, solute_ions=False).execute()
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [5, 926, 2])
-        PT.setMolecules(parm, solute_ions=True).execute()
+        act = PT.setMolecules(parm, solute_ions=True)
+        act.execute()
+        str(act)
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.setMolecules(parm, solute_ions='foo'))
+
+        # Make sure we warn if reordering was required
+        warnings.filterwarnings('error', category=exc.ParmWarning)
+        self.assertRaises(exc.ParmWarning,
+                PT.setMolecules(pmd.load_file(get_fn('things.parm7')),
+                    solute_ions=True).execute)
+        warnings.filterwarnings('always', category=exc.ParmWarning)
 
     def test_net_charge(self):
         """ Test netCharge on AmberParm """
@@ -790,19 +979,28 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_strip(self):
         """ Test stripping of AmberParm """
         parm = copy(gasparm)
+        parm.box = [10, 10, 10, 90, 90, 90]
         act = PT.strip(parm, ':1')
         act.execute()
         self.assertEqual(parm.ptr('natom'), 1641)
         self.assertEqual(len(parm.atoms), 1641)
         self.assertEqual(str(act), "Removing mask ':1' (%d atoms) "
                          "from the topology file." % (len(gasparm.residues[0])))
+        np.testing.assert_equal(parm.box, [10, 10, 10, 90, 90, 90])
+        # Now test nobox
+        act = PT.strip(parm, ':1', 'nobox')
+        act.execute()
+        str(act)
+        self.assertIs(parm.box, None)
 
     def test_define_solvent(self):
         """ Test defineSolvent on AmberParm """
         import parmed.residue as residue
         PT.defineSolvent(gasparm, 'WAT,HOH,Na+,Cl-').execute()
         self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH Na+ Cl-'.split())
-        PT.defineSolvent(gasparm, 'WAT,HOH').execute()
+        act = PT.defineSolvent(gasparm, 'WAT,HOH,')
+        act.execute()
+        str(act)
         self.assertEqual(residue.SOLVENT_NAMES, 'WAT HOH'.split())
 
     def test_add_exclusions(self):
@@ -810,16 +1008,18 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = copy(gasparm)
         in_exclusions_before = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
                 in_exclusions_before.append(atom2 in all_exclusions)
         self.assertFalse(all(in_exclusions_before))
-        PT.addExclusions(parm, ':1', ':1').execute()
+        act = PT.addExclusions(parm, ':1', ':1')
+        act.execute()
+        str(act)
         in_exclusions_after = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                                 atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -833,7 +1033,7 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = AmberParm.from_rawdata(parm)
         in_exclusions_before = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -843,14 +1043,19 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_add_delete_dihedral(self):
         """ Test addDihedral and deleteDihedral on AmberParm """
         parm = copy(gasparm)
-        n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
+        act = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1')
+        n = act.execute()
+        str(act)
+        str(PT.deleteDihedral(parm, '@NONE', '@NONE', '@NONE', '@NONE'))
         parm.remake_parm()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
         NALA = sum([res.name == 'ALA' for res in parm.residues])
         self.assertEqual(n, NALA)
-        PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
-                       0.1556, 3, 0, 1.2, 2.0).execute()
+        act = PT.addDihedral(parm, ':ALA@N', ':ALA@CA', ':ALA@CB', ':ALA@HB1',
+                       0.1556, 3, 0, 1.2, 2.0)
+        act.execute()
+        str(act)
         parm.remake_parm()
         self.assertEqual(gasparm.ptr('nphih') + gasparm.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia'))
@@ -878,6 +1083,35 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                                 num_ignore_ends += 1
         self.assertEqual(num_dihedrals, 2*NALA)
         self.assertEqual(num_ignore_ends, 1*NALA)
+        # Try adding a new improper
+        ntyp = len(parm.dihedral_types)
+        for d in parm.dihedrals:
+            if d.improper:
+                dt = d.type
+                break
+        else:
+            assert False, 'No natural impropers found'
+        PT.addDihedral(parm, '@1', '@20', '@30', '@40', dt.phi_k,
+                dt.per, dt.phase, dt.scee, dt.scnb, type='improper').execute()
+        self.assertEqual(len(parm.dihedral_types), ntyp)
+        self.assertIs(parm.dihedrals[-1].type, dt)
+        # Error checking
+        self.assertRaises(exc.SetParamError,
+                PT.addDihedral(parm, '@1-2', '@3', '@4', '@5', 1, 1, 10).execute)
+        self.assertRaises(exc.InputError, lambda:
+                PT.addDihedral(parm, '@1', '@2', '@3', '@4', 1, 1, 10,
+                               type='badtype').execute()
+        )
+        self.assertRaises(exc.SetParamError, lambda:
+                PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1,
+                    10).execute())
+        self.assertRaises(exc.DeleteDihedralError, lambda:
+                PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
+        self.assertRaises(exc.SeriousParmWarning,
+                PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5',
+                    '@6-7').execute)
+        self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35',
+            '@45').execute(), 0)
 
     def test_set_bond(self):
         """ Test setBond on AmberParm """
@@ -887,36 +1121,66 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertEqual(str(act), saved.SET_BOND)
         nala = sum([1 for res in parm.residues if res.name == 'ALA'])
         nbon = len(parm.bonds)
-        PT.setBond(parm, ':ALA@CB', ':ALA@HA', 100.0, 1.5).execute()
+        act = PT.setBond(parm, ':ALA@CB', ':ALA@HA', 100.0, 1.5)
+        act.execute()
+        str(act)
         for atom in parm.atoms:
             if atom.residue.name == 'ALA' and atom.name == 'HA':
                 self.assertEqual(len(atom.bonds), 2)
                 for atom2 in atom.bond_partners:
                     self.assertIn(atom2.name, ('CA','CB'))
         self.assertEqual(nbon + nala, len(parm.bonds))
+        # Add a new bond with an existing bond type and make sure a new type is
+        # not added
+        ntyp = len(parm.bond_types)
+        PT.setBond(parm, '@1', '@20', parm.bond_types[0].k,
+                   parm.bond_types[0].req).execute()
+        self.assertEqual(ntyp, len(parm.bond_types))
+        self.assertIs(parm.bonds[-1].type, parm.bond_types[0])
+        # Error checking
+        self.assertRaises(exc.SetParamError, lambda:
+                PT.setBond(parm, '@1', '@2-3', 300.0, 1.5).execute())
 
     def test_set_angle(self):
         """ Test setAngle on AmberParm """
         parm = copy(gasparm)
-        PT.setAngle(parm, ':ALA@CA', ':ALA@CB', ':ALA@HB1', 40, 100).execute()
+        act = PT.setAngle(parm, ':ALA@CA', ':ALA@CB', ':ALA@HB1', 40, 100)
+        act.execute()
+        str(act)
         act = PT.printAngles(parm, ':ALA@CB')
         self.assertEqual(str(act), saved.SET_ANGLE)
         nala = sum([1 for res in parm.residues if res.name == 'ALA'])
         nang = len(parm.angles)
         PT.setAngle(parm, ':ALA@HA', ':ALA@CB', ':ALA@HB1', 50, 120).execute()
         self.assertEqual(nang + nala, len(parm.angles))
+        # Add a new angle with an existing type and make sure it uses that
+        angtyp = parm.angle_types[0]
+        ntyp = len(parm.angle_types)
+        PT.setAngle(parm, '@1', '@20', '@30', angtyp.k, angtyp.theteq).execute()
+        self.assertEqual(len(parm.angle_types), ntyp)
+        self.assertIs(parm.angles[-1].type, parm.angle_types[0])
+        # Error checking
+        self.assertRaises(exc.SetParamError,
+                PT.setAngle(parm, '@1', '@2', '@3-4', 50, 120).execute)
+        self.assertRaises(exc.SetParamError,
+                PT.setAngle(parm, '@1', '@2-3', '@4', 50, 120).execute)
 
     def test_add_atomic_number(self):
         """ Test addAtomicNumber on AmberParm """
         parm = copy(gasparm)
         self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
         atomic_numbers = [atom.atomic_number for atom in parm.atoms]
-        PT.addAtomicNumber(parm).execute()
+        act = PT.addAtomicNumber(parm)
+        act.execute()
+        str(act)
         self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
+        str(PT.addAtomicNumber(parm)) # Already present
 
     def test_print_lj_matrix(self):
         """ Test printLJMatrix on AmberParm """
         act = PT.printLJMatrix(gasparm, '@1')
+        self.assertEqual(str(act), saved.PRINT_LJMATRIX)
+        act = PT.printLJMatrix(gasparm, gasparm[0].nb_idx)
         self.assertEqual(str(act), saved.PRINT_LJMATRIX)
 
     def test_delete_bond(self):
@@ -972,7 +1236,9 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         parm = AmberParm(get_fn('ash.parm7'))
         origparm = copy(parm)
         origparm.name = origparm.name + '_copy1'
-        PT.changeProtState(parm, ':ASH', 0).execute()
+        act = PT.changeProtState(parm, ':ASH', 0)
+        act.execute()
+        str(act)
         self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
         self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)
         for i, atom in enumerate(parm.atoms):
@@ -1011,6 +1277,22 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
                     self.assertTrue(before[j] <= this[j] <= after[j])
                 else:
                     self.assertTrue(before[j] >= this[j] >= after[j])
+        # Now check that if no atoms are selected, it is handled properly
+        parm = pmd.load_file(get_fn('ash.parm7'))
+        act = PT.changeProtState(parm, ':GLH', 1)
+        str(act)
+        act.execute()
+        # Now check error handling if the selected residue is not protonable
+        self.assertRaises(exc.ChangeStateError,
+                PT.changeProtState(parm, ':ACE', 1).execute)
+        self.assertRaises(exc.ChangeStateError,
+                PT.changeProtState(parm, ':ASH', 10).execute)
+        self.assertRaises(exc.ChangeStateError,
+                PT.changeProtState(parm, ':*', 1).execute)
+        self.assertRaises(exc.ChangeStateError,
+                PT.changeProtState(parm, ':ASH@CA', 1).execute)
+        self.assertRaises(exc.ChangeStateError,
+                PT.changeProtState(parm, '@13-25', 1).execute)
 
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB actions on AmberParm """
@@ -1127,13 +1409,40 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     def test_ti_merge(self):
         """ Tests the tiMerge action on AmberParm """
         parm = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
+        parm2 = AmberParm(get_fn('abs.prmtop'), get_fn('abs.inpcrd'))
         PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute()
-        parm.write_parm(get_fn('abs_merged.prmtop', written=True))
-        parm.write_rst7(get_fn('abs_merged.inpcrd', written=True))
-        self.assertTrue(diff_files(get_fn('abs_merged.prmtop', written=True),
-                                   get_saved_fn('abs_merged.prmtop')))
-        self.assertTrue(diff_files(get_fn('abs_merged.inpcrd', written=True),
-                                   get_saved_fn('abs_merged.inpcrd')))
+        parm.save(get_fn('abs_merged.prmtop', written=True))
+        parm.save(get_fn('abs_merged.inpcrd', written=True))
+        new_parm = pmd.load_file(get_fn('abs_merged.prmtop', written=True))
+        new_crd = pmd.load_file(get_fn('abs_merged.inpcrd', written=True))
+        self.assertEqual(len(parm.parm_data), len(new_parm.parm_data))
+        for key in parm.parm_data:
+            if len(parm.parm_data[key]) == 0:
+                self.assertEqual(len(new_parm.parm_data[key]), 0)
+            elif isinstance(parm.parm_data[key][0], string_types):
+                self.assertEqual(parm.parm_data[key], new_parm.parm_data[key])
+            else:
+                np.testing.assert_allclose(parm.parm_data[key],
+                        new_parm.parm_data[key], atol=1e-6)
+        np.testing.assert_allclose(new_crd.coordinates[0], parm.coordinates,
+                atol=1e-5)
+        # The extra 2 masks are simply informational, so results should be the
+        # same
+        PT.tiMerge(parm2, ':1-3', ':4-6', ':2', ':5', ':7', ':8').execute()
+        for key in parm.parm_data:
+            if len(parm.parm_data[key]) == 0:
+                self.assertEqual(len(new_parm.parm_data[key]), 0)
+            elif isinstance(parm.parm_data[key][0], string_types):
+                self.assertEqual(parm.parm_data[key], new_parm.parm_data[key])
+            else:
+                np.testing.assert_allclose(parm.parm_data[key],
+                        new_parm.parm_data[key], atol=1e-6)
+        np.testing.assert_allclose(new_crd.coordinates[0], parm.coordinates,
+                atol=1e-5)
+        # Error checking
+        parm = AmberParm(get_fn('abs.prmtop'))
+        self.assertRaises(exc.TiMergeError, lambda:
+                PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
     def test_add12_6_4(self):
         """ Test the add12_6_4 action on AmberParm """
@@ -1160,14 +1469,77 @@ class TestAmberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
         self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
                          saved.PRINTLJMATRIX_NACLMG)
 
-class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
+    @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
+    def test_write_coordinates(self):
+        """ Test writeCoordinates method """
+        parm = copy(gasparm)
+        PT.loadCoordinates(parm, get_fn('trx.inpcrd')).execute()
+        basefn = get_fn('test', written=True)
+        # NetCDF trajectory
+        act = PT.writeCoordinates(parm, basefn + '.nc')
+        act.execute()
+        str(act) # Make sure it doesn't fail
+        self.assertTrue(pmd.amber.NetCDFTraj.id_format(basefn + '.nc'))
+        PT.writeCoordinates(parm, basefn + '_nc', 'netcdftraj').execute()
+        self.assertTrue(pmd.amber.NetCDFTraj.id_format(basefn + '_nc'))
+        # NetCDF restart
+        PT.writeCoordinates(parm, basefn + '.ncrst').execute()
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(basefn + '.ncrst'))
+        PT.writeCoordinates(parm, basefn + '_ncrst', 'netcdf').execute()
+        self.assertTrue(pmd.amber.NetCDFRestart.id_format(basefn + '_ncrst'))
+        # PDB
+        PT.writeCoordinates(parm, basefn + '.pdb').execute()
+        self.assertTrue(pmd.formats.PDBFile.id_format(basefn + '.pdb'))
+        PT.writeCoordinates(parm, basefn + '_pdb', 'pdb').execute()
+        self.assertTrue(pmd.formats.PDBFile.id_format(basefn + '_pdb'))
+        # CIF
+        PT.writeCoordinates(parm, basefn + '.cif').execute()
+        self.assertTrue(pmd.formats.CIFFile.id_format(basefn + '.cif'))
+        PT.writeCoordinates(parm, basefn + '_cif', 'CIF').execute()
+        self.assertTrue(pmd.formats.CIFFile.id_format(basefn + '_cif'))
+        # ASCII restart
+        PT.writeCoordinates(parm, basefn + '.rst7').execute()
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(basefn + '.rst7'))
+        PT.writeCoordinates(parm, basefn + '_rst7', 'restart').execute()
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(basefn + '_rst7'))
+        # ASCII trajectory
+        PT.writeCoordinates(parm, basefn + '.mdcrd').execute()
+        self.assertTrue(pmd.amber.AmberMdcrd.id_format(basefn + '.mdcrd'))
+        PT.writeCoordinates(parm, basefn + '_mdcrd', 'mdcrd').execute()
+        self.assertTrue(pmd.amber.AmberMdcrd.id_format(basefn + '_mdcrd'))
+        # Mol2 file
+        PT.writeCoordinates(parm, basefn + '.mol2').execute()
+        self.assertTrue(pmd.formats.Mol2File.id_format(basefn + '.mol2'))
+        PT.writeCoordinates(parm, basefn + '_mol2', 'mol2').execute()
+        self.assertTrue(pmd.formats.Mol2File.id_format(basefn + '_mol2'))
+        # ASCII restart by default
+        PT.writeCoordinates(parm, basefn + '.noext').execute()
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(basefn + '.noext'))
+        self.assertRaises(exc.InputError, lambda:
+                PT.writeCoordinates(parm, basefn, 'noformat').execute())
+        # Make sure overwriting is correctly handled
+        self.assertRaises(exc.FileExists, act.execute)
+
+    def test_check_validity(self):
+        """ Tests the checkValidity test """
+        act = PT.checkValidity(gasparm)
+        str(act)
+        act.execute()
+
+class TestChamberParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
-    
+
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        utils.FileIOTestCase.setUp(self)
+
     def test_parmout_outparm_load_restrt(self):
-        """ Test parmout, outparm, and loadRestrt actions for ChamberParm """
+        """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
         self._empty_writes()
         parm = copy(gascham)
-        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        act = PT.loadCoordinates(parm, get_fn('ala_ala_ala.rst7'))
+        act.execute()
+        str(act) # Make sure it doesn't fail
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
@@ -1203,6 +1575,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
                                    get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
+        # Check loadCoordinates error handling
+        self.assertRaises(exc.ParmError, lambda:
+                PT.loadCoordinates(parm, get_fn('trx.prmtop')).execute())
 
     def test_write_frcmod(self):
         """ Check that writeFrcmod fails for ChamberParm """
@@ -1401,7 +1776,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     def test_change_lj_14_pair(self):
         """ Test changeLJ14Pair for ChamberParm """
         parm = copy(gascham)
-        PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0).execute()
+        act = PT.changeLJ14Pair(parm, '@%NH3', '@%HC', 1.0, 1.0)
+        act.execute()
+        str(act)
         # Figure out what type numbers each atom type belongs to
         ntype = htype = 0
         for atom in parm.atoms:
@@ -1426,6 +1803,16 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
                 else:
                     self.assertEqual(acoef[idx-1], refa[idx-1])
                     self.assertEqual(bcoef[idx-1], refb[idx-1])
+        # Check handling with no atoms
+        PT.changeLJ14Pair(parm, '@NONE', '@%H', 1.0, 1.0).execute()
+        # Make sure nothing changed
+        np.testing.assert_equal(acoef, parm.parm_data['LENNARD_JONES_14_ACOEF'])
+        np.testing.assert_equal(bcoef, parm.parm_data['LENNARD_JONES_14_BCOEF'])
+        # Check error handling
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJ14Pair(parm, ':*', '@%H', 1.0, 1.0).execute())
+        self.assertRaises(exc.ChangeLJPairError, lambda:
+                PT.changeLJ14Pair(parm, '@%H', ':*', 1.0, 1.0).execute())
 
     def test_change(self):
         """ Test change on ChamberParm with all properties """
@@ -1511,11 +1898,16 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
                     self.assertAlmostEqual(datatype(i), j, places=4)
                 else:
                     self.assertEqual(datatype(i), j)
+        # Check this on non-AmberParm Structure classes
+        self.assertRaises(exc.ParmError, lambda:
+                PT.printInfo(load_file(get_fn('2koc.pdb'))))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on ChamberParm """
         parm = copy(gascham)
-        PT.addLJType(parm, '@1').execute()
+        act = PT.addLJType(parm, '@1')
+        act.execute()
+        str(act)
         self.assertEqual(parm.ptr('ntypes'), gascham.ptr('ntypes') + 1)
         self.assertEqual(parm.atoms[0].nb_idx, parm.ptr('ntypes'))
         ntypes = parm.ptr('ntypes')
@@ -1550,8 +1942,12 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
                             gascham.parm_data['LENNARD_JONES_BCOEF'][idx2-1])
         # Now supply keywords
         parm2 = copy(gascham)
-        PT.addLJType(parm2, '@1', radius=1.0, epsilon=1.0).execute()
-        PT.changeLJSingleType(parm, '@1', 1.0, 1.0).execute()
+        act = PT.addLJType(parm2, '@1', radius=1.0, epsilon=1.0)
+        act.execute()
+        str(act)
+        act = PT.changeLJSingleType(parm, '@1', 1.0, 1.0)
+        act.execute()
+        str(act)
         for x, y in zip(parm.parm_data['LENNARD_JONES_ACOEF'],
                         parm2.parm_data['LENNARD_JONES_ACOEF']):
             self.assertRelativeEqual(x, y)
@@ -1566,6 +1962,15 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(ntypes-1)+ntypes-1]
         self.assertEqual(parm.parm_data['LENNARD_JONES_ACOEF'][idx-1], 0.0)
         self.assertEqual(parm.parm_data['LENNARD_JONES_BCOEF'][idx-1], 0.0)
+        # Make sure an empty selection still works
+        act = PT.changeLJSingleType(parm, '@NOATOM', 1, 2)
+        act.execute()
+        str(act)
+        # Turn the first atom into a new type, then make sure changeLJSingleType
+        # fails if multiple atom types are selected
+        PT.addLJType(parm, '@1', radius=1, epsilon=0.5).execute()
+        self.assertRaises(exc.LJ_TypeError, PT.changeLJSingleType(parm, '@1-2',
+                                        1, 2).execute)
 
     def test_print_lj_types(self):
         """ Test printLJTypes for ChamberParm """
@@ -1664,7 +2069,9 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     def test_strip(self):
         """ Test strip action for ChamberParm """
         parm = copy(gascham)
-        PT.strip(parm, ':1').execute()
+        act = PT.strip(parm, ':1')
+        str(act)
+        act.execute()
         self.assertEqual(parm.ptr('natom'), 21)
         self.assertEqual(len(parm.atoms), 21)
         # Good enough for here. The strip action is repeatedly tested in the
@@ -1684,7 +2091,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         parm = copy(gascham)
         in_exclusions_before = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -1693,7 +2100,7 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         PT.addExclusions(parm, ':1', ':1').execute()
         in_exclusions_after = []
         for atom1 in parm.residues[0].atoms:
-            all_exclusions = (atom1.bond_partners + atom1.angle_partners + 
+            all_exclusions = (atom1.bond_partners + atom1.angle_partners +
                              atom1.dihedral_partners + atom1.exclusion_partners)
             for atom2 in parm.residues[0].atoms:
                 if atom1 is atom2: continue
@@ -1977,9 +2384,13 @@ class TestChamberParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
 
-class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
+class TestAmoebaParmActions(utils.FileIOTestCase, utils.TestCaseRelative):
     """ Tests actions on Amber prmtop files """
-    
+
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        utils.FileIOTestCase.setUp(self)
+
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()
@@ -2077,6 +2488,17 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
             else:
                 self.assertEqual(atom.type,
                                  amoebaparm.parm_data['AMBER_ATOM_TYPE'][i])
+        # Change atomic number
+        PT.change(parm, 'ATOMIC_NUMBER', '@1', 10).execute()
+        self.assertEqual(parm.atoms[0].atomic_number, 10)
+        self.assertEqual(parm.parm_data['AMOEBA_ATOMIC_NUMBER'][0], 10)
+        # Now make sure it adds the AMOEBA_ATOMIC_NUMBER section
+        parm.delete_flag('AMOEBA_ATOMIC_NUMBER')
+        PT.change(parm, 'ATOMIC_NUMBER', '@1', 1).execute()
+        self.assertIn('AMOEBA_ATOMIC_NUMBER', parm.parm_data)
+        self.assertEqual(parm[0].atomic_number, 1)
+        self.assertEqual(parm.parm_data['AMOEBA_ATOMIC_NUMBER'][0], 1)
+        # Check some error-handling
         self.assertRaises(exc.ParmedChangeError, lambda:
                 PT.change(parm, 'ATOM_TYPE_INDEX', '@1', 4).execute())
         self.assertRaises(exc.ParmedChangeError, lambda:
@@ -2086,6 +2508,12 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
+        # Make sure string casting always works
+        act = PT.change(parm, 'MASS', '@NOTHING', 0, 'quiet')
+        str(act)
+        previous_masses = parm.parm_data['MASS'][:]
+        act.execute()
+        np.testing.assert_equal(previous_masses, parm.parm_data['MASS'])
 
     def test_print_info(self):
         """ Test printInfo for all flags of AmoebaParm """
@@ -2168,6 +2596,8 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
         """ Test printDihedrals for AmoebaParm """
         act = PT.printDihedrals(amoebaparm, '@1')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALSA)
+        str(PT.printDihedrals(amoebaparm, ':*', '@10-12', ':*', ':*'))
+        str(PT.printDihedrals(amoebaparm, ':*', ':1-20', ':*', ':*'))
 
     def test_set_molecules(self):
         """ Test setMolecules for AmoebaParm """
@@ -2245,10 +2675,9 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
     def test_add_atomic_number(self):
         """ Test addAtomicNumber for AmoebaParm """
         parm = copy(amoebaparm)
-        self.assertFalse('ATOMIC_NUMBER' in parm.parm_data)
         atomic_numbers = [atom.atomic_number for atom in parm.atoms]
         PT.addAtomicNumber(parm).execute()
-        self.assertEqual(parm.parm_data['ATOMIC_NUMBER'], atomic_numbers)
+        self.assertEqual(parm.parm_data['AMOEBA_ATOMIC_NUMBER'], atomic_numbers)
 
     def test_print_lj_matrix(self):
         """ Check that printLJMatrix fails for AmoebaParm """
@@ -2441,7 +2870,36 @@ class TestAmoebaParmActions(utils.TestCaseRelative, utils.FileIOTestCase):
 class TestOtherParm(unittest.TestCase):
     """ Tests the use of other parms as the main parm """
 
+    def setUp(self):
+        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+
     def test_summary(self):
         """ Tests the use of a PDB file with the summary action """
         parm = load_file(get_fn('4lzt.pdb'))
         self.assertEqual(str(PT.summary(parm)), saved.PDB_SUMMARY)
+
+    def test_print_bonds(self):
+        """ Tests printBonds on a PSF file with no parameters """
+        parm = load_file(get_fn('ala_ala_ala.psf'))
+        repr(PT.printBonds(parm, ':1-2'))
+
+    def test_print_angles(self):
+        """ Tests printAngles on a PSF file with no parameters """
+        parm = load_file(get_fn('ala_ala_ala.psf'))
+        repr(PT.printAngles(parm, ':1'))
+        repr(PT.printAngles(parm, ':1', ':1'))
+        repr(PT.printAngles(parm, ':1', ':1', ':1'))
+
+    def test_print_dihedrals(self):
+        """ Tests printDihedrals on a PSF file with no parameters """
+        parm = load_file(get_fn('ala_ala_ala.psf'))
+        repr(PT.printDihedrals(parm, ':1'))
+        repr(PT.printDihedrals(parm, ':*', ':1'))
+        repr(PT.printDihedrals(parm, ':*', ':*', ':1'))
+        repr(PT.printDihedrals(parm, ':*', ':*', ':*', ':*'))
+        parm.dihedrals[0].improper = True
+        parm.dihedrals[1].ignore_end = True
+        repr(PT.printDihedrals(parm, ':1'))
+        repr(PT.printDihedrals(parm, ':*', ':1'))
+        repr(PT.printDihedrals(parm, ':*', ':*', ':1'))
+        repr(PT.printDihedrals(parm, ':*', ':*', ':*', ':*'))

@@ -32,6 +32,23 @@ run_all_tests = os.getenv('PARMED_RUN_ALL_TESTS') is not None
 
 HAS_GROMACS = os.path.isdir(gromacs.GROMACS_TOPDIR)
 
+class QuantityTestCase(unittest.TestCase):
+
+    def assertAlmostEqualQuantities(self, item1, item2, places=6):
+        try:
+            val1 = item1.value_in_unit(item1.unit)
+            val2 = item2.value_in_unit(item1.unit)
+        except TypeError:
+            raise self.failureException('Incompatible units %s and %s' %
+                                        (item1.unit, item2.unit))
+        try:
+            if len(val1) != len(val2):
+                raise self.failureException('collections are different lengths')
+            for x, y in zip(val1, val2):
+                self.assertAlmostEqual(x, y, places=places)
+        except TypeError:
+            self.assertAlmostEqual(val1, val2, places=places)
+
 class TestCaseRelative(unittest.TestCase):
 
     def assertRelativeEqual(self, val1, val2, places=7, delta=None):
@@ -110,7 +127,7 @@ def get_saved_fn(filename):
     ----------
     filename : str
         Name of the file to get
-    
+
     Returns
     -------
     str
@@ -148,7 +165,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
     -------
     bool
         True if files match. False if they do not or one file does not exist
-    
+
     Notes
     -----
     This routine is not protected against bad types of input. AttributeError may
@@ -403,7 +420,7 @@ def create_random_structure(parametrized, novalence=False):
         struct.adjust_types.extend([AmoebaNonbondedExceptionType(0.5, 0.5, 0.6, 0.6, 0.7)
                                     for i in range(random.randint(10, 20))])
         struct.adjust_types.claim()
-    # Add valence terms with optional 
+    # Add valence terms with optional
     for i in range(random.randint(40, 50)):
         struct.bonds.append(Bond(*random.sample(struct.atoms, 2)))
         if parametrized:

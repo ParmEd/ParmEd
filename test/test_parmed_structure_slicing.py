@@ -2,7 +2,9 @@
 Tests the fancy indexing and slicing capabilities of Structure
 """
 from collections import defaultdict
+import numpy as np
 import parmed as pmd
+import parmed.unit as u
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import range, zip
 import random
@@ -12,6 +14,7 @@ import utils
 parm = pmd.load_file(utils.get_fn('trx.prmtop'))
 pdb1 = pmd.load_file(utils.get_fn('4lzt.pdb'))
 pdb2 = pmd.load_file(utils.get_fn('1kip.cif'))
+parmep = pmd.load_file(utils.get_fn('tip4p.parm7'))
 
 class TestStructureSlicing(unittest.TestCase):
     """ Tests the fancy slicing/indexing of Structure """
@@ -429,3 +432,22 @@ class TestStructureViewSlicing(unittest.TestCase):
         sel = pdb2.view[['A','B'], :10:2, 0]
         self.assertIsInstance(sel, pmd.structure.StructureView)
         self.assertEqual(len(sel.atoms), 2*5*1)
+
+    def test_structure_view_coordinates(self):
+        """ Tests handling of coordinates on a StructureView """
+        s = utils.create_random_structure(parametrized=True)
+        self.assertIs(s.view[:len(s.atoms)//2].coordinates, None)
+        self.assertIs(s.view[:len(s.atoms)//2].positions, None)
+        # Make sure it's an even number of atoms
+        if len(s.atoms) % 2 == 1:
+            s.strip('@1')
+        x = np.random.rand(len(s.atoms)//2, 3)
+        s.coordinates = np.vstack([x.flatten(), x.flatten()])
+        np.testing.assert_equal(s.view[:len(s.atoms)//2].coordinates, x)
+        np.testing.assert_equal(
+                s.view[:len(s.atoms)//2].positions.value_in_unit(u.angstroms), x)
+
+    def test_structure_view_repr(self):
+        """ Make sure the __repr__ method works on StructureView """
+        repr(parm.view[:10])
+        repr(parmep.view[:10])
