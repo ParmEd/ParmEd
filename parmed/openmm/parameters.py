@@ -161,6 +161,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_cmaps(dest)
             self._write_omm_scripts(dest)
             self._write_omm_nonbonded(dest)
+            self._write_omm_nbfix(dest)
         finally:
             dest.write('</ForceField>\n')
             if own_handle:
@@ -405,11 +406,27 @@ class OpenMMParameterSet(ParameterSet):
                        (name, sigma, epsilon))
         dest.write(' </NonbondedForce>\n')
 
+    def _write_omm_nbfix(self, dest):
+        if not self.nbfix_types: return
+        # Convert Conversion factors for writing in natural OpenMM units
+        length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+
+        # write NBFIX records
+        dest.write(' <NBFixForce>\n')
+        for (atom_types, value) in iteritems(self.nbfix_types):
+            emin = value[0] * ene_conv
+            rmin = value[1] * length_conv
+            dest.write('  <NBFix type1="%s" type2="%s" emin="%s" rmin="%s"/>\n' %
+                       (atom_types[0], atom_types[1], emin, rmin))
+        dest.write(' </NBFixForce>\n')
+
+
     def _write_omm_scripts(self, dest):
         # Not currently implemented, so throw an exception if any unsupported
         # options are specified
         if self.combining_rule == 'geometric':
             raise NotImplementedError('Geometric combining rule not currently '
                                       'supported.')
-        if len(self.nbfix_types) > 0:
-            raise NotImplementedError('NBFIX not currently supported')
+        # if len(self.nbfix_types) > 0:
+        #     raise NotImplementedError('NBFIX not currently supported')
