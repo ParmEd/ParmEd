@@ -32,7 +32,7 @@ from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
         DeleteDihedralError, NoArgument, NonexistentParm, AmbiguousParmError,
         IncompatibleParmsError, ArgumentError, AddPDBError, AddPDBWarning,
         HMassRepartitionError, SimulationError, UnhandledArgumentWarning,
-        SeriousParmWarning, FileExists, NonexistentParmWarning, LJ12_6_4Error,
+        SeriousParmWarning, FileExists, ParmFileNotFound, LJ12_6_4Error,
         ChamberError, FileDoesNotExist, InputError, TiMergeError,
 #       CoarseGrainError,
 )
@@ -2594,7 +2594,7 @@ class source(Action):
         This is a no-op, since a separate command interpreter for this file is
         launched inside parmed_cmd.py
         """
-        pass # pragma: no cover
+        pass
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2605,7 +2605,7 @@ class parm(Action):
     """
     usage = ('<filename> [<filename> [<filename> ...]] || parm copy <filename>|'
              '<index> || parm select <filename>|<index>')
-    needs_parm = False # We don't need a parm for this action
+    needs_parm = False
     def init(self, arg_list):
         from glob import glob
         self.new_active_parm = arg_list.get_key_string('select', None)
@@ -2642,13 +2642,10 @@ class parm(Action):
             while new_parm is not None:
                 listparms = glob(new_parm)
                 if not listparms:
-                    warnings.warn('No files matching %s' % new_parm,
-                                  NonexistentParmWarning)
-                    continue
+                    raise ParmFileNotFound('No files matching %s' % new_parm)
                 self.new_parm.extend(glob(new_parm))
                 new_parm = arg_list.get_next_string(optional=True)
-            if not self.new_parm:
-                raise NonexistentParm('No matching parm files')
+            assert self.new_parm, 'No matching parm files? should not happen'
 
     def __str__(self):
         if self.new_active_parm is not None:
@@ -2669,7 +2666,7 @@ class parm(Action):
                         self.new_active_parm)
             return ("Copying prmtop %s to parm list. %s's copy is the active "
                     "parm." % (self.parm_list[idx], self.parm_list[idx]))
-        return 'Internal error!' # should never reach here
+        raise AssertionError('Should not be here')
 
     def execute(self):
         """ Either set the new active parm or add the new parm """
@@ -2727,8 +2724,6 @@ class ls(Action):
         process = Popen(['/bin/ls', '-C'] + self.args, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate('')
         process.wait()
-#       if PY3: TODO: delete
-#           return (out + err).decode('UTF-8') TODO: delete
         return (out + err).decode('UTF-8')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2756,15 +2751,15 @@ class cd(Action):
         if len(self.directory) < 1:
             warnings.warn('No recognized directories given to cd',
                           SeriousParmWarning)
-            return
+            return # pragma: no cover
         elif len(self.directory) > 1:
             warnings.warn('More than one file/directory given to cd',
                           SeriousParmWarning)
-            return
+            return # pragma: no cover
         if not os.path.isdir(self.directory[0]):
             warnings.warn('%s is not a directory' % self.directory[0],
                           SeriousParmWarning)
-            return
+            return # pragma: no cover
         # If we've gotten this far, go ahead and change to the directory
         os.chdir(self.directory[0])
 
@@ -2779,7 +2774,7 @@ class listParms(Action):
     def init(self, arg_list):
         pass
 
-    def __str__(self):
+    def __repr__(self):
         if self.parm_list.empty():
             return "No topology files are loaded"
 

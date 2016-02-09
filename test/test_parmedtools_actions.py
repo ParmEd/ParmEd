@@ -2945,11 +2945,12 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         self.assertRaises(exc.ParmError, lambda:
                 PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
-class TestOtherParm(unittest.TestCase):
+class TestOtherParm(FileIOTestCase):
     """ Tests the use of other parms as the main parm """
 
     def setUp(self):
         warnings.filterwarnings('error', category=exc.SeriousParmWarning)
+        FileIOTestCase.setUp(self)
 
     def test_summary(self):
         """ Tests the use of a PDB file with the summary action """
@@ -2981,3 +2982,83 @@ class TestOtherParm(unittest.TestCase):
         repr(PT.printDihedrals(parm, ':*', ':1'))
         repr(PT.printDihedrals(parm, ':*', ':*', ':1'))
         repr(PT.printDihedrals(parm, ':*', ':*', ':*', ':*'))
+
+    def test_parm(self):
+        """ Tests the parm action on a series of topology types and listParms """
+        parms = parmlist.ParmList()
+        # Make sure listParms works on an empty list
+        repr(PT.listParms(parms))
+        # First add an AmberParm
+        act = PT.parm(parms, get_fn('ash.parm7'))
+        act.execute()
+        str(act)
+        self.assertEqual(len(parms), 1)
+        self.assertIs(parms.parm, parms[-1])
+        # Next add a PDB and make sure it is the active parm
+        PT.parm(parms, get_fn('2koc.pdb')).execute()
+        self.assertEqual(len(parms), 2)
+        self.assertIs(parms.parm, parms[-1])
+        # Next add a GROMACS topology file
+        PT.parm(parms, get_fn('ildn.solv.top')).execute()
+        self.assertEqual(len(parms), 3)
+        self.assertIs(parms.parm, parms[-1])
+        # Next copy the amber parm
+        act = PT.parm(parms, copy=0)
+        act.execute()
+        str(act)
+        self.assertEqual(len(parms), 4)
+        self.assertIs(parms[-1], parms.parm)
+        self.assertEqual(len(parms[0].atoms), len(parms[3].atoms))
+        # Next copy the GROMACS topology file parm
+        act = PT.parm(parms, copy=get_fn('ildn.solv.top'))
+        act.execute()
+        str(act)
+        self.assertEqual(len(parms), 5)
+        self.assertIs(parms[-1], parms.parm)
+        self.assertEqual(len(parms[2].atoms), len(parms[4].atoms))
+
+        # Check setting new active parm by name and index
+        act = PT.parm(parms, select=0)
+        str(act)
+        act.execute()
+        self.assertEqual(len(parms), 5)
+        self.assertIs(parms.parm, parms[0])
+        act = PT.parm(parms, select=get_fn('2koc.pdb'))
+        str(act)
+        act.execute()
+        self.assertEqual(len(parms), 5)
+        self.assertIs(parms.parm, parms[1])
+
+        # Error handling
+        self.assertRaises(exc.ParmError, lambda: PT.parm(parms).execute())
+        self.assertRaises(exc.ParmError, lambda:
+                PT.parm(parms, copy=0, select=1).execute())
+        self.assertRaises(exc.ParmError, lambda:
+                PT.parm(parms, 'notafile').execute())
+        act = PT.parm(parms, select='notafile')
+        str(act)
+        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        act = PT.parm(parms, select=100)
+        str(act)
+        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        act = PT.parm(parms, copy='notafile')
+        str(act)
+        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        act = PT.parm(parms, copy=100)
+        str(act)
+        self.assertRaises(exc.SeriousParmWarning, act.execute)
+
+        # Catch permissions error, but only on Linux
+        import platform
+        if platform.system() == 'Windows': return
+        fn = get_fn('test.pdb', written=True)
+        with open(fn, 'w') as fw, open(get_fn('ash.parm7')) as fr:
+            fw.write(fr.read())
+        # Change the permissions to remove read perms
+        os.chmod(fn, int('333', 8))
+        act = PT.parm(parms, fn)
+        self.assertRaises(exc.SeriousParmWarning, act.execute)
+
+        # Now check that listParms works
+        info = repr(PT.listParms(parms))
+        self.assertIn('(active)', info)
