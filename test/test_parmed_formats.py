@@ -28,6 +28,15 @@ def reset_stringio(io):
 class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
 
+    def test_load_blank_file(self):
+        """ Makes sure that a blank file does not match any id_format """
+        from parmed.formats.registry import PARSER_REGISTRY
+        fn = get_fn('test', written=True)
+        with open(fn, 'w'):
+            pass
+        for name, cls in iteritems(PARSER_REGISTRY):
+            self.assertFalse(cls.id_format(fn))
+
     def test_load_off(self):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
@@ -223,7 +232,7 @@ class TestFileLoader(FileIOTestCase):
         self.assertIsInstance(crd, amber.AmberParm)
 
 class TestPDBStructure(FileIOTestCase):
-    
+
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
         self.pdbgz = get_fn('4lzt.pdb.gz')
