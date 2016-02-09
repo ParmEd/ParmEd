@@ -192,9 +192,25 @@ class OpenMMParameterSet(ParameterSet):
         dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
                    datetime.datetime.now().timetuple()[:3])
         provenance = provenance if provenance is not None else {}
-        for item, key in iteritems(provenance):
-            if item == 'DateGenerated': continue
-            dest.write('  <%s>%s</%s>\n' % (item, key, item))
+        for tag, content in iteritems(provenance):
+            if tag == 'DateGenerated': continue
+            if isinstance(content, string_types):
+                dest.write('  <%s>%s</%s>\n' % (tag, content, tag))
+            elif isinstance(content, list):
+                for sub in content:
+                    dest.write('  <%s>%s</%s>\n' % (tag, sub, tag))
+            elif isinstance(content, dict):
+                if tag not in content:
+                    raise KeyError('Content of an attribute-containing element '
+                                   'specified incorrectly.')
+                attributes = [key for key in content if key != tag]
+                element_content = content[tag]
+                dest.write('  <%s' % tag)
+                for attribute in attributes:
+                    dest.write(' %s="%s"' % (attribute, content[attribute]))
+                dest.write('>%s</%s>\n' % (element_content, tag))
+            else:
+                raise TypeError('Incorrect type of the %s element content' % tag)
         dest.write(' </Info>\n')
 
     def _write_omm_atom_types(self, dest, skip_types):
