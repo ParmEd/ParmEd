@@ -68,8 +68,8 @@ class CharmmCrdFile(object):
 
             intitle = True
             while intitle:
-                line = f.readline().strip()
-                if len(line) == 0:
+                line = f.readline()
+                if len(line.strip()) == 0:
                     intitle = False
                 elif line[0] != '*':
                     intitle = False
