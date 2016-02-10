@@ -3307,7 +3307,6 @@ class add12_6_4(Action):
 
     def execute(self):
         from parmed.tools.add1264 import params1264 as params
-#       if 'LENNARD_JONES_CCOEF' in self.parm.flag_list: TODO delete
         self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
@@ -3434,10 +3433,6 @@ class OpenMM(Action):
         if self.parm.coordinates is None and not inptraj and not has_inpcrd:
             raise SimulationError('No input coordinates provided.')
         # Eliminate some incompatibilities that are easy to catch now
-# TODO delete
-# TODO delete
-# TODO delete
-# TODO delete
         simulate(self.parm, self.arg_list)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3855,8 +3850,6 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-# TODO delete
-#       try: TODO delete
         parmset = CharmmParameterSet()
         for tfile in self.topfiles:
             parmset.read_topology_file(tfile)
@@ -3864,14 +3857,9 @@ class chamber(Action):
             parmset.read_parameter_file(pfile)
         for sfile in self.streamfiles:
             parmset.read_stream_file(sfile)
-#       except ParmedError as e: TODO delete
-# TODO deleteaise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
         # Now read the PSF
-#       try: TODO delete
         psf = CharmmPsfFile(self.psf)
-#       except ParmedError as e: TODO delete
-#           raise ChamberError('Problem reading CHARMM PSF: %s' % e) TODO delete
 
         # Read the PDB and set the box information
         if self.crdfile is not None:
