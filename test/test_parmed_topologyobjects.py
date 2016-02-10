@@ -1542,16 +1542,17 @@ class TestTopologyObjects(unittest.TestCase):
         # Check segid assignment
         self.assertEqual(res.segid, 'SYS')
         # Deprecated behavior
-        warnings.filterwarnings('error', category=DeprecationWarning)
         self.assertRaises(DeprecationWarning, lambda: res[0].segid)
         def tmp():
             res[0].segid = 'SYS1'
         self.assertRaises(DeprecationWarning, tmp)
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='parmed')
         tmp()
         self.assertEqual(res[0].segid, 'SYS1')
         self.assertEqual(res.segid, 'SYS1')
-        warnings.filterwarnings('always', category=DeprecationWarning)
+        warnings.filterwarnings('error', category=DeprecationWarning,
+                                module='parmed')
 
         # __repr__ testing
         self.assertEqual(repr(atoms[0]), '<Atom CA [0]; In ALA -1>')

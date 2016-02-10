@@ -958,14 +958,10 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
 
     def test_deprecations(self):
-        warnings.filterwarnings('error', category=DeprecationWarning)
         fn = get_fn('blah', written=True)
-        try:
-            parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-            self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
-            self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
-        finally:
-            warnings.filterwarnings('always', category=DeprecationWarning)
+        parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
+        self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
 
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,

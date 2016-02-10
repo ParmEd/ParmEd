@@ -2787,7 +2787,7 @@ class listParms(Action):
                 retstr += ' (active)'
 
         return retstr
-
+    __str__ = __repr__ # FIXME
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class interpolate(Action):
@@ -3122,8 +3122,8 @@ class addPDB(Action):
             res.chain = '*'
             res.insertion_code = ''
         for i, res in enumerate(pdb.residues):
-            parmres = self.parm.residues[i]
             try:
+                parmres = self.parm.residues[i]
                 reslab = parmres.name
                 resname = res.name.strip()
                 if resname != reslab:
@@ -3307,8 +3307,8 @@ class add12_6_4(Action):
 
     def execute(self):
         from parmed.tools.add1264 import params1264 as params
-        if 'LENNARD_JONES_CCOEF' in self.parm.flag_list:
-            self.parm.delete_flag('LENNARD_JONES_CCOEF')
+#       if 'LENNARD_JONES_CCOEF' in self.parm.flag_list: TODO delete
+        self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
                 comments=['For 12-6-4 potential used for divalent metal ions'])
@@ -3366,7 +3366,7 @@ class HMassRepartition(Action):
             atom.mass = self.new_h_mass
             heteroatom.mass -= transfermass
             if isinstance(self.parm, AmberParm):
-                self.parm.parm_data['MASS'][i] = atom.mass = self.new_h_mass
+                self.parm.parm_data['MASS'][i] = self.new_h_mass
                 self.parm.parm_data['MASS'][heteroatom.idx] -= transfermass
 
         # Now make sure that all masses are positive, or revert masses and
@@ -3427,17 +3427,17 @@ class OpenMM(Action):
         """ Runs the OpenMM simulation """
         from parmed.tools.simulations.openmm import simulate, HAS_OPENMM
         if not HAS_OPENMM:
-            raise SimulationError('OpenMM could not be imported. Skipping.')
+            raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
         # First try to load a restart file if it was supplied
         inptraj = self.arg_list.has_key('-y', mark=False)
         has_inpcrd = self.arg_list.has_key('-c', mark=False)
         if self.parm.coordinates is None and not inptraj and not has_inpcrd:
             raise SimulationError('No input coordinates provided.')
         # Eliminate some incompatibilities that are easy to catch now
-        if self.parm.ptr('ifbox') > 1:
-            raise SimulationError('OpenMM only supports orthorhombic boxes '
-                                  'currently.')
-
+# TODO delete
+# TODO delete
+# TODO delete
+# TODO delete
         simulate(self.parm, self.arg_list)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3499,8 +3499,8 @@ class energy(Action):
         self.use_openmm = (arg_list.has_key('omm') or
                     not isinstance(self.parm, AmberParm))
         self.arg_list = ArgumentList(arg_list)
-        if self.use_openmm and isinstance(self.parm, AmoebaParm):
-            raise InputError('Amoeba prmtops can only get energies from sander')
+        if self.use_openmm and isinstance(self.parm, AmoebaParm): # FIXME
+            raise NotImplementedError('Amoeba prmtops can only get energies from sander')
 
     def __str__(self):
         return 'Computing a single-point energy for %s' % self.parm
@@ -3509,13 +3509,13 @@ class energy(Action):
         if self.use_openmm:
             from parmed.tools.simulations.openmm import energy, HAS_OPENMM
             if not HAS_OPENMM:
-                raise SimulationError('OpenMM could not be imported. Skipping.')
+                raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
 
             energy(self.parm, self.arg_list, self.output)
         else:
             from parmed.tools.simulations.sanderapi import energy, HAS_SANDER
             if not HAS_SANDER:
-                raise SimulationError('sander could not be imported. Skipping.')
+                raise SimulationError('sander could not be imported. Skipping.') # pragma: no cover
             # Consume the OMM-specific arguments so we don't have any apparently
             # unused arguments
             self.arg_list.get_key_string('platform', None)
@@ -3618,32 +3618,32 @@ class deleteBond(Action):
         retstr = 'Deleting %d bonds between %s and %s:\n' % (
                     len(self.del_bonds), self.mask1, self.mask2)
         for bond in self.del_bonds:
-            a1, a2 = bond.atom1, bond.atom2
+            a1, a2 = self.parm.bonds[bond].atom1, self.parm.bonds[bond].atom2
             retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (a1.idx+1,
                     a1.residue.name, a1.residue.idx+1, a1.name, a2.idx+1,
                     a2.residue.name, a2.residue.idx+1, a2.name)
         retstr += 'Deleting %d angles, ' % (len(self.del_angles))
-        if self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
-            retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
-                        'and %d CMAPs' % (
-                        len(self.del_urey_bradleys), len(self.del_impropers),
-                        len(self.del_dihedrals), len(self.del_cmap))
-            )
-        elif self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
+        if self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
                 self.parm.stretch_bends or self.parm.torsion_torsions:
             retstr += ('%d Urey-Bradleys, %d trigonal angles,\n         '
                        '%d dihedrals, %d out-of-plane bends, %d stretch-bends\n'
                        '         and %d torsion-torsions' % (
                         len(self.del_urey_bradleys),
                         len(self.del_trigonal_angles),
-                        len(self.del_dihedrals), len(self.del_oopbends),
-                        len(self.del_strbnds), len(self.del_tortors))
+                        len(self.del_dihedrals)+len(self.del_rbtorsions),
+                        len(self.del_oopbends), len(self.del_strbnds),
+                        len(self.del_tortors))
             )
-        elif self.parm.rb_torsions:
-            retstr += ('%d R-B torsions and %d dihedrals' %
-                    (len(self.del_rbtorsions), len(self.del_dihedrals)))
+        elif self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
+            retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
+                        'and %d CMAPs' % (
+                        len(self.del_urey_bradleys), len(self.del_impropers),
+                        len(self.del_dihedrals)+len(self.del_rbtorsions),
+                        len(self.del_cmaps))
+            )
         else:
-            retstr += 'and %d dihedrals' % (len(self.del_dihedrals))
+            retstr += 'and %d dihedrals' % (len(self.del_dihedrals) +
+                    len(self.del_rbtorsions))
         return retstr
 
     def execute(self):
@@ -3786,7 +3786,7 @@ class chamber(Action):
             crdfiles = glob.glob(expanduser(expandvars(crdfile)))
             if not crdfiles:
                 raise FileDoesNotExist('Coordinate file %s does not exist' %
-                                       self.crdfile)
+                                       crdfile)
             if len(crdfiles) > 1:
                 raise InputError('Too many coordinate files selected through '
                                  'globbing')
@@ -3855,23 +3855,23 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-        # We're not using chamber, do the conversion in-house
-        try:
-            parmset = CharmmParameterSet()
-            for tfile in self.topfiles:
-                parmset.read_topology_file(tfile)
-            for pfile in self.paramfiles:
-                parmset.read_parameter_file(pfile)
-            for sfile in self.streamfiles:
-                parmset.read_stream_file(sfile)
-        except ParmedError as e:
-            raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
+# TODO delete
+#       try: TODO delete
+        parmset = CharmmParameterSet()
+        for tfile in self.topfiles:
+            parmset.read_topology_file(tfile)
+        for pfile in self.paramfiles:
+            parmset.read_parameter_file(pfile)
+        for sfile in self.streamfiles:
+            parmset.read_stream_file(sfile)
+#       except ParmedError as e: TODO delete
+# TODO deleteaise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
 
         # Now read the PSF
-        try:
-            psf = CharmmPsfFile(self.psf)
-        except ParmedError as e:
-            raise ChamberError('Problem reading CHARMM PSF: %s' % e)
+#       try: TODO delete
+        psf = CharmmPsfFile(self.psf)
+#       except ParmedError as e: TODO delete
+#           raise ChamberError('Problem reading CHARMM PSF: %s' % e) TODO delete
 
         # Read the PDB and set the box information
         if self.crdfile is not None:
@@ -3883,7 +3883,7 @@ class chamber(Action):
                     coords = crd.coordinates[0]
                 else:
                     coords = crd.coordinates
-            except AttributeError:
+            except (AttributeError, TypeError):
                 raise ChamberError('No coordinates in %s' % self.crdfile)
             if hasattr(crd, 'box') and crd.box is not None:
                 if len(crd.box.shape) == 1:
@@ -4016,7 +4016,7 @@ class minimize(Action):
         self.platform = arg_list.get_key_string('platform', None)
         self.precision = arg_list.get_key_string('precision', 'mixed')
         self.tol = arg_list.get_key_float('tol', 0.001)
-        self.maxcyc = arg_list.get_key_float('maxcyc', None)
+        self.maxcyc = arg_list.get_key_int('maxcyc', None)
         # Check for legal values
         if self.parm.ptr('ifbox') == 0:
             if self.cutoff is None or self.cutoff > 500:
