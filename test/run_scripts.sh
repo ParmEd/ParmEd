@@ -22,7 +22,7 @@ evaluate_test() {
         echo "ERROR"
         errors=`python -c "print($errors + 1)"`
     elif [ $# -eq 2 ]; then
-        diff $DIFFARGS files/saved_scripts/$2 files/writes/$2 > /dev/null 2>&1
+        diff $DIFFARGS files/saved_scripts/$2 files/writes/$2 >> files/writes/DIFFLOG 2>&1
         if [ $? -ne 0 ]; then
             failures=`python -c "print($failures + 1)"`
             echo "FAILED"
@@ -30,7 +30,7 @@ evaluate_test() {
             echo "PASSED"
         fi
     elif [ $# -eq 3 ]; then
-        diff $DIFFARGS $3 $2 > /dev/null 2>&1
+        diff $DIFFARGS $3 $2 >> files/writes/DIFFLOG 2>&1
         if [ $? -ne 0 ]; then
             failures=`python -c "print($failures + 1)"`
             echo "FAILED"
