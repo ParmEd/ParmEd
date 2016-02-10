@@ -467,7 +467,9 @@ CHIS = CHIE
         )
         params.write(get_fn('amber_conv.xml', written=True),
                      provenance=dict(OriginalFile='leaprc.ff14SB',
-                     Reference='Maier & Simmerling')
+                     Reference=['Maier & Simmerling', 'Simmerling & Maier'],
+                     Source=dict(Source='leaprc.ff14SB',
+                     sourcePackage='AmberTools', sourcePackageVersion='15'))
         )
 
 
