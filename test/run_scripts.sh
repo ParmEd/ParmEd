@@ -64,6 +64,7 @@ $run_cmd `which parmed` -r > files/writes/parmed1.out 2>&1 << EOF
 cd files
 cd */
 cd nodir
+cd ash.parm7
 parm ash.parm7
 outparm writes/parmed_test1.parm7
 EOF
@@ -94,7 +95,7 @@ evaluate_test $? parmed2.out
 printf "Running test parmed CL test 3..."
 cat > files/writes/parmed1.in << EOF
 cd files/testbed
-ls
+ls -C
 ls file*
 ls nofile
 ls */
@@ -109,7 +110,7 @@ evaluate_test $? parmed3.out
 
 # Clean up if everything passed
 if [ $failures -eq 0 -a $errors -eq 0 ]; then
-    /bin/rm -fr files/writes
+    /bin/rm -fr files/writes files/testbed
 fi
 cd "$old_pwd"
 

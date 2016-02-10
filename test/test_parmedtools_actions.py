@@ -1224,7 +1224,9 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         """ Test lmod action on AmberParm """
         parm = copy(gasparm)
         self.assertFalse(all(parm.parm_data['LENNARD_JONES_ACOEF']))
-        PT.lmod(parm).execute()
+        act = PT.lmod(parm)
+        act.execute()
+        str(act)
         self.assertTrue(all(parm.parm_data['LENNARD_JONES_ACOEF']))
 
     def test_prot_state_interpolate(self):
@@ -1246,9 +1248,15 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         parms = parmlist.ParmList()
         parms.add_parm(parm)
         parms.add_parm(origparm)
+        # First do some error checking
+        self.assertRaises(exc.ArgumentError, lambda:
+                PT.interpolate(parms, -1, 'eleconly',
+                    prefix=get_fn('test.parm7', written=True)).execute())
         sys.stdout = open(os.devnull, 'w')
-        PT.interpolate(parms, 5, 'eleconly', startnum=2,
-                       prefix=get_fn('test.parm7', written=True)).execute()
+        act = PT.interpolate(parms, 5, 'eleconly', startnum=2,
+                       prefix=get_fn('test.parm7', written=True))
+        str(act)
+        act.execute()
         sys.stdout = sys.__stdout__
         self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
         self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
@@ -1290,6 +1298,121 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                 PT.changeProtState(parm, ':ASH@CA', 1).execute)
         self.assertRaises(exc.ChangeStateError,
                 PT.changeProtState(parm, '@13-25', 1).execute)
+        self.assertRaises(exc.NonexistentParm, lambda:
+                PT.interpolate(load_file(get_fn('ash.parm7')), 10, 'eleconly').execute())
+        # Make a list of 3 parms and make sure ambiguity causes failure
+        act = PT.parm(parm, copy=0)
+        act.execute()
+        PT.changeProtState(act.parm_list, ':ASH', 1).execute()
+        PT.parm(act.parm_list, copy=0).execute()
+        self.assertEqual(len(act.parm_list), 3)
+        self.assertRaises(exc.AmbiguousParmError, lambda:
+                PT.interpolate(act.parm_list, 10, 'eleconly').execute())
+        act.parm_list.add_parm(get_fn('trx.prmtop'))
+        self.assertRaises(exc.IncompatibleParmsError, lambda:
+                PT.interpolate(act.parm_list, 10, 'eleconly', parm2=0).execute())
+        act.parm_list[0].atoms[0].name = 'FOO'
+        self.assertRaises(exc.SeriousParmWarning, lambda:
+                PT.interpolate(act.parm_list, 10, 'eleconly', parm=0,
+                    parm2=1).execute())
+
+    def test_prot_state_interpolate_2(self):
+        """ Test interpolate actions on AmberParm with more parm selection """
+        self._empty_writes()
+        parm = AmberParm(get_fn('ash.parm7'))
+        origparm = copy(parm)
+        origparm.name = origparm.name + '_copy1'
+        act = PT.changeProtState(parm, ':ASH', 0)
+        act.execute()
+        str(act)
+        self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
+        self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)
+        for i, atom in enumerate(parm.atoms):
+            self.assertEqual(atom.charge, parm.parm_data['CHARGE'][i])
+        for i, atom in enumerate(origparm.atoms):
+            self.assertEqual(atom.charge, origparm.parm_data['CHARGE'][i])
+        # Now set up a ParmList so we can interpolate these topology files
+        parms = parmlist.ParmList()
+        parms.add_parm(parm)
+        parms.add_parm(origparm)
+        parms.add_parm(load_file(get_fn('trx.prmtop')))
+        sys.stdout = open(os.devnull, 'w')
+        PT.interpolate(parms, 5, 'eleconly', parm=1, parm2=0, startnum=2,
+                       prefix=get_fn('test.parm7', written=True)).execute()
+        sys.stdout = sys.__stdout__
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
+        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        # Now check them all
+        ladder = [origparm]
+        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(parm)
+        natom = parm.ptr('natom')
+        for i in range(1, 6):
+            before = ladder[i-1].parm_data['CHARGE']
+            after = ladder[i+1].parm_data['CHARGE']
+            this = ladder[i].parm_data['CHARGE']
+            for j in range(natom):
+                if before[j] < after[j]:
+                    self.assertTrue(before[j] <= this[j] <= after[j])
+                else:
+                    self.assertTrue(before[j] >= this[j] >= after[j])
+
+    def test_prot_state_interpolate_3(self):
+        """ Test interpolate actions on AmberParm with parm name selection """
+        self._empty_writes()
+        parm = AmberParm(get_fn('ash.parm7'))
+        origparm = copy(parm)
+        origparm.name = origparm.name + '_copy1'
+        act = PT.changeProtState(parm, ':ASH', 0)
+        act.execute()
+        str(act)
+        self.assertAlmostEqual(sum(parm.parm_data['CHARGE']), -1)
+        self.assertAlmostEqual(sum(origparm.parm_data['CHARGE']), 0)
+        for i, atom in enumerate(parm.atoms):
+            self.assertEqual(atom.charge, parm.parm_data['CHARGE'][i])
+        for i, atom in enumerate(origparm.atoms):
+            self.assertEqual(atom.charge, origparm.parm_data['CHARGE'][i])
+        # Now set up a ParmList so we can interpolate these topology files
+        parms = parmlist.ParmList()
+        parms.add_parm(parm)
+        parms.add_parm(origparm)
+        parms.add_parm(load_file(get_fn('trx.prmtop')))
+        sys.stdout = open(os.devnull, 'w')
+        PT.interpolate(parms, 5, 'eleconly', parm=1, parm2=get_fn('ash.parm7'),
+                       startnum=2, prefix=get_fn('test.parm7', written=True)).execute()
+        sys.stdout = sys.__stdout__
+        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
+        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        # Now check them all
+        ladder = [origparm]
+        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(parm)
+        natom = parm.ptr('natom')
+        for i in range(1, 6):
+            before = ladder[i-1].parm_data['CHARGE']
+            after = ladder[i+1].parm_data['CHARGE']
+            this = ladder[i].parm_data['CHARGE']
+            for j in range(natom):
+                if before[j] < after[j]:
+                    self.assertTrue(before[j] <= this[j] <= after[j])
+                else:
+                    self.assertTrue(before[j] >= this[j] >= after[j])
 
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB actions on AmberParm """
@@ -1341,12 +1464,17 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_pdb2(self):
         """ Test addPDB with atypical numbering and extra residues """
         parm = load_file(get_fn('4lzt.parm7'))
-        PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb')).execute()
+        act = PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb'), 'strict')
+        act.execute()
+        str(act)
         parm.write_parm(get_fn('4lzt_pdb.parm7', written=True))
         self.assertTrue(diff_files(get_saved_fn('4lzt_pdb.parm7'),
                                    get_fn('4lzt_pdb.parm7', written=True),
                                    absolute_error=1e-6)
         )
+        act = PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb'))
+        str(act)
+        act.execute()
 
     def test_h_mass_repartition(self):
         """ Test HMassRepartition on AmberParm """
@@ -2298,11 +2426,15 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         parm.load_rst7(get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
         self.assertTrue(detailed_diff(str(act), saved.SUMMARYC1, relative_error=1e-6))
+        act = PT.summary(load_file(get_fn('2koc.pdb')))
+        repr(act)
 
     def test_scale(self):
         """ Test scale action for ChamberParm """
         parm = copy(gascham)
-        PT.scale(parm, 'DIHEDRAL_FORCE_CONSTANT', 2.0).execute()
+        act = PT.scale(parm, 'DIHEDRAL_FORCE_CONSTANT', 2.0)
+        act.execute()
+        str(act)
         self.assertEqual(
                 [2*x for x in gascham.parm_data['DIHEDRAL_FORCE_CONSTANT']],
                 parm.parm_data['DIHEDRAL_FORCE_CONSTANT'])
@@ -2313,6 +2445,11 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             self.assertEqual(val, 0)
         for dt in parm.dihedral_types:
             self.assertEqual(dt.phi_k, 0)
+        # Error handling
+        self.assertRaises(exc.ArgumentError, lambda:
+                PT.scale(parm, 'NOTAFLAG', 10.0).execute())
+        self.assertRaises(exc.ArgumentError, lambda:
+                PT.scale(parm, 'ATOM_NAME', 10.0).execute())
 
     def test_interpolate(self):
         """ Test interpolate action for ChamberParm """

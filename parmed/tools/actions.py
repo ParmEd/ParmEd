@@ -2594,7 +2594,7 @@ class source(Action):
         This is a no-op, since a separate command interpreter for this file is
         launched inside parmed_cmd.py
         """
-        pass
+        pass # pragma: no cover
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2807,7 +2807,7 @@ class interpolate(Action):
         - <num> : Starting number for file names (see <prefix> above)
     """
     usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] '
-             '[startnum <num>')
+             '[startnum <num>]')
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Make sure we have at least 2 prmtops
@@ -2865,8 +2865,8 @@ class interpolate(Action):
 
     def execute(self):
         """ Interpolates the prmtops """
-        if self.diff_vdw and not self.eleconly:
-            raise NotImplemented('No support for scaling vdW parameters yet!')
+        if self.diff_vdw and not self.eleconly: #FIXME formatting
+            raise NotImplementedError('No support for scaling vdW parameters yet!')
 
         parm1, parm2 = self.parm, self.parm2
         # Original charges for parm 1
@@ -2907,16 +2907,16 @@ def _split_range(chunksize, start, stop):
             _stop = stop
         yield start + i * chunksize, _stop
 
-def _reformat_long_sentence(long_sentence, title, n_words=6, offset=None):
+def _reformat_long_sentence(long_sentence, title, n_words=6):
     words = long_sentence.split(', ')
     empty = "\n" + " " * len(title)
     lines = [words[slice(*idx)] for idx in _split_range(n_words, 0, len(words))]
     sentences = [', '.join(line) for line in lines]
 
-    if offset is None:
-        sentences[0] = title[:] + sentences[0]
-    else:
-        sentences[0] = title[:offset] + sentences[0]
+#   if offset is None: TODO delete
+    sentences[0] = title[:] + sentences[0]
+#   else: TODO delete
+#       sentences[0] = title[:offset] + sentences[0] TODO delete
     return empty.join(sentences)
 
 class summary(Action):
@@ -2967,7 +2967,7 @@ class summary(Action):
         rset = ", ".join(sorted(set(res.name for res in self.parm.residues)))
         retval.append(
                 _reformat_long_sentence(rset, 'Residue set:           ',
-                                        offset=None, n_words=7)
+                                        n_words=7)
         )
         rcount = ','.join('%s: %d' % (x, y)
                            for x, y in iteritems(
@@ -2976,8 +2976,8 @@ class summary(Action):
         )
         retval.append(
                 _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
-                                        'Residue count:         ',
-                                        offset=None, n_words=7)
+                                        'Residue count:         ', n_words=7)
+# TODO delete
         )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
