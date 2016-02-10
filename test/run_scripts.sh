@@ -111,6 +111,8 @@ evaluate_test $? parmed3.out
 # Clean up if everything passed
 if [ $failures -eq 0 -a $errors -eq 0 ]; then
     /bin/rm -fr files/writes files/testbed
+else
+    test -f files/writes/DIFFLOG && cat files/writes/DIFFLOG
 fi
 cd "$old_pwd"
 
