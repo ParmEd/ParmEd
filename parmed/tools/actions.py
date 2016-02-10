@@ -2048,11 +2048,13 @@ class addAtomicNumber(Action):
 
     def execute(self):
         if self.present: return
-        if self.parm.amoeba: # FIXME
-            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+        if self.parm.amoeba:
+            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8',
+                               num_items=len(self.parm.atoms))
             flag = 'AMOEBA_ATOMIC_NUMBER'
         else:
-            self.parm.add_flag('ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+            self.parm.add_flag('ATOMIC_NUMBER', '10I8',
+                               num_items=len(self.parm.atoms))
             flag = 'ATOMIC_NUMBER'
         for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data[flag][i] = atm.atomic_number
@@ -2865,9 +2867,9 @@ class interpolate(Action):
 
     def execute(self):
         """ Interpolates the prmtops """
-        if self.diff_vdw and not self.eleconly: #FIXME formatting
-            raise NotImplementedError('No support for scaling vdW parameters yet!')
-
+        if self.diff_vdw and not self.eleconly:
+            raise NotImplementedError('No support for scaling vdW '
+                                      'parameters yet!')
         parm1, parm2 = self.parm, self.parm2
         # Original charges for parm 1
         orig_chg1 = parm1.parm_data['CHARGE']
@@ -2913,10 +2915,7 @@ def _reformat_long_sentence(long_sentence, title, n_words=6):
     lines = [words[slice(*idx)] for idx in _split_range(n_words, 0, len(words))]
     sentences = [', '.join(line) for line in lines]
 
-#   if offset is None: TODO delete
     sentences[0] = title[:] + sentences[0]
-#   else: TODO delete
-#       sentences[0] = title[:offset] + sentences[0] TODO delete
     return empty.join(sentences)
 
 class summary(Action):
@@ -2977,7 +2976,6 @@ class summary(Action):
         retval.append(
                 _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
                                         'Residue count:         ', n_words=7)
-# TODO delete
         )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
