@@ -153,6 +153,9 @@ class CharmmStreamFile(object):
                     self.line_number += 1
                     line = self.lines[self.line_number]
                     comment = self.comments[self.line_number]
+                if line[:3].upper() == 'END':
+                    lines.append(line)
+                    comments.append(comment)
                 return title, lines, comments
             self.line_number += 1
         # No sections left
