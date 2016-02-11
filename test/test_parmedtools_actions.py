@@ -3528,6 +3528,7 @@ class TestOtherParm(FileIOTestCase):
         repr(PT.printDihedrals(parm, ':*', ':*', ':1'))
         repr(PT.printDihedrals(parm, ':*', ':*', ':*', ':*'))
 
+    @unittest.skipUnless(HAS_GROMACS, 'Cannot test without GROMACS')
     def test_parm(self):
         """ Tests the parm action on a series of topology types and listParms """
         parms = parmlist.ParmList()
