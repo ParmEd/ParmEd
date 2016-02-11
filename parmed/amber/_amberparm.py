@@ -168,13 +168,16 @@ class AmberParm(AmberFormat, Structure):
         self.hasvels = False
         self.hasbox = False
         self._box = None
+        self.crdname = None
         if xyz is None and rst7_name is not None:
             warn('rst7_name keyword is deprecated. Use xyz instead',
                  DeprecationWarning)
-            xyz = rst7_name
+            self.crdname = xyz = rst7_name
         elif xyz is not None and rst7_name is not None:
             warn('rst7_name keyword is deprecated and ignored in favor of xyz',
                  DeprecationWarning)
+        if isinstance(xyz, string_types):
+            self.crdname = xyz
         if prm_name is not None:
             self.initialize_topology(xyz, box)
 

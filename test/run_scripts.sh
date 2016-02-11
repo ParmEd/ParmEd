@@ -21,8 +21,16 @@ evaluate_test() {
     if [ $1 -ne 0 ]; then
         echo "ERROR"
         errors=`python -c "print($errors + 1)"`
-    else
-        diff files/saved_scripts/$2 files/writes/$2 > /dev/null 2>&1
+    elif [ $# -eq 2 ]; then
+        diff $DIFFARGS files/saved_scripts/$2 files/writes/$2 >> files/writes/DIFFLOG 2>&1
+        if [ $? -ne 0 ]; then
+            failures=`python -c "print($failures + 1)"`
+            echo "FAILED"
+        else
+            echo "PASSED"
+        fi
+    elif [ $# -eq 3 ]; then
+        diff $DIFFARGS $3 $2 >> files/writes/DIFFLOG 2>&1
         if [ $? -ne 0 ]; then
             failures=`python -c "print($failures + 1)"`
             echo "FAILED"
@@ -32,6 +40,8 @@ evaluate_test() {
     fi
 }
 ######   TESTS   ######
+
+# Gromacs CPP tests
 printf "Running test python -m parmed.gromacs._cpp test 1..."
 $run_cmd -m parmed.gromacs._cpp -i files/pptest1/pptest1.h > files/writes/cpptest1
 evaluate_test $? cpptest1
@@ -45,11 +55,74 @@ printf "Running test python -m parmed.gromacs._cpp test 3..."
 $run_cmd -m parmed.gromacs._cpp -i - < files/pptest1/pptest1.h \
         -Ifiles/pptest1 > files/writes/cpptest1 || exit
 evaluate_test $? cpptest1
+
+# parmed CL tests
+# TODO: source, parm, ls, cd
+DIFFARGS="-I %VERSION -w"
+printf "Running test parmed CL test 1..."
+$run_cmd `which parmed` -r > files/writes/parmed1.out 2>&1 << EOF
+cd files
+cd */
+cd nodir
+cd ash.parm7
+parm ash.parm7
+outparm writes/parmed_test1.parm7
+EOF
+evaluate_test $? files/ash.parm7 files/writes/parmed_test1.parm7
+
+printf "Running test parmed CL test 2..."
+/bin/rm -fr files/testbed
+mkdir files/testbed
+touch files/testbed/file1
+touch files/testbed/file2
+touch files/testbed/file3
+mkdir files/testbed/subdir
+mkdir files/testbed/subdir2
+touch files/testbed/subdir/file1
+touch files/testbed/subdir/file2
+touch files/testbed/subdir2/file1
+touch files/testbed/subdir2/file2
+$run_cmd `which parmed` -nr > files/writes/parmed2.out 2>&1 << EOF
+cd files/testbed
+ls
+ls file*
+ls nofile
+ls */
+ls subdir/file?
+EOF
+if [ $? -ne 0 ]; then
+    echo "FAILED"
+else
+    echo "PASSED"
+fi
+#evaluate_test $? parmed2.out
+
+printf "Running test parmed CL test 3..."
+cat > files/writes/parmed1.in << EOF
+cd files/testbed
+ls -C
+ls file*
+ls nofile
+ls */
+ls subdir/file?
+EOF
+$run_cmd `which parmed` -nr > files/writes/parmed3.out 2>&1 << EOF
+source files/writes/parmed1.in
+EOF
+if [ $? -ne 0 ]; then
+    echo "FAILED"
+else
+    echo "PASSED"
+fi
+#evaluate_test $? parmed3.out
+
 ###### END TESTS ######
 
 # Clean up if everything passed
-if [ $failures -eq 0 ]; then
-    /bin/rm -fr files/writes
+if [ $failures -eq 0 -a $errors -eq 0 ]; then
+    /bin/rm -fr files/writes files/testbed
+else
+    test -f files/writes/DIFFLOG && cat files/writes/DIFFLOG
 fi
 cd "$old_pwd"
 

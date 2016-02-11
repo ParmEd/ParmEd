@@ -23,7 +23,7 @@ from parmed.modeller import ResidueTemplateContainer, AmberOFFLibrary
 from parmed.periodic_table import Element as _Element
 from parmed.residue import (SOLVENT_NAMES, CATION_NAMES, ANION_NAMES,
         AminoAcidResidue, RNAResidue, DNAResidue)
-from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
+from parmed.utils.six import iteritems, string_types, add_metaclass
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u
 from parmed.tools.argumentlist import ArgumentList
@@ -32,7 +32,7 @@ from parmed.tools.exceptions import (WriteOFFError, ParmError, ParmWarning,
         DeleteDihedralError, NoArgument, NonexistentParm, AmbiguousParmError,
         IncompatibleParmsError, ArgumentError, AddPDBError, AddPDBWarning,
         HMassRepartitionError, SimulationError, UnhandledArgumentWarning,
-        SeriousParmWarning, FileExists, NonexistentParmWarning, LJ12_6_4Error,
+        SeriousParmWarning, FileExists, ParmFileNotFound, LJ12_6_4Error,
         ChamberError, FileDoesNotExist, InputError, TiMergeError,
 #       CoarseGrainError,
 )
@@ -901,9 +901,10 @@ class printLJTypes(Action):
             for field in type_fields:
                 if len(field.strip()) == 0: continue
                 if '-' in field:
-                    begin = int(field.split('-')[0]) # FIXME
+                    begin = int(field.split('-')[0])
                     end = min(int(field.split('-')[1]), self.parm.ptr('ntypes'))
-                    if begin <= 0 or end < begin or begin > self.parm.ptr('ntypes'):
+                    if (begin <= 0 or end < begin or
+                            begin > self.parm.ptr('ntypes')):
                         raise ParmError('printLJTypes: Bad atom type range')
                     self.type_list.extend([i for i in range(begin, end+1)])
                 else:
@@ -921,8 +922,9 @@ class printLJTypes(Action):
             selection = self.mask.Selection()
         elif self.type_list:
             selection = [0 for atom in self.parm.atoms]
-            for i, atom in enumerate(self.parm.atoms): # FIXME
-                if atom.nb_idx in self.type_list: selection[i] = 1
+            for i, atom in enumerate(self.parm.atoms):
+                if atom.nb_idx in self.type_list:
+                    selection[i] = 1
         if sum(selection) == 0:
             return 'Nothing to do for printLJTypes'
 
@@ -2046,11 +2048,13 @@ class addAtomicNumber(Action):
 
     def execute(self):
         if self.present: return
-        if self.parm.amoeba: # FIXME
-            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+        if self.parm.amoeba:
+            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8',
+                               num_items=len(self.parm.atoms))
             flag = 'AMOEBA_ATOMIC_NUMBER'
         else:
-            self.parm.add_flag('ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
+            self.parm.add_flag('ATOMIC_NUMBER', '10I8',
+                               num_items=len(self.parm.atoms))
             flag = 'ATOMIC_NUMBER'
         for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data[flag][i] = atm.atomic_number
@@ -2278,8 +2282,6 @@ class tiMerge(Action):
             self.molmask2N = None
 
     def __str__(self):
-        if not self.molmask1 or not self.molmask2:
-            return 'No molecules specified to merge'
         return ('Merging molecules [%s] [%s] with sc mask [%s] [%s]' % (
                self.molmask1, self.molmask2, self.mask1, self.mask2 )
         )
@@ -2398,7 +2400,7 @@ class tiMerge(Action):
             atm_j = mol2common[i]
             diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
             if (np.abs(diff) > self.tol).any():
-                raise TiMergeError('Common (nonsoftcore) atoms must have the '
+                raise TiMergeError('Common (nonsoftcore) atoms must have the ' # pragma: no cover
                                    'same coordinates.')
 
         for j in range(natom):
@@ -2553,7 +2555,7 @@ class tiMerge(Action):
                     atmi not in new_sc_atm2_int and
                     atml not in new_sc_atm1_int and
                     atml not in new_sc_atm2_int):
-                    raise TiMergeError(
+                    raise TiMergeError( # pragma: no cover
                             'Cannot have dihedral cross through softcore '
                             'region. (DIHED : %d %d %d %d). Usually this means '
                             'you have defined the softcore region in a way '
@@ -2594,7 +2596,7 @@ class source(Action):
         This is a no-op, since a separate command interpreter for this file is
         launched inside parmed_cmd.py
         """
-        pass
+        pass # pragma: no cover
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2605,7 +2607,7 @@ class parm(Action):
     """
     usage = ('<filename> [<filename> [<filename> ...]] || parm copy <filename>|'
              '<index> || parm select <filename>|<index>')
-    needs_parm = False # We don't need a parm for this action
+    needs_parm = False
     def init(self, arg_list):
         from glob import glob
         self.new_active_parm = arg_list.get_key_string('select', None)
@@ -2642,13 +2644,10 @@ class parm(Action):
             while new_parm is not None:
                 listparms = glob(new_parm)
                 if not listparms:
-                    warnings.warn('No files matching %s' % new_parm,
-                                  NonexistentParmWarning)
-                    continue
+                    raise ParmFileNotFound('No files matching %s' % new_parm)
                 self.new_parm.extend(glob(new_parm))
                 new_parm = arg_list.get_next_string(optional=True)
-            if not self.new_parm:
-                raise NonexistentParm('No matching parm files')
+            assert self.new_parm, 'No matching parm files? should not happen'
 
     def __str__(self):
         if self.new_active_parm is not None:
@@ -2669,7 +2668,7 @@ class parm(Action):
                         self.new_active_parm)
             return ("Copying prmtop %s to parm list. %s's copy is the active "
                     "parm." % (self.parm_list[idx], self.parm_list[idx]))
-        return 'Internal error!' # should never reach here
+        raise AssertionError('Should not be here')
 
     def execute(self):
         """ Either set the new active parm or add the new parm """
@@ -2727,9 +2726,7 @@ class ls(Action):
         process = Popen(['/bin/ls', '-C'] + self.args, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate('')
         process.wait()
-        if PY3:
-            return (out + err).decode('UTF-8')
-        return out + err
+        return (out + err).decode('UTF-8')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2756,15 +2753,15 @@ class cd(Action):
         if len(self.directory) < 1:
             warnings.warn('No recognized directories given to cd',
                           SeriousParmWarning)
-            return
+            return # pragma: no cover
         elif len(self.directory) > 1:
             warnings.warn('More than one file/directory given to cd',
                           SeriousParmWarning)
-            return
+            return # pragma: no cover
         if not os.path.isdir(self.directory[0]):
             warnings.warn('%s is not a directory' % self.directory[0],
                           SeriousParmWarning)
-            return
+            return # pragma: no cover
         # If we've gotten this far, go ahead and change to the directory
         os.chdir(self.directory[0])
 
@@ -2779,7 +2776,7 @@ class listParms(Action):
     def init(self, arg_list):
         pass
 
-    def __str__(self):
+    def __repr__(self):
         if self.parm_list.empty():
             return "No topology files are loaded"
 
@@ -2790,7 +2787,7 @@ class listParms(Action):
                 retstr += ' (active)'
 
         return retstr
-
+    __str__ = __repr__ # FIXME
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class interpolate(Action):
@@ -2812,7 +2809,7 @@ class interpolate(Action):
         - <num> : Starting number for file names (see <prefix> above)
     """
     usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] '
-             '[startnum <num>')
+             '[startnum <num>]')
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Make sure we have at least 2 prmtops
@@ -2871,8 +2868,8 @@ class interpolate(Action):
     def execute(self):
         """ Interpolates the prmtops """
         if self.diff_vdw and not self.eleconly:
-            raise NotImplemented('No support for scaling vdW parameters yet!')
-
+            raise NotImplementedError('No support for scaling vdW '
+                                      'parameters yet!')
         parm1, parm2 = self.parm, self.parm2
         # Original charges for parm 1
         orig_chg1 = parm1.parm_data['CHARGE']
@@ -2912,16 +2909,13 @@ def _split_range(chunksize, start, stop):
             _stop = stop
         yield start + i * chunksize, _stop
 
-def _reformat_long_sentence(long_sentence, title, n_words=6, offset=None):
+def _reformat_long_sentence(long_sentence, title, n_words=6):
     words = long_sentence.split(', ')
     empty = "\n" + " " * len(title)
     lines = [words[slice(*idx)] for idx in _split_range(n_words, 0, len(words))]
     sentences = [', '.join(line) for line in lines]
 
-    if offset is None:
-        sentences[0] = title[:] + sentences[0]
-    else:
-        sentences[0] = title[:offset] + sentences[0]
+    sentences[0] = title[:] + sentences[0]
     return empty.join(sentences)
 
 class summary(Action):
@@ -2972,7 +2966,7 @@ class summary(Action):
         rset = ", ".join(sorted(set(res.name for res in self.parm.residues)))
         retval.append(
                 _reformat_long_sentence(rset, 'Residue set:           ',
-                                        offset=None, n_words=7)
+                                        n_words=7)
         )
         rcount = ','.join('%s: %d' % (x, y)
                            for x, y in iteritems(
@@ -2981,8 +2975,7 @@ class summary(Action):
         )
         retval.append(
                 _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
-                                        'Residue count:         ',
-                                        offset=None, n_words=7)
+                                        'Residue count:         ', n_words=7)
         )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
@@ -3129,8 +3122,8 @@ class addPDB(Action):
             res.chain = '*'
             res.insertion_code = ''
         for i, res in enumerate(pdb.residues):
-            parmres = self.parm.residues[i]
             try:
+                parmres = self.parm.residues[i]
                 reslab = parmres.name
                 resname = res.name.strip()
                 if resname != reslab:
@@ -3314,8 +3307,7 @@ class add12_6_4(Action):
 
     def execute(self):
         from parmed.tools.add1264 import params1264 as params
-        if 'LENNARD_JONES_CCOEF' in self.parm.flag_list:
-            self.parm.delete_flag('LENNARD_JONES_CCOEF')
+        self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
                 comments=['For 12-6-4 potential used for divalent metal ions'])
@@ -3373,7 +3365,7 @@ class HMassRepartition(Action):
             atom.mass = self.new_h_mass
             heteroatom.mass -= transfermass
             if isinstance(self.parm, AmberParm):
-                self.parm.parm_data['MASS'][i] = atom.mass = self.new_h_mass
+                self.parm.parm_data['MASS'][i] = self.new_h_mass
                 self.parm.parm_data['MASS'][heteroatom.idx] -= transfermass
 
         # Now make sure that all masses are positive, or revert masses and
@@ -3434,17 +3426,13 @@ class OpenMM(Action):
         """ Runs the OpenMM simulation """
         from parmed.tools.simulations.openmm import simulate, HAS_OPENMM
         if not HAS_OPENMM:
-            raise SimulationError('OpenMM could not be imported. Skipping.')
+            raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
         # First try to load a restart file if it was supplied
         inptraj = self.arg_list.has_key('-y', mark=False)
         has_inpcrd = self.arg_list.has_key('-c', mark=False)
         if self.parm.coordinates is None and not inptraj and not has_inpcrd:
             raise SimulationError('No input coordinates provided.')
         # Eliminate some incompatibilities that are easy to catch now
-        if self.parm.ptr('ifbox') > 1:
-            raise SimulationError('OpenMM only supports orthorhombic boxes '
-                                  'currently.')
-
         simulate(self.parm, self.arg_list)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3506,8 +3494,8 @@ class energy(Action):
         self.use_openmm = (arg_list.has_key('omm') or
                     not isinstance(self.parm, AmberParm))
         self.arg_list = ArgumentList(arg_list)
-        if self.use_openmm and isinstance(self.parm, AmoebaParm):
-            raise InputError('Amoeba prmtops can only get energies from sander')
+        if self.use_openmm and isinstance(self.parm, AmoebaParm): # FIXME
+            raise NotImplementedError('Amoeba prmtops can only get energies from sander')
 
     def __str__(self):
         return 'Computing a single-point energy for %s' % self.parm
@@ -3516,13 +3504,13 @@ class energy(Action):
         if self.use_openmm:
             from parmed.tools.simulations.openmm import energy, HAS_OPENMM
             if not HAS_OPENMM:
-                raise SimulationError('OpenMM could not be imported. Skipping.')
+                raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
 
             energy(self.parm, self.arg_list, self.output)
         else:
             from parmed.tools.simulations.sanderapi import energy, HAS_SANDER
             if not HAS_SANDER:
-                raise SimulationError('sander could not be imported. Skipping.')
+                raise SimulationError('sander could not be imported. Skipping.') # pragma: no cover
             # Consume the OMM-specific arguments so we don't have any apparently
             # unused arguments
             self.arg_list.get_key_string('platform', None)
@@ -3625,32 +3613,32 @@ class deleteBond(Action):
         retstr = 'Deleting %d bonds between %s and %s:\n' % (
                     len(self.del_bonds), self.mask1, self.mask2)
         for bond in self.del_bonds:
-            a1, a2 = bond.atom1, bond.atom2
+            a1, a2 = self.parm.bonds[bond].atom1, self.parm.bonds[bond].atom2
             retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (a1.idx+1,
                     a1.residue.name, a1.residue.idx+1, a1.name, a2.idx+1,
                     a2.residue.name, a2.residue.idx+1, a2.name)
         retstr += 'Deleting %d angles, ' % (len(self.del_angles))
-        if self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
-            retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
-                        'and %d CMAPs' % (
-                        len(self.del_urey_bradleys), len(self.del_impropers),
-                        len(self.del_dihedrals), len(self.del_cmap))
-            )
-        elif self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
+        if self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
                 self.parm.stretch_bends or self.parm.torsion_torsions:
             retstr += ('%d Urey-Bradleys, %d trigonal angles,\n         '
                        '%d dihedrals, %d out-of-plane bends, %d stretch-bends\n'
                        '         and %d torsion-torsions' % (
                         len(self.del_urey_bradleys),
                         len(self.del_trigonal_angles),
-                        len(self.del_dihedrals), len(self.del_oopbends),
-                        len(self.del_strbnds), len(self.del_tortors))
+                        len(self.del_dihedrals)+len(self.del_rbtorsions),
+                        len(self.del_oopbends), len(self.del_strbnds),
+                        len(self.del_tortors))
             )
-        elif self.parm.rb_torsions:
-            retstr += ('%d R-B torsions and %d dihedrals' %
-                    (len(self.del_rbtorsions), len(self.del_dihedrals)))
+        elif self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
+            retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
+                        'and %d CMAPs' % (
+                        len(self.del_urey_bradleys), len(self.del_impropers),
+                        len(self.del_dihedrals)+len(self.del_rbtorsions),
+                        len(self.del_cmaps))
+            )
         else:
-            retstr += 'and %d dihedrals' % (len(self.del_dihedrals))
+            retstr += 'and %d dihedrals' % (len(self.del_dihedrals) +
+                    len(self.del_rbtorsions))
         return retstr
 
     def execute(self):
@@ -3793,7 +3781,7 @@ class chamber(Action):
             crdfiles = glob.glob(expanduser(expandvars(crdfile)))
             if not crdfiles:
                 raise FileDoesNotExist('Coordinate file %s does not exist' %
-                                       self.crdfile)
+                                       crdfile)
             if len(crdfiles) > 1:
                 raise InputError('Too many coordinate files selected through '
                                  'globbing')
@@ -3862,23 +3850,16 @@ class chamber(Action):
         return retstr
 
     def execute(self):
-        # We're not using chamber, do the conversion in-house
-        try:
-            parmset = CharmmParameterSet()
-            for tfile in self.topfiles:
-                parmset.read_topology_file(tfile)
-            for pfile in self.paramfiles:
-                parmset.read_parameter_file(pfile)
-            for sfile in self.streamfiles:
-                parmset.read_stream_file(sfile)
-        except ParmedError as e:
-            raise ChamberError('Problem reading CHARMM parameter sets: %s' % e)
+        parmset = CharmmParameterSet()
+        for tfile in self.topfiles:
+            parmset.read_topology_file(tfile)
+        for pfile in self.paramfiles:
+            parmset.read_parameter_file(pfile)
+        for sfile in self.streamfiles:
+            parmset.read_stream_file(sfile)
 
         # Now read the PSF
-        try:
-            psf = CharmmPsfFile(self.psf)
-        except ParmedError as e:
-            raise ChamberError('Problem reading CHARMM PSF: %s' % e)
+        psf = CharmmPsfFile(self.psf)
 
         # Read the PDB and set the box information
         if self.crdfile is not None:
@@ -3890,7 +3871,7 @@ class chamber(Action):
                     coords = crd.coordinates[0]
                 else:
                     coords = crd.coordinates
-            except AttributeError:
+            except (AttributeError, TypeError):
                 raise ChamberError('No coordinates in %s' % self.crdfile)
             if hasattr(crd, 'box') and crd.box is not None:
                 if len(crd.box.shape) == 1:
@@ -4023,7 +4004,7 @@ class minimize(Action):
         self.platform = arg_list.get_key_string('platform', None)
         self.precision = arg_list.get_key_string('precision', 'mixed')
         self.tol = arg_list.get_key_float('tol', 0.001)
-        self.maxcyc = arg_list.get_key_float('maxcyc', None)
+        self.maxcyc = arg_list.get_key_int('maxcyc', None)
         # Check for legal values
         if self.parm.ptr('ifbox') == 0:
             if self.cutoff is None or self.cutoff > 500:

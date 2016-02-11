@@ -17,13 +17,13 @@ fi
 sh devtools/travis-ci/pyflakes_check.sh
 cd test
 echo "Using nosetests...:"
-./run_scripts.sh
 if [ "$PYTHON_VERSION" = "pypy" ]; then
     # Disable coverage with pypy, since it multiplies the time taken by 6 or
     # something ridiculous like that
     nosetests -vs --with-timer --timer-ok=5s --timer-warning=12s \
               --timer-filter=warning,error .
 else
+    ./run_scripts.sh
     # Run nose under coverage, since that allows getting the full flexibility of
     # the coverage package without sacrificing nose functionality
     test -z "$MINIMAL_PACKAGES" && export AMBERHOME=$HOME/miniconda/envs/myenv

@@ -10,7 +10,7 @@ from os.path import join, split, abspath
 from parmed import gromacs
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import zip
-warnings.filterwarnings('error', category=DeprecationWarning)
+warnings.filterwarnings('error', category=DeprecationWarning, module='parmed')
 
 try:
     from simtk import openmm as mm
