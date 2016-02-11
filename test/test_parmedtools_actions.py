@@ -88,11 +88,12 @@ class TestActionAPI(unittest.TestCase):
         self.assertRaises(exc.ParmError, lambda:
                 PT.changeRadii(None, 'mbondi2'))
 
-class TestNonParmActions(unittest.TestCase):
+class TestNonParmActions(FileIOTestCase):
     """ Tests all actions that do not require a prmtop instance """
 
     def setUp(self):
         self.parm = gasparm
+        FileIOTestCase.setUp(self)
 
     def test_overwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
