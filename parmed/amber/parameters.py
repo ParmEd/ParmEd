@@ -13,7 +13,7 @@ import math
 import os
 from parmed.amber.offlib import AmberOFFLibrary
 from parmed.constants import TINY
-from parmed.exceptions import ParameterError, ParameterWarning
+from parmed.exceptions import ParameterError, AmberWarning
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Mass, element_by_mass, AtomicNum
@@ -546,7 +546,7 @@ class AmberParameterSet(ParameterSet):
                             or abs(otyp.rmin-self.atom_types[atyp].rmin) > TINY):
                         warnings.warn('Equivalency defined between %s and %s '
                                       'but parameters are not equal' %
-                                      (otyp.name, atyp), ParameterWarning)
+                                      (otyp.name, atyp), AmberWarning)
                         # Remove from equivalent types
                         equivalent_types[otyp.name].remove(atyp)
                         continue

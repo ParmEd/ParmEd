@@ -13,7 +13,7 @@ import sys
 from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
                           FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
-                               MaskError, InputError, ParameterWarning)
+                               MaskError, InputError)
 from parmed import topologyobjects, load_file, Structure
 import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
@@ -901,7 +901,16 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_parm_dat_bad_equivalencing(self):
         """ Test handling of erroneous atom equivalencing in parm.dat files """
-        warnings.filterwarnings('ignore', category=ParameterWarning)
+        # Now make sure it warns
+        warnings.filterwarnings('error', category=AmberWarning)
+        self.assertRaises(AmberWarning, lambda:
+                parameters.AmberParameterSet(
+                        os.path.join(get_fn('parm'), 'parmAM1.dat')
+                )
+        )
+        warnings.filterwarnings('always', category=AmberWarning)
+        # Now check it does the right thing.
+        warnings.filterwarnings('ignore', category=AmberWarning)
         params = parameters.AmberParameterSet(
                 os.path.join(get_fn('parm'), 'parmAM1.dat')
         )
@@ -911,14 +920,6 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(params.atom_types['C'].epsilon, 0.086)
         self.assertEqual(params.atom_types['CA'].rmin, 1.9061)
         self.assertEqual(params.atom_types['CA'].epsilon, 0.086)
-        # Now make sure it warns
-        warnings.filterwarnings('error', category=ParameterWarning)
-        self.assertRaises(ParameterWarning, lambda:
-                parameters.AmberParameterSet(
-                        os.path.join(get_fn('parm'), 'parmAM1.dat')
-                )
-        )
-        warnings.filterwarnings('always', category=ParameterWarning)
 
     def test_frcmod_with_tabstops(self):
         """ Test parsing an Amber frcmod file with tabs instead of spaces """
