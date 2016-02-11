@@ -55,13 +55,25 @@ class ParameterSet(object):
         Dictionary mapping the 4-element tuple of the names of the four atom
         types involved in the improper torsion (modeled as a Fourier series) to
         the DihedralType instances
-    cmap_types : dict((str,str,str,str,str):CmapType)
+    rb_torsion_types : dict((str,str,str,str):RBTorsionType)
+        Dictionary mapping the 4-element tuple of the names of the four atom
+        types involved in the Ryckaert-Bellemans torsion to the RBTorsionType
+        instances
+    cmap_types : dict((str,str,str,str,str,str,str,str):CmapType)
         Dictionary mapping the 5-element tuple of the names of the five atom
         types involved in the correction map to the CmapType instances
     nbfix_types : dict((str,str):(float,float))
         Dictionary mapping the 2-element tuple of the names of the two atom
         types whose LJ terms are modified to the tuple of the (epsilon,rmin)
         terms for that off-diagonal term
+    pair_types : dict((str,str):NonbondedExceptionType)
+        Dictionary mapping the 2-element tuple of atom type names for which
+        explicit exclusion rules should be applied
+    parametersets : list(str)
+        List of parameter set names processed in the current ParameterSet
+    residues : dict(str:ResidueTemplate|ResidueTemplateContainer)
+        A library of ResidueTemplate objects mapped to the residue name defined
+        in the force field library files
     """
 
     def __init__(self, *args):
@@ -81,6 +93,8 @@ class ParameterSet(object):
         self.pair_types = OrderedDict()
         self.parametersets = []
         self._combining_rule = 'lorentz'
+        self.residues = OrderedDict()
+        self.default_scee = self.default_scnb = 1.0
 
     def __copy__(self):
         other = type(self)()
@@ -133,6 +147,8 @@ class ParameterSet(object):
             typ = copy(item)
             other.cmap_types[key] = typ
             other.cmap_types[tuple(reversed(key))] = typ
+        for key, item in iteritems(self.residues):
+            other.residues[key] = copy(item)
         other.combining_rule = self.combining_rule
 
         return other
@@ -321,12 +337,14 @@ class ParameterSet(object):
         for cmap in struct.cmaps:
             if cmap.type is None: continue
             key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
+                    cmap.atom4.type, cmap.atom2.type, cmap.atom3.type,
                     cmap.atom4.type, cmap.atom5.type)
             if key in params.cmap_types:
                 if (not allow_unequal_duplicates and
                         cmap.type != params.cmap_types[key]):
                     raise ParameterError('Unequal CMAP types defined between '
-                            '%s, %s, %s, %s, and %s' % key)
+                            '%s, %s, %s, %s, and %s' % (key[0], key[1], key[2],
+                                key[3], key[7]))
                 continue # pragma: no cover
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
@@ -435,3 +453,16 @@ class ParameterSet(object):
         if value not in ('lorentz', 'geometric'):
             raise ValueError('combining_rule must be "lorentz" or "geometric"')
         self._combining_rule = value
+
+    def typeify_templates(self):
+        """ Assign atom types to atom names in templates """
+        from parmed.modeller import ResidueTemplateContainer, ResidueTemplate
+        for name, residue in iteritems(self.residues):
+            if isinstance(residue, ResidueTemplateContainer):
+                for res in residue:
+                    for atom in res:
+                        atom.atom_type = self.atom_types[atom.type]
+            else:
+                assert isinstance(residue, ResidueTemplate), 'Wrong type!'
+                for atom in residue:
+                    atom.atom_type = self.atom_types[atom.type]

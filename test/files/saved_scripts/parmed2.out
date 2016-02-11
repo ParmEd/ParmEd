@@ -1,0 +1,18 @@
+Reading input from STDIN...
+> New working directory: files/testbed
+> file1	file2	file3	subdir	subdir2
+
+> file1	file2	file3
+
+> ls: nofile: No such file or directory
+
+> subdir/:
+file1	file2
+
+subdir2/:
+file1	file2
+
+> subdir/file1	subdir/file2
+
+> Done!
+[?1034h

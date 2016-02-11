@@ -28,6 +28,15 @@ def reset_stringio(io):
 class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
 
+    def test_load_blank_file(self):
+        """ Makes sure that a blank file does not match any id_format """
+        from parmed.formats.registry import PARSER_REGISTRY
+        fn = get_fn('test', written=True)
+        with open(fn, 'w'):
+            pass
+        for name, cls in iteritems(PARSER_REGISTRY):
+            self.assertFalse(cls.id_format(fn))
+
     def test_load_off(self):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
@@ -223,7 +232,7 @@ class TestFileLoader(FileIOTestCase):
         self.assertIsInstance(crd, amber.AmberParm)
 
 class TestPDBStructure(FileIOTestCase):
-    
+
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
         self.pdbgz = get_fn('4lzt.pdb.gz')
@@ -958,14 +967,10 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
 
     def test_deprecations(self):
-        warnings.filterwarnings('error', category=DeprecationWarning)
         fn = get_fn('blah', written=True)
-        try:
-            parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-            self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
-            self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
-        finally:
-            warnings.filterwarnings('always', category=DeprecationWarning)
+        parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
+        self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
 
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,

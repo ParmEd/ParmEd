@@ -5,7 +5,7 @@ parameters defined in an input file for sander and pmemd.
 from __future__ import division, print_function
 
 from parmed.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7
-from parmed.amber.mdin import mdin as Mdin
+from parmed.amber.mdin import Mdin
 from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
 from parmed.utils.timer import Timer
@@ -123,11 +123,11 @@ def simulate(parm, args):
 
     # Open up the script file and write the header if requested
     if scriptfile is not None:
-        scriptfile = open(scriptfile, 'w', 0)
+        scriptfile = open(scriptfile, 'w')
         if inpcrd is not None:
             scriptfile.write(_SCRIPT_HEADER % (parm, inpcrd))
         else:
-            scriptfile.write(_SCRIPT_HEADER % (parm, parm.rst7.filename))
+            scriptfile.write(_SCRIPT_HEADER % (parm, parm.crdname))
 
     # Parse the input file
     mdin = Mdin()
@@ -217,18 +217,19 @@ def simulate(parm, args):
                 mdin.change('cntrl', 'ntb', 2)
             else:
                 mdin.change('cntrl', 'ntb', 1)
-            if mdin.cntrl_nml['cut'] == 0:
-                mdin.change('cntrl', 'cut', 8.0)
         else:
             mdin.change('cntrl', 'ntb', 0)
-            if mdin.cntrl_nml['cut'] is None:
-                mdin.change('cntrl', 'cut', 9999.0)
+    if not mdin.cntrl_nml['cut']:
+        if mdin.cntrl_nml['ntb'] > 0:
+            mdin.cntrl_nml['cut'] = 8.0
+        else:
+            mdin.cntrl_nml['cut'] = 1000.0
 
     # Determine our cutoff and electrostatic method
     gbmeth, kappa = None, 0.0
     if mdin.cntrl_nml['ntb'] == 0:
         # Interpret cutoffs greater than 500 Angstroms as infinite
-        if mdin.cntrl_nml['cut'] > 500:
+        if mdin.cntrl_nml['cut'] >= 500:
             nbmeth = ff.NoCutoff
         else:
             nbmeth = ff.CutoffNonPeriodic
@@ -897,11 +898,11 @@ def energy(parm, args, output=sys.stdout):
             parm_ = amberprmtopfile.AmberPrmtopFile(tmp)
             os.unlink(tmp)
         except IOError:
-            raise SimulationError('Could not create temporary file for app '
+            raise SimulationError('Could not create temporary file for app ' # pragma: no cover
                                   'layer energy calculation.')
-        except Exception as exc:
-            raise SimulationError('Error creating parm object from app layer. '
-                                  '[ %s: %s ]' % (type(exc).__name__, exc))
+#       except Exception as exc: TODO delete
+#TODO deleteraise SimulationError('Error creating parm object from app layer. '
+#TODO delete                      '[ %s: %s ]' % (type(exc).__name__, exc))
 
     # Time to create the OpenMM system
     system = parm_.createSystem(nonbondedMethod=nbmeth,
@@ -1054,7 +1055,7 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
     # Open the script file
     if script is not None:
         scriptfile = open(script, 'w')
-        scriptfile.write(_SCRIPT_HEADER % (parm, parm.rst7.filename))
+        scriptfile.write(_SCRIPT_HEADER % (parm, parm.crdname))
     else:
         scriptfile = None
 
