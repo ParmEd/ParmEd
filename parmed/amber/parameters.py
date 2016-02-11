@@ -12,7 +12,8 @@ from contextlib import closing
 import math
 import os
 from parmed.amber.offlib import AmberOFFLibrary
-from parmed.exceptions import ParameterError
+from parmed.constants import TINY
+from parmed.exceptions import ParameterError, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Mass, element_by_mass, AtomicNum
@@ -22,6 +23,7 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import map
 import re
+import warnings
 
 # parameter file regexes
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
@@ -538,6 +540,16 @@ class AmberParameterSet(ParameterSet):
         for atyp, otyp in iteritems(equivalent_ljtypes):
             otyp = self.atom_types[otyp]
             if atyp in self.atom_types:
+                if (self.atom_types[atyp].rmin is not None and
+                        self.atom_types[atyp].epsilon is not None):
+                    if (abs(otyp.epsilon-self.atom_types[atyp].epsilon) > TINY
+                            or abs(otyp.rmin-self.atom_types[atyp].rmin) > TINY):
+                        warnings.warn('Equivalency defined between %s and %s '
+                                      'but parameters are not equal' %
+                                      (otyp.name, atyp), ParameterWarning)
+                        # Remove from equivalent types
+                        equivalent_types[otyp.name].remove(atyp)
+                        continue
                 self.atom_types[atyp].set_lj_params(otyp.epsilon, otyp.rmin)
         line = next(fiter).strip()
         if line == 'LJEDIT':
