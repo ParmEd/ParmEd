@@ -13,7 +13,7 @@ import sys
 from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
                           FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
-                               MaskError, InputError)
+                               MaskError, InputError, ParameterWarning)
 from parmed import topologyobjects, load_file, Structure
 import parmed.unit as u
 from parmed.utils.six import string_types, iteritems
@@ -906,7 +906,6 @@ class TestParameterFiles(FileIOTestCase):
                         os.path.join(get_fn('parm'), 'parmAM1.dat')
                 )
         )
-        warnings.filterwarnings('always', category=AmberWarning)
         # Now check it does the right thing.
         warnings.filterwarnings('ignore', category=AmberWarning)
         params = parameters.AmberParameterSet(
@@ -918,6 +917,7 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(params.atom_types['C'].epsilon, 0.086)
         self.assertEqual(params.atom_types['CA'].rmin, 1.9061)
         self.assertEqual(params.atom_types['CA'].epsilon, 0.086)
+        warnings.filterwarnings('always', category=AmberWarning)
 
     def test_frcmod_with_tabstops(self):
         """ Test parsing an Amber frcmod file with tabs instead of spaces """
@@ -927,6 +927,16 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(len(params.atom_types), 38) # Ugh! Duplicates??  Really??
         self.assertEqual(params.bond_types[('C', 'CM')],
                          topologyobjects.BondType(449.9, 1.466)) # OVERWRITING IN THE SAME FILE??
+
+    def test_nonconsecutive_torsions(self):
+        """ Test proper warning of non-consecutive multi-term dihedrals """
+        warnings.filterwarnings('error', category=ParameterWarning)
+        self.assertRaises(ParameterWarning, lambda:
+                parameters.AmberParameterSet(
+                        os.path.join(get_fn('parm'), 'parm14ipq.dat')
+                )
+        )
+        warnings.filterwarnings('always', category=ParameterWarning)
 
     def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
