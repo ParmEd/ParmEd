@@ -763,6 +763,8 @@ class change(Action):
             prop = 'type'
         elif self.prop == 'TREE_CHAIN_CLASSIFICATION':
             prop = 'tree'
+        elif self.prop == 'RADII':
+            prop = 'solvent_radius'
         else:
             prop = self.prop.lower()
         for i, atom in enumerate(self.parm.atoms):
