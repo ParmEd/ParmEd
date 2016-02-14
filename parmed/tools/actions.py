@@ -2789,7 +2789,9 @@ class listParms(Action):
                 retstr += ' (active)'
 
         return retstr
-    __str__ = __repr__ # FIXME
+
+    __str__ = __repr__
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class interpolate(Action):
@@ -3496,8 +3498,9 @@ class energy(Action):
         self.use_openmm = (arg_list.has_key('omm') or
                     not isinstance(self.parm, AmberParm))
         self.arg_list = ArgumentList(arg_list)
-        if self.use_openmm and isinstance(self.parm, AmoebaParm): # FIXME
-            raise NotImplementedError('Amoeba prmtops can only get energies from sander')
+        if self.use_openmm and isinstance(self.parm, AmoebaParm):
+            raise NotImplementedError('Amoeba prmtops can only get energies '
+                                      'from sander')
 
     def __str__(self):
         return 'Computing a single-point energy for %s' % self.parm

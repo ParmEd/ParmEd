@@ -97,38 +97,38 @@ def mbondi(parm):
         if atom.atomic_number == 1:
             bondeds = list(atom.bond_partners)
             if bondeds[0].atomic_number in (6, 7): # C or N
-                atom.radius_set = 1.3
+                atom.solvent_radius = 1.3
             elif bondeds[0].atomic_number in (8, 16): # O or S
-                atom.radius_set = 0.8
+                atom.solvent_radius = 0.8
             else:
-                atom.radius_set = 1.2
+                atom.solvent_radius = 1.2
         # Radius of C atom depends on what type it is
         elif atom.atomic_number == 6:
             if atom.type.startswith('C1') and atom.mass > 13.0:
-                atom.radius_set = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C2') and atom.mass > 14.0:
-                atom.radius_set = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C3') and atom.mass > 15.0:
-                atom.radius_set = 2.2
+                atom.solvent_radius = 2.2
             else:
-                atom.radius_set = 1.7
-        # All other elements have fixed radius_set for all types/partners
+                atom.solvent_radius = 1.7
+        # All other elements have fixed solvent_radius for all types/partners
         elif atom.atomic_number == 7:
-            atom.radius_set = 1.55
+            atom.solvent_radius = 1.55
         elif atom.atomic_number == 8:
-            atom.radius_set = 1.5
+            atom.solvent_radius = 1.5
         elif atom.atomic_number == 9:
-            atom.radius_set = 1.5
+            atom.solvent_radius = 1.5
         elif atom.atomic_number == 14:
-            atom.radius_set = 2.1
+            atom.solvent_radius = 2.1
         elif atom.atomic_number == 15:
-            atom.radius_set = 1.85
+            atom.solvent_radius = 1.85
         elif atom.atomic_number == 16:
-            atom.radius_set = 1.8
+            atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.radius_set = 1.5
+            atom.solvent_radius = 1.5
         else:
-            atom.radius_set = 1.5
+            atom.solvent_radius = 1.5
     try:
         parm.parm_data['RADIUS_SET'][0] = 'modified Bondi radii (mbondi)'
     except AttributeError:
