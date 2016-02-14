@@ -106,8 +106,8 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         traj.close()
         traj = NetCDFRestart.open_old(rstfn)
         self.assertEqual(traj.temp0, 300)
-        np.testing.assert_allclose(crd, traj.coordinates.squeeze())
-        np.testing.assert_allclose(vel, traj.velocities.squeeze())
+        np.testing.assert_allclose(crd, traj.coordinates.squeeze(), atol=1e-5)
+        np.testing.assert_allclose(vel, traj.velocities.squeeze(), atol=1e-5)
 
         traj = NetCDFRestart.open_new(
                 rstfn, 100, False, True, 'Restart w/ REMD', remd='Multi',
@@ -121,8 +121,8 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         traj.remd_indices = remd_indices
         traj.close()
         traj = NetCDFRestart.open_old(rstfn)
-        np.testing.assert_allclose(crd, traj.coordinates.squeeze())
-        np.testing.assert_allclose(vel, traj.velocities.squeeze())
+        np.testing.assert_allclose(crd, traj.coordinates.squeeze(), atol=1e-5)
+        np.testing.assert_allclose(vel, traj.velocities.squeeze(), atol=1e-5)
         np.testing.assert_equal(remd_indices, traj.remd_indices)
         np.testing.assert_equal([1, 3, 3, 3], traj.remd_dimtype)
         # Do the restart with T-REMD first
@@ -139,8 +139,8 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         traj.close()
         traj = NetCDFTraj.open_old(trjfn)
         np.testing.assert_equal(traj.temp0, [300])
-        np.testing.assert_allclose(crd, traj.coordinates.squeeze())
-        np.testing.assert_allclose(vel, traj.velocities.squeeze())
+        np.testing.assert_allclose(crd, traj.coordinates.squeeze(), atol=1e-5)
+        np.testing.assert_allclose(vel, traj.velocities.squeeze(), atol=1e-5)
 
         traj = NetCDFTraj.open_new(
                 trjfn, 100, False, True, title='Traj w/ REMD', remd='Multi',
@@ -157,9 +157,9 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         traj.add_remd_indices(remd_indices)
         traj.close()
         traj = NetCDFTraj.open_old(trjfn)
-        np.testing.assert_allclose(crd, traj.coordinates.squeeze())
-        np.testing.assert_allclose(vel, traj.velocities.squeeze())
-        np.testing.assert_allclose(frc, traj.forces.squeeze())
+        np.testing.assert_allclose(crd, traj.coordinates.squeeze(), atol=1e-5)
+        np.testing.assert_allclose(vel, traj.velocities.squeeze(), atol=1e-5)
+        np.testing.assert_allclose(frc, traj.forces.squeeze(), atol=1e-5)
         np.testing.assert_equal(remd_indices, traj.remd_indices.squeeze())
         np.testing.assert_equal([1, 3, 3, 3], traj.remd_dimtype)
 

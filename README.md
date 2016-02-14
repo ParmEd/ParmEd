@@ -4,10 +4,11 @@ ParmEd
 Cross-program parameter and topology file editor and molecular mechanical
 simulator engine.
 
-Build Status
-============
+Badges
+======
 
 [![Build/Test Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
+[![Coverage Status](https://coveralls.io/repos/github/ParmEd/ParmEd/badge.svg?branch=master)](https://coveralls.io/github/ParmEd/ParmEd?branch=master)
 
 Description
 ===========
@@ -89,7 +90,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,

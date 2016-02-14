@@ -52,7 +52,6 @@ class PQRFile(object):
                 elif line[:5] in ('ORIGX', 'SCALE', 'MTRIX'):
                     if line[5] not in '123':
                         return False
-                    continue
                 elif words[0] in ('ATOM', 'HETATM'):
                     # Format is:
                     # rec atnum atname resname [chain] resnum x y z chg radius
@@ -83,8 +82,9 @@ class PQRFile(object):
                     except ValueError:
                         return False
                     return True
-                return False
-            return True
+                else:
+                    return False
+            return False
 
     #===================================================
 
@@ -165,10 +165,7 @@ class PQRFile(object):
                         try:
                             orig_atom = struct.atoms[atomno-1]
                         except IndexError:
-                            raise PDBError('Atom %d differs in MODEL %d [%s %s '
-                                           'vs. %s %s]' % (num, modelno,
-                                           atom.residue.name, atom.name,
-                                           res, nam))
+                            raise PDBError('Extra atom in MODEL %d' % modelno)
                         if (orig_atom.residue.name != res.strip()
                                 or orig_atom.name != nam.strip()):
                             raise PDBError('Atom %d differs in MODEL %d [%s %s '
@@ -182,7 +179,7 @@ class PQRFile(object):
                         raise PDBError('MODEL ended before any atoms read in')
                     modelno += 1
                     if len(struct.atoms)*3 != len(coordinates):
-                        raise ValueError(
+                        raise PDBError(
                                 'Inconsistent atom numbers in some PDB models')
                     all_coordinates.append(coordinates)
                     atomno = 0
@@ -191,12 +188,13 @@ class PQRFile(object):
                     if modelno == 1 and len(struct.atoms) == 0: continue
                     if len(coordinates) > 0:
                         if len(struct.atoms)*3 != len(coordinates):
-                            raise ValueError('Inconsistent atom numbers in '
-                                             'some PDB models')
+                            raise PDBError('Inconsistent atom numbers in '
+                                           'some PDB models')
                         warnings.warn('MODEL not explicitly ended', PDBWarning)
                         all_coordinates.append(coordinates)
                         coordinates = []
                     modelno += 1
+                    atomno = 0
                 elif words[0] == 'CRYST1':
                     a, b, c = (float(w) for w in words[1:4])
                     try:
@@ -210,7 +208,7 @@ class PQRFile(object):
         struct.unchange()
         if coordinates:
             if len(coordinates) != 3*len(struct.atoms):
-                raise ValueError('bad number of atoms in some PQR models')
+                raise PDBError('bad number of atoms in some PQR models')
             all_coordinates.append(coordinates)
         struct._coordinates = np.array(all_coordinates).reshape(
                         (-1, len(struct.atoms), 3))
@@ -257,7 +255,7 @@ class PQRFile(object):
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
                     struct.box[4], struct.box[5]))
         if coordinates is not None:
-            coords = np.asarray(coordinates, copy=False, subok=True)
+            coords = np.array(coordinates, copy=False, subok=True)
             try:
                 coords = coords.reshape((-1, len(struct.atoms), 3))
             except ValueError:

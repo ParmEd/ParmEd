@@ -296,6 +296,7 @@ class netcdf_file(object):
 
     def close(self):
         """Closes the NetCDF file."""
+        if not hasattr(self, 'fp'): return
         if not self.fp.closed:
             try:
                 self.flush()

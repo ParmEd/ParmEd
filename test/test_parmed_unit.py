@@ -11,25 +11,9 @@ from parmed.utils.six.moves import zip
 import copy
 import math
 import unittest
+import utils
 
-class QuantityTestCase(unittest.TestCase):
-
-    def assertAlmostEqualQuantities(self, item1, item2, places=6):
-        try:
-            val1 = item1.value_in_unit(item1.unit)
-            val2 = item2.value_in_unit(item1.unit)
-        except TypeError:
-            raise self.failureException('Incompatible units %s and %s' %
-                                        (item1.unit, item2.unit))
-        try:
-            if len(val1) != len(val2):
-                raise self.failureException('collections are different lengths')
-            for x, y in zip(val1, val2):
-                self.assertAlmostEqual(x, y, places=places)
-        except TypeError:
-            self.assertAlmostEqual(val1, val2, places=places)
-
-class TestUnits(QuantityTestCase):
+class TestUnits(utils.QuantityTestCase):
 
     def testBaseUnit(self):
         """ Tests the creation of a base unit furlong """
@@ -639,7 +623,7 @@ class TestUnits(QuantityTestCase):
         self.assertEqual(str(u.meters*u.meters), 'meter**2')
         self.assertEqual(str(u.meter*u.meter), 'meter**2')
 
-class TestNumpyUnits(QuantityTestCase):
+class TestNumpyUnits(utils.QuantityTestCase):
 
     def testNumpyQuantity(self):
         """ Tests that numpy arrays can form Quantity values """

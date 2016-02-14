@@ -3,7 +3,11 @@ Tests the parmed/structure module
 """
 from __future__ import division
 
+import bz2
+import gzip
+from copy import copy
 import numpy as np
+import os
 import parmed as pmd
 from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
@@ -12,12 +16,11 @@ import parmed.unit as u
 from parmed.utils.six import integer_types
 from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
-from copy import copy
 import random
 import string
-import os
 import unittest
-from utils import create_random_structure, get_fn, FileIOTestCase
+from utils import (create_random_structure, get_fn, FileIOTestCase,
+                   has_openmm, app, HAS_GROMACS)
 import warnings
 
 class TestStructureAPI(unittest.TestCase):
@@ -25,17 +28,66 @@ class TestStructureAPI(unittest.TestCase):
 
     def setUp(self):
         s = self.s = structure.Structure()
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'ALA', 1, 'A')
-        s.add_atom(Atom(), 'GLY', 2, 'A')
-        s.add_atom(Atom(), 'GLY', 3, 'A')
-        s.add_atom(Atom(), 'GLY', 3, 'B')
-        s.add_atom(Atom(), 'GLY', 3, 'B')
-        s.add_atom(Atom(), 'GLY', 3, 'B')
+        s.add_atom(Atom(atomic_number=6), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=1), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=7), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=8), 'ALA', 1, 'A')
+        s.add_atom(Atom(atomic_number=16), 'GLY', 2, 'A')
+        s.add_atom(Atom(atomic_number=99), 'GLY', 3, 'A')
+        s.add_atom(Atom(atomic_number=6), 'GLY', 3, 'B')
+        s.add_atom(Atom(atomic_number=6), 'GLY', 3, 'B')
+        s.add_atom(Atom(atomic_number=6), 'GLY', 3, 'B')
 
-    def testAddAtom(self):
+    @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+    def test_gb_assignment(self):
+        """ Tests GB parameter assignment """
+        # GBneck1
+        params = self.s._get_gb_parameters(app.GBn)
+        # Radii are assigned elsewhere -- check screen
+        self.assertEqual(params[0][1], 0.48435382330)
+        self.assertEqual(params[1][1], 1.09085413633)
+        self.assertEqual(params[2][1], 0.700147318409)
+        self.assertEqual(params[3][1], 1.06557401132)
+        self.assertEqual(params[4][1], 0.602256336067)
+        self.assertEqual(params[5][1], 0.5)
+        # GBneck2
+        self.s.bonds.append(Bond(self.s[0], self.s[1]))
+        params = self.s._get_gb_parameters(app.GBn2)
+        self.assertEqual(params[0][1], 1.058554)
+        self.assertEqual(params[0][2], 0.733756)
+        self.assertEqual(params[0][3], 0.506378)
+        self.assertEqual(params[0][4], 0.205844)
+        self.assertEqual(params[1][1], 1.425952)
+        self.assertEqual(params[1][2], 0.788440)
+        self.assertEqual(params[1][3], 0.798699)
+        self.assertEqual(params[1][4], 0.437334)
+        self.assertEqual(params[2][1], 0.733599)
+        self.assertEqual(params[2][2], 0.503364)
+        self.assertEqual(params[2][3], 0.316828)
+        self.assertEqual(params[2][4], 0.192915)
+        self.assertEqual(params[3][1], 1.061039)
+        self.assertEqual(params[3][2], 0.867814)
+        self.assertEqual(params[3][3], 0.876635)
+        self.assertEqual(params[3][4], 0.387882)
+        self.assertEqual(params[4][1], -0.703469)
+        self.assertEqual(params[4][2], 0.867814)
+        self.assertEqual(params[4][3], 0.876635)
+        self.assertEqual(params[4][4], 0.387882)
+        self.assertEqual(params[5][1], 0.5)
+        self.assertEqual(params[5][2], 1.0)
+        self.assertEqual(params[5][3], 0.8)
+        self.assertEqual(params[5][4], 4.85)
+
+    def test_combining_rule(self):
+        """ Tests the Structure.combining_rule attribute """
+        self.assertEqual(self.s.combining_rule, 'lorentz')
+        self.s.combining_rule = 'geometric'
+        self.assertEqual(self.s.combining_rule, 'geometric')
+        def fail():
+            self.s.combining_rule = 'badchoice'
+        self.assertRaises(ValueError, fail)
+
+    def test_add_atom(self):
         """ Tests the Structure.add_atom method """
         # Check that we have the expected number of residues and atoms
         s = self.s
@@ -50,12 +102,48 @@ class TestStructureAPI(unittest.TestCase):
             self.assertEqual(residue.atoms[-1].idx - residue.atoms[0].idx + 1,
                              len(residue))
 
-    def testBool(self):
+    def test_split_duplicate_detection(self):
+        """ Tests detection of duplicate molecules in split """
+        parm = pmd.load_file(get_fn('ash.parm7')) * 5
+        self.assertEqual(len(parm.split()), 1)
+        self.assertEqual(len(parm.split()[0][1]), 5)
+        parm.residues[0].name = 'ACE1'
+        x = parm.split()
+        self.assertEqual(len(x), 2)
+        self.assertEqual(len(x[0][1]), 1)
+        self.assertEqual(len(x[1][1]), 4)
+        parm.residues[0].name = 'ACE'
+        self.assertEqual(len(parm.split()), 1)
+        parm[0].name += '1'
+        x = parm.split()
+        self.assertEqual(len(x), 2)
+        self.assertEqual(len(x[0][1]), 1)
+        self.assertEqual(len(x[1][1]), 4)
+
+    def test_split_single_atom(self):
+        s = structure.Structure()
+        na = pmd.periodic_table.AtomicNum['Na']
+        cl = pmd.periodic_table.AtomicNum['Cl']
+        li = pmd.periodic_table.AtomicNum['Li']
+        f = pmd.periodic_table.AtomicNum['F']
+        s.add_atom(Atom(name='NA', type='Na+', atomic_number=na), 'NA', 1, 'A')
+        s.add_atom(Atom(name='NA', type='Na+', atomic_number=na), 'NA', 2, 'A')
+        s.add_atom(Atom(name='LI', type='Li+', atomic_number=li), 'LI', 3, 'A')
+        s.add_atom(Atom(name='LI', type='Li+', atomic_number=li), 'LI', 4, 'A')
+        s.add_atom(Atom(name='CL', type='Cl-', atomic_number=cl), 'CL', 5, 'A')
+        s.add_atom(Atom(name='CL', type='Cl-', atomic_number=cl), 'CL', 6, 'A')
+        s.add_atom(Atom(name='F', type='F-', atomic_number=f), 'F', 7, 'B')
+        s.add_atom(Atom(name='F', type='F-', atomic_number=f), 'F', 8, 'B')
+        x = s.split()
+        self.assertEqual(len(x), 4)
+        self.assertEqual(set(len(_[1]) for _ in x), {2})
+
+    def test_bool(self):
         """ Tests bool-ness of Structure """
         self.assertTrue(bool(self.s))
         self.assertFalse(bool(structure.Structure()))
 
-    def testAddAtomToResidue(self):
+    def test_add_atom_to_residue(self):
         """ Tests the Structure.add_atom_to_residue method """
         s = self.s
         res = s.residues[1]
@@ -89,10 +177,16 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.atoms[5].name, 'TOK')
         self.assertEqual(s.atoms[-1].name, 'TOK2')
 
-    def testBoxHandling(self):
+        # Error handling
+        self.assertRaises(ValueError, lambda:
+                s.add_atom_to_residue(Atom(name='AXE'), Residue('ALA')))
+
+    def test_box_handling(self):
         """ Tests that Structure.box is always the expected type """
         s = create_random_structure(parametrized=False)
         self.assertIs(s.box, None)
+        self.assertIs(s.get_box(), None)
+        self.assertRaises(IndexError, lambda: s.get_box(0))
         s.box = [10, 10, 10, 90, 90, 90]
         self.assertIsInstance(s.box, np.ndarray)
         self.assertEqual(s.box[0], 10)
@@ -118,8 +212,50 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.box[3], 90)
         self.assertEqual(s.box[4], 90)
         self.assertEqual(s.box[5], 90)
+        s.box = [[10*u.angstroms, 1*u.nanometers, 10*u.angstroms,
+                  90*u.degrees, 90*u.degrees, 90*u.degrees],
+                 [11*u.angstroms, 1*u.nanometers, 11*u.angstroms,
+                  91*u.degrees, 91*u.degrees, 91*u.degrees]]
+        self.assertIsInstance(s.box, np.ndarray)
+        self.assertEqual(s.box[0], 10)
+        self.assertEqual(s.box[1], 10)
+        self.assertEqual(s.box[2], 10)
+        self.assertEqual(s.box[3], 90)
+        self.assertEqual(s.box[4], 90)
+        self.assertEqual(s.box[5], 90)
+        box = s.get_box(0)
+        self.assertEqual(box[0], 10)
+        self.assertEqual(box[1], 10)
+        self.assertEqual(box[2], 10)
+        self.assertEqual(box[3], 90)
+        self.assertEqual(box[4], 90)
+        self.assertEqual(box[5], 90)
+        box = s.get_box(1)
+        self.assertEqual(box[0], 11)
+        self.assertEqual(box[1], 10)
+        self.assertEqual(box[2], 11)
+        self.assertEqual(box[3], 91)
+        self.assertEqual(box[4], 91)
+        self.assertEqual(box[5], 91)
+        box = s.get_box('all')
+        self.assertEqual(box[0][0], 10)
+        self.assertEqual(box[0][1], 10)
+        self.assertEqual(box[0][2], 10)
+        self.assertEqual(box[0][3], 90)
+        self.assertEqual(box[0][4], 90)
+        self.assertEqual(box[0][5], 90)
+        self.assertEqual(box[1][0], 11)
+        self.assertEqual(box[1][1], 10)
+        self.assertEqual(box[1][2], 11)
+        self.assertEqual(box[1][3], 91)
+        self.assertEqual(box[1][4], 91)
+        self.assertEqual(box[1][5], 91)
+        self.assertRaises(IndexError, lambda: s.get_box(3))
+        # Now test box vectors
+        s.box_vectors = [[1, 0, 0], [0, 1, 0], [0, 0, 1]] * u.nanometers
+        np.testing.assert_equal(s.box, [10, 10, 10, 90, 90, 90])
 
-    def testBadBoxHandling(self):
+    def test_bad_box_handling(self):
         """ Tests error handling when Structure.box is improperly assigned """
         s = create_random_structure(parametrized=True)
         def wrong_number_of_args():
@@ -140,10 +276,11 @@ class TestStructureAPI(unittest.TestCase):
                 s.box = box
             self.assertRaises(TypeError, func)
 
-    def testCoordinates(self):
+    def test_coordinates(self):
         """ Tests coordinate handling in Structure """
         s = create_random_structure(parametrized=False)
         self.assertIs(s.coordinates, None)
+        self.assertIs(s.positions, None)
         natom = len(s.atoms)
         # Make sure coordinates will be generated from Atom.xx, xy, xz if not
         # otherwise generated
@@ -194,8 +331,55 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.coordinates.shape, (natom, 3))
         diff = (old_crds - s.coordinates).ravel()**2
         self.assertGreater(diff.sum(), 0.01)
+        # Check setting the positions attribute
+        new_crds = np.random.rand(len(s.atoms), 3) * u.nanometers
+        s.positions = new_crds
+        np.testing.assert_allclose(new_crds*10, s.coordinates)
+        new_crds2 = np.random.rand(len(s.atoms)*3) * u.nanometers
+        s.positions = new_crds2
+        np.testing.assert_allclose(new_crds2*10,
+                s.coordinates.reshape(new_crds2.shape))
+        def bad():
+            s.positions = [1, 2, 3]
+        self.assertRaises(ValueError, bad)
+        # Try deleting the coordinates for the first atom
+        del s[0].xx, s[0].xy, s[0].xz
+        self.assertIs(s.coordinates, None)
+        # Make sure it doesn't affect the rest
+        for atom in s.view[1:].atoms:
+            self.assertTrue(hasattr(atom, 'xx'))
+            self.assertTrue(hasattr(atom, 'xy'))
+            self.assertTrue(hasattr(atom, 'xz'))
+        # Now make sure that setting coordinates to an empty iterable wipes out
+        # all xx/y/z attributes
+        s.coordinates = []
+        self.assertIs(s.coordinates, None)
+        # Restore coordinates
+        s.coordinates = np.random.rand(3, len(s.atoms), 3)
+        del s[0].xx
+        self.assertIs(s.get_coordinates(), None)
+        s.coordinates = xyz = np.random.rand(3, len(s.atoms), 3)
+        del s.atoms[-1]
+        np.testing.assert_equal(s.get_coordinates().flatten(), xyz[0,:-1,:].flatten())
+        s.coordinates = np.random.rand(3, len(s.atoms), 3)
+        s[0].xx = 10
+        self.assertEqual(s.get_coordinates().shape, (1, len(s.atoms), 3))
+        s.coordinates = xyz = np.random.rand(3, len(s.atoms), 3)
+        s[0].xx = 10
+        np.testing.assert_equal(s.get_coordinates(0)[1:,:], xyz[0,1:,:])
+        s.coordinates = xyz = np.random.rand(3, len(s.atoms), 3)
+        s[0].xx = 10
+        self.assertRaises(IndexError, lambda: s.get_coordinates(1))
 
-    def testCoordinateSetToEmptyList(self):
+    def test_velocities(self):
+        """ Tests coordinate handling in Structure """
+        s = create_random_structure(parametrized=False)
+        self.assertIs(s.velocities, None)
+        x = np.random.rand(len(s.atoms), 3)
+        s.velocities = x * u.nanometers/u.picosecond
+        np.testing.assert_allclose(x*10, s.velocities)
+
+    def test_coordinate_set_to_empty_list(self):
         """ Tests behavior of setting coordinates to an empty iterable """
         s = create_random_structure(parametrized=True)
         xyz = np.random.random((len(s.atoms), 3))
@@ -214,15 +398,29 @@ class TestStructureAPI(unittest.TestCase):
             self.assertFalse(hasattr(atom, 'xy'))
             self.assertFalse(hasattr(atom, 'xz'))
 
-    def testStrip(self):
+    def test_strip(self):
         """ Tests the Structure.strip method """
         s = create_random_structure(parametrized=True)
         nres = len(s.residues)
         natom_per_res = [len(res) for res in s.residues]
         s.strip(':1-5')
         self.assertEqual(len(s.atoms), sum(natom_per_res) - sum(natom_per_res[:5]))
+        # Bad usage of strip
+        mask = pmd.amber.AmberMask(create_random_structure(parametrized=True), ':1')
+        self.assertRaises(TypeError, lambda: s.strip(mask))
+        self.assertRaises(TypeError, lambda: s.strip(10))
 
-    def testStripWithCoords(self):
+    def test_strip_array(self):
+        """ Tests Structure.strip with a mask array """
+        s = create_random_structure(parametrized=True)
+        natom = len(s.atoms)
+        maskarray = [random.choice([0, 1]) for i in range(natom)]
+        s.strip(maskarray)
+        self.assertEqual(len(s.atoms), natom-sum(maskarray))
+        # Error checking
+        self.assertRaises(ValueError, lambda: s.strip([1, 0]))
+
+    def test_strip_with_coords(self):
         """ Tests the Structure.strip method when it has coordinates """
         s = create_random_structure(parametrized=True)
         coords = np.random.rand(10, len(s.atoms), 3)
@@ -238,6 +436,176 @@ class TestStructureAPI(unittest.TestCase):
         # coordinates corresponding to the ones that did *not* get stripped
         n = sum(natom_per_res[:5])
         self.assertTrue((coords[:,n:,:] == s.get_coordinates()).all())
+
+    def test_helpers(self):
+        """ Test private helper functions in parmed/structure.py """
+        ang, deg = u.angstroms, u.degrees
+        strip_units = structure._strip_box_units
+        self.assertEqual(strip_units([1, 2, 3]), [1, 2, 3])
+        self.assertEqual(strip_units([1*ang, 2*ang, 3*ang]), [1, 2, 3])
+        self.assertEqual(strip_units([1*ang, 90*deg]), [1, 90])
+        self.assertEqual(strip_units([[1*ang, 90*deg], [2*ang, 109*deg]]),
+                         [[1, 90], [2, 109]])
+        self.assertRaises(TypeError, lambda: strip_units(['this', 'is', 'bad']))
+
+    def test_radii_assignment(self):
+        """ Test radius assignment in Structure """
+        parm = pmd.load_file(get_fn('trx.prmtop'))
+        criteria_satisfied = [0, 0, 0, 0, 0, 0]
+        for atom in parm.atoms:
+            if atom.atomic_number == 1:
+                oa = atom.bond_partners[0]
+                an, mass = oa.atomic_number, oa.mass
+                oa.atomic_number = 8
+                oa.mass = pmd.periodic_table.Mass['O']
+                self.assertEqual(structure._mbondi(atom), 0.8)
+                oa.atomic_number = 2
+                oa.mass = pmd.periodic_table.Mass['He']
+                self.assertEqual(structure._mbondi(atom), 1.2)
+                oa.atomic_number = an
+                oa.mass = mass
+                criteria_satisfied[0] = 1
+            if atom.name.startswith('OD') and atom.residue.name == 'ASP':
+                self.assertEqual(structure._mbondi3(atom), 1.4)
+                criteria_satisfied[1] = 1
+            if atom.name.startswith('OXT'):
+                self.assertEqual(structure._mbondi3(atom), 1.4)
+                criteria_satisfied[2] = 1
+            if atom.name.startswith('OE') and atom.residue.name == 'GLU':
+                self.assertEqual(structure._mbondi3(atom), 1.4)
+                criteria_satisfied[3] = 1
+            if atom.name.startswith('HH') and atom.residue.name == 'ARG':
+                self.assertEqual(structure._mbondi3(atom), 1.17)
+                criteria_satisfied[4] = 1
+            if atom.name.startswith('HE') and atom.residue.name == 'ARG':
+                self.assertEqual(structure._mbondi3(atom), 1.17)
+                criteria_satisfied[5] = 1
+        # Make sure we ran all checks
+        self.assertEqual(set(criteria_satisfied), {1})
+
+    @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+    def test_screen_assignment(self):
+        """ Testing screen parameter assignment """
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=9), app.GBn2)[1],
+                0.88
+        )
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=15), app.GBn2)[1],
+                0.86
+        )
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=16), app.GBn2)[1],
+                0.96
+        )
+        self.assertEqual(
+                structure._gb_rad_screen(Atom(atomic_number=2), app.GBn2)[1],
+                0.8
+        )
+
+    @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+    def test_omm_topology(self):
+        """ Tests the creation of the OpenMM Topology instance """
+        # Make sure an empty structure returns an empty topology
+        self.assertEqual(len(list(pmd.Structure().topology.atoms())), 0)
+
+    def test_join_dihedrals(self):
+        """ Tests the Structure.join_dihedrals method """
+        s = self.s
+        dt1 = DihedralType(10, 2, 0)
+        dt2 = DihedralType(12, 1, 180)
+        dt3 = DihedralType(13, 3, 0)
+        s.dihedrals.append(Dihedral(s[0], s[1], s[2], s[3], type=dt1))
+        s.dihedrals.append(Dihedral(s[3], s[2], s[1], s[0], type=dt2))
+        s.dihedrals.append(Dihedral(s[0], s[1], s[2], s[3], type=dt3))
+        s.dihedral_types.extend([dt1, dt2, dt3])
+        s.dihedral_types.claim()
+        # Now join dihedrals
+        s.join_dihedrals()
+        self.assertEqual(len(s.dihedrals), 1)
+        self.assertEqual(len(s.dihedral_types), 1)
+        self.assertIsInstance(s.dihedral_types[0], pmd.DihedralTypeList)
+        self.assertEqual(len(s[0].dihedral_partners), 3)
+        self.assertEqual(len(s[0].dihedrals), 1)
+
+    def test_prune_empty(self):
+        """ Tests the prune_empty_terms function """
+        s = create_random_structure(parametrized=True)
+        # Bonds
+        nterms = len(s.bonds)
+        s.bonds[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.bonds), nterms-1)
+        # Angles
+        nterms = len(s.angles)
+        s.angles[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.angles), nterms-1)
+        # Dihedrals
+        nterms = len(s.dihedrals)
+        s.dihedrals[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.dihedrals), nterms-1)
+        # R-B torsions
+        nterms = len(s.rb_torsions)
+        s.rb_torsions[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.rb_torsions), nterms-1)
+        # Urey-Bradleys
+        nterms = len(s.urey_bradleys)
+        s.urey_bradleys[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.urey_bradleys), nterms-1)
+        # Impropers
+        nterms = len(s.impropers)
+        s.impropers[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.impropers), nterms-1)
+        # CMAPs
+        nterms = len(s.cmaps)
+        s.cmaps[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.cmaps), nterms-1)
+        # Trigonal angles
+        nterms = len(s.trigonal_angles)
+        s.trigonal_angles[-1].atom1 = s.trigonal_angles[-1].atom2 = \
+                s.trigonal_angles[-1].atom3 = s.trigonal_angles[-1].atom4 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.trigonal_angles), nterms-1)
+        # OOP bends
+        nterms = len(s.out_of_plane_bends)
+        s.out_of_plane_bends[-1].atom1 = s.out_of_plane_bends[-1].atom2 = \
+                s.out_of_plane_bends[-1].atom3 = s.out_of_plane_bends[-1].atom4 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.out_of_plane_bends), nterms-1)
+        # Pi-torsions
+        nterms = len(s.pi_torsions)
+        s.pi_torsions[-1].atom1 = s.pi_torsions[-1].atom2 = \
+                s.pi_torsions[-1].atom3 = s.pi_torsions[-1].atom4 = \
+                s.pi_torsions[-1].atom5 = s.pi_torsions[-1].atom6 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.pi_torsions), nterms-1)
+        # Stretch-bends
+        nterms = len(s.stretch_bends)
+        s.stretch_bends[-1].atom1 = s.stretch_bends[-1].atom2 = \
+                s.stretch_bends[-1].atom3 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.stretch_bends), nterms-1)
+        # Torsion-torsions
+        nterms = len(s.torsion_torsions)
+        s.torsion_torsions[-1].delete()
+        s.prune_empty_terms()
+        self.assertEqual(len(s.torsion_torsions), nterms-1)
+        # Chiral frames
+        nterms = len(s.chiral_frames)
+        s.chiral_frames[-1].atom1 = s.chiral_frames[-1].atom2 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.chiral_frames), nterms-1)
+        # Adjusts
+        nterms = len(s.adjusts)
+        s.adjusts[-1].atom1 = s.adjusts[-1].atom2 = None
+        s.prune_empty_terms()
+        self.assertEqual(len(s.adjusts), nterms-1)
 
 class TestStructureAdd(unittest.TestCase):
     """ Tests the addition property of a System """
@@ -454,23 +822,28 @@ class TestStructureAdd(unittest.TestCase):
         chk_valence(s.acceptors, s1.acceptors+s2.acceptors)
         chk_valence(s.groups, s1.groups+s2.groups)
 
-    def testAddParametrized(self):
+    def test_add_parametrized(self):
         """ Tests addition of two parametrized Structure instances """
         s1 = create_random_structure(parametrized=True)
         s2 = create_random_structure(parametrized=True)
+        s1.coordinates = np.random.random((4, len(s1.atoms), 3))
+        s2.coordinates = np.random.random((2, len(s2.atoms), 3))
+        s1.box = [[10, 10, 10, 90, 90, 90], [11, 11, 11, 90, 90, 90]]
+        s2.box = [[20, 20, 20, 90, 90, 90], [21, 21, 21, 90, 90, 90]]
         self.assertTrue(bool(s1.bond_types))
         self.assertTrue(bool(s2.bond_types))
         s = s1 + s2
         self._check_sum(s, s1, s2)
+        self.assertEqual(s.get_coordinates('all').shape, (2, len(s.atoms), 3))
 
-    def testAddToEmptyStructure(self):
+    def test_add_to_empty_structure(self):
         """ Tests addition to empty Structure """
         s1 = create_random_structure(parametrized=True)
         s2 = structure.Structure()
         s2 += s1
         self._check_sum(s2, structure.Structure(), s1)
 
-    def testIAdd(self):
+    def test_iadd(self):
         """ Tests in-place addition of two Structure instances """
         s1 = create_random_structure(parametrized=True)
         s2 = create_random_structure(parametrized=True)
@@ -478,7 +851,7 @@ class TestStructureAdd(unittest.TestCase):
         s1 += s2
         self._check_sum(s1, s1cp, s2)
 
-    def testAddNotParametrized(self):
+    def test_add_not_parametrized(self):
         """ Tests addition of two non-parametrized Structure instances """
         s1 = create_random_structure(parametrized=False)
         s2 = create_random_structure(parametrized=False)
@@ -566,7 +939,7 @@ class TestStructureAdd(unittest.TestCase):
         chk_valence(s.acceptors, s1.acceptors+s2.acceptors)
         chk_valence(s.groups, s1.groups+s2.groups)
 
-    def testAddNoValence(self):
+    def test_add_no_valence(self):
         """ Tests addition of two minimal Structure instances """
         s1 = create_random_structure(parametrized=False, novalence=True)
         s2 = create_random_structure(parametrized=False, novalence=True)
@@ -605,7 +978,7 @@ class TestStructureAdd(unittest.TestCase):
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
 
-    def testMultiplyParametrized(self):
+    def test_multiply_parametrized(self):
         """ Tests replicating a parametrized Structure instance """
         s1 = create_random_structure(parametrized=True)
         multfac = random.randint(2, 5)
@@ -618,8 +991,13 @@ class TestStructureAdd(unittest.TestCase):
         self.assertIsNot(s1, s3)
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
+        # Check when coordinates exist
+        crd = np.random.rand(5, len(s1.atoms), 3)
+        s1.coordinates = crd
+        np.testing.assert_equal((s1*multfac).get_coordinates(),
+                                np.hstack([crd for i in range(multfac)]))
 
-    def testMultiplyNotParametrized(self):
+    def test_multiply_not_parametrized(self):
         """ Tests replicating a non-parametrized Structure instance """
         s1 = create_random_structure(parametrized=False)
         multfac = random.randint(2, 5)
@@ -633,7 +1011,7 @@ class TestStructureAdd(unittest.TestCase):
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
 
-    def testMultNoValence(self):
+    def test_mult_no_valence(self):
         """ Tests addition of two minimal Structure instances """
         s1 = create_random_structure(parametrized=False, novalence=True)
         multfac = random.randint(2, 5)
@@ -690,6 +1068,8 @@ class TestStructureSave(FileIOTestCase):
         self.sys2 = pmd.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         self.sys3 = pmd.load_file(get_fn(os.path.join('01.1water', 'topol.top')),
                                   xyz=get_fn(os.path.join('01.1water', 'conf.gro')))
+        self.sys4 = pmd.load_file(get_fn('ala_ala_ala.psf'))
+        self.sys4.coordinates = np.random.rand(len(self.sys4.atoms), 3)
         super(TestStructureSave, self).setUp()
 
     def tearDown(self):
@@ -697,19 +1077,34 @@ class TestStructureSave(FileIOTestCase):
         warnings.filterwarnings('default', category=ParameterWarning)
         super(TestStructureSave, self).tearDown()
 
-    def testSavePDB(self):
+    def test_save_pdb(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.pdb', written=True))
         self.sys2.save(get_fn('test2.pdb', written=True))
         self.sys3.save(get_fn('test3.pdb', written=True))
+        self.sys4.save(get_fn('test4.pdb', written=True))
         x1 = pmd.formats.PDBFile.parse(get_fn('test.pdb', written=True))
         x2 = pmd.formats.PDBFile.parse(get_fn('test2.pdb', written=True))
         x3 = pmd.formats.PDBFile.parse(get_fn('test3.pdb', written=True))
+        x4 = pmd.formats.PDBFile.parse(get_fn('test4.pdb', written=True))
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys4.atoms], [a.name for a in x4.atoms])
+        # Make sure atom types as integers are preserved
+        self.sys4.load_parameters(
+                pmd.charmm.CharmmParameterSet(
+                    get_fn('top_all22_prot.inp'),
+                    get_fn('par_all22_prot.inp')
+                )
+        )
+        for a in self.sys4.atoms:
+            a.type = int(a.atom_type)
+        self.sys4.save(get_fn('test5.pdb', written=True))
+        for a in self.sys4.atoms:
+            self.assertIsInstance(a.type, int)
 
-    def testSaveCIF(self):
+    def test_save_cif(self):
         """ Test saving various Structure instances as a PDBx/mmCIF """
         self.sys1.save(get_fn('test.cif', written=True))
         self.sys2.save(get_fn('test2.cif', written=True))
@@ -720,8 +1115,19 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        # Try a gzip and a bzip2 file
+        self.sys1.save(get_fn('test.cif.bz2', written=True))
+        self.sys1.save(get_fn('test.cif.gz', written=True))
+        # Make sure they're compressed
+        bz2.BZ2File(get_fn('test.cif.bz2', written=True), 'r').read()
+        gzip.open(get_fn('test.cif.gz', written=True), 'r').read()
+        # Make sure they're the right format
+        self.assertTrue(pmd.formats.CIFFile.id_format(
+            get_fn('test.cif.gz', written=True)))
+        self.assertTrue(pmd.formats.CIFFile.id_format(
+            get_fn('test.cif.bz2', written=True)))
 
-    def testSaveMol2(self):
+    def test_save_mol2(self):
         """ Test saving various Structure instances as Mol2 files """
         self.sys1.save(get_fn('test.mol2', written=True))
         self.sys2.save(get_fn('test2.mol2', written=True))
@@ -736,7 +1142,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
 
-    def testSaveMol3(self):
+    def test_save_mol3(self):
         """ Test saving various Structure instances as Mol3 files """
         self.sys1.save(get_fn('test.mol3', written=True))
         x1 = pmd.formats.Mol2File.parse(get_fn('test.mol3', written=True), structure=True)
@@ -749,7 +1155,7 @@ class TestStructureSave(FileIOTestCase):
             else:
                 self.assertFalse(True)
 
-    def testSaveAmberParm(self):
+    def test_save_amber_parm(self):
         """ Test saving various Structure instances as Amber prmtop files """
         self.sys1.save(get_fn('test.parm7', written=True))
         self.sys2.save(get_fn('test2.parm7', written=True))
@@ -788,8 +1194,36 @@ class TestStructureSave(FileIOTestCase):
         for a1, a2 in zip(self.sys3.atoms, x3.atoms):
             self.assertAlmostEqual(a1.rmin, a2.rmin)
             self.assertAlmostEqual(abs(a1.epsilon), abs(a2.epsilon))
+        # Now try the Amoeba topology
+        parm = pmd.load_file(get_fn('nma.parm7'))
+        parm.save(get_fn('test4.parm7', written=True))
+        self.assertIsInstance(pmd.load_file(get_fn('test4.parm7', written=True)),
+                              pmd.amber.AmoebaParm)
 
-    def testSavePSF(self):
+    @unittest.skipUnless(HAS_GROMACS, 'Cannot test without GROMACS')
+    def test_save_amber_parm2(self):
+        """ Test saving AmberParm with custom exceptions """
+        parm = pmd.load_file(os.path.join(get_fn('04.Ala'), 'topol.top'),
+                             xyz=os.path.join(get_fn('04.Ala'), 'conf.gro'))
+        fn = get_fn('test.parm7', written=True)
+        parm.save(fn, overwrite=True)
+        self.assertIs(type(pmd.load_file(fn)), pmd.amber.AmberParm)
+        # Now modify one of the exceptions
+        parm.adjust_types.append(copy(parm.adjust_types[0]))
+        parm.adjust_types[-1].rmin = 0.1
+        parm.adjust_types[-1].epsilon = 0.1
+        for adjust in parm.adjusts:
+            if adjust.atom1 not in adjust.atom2.dihedral_partners:
+                continue
+            break
+        else:
+            assert False, 'No pair types that are 1-4 pairs'
+        adjust.type = parm.adjust_types[-1]
+        parm.save(fn, overwrite=True)
+        # Now it should be a ChamberParm
+        self.assertIs(type(pmd.load_file(fn)), pmd.amber.ChamberParm)
+
+    def test_save_psf(self):
         """ Test saving various Structure instances as CHARMM PSF files """
         self.sys1.save(get_fn('test.psf', written=True))
         self.sys2.save(get_fn('test2.psf', written=True))
@@ -805,7 +1239,17 @@ class TestStructureSave(FileIOTestCase):
         # this difference. Add methods to determine the numbers of proper and
         # improper torsions
         def _propers(struct):
-            return sum(1 for dih in struct.dihedrals if not dih.improper)
+            # Only uniques
+            nnormal = 0
+            added = set()
+            for dih in struct.dihedrals:
+                a1, a2, a3, a4 = dih.atom1, dih.atom2, dih.atom3, dih.atom4
+                if dih.improper: continue
+                if (a1, a2, a3, a4) in added or (a4, a3, a2, a1) in added:
+                    continue
+                nnormal += 1
+                added.add((a1, a2, a3, a4))
+            return nnormal
         def _impropers(struct):
             return sum(1 for dih in struct.dihedrals if dih.improper) + len(struct.impropers)
         # Check equivalence of topologies
@@ -828,7 +1272,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
-    def testSaveCharmmCrd(self):
+    def test_save_charmm_crd(self):
         """ Test saving various Structure instances as CHARMM coord files """
         self.sys1.save(get_fn('test.crd', written=True))
         self.sys2.save(get_fn('test2.crd', written=True))
@@ -844,7 +1288,7 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(self.sys3.coordinates,
                 x3.coordinates.reshape(self.sys3.coordinates.shape))
 
-    def testSaveGromacs(self):
+    def test_save_gromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
         warnings.filterwarnings('ignore', category=ParameterWarning)
         self.sys1.save(get_fn('test.top', written=True))
@@ -873,7 +1317,12 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual(len(self.sys2.cmaps), len(x2.cmaps))
         self.assertEqual(len(self.sys3.cmaps), len(x3.cmaps))
 
-    def testSaveGRO(self):
+    def test_save_psf2(self):
+        """ Test saving PSF file for unparametrized system """
+        url = 'http://ambermd.org/tutorials/advanced/tutorial1/files/polyAT.pdb'
+        pmd.load_file(url).save(get_fn('test.psf', written=True))
+
+    def test_save_gro(self):
         """ Test saving various Structure instances as a PDB """
         self.sys1.save(get_fn('test.gro', written=True))
         self.sys2.save(get_fn('test2.gro', written=True))
@@ -885,7 +1334,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
 
-    def testSaveRst7(self):
+    def test_save_rst7(self):
         """ Test saving various Structure instances as Amber ASCII restarts """
         f1 = get_fn('test.rst7', written=True)
         f2 = get_fn('test1.restrt', written=True)
@@ -915,7 +1364,7 @@ class TestStructureSave(FileIOTestCase):
                                    atol=1e-6)
 
     @unittest.skipIf(PYPY, 'NetCDF tests cannot run on pypy yet')
-    def testSaveNCRst7(self):
+    def test_save_ncrst7(self):
         """ Test saving various Structure instances as Amber NetCDF restarts """
         f1 = get_fn('test.ncrst', written=True)
         f2 = get_fn('test1.ncrst', written=True)
@@ -935,7 +1384,7 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(self.sys3.coordinates,
                                    pmd.load_file(f3).coordinates[0])
 
-    def testSavePQR(self):
+    def test_save_pqr(self):
         """ Test saving various Structure instances as PQR files """
         f1 = get_fn('test', written=True)
         f2 = get_fn('test.pqr', written=True)
@@ -965,7 +1414,13 @@ class TestStructureSave(FileIOTestCase):
         np.testing.assert_allclose(np.array([a.charge for a in self.sys3.atoms]),
                                    np.array([a.charge for a in x3.atoms]))
 
-    def testOverwrite(self):
+    def test_error_handling(self):
+        """ Tests handling of bad input """
+        self.assertRaises(ValueError, lambda:
+                self.sys1.save('somefile', format='NOFMT'))
+        self.assertRaises(ValueError, lambda: self.sys1.save('somefile.nofmt'))
+
+    def test_overwrite(self):
         """ Test overwrite option of Structure.save """
         open(get_fn('test.pdb', written=True), 'w').close()
         self.assertRaises(IOError, lambda:
@@ -975,6 +1430,3 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.pdb', written=True), overwrite=True)
         pdb = pmd.load_file(get_fn('test.pdb', written=True))
         self.assertEqual(len(pdb.atoms), len(self.sys1.atoms))
-
-if __name__ == '__main__':
-    unittest.main()

@@ -10,12 +10,11 @@ from __future__ import division
 
 from contextlib import closing
 from copy import copy as _copy
-from parmed import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group,
-                    Cmap, UreyBradley, NoUreyBradley, Structure, Atom,
-                    DihedralType, ImproperType)
-from parmed.exceptions import (CharmmError, MoleculeError, CharmmWarning,
-        ParameterError)
-from parmed.structure import needs_openmm
+from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
+                    AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
+                    Atom, DihedralType, ImproperType, UnassignedAtomType)
+from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError)
+from parmed.structure import needs_openmm, Structure
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
 from parmed.utils.six.moves import zip, range
@@ -139,7 +138,7 @@ class CharmmPsfFile(Structure):
             if ':' in title:
                 title = title[:title.index(':')]
         else:
-            raise CharmmError('Could not determine section title')
+            raise CharmmError('Could not determine section title') # pragma: no cover
         if len(words) == 1:
             pointers = conv(words[0], int, 'pointer')
         else:
@@ -183,7 +182,7 @@ class CharmmPsfFile(Structure):
             line = psf.readline()
             if not line.startswith('PSF'):
                 raise CharmmError('Unrecognized PSF file. First line is %s' %
-                                     line.strip())
+                                  line.strip())
             # Store the flags
             psf_flags = line.split()[1:]
             # Now get all of the sections and store them in a dict
@@ -209,8 +208,8 @@ class CharmmPsfFile(Structure):
                 segid = words[1]
                 rematch = _resre.match(words[2])
                 if not rematch:
-                    raise RuntimeError('Could not interpret residue number %s' %
-                                       words[2])
+                    raise CharmmError('Could not interpret residue number %s' % # pragma: no cover
+                                      words[2])
                 resid, inscode = rematch.groups()
                 resid = conv(resid, int, 'residue number')
                 resname = words[3]
@@ -231,16 +230,16 @@ class CharmmPsfFile(Structure):
             # Now get the number of bonds
             nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
             if len(psfsections['NBOND'][1]) != nbond * 2:
-                raise CharmmError('Got %d indexes for %d bonds' %
-                                     (len(psfsections['NBOND'][1]), nbond))
+                raise CharmmError('Got %d indexes for %d bonds' % # pragma: no cover
+                                  (len(psfsections['NBOND'][1]), nbond))
             it = iter(psfsections['NBOND'][1])
             for i, j in zip(it, it):
                 self.bonds.append(Bond(self.atoms[i-1], self.atoms[j-1]))
             # Now get the number of angles and the angle list
             ntheta = conv(psfsections['NTHETA'][0], int, 'number of angles')
             if len(psfsections['NTHETA'][1]) != ntheta * 3:
-                raise CharmmError('Got %d indexes for %d angles' %
-                                     (len(psfsections['NTHETA'][1]), ntheta))
+                raise CharmmError('Got %d indexes for %d angles' % # pragma: no cover
+                                  (len(psfsections['NTHETA'][1]), ntheta))
             it = iter(psfsections['NTHETA'][1])
             for i, j, k in zip(it, it, it):
                 self.angles.append(
@@ -250,8 +249,8 @@ class CharmmPsfFile(Structure):
             # Now get the number of torsions and the torsion list
             nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
             if len(psfsections['NPHI'][1]) != nphi * 4:
-                raise CharmmError('Got %d indexes for %d torsions' %
-                                     (len(psfsections['NPHI']), nphi))
+                raise CharmmError('Got %d indexes for %d torsions' % # pragma: no cover
+                                  (len(psfsections['NPHI']), nphi))
             it = iter(psfsections['NPHI'][1])
             for i, j, k, l in zip(it, it, it, it):
                 self.dihedrals.append(
@@ -262,8 +261,8 @@ class CharmmPsfFile(Structure):
             # Now get the number of improper torsions
             nimphi = conv(psfsections['NIMPHI'][0], int, 'number of impropers')
             if len(psfsections['NIMPHI'][1]) != nimphi * 4:
-                raise CharmmError('Got %d indexes for %d impropers' %
-                                     (len(psfsections['NIMPHI'][1]), nimphi))
+                raise CharmmError('Got %d indexes for %d impropers' % # pragma: no cover
+                                  (len(psfsections['NIMPHI'][1]), nimphi))
             it = iter(psfsections['NIMPHI'][1])
             for i, j, k, l in zip(it, it, it, it):
                 self.impropers.append(
@@ -273,8 +272,8 @@ class CharmmPsfFile(Structure):
             # Now handle the donors (what is this used for??)
             ndon = conv(psfsections['NDON'][0], int, 'number of donors')
             if len(psfsections['NDON'][1]) != ndon * 2:
-                raise CharmmError('Got %d indexes for %d donors' %
-                                     (len(psfsections['NDON'][1]), ndon))
+                raise CharmmError('Got %d indexes for %d donors' % # pragma: no cover
+                                  (len(psfsections['NDON'][1]), ndon))
             it = iter(psfsections['NDON'][1])
             for i, j in zip(it, it):
                 self.donors.append(
@@ -283,8 +282,8 @@ class CharmmPsfFile(Structure):
             # Now handle the acceptors (what is this used for??)
             nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
             if len(psfsections['NACC'][1]) != nacc * 2:
-                raise CharmmError('Got %d indexes for %d acceptors' %
-                                     (len(psfsections['NACC'][1]), nacc))
+                raise CharmmError('Got %d indexes for %d acceptors' % # pragma: no cover
+                                  (len(psfsections['NACC'][1]), nacc))
             it = iter(psfsections['NACC'][1])
             for i, j in zip(it, it):
                 self.acceptors.append(
@@ -293,17 +292,17 @@ class CharmmPsfFile(Structure):
             # Now get the group sections
             try:
                 ngrp, nst2 = psfsections['NGRP NST2'][0]
-            except ValueError:
-                raise CharmmError('Could not unpack GROUP pointers')
+            except ValueError: # pragma: no cover
+                raise CharmmError('Could not unpack GROUP pointers') # pragma: no cover
             tmp = psfsections['NGRP NST2'][1]
             self.groups.nst2 = nst2
             # Now handle the groups
             if len(psfsections['NGRP NST2'][1]) != ngrp * 3:
-                raise CharmmError('Got %d indexes for %d groups' %
+                raise CharmmError('Got %d indexes for %d groups' % # pragma: no cover
                                      (len(tmp), ngrp))
             it = iter(psfsections['NGRP NST2'][1])
             for i, j, k in zip(it, it, it):
-                self.groups.append(Group(i, j, k))
+                self.groups.append(Group(self.atoms[i], j, k))
             # Assign all of the atoms to molecules recursively
             tmp = psfsections['MOLNT'][1]
             set_molecules(self.atoms)
@@ -321,7 +320,7 @@ class CharmmPsfFile(Structure):
             # Now do the CMAPs
             ncrterm = conv(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
             if len(psfsections['NCRTERM'][1]) != ncrterm * 8:
-                raise CharmmError('Got %d CMAP indexes for %d cmap terms' %
+                raise CharmmError('Got %d CMAP indexes for %d cmap terms' % # pragma: no cover
                                   (len(psfsections['NCRTERM']), ncrterm))
             it = iter(psfsections['NCRTERM'][1])
             for i, j, k, l, m, n, o, p in zip(it, it, it, it, it, it, it, it):
@@ -375,6 +374,7 @@ class CharmmPsfFile(Structure):
             struct = _copy(struct)
         psf = cls()
         psf.atoms = struct.atoms
+        psf.residues = struct.residues
         psf.bonds = struct.bonds
         psf.angles = struct.angles
         psf.urey_bradleys = struct.urey_bradleys
@@ -395,22 +395,23 @@ class CharmmPsfFile(Structure):
         # Make all atom type names upper-case
         def typeconv(name):
             if name.upper() == name:
-                return name
+                return name.replace('*', 'STR')
             # Lowercase letters present -- decorate the type name with LTU --
             # Lower To Upper
-            return '%sLTU' % name.upper()
+            return ('%sLTU' % name.upper()).replace('*', 'STR')
         for atom in psf.atoms:
             atom.type = typeconv(atom.type)
-            if atom.atom_type is not None:
+            if atom.atom_type is not UnassignedAtomType:
                 atom.atom_type.name = typeconv(atom.atom_type.name)
 
-        # If no groups are defined, make the entire system one group
+        # If no groups are defined, make each residue its own group
         if not psf.groups:
-            if abs(sum(atom.charge for atom in psf.atoms)) < 1e-4:
-                group = Group(0, 1, 0)
-            else:
-                group = Group(0, 2, 0)
-            psf.groups.append(group)
+            for residue in psf.residues:
+                chg = sum(a.charge for a in residue)
+                if chg < 1e-4:
+                    psf.groups.append(Group(residue[0], 1, 0))
+                else:
+                    psf.groups.append(Group(residue[0], 2, 0))
             psf.groups.nst2 = 0
 
         return psf
@@ -475,12 +476,10 @@ class CharmmPsfFile(Structure):
         parmset = _copy(parmset)
         self.combining_rule = parmset.combining_rule
         # First load the atom types
-        types_are_int = False
         for atom in self.atoms:
             try:
                 if isinstance(atom.type, int):
                     atype = parmset.atom_types_int[atom.type]
-                    types_are_int = True # if we have to change back
                 else:
                     atype = parmset.atom_types_str[atom.type]
             except KeyError:
@@ -549,7 +548,7 @@ class CharmmPsfFile(Structure):
                 key = ('X', a2.type, a3.type, 'X')
                 if not key in parmset.dihedral_types:
                     raise ParameterError('No dihedral parameters found for '
-                                           '%r' % dih)
+                                         '%r' % dih)
             dih.type = parmset.dihedral_types[key]
             dih.type.used = False
             pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions
@@ -609,7 +608,7 @@ class CharmmPsfFile(Structure):
                 self.dihedral_types.append(improper.type)
                 improper.type.list = self.dihedral_types
             else:
-                raise RuntimeError('Should not be here') # Avoid masking errors
+                assert False, 'Should not be here'
         # Look through the list of impropers -- if there are any periodic
         # impropers, move them over to the dihedrals list
         for i in reversed(range(len(self.impropers))):
@@ -635,9 +634,6 @@ class CharmmPsfFile(Structure):
             cmap.type.used = True
             self.cmap_types.append(cmap.type)
             cmap.type.list = self.cmap_types
-        # If the types started out as integers, change them back
-        if types_are_int:
-            for atom in self.atoms: atom.type = int(atom.atom_type)
 
     #===================================================
 
@@ -694,8 +690,6 @@ def _set_owner(atoms, owner_array, atm, mol_id):
         if not partner.marked:
             owner_array.append(partner.idx)
             _set_owner(atoms, owner_array, partner.idx, mol_id)
-        elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
-                                partner.idx)
+        assert partner.marked == mol_id, 'Atom in multiple molecules!'
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

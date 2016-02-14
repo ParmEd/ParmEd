@@ -1,0 +1,149 @@
+data_TEST
+# 
+_entry.id   TEST
+# 
+_audit_conform.dict_name       mmcif_pdbx.dic 
+_audit_conform.dict_version    4.007 
+_audit_conform.dict_location   http://mmcif.pdb.org/dictionaries/ascii/mmcif_pdbx.dic 
+# 
+loop_
+_atom_site.group_PDB 
+_atom_site.id 
+_atom_site.type_symbol 
+_atom_site.label_atom_id 
+_atom_site.label_alt_id 
+_atom_site.label_comp_id 
+_atom_site.label_asym_id 
+_atom_site.label_entity_id 
+_atom_site.label_seq_id 
+_atom_site.pdbx_PDB_ins_code 
+_atom_site.Cartn_x 
+_atom_site.Cartn_y 
+_atom_site.Cartn_z 
+_atom_site.occupancy 
+_atom_site.B_iso_or_equiv 
+_atom_site.Cartn_x_esd 
+_atom_site.Cartn_y_esd 
+_atom_site.Cartn_z_esd 
+_atom_site.occupancy_esd 
+_atom_site.B_iso_or_equiv_esd 
+_atom_site.pdbx_formal_charge 
+_atom_site.auth_seq_id 
+_atom_site.auth_comp_id 
+_atom_site.auth_asym_id 
+_atom_site.auth_atom_id 
+_atom_site.pdbx_PDB_model_num 
+ATOM   1     XX ZN   A THR A 1 1  ? 3.265   -14.107 16.877 0.87 4.71  ? ? ? ? ? ? 1    THR A ZN   1 
+ATOM   2     XX ZN   B THR A 1 1  ? 4.046   -14.111 17.614 0.25 9.35  ? ? ? ? ? ? 1    THR A ZN   1 
+ATOM   3     XX CA   A THR A 1 1  ? 4.047   -12.839 16.901 0.76 3.80  ? ? ? ? ? ? 1    THR A CA   1 
+ATOM   4     XX CA   B THR A 1 1  ? 4.261   -12.797 17.017 0.20 4.94  ? ? ? ? ? ? 1    THR A CA   1 
+ATOM   5     XX ZZ   A THR A 1 1  ? 4.817   -12.834 15.587 0.80 3.68  ? ? ? ? ? ? 1    THR A ZZ   1 
+ATOM   6     XX ZZ   B THR A 1 1  ? 4.935   -12.642 15.657 0.22 3.77  ? ? ? ? ? ? 1    THR A ZZ   1 
+ATOM   7     XX EP   A THR A 1 1  ? 5.379   -13.834 15.145 0.85 5.76  ? ? ? ? ? ? 1    THR A EP   1 
+ATOM   8     XX EP   B THR A 1 1  ? 5.025   -13.745 15.106 0.16 5.61  ? ? ? ? ? ? 1    THR A EP   1 
+ATOM   9     XX CB   A THR A 1 1  ? 5.042   -12.868 18.075 0.65 4.22  ? ? ? ? ? ? 1    THR A CB   1 
+ATOM   10    XX CB   B THR A 1 1  ? 4.850   -11.840 18.069 0.25 9.70  ? ? ? ? ? ? 1    THR A CB   1 
+ATOM   11    XX OG1  A THR A 1 1  ? 4.228   -13.043 19.244 0.78 6.21  ? ? ? ? ? ? 1    THR A OG1  1 
+ATOM   12    XX OG1  B THR A 1 1  ? 4.711   -10.458 17.718 0.25 10.60 ? ? ? ? ? ? 1    THR A OG1  1 
+ATOM   13    XX CG2  A THR A 1 1  ? 5.890   -11.610 18.173 0.63 5.67  ? ? ? ? ? ? 1    THR A CG2  1 
+ATOM   14    XX CG2  B THR A 1 1  ? 6.341   -12.129 18.134 0.25 9.55  ? ? ? ? ? ? 1    THR A CG2  1 
+ATOM   15    XX H1   A THR A 1 1  ? 3.035   -14.005 16.173 0.75 6.58  ? ? ? ? ? ? 1    THR A H1   1 
+ATOM   16    XX H1   B THR A 1 1  ? 2.914   -14.713 18.488 0.25 11.77 ? ? ? ? ? ? 1    THR A H1   1 
+ATOM   17    XX H2   A THR A 1 1  ? 2.830   -14.148 17.523 0.75 6.58  ? ? ? ? ? ? 1    THR A H2   1 
+ATOM   18    XX H2   B THR A 1 1  ? 4.980   -14.983 15.512 0.25 11.77 ? ? ? ? ? ? 1    THR A H2   1 
+ATOM   19    XX H3   A THR A 1 1  ? 3.680   -15.162 17.238 0.75 6.58  ? ? ? ? ? ? 1    THR A H3   1 
+ATOM   20    XX H3   B THR A 1 1  ? 9.013   -8.192  18.474 0.25 11.77 ? ? ? ? ? ? 1    THR A H3   1 
+ATOM   21    XX HA   A THR A 1 1  ? 3.181   -11.806 16.823 0.75 4.19  ? ? ? ? ? ? 1    THR A HA   1 
+ATOM   22    XX HA   B THR A 1 1  ? 3.605   -12.290 17.060 0.25 5.98  ? ? ? ? ? ? 1    THR A HA   1 
+ATOM   23    XX HB   A THR A 1 1  ? 5.699   -13.731 17.989 0.75 4.53  ? ? ? ? ? ? 1    THR A HB   1 
+ATOM   24    XX HB   B THR A 1 1  ? 4.523   -12.115 19.103 0.25 9.37  ? ? ? ? ? ? 1    THR A HB   1 
+ATOM   25    XX HG1  A THR A 1 1  ? 3.314   -12.887 19.057 0.75 8.30  ? ? ? ? ? ? 1    THR A HG1  1 
+ATOM   26    XX HG1  B THR A 1 1  ? 4.049   -10.109 18.478 0.25 15.91 ? ? ? ? ? ? 1    THR A HG1  1 
+ATOM   27    XX HG21 A THR A 1 1  ? 6.468   -11.628 19.047 0.75 7.89  ? ? ? ? ? ? 1    THR A HG21 1 
+ATOM   28    XX HG21 B THR A 1 1  ? 6.884   -11.458 18.774 0.25 14.33 ? ? ? ? ? ? 1    THR A HG21 1 
+ATOM   29    XX HG22 A THR A 1 1  ? 5.265   -10.749 18.178 0.75 7.89  ? ? ? ? ? ? 1    THR A HG22 1 
+ATOM   30    XX HG22 B THR A 1 1  ? 6.764   -11.781 17.079 0.25 14.33 ? ? ? ? ? ? 1    THR A HG22 1 
+ATOM   31    XX HG23 A THR A 1 1  ? 6.528   -11.557 17.317 0.75 7.89  ? ? ? ? ? ? 1    THR A HG23 1 
+ATOM   32    XX HG23 B THR A 1 1  ? 6.638   -13.077 18.217 0.25 14.33 ? ? ? ? ? ? 1    THR A HG23 1 
+ATOM   33    XX N    A THR A 1 2  ? 4.935   -11.632 15.046 0.74 2.95  ? ? ? ? ? ? 2    THR A N    1 
+ATOM   34    XX N    B THR A 1 2  ? 5.078   -11.406 15.180 0.31 2.78  ? ? ? ? ? ? 2    THR A N    1 
+ATOM   35    XX CA   A THR A 1 2  ? 5.757   -11.521 13.850 0.81 3.02  ? ? ? ? ? ? 2    THR A CA   1 
+ATOM   36    XX CA   B THR A 1 2  ? 5.773   -11.153 13.921 0.20 2.67  ? ? ? ? ? ? 2    THR A CA   1 
+ATOM   37    XX C    A THR A 1 2  ? 7.070   -10.839 14.210 0.74 2.82  ? ? ? ? ? ? 2    THR A C    1 
+ATOM   38    XX C    B THR A 1 2  ? 7.155   -10.559 14.193 0.29 1.80  ? ? ? ? ? ? 2    THR A C    1 
+ATOM   39    XX O    A THR A 1 2  ? 7.152   -9.941  15.050 0.80 3.31  ? ? ? ? ? ? 2    THR A O    1 
+ATOM   40    XX O    B THR A 1 2  ? 7.214   -9.641  15.012 0.25 2.41  ? ? ? ? ? ? 2    THR A O    1 
+ATOM   41    XX CB   A THR A 1 2  ? 4.976   -10.693 12.813 0.87 5.53  ? ? ? ? ? ? 2    THR A CB   1 
+ATOM   42    XX CB   B THR A 1 2  ? 4.896   -10.354 12.941 0.25 12.07 ? ? ? ? ? ? 2    THR A CB   1 
+ATOM   43    XX OG1  A THR A 1 2  ? 4.611   -9.432  13.388 1.00 6.88  ? ? ? ? ? ? 2    THR A OG1  1 
+ATOM   44    XX OG1  B THR A 1 2  ? 3.743   -11.083 12.501 0.25 9.57  ? ? ? ? ? ? 2    THR A OG1  1 
+ATOM   45    XX CG2  A THR A 1 2  ? 3.858   -11.584 12.293 0.75 10.03 ? ? ? ? ? ? 2    THR A CG2  1 
+ATOM   46    XX CG2  B THR A 1 2  ? 5.683   -9.885  11.726 0.27 5.90  ? ? ? ? ? ? 2    THR A CG2  1 
+ATOM   47    XX H    A THR A 1 2  ? 4.547   -10.814 15.527 0.75 3.44  ? ? ? ? ? ? 2    THR A H    1 
+ATOM   48    XX H    B THR A 1 2  ? 5.510   -10.211 15.754 0.25 2.90  ? ? ? ? ? ? 2    THR A H    1 
+ATOM   49    XX HA   A THR A 1 2  ? 5.962   -12.339 13.548 0.75 3.32  ? ? ? ? ? ? 2    THR A HA   1 
+ATOM   50    XX HA   B THR A 1 2  ? 4.036   -9.929  13.477 0.25 2.86  ? ? ? ? ? ? 2    THR A HA   1 
+ATOM   51    XX HB   A THR A 1 2  ? 5.648   -10.589 11.938 0.75 5.43  ? ? ? ? ? ? 2    THR A HB   1 
+ATOM   52    XX HB   B THR A 1 2  ? 4.644   -9.326  13.574 0.25 5.67  ? ? ? ? ? ? 2    THR A HB   1 
+ATOM   53    XX HG1  A THR A 1 2  ? 5.030   -9.344  14.216 0.75 8.74  ? ? ? ? ? ? 2    THR A HG1  1 
+ATOM   54    XX HG1  B THR A 1 2  ? 3.236   -11.198 13.399 0.25 10.21 ? ? ? ? ? ? 2    THR A HG1  1 
+ATOM   55    XX HG21 A THR A 1 2  ? 4.096   -12.441 11.924 0.75 10.92 ? ? ? ? ? ? 2    THR A HG21 1 
+ATOM   56    XX HG21 B THR A 1 2  ? 6.542   -9.278  12.024 0.25 9.66  ? ? ? ? ? ? 2    THR A HG21 1 
+ATOM   57    XX HG22 A THR A 1 2  ? 3.222   -10.974 11.650 0.75 10.92 ? ? ? ? ? ? 2    THR A HG22 1 
+ATOM   58    XX HG22 B THR A 1 2  ? 5.039   -9.142  11.179 0.25 9.66  ? ? ? ? ? ? 2    THR A HG22 1 
+ATOM   59    XX HG23 A THR A 1 2  ? 3.163   -11.738 13.200 0.75 10.92 ? ? ? ? ? ? 2    THR A HG23 1 
+ATOM   60    XX HG23 B THR A 1 2  ? 5.904   -10.639 11.169 0.25 9.66  ? ? ? ? ? ? 2    THR A HG23 1 
+# 
+loop_
+_atom_site_anisotrop.id 
+_atom_site_anisotrop.type_symbol 
+_atom_site_anisotrop.pdbx_label_atom_id 
+_atom_site_anisotrop.pdbx_label_alt_id 
+_atom_site_anisotrop.pdbx_label_comp_id 
+_atom_site_anisotrop.pdbx_label_asym_id 
+_atom_site_anisotrop.pdbx_label_seq_id 
+_atom_site_anisotrop.U[1][1] 
+_atom_site_anisotrop.U[2][2] 
+_atom_site_anisotrop.U[3][3] 
+_atom_site_anisotrop.U[1][2] 
+_atom_site_anisotrop.U[1][3] 
+_atom_site_anisotrop.U[2][3] 
+_atom_site_anisotrop.U[1][1]_esd 
+_atom_site_anisotrop.U[2][2]_esd 
+_atom_site_anisotrop.U[3][3]_esd 
+_atom_site_anisotrop.U[1][2]_esd 
+_atom_site_anisotrop.U[1][3]_esd 
+_atom_site_anisotrop.U[2][3]_esd 
+_atom_site_anisotrop.pdbx_auth_seq_id 
+_atom_site_anisotrop.pdbx_auth_comp_id 
+_atom_site_anisotrop.pdbx_auth_asym_id 
+_atom_site_anisotrop.pdbx_auth_atom_id 
+1   XX ZN  A THR A 1  0.0704 0.0658 0.0428 -0.0200 0.0103  0.0029  ? ? ? ? ? ? 1    THR A ZN  
+2   XX ZN  B THR A 1  0.0977 0.1190 0.1387 -0.0370 0.0156  0.0004  ? ? ? ? ? ? 1    THR A ZN  
+3   XX CA  A THR A 1  0.0537 0.0597 0.0311 -0.0068 0.0110  0.0034  ? ? ? ? ? ? 1    THR A CA  
+4   XX CA  B THR A 1  0.0508 0.0495 0.0873 0.0088  0.0166  0.0030  ? ? ? ? ? ? 1    THR A CA  
+5   XX ZZ  A THR A 1  0.0546 0.0524 0.0328 0.0010  0.0100  0.0080  ? ? ? ? ? ? 1    THR A ZZ  
+6   XX ZZ  B THR A 1  0.0516 0.0458 0.0461 -0.0008 0.0145  -0.0241 ? ? ? ? ? ? 1    THR A ZZ  
+7   XX EP  A THR A 1  0.1042 0.0695 0.0455 0.0331  0.0234  0.0070  ? ? ? ? ? ? 1    THR A EP  
+8   XX EP  B THR A 1  0.0944 0.0375 0.0818 0.0117  0.0270  -0.0150 ? ? ? ? ? ? 1    THR A EP  
+9   XX CB  A THR A 1  0.0562 0.0766 0.0275 -0.0059 0.0047  0.0119  ? ? ? ? ? ? 1    THR A CB  
+10  XX CB  B THR A 1  0.1815 0.0569 0.1318 -0.0236 0.0862  0.0152  ? ? ? ? ? ? 1    THR A CB  
+11  XX OG1 A THR A 1  0.0991 0.1077 0.0293 -0.0096 0.0192  0.0085  ? ? ? ? ? ? 1    THR A OG1 
+12  XX OG1 B THR A 1  0.1342 0.1342 0.1342 0.0000  0.0000  0.0000  ? ? ? ? ? ? 1    THR A OG1 
+13  XX CG2 A THR A 1  0.0771 0.0996 0.0386 -0.0215 -0.0025 0.0051  ? ? ? ? ? ? 1    THR A CG2 
+14  XX CG2 B THR A 1  0.1209 0.1209 0.1209 0.0000  0.0000  0.0000  ? ? ? ? ? ? 1    THR A CG2 
+33  XX N   A THR A 2  0.0355 0.0460 0.0308 -0.0010 0.0097  0.0021  ? ? ? ? ? ? 2    THR A N   
+34  XX N   B THR A 2  0.0250 0.0478 0.0328 -0.0055 0.0047  -0.0054 ? ? ? ? ? ? 2    THR A N   
+35  XX CA  A THR A 2  0.0351 0.0469 0.0329 -0.0062 0.0093  -0.0015 ? ? ? ? ? ? 2    THR A CA  
+36  XX CA  B THR A 2  0.0308 0.0418 0.0291 -0.0003 0.0143  -0.0053 ? ? ? ? ? ? 2    THR A CA  
+37  XX C   A THR A 2  0.0359 0.0395 0.0319 -0.0057 0.0092  0.0049  ? ? ? ? ? ? 2    THR A C   
+38  XX C   B THR A 2  0.0248 0.0236 0.0199 -0.0054 0.0082  0.0066  ? ? ? ? ? ? 2    THR A C   
+39  XX O   A THR A 2  0.0470 0.0408 0.0380 -0.0023 0.0127  -0.0014 ? ? ? ? ? ? 2    THR A O   
+40  XX O   B THR A 2  0.0341 0.0270 0.0304 0.0011  0.0120  -0.0017 ? ? ? ? ? ? 2    THR A O   
+41  XX CB  A THR A 2  0.0526 0.0978 0.0594 -0.0226 -0.0069 0.0413  ? ? ? ? ? ? 2    THR A CB  
+42  XX CB  B THR A 2  0.0266 0.3923 0.0396 0.0087  0.0042  0.0717  ? ? ? ? ? ? 2    THR A CB  
+43  XX OG1 A THR A 2  0.0510 0.0781 0.1318 -0.0059 -0.0071 0.0584  ? ? ? ? ? ? 2    THR A OG1 
+44  XX OG1 B THR A 2  0.0766 0.1982 0.0893 0.0240  0.0262  0.0944  ? ? ? ? ? ? 2    THR A OG1 
+45  XX CG2 A THR A 2  0.1030 0.1789 0.0979 -0.0852 -0.0575 0.0663  ? ? ? ? ? ? 2    THR A CG2 
+46  XX CG2 B THR A 2  0.0883 0.0819 0.0537 0.0025  -0.0139 0.0255  ? ? ? ? ? ? 2    THR A CG2 
+61  XX N   . CYS A 3  0.0324 0.0494 0.0275 0.0000  0.0089  0.0054  ? ? ? ? ? ? 3    CYS A N   

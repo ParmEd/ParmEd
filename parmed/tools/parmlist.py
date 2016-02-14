@@ -28,24 +28,27 @@ class ParmList(object):
         self.current_index = self.index(idx)
         self.parm = self[self.current_index]
 
-    def add_parm(self, parm):
+    def add_parm(self, parm, name=None):
         """ Add a parm to the list """
         # Make sure this parm is not part of the list already
         if isinstance(parm, string_types):
-            if parm in self._parm_names:
-                raise DuplicateParm('%s already in ParmList' % parm)
+            name = parm
+            if name in self._parm_names:
+                raise DuplicateParm('%s already in ParmList' % name)
             try:
-                parm = load_file(parm, structure=True)
+                parm = load_file(name, structure=True)
             except FormatNotFound:
-                raise ParmError('Could not determine file type of %s' % parm)
+                raise ParmError('Could not determine file type of %s' % name)
             if not isinstance(parm, Structure):
                 raise ParmError('Added parm must be Structure or a subclass')
         elif not isinstance(parm, Structure):
             raise ParmError('Added parm must be Structure or a subclass')
-            if str(parm) in self._parm_names:
+        else:
+            name = name or str(parm)
+            if name in self._parm_names:
                 raise DuplicateParm('%s already in ParmList' % parm)
         # Otherwise, add in the new parm's name
-        self._parm_names.append(str(parm))
+        self._parm_names.append(name)
         self._parm_instances.append(parm)
         # A newly added topology file is the currently active parm
         self.current_index = len(self._parm_instances) - 1
@@ -54,7 +57,7 @@ class ParmList(object):
     def index(self, idx):
         """ See what the index of the requested parm is (can be int or str) """
         if isinstance(idx, int):
-            if (idx <= -len(self._parm_instances) or
+            if (idx < -len(self._parm_instances) or
                     idx >= len(self._parm_instances)):
                 raise ParmIndexError('index out of range for ParmList')
             return idx

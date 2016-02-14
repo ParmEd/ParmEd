@@ -3,7 +3,7 @@ Tests for the parmed/charmm subpackage
 """
 from __future__ import division, print_function
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import numpy as np
 import os
 import parmed as pmd
@@ -17,13 +17,17 @@ import random
 import unittest
 import utils
 from utils import HAS_GROMACS
+import warnings
 
+# Suppress warning from overwriting parameters
+warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
 get_fn = utils.get_fn
+
 
 class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
     
-    def testCharmmCrd(self):
+    def test_charmm_crd(self):
         """ Test CHARMM coordinate file parser """
         self.assertTrue(charmmcrds.CharmmCrdFile.id_format(get_fn('1tnm.crd')))
         self._check_crd(charmmcrds.CharmmCrdFile(get_fn('1tnm.crd')))
@@ -61,7 +65,7 @@ class TestCharmmCoords(utils.FileIOTestCase):
         self.assertEqual(len(crd.resname), crd.natom)
         self.assertEqual(len(crd.weighting), crd.natom)
 
-    def testWriteCrd(self):
+    def test_write_crd(self):
         """ Test CHARMM coordinate writing capabilities """
         struct = load_file(get_fn('4lzt.pdb'))
         charmmcrds.CharmmCrdFile.write(struct, get_fn('test.crd', written=True))
@@ -77,7 +81,7 @@ class TestCharmmCoords(utils.FileIOTestCase):
         np.testing.assert_allclose(struct.coordinates,
                                    crd.coordinates.reshape((len(struct.atoms), 3)))
 
-    def testCharmmRst(self):
+    def test_charmm_rst(self):
         """ Test CHARMM restart file parser """
         crd = charmmcrds.CharmmRstFile(get_fn('sample-charmm.rst'))
         self.assertEqual(crd.natom, 256)
@@ -116,10 +120,44 @@ class TestCharmmCoords(utils.FileIOTestCase):
         self.assertRaises(exceptions.CharmmError, lambda:
                 charmmcrds.CharmmRstFile(fn))
 
-class TestCharmmPsf(unittest.TestCase):
+class TestCharmmPsf(utils.FileIOTestCase):
     """ Test CHARMM PSF file capabilities """
     
-    def testCharmmPsf(self):
+    def test_private_internals(self):
+        """ Test private internal functions for CHARMM psf file """
+        # _catchindexerror
+        func = psf._catchindexerror(lambda: [1, 2, 3][10])
+        # _ZeroDict
+        self.assertRaises(exceptions.CharmmError, func)
+        d1 = psf._ZeroDict()
+        d2 = psf._ZeroDict()
+        d1['NGRP NST2'] = ([1, 1], [1, 2, 3])
+        d1['NUMLP NUMLPH'] = ([3, 3], [1, 2, 3])
+        d1['a'] = 0
+        d1['b'] = 1
+        d1['c'] = 2
+        self.assertEqual(d1['NGRP'], ([1, 1], [1, 2, 3]))
+        self.assertEqual(d2['NGRP'], ([0, 0], []))
+        self.assertEqual(d1['NUMLP'], ([3, 3], [1, 2, 3]))
+        self.assertEqual(d2['NUMLP'], ([0, 0], []))
+        self.assertEqual(d1['a'], 0)
+        self.assertEqual(d1['b'], 1)
+        self.assertEqual(d1['c'], 2)
+        self.assertEqual(d2['a'], (0, []))
+        self.assertEqual(d2['b'], (0, []))
+        self.assertEqual(d2['c'], (0, []))
+        # CharmmPsfFile._convert staticmethod
+        self.assertRaises(exceptions.CharmmError, lambda:
+                psf.CharmmPsfFile._convert('bad', int, 'not an integer')
+        )
+        try:
+            psf.CharmmPsfFile._convert('bad', int, 'not an integer')
+        except exceptions.CharmmError as e:
+            self.assertIn('not an integer', str(e))
+        else:
+            self.assertTrue(False)
+
+    def test_charmm_psf(self):
         """ Test CHARMM PSF file parsing """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         self.assertEqual(len(cpsf.atoms), 33)
@@ -194,8 +232,13 @@ class TestCharmmPsf(unittest.TestCase):
         for cmap in cpsf.cmaps:
             self.assertEqual(sum([int(a in cmap) for a in atoms]), 5)
             self.assertEqual(sum([int(b in cmap) for b in bonds]), 4)
+        # Test CHARMM groups
+        g = to.Group(cpsf.groups[0].atom, cpsf.groups[0].type, cpsf.groups[0].move)
+        self.assertEqual(g, cpsf.groups[0])
+        g.type = 0
+        self.assertNotEqual(g, cpsf.groups[0])
 
-    def testXplorPsf(self):
+    def test_xplor_psf(self):
         """ Test Xplor-format CHARMM PSF file parsing """
         # Atom types are strings, not integers like in charmm
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf.xplor'))
@@ -272,7 +315,7 @@ class TestCharmmPsf(unittest.TestCase):
             self.assertEqual(sum([int(a in cmap) for a in atoms]), 5)
             self.assertEqual(sum([int(b in cmap) for b in bonds]), 4)
 
-    def testCharmmGuiBuilder(self):
+    def test_charmm_gui_builder(self):
         """ Test parsing of CHARMM PSF from CHARMM-GUI """
         cpsf = psf.CharmmPsfFile(get_fn('parv.psf'))
         self.assertEqual(len(cpsf.acceptors), 0)
@@ -288,7 +331,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(len(cpsf.residues), 109)
         self.assertEqual(len(cpsf.title), 3)
     
-    def testVmdPsf(self):
+    def test_vmd_psf(self):
         """ Test parsing of CHARMM PSF from VMD """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala_autopsf.psf'))
         # Atom types are strings, not integers like in charmm
@@ -365,7 +408,7 @@ class TestCharmmPsf(unittest.TestCase):
             self.assertEqual(sum([int(a in cmap) for a in atoms]), 5)
             self.assertEqual(sum([int(b in cmap) for b in bonds]), 4)
 
-    def testInscodePSF(self):
+    def test_inscode_psf(self):
         """ Test PSF with insertion code as part of residue number """
         cpsf = psf.CharmmPsfFile(get_fn('4TVP-dmj_wat-ion.psf'))
         self.assertEqual(len(cpsf.atoms), 66264)
@@ -378,7 +421,7 @@ class TestCharmmPsf(unittest.TestCase):
         self.assertEqual(cpsf.residues[281].insertion_code, 'A')
 
     @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
-    def testFromStructure(self):
+    def test_from_structure(self):
         """ Tests the CharmmPsfFile.from_structure constructor """
         top1 = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
         psf1 = psf.CharmmPsfFile.from_structure(top1)
@@ -388,6 +431,8 @@ class TestCharmmPsf(unittest.TestCase):
 
         self.assertEqual(len(psf1.atoms), len(top1.atoms))
         self.assertEqual(len(psf2.atoms), len(top2.atoms))
+        self.assertEqual(len(psf1.residues), len(top1.residues))
+        self.assertEqual(len(psf2.residues), len(top2.residues))
 
         self.assertEqual(len(psf1.bonds), len(top1.bonds))
         self.assertEqual(len(psf2.bonds), len(top2.bonds))
@@ -424,10 +469,56 @@ class TestCharmmPsf(unittest.TestCase):
         for atom in psf1.atoms:
             self.assertEqual(atom.type.upper(), atom.type)
 
+        # Test the copy argument
+        psf3 = psf.CharmmPsfFile.from_structure(top2, copy=True)
+        self.assertIsNot(psf3.atoms, top2.atoms)
+        self.assertIsNot(psf3.residues, top2.residues)
+
+        self.assertIsNot(psf3.bonds, top2.bonds)
+        self.assertIsNot(psf3.angles, top2.angles)
+        self.assertIsNot(psf3.urey_bradleys, top2.urey_bradleys)
+        self.assertIsNot(psf3.dihedrals, top2.dihedrals)
+        self.assertIsNot(psf3.impropers, top2.impropers)
+        self.assertIsNot(psf3.cmaps, top2.cmaps)
+        self.assertIsNot(psf3.acceptors, top2.acceptors)
+        self.assertIsNot(psf3.donors, top2.donors)
+        self.assertIsNot(psf3.groups, top2.groups)
+
+        self.assertIsNot(psf3.bond_types, top2.bond_types)
+        self.assertIsNot(psf3.angle_types, top2.angle_types)
+        self.assertIsNot(psf3.dihedral_types, top2.dihedral_types)
+        self.assertIsNot(psf3.urey_bradley_types, top2.urey_bradley_types)
+        self.assertIsNot(psf3.improper_types, top2.improper_types)
+        self.assertIsNot(psf3.cmap_types, top2.cmap_types)
+
+    def test_error_handling(self):
+        """ Tests error handling of CharmmPsfFile """
+        self.assertRaises(exceptions.CharmmError, lambda:
+                psf.CharmmPsfFile(get_fn('trx.prmtop'))
+        )
+        # Print some atoms out-of-order
+        with open(get_fn('ala_ala_ala.psf'), 'r') as f, \
+                open(get_fn('ala_ala_ala2.psf', written=True), 'w') as f2:
+            for i in range(15):
+                f2.write(f.readline())
+            tmp = f.readline()
+            f2.write(f.readline())
+            f2.write(tmp)
+            for line in f:
+                f2.write(line)
+        self.assertRaises(exceptions.CharmmError, lambda:
+                psf.CharmmPsfFile(get_fn('ala_ala_ala2.psf', written=True))
+        )
+        # CHARMM can't handle all potential energy functions
+        struct = utils.create_random_structure(True)
+        self.assertRaises(ValueError, lambda:
+                psf.CharmmPsfFile.from_structure(struct)
+        )
+
 class TestCharmmParameters(utils.FileIOTestCase):
     """ Test CHARMM Parameter file parsing """
 
-    def testPrivateFunctions(self):
+    def test_private_functions(self):
         """ Tests private helper functions for CharmmParameterSet """
         # EmptyStringIterator
         si = parameters._EmptyStringIterator()
@@ -441,7 +532,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(parameters._typeconv('NOCHNG'), 'NOCHNG')
         self.assertEqual(parameters._typeconv('NoCh'), 'NOCHLTU')
 
-    def testE14FAC(self):
+    def test_e14_fac(self):
         """ Test reading CHARMM parameter files with 1-4 EEL scaling """
         params = parameters.CharmmParameterSet(
                 get_fn('parm14sb_all.prm'),
@@ -455,8 +546,39 @@ class TestCharmmParameters(utils.FileIOTestCase):
         for i, tortype in iteritems(params.dihedral_types):
             for typ in tortype:
                 self.assertAlmostEqual(typ.scee, 1.2)
+        # Now test that adding to the parameter set with a DIFFERENT 1-4 scaling
+        # factor is caught
+        self.assertRaises(exceptions.CharmmError, lambda:
+                params.read_parameter_file(get_fn('par_all36_prot.prm'))
+        )
+        self.assertRaises(exceptions.CharmmError, lambda:
+                parameters.CharmmParameterSet(get_fn('parm14sb_all.prm'),
+                                              get_fn('dummy_charmm.str'))
+        )
 
-    def testSingleParameterset(self):
+    def test_geometric(self):
+        """ Test reading CHARMM parameter file with geometric comb. rule """
+        opls = parameters.CharmmParameterSet(get_fn('top_opls_aa.inp'),
+                                             get_fn('par_opls_aa.inp'))
+        self.assertEqual(opls.combining_rule, 'geometric')
+        # Now test error handling corresponding to illegal mixing of
+        # incompatible parameter files.
+        non_opls = parameters.CharmmParameterSet(get_fn('par_all36_prot.prm'))
+        self.assertEqual(non_opls.combining_rule, 'lorentz')
+        non_opls.read_topology_file(get_fn('top_opls_aa.inp'))
+        self.assertRaises(exceptions.CharmmError, lambda:
+                non_opls.read_parameter_file(get_fn('par_geometric_combining.inp'))
+        )
+        self.assertRaises(exceptions.CharmmError, lambda:
+                non_opls.read_parameter_file(get_fn('par_opls_aa.inp'))
+        )
+        for _, dt in iteritems(opls.dihedral_types):
+            for t in dt: t.scee = t.scnb = 1.0
+        self.assertRaises(exceptions.CharmmError, lambda:
+                opls.read_parameter_file(get_fn('par_all36_prot.prm'))
+        )
+
+    def test_single_parameterset(self):
         """ Test reading a single parameter set """
         # Make sure we error if trying to load parameters before topology
         self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
@@ -546,8 +668,11 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(uniques(params.dihedral_types), 81)
         self.assertEqual(uniques(params.improper_types), 20)
         self.assertEqual(uniques(params.urey_bradley_types), 42)
+        # Make sure all cmaps have 8 atom type keys
+        for key in params.cmap_types:
+            self.assertEqual(len(key), 8)
 
-    def testParamFileOnly(self):
+    def test_param_file_only(self):
         """ Test reading only a parameter file with no RTF (CHARMM36) """
         parameters.CharmmParameterSet(get_fn('par_all36_carb.prm')).condense()
         # Make sure read_parameter_file can accept a list of lines *without*
@@ -556,7 +681,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
             params = parameters.CharmmParameterSet()
             params.read_parameter_file(f.readlines())
 
-    def testCollection(self):
+    def test_collection(self):
         """ Test reading a large number of parameter files """
         p = parameters.CharmmParameterSet(
                     get_fn('top_all36_prot.rtf'), 
@@ -580,8 +705,10 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(uniques(p.improper_types), 15)
         self.assertEqual(uniques(p.nbfix_types), 6)
         self.assertEqual(uniques(p.urey_bradley_types), 45)
+        for key in p.cmap_types:
+            self.assertEqual(len(key), 8)
 
-    def testWriteParams(self):
+    def test_write_params(self):
         """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
         params = parameters.CharmmParameterSet(
                                 get_fn('top_all22_prot.inp'),
@@ -590,6 +717,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
         params.write(top=get_fn('test.rtf', written=True),
                      par=get_fn('test.par', written=True))
         params.write(str=get_fn('test.str', written=True))
+        # Check bad options
+        self.assertRaises(ValueError, lambda: params.write())
 
         params2 = parameters.CharmmParameterSet(
                                 get_fn('test.rtf', written=True),
@@ -609,7 +738,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self._compare_paramsets(params, params4, copy=True)
         self._compare_paramsets(params, params5, copy=True)
 
-    def testCGenFF(self):
+    def test_cgenff(self):
         """ Test parsing stream files generated by CGenFF """
         p = parameters.CharmmParameterSet(get_fn('toppar_spin_label_dummy.str'))
         p = p.condense()
@@ -619,7 +748,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertAlmostEqual(p.atom_types_str['OND'].epsilon, -0.05)
         self.assertAlmostEqual(p.atom_types_str['OND'].rmin, 2.0)
 
-    def testPenalty(self):
+    def test_penalty(self):
         """ Test parsing penalty scores for CGenFF parameters from comments """
         p = parameters.CharmmParameterSet(get_fn('pyrrol.str'))
         # Check bond types
@@ -669,7 +798,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
 
     @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
-    def testCharmmParameterSetConversion(self):
+    def test_charmm_parameter_set_conversion(self):
         """ Tests CharmmParameterSet.from_parameterset and from_structure """
         params1 = ParameterSet.from_structure(
                 load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
@@ -735,13 +864,6 @@ class TestCharmmParameters(utils.FileIOTestCase):
                 os.path.join(pmd.gromacs.GROMACS_TOPDIR,
                              'charmm27.ff', 'forcefield.itp')
         )
-        # Make sure it can handle 8-key CMAPs
-        types = OrderedDict()
-        for key, typ in iteritems(gmx.parameterset.cmap_types):
-            assert len(key) == 5, 'Unexpected cmap key length'
-            types[(key[0], key[1], key[2], key[3],
-                   key[1], key[2], key[3], key[4])] = typ
-        gmx.parameterset.cmap_types = types
         gmx.parameterset.nbfix_types[('X', 'Y')] = (2.0, 3.0)
         from_gmx2 = parameters.CharmmParameterSet.from_parameterset(gmx.parameterset)
         for (key1, typ1), (key2, typ2) in zip(iteritems(from_gmx.cmap_types),
@@ -750,6 +872,14 @@ class TestCharmmParameters(utils.FileIOTestCase):
             self.assertEqual(typ1, typ2)
         self.assertEqual(len(from_gmx2.nbfix_types), 1)
         self.assertEqual(from_gmx2.nbfix_types[('X', 'Y')], (2.0, 3.0))
+
+    def test_warning(self):
+        """ Tests warning when overwriting parameters"""
+        warnings.filterwarnings('error', category=exceptions.ParameterWarning)
+        self.assertRaises(exceptions.ParameterWarning, lambda: parameters.CharmmParameterSet(
+                get_fn('toppar_all36_prot_aldehydes.str'),
+                get_fn('toppar_all36_na_modifications.str')))
+
 
     def _check_uppercase_types(self, params):
         for aname, atom_type in iteritems(params.atom_types):
@@ -780,8 +910,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
         def typenames(key):
             if isinstance(key, string_types):
                 if key != key.upper():
-                    return '%sLTU' % key.upper()
-                return key
+                    return ('%sLTU' % key.upper()).replace('*', 'STR')
+                return key.replace('*', 'STR')
             return tuple(typenames(k) for k in key)
         # Bonds
         b1, b2 = get_typeset(set1.bond_types, set2.bond_types)
@@ -836,6 +966,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         else:
             self.assertEqual(d1, d2)
         for key, item2 in iteritems(set2.cmap_types):
+            self.assertEqual(len(key), 8)
             self.assertEqual(set1.cmap_types[typenames(key)], item2)
         # Atom types
         a1, a2 = get_typeset(set1.atom_types, set2.atom_types)
@@ -848,7 +979,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
 
-    def testCharmmFile(self):
+    def test_charmm_file(self):
         """ Test the CharmmFile API and error handling """
         self.assertRaises(ValueError, lambda:
                 CharmmFile(get_fn('trx.prmtop'), 'x')
@@ -891,7 +1022,7 @@ class TestFileWriting(utils.FileIOTestCase):
             self.assertEqual(comments, ['! first comment', '! second comment',
                                         '! third comment', '! fourth comment'])
 
-    def testCharmmStreamFile(self):
+    def test_charmm_stream_file(self):
         """ Test the CharmmStreamFile API """
         stream = CharmmStreamFile(get_fn('toppar_spin_label_dummy.str'))
         lines = open(get_fn('toppar_spin_label_dummy.str'), 'r').readlines()
@@ -908,7 +1039,36 @@ class TestFileWriting(utils.FileIOTestCase):
         else:
             self.assertEqual(next(iter(stream)), lines[0])
 
-    def testWriteCharmm(self):
+    def test_write_simple_psf(self):
+        """ Test writing simple PSF files """
+        cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        cpsf.flags = [f for f in cpsf.flags if f != 'EXT'] # NO EXT!
+        fn = get_fn('test.psf', written=True)
+        cpsf.write_psf(fn)
+        cpsf2 = psf.CharmmPsfFile(fn)
+
+    def test_eliminate_duplicate_dihedrals(self):
+        """ Test that duplicate torsions are eliminated in PSF writes """
+        def count_torsions(parm):
+            torsions = defaultdict(int)
+            for d in parm.dihedrals:
+                if d.improper: continue # Skip impropers
+                if d.atom1 > d.atom4:
+                    torsions[(d.atom4.idx, d.atom3.idx, d.atom2.idx, d.atom1.idx)] += 1
+                else:
+                    torsions[(d.atom1.idx, d.atom2.idx, d.atom3.idx, d.atom4.idx)] += 1
+            return torsions
+        fn = get_fn('test.psf', written=True)
+        parm = load_file(get_fn('trx.prmtop'))
+        ptorsions = count_torsions(parm)
+        parm.write_psf(fn)
+        cpsf = psf.CharmmPsfFile(fn)
+        ctorsions = count_torsions(cpsf)
+        self.assertGreater(max(ptorsions.values()), 1)
+        self.assertEqual(set(ctorsions.keys()), set(ptorsions.keys()))
+        self.assertEqual(max(ctorsions.values()), 1)
+
+    def test_write_charmm(self):
         """ Test writing CHARMM-style PSF files """
         # Test writing CHARMM-style PSFs
         cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
@@ -937,7 +1097,7 @@ class TestFileWriting(utils.FileIOTestCase):
             f.close()
         self.assertTrue(has_key)
 
-    def testWriteVmd(self):
+    def test_write_vmd(self):
         """ Test writing VMD-style PSF files """
         # Test writing VMD-style PSFs
         cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))

@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -101,7 +101,7 @@ class ChamberParm(AmberParm):
         self.LJ_14_radius = []
         self.LJ_14_depth = []
         AmberParm.initialize_topology(self, xyz, box)
-      
+
     #===================================================
 
     def load_pointers(self):
@@ -124,7 +124,7 @@ class ChamberParm(AmberParm):
     #===================================================
 
     def load_structure(self):
-        """ 
+        """
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
         (like deleting atoms)
@@ -193,10 +193,10 @@ class ChamberParm(AmberParm):
         inst.LJ_14_radius = [0 for i in range(ntyp)]
         inst.LJ_14_depth = [0 for i in range(ntyp)]
         for atom in inst.atoms:
-            inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
-            inst.LJ_14_radius[atom.nb_idx-1] = atom.atom_type.rmin_14
-            inst.LJ_14_depth[atom.nb_idx-1] = atom.atom_type.epsilon_14
+            inst.LJ_radius[atom.nb_idx-1] = atom.rmin
+            inst.LJ_depth[atom.nb_idx-1] = atom.epsilon
+            inst.LJ_14_radius[atom.nb_idx-1] = atom.rmin_14
+            inst.LJ_14_depth[atom.nb_idx-1] = atom.epsilon_14
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
@@ -250,7 +250,7 @@ class ChamberParm(AmberParm):
         self.residues.prune()
         self.rediscover_molecules()
 
-        # Transfer information from the topology lists 
+        # Transfer information from the topology lists
         self._xfer_atom_info()
         self._xfer_residue_info()
         self._xfer_bond_info()
@@ -317,7 +317,7 @@ class ChamberParm(AmberParm):
     @property
     def chamber(self):
         return True
-   
+
     @property
     def amoeba(self):
         return False
@@ -684,16 +684,16 @@ class ChamberParm(AmberParm):
         for i in range(len(data['LENNARD_JONES_14_ACOEF'])):
             data['LENNARD_JONES_14_ACOEF'][i] = None
             data['LENNARD_JONES_14_BCOEF'][i] = None
-        atom_types_assigned_unique_idx = set()
         ii = 0
+        replaced_atoms = set()
         while True:
             needed_split = False
             for pair in self.adjusts:
                 a1, a2 = pair.atom1, pair.atom2
                 i, j = sorted([a1.nb_idx - 1, a2.nb_idx - 1])
                 idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                eps = sqrt(a1.epsilon_14 * a2.epsilon_14)
-                rmin = a1.rmin_14 + a2.rmin_14
+                eps = pair.type.epsilon
+                rmin = pair.type.rmin
                 rmin6 = rmin * rmin * rmin * rmin * rmin * rmin
                 acoef = eps * rmin6*rmin6
                 bcoef = 2 * eps * rmin6
@@ -701,16 +701,15 @@ class ChamberParm(AmberParm):
                     if abs(data['LENNARD_JONES_14_ACOEF'][idx] - acoef) > SMALL:
                         # Need to split out another type
                         needed_split = True
-                        if a1.type in atom_types_assigned_unique_idx:
-                            if a2.type in atom_types_assigned_unique_idx:
-                                # Ugh. Split out this atom by itself
-                                mask = '@%d' % (a1.idx + 1)
-                            else:
-                                mask = '@%%%s' % a2.type
-                                atom_types_assigned_unique_idx.add(a2.type)
+                        assert (a1 not in replaced_atoms or
+                                a2 not in replaced_atoms)
+                        # Only add each atom as a new type ONCE
+                        if a1 in replaced_atoms:
+                            mask = '@%d' % (a2.idx+1)
+                            replaced_atoms.add(a2)
                         else:
-                            atom_types_assigned_unique_idx.add(a1.type)
-                            mask = '@%%%s' % a1.type
+                            mask = '@%d' % (a1.idx+1)
+                            replaced_atoms.add(a1)
                         addLJType(self, mask, radius_14=0,
                                   epsilon_14=0).execute()
                         ntypes += 1
@@ -729,9 +728,8 @@ class ChamberParm(AmberParm):
             if not needed_split:
                 break
             # The following should never happen
-            if ii > len(self.atoms):
-                raise RuntimeError("Could not resolve all exceptions. Some "
-                                   "unexpected problem with the algorithm")
+            assert ii <= len(self.atoms)+1, 'Could not resolve all exceptions. ' \
+                    'Some unexpected problem with the algorithm'
         # Now go through and change all None's to 0s, as these terms won't be
         # used for any exceptions, anyway
         for i, item in enumerate(data['LENNARD_JONES_14_ACOEF']):

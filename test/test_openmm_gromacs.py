@@ -24,7 +24,7 @@ import os
 import unittest
 import warnings
 from utils import (get_fn, CPU, has_openmm, mm, app, TestCaseRelative,
-                   skip_big_tests, Reference)
+                   run_all_tests, Reference)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -57,15 +57,15 @@ def zero_ep_frc(frc, struct):
         if isinstance(atom, ExtraPoint):
             frc[i] = vec0
 
-@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
-@unittest.skipIf(not utils.HAS_GROMACS, "Cannot test without GROMACS")
-class TestGromacsTop(utils.TestCaseRelative):
+@unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
+@unittest.skipUnless(utils.HAS_GROMACS, "Cannot test without GROMACS")
+class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
     def setUp(self):
         warnings.filterwarnings('always', category=GromacsWarning)
 
-    def testTiny(self):
+    def test_tiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('01.1water'), 'topol.top'),
@@ -87,7 +87,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.01)
 
-    def testVerySmall(self):
+    def test_very_small(self):
         """ Test very small Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('02.6water'), 'topol.top'),
@@ -112,7 +112,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    def testSmallPeptide(self):
+    def test_small_peptide(self):
         """ Test alanine dipeptide Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('04.Ala'), 'topol.top'),
@@ -138,7 +138,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    def testSmallDoublePeptide(self):
+    def test_small_double_peptide(self):
         """ Test interacting peptides Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
@@ -164,8 +164,8 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.05)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
-    def testJAC(self):
+    @unittest.skipUnless(run_all_tests, "Skipping long-running tests")
+    def test_jac(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (no PBC) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'topol.top'),
@@ -192,8 +192,8 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 0.5)
 
-    @unittest.skipIf(skip_big_tests(), "Skipping long-running tests")
-    def testJACPME(self):
+    @unittest.skipUnless(run_all_tests, "Skipping long-running tests")
+    def test_jac_pme(self):
         """ Tests the JAC benchmark Gromacs system nrg and force (PME) """
         # Load the top and gro files
         top = load_file(os.path.join(get_fn('09.DHFR-PME'), 'topol.top'),
@@ -223,37 +223,31 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
 
-    def testJACPMESwitch(self):
+    def test_pme_switch(self):
         """ Tests the DHFR Gromacs system nrg and force (PME w/ switch) """
         # Load the top and gro files
-        top = load_file(os.path.join(get_fn('10.DHFR-PME-Switch'), 'topol.top'),
-                        xyz=os.path.join(get_fn('10.DHFR-PME-Switch'), 'conf.gro'))
+        top = load_file(get_fn('ildn.solv.top'), xyz=get_fn('ildn.solv.gro'))
         self.assertEqual(top.combining_rule, 'lorentz')
 
         # Create the system and context, then calculate the energy decomposition
         system = top.createSystem(nonbondedMethod=app.PME,
                                   constraints=app.HBonds,
+                                  flexibleConstraints=True,
                                   nonbondedCutoff=0.9*u.nanometers,
-                                  ewaldErrorTolerance=1.0e-5)
+                                  ewaldErrorTolerance=1.0e-5,
+                                  switchDistance=0.7*u.nanometers)
         context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
         # Compare with Lee-Ping's answers. Make sure we zero-out forces for
         # virtual sites, since OMM doesn't do this and Gromacs does.
-        self.assertAlmostEqual(energies['bond'], 1628.54739, places=3)
-        self.assertAlmostEqual(energies['angle'], 3604.58751, places=3)
-        self.assertAlmostEqual(energies['dihedral'], 6490.00844, delta=0.002)
-        self.assertRelativeEqual(energies['nonbonded'], 23616.457584, places=3)
-        gmxfrc = get_forces_from_xvg(
-                os.path.join(get_fn('10.DHFR-PME-Switch'), 'force.xvg'))
-        ommfrc = context.getState(getForces=True).getForces().value_in_unit(
-                    u.kilojoules_per_mole/u.nanometer)
-        zero_ep_frc(ommfrc, top)
-        max_diff = get_max_diff(gmxfrc, ommfrc)
-        self.assertLess(max_diff, 5)
+        self.assertAlmostEqual(energies['bond'], 399.925189, places=4)
+        self.assertAlmostEqual(energies['angle'], 36.18562, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 101.92265, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -18587.09715, places=4)
 
-    def testDPPC(self):
+    def test_dppc(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
         # We know what we're doing
         warnings.filterwarnings('ignore', category=GromacsWarning)
@@ -281,7 +275,7 @@ class TestGromacsTop(utils.TestCaseRelative):
         max_diff = get_max_diff(gmxfrc, ommfrc)
         self.assertLess(max_diff, 5)
 
-    def testOPLS(self):
+    def test_opls(self):
         """ Tests geometric combining rules with OPLS/AA in Gromacs topology """
         top = load_file(os.path.join(get_fn('05.OPLS'), 'topol.top'),
                         xyz=os.path.join(get_fn('05.OPLS'), 'conf.gro'))
@@ -299,8 +293,40 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 0.0057758656, places=4)
         self.assertAlmostEqual(energies['rb_torsion'], 55.603030624, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 327.954397827, places=4)
+        # Now make sure it can be set with PME
+        system = top.createSystem(nonbondedMethod=app.PME,
+                                  nonbondedCutoff=8*u.angstroms)
+        n = 0
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce):
+                self.assertAlmostEqualQuantities(force.getCutoffDistance(),
+                                                  8*u.angstroms)
+                self.assertEqual(force.getNonbondedMethod(), force.PME)
+                n += 1
+            elif isinstance(force, mm.CustomNonbondedForce):
+                self.assertAlmostEqualQuantities(force.getCutoffDistance(),
+                                                  8*u.angstroms)
+                self.assertEqual(force.getNonbondedMethod(), force.CutoffPeriodic)
+                n += 1
+        self.assertEqual(n, 2)
+        # Now try with non-periodic cutoff
+        system = top.createSystem(nonbondedMethod=app.CutoffNonPeriodic,
+                                  nonbondedCutoff=16*u.angstroms,
+                                  switchDistance=14*u.angstroms)
+        n = 0
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce) or isinstance(force,
+                    mm.CustomNonbondedForce):
+                self.assertAlmostEqualQuantities(force.getCutoffDistance(),
+                                                  16*u.angstroms)
+                self.assertEqual(force.getNonbondedMethod(), force.CutoffNonPeriodic)
+                self.assertTrue(force.getUseSwitchingFunction())
+                self.assertAlmostEqualQuantities(force.getSwitchingDistance(),
+                                                 14*u.angstroms)
+                n += 1
+        self.assertEqual(n, 2)
 
-    def testRoundTrip(self):
+    def test_round_trip(self):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """
         # Use DPPC to get RB-torsions tested. Also check that it initially fails
         # with the CustomNonbondedForce

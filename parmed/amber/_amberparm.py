@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -168,13 +168,16 @@ class AmberParm(AmberFormat, Structure):
         self.hasvels = False
         self.hasbox = False
         self._box = None
+        self.crdname = None
         if xyz is None and rst7_name is not None:
             warn('rst7_name keyword is deprecated. Use xyz instead',
                  DeprecationWarning)
-            xyz = rst7_name
+            self.crdname = xyz = rst7_name
         elif xyz is not None and rst7_name is not None:
             warn('rst7_name keyword is deprecated and ignored in favor of xyz',
                  DeprecationWarning)
+        if isinstance(xyz, string_types):
+            self.crdname = xyz
         if prm_name is not None:
             self.initialize_topology(xyz, box)
 
@@ -387,7 +390,7 @@ class AmberParm(AmberFormat, Structure):
         return other
 
     #===================================================
-   
+
     def __getitem__(self, selection):
         other = super(AmberParm, self).__getitem__(selection)
         if isinstance(other, Atom):
@@ -466,7 +469,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_structure(self):
-        """ 
+        """
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
         (like deleting atoms)
@@ -642,7 +645,7 @@ class AmberParm(AmberFormat, Structure):
         self.residues.prune()
         self.rediscover_molecules()
 
-        # Transfer information from the topology lists 
+        # Transfer information from the topology lists
         self._xfer_atom_info()
         self._xfer_residue_info()
         self._xfer_bond_info()
@@ -654,9 +657,9 @@ class AmberParm(AmberFormat, Structure):
         super(AmberParm, self).unchange()
 
     #===================================================
-   
+
     def is_changed(self):
-        """ 
+        """
         Determines if any of the topological arrays have changed since the
         last upload
         """
@@ -778,7 +781,7 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.pointers['NTYPES']
         for i in range(natom): # fill the LJ_types array
             self.LJ_types[pd["AMBER_ATOM_TYPE"][i]] = pd["ATOM_TYPE_INDEX"][i]
-         
+
         for i in range(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
@@ -803,12 +806,12 @@ class AmberParm(AmberFormat, Structure):
         This will undo any off-diagonal L-J modifications you may have made, so
         call this function with care.
         """
+        assert self.combining_rule in ('lorentz', 'geometric'), \
+                "Unrecognized combining rule"
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, "Unrecognized combining rule"
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
         fac = 2**(-1/6) * 2
@@ -842,12 +845,12 @@ class AmberParm(AmberFormat, Structure):
             If True, off-diagonal elements in the combined Lennard-Jones matrix
             exist. If False, they do not.
         """
+        assert self.combining_rule in ('lorentz', 'geometric'), \
+                "Unrecognized combining rule"
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, "Unrecognized combining rule"
         fac = 2**(-1/6) * 2
         LJ_sigma = [x*fac for x in self.LJ_radius]
         pd = self.parm_data
@@ -978,6 +981,8 @@ class AmberParm(AmberFormat, Structure):
         hasnbfix = self.has_NBFIX()
         has1264 = 'LENNARD_JONES_CCOEF' in self.flag_list
         if not hasnbfix and not has1264 and not has1012:
+            if self.chamber:
+                self._modify_nonb_exceptions(nonbfrc, None)
             return nonbfrc
 
         # If we have NBFIX, omm_nonbonded_force returned a tuple
@@ -1119,15 +1124,14 @@ class AmberParm(AmberFormat, Structure):
         force.setUseLongRangeCorrection(True)
         # Determine which nonbonded method we should use and transfer the
         # nonbonded cutoff
+        assert nonbondedMethod in (app.NoCutoff, app.CutoffNonPeriodic,
+                app.PME, app.Ewald, app.CutoffPeriodic), 'Bad nonbondedMethod'
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
-        else:
-            raise ValueError('Unsupported nonbonded method %s' %
-                             nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
 
         return nonbfrc, force
@@ -1742,8 +1746,9 @@ class AmberParm(AmberFormat, Structure):
         exclusions. The exceptions on the nonbonded force might need to be
         adjusted if off-diagonal modifications on the L-J matrix are present
         """
-        # To get into this routine, we already needed to know that nbfix is
-        # present
+        # To get into this routine, either NBFIX is present OR this is a chamber
+        # prmtop and we need to pull the 1-4 L-J parameters from the
+        # LENNARD_JONES_14_A/BCOEF arrays
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         atoms = self.atoms
@@ -1758,10 +1763,13 @@ class AmberParm(AmberFormat, Structure):
         sigma_scale = 2**(-1/6) * length_conv
         for ii in range(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
-            if qq == 0 and (ss == 0 or ee == 0):
+            if qq.value_in_unit(u.elementary_charge**2) == 0 and (
+                    ss.value_in_unit(u.angstroms) == 0 or
+                    ee.value_in_unit(u.kilocalories_per_mole) == 0):
                 # Copy this exclusion as-is... no need to modify the nonbfrc
                 # exception parameters
-                customforce.addExclusion(i, j)
+                if customforce is not None:
+                    customforce.addExclusion(i, j)
                 continue
             # Figure out what the 1-4 scaling parameters were for this pair...
             unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
@@ -1787,7 +1795,8 @@ class AmberParm(AmberFormat, Structure):
                 epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
-            customforce.addExclusion(i, j)
+            if customforce is not None:
+                customforce.addExclusion(i, j)
 
     #===================================================
 
@@ -1815,6 +1824,8 @@ class AmberParm(AmberFormat, Structure):
         """
         # We need to figure out what 1-4 scaling term to use if we don't have
         # explicit exceptions
+        assert self.combining_rule in ('lorentz', 'geometric'), \
+                "Unrecognized combining rule"
         if not self.adjusts:
             scalings = defaultdict(int)
             for dih in self.dihedrals:
@@ -1842,8 +1853,6 @@ class AmberParm(AmberFormat, Structure):
                 comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
             elif self.combining_rule == 'geometric':
                 comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-            else:
-                assert False, "Unrecognized combining rule"
             fac = 2**(1/6)
             for dihedral in self.dihedrals:
                 if dihedral.ignore_end: continue
@@ -1861,12 +1870,11 @@ class AmberParm(AmberFormat, Structure):
                         scee = 1e10
                     else:
                         scee = 1 / pair.type.chgscale
-                    if (abs(rref - pair.type.rmin) > SMALL and
+                    if ignore_inconsistent_vdw:
+                        scnb = 1.0
+                    elif (abs(rref - pair.type.rmin) > SMALL and
                             pair.type.epsilon != 0):
-                        if ignore_inconsistent_vdw:
-                            scnb = 1.0
-                        else:
-                            raise TypeError('Cannot translate exceptions')
+                        raise TypeError('Cannot translate exceptions')
                     if (abs(scnb - dihedral.type.scnb) < SMALL and
                             abs(scee - dihedral.type.scee) < SMALL):
                         continue
@@ -1886,8 +1894,6 @@ class AmberParm(AmberFormat, Structure):
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        else:
-            assert False, 'Unrecognized combining rule. Should not be here'
         fac = 2**(1/6)
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue
@@ -2100,7 +2106,7 @@ class Rst7(object):
     @classmethod
     def open(cls, filename):
         """ Constructor that opens and parses an input coordinate file
-        
+
         Parameters
         ----------
         filename : str
@@ -2123,12 +2129,7 @@ class Rst7(object):
             try:
                 f = NetCDFRestart.open_old(filename)
                 self.natom = f.atom
-            except ImportError:
-                raise AmberError('Could not parse %s as an ASCII restart and '
-                                 'could not find any NetCDF-Python packages '
-                                 'to attempt to parse as a NetCDF Restart.'
-                                 % filename)
-            except RuntimeError:
+            except (TypeError, RuntimeError):
                 raise AmberError('Could not parse restart file %s' % filename)
 
         self.coordinates = f.coordinates
@@ -2235,12 +2236,12 @@ def set_molecules(parm):
     owner = []
     # The way I do this is via a recursive algorithm, in which
     # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and 
+    # has, which in turn calls set_owner for each of its partners and
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
     for i, atom in enumerate(parm.atoms):
         # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if 
+        # However, we only increment which molecule number we're on if
         # we actually assigned a new molecule (obviously)
         if not atom.marked:
             tmp = set()
@@ -2261,7 +2262,7 @@ def _set_owner(parm, owner_array, atm, mol_id):
             owner_array.add(partner.idx)
             _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
+            raise MoleculeError('Atom %d in multiple molecules' %
                                 partner.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

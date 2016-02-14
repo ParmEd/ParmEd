@@ -85,7 +85,6 @@ ExitStatus readparm(const string &fname, vector<string> &flagList,
     string curflag = "";
     int ncols = -1;
     int width = -1;
-    size_t linewidth = -1;
     ParmDataType curtype = UNKNOWN;
     ParmData d;
     string word;
@@ -108,7 +107,6 @@ ExitStatus readparm(const string &fname, vector<string> &flagList,
                 typ.dataType = curtype;
                 typ.fmt = fmt;
                 parmFormats[curflag] = typ;
-                linewidth = ncols * width;
             } else {
                 // No idea what this is if it starts with % and doesn't match
                 // any of these flags...

@@ -49,7 +49,7 @@ class TestParmedSerialization(unittest.TestCase):
         pickle.dump(atom, fobj)
         fobj.seek(0)
         unpickled = pickle.load(fobj)
-        
+
         self.assertIsInstance(unpickled, pmd.Atom)
         self._equal_atoms(unpickled, atom)
 
@@ -236,7 +236,7 @@ class TestParmedSerialization(unittest.TestCase):
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacstop_serialization(self):
         """ Tests the serialization of a GromacsTopologyFile """
         structure = pmd.load_file(os.path.join(utils.get_fn('03.AlaGlu'),
@@ -250,7 +250,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._compare_parametersets(structure.parameterset,
                                     unpickled.parameterset)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacscharmm_serialization(self):
         """ Tests the serialization of a CHARMM FF Gromacs topology """
         structure = pmd.load_file(utils.get_fn('1aki.charmm27.solv.top'))
@@ -339,7 +339,6 @@ class TestParmedSerialization(unittest.TestCase):
                         unpickled.torsion_torsion_types)
         cmp_type_arrays(structure.pi_torsion_types, unpickled.pi_torsion_types)
         cmp_type_arrays(structure.adjust_types, unpickled.adjust_types)
-        cmp_type_arrays(structure.groups, unpickled.groups)
 
         # Make sure all of the connectivity arrays are equivalent
         def cmp_top_arrays(arr1, arr2):
@@ -367,6 +366,7 @@ class TestParmedSerialization(unittest.TestCase):
         cmp_top_arrays(structure.chiral_frames, unpickled.chiral_frames)
         cmp_top_arrays(structure.multipole_frames, unpickled.multipole_frames)
         cmp_top_arrays(structure.adjusts, unpickled.adjusts)
+        cmp_top_arrays(structure.groups, unpickled.groups)
 
     def _compare_parametersets(self, set1, set2):
 
