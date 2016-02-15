@@ -535,7 +535,7 @@ class AmberParm(AmberFormat, Structure):
             atom.join = join[i]
             atom.irotat = irot[i]
             atom.tree = tree[i]
-            atom.radii = radii[i]
+            atom.solvent_radius = radii[i]
             atom.screen = screen[i]
             if replace_atnum or atom.atomic_number == 0:
                 atom.atomic_number = atnum[i]
@@ -1467,7 +1467,7 @@ class AmberParm(AmberFormat, Structure):
         data['IROTAT'] = [atom.irotat for atom in self.atoms]
         data['NUMBER_EXCLUDED_ATOMS'] = [0 for atom in self.atoms]
         if 'RADII' in data:
-            data['RADII'] = [atom.radii for atom in self.atoms]
+            data['RADII'] = [atom.solvent_radius for atom in self.atoms]
         if 'SCREEN' in data:
             data['SCREEN'] = [atom.screen for atom in self.atoms]
         if 'ATOMIC_NUMBER' in data:

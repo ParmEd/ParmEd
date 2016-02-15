@@ -558,7 +558,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'amber6 modified Bondi radii (amber6)')
         for i, atom in enumerate(parm.atoms):
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             self.assertEqual(parm.parm_data['RADII'][i], radii)
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
@@ -589,7 +589,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         PT.changeRadii(parm, 'bondi').execute()
         self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'Bondi radii (bondi)')
         for atom in parm.atoms:
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -611,7 +611,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'modified Bondi radii (mbondi)')
         for atom in parm.atoms:
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -638,7 +638,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'H(N)-modified Bondi radii (mbondi2)')
         for atom in parm.atoms:
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -663,7 +663,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'ArgH and AspGluO modified Bondi2 radii (mbondi3)')
         for i, atom in enumerate(parm.atoms):
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -801,11 +801,12 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                 self.assertEqual(atom.nb_idx, gasparm.atoms[i].nb_idx)
         PT.change(parm, 'RADII', ':1-20', 2.0, 'quiet').execute()
         for i, atom in enumerate(parm.atoms):
-            self.assertEqual(atom.radii, parm.parm_data['RADII'][i])
+            self.assertEqual(atom.solvent_radius, parm.parm_data['RADII'][i])
             if atom.residue.idx < 20:
-                self.assertEqual(atom.radii, 2.0)
+                self.assertEqual(atom.solvent_radius, 2.0)
             else:
-                self.assertEqual(atom.radii, gasparm.atoms[i].radii)
+                self.assertEqual(atom.solvent_radius,
+                                 gasparm.atoms[i].solvent_radius)
         PT.change(parm, 'SCREEN', '*', 0.0).execute()
         for i, atom in enumerate(parm.atoms):
             self.assertEqual(atom.screen, parm.parm_data['SCREEN'][i])
@@ -2172,7 +2173,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'amber6 modified Bondi radii (amber6)')
         for i, atom in enumerate(parm.atoms):
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             self.assertEqual(parm.parm_data['RADII'][i], radii)
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
@@ -2199,7 +2200,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         PT.changeRadii(parm, 'bondi').execute()
         self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'Bondi radii (bondi)')
         for atom in parm.atoms:
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -2221,7 +2222,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'modified Bondi radii (mbondi)')
         for atom in parm.atoms:
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -2248,7 +2249,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'H(N)-modified Bondi radii (mbondi2)')
         for atom in parm.atoms:
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -2273,7 +2274,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.parm_data['RADIUS_SET'][0],
                          'ArgH and AspGluO modified Bondi2 radii (mbondi3)')
         for i, atom in enumerate(parm.atoms):
-            radii, atomic_number = atom.radii, atom.atomic_number
+            radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
                 self.assertEqual(radii, 1.7)
             elif atomic_number == 7:
@@ -2431,11 +2432,11 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
                                  gascham.parm_data['ATOM_TYPE_INDEX'][i])
         PT.change(parm, 'RADII', ':1-2', 2.0, 'quiet').execute()
         for i, atom in enumerate(parm.atoms):
-            self.assertEqual(atom.radii, parm.parm_data['RADII'][i])
+            self.assertEqual(atom.solvent_radius, parm.parm_data['RADII'][i])
             if atom.residue.idx < 2:
-                self.assertEqual(atom.radii, 2.0)
+                self.assertEqual(atom.solvent_radius, 2.0)
             else:
-                self.assertEqual(atom.radii, gascham.parm_data['RADII'][i])
+                self.assertEqual(atom.solvent_radius, gascham.parm_data['RADII'][i])
         PT.change(parm, 'SCREEN', '*', 0.0).execute()
         for i, atom in enumerate(parm.atoms):
             self.assertEqual(atom.screen, parm.parm_data['SCREEN'][i])

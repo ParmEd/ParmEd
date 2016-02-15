@@ -2214,7 +2214,7 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
         self.assertEqual(len(comb.residues), len(parm1.residues) + len(parm2.residues))
         for r1, r2 in zip(comb.residues, parm1.residues + parm2.residues):
             self.assertEqual(len(r1), len(r2))
@@ -2227,7 +2227,7 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
         self.assertEqual(len(parm1.residues), len(comb.residues))
         for r1, r2 in zip(comb.residues, parm1.residues):
             self.assertEqual(len(r1), len(r2))
@@ -2245,7 +2245,7 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
         for i, r1 in enumerate(mult.residues):
             r2 = parm.residues[i%len(parm.residues)]
             self.assertEqual(len(r1), len(r2))
@@ -2258,7 +2258,7 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.mass, a2.mass)
             self.assertEqual(a1.charge, a2.charge)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
         self.assertEqual(len(parm.residues), len(mult.residues))
         for r1, r2 in zip(mult.residues, parm.residues):
             self.assertEqual(len(r1), len(r2))
@@ -2282,7 +2282,7 @@ class TestAmberParmSlice(unittest.TestCase):
             self.assertEqual(a1.type, a2.type)
             self.assertEqual(a1.charge, a2.charge)
             self.assertEqual(a1.tree, a2.tree)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
             self.assertEqual(a1.screen, a2.screen)
             self.assertEqual(a1.join, a2.join)
             self.assertEqual(a1.mass, a2.mass)

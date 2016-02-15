@@ -552,7 +552,7 @@ class changeRadii(Action):
             ChRad(self.parm, self.radii)
             # Load the data into the parm arrays
             for i, atom in enumerate(self.parm.atoms):
-                self.parm.parm_data['RADII'][i] = atom.radii
+                self.parm.parm_data['RADII'][i] = atom.solvent_radius
                 self.parm.parm_data['SCREEN'][i] = atom.screen
         else:
             # Otherwise, just set the radii
@@ -763,6 +763,8 @@ class change(Action):
             prop = 'type'
         elif self.prop == 'TREE_CHAIN_CLASSIFICATION':
             prop = 'tree'
+        elif self.prop == 'RADII':
+            prop = 'solvent_radius'
         else:
             prop = self.prop.lower()
         for i, atom in enumerate(self.parm.atoms):
@@ -1106,7 +1108,7 @@ class printDetails(Action):
                     "%7d%7d%9s%6s%6s%7d%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n" %
                     (i+1, atm.residue.idx+1, atm.residue.name, atm.name,
                      atm.type, atm.atomic_number, atm.rmin, atm.epsilon,
-                     atm.mass, atm.charge, atm.radii, atm.screen)
+                     atm.mass, atm.charge, atm.solvent_radius, atm.screen)
                 )
         return ''.join(retstr)
 
@@ -2787,7 +2789,9 @@ class listParms(Action):
                 retstr += ' (active)'
 
         return retstr
-    __str__ = __repr__ # FIXME
+
+    __str__ = __repr__
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class interpolate(Action):
@@ -3494,8 +3498,9 @@ class energy(Action):
         self.use_openmm = (arg_list.has_key('omm') or
                     not isinstance(self.parm, AmberParm))
         self.arg_list = ArgumentList(arg_list)
-        if self.use_openmm and isinstance(self.parm, AmoebaParm): # FIXME
-            raise NotImplementedError('Amoeba prmtops can only get energies from sander')
+        if self.use_openmm and isinstance(self.parm, AmoebaParm):
+            raise NotImplementedError('Amoeba prmtops can only get energies '
+                                      'from sander')
 
     def __str__(self):
         return 'Computing a single-point energy for %s' % self.parm

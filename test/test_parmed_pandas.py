@@ -71,7 +71,7 @@ class TestStructureDataFrame(unittest.TestCase):
             self.assertEqual(r1.charge, 0)
             self.assertEqual(r1.charge, pdb.atoms[i].charge)
             self.assertEqual(r1['name'], pdb.atoms[i].name)
-            self.assertEqual(r1.radii, pdb.atoms[i].radii)
+            self.assertEqual(r1.solvent_radius, pdb.atoms[i].solvent_radius)
             self.assertEqual(r1.screen, pdb.atoms[i].screen)
             self.assertEqual(r1.type, pdb.atoms[i].type)
             self.assertEqual(r1.occupancy, pdb.atoms[i].occupancy)
@@ -111,7 +111,7 @@ class TestStructureDataFrame(unittest.TestCase):
         for i, r1 in df.iterrows():
             self.assertEqual(r1.charge, parm.atoms[i].charge)
             self.assertEqual(r1['name'], parm.atoms[i].name)
-            self.assertEqual(r1.radii, parm.atoms[i].radii)
+            self.assertEqual(r1.solvent_radius, parm.atoms[i].solvent_radius)
             self.assertEqual(r1.screen, parm.atoms[i].screen)
             self.assertEqual(r1.type, parm.atoms[i].type)
             self.assertEqual(r1.occupancy, parm.atoms[i].occupancy)
@@ -151,7 +151,7 @@ class TestStructureDataFrame(unittest.TestCase):
         for i, r1 in df.iterrows():
             self.assertEqual(r1.charge, parm.atoms[i].charge)
             self.assertEqual(r1['name'], parm.atoms[i].name)
-            self.assertEqual(r1.radii, parm.atoms[i].radii)
+            self.assertEqual(r1.solvent_radius, parm.atoms[i].solvent_radius)
             self.assertEqual(r1.screen, parm.atoms[i].screen)
             self.assertEqual(r1.type, parm.atoms[i].type)
             self.assertEqual(r1.occupancy, parm.atoms[i].occupancy)
@@ -194,7 +194,7 @@ class TestStructureDataFrame(unittest.TestCase):
         for i, r1 in df.iterrows():
             self.assertEqual(r1.charge, parm.atoms[i].charge)
             self.assertEqual(r1['name'], parm.atoms[i].name)
-            self.assertEqual(r1.radii, parm.atoms[i].radii)
+            self.assertEqual(r1.solvent_radius, parm.atoms[i].solvent_radius)
             self.assertEqual(r1.screen, parm.atoms[i].screen)
             self.assertEqual(r1.type, parm.atoms[i].type)
             self.assertEqual(r1.occupancy, parm.atoms[i].occupancy)
@@ -233,7 +233,7 @@ class TestStructureDataFrame(unittest.TestCase):
         for i, r1 in df.iterrows():
             self.assertEqual(r1.charge, parm.atoms[i].charge)
             self.assertEqual(r1['name'], parm.atoms[i].name)
-            self.assertEqual(r1.radii, parm.atoms[i].radii)
+            self.assertEqual(r1.solvent_radius, parm.atoms[i].solvent_radius)
             self.assertEqual(r1.screen, parm.atoms[i].screen)
             self.assertEqual(r1.type, parm.atoms[i].type)
             self.assertEqual(r1.occupancy, parm.atoms[i].occupancy)
@@ -286,7 +286,7 @@ class TestStructureDataFrame(unittest.TestCase):
         df.loc[0, 'charge'] *= 2
         df.loc[0, 'mass'] *= 10
         df.loc[0, 'nb_idx'] = 10
-        df.loc[0, 'radii'] *= 2
+        df.loc[0, 'solvent_radius'] *= 2
         df.loc[0, 'screen'] = 0.5
         df.loc[0, 'occupancy'] = 0.1
         df.loc[0, 'bfactor'] = 0.5
@@ -305,7 +305,7 @@ class TestStructureDataFrame(unittest.TestCase):
         self.assertEqual(atom.charge, charges[0]*2)
         self.assertEqual(atom.mass, 10*df_orig.loc[0, 'mass'])
         self.assertEqual(atom.nb_idx, 10)
-        self.assertEqual(atom.radii, 2*df_orig.loc[0, 'radii'])
+        self.assertEqual(atom.solvent_radius, 2*df_orig.loc[0, 'solvent_radius'])
         self.assertEqual(atom.screen, 0.5)
         self.assertEqual(atom.occupancy, 0.1)
         self.assertEqual(atom.bfactor, 0.5)
@@ -338,7 +338,7 @@ class TestStructureDataFrame(unittest.TestCase):
         df.loc[0, 'charge'] *= 2
         df.loc[0, 'mass'] *= 10
         df.loc[0, 'nb_idx'] = 10
-        df.loc[0, 'radii'] *= 2
+        df.loc[0, 'solvent_radius'] *= 2
         df.loc[0, 'screen'] = 0.5
         df.loc[0, 'occupancy'] = 0.1
         df.loc[0, 'bfactor'] = 0.5
@@ -357,7 +357,7 @@ class TestStructureDataFrame(unittest.TestCase):
         self.assertEqual(atom.charge, charges[0]*2)
         self.assertEqual(atom.mass, 10*df_orig.loc[0, 'mass'])
         self.assertEqual(atom.nb_idx, 10)
-        self.assertEqual(atom.radii, 2*df_orig.loc[0, 'radii'])
+        self.assertEqual(atom.solvent_radius, 2*df_orig.loc[0, 'solvent_radius'])
         self.assertEqual(atom.screen, 0.5)
         self.assertEqual(atom.occupancy, 0.1)
         self.assertEqual(atom.bfactor, 0.5)

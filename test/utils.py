@@ -381,10 +381,10 @@ def create_random_structure(parametrized, novalence=False):
                 mass = random.random() * 16 + 1
                 atomic_number = random.randint(1, 8)
             charge = random.random() * 2 - 1
-            radii = random.random() * 2
+            solvent_radius = random.random() * 2
             screen = random.random() * 2
-            atom = Atom(atomic_number=atomic_number, type=type,
-                        charge=charge, mass=mass, radii=radii,
+            atom = Atom(atomic_number=atomic_number, type=type, charge=charge,
+                        mass=mass, solvent_radius=solvent_radius,
                         screen=screen, name=name)
             if parametrized:
                 atom.atom_type = typ
@@ -508,7 +508,7 @@ def equal_atoms(tester, a1, a2):
     tester.assertEqual(a1.charge, a2.charge)
     tester.assertEqual(a1.mass, a2.mass)
     tester.assertEqual(a1.nb_idx, a2.nb_idx)
-    tester.assertEqual(a1.radii, a2.radii)
+    tester.assertEqual(a1.solvent_radius, a2.solvent_radius)
     tester.assertEqual(a1.tree, a2.tree)
     tester.assertEqual(a1.join, a2.join)
     tester.assertEqual(a1.irotat, a2.irotat)
