@@ -66,6 +66,8 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
         self.assertRaises(IndexError, lambda: templ['NOAT'])
+        # Make sure we can print an atom's repr when it is in a ResidueTemplate
+        repr(templ.atoms[0])
 
     def test_to_structure(self):
         """ Tests the ResidueTemplate.to_structure function """
