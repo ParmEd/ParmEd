@@ -1291,7 +1291,7 @@ class TestParmedPQRStructure(FileIOTestCase):
     def test_pqr_standard_resnames(self):
         """ Test standard residue name replacement in PQR writing """
         struct = Structure()
-        a = Atom(name='CA', atomic_number=6, charge=0.5, radii=1.2)
+        a = Atom(name='CA', atomic_number=6, charge=0.5, solvent_radius=1.2)
         struct.add_atom(a, 'ASH', 2, 'A')
         fobj = StringIO()
         formats.PQRFile.write(struct, fobj, standard_resnames=True,
