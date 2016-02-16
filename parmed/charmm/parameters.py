@@ -383,7 +383,7 @@ class CharmmParameterSet(ParameterSet):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
-            if line.startswith('END'): # should this be case-insensitive?
+            if line[:3].upper() == 'END': # should this be case-insensitive?
                 section = None
                 continue
             # If we have no section, skip
@@ -398,6 +398,8 @@ class CharmmParameterSet(ParameterSet):
             if section == 'ATOMS':
                 if not line.startswith('MASS'): continue # Should this happen?
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     idx = conv(words[1], int, 'atom type')
                     name = words[2].upper()
@@ -421,6 +423,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'BONDS':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -445,6 +449,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'ANGLES':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -481,6 +487,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'DIHEDRALS':
                 words = line.split()
+                if words[0].upper == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -519,6 +527,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'IMPROPER':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -557,6 +567,8 @@ class CharmmParameterSet(ParameterSet):
                 # This is the most complicated part, since cmap parameters span
                 # many lines. We won't do much error catching here.
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     holder = [float(w) for w in words]
                     current_cmap_data.extend(holder)
@@ -591,6 +603,8 @@ class CharmmParameterSet(ParameterSet):
             if section == 'NONBONDED':
                 # Now get the nonbonded values
                 words = line.split()
+                if words[0].upper == 'END':
+                    continue
                 try:
                     atype = words[0].upper()
                     # 1st column is ignored
@@ -657,6 +671,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'NBFIX':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     at1 = words[0].upper()
                     at2 = words[1].upper()
