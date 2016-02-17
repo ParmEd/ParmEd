@@ -50,7 +50,7 @@ class CharmmParameterSet(ParameterSet):
 
     Parameters
     ----------
-    filenames : list of str
+    *filenames : variable length arguments of str
         The list of topology, parameter, and stream files to load into the
         parameter set. The following file type suffixes are recognized:
             .rtf, .top -- Residue topology file
