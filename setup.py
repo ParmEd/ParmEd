@@ -1,4 +1,9 @@
+import os
+import sys
 try:
+    if '--no-setuptools' in sys.argv:
+        sys.argv.pop(sys.argv.index('--no-setuptools'))
+        raise ImportError() # Don't import setuptools...
     from setuptools import setup, Extension
     kws = dict(entry_points={
             'console_scripts' : ['parmed = parmed.scripts:clapp'],
@@ -9,9 +14,6 @@ except ImportError:
     kws = {'scripts' : [os.path.join('scripts', 'parmed'),
                         os.path.join('scripts', 'xparmed')]
     }
-
-import os
-import sys
 
 if sys.version_info < (2, 7):
     sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
