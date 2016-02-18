@@ -298,7 +298,7 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' </HarmonicAngleForce>\n')
 
     def _write_omm_dihedrals(self, dest, skip_types):
-        if not self.dihedral_types: return
+        if not self.dihedral_types and not self.improper_periodic_types: return
         # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
         # The from_structure method ensures that, even if the containing
         # Structure has separate dihedral entries for each torsion
