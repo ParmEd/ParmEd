@@ -1,16 +1,17 @@
 """
 Tests the ParmList class
 """
-from utils import get_fn
-from parmed import Structure
+import os
+from parmed import Structure, load_file
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm
 from parmed.charmm import CharmmPsfFile
-from parmed.tools import ParmList
+from parmed.tools import ParmList, exceptions as exc
 import unittest
+from utils import get_fn
 
 class TestParmList(unittest.TestCase):
 
-    def testAddAmberParm(self):
+    def test_add_amber_parm(self):
         """ Test adding AmberParm-derived instances to ParmList """
         parms = ParmList()
         amber = AmberParm(get_fn('tip4p.parm7'))
@@ -39,8 +40,17 @@ class TestParmList(unittest.TestCase):
         self.assertIs(parms.parm, chamber)
         self.assertRaises(IndexError, lambda: parms.set_new_active(3))
         self.assertIs(parms.parm, chamber)
+        self.assertRaises(exc.DuplicateParm, lambda:
+                parms.add_parm(get_fn('ala_ala_ala.parm7')))
+        self.assertRaises(exc.DuplicateParm, lambda:
+                parms.add_parm(load_file(get_fn('ala_ala_ala.parm7'))))
+        self.assertRaises(exc.ParmError, lambda:
+                parms.add_parm(os.path.join(get_fn('pptest1'), 'pptest1.h')))
+        self.assertRaises(exc.ParmError, lambda:
+                parms.add_parm(get_fn('amino12.lib')))
+        self.assertRaises(exc.ParmError, lambda: parms.add_parm(object()))
 
-    def testAddAmberParmNames(self):
+    def test_add_amber_parm_names(self):
         """ Test adding Amber prmtop file names to ParmList """
         parms = ParmList()
         parms.add_parm(get_fn('tip4p.parm7'))
@@ -68,7 +78,7 @@ class TestParmList(unittest.TestCase):
         self.assertRaises(IndexError, lambda: parms.set_new_active(3))
         self.assertIs(parms.parm, chamber)
 
-    def testAddCharmmPsf(self):
+    def test_add_charmm_psf(self):
         """ Test adding CHARMM PSF file to ParmList """
         parms = ParmList()
         ala3 = CharmmPsfFile(get_fn('ala3_solv.psf'))
@@ -98,7 +108,7 @@ class TestParmList(unittest.TestCase):
         self.assertIs(parms.parm, aaa)
 
 
-    def testAddCharmmPsfNames(self):
+    def test_add_charmm_psf_names(self):
         """ Test adding CHARMM PSF file names to ParmList """
         parms = ParmList()
         parms.add_parm(get_fn('ala3_solv.psf'))
@@ -127,9 +137,11 @@ class TestParmList(unittest.TestCase):
         parms.set_new_active(get_fn('ala_ala_ala.psf'))
         self.assertIs(parms.parm, aaa)
 
-    def testAddMol2(self):
+    def test_add_mol2(self):
         """ Test adding Mol2 file to ParmList """
         parms = ParmList()
         parms.add_parm(get_fn('tripos9.mol2'))
         self.assertEqual(len(parms), 1)
         self.assertIsInstance(parms[0], Structure)
+        self.assertIn(0, parms)
+        self.assertNotIn(1, parms)

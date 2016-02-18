@@ -13,7 +13,7 @@ import math
 import os
 from parmed.amber.offlib import AmberOFFLibrary
 from parmed.constants import TINY
-from parmed.exceptions import ParameterError, AmberWarning
+from parmed.exceptions import ParameterError, AmberWarning, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Mass, element_by_mass, AtomicNum
@@ -648,6 +648,10 @@ class AmberParameterSet(ParameterSet):
             a1, a2, a3, a4 =  a1.strip(), a2.strip(), a3.strip(), a4.strip()
             key = (a1, a2, a3, a4)
             rkey = (a4, a3, a2, a1)
+            if last_key is not None and (last_key != key and last_key != rkey):
+                warnings.warn('Expecting next term in dihedral %r, got '
+                              'definition for dihedral %r' % (last_key, key),
+                              ParameterWarning)
         scee = [float(x) for x in _sceere.findall(line)] or [1.2]
         scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
         per = float(per)

@@ -66,6 +66,8 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
         self.assertRaises(IndexError, lambda: templ['NOAT'])
+        # Make sure we can print an atom's repr when it is in a ResidueTemplate
+        repr(templ.atoms[0])
 
     def test_to_structure(self):
         """ Tests the ResidueTemplate.to_structure function """
@@ -1122,7 +1124,7 @@ quit
             self.assertEqual(a1.atomic_number, a2.atomic_number)
             self.assertEqual(a1.atom_type.rmin, a2.atom_type.rmin)
             self.assertEqual(a1.atom_type.epsilon, a2.atom_type.epsilon)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
             self.assertEqual(a1.screen, a2.screen)
             # Ugh. OFF libs are inconsistent
             if tree:

@@ -153,11 +153,11 @@ class PQRFile(object):
                     if nam in ('EP', 'LP'): # lone pair
                         atom = ExtraPoint(atomic_number=atomic_number, name=nam,
                                           charge=chg, mass=mass, number=num,
-                                          radii=rad)
+                                          solvent_radius=rad)
                     else:
                         atom = Atom(atomic_number=atomic_number, name=nam,
                                     charge=chg, mass=mass, number=num,
-                                    radii=rad)
+                                    solvent_radius=rad)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
                     if modelno == 1:
                         struct.add_atom(atom, res, resn, chn)
@@ -297,7 +297,8 @@ class PQRFile(object):
                     xyz = coord[atom.idx]
                     dest.write(atomrec % (anum, aname, standardize(res.name),
                                           res.chain, rnum, xyz[0], xyz[1],
-                                          xyz[2], atom.charge, atom.radii))
+                                          xyz[2], atom.charge,
+                                          atom.solvent_radius))
             if coords.shape[0] > 1:
                 dest.write('ENDMDL\n')
 
