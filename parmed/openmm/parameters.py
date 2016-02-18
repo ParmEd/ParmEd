@@ -464,7 +464,7 @@ class OpenMMParameterSet(ParameterSet):
                                      "epsilon != 0." % name)
 
             dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (name, sigma, epsilon))
+                       (name, sigma, abs(epsilon)))
         dest.write(' </NonbondedForce>\n')
 
     def _write_omm_scripts(self, dest, skip_types):
