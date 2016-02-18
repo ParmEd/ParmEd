@@ -33,9 +33,6 @@ except ImportError:
 class TestReadParm(unittest.TestCase):
     """ Tests the various Parm file classes """
 
-    def tearDown(self):
-        warnings.filterwarnings('always', category=DeprecationWarning)
-
     def test_fortran_format(self):
         """ Tests the FortranFormat object """
         fmt = FortranFormat('(F8.5)')
@@ -176,7 +173,6 @@ class TestReadParm(unittest.TestCase):
 
     def test_deprecations(self):
         """ Test proper deprecation of old/renamed AmberParm features """
-        warnings.filterwarnings('error', category=DeprecationWarning)
         self.assertRaises(DeprecationWarning, lambda:
                 readparm.AmberParm(get_fn('ash.parm7'),
                                    rst7_name=get_fn('ash.rst7'))
@@ -185,10 +181,12 @@ class TestReadParm(unittest.TestCase):
                 readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'),
                                    rst7_name=get_fn('ash.rst7'))
         )
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='parmed')
         parm = readparm.AmberParm(get_fn('ash.parm7'),
                                   rst7_name=get_fn('ash.rst7'))
-        warnings.filterwarnings('always', category=DeprecationWarning)
+        warnings.filterwarnings('error', category=DeprecationWarning,
+                                module='parmed')
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
@@ -898,6 +896,28 @@ class TestParameterFiles(FileIOTestCase):
                     os.path.join(get_fn('parm'), 'frcmod.1')
                 )
         )
+
+    def test_parm_dat_bad_equivalencing(self):
+        """ Test handling of erroneous atom equivalencing in parm.dat files """
+        # Now make sure it warns
+        warnings.filterwarnings('error', category=AmberWarning)
+        self.assertRaises(AmberWarning, lambda:
+                parameters.AmberParameterSet(
+                        os.path.join(get_fn('parm'), 'parmAM1.dat')
+                )
+        )
+        warnings.filterwarnings('always', category=AmberWarning)
+        # Now check it does the right thing.
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        params = parameters.AmberParameterSet(
+                os.path.join(get_fn('parm'), 'parmAM1.dat')
+        )
+        # Make sure CA and C have different types, even though they are
+        # explicitly equivalenced
+        self.assertEqual(params.atom_types['C'].rmin, 1.9127)
+        self.assertEqual(params.atom_types['C'].epsilon, 0.086)
+        self.assertEqual(params.atom_types['CA'].rmin, 1.9061)
+        self.assertEqual(params.atom_types['CA'].epsilon, 0.086)
 
     def test_frcmod_with_tabstops(self):
         """ Test parsing an Amber frcmod file with tabs instead of spaces """

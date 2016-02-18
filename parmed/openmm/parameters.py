@@ -127,8 +127,24 @@ class OpenMMParameterSet(ParameterSet):
             attribute) to which the XML file will be written
         provenance : dict, optional
             If present, the XML file will be tagged with the available fields.
-            The keys of this dictionary are turned into the XML tags, and the
-            values become the contents of that tag. Default is no provenance
+            Keys of the dictionary become XML element tags, the values of the
+            dictionary must be instances of any of:
+            - str / unicode (Py2) or str (Py3) - one XML element with this
+            content is written
+            - list - one XML element per each item of the list is written, all
+            these XML elements use the same tag (key in provenance dict)
+            - dict - one of the keys of this dict must be the same as the key of
+            of the provenance dict under which this dict is nested. The value
+            under this key becomes the content of the XML element. Remaining keys
+            and their values are used to construct attributes of the XML element.
+            Note that OrderedDict's should be used to ensure appropriate order
+            of the XML elements and their attributes.
+            Default is no provenance.
+            Example (unordered):
+            provenance = {'Reference' : ['Nature', 'Cell'],
+                          'Source' : {'Source': 'leaprc.ff14SB', sourcePackage :
+                          'AmberTools', sourcePackageVersion : '15'},
+                          'User' : 'Mark'}
         write_unused : bool
             If False, atom types that are not used in any of the residue templates
             and parameters including those atom types will not be written
@@ -193,9 +209,25 @@ class OpenMMParameterSet(ParameterSet):
         dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
                    datetime.datetime.now().timetuple()[:3])
         provenance = provenance if provenance is not None else {}
-        for item, key in iteritems(provenance):
-            if item == 'DateGenerated': continue
-            dest.write('  <%s>%s</%s>\n' % (item, key, item))
+        for tag, content in iteritems(provenance):
+            if tag == 'DateGenerated': continue
+            if isinstance(content, string_types):
+                dest.write('  <%s>%s</%s>\n' % (tag, content, tag))
+            elif isinstance(content, list):
+                for sub in content:
+                    dest.write('  <%s>%s</%s>\n' % (tag, sub, tag))
+            elif isinstance(content, dict):
+                if tag not in content:
+                    raise KeyError('Content of an attribute-containing element '
+                                   'specified incorrectly.')
+                attributes = [key for key in content if key != tag]
+                element_content = content[tag]
+                dest.write('  <%s' % tag)
+                for attribute in attributes:
+                    dest.write(' %s="%s"' % (attribute, content[attribute]))
+                dest.write('>%s</%s>\n' % (element_content, tag))
+            else:
+                raise TypeError('Incorrect type of the %s element content' % tag)
         dest.write(' </Info>\n')
 
     def _write_omm_atom_types(self, dest, skip_types):

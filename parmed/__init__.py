@@ -6,7 +6,7 @@ between standard and amber file formats, manipulate structures, etc.
 # Version format should be "major.minor.patch". For beta releases, attach
 # "-beta#" to the end. The beta number will be turned into another number in the
 # version tuple
-__version__ = '2.2.2'
+__version__ = '2.2.3'
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
