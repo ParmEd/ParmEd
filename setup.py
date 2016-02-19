@@ -2,7 +2,7 @@ import os
 import sys
 try:
     if '--no-setuptools' in sys.argv:
-        sys.argv.pop(sys.argv.index('--no-setuptools'))
+        sys.argv.remove('--no-setuptools')
         raise ImportError() # Don't import setuptools...
     from setuptools import setup, Extension
     kws = dict(entry_points={
