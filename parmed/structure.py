@@ -2356,7 +2356,8 @@ class Structure(object):
             if level >= end: return
             for partner in atom.bond_partners:
                 if partner is origin: continue
-                force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
+                if atom is not origin:
+                    force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
                 # Exclude EP children, too
                 for child in origin.children:
                     force.addException(partner.idx, child.idx, 0.0, 0.5, 0.0,
