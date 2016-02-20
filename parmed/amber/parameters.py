@@ -14,7 +14,7 @@ import os
 from parmed.amber.offlib import AmberOFFLibrary
 from parmed.constants import TINY
 from parmed.exceptions import ParameterError, AmberWarning, ParameterWarning
-from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from parmed.modeller.residue import ResidueTemplateContainer
 from parmed.formats.mol2 import Mol2File
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
