@@ -20,6 +20,7 @@ from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip, StringIO
 import random
 import saved_outputs as saved
+import shutil
 import unittest
 from utils import (get_fn, FileIOTestCase, equal_atoms,
                    create_random_structure, HAS_GROMACS,
@@ -1159,6 +1160,19 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['EP'].atomic_number, 0)
         self.assertTrue(params.residues)
+
+    def test_load_leaprc_filenames_with_spaces(self):
+        """ Tests loading a leaprc file with filenames containing spaces """
+        fn1 = get_fn('leaprc', written=True)
+        fn2 = get_fn('amino 12.lib', written=True)
+        fn3 = os.path.join(get_fn('parm'), 'parm10.dat')
+        fn4 = get_fn('parm 10.dat', written=True)
+        with open(fn1, 'w') as f:
+            f.write('loadOFF %s\n' % fn2)
+            f.write('loadAmberParams %s\n' % fn4)
+        shutil.copy(get_fn('amino12.lib'), fn2)
+        shutil.copy(fn3, fn4)
+        params = parameters.AmberParameterSet.from_leaprc(fn1)
 
     def test_parm_set_parsing(self):
         """ Tests parsing a set of Amber parameter files """
