@@ -26,7 +26,7 @@ get_fn = utils.get_fn
 
 class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
-    
+
     def test_charmm_crd(self):
         """ Test CHARMM coordinate file parser """
         self.assertTrue(charmmcrds.CharmmCrdFile.id_format(get_fn('1tnm.crd')))
@@ -122,7 +122,7 @@ class TestCharmmCoords(utils.FileIOTestCase):
 
 class TestCharmmPsf(utils.FileIOTestCase):
     """ Test CHARMM PSF file capabilities """
-    
+
     def test_private_internals(self):
         """ Test private internal functions for CHARMM psf file """
         # _catchindexerror
@@ -330,7 +330,7 @@ class TestCharmmPsf(utils.FileIOTestCase):
         self.assertEqual(len(cpsf.impropers), 295)
         self.assertEqual(len(cpsf.residues), 109)
         self.assertEqual(len(cpsf.title), 3)
-    
+
     def test_vmd_psf(self):
         """ Test parsing of CHARMM PSF from VMD """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala_autopsf.psf'))
@@ -581,8 +581,10 @@ class TestCharmmParameters(utils.FileIOTestCase):
     def test_single_parameterset(self):
         """ Test reading a single parameter set """
         # Make sure we error if trying to load parameters before topology
-        self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
-                                                get_fn('par_all22_prot.inp')))
+        warnings.filterwarnings('error', category=exceptions.ParameterWarning)
+        self.assertRaises(exceptions.ParameterWarning, lambda:
+                parameters.CharmmParameterSet(get_fn('par_all22_prot.inp')))
+        warnings.filterwarnings('always', category=exceptions.ParameterWarning)
         # Test error handling for loading files with unsupported extensions
         self.assertRaises(ValueError, lambda:
                 parameters.CharmmParameterSet(get_fn('trx.prmtop'))
@@ -684,7 +686,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
     def test_collection(self):
         """ Test reading a large number of parameter files """
         p = parameters.CharmmParameterSet(
-                    get_fn('top_all36_prot.rtf'), 
+                    get_fn('top_all36_prot.rtf'),
                     get_fn('top_all36_carb.rtf'),
                     get_fn('par_all36_prot.prm'),
                     get_fn('par_all36_carb.prm'),
