@@ -42,8 +42,8 @@ del subs
 # Leaprc regexes
 _atomtypere = re.compile(r"""({\s*["']([\w\+\-]+)["']\s*["'](\w+)["']\s*"""
                          r"""["'](\w+)["']\s*})""")
-_loadparamsre = re.compile(r'loadamberparams (\S*)', re.I)
-_loadoffre = re.compile(r'loadoff (\S*)', re.I)
+_loadparamsre = re.compile(r'''loadamberparams\s+(".+?"|'.+'|[\S{\\ }]*)''', re.I)
+_loadoffre = re.compile(r'''loadoff\s+(".+?"|'.+'|[\S{\\ }]*)''', re.I)
 
 def _find_amber_file(fname, search_oldff):
     """
@@ -271,9 +271,13 @@ class AmberParameterSet(ParameterSet):
         lowertext = text.lower() # commands are case-insensitive
         # Now process the parameter files
         for fname in _loadparamsre.findall(text):
+            if fname[0] in ('"', "'"): fname = fname[1:-1]
+            fname = fname.replace(r'\ ', ' ')
             params.load_parameters(_find_amber_file(fname, search_oldff))
         # Now process the library file
         for fname in _loadoffre.findall(text):
+            if fname[0] in ('"', "'"): fname = fname[1:-1]
+            fname = fname.replace(r'\ ', ' ')
             params.residues.update(
                     AmberOFFLibrary.parse(_find_amber_file(fname, search_oldff))
             )
