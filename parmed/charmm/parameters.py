@@ -245,7 +245,7 @@ class CharmmParameterSet(ParameterSet):
         -------
         New CharmmParameterSet populated with parameters found in the provided
         files
-            
+
         Notes
         -----
         The RTF file is read first (if provided), followed by the PAR file,
@@ -330,7 +330,7 @@ class CharmmParameterSet(ParameterSet):
             if line.startswith('ANGLE') or line.startswith('THETA'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHE') or line.startswith('PHI'): 
+            if line.startswith('DIHE') or line.startswith('PHI'):
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER') or line.startswith('IMPHI'):
@@ -463,11 +463,13 @@ class CharmmParameterSet(ParameterSet):
                 angle_type = AngleType(k, theteq)
                 key = (type1, type2, type3)
                 if key in self.angle_types:
-                    # See if the existing angle type list has a different value and replaces it with a warning
+                    # See if the existing angle type list has a different value
+                    # and replaces it with a warning
                     if self.angle_types[key] != angle_type:
                         # Replace. Warn if they are different
                         warnings.warn('Replacing angle %r, %r with %r' %
-                                      (key, self.angle_types[key], angle_type), ParameterWarning)
+                                      (key, self.angle_types[key], angle_type),
+                                      ParameterWarning)
                         self.bond_types[(type1, type2, type3)] = angle_type
                         self.bond_types[(type3, type2, type1)] = angle_type
                 else: # key not present
@@ -713,8 +715,8 @@ class CharmmParameterSet(ParameterSet):
             for key in nonbonded_types:
                 self.atom_types_str[key].set_lj_params(*nonbonded_types[key])
         except KeyError:
-            raise RuntimeError('Atom type %s not present in AtomType list' %
-                               key)
+            warnings.warn('Atom type %s not present in AtomType list' % key,
+                          ParameterWarning)
         if parameterset is not None: self.parametersets.append(parameterset)
         if own_handle: f.close()
 
