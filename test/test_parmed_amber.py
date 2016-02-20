@@ -1168,10 +1168,14 @@ class TestParameterFiles(FileIOTestCase):
         fn3 = os.path.join(get_fn('parm'), 'parm10.dat')
         fn4 = get_fn('parm 10.dat', written=True)
         with open(fn1, 'w') as f:
-            f.write('loadOFF %s\n' % fn2)
-            f.write('loadAmberParams %s\n' % fn4)
+            f.write('loadOFF "%s"\n' % fn2)
+            f.write('loadAmberParams "%s"\n' % fn4)
         shutil.copy(get_fn('amino12.lib'), fn2)
         shutil.copy(fn3, fn4)
+        params = parameters.AmberParameterSet.from_leaprc(fn1)
+        with open(fn1, 'w') as f:
+            f.write('loadOFF %s\n' % fn2.replace(' ', r'\ '))
+            f.write('loadAmberParams %s\n' % fn4.replace(' ', r'\ '))
         params = parameters.AmberParameterSet.from_leaprc(fn1)
 
     def test_parm_set_parsing(self):
