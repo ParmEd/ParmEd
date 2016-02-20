@@ -1190,10 +1190,14 @@ class TestParameterFiles(FileIOTestCase):
         self.assertIn('GPN', params.residues)
         # Now make sure we warn about mult-residue mol2 files
         with open(fn1, 'w') as f:
-            f.write('SOME = loadMol2 %s\n' % get_fn('test_multi.mol2'))
+            f.write('SOME = loadMol2 %s\n' % get_fn('multimol.mol2'))
         warnings.filterwarnings('error', category=AmberWarning)
         self.assertRaises(AmberWarning, lambda:
-                AmberParameterSet.from_leaprc(fn1))
+                parameters.AmberParameterSet.from_leaprc(fn1))
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        params = parameters.AmberParameterSet.from_leaprc(fn1)
+        self.assertEqual(len(params.residues), 200)
+        self.assertIn('ZINC00000016_1', params.residues)
 
     def test_parm_set_parsing(self):
         """ Tests parsing a set of Amber parameter files """

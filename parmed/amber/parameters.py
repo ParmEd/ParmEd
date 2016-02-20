@@ -14,6 +14,8 @@ import os
 from parmed.amber.offlib import AmberOFFLibrary
 from parmed.constants import TINY
 from parmed.exceptions import ParameterError, AmberWarning, ParameterWarning
+from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from parmed.formats.mol2 import Mol2File
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Mass, element_by_mass, AtomicNum
@@ -26,7 +28,8 @@ import re
 import warnings
 
 # parameter file regexes
-subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
+subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))',
+            FILENAMERE=r'''(".+?"|'.+?'|[\S]*)''')
 _bondre = re.compile(r'(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _anglere = re.compile(r'(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+'
@@ -37,13 +40,13 @@ _sceere = re.compile(r'SCEE=\s*%(FLOATRE)s' % subs)
 _scnbre = re.compile(r'SCNB=\s*%(FLOATRE)s' % subs)
 _impropre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+'
                        '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
-del subs
-
 # Leaprc regexes
 _atomtypere = re.compile(r"""({\s*["']([\w\+\-]+)["']\s*["'](\w+)["']\s*"""
                          r"""["'](\w+)["']\s*})""")
-_loadparamsre = re.compile(r'''loadamberparams\s+(".+?"|'.+'|[\S{\\ }]*)''', re.I)
-_loadoffre = re.compile(r'''loadoff\s+(".+?"|'.+'|[\S{\\ }]*)''', re.I)
+_loadparamsre = re.compile(r'loadamberparams\s+%(FILENAMERE)s' % subs, re.I)
+_loadoffre = re.compile(r'loadoff\s+%(FILENAMERE)s' % subs, re.I)
+_loadmol2re = re.compile(r'(\S+)\s*=\s*loadmol[23]\s*%(FILENAMERE)s' % subs, re.I)
+del subs
 
 def _find_amber_file(fname, search_oldff):
     """
@@ -66,7 +69,7 @@ def _find_amber_file(fname, search_oldff):
             return os.path.join(leapdir, 'lib', 'oldff', fname)
 #       if os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname)):
 #           return os.path.join(leapdir, 'parm', 'oldff', fname)
-    raise ValueError('Cannot find Amber file %s' % fname)
+    raise ValueError('Cannot find Amber file [%s]' % fname)
 
 @add_metaclass(FileFormatType)
 class AmberParameterSet(ParameterSet):
@@ -254,6 +257,8 @@ class AmberParameterSet(ParameterSet):
         - addAtomTypes
         - loadAmberParams
         - loadOFF
+        - loadMol2
+        - loadMol3
         """
         params = cls()
         if isinstance(fname, string_types):
@@ -264,23 +269,52 @@ class AmberParameterSet(ParameterSet):
             own_handle = False
         # To make parsing easier, and because leaprc files are usually quite
         # short, I'll read the whole file into memory
-        lines = map(lambda line:
-                line if '#' not in line else line[:line.index('#')], f)
+        def joinlines(lines):
+            newlines = []
+            composite = []
+            for line in lines:
+                if line.endswith('\\\n'):
+                    composite.append(line[:-2])
+                    continue
+                else:
+                    composite.append(line)
+                newlines.append(''.join(composite))
+                composite = []
+            if composite:
+                newlines.append(''.join(composite))
+            return newlines
+        lines = joinlines(map(lambda line:
+                    line if '#' not in line else line[:line.index('#')], f))
         text = ''.join(lines)
         if own_handle: f.close()
         lowertext = text.lower() # commands are case-insensitive
         # Now process the parameter files
-        for fname in _loadparamsre.findall(text):
-            if fname[0] in ('"', "'"): fname = fname[1:-1]
-            fname = fname.replace(r'\ ', ' ')
-            params.load_parameters(_find_amber_file(fname, search_oldff))
-        # Now process the library file
-        for fname in _loadoffre.findall(text):
-            if fname[0] in ('"', "'"): fname = fname[1:-1]
-            fname = fname.replace(r'\ ', ' ')
-            params.residues.update(
+        def process_fname(fname):
+            if fname[0] in ('"', "'"):
+                fname = fname[1:-1]
+            fname = fname.replace('_BSTOKEN_', r'\ ').replace(r'\ ', ' ')
+            return fname
+        for line in lines:
+            line = line.replace(r'\ ', '_BSTOKEN_')
+            if _loadparamsre.findall(line):
+                fname = process_fname(_loadparamsre.findall(line)[0])
+                params.load_parameters(_find_amber_file(fname, search_oldff))
+            elif _loadoffre.findall(line):
+                fname = process_fname(_loadoffre.findall(line)[0])
+                params.residues.update(
                     AmberOFFLibrary.parse(_find_amber_file(fname, search_oldff))
-            )
+                )
+            elif _loadmol2re.findall(line):
+                (resname, fname), = _loadmol2re.findall(line)
+                residue = Mol2File.parse(_find_amber_file(fname, search_oldff))
+                if isinstance(residue, ResidueTemplateContainer):
+                    warnings.warn('Multi-residue mol2 files not supported by '
+                                  'tleap. Loading anyway using names in mol2',
+                                  AmberWarning)
+                    for res in residue:
+                        params.residues[res.name] = res
+                else:
+                    params.residues[resname] = residue
         # Now process the addAtomTypes
         try:
             idx = lowertext.index('addatomtypes')
