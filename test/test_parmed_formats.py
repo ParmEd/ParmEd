@@ -1887,7 +1887,15 @@ class TestMol2File(FileIOTestCase):
         mol2 = formats.load_file(get_fn('tripos3.mol2'), structure=True)
         np.testing.assert_equal(mol2.box, [20, 20, 20, 90, 90, 90])
 
-    @unittest.skipIf(not HAS_GROMACS, 'Cannot test without gromacs')
+    def test_mol2_duplicate_atoms(self):
+        """ Tests parsing Mol2 files with duplicate atoms """
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.Mol2File.parse(get_fn('duplicate_names.mol2')))
+        mol2 = formats.Mol2File.parse(get_fn('duplicate_names.mol2'), structure=True)
+        self.assertEqual(len(mol2.atoms), 89)
+        self.assertEqual(len(mol2.bonds), 89)
+
+    @unittest.skipUnless(HAS_GROMACS, 'Cannot test without gromacs')
     def test_mol3_disulfide(self):
         """ Tests writing mol3 file w/ disulfide (for RESIDUECONNECT) """
         top = formats.load_file(get_fn('1aki.ff99sbildn.top'))['!:SOL']
