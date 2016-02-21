@@ -10,6 +10,7 @@ omit =
     */parmed/rosetta/*
     */parmed/unit/*
     */parmed/tools/gui/*
+    */parmed/tools/coarsegrain.py
 [paths]
 source =
     /home/*/site-packages/ParmEd-*.egg/
