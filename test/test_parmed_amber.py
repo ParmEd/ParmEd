@@ -1178,6 +1178,27 @@ class TestParameterFiles(FileIOTestCase):
             f.write('loadAmberParams %s\n' % fn4.replace(' ', r'\ '))
         params = parameters.AmberParameterSet.from_leaprc(fn1)
 
+    def test_load_leaprc_with_mol2(self):
+        """ Tests loading a leaprc file with loadMol2 files """
+        fn1 = get_fn('leaprc', written=True)
+        with open(fn1, 'w') as f:
+            f.write('DAN = loadMol2 %s\n' % get_fn('tripos1.mol2'))
+            f.write('GPN = loadMol3 %s\n' % get_fn('tripos9.mol2'))
+        params = parameters.AmberParameterSet.from_leaprc(fn1)
+        self.assertEqual(len(params.residues), 2)
+        self.assertIn('DAN', params.residues)
+        self.assertIn('GPN', params.residues)
+        # Now make sure we warn about mult-residue mol2 files
+        with open(fn1, 'w') as f:
+            f.write('SOME = loadMol2 %s\n' % get_fn('multimol.mol2'))
+        warnings.filterwarnings('error', category=AmberWarning)
+        self.assertRaises(AmberWarning, lambda:
+                parameters.AmberParameterSet.from_leaprc(fn1))
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        params = parameters.AmberParameterSet.from_leaprc(fn1)
+        self.assertEqual(len(params.residues), 200)
+        self.assertIn('ZINC00000016_1', params.residues)
+
     def test_parm_set_parsing(self):
         """ Tests parsing a set of Amber parameter files """
         params = parameters.AmberParameterSet(
