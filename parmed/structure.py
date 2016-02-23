@@ -2356,7 +2356,8 @@ class Structure(object):
             if level >= end: return
             for partner in atom.bond_partners:
                 if partner is origin: continue
-                force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
+                if atom is not origin:
+                    force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
                 # Exclude EP children, too
                 for child in origin.children:
                     force.addException(partner.idx, child.idx, 0.0, 0.5, 0.0,
@@ -3460,6 +3461,7 @@ class Structure(object):
                        _box=self._box,
                        nrexcl=self.nrexcl,
                        _combining_rule=self._combining_rule,
+                       unknown_functional=self.unknown_functional,
         )
         def idx(thing):
             if thing is None: return None
@@ -3534,7 +3536,7 @@ class Structure(object):
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
                     'resolution', 'related_entries', '_coordinates', '_box',
-                    'nrexcl', '_combining_rule'):
+                    'nrexcl', '_combining_rule', 'unknown_functional'):
             if key in d:
                 setattr(self, key, d[key])
 
