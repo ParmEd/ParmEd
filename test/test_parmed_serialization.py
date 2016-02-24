@@ -217,7 +217,7 @@ class TestParmedSerialization(unittest.TestCase):
         # Check metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
-                    'resolution', 'related_entries'):
+                    'resolution', 'related_entries', 'space_group'):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
     def test_pdbtraj_serialization(self):
