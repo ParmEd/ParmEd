@@ -9,6 +9,19 @@ omit =
     */parmed/tinker/*
     */parmed/rosetta/*
     */parmed/unit/*
+    */parmed/tools/gui/*
+    */parmed/tools/coarsegrain.py
 [paths]
 source =
-    */site-packages/
+    /home/*/site-packages/ParmEd-*.egg/
+
+[report]
+exclude_lines =
+    # Re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about defensive assertion code
+    raise AssertionError
+    raise RuntimeError
+    raise NotImplementedError
+    return NotImplemented

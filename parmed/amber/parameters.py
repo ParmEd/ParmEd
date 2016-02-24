@@ -12,7 +12,10 @@ from contextlib import closing
 import math
 import os
 from parmed.amber.offlib import AmberOFFLibrary
-from parmed.exceptions import ParameterError
+from parmed.constants import TINY
+from parmed.exceptions import ParameterError, AmberWarning, ParameterWarning
+from parmed.modeller.residue import ResidueTemplateContainer
+from parmed.formats.mol2 import Mol2File
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Mass, element_by_mass, AtomicNum
@@ -20,27 +23,32 @@ from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
                                     DihedralTypeList)
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
+from parmed.utils.six.moves import map
 import re
+import warnings
 
 # parameter file regexes
-subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))')
-_bondre = re.compile(r'(..?)-(..?) *%(FLOATRE)s *%(FLOATRE)s' % subs)
-_anglere = re.compile(r'(..?)-(..?)-(..?) ' '*%(FLOATRE)s *%(FLOATRE)s' % subs)
-_dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?) *%(FLOATRE)s '
-                      '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
-_sceere = re.compile(r'SCEE=%(FLOATRE)s' % subs)
-_scnbre = re.compile(r'SCNB=%(FLOATRE)s' % subs)
-_impropre = re.compile(r'(..?)-(..?)-(..?)-(..?) '
-                       '*%(FLOATRE)s *%(FLOATRE)s *%(FLOATRE)s' % subs)
-del subs
-
+subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))',
+            FILENAMERE=r'''(".+?"|'.+?'|[\S]*)''')
+_bondre = re.compile(r'(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_anglere = re.compile(r'(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+'
+                      '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+_dihed2re = re.compile(r'\s*%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s\s+'
+                       '%(FLOATRE)s' % subs)
+_sceere = re.compile(r'SCEE=\s*%(FLOATRE)s' % subs)
+_scnbre = re.compile(r'SCNB=\s*%(FLOATRE)s' % subs)
+_impropre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+'
+                       '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 # Leaprc regexes
 _atomtypere = re.compile(r"""({\s*["']([\w\+\-]+)["']\s*["'](\w+)["']\s*"""
                          r"""["'](\w+)["']\s*})""")
-_loadparamsre = re.compile(r'loadamberparams (\S*)', re.I)
-_loadoffre = re.compile(r'loadoff (\S*)', re.I)
+_loadparamsre = re.compile(r'loadamberparams\s+%(FILENAMERE)s' % subs, re.I)
+_loadoffre = re.compile(r'loadoff\s+%(FILENAMERE)s' % subs, re.I)
+_loadmol2re = re.compile(r'(\S+)\s*=\s*loadmol[23]\s*%(FILENAMERE)s' % subs, re.I)
+del subs
 
-def _find_amber_file(fname):
+def _find_amber_file(fname, search_oldff):
     """
     Finds an Amber file. Looks in the current directory, then the following
     locations:
@@ -56,7 +64,12 @@ def _find_amber_file(fname):
         return os.path.join(leapdir, 'lib', fname)
     if os.path.exists(os.path.join(leapdir, 'parm', fname)):
         return os.path.join(leapdir, 'parm', fname)
-    raise ValueError('Cannot find Amber file %s' % fname)
+    if search_oldff:
+        if os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname)):
+            return os.path.join(leapdir, 'lib', 'oldff', fname)
+#       if os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname)):
+#           return os.path.join(leapdir, 'parm', 'oldff', fname)
+    raise ValueError('Cannot find Amber file [%s]' % fname)
 
 @add_metaclass(FileFormatType)
 class AmberParameterSet(ParameterSet):
@@ -64,7 +77,7 @@ class AmberParameterSet(ParameterSet):
 
     Parameters
     ----------
-    filenames : str, list of str, file-like, or list of file-like
+    filenames : str, list of str, file-like, or list of file-like; optional
         Either the name of a file or a list of filenames from which parameters
         should be parsed.
 
@@ -74,6 +87,10 @@ class AmberParameterSet(ParameterSet):
     in the order they are provided, and any parameters that are specified in
     multiple places are overwritten (that is, the *last* occurrence is the
     parameter type that is used)
+
+    See Also
+    --------
+    :class:`parmed.parameters.ParameterSet`
     """
 
     #===================================================
@@ -196,14 +213,21 @@ class AmberParameterSet(ParameterSet):
 
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
+        self.default_scee = 1.2
+        self.default_scnb = 2.0
         self.titles = []
-        self.residues = dict()
         for filename in filenames:
             if isinstance(filename, string_types):
-                self.load_parameters(filename)
+                if AmberOFFLibrary.id_format(filename):
+                    self.residues.update(AmberOFFLibrary.parse(filename))
+                else:
+                    self.load_parameters(filename)
             elif isinstance(filename, Sequence):
                 for fname in filename:
-                    self.load_parameters(fname)
+                    if AmberOFFLibrary.id_format(fname):
+                        self.residues.update(AmberOFFLibrary.parse(fname))
+                    else:
+                        self.load_parameters(fname)
             else:
                 # Assume open file object
                 self.load_parameters(filename)
@@ -211,7 +235,7 @@ class AmberParameterSet(ParameterSet):
     #===================================================
 
     @classmethod
-    def from_leaprc(cls, fname):
+    def from_leaprc(cls, fname, search_oldff=False):
         """ Load a parameter set from a leaprc file
 
         Parameters
@@ -219,6 +243,10 @@ class AmberParameterSet(ParameterSet):
         fname : str or file-like
             Name of the file or open file-object from which a leaprc-style file
             will be read
+
+        search_oldff : bool, optional, default=False
+            If True, search the oldff directories in the main Amber leap
+            folders. Default is False
 
         Notes
         -----
@@ -229,6 +257,8 @@ class AmberParameterSet(ParameterSet):
         - addAtomTypes
         - loadAmberParams
         - loadOFF
+        - loadMol2
+        - loadMol3
         """
         params = cls()
         if isinstance(fname, string_types):
@@ -239,16 +269,59 @@ class AmberParameterSet(ParameterSet):
             own_handle = False
         # To make parsing easier, and because leaprc files are usually quite
         # short, I'll read the whole file into memory
-        text = f.read()
+        def joinlines(lines):
+            newlines = []
+            composite = []
+            for line in lines:
+                if line.endswith('\\\n'):
+                    composite.append(line[:-2])
+                    continue
+                else:
+                    composite.append(line)
+                newlines.append(''.join(composite))
+                composite = []
+            if composite:
+                newlines.append(''.join(composite))
+            return newlines
+        lines = joinlines(map(lambda line:
+                    line if '#' not in line else line[:line.index('#')], f))
+        text = ''.join(lines)
         if own_handle: f.close()
         lowertext = text.lower() # commands are case-insensitive
+        # Now process the parameter files
+        def process_fname(fname):
+            if fname[0] in ('"', "'"):
+                fname = fname[1:-1]
+            fname = fname.replace('_BSTOKEN_', r'\ ').replace(r'\ ', ' ')
+            return fname
+        for line in lines:
+            line = line.replace(r'\ ', '_BSTOKEN_')
+            if _loadparamsre.findall(line):
+                fname = process_fname(_loadparamsre.findall(line)[0])
+                params.load_parameters(_find_amber_file(fname, search_oldff))
+            elif _loadoffre.findall(line):
+                fname = process_fname(_loadoffre.findall(line)[0])
+                params.residues.update(
+                    AmberOFFLibrary.parse(_find_amber_file(fname, search_oldff))
+                )
+            elif _loadmol2re.findall(line):
+                (resname, fname), = _loadmol2re.findall(line)
+                residue = Mol2File.parse(_find_amber_file(fname, search_oldff))
+                if isinstance(residue, ResidueTemplateContainer):
+                    warnings.warn('Multi-residue mol2 files not supported by '
+                                  'tleap. Loading anyway using names in mol2',
+                                  AmberWarning)
+                    for res in residue:
+                        params.residues[res.name] = res
+                else:
+                    params.residues[resname] = residue
+        # Now process the addAtomTypes
         try:
             idx = lowertext.index('addatomtypes')
         except ValueError:
             # Does not exist in this file
             atom_types_str = ''
         else:
-            # Now process the addAtomTypes
             i = idx + len('addatomtypes')
             while i < len(text) and text[i] != '{':
                 if text[i] not in '\r\n\t ':
@@ -279,18 +352,6 @@ class AmberParameterSet(ParameterSet):
                 raise ParameterError('%s is not a recognized element' % symb)
             if name in params.atom_types:
                 params.atom_types[name].atomic_number = AtomicNum[symb]
-            else:
-                params.atom_types[name] = \
-                        AtomType(name, len(params.atom_types)+1, Mass[symb],
-                                 AtomicNum[symb])
-        # Now process the parameter files
-        for fname in _loadparamsre.findall(text):
-            params.load_parameters(_find_amber_file(fname))
-        # Now process the library file
-        for fname in _loadoffre.findall(text):
-            params.residues.update(
-                    AmberOFFLibrary.parse(_find_amber_file(fname))
-            )
         return params
 
     #===================================================
@@ -377,6 +438,7 @@ class AmberParameterSet(ParameterSet):
             for l in f: yield l
         section = None
         finished_diheds = defaultdict(lambda: True)
+        key = None
         for line in fiter():
             line = line.rstrip()
             if not line: continue
@@ -409,7 +471,7 @@ class AmberParameterSet(ParameterSet):
             elif section == 'ANGLE':
                 self._process_angle_line(line)
             elif section == 'DIHEDRAL':
-                self._process_dihedral_line(line, finished_diheds)
+                key = self._process_dihedral_line(line, finished_diheds, key)
             elif section == 'IMPROPER':
                 self._process_improper_line(line)
             elif section == 'NONBOND':
@@ -455,11 +517,12 @@ class AmberParameterSet(ParameterSet):
             rawline = next(fiter)
         # Process the dihedrals
         rawline = next(fiter)
+        key = None
         while rawline:
             line = rawline.strip()
             if not line:
                 break
-            self._process_dihedral_line(line, finished_diheds)
+            key = self._process_dihedral_line(line, finished_diheds, key)
             rawline = next(fiter)
         # Process the impropers
         rawline = next(fiter)
@@ -514,7 +577,18 @@ class AmberParameterSet(ParameterSet):
         # Now assign all of the equivalenced atoms
         for atyp, otyp in iteritems(equivalent_ljtypes):
             otyp = self.atom_types[otyp]
-            self.atom_types[atyp].set_lj_params(otyp.epsilon, otyp.rmin)
+            if atyp in self.atom_types:
+                if (self.atom_types[atyp].rmin is not None and
+                        self.atom_types[atyp].epsilon is not None):
+                    if (abs(otyp.epsilon-self.atom_types[atyp].epsilon) > TINY
+                            or abs(otyp.rmin-self.atom_types[atyp].rmin) > TINY):
+                        warnings.warn('Equivalency defined between %s and %s '
+                                      'but parameters are not equal' %
+                                      (otyp.name, atyp), AmberWarning)
+                        # Remove from equivalent types
+                        equivalent_types[otyp.name].remove(atyp)
+                        continue
+                self.atom_types[atyp].set_lj_params(otyp.epsilon, otyp.rmin)
         line = next(fiter).strip()
         if line == 'LJEDIT':
             rawline = next(fiter)
@@ -539,6 +613,9 @@ class AmberParameterSet(ParameterSet):
             raise ParameterError('Error parsing MASS line. Not enough tokens')
         if words[0] in self.atom_types:
             self.atom_types[words[0]].mass = mass
+        elif words[0] in ('EP', 'LP'):
+            atype = AtomType(words[0], len(self.atom_types)+1, mass, 0)
+            self.atom_types[words[0]] = atype
         else:
             atype = AtomType(words[0], len(self.atom_types)+1, mass,
                              AtomicNum[element_by_mass(mass)])
@@ -566,30 +643,69 @@ class AmberParameterSet(ParameterSet):
         self.angle_types[(a1, a2, a3)] = typ
         self.angle_types[(a3, a2, a1)] = typ
 
-    def _process_dihedral_line(self, line, finished_diheds):
+    def _process_dihedral_line(self, line, finished_diheds, last_key):
+        """ Processes a dihedral line, possibly part of a multi-term dihedral
+
+        Parameters
+        ----------
+        line : str
+            Line of the file that contains a dihedral term
+        finished_diheds : dict
+            Dictionary of dihedral parameters whose final term has been read in
+            already (which means additional terms will overwrite, not add)
+        last_key : str or None
+            If not None, this is the key for the last dihedral type that should
+            be implied if the atom types are missing. Atom types seem to only be
+            required for the first term in a multi-term torsion definition
+
+        Returns
+        -------
+        key or None
+            If a negative periodicity indicates another term is coming, the
+            current key is returned so it can be passed as key to the next
+            _process_dihedral_call
+        """
         rematch = _dihedre.match(line)
-        if not rematch:
+        if not rematch and last_key is None:
             raise ParameterError('Could not understand DIHEDRAL line '
                                  '[%s]' % line)
-        a1, a2, a3, a4, div, k, phi, per = rematch.groups()
+        elif not rematch:
+            rematch = _dihed2re.match(line)
+            if not rematch:
+                raise ParameterError('Could not understand DIHEDRAL line '
+                                     '[%s]' % line)
+            div, k, phi, per = rematch.groups()
+            key = last_key
+            rkey = tuple(reversed(key))
+            assert key in finished_diheds
+            if finished_diheds[key]:
+                raise AssertionError('Cannot have an implied torsion that '
+                                     'has already finished!')
+        else:
+            a1, a2, a3, a4, div, k, phi, per = rematch.groups()
+            a1, a2, a3, a4 =  a1.strip(), a2.strip(), a3.strip(), a4.strip()
+            key = (a1, a2, a3, a4)
+            rkey = (a4, a3, a2, a1)
+            if last_key is not None and (last_key != key and last_key != rkey):
+                warnings.warn('Expecting next term in dihedral %r, got '
+                              'definition for dihedral %r' % (last_key, key),
+                              ParameterWarning)
         scee = [float(x) for x in _sceere.findall(line)] or [1.2]
         scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
-        a1 = a1.strip(); a2 = a2.strip();
-        a3 = a3.strip(); a4 = a4.strip()
         per = float(per)
         typ = DihedralType(float(k)/float(div), abs(per), float(phi),
                            scee[0], scnb[0])
-        key = (a1, a2, a3, a4)
-        rkey = (a4, a3, a2, a1)
         if finished_diheds[key]:
-            # This dihedral is already finished its definition, which means we
-            # go ahead and add a new one to override it
+            # This dihedral is already finished its definition, which means
+            # we go ahead and add a new one to override it
             typs = DihedralTypeList()
             typs.append(typ)
             self.dihedral_types[key] = self.dihedral_types[rkey] = typs
         else:
             self.dihedral_types[key].append(typ)
         finished_diheds[key] = finished_diheds[rkey] = per >= 0
+        if per < 0:
+            return key
 
     def _process_improper_line(self, line):
         rematch = _impropre.match(line)

@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -101,7 +101,7 @@ class ChamberParm(AmberParm):
         self.LJ_14_radius = []
         self.LJ_14_depth = []
         AmberParm.initialize_topology(self, xyz, box)
-      
+
     #===================================================
 
     def load_pointers(self):
@@ -124,7 +124,7 @@ class ChamberParm(AmberParm):
     #===================================================
 
     def load_structure(self):
-        """ 
+        """
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
         (like deleting atoms)
@@ -250,7 +250,7 @@ class ChamberParm(AmberParm):
         self.residues.prune()
         self.rediscover_molecules()
 
-        # Transfer information from the topology lists 
+        # Transfer information from the topology lists
         self._xfer_atom_info()
         self._xfer_residue_info()
         self._xfer_bond_info()
@@ -317,7 +317,7 @@ class ChamberParm(AmberParm):
     @property
     def chamber(self):
         return True
-   
+
     @property
     def amoeba(self):
         return False
@@ -685,6 +685,7 @@ class ChamberParm(AmberParm):
             data['LENNARD_JONES_14_ACOEF'][i] = None
             data['LENNARD_JONES_14_BCOEF'][i] = None
         ii = 0
+        replaced_atoms = set()
         while True:
             needed_split = False
             for pair in self.adjusts:
@@ -700,7 +701,15 @@ class ChamberParm(AmberParm):
                     if abs(data['LENNARD_JONES_14_ACOEF'][idx] - acoef) > SMALL:
                         # Need to split out another type
                         needed_split = True
-                        mask = '@%d' % (a1.idx + 1)
+                        assert (a1 not in replaced_atoms or
+                                a2 not in replaced_atoms)
+                        # Only add each atom as a new type ONCE
+                        if a1 in replaced_atoms:
+                            mask = '@%d' % (a2.idx+1)
+                            replaced_atoms.add(a2)
+                        else:
+                            mask = '@%d' % (a1.idx+1)
+                            replaced_atoms.add(a1)
                         addLJType(self, mask, radius_14=0,
                                   epsilon_14=0).execute()
                         ntypes += 1
@@ -719,7 +728,7 @@ class ChamberParm(AmberParm):
             if not needed_split:
                 break
             # The following should never happen
-            assert ii <= len(self.atoms), 'Could not resolve all exceptions. ' \
+            assert ii <= len(self.atoms)+1, 'Could not resolve all exceptions. ' \
                     'Some unexpected problem with the algorithm'
         # Now go through and change all None's to 0s, as these terms won't be
         # used for any exceptions, anyway

@@ -14,7 +14,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-   
+
 You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -168,13 +168,16 @@ class AmberParm(AmberFormat, Structure):
         self.hasvels = False
         self.hasbox = False
         self._box = None
+        self.crdname = None
         if xyz is None and rst7_name is not None:
             warn('rst7_name keyword is deprecated. Use xyz instead',
                  DeprecationWarning)
-            xyz = rst7_name
+            self.crdname = xyz = rst7_name
         elif xyz is not None and rst7_name is not None:
             warn('rst7_name keyword is deprecated and ignored in favor of xyz',
                  DeprecationWarning)
+        if isinstance(xyz, string_types):
+            self.crdname = xyz
         if prm_name is not None:
             self.initialize_topology(xyz, box)
 
@@ -387,7 +390,7 @@ class AmberParm(AmberFormat, Structure):
         return other
 
     #===================================================
-   
+
     def __getitem__(self, selection):
         other = super(AmberParm, self).__getitem__(selection)
         if isinstance(other, Atom):
@@ -466,7 +469,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def load_structure(self):
-        """ 
+        """
         Loads all of the topology instance variables. This is necessary if we
         actually want to modify the topological layout of our system
         (like deleting atoms)
@@ -532,7 +535,7 @@ class AmberParm(AmberFormat, Structure):
             atom.join = join[i]
             atom.irotat = irot[i]
             atom.tree = tree[i]
-            atom.radii = radii[i]
+            atom.solvent_radius = radii[i]
             atom.screen = screen[i]
             if replace_atnum or atom.atomic_number == 0:
                 atom.atomic_number = atnum[i]
@@ -642,7 +645,7 @@ class AmberParm(AmberFormat, Structure):
         self.residues.prune()
         self.rediscover_molecules()
 
-        # Transfer information from the topology lists 
+        # Transfer information from the topology lists
         self._xfer_atom_info()
         self._xfer_residue_info()
         self._xfer_bond_info()
@@ -654,9 +657,9 @@ class AmberParm(AmberFormat, Structure):
         super(AmberParm, self).unchange()
 
     #===================================================
-   
+
     def is_changed(self):
-        """ 
+        """
         Determines if any of the topological arrays have changed since the
         last upload
         """
@@ -778,7 +781,7 @@ class AmberParm(AmberFormat, Structure):
         ntypes = self.pointers['NTYPES']
         for i in range(natom): # fill the LJ_types array
             self.LJ_types[pd["AMBER_ATOM_TYPE"][i]] = pd["ATOM_TYPE_INDEX"][i]
-         
+
         for i in range(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
             if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
@@ -1464,7 +1467,7 @@ class AmberParm(AmberFormat, Structure):
         data['IROTAT'] = [atom.irotat for atom in self.atoms]
         data['NUMBER_EXCLUDED_ATOMS'] = [0 for atom in self.atoms]
         if 'RADII' in data:
-            data['RADII'] = [atom.radii for atom in self.atoms]
+            data['RADII'] = [atom.solvent_radius for atom in self.atoms]
         if 'SCREEN' in data:
             data['SCREEN'] = [atom.screen for atom in self.atoms]
         if 'ATOMIC_NUMBER' in data:
@@ -2103,7 +2106,7 @@ class Rst7(object):
     @classmethod
     def open(cls, filename):
         """ Constructor that opens and parses an input coordinate file
-        
+
         Parameters
         ----------
         filename : str
@@ -2233,12 +2236,12 @@ def set_molecules(parm):
     owner = []
     # The way I do this is via a recursive algorithm, in which
     # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and 
+    # has, which in turn calls set_owner for each of its partners and
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
     for i, atom in enumerate(parm.atoms):
         # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if 
+        # However, we only increment which molecule number we're on if
         # we actually assigned a new molecule (obviously)
         if not atom.marked:
             tmp = set()
@@ -2259,7 +2262,7 @@ def _set_owner(parm, owner_array, atm, mol_id):
             owner_array.add(partner.idx)
             _set_owner(parm, owner_array, partner.idx, mol_id)
         elif partner.marked != mol_id:
-            raise MoleculeError('Atom %d in multiple molecules' % 
+            raise MoleculeError('Atom %d in multiple molecules' %
                                 partner.idx)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

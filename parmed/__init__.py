@@ -6,13 +6,13 @@ between standard and amber file formats, manipulate structures, etc.
 # Version format should be "major.minor.patch". For beta releases, attach
 # "-beta#" to the end. The beta number will be turned into another number in the
 # version tuple
-__version__ = '2.1.11'
+__version__ = '2.3.2'
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
-           'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs', 
-           'tinker', 'openmm', 'rosetta', 'formats', 'Vec3', 'ParameterSet', 
-           'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF', 
+           'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs',
+           'tinker', 'openmm', 'rosetta', 'formats', 'Vec3', 'ParameterSet',
+           'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF',
            'load_rosetta', 'download_PDB', 'download_CIF', 'tools', 'version']
 
 from parmed import exceptions, periodic_table, residue

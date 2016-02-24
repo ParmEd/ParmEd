@@ -7,10 +7,6 @@ from collections import OrderedDict
 import copy as _copy
 import numpy as np
 import os
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
@@ -340,7 +336,7 @@ class ResidueTemplate(object):
             - charge : float
             - mass : float
             - nb_idx : int
-            - radii : float
+            - solvent_radius : float
             - screen : float
             - occupancy : float
             - bfactor : float
@@ -363,9 +359,7 @@ class ResidueTemplate(object):
             - vy : float (y-coordinate velocity)
             - vz : float (z-coordinate velocity)
         """
-        if pd is None:
-            raise ImportError('pandas is not available; cannot create a pandas '
-                              'DataFrame from this Structure')
+        import pandas as pd
         ret = pd.DataFrame()
 
         ret['number'] = [atom.number for atom in self.atoms]
@@ -375,7 +369,7 @@ class ResidueTemplate(object):
         ret['charge'] = [atom.charge for atom in self.atoms]
         ret['mass'] = [atom.mass for atom in self.atoms]
         ret['nb_idx'] = [atom.nb_idx for atom in self.atoms]
-        ret['radii'] = [atom.radii for atom in self.atoms]
+        ret['solvent_radius'] = [atom.solvent_radius for atom in self.atoms]
         ret['screen'] = [atom.screen for atom in self.atoms]
         ret['occupancy'] = [atom.occupancy for atom in self.atoms]
         ret['bfactor'] = [atom.bfactor for atom in self.atoms]

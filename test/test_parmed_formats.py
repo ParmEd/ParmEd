@@ -28,6 +28,15 @@ def reset_stringio(io):
 class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
 
+    def test_load_blank_file(self):
+        """ Makes sure that a blank file does not match any id_format """
+        from parmed.formats.registry import PARSER_REGISTRY
+        fn = get_fn('test', written=True)
+        with open(fn, 'w'):
+            pass
+        for name, cls in iteritems(PARSER_REGISTRY):
+            self.assertFalse(cls.id_format(fn))
+
     def test_load_off(self):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
@@ -170,11 +179,11 @@ class TestFileLoader(FileIOTestCase):
         self.assertEqual(len(pqr.residues), 214)
         self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
         self.assertEqual(pqr.atoms[0].charge, -0.30)
-        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].solvent_radius, 1.85)
         self.assertEqual(pqr.atoms[0].atomic_number, 7)
         self.assertEqual(pqr.atoms[35].charge, -0.8)
         self.assertEqual(pqr.atoms[-1].charge, -0.67)
-        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].solvent_radius, 1.7)
         self.assertEqual(pqr.atoms[-1].atomic_number, 8)
         self.assertIsInstance(random.choice(pqr.residues).number, int)
         self.assertIsInstance(random.choice(pqr.atoms).number, int)
@@ -223,7 +232,7 @@ class TestFileLoader(FileIOTestCase):
         self.assertIsInstance(crd, amber.AmberParm)
 
 class TestPDBStructure(FileIOTestCase):
-    
+
     def setUp(self):
         self.pdb = get_fn('4lzt.pdb')
         self.pdbgz = get_fn('4lzt.pdb.gz')
@@ -958,14 +967,10 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
 
     def test_deprecations(self):
-        warnings.filterwarnings('error', category=DeprecationWarning)
         fn = get_fn('blah', written=True)
-        try:
-            parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-            self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
-            self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
-        finally:
-            warnings.filterwarnings('always', category=DeprecationWarning)
+        parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
+        self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
 
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
@@ -1246,11 +1251,11 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(len(pqr.residues), 214)
         self.assertAlmostEqual(sum(a.charge for a in pqr.atoms), -4, places=4)
         self.assertEqual(pqr.atoms[0].charge, -0.30)
-        self.assertEqual(pqr.atoms[0].radii, 1.85)
+        self.assertEqual(pqr.atoms[0].solvent_radius, 1.85)
         self.assertEqual(pqr.atoms[0].atomic_number, 7)
         self.assertEqual(pqr.atoms[35].charge, -0.8)
         self.assertEqual(pqr.atoms[-1].charge, -0.67)
-        self.assertEqual(pqr.atoms[-1].radii, 1.7)
+        self.assertEqual(pqr.atoms[-1].solvent_radius, 1.7)
         self.assertEqual(pqr.atoms[-1].atomic_number, 8)
 
     def test_pqr_writer(self):
@@ -1271,7 +1276,7 @@ class TestParmedPQRStructure(FileIOTestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
             self.assertAlmostEqual(a1.charge, a2.charge)
-            self.assertAlmostEqual(a1.radii, a2.radii)
+            self.assertAlmostEqual(a1.solvent_radius, a2.solvent_radius)
         self.assertEqual(pqr.get_coordinates().shape[0], 3)
         np.testing.assert_allclose(pqr.get_coordinates(0),
                                    parm.get_coordinates(0), atol=2e-3)
@@ -1286,7 +1291,7 @@ class TestParmedPQRStructure(FileIOTestCase):
     def test_pqr_standard_resnames(self):
         """ Test standard residue name replacement in PQR writing """
         struct = Structure()
-        a = Atom(name='CA', atomic_number=6, charge=0.5, radii=1.2)
+        a = Atom(name='CA', atomic_number=6, charge=0.5, solvent_radius=1.2)
         struct.add_atom(a, 'ASH', 2, 'A')
         fobj = StringIO()
         formats.PQRFile.write(struct, fobj, standard_resnames=True,
@@ -1301,7 +1306,7 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertEqual(len(pqr.atoms), 458)
         self.assertEqual(len(pqr.residues), 14)
         self.assertEqual(pqr.atoms[0].charge, -0.9526)
-        self.assertEqual(pqr.atoms[-1].radii, 0.8)
+        self.assertEqual(pqr.atoms[-1].solvent_radius, 0.8)
 
     def test_pqr_format_detection(self):
         """ Tests PDB file detection from contents """
@@ -1882,7 +1887,15 @@ class TestMol2File(FileIOTestCase):
         mol2 = formats.load_file(get_fn('tripos3.mol2'), structure=True)
         np.testing.assert_equal(mol2.box, [20, 20, 20, 90, 90, 90])
 
-    @unittest.skipIf(not HAS_GROMACS, 'Cannot test without gromacs')
+    def test_mol2_duplicate_atoms(self):
+        """ Tests parsing Mol2 files with duplicate atoms """
+        self.assertRaises(exceptions.Mol2Error, lambda:
+                formats.Mol2File.parse(get_fn('duplicate_names.mol2')))
+        mol2 = formats.Mol2File.parse(get_fn('duplicate_names.mol2'), structure=True)
+        self.assertEqual(len(mol2.atoms), 89)
+        self.assertEqual(len(mol2.bonds), 89)
+
+    @unittest.skipUnless(HAS_GROMACS, 'Cannot test without gromacs')
     def test_mol3_disulfide(self):
         """ Tests writing mol3 file w/ disulfide (for RESIDUECONNECT) """
         top = formats.load_file(get_fn('1aki.ff99sbildn.top'))['!:SOL']

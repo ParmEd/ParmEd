@@ -12,7 +12,7 @@ from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
                     DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed.constants import TINY
-from parmed.exceptions import CharmmError
+from parmed.exceptions import CharmmError, ParameterWarning
 from parmed.modeller import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import AtomicNum, element_by_mass
@@ -50,7 +50,7 @@ class CharmmParameterSet(ParameterSet):
 
     Parameters
     ----------
-    filenames : list of str
+    *filenames : variable length arguments of str
         The list of topology, parameter, and stream files to load into the
         parameter set. The following file type suffixes are recognized:
             .rtf, .top -- Residue topology file
@@ -60,49 +60,9 @@ class CharmmParameterSet(ParameterSet):
                     "top" is in the file name, it is a topology file.
                     Otherwise, ValueError is raised.
 
-    Attributes
-    ----------
-    atom_types : dict(str:AtomType)
-        Dictionary mapping the names of the atom types to the corresponding
-        AtomType instances
-    atom_types_str : dict(str:AtomType)
-        alias for atom_types
-    atom_types_int : dict(int:AtomType)
-        Dictionary mapping the serial indexes of the atom types to the
-        corresponding AtomType instances
-    atom_types_tuple : dict((str,int):AtomType)
-        Dictionary mapping the (name,number) tuple of the atom types to the
-        corresponding AtomType instances
-    bond_types : dict((str,str):AtomType)
-        Dictionary mapping the 2-element tuple of the names of the two atom
-        types involved in the bond to the BondType instances
-    angle_types : dict((str,str,str):AngleType)
-        Dictionary mapping the 3-element tuple of the names of the three atom
-        types involved in the angle to the AngleType instances
-    urey_bradley_types : dict((str,str,str):BondType)
-        Dictionary mapping the 3-element tuple of the names of the three atom
-        types involved in the angle to the BondType instances of the
-        Urey-Bradley terms
-    dihedral_types : dict((str,str,str,str):list(DihedralType))
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the dihedral to the DihedralType instances. Since each
-        torsion term can be a multiterm expansion, each item corresponding to a
-        key in this dict is a list of `DihedralType`s for each term in the
-        expansion
-    improper_types : dict((str,str,str,str):ImproperType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the improper torsion to the ImproperType instances
-    improper_periodic_types : dict((str,str,str,str):DihedralType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the improper torsion (modeled as a Fourier series) to
-        the DihedralType instances
-    cmap_types : dict((str,str,str,str,str):CmapType)
-        Dictionary mapping the 5-element tuple of the names of the five atom
-        types involved in the correction map to the CmapType instances
-    nbfix_types : dict((str,str):(float,float))
-        Dictionary mapping the 2-element tuple of the names of the two atom
-        types whose LJ terms are modified to the tuple of the (epsilon,rmin)
-        terms for that off-diagonal term
+    See Also
+    --------
+    :class:`parmed.parameters.ParameterSet`
     """
 
     def __copy__(self):
@@ -123,9 +83,8 @@ class CharmmParameterSet(ParameterSet):
 
     def __init__(self, *args):
         # Instantiate the list types
-        super(CharmmParameterSet, self).__init__(self)
+        super(CharmmParameterSet, self).__init__()
         self.parametersets = []
-        self.residues = dict()
         self.patches = dict()
         self._declared_nbrules = False
 
@@ -224,11 +183,8 @@ class CharmmParameterSet(ParameterSet):
         for key, typ in iteritems(params.improper_types):
             copy_paramtype(key, typ, new_params.improper_types)
         for key, typ in iteritems(params.cmap_types):
-            if len(key) == 8:
-                key = (key[0], key[1], key[2], key[3], key[7])
-                copy_paramtype(key, typ, new_params.cmap_types)
-            elif len(key) == 5:
-                copy_paramtype(key, typ, new_params.cmap_types)
+            assert len(key) == 8, '%d-key cmap type detected!' % len(key)
+            copy_paramtype(key, typ, new_params.cmap_types)
         for key, typ in iteritems(params.nbfix_types):
             copy_paramtype(key, typ, new_params.nbfix_types)
 
@@ -289,7 +245,7 @@ class CharmmParameterSet(ParameterSet):
         -------
         New CharmmParameterSet populated with parameters found in the provided
         files
-            
+
         Notes
         -----
         The RTF file is read first (if provided), followed by the PAR file,
@@ -374,7 +330,7 @@ class CharmmParameterSet(ParameterSet):
             if line.startswith('ANGLE') or line.startswith('THETA'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHEDRAL') or line.startswith('PHI'):
+            if line.startswith('DIHE') or line.startswith('PHI'):
                 section = 'DIHEDRALS'
                 continue
             if line.startswith('IMPROPER') or line.startswith('IMPHI'):
@@ -427,7 +383,7 @@ class CharmmParameterSet(ParameterSet):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
-            if line.startswith('END'): # should this be case-insensitive?
+            if line[:3].upper() == 'END': # should this be case-insensitive?
                 section = None
                 continue
             # If we have no section, skip
@@ -442,6 +398,8 @@ class CharmmParameterSet(ParameterSet):
             if section == 'ATOMS':
                 if not line.startswith('MASS'): continue # Should this happen?
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     idx = conv(words[1], int, 'atom type')
                     name = words[2].upper()
@@ -465,6 +423,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'BONDS':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -474,12 +434,23 @@ class CharmmParameterSet(ParameterSet):
                     raise CharmmError('Could not parse bonds.')
                 key = (min(type1, type2), max(type1, type2))
                 bond_type = BondType(k, req)
-                self.bond_types[(type1, type2)] = bond_type
-                self.bond_types[(type2, type1)] = bond_type
+                if key in self.bond_types:
+                    # See if the existing bond type list has a different value and replaces it with a warning
+                    if self.bond_types[key] != bond_type:
+                        # Replace. Warn if they are different
+                        warnings.warn('Replacing bond %r, %r with %r' %
+                                              (key, self.bond_types[key], bond_type), ParameterWarning)
+                        self.bond_types[(type1, type2)] = bond_type
+                        self.bond_types[(type2, type1)] = bond_type
+                else: # key not present
+                    self.bond_types[(type1, type2)] = bond_type
+                    self.bond_types[(type2, type1)] = bond_type
                 bond_type.penalty = penalty
                 continue
             if section == 'ANGLES':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -488,9 +459,22 @@ class CharmmParameterSet(ParameterSet):
                     theteq = conv(words[4], float, 'angle equilibrium value')
                 except IndexError:
                     raise CharmmError('Could not parse angles.')
+
                 angle_type = AngleType(k, theteq)
-                self.angle_types[(type1, type2, type3)] = angle_type
-                self.angle_types[(type3, type2, type1)] = angle_type
+                key = (type1, type2, type3)
+                if key in self.angle_types:
+                    # See if the existing angle type list has a different value
+                    # and replaces it with a warning
+                    if self.angle_types[key] != angle_type:
+                        # Replace. Warn if they are different
+                        warnings.warn('Replacing angle %r, %r with %r' %
+                                      (key, self.angle_types[key], angle_type),
+                                      ParameterWarning)
+                        self.bond_types[(type1, type2, type3)] = angle_type
+                        self.bond_types[(type3, type2, type1)] = angle_type
+                else: # key not present
+                    self.angle_types[(type1, type2, type3)] = angle_type
+                    self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
                 try:
                     ubk = conv(words[5], float, 'Urey-Bradley force constant')
@@ -505,6 +489,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'DIHEDRALS':
                 words = line.split()
+                if words[0].upper == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -528,8 +514,8 @@ class CharmmParameterSet(ParameterSet):
                         if dtype.per == dihedral.per:
                             # Replace. Warn if they are different
                             if dtype != dihedral:
-                                warnings.warn('Replacing dihedral %r with %r' % 
-                                              (dtype, dihedral))
+                                warnings.warn('Replacing dihedral %r with %r' %
+                                              (dtype, dihedral), ParameterWarning)
                             self.dihedral_types[key][i] = dihedral
                             replaced = True
                             break
@@ -543,6 +529,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'IMPROPER':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
@@ -581,6 +569,8 @@ class CharmmParameterSet(ParameterSet):
                 # This is the most complicated part, since cmap parameters span
                 # many lines. We won't do much error catching here.
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     holder = [float(w) for w in words]
                     current_cmap_data.extend(holder)
@@ -615,6 +605,8 @@ class CharmmParameterSet(ParameterSet):
             if section == 'NONBONDED':
                 # Now get the nonbonded values
                 words = line.split()
+                if words[0].upper == 'END':
+                    continue
                 try:
                     atype = words[0].upper()
                     # 1st column is ignored
@@ -681,6 +673,8 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if section == 'NBFIX':
                 words = line.split()
+                if words[0].upper() == 'END':
+                    continue
                 try:
                     at1 = words[0].upper()
                     at2 = words[1].upper()
@@ -721,8 +715,8 @@ class CharmmParameterSet(ParameterSet):
             for key in nonbonded_types:
                 self.atom_types_str[key].set_lj_params(*nonbonded_types[key])
         except KeyError:
-            raise RuntimeError('Atom type %s not present in AtomType list' %
-                               key)
+            warnings.warn('Atom type %s not present in AtomType list' % key,
+                          ParameterWarning)
         if parameterset is not None: self.parametersets.append(parameterset)
         if own_handle: f.close()
 

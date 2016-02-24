@@ -57,9 +57,9 @@ def zero_ep_frc(frc, struct):
         if isinstance(atom, ExtraPoint):
             frc[i] = vec0
 
-@unittest.skipIf(not HAS_OPENMM, "Cannot test without OpenMM")
-@unittest.skipIf(not utils.HAS_GROMACS, "Cannot test without GROMACS")
-class TestGromacsTop(utils.TestCaseRelative):
+@unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
+@unittest.skipUnless(utils.HAS_GROMACS, "Cannot test without GROMACS")
+class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
     def setUp(self):
@@ -293,6 +293,38 @@ class TestGromacsTop(utils.TestCaseRelative):
         self.assertAlmostEqual(energies['dihedral'], 0.0057758656, places=4)
         self.assertAlmostEqual(energies['rb_torsion'], 55.603030624, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 327.954397827, places=4)
+        # Now make sure it can be set with PME
+        system = top.createSystem(nonbondedMethod=app.PME,
+                                  nonbondedCutoff=8*u.angstroms)
+        n = 0
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce):
+                self.assertAlmostEqualQuantities(force.getCutoffDistance(),
+                                                  8*u.angstroms)
+                self.assertEqual(force.getNonbondedMethod(), force.PME)
+                n += 1
+            elif isinstance(force, mm.CustomNonbondedForce):
+                self.assertAlmostEqualQuantities(force.getCutoffDistance(),
+                                                  8*u.angstroms)
+                self.assertEqual(force.getNonbondedMethod(), force.CutoffPeriodic)
+                n += 1
+        self.assertEqual(n, 2)
+        # Now try with non-periodic cutoff
+        system = top.createSystem(nonbondedMethod=app.CutoffNonPeriodic,
+                                  nonbondedCutoff=16*u.angstroms,
+                                  switchDistance=14*u.angstroms)
+        n = 0
+        for force in system.getForces():
+            if isinstance(force, mm.NonbondedForce) or isinstance(force,
+                    mm.CustomNonbondedForce):
+                self.assertAlmostEqualQuantities(force.getCutoffDistance(),
+                                                  16*u.angstroms)
+                self.assertEqual(force.getNonbondedMethod(), force.CutoffNonPeriodic)
+                self.assertTrue(force.getUseSwitchingFunction())
+                self.assertAlmostEqualQuantities(force.getSwitchingDistance(),
+                                                 14*u.angstroms)
+                n += 1
+        self.assertEqual(n, 2)
 
     def test_round_trip(self):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """

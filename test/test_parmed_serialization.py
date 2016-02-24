@@ -32,7 +32,8 @@ class TestParmedSerialization(unittest.TestCase):
                         name=random.choice(uppercase)+random.choice(uppercase),
                         type=random.choice(uppercase)+random.choice(uppercase),
                         charge=random.random()*2-1, mass=random.random()*30+1,
-                        nb_idx=random.randint(1, 20), radii=random.random()*2,
+                        nb_idx=random.randint(1, 20),
+                        solvent_radius=random.random()*2,
                         screen=random.random()*2, tree='M',
                         join=random.random()*2, irotat=random.random(),
                         occupancy=random.random(), bfactor=random.random()*10,
@@ -48,7 +49,7 @@ class TestParmedSerialization(unittest.TestCase):
         pickle.dump(atom, fobj)
         fobj.seek(0)
         unpickled = pickle.load(fobj)
-        
+
         self.assertIsInstance(unpickled, pmd.Atom)
         self._equal_atoms(unpickled, atom)
 
@@ -139,6 +140,8 @@ class TestParmedSerialization(unittest.TestCase):
         """ Tests the serialization of AmberParm """
         structure = pmd.load_file(utils.get_fn('ash.parm7'))
         unpickled = pickle.loads(pickle.dumps(structure))
+        self.assertFalse(structure.unknown_functional)
+        self.assertFalse(structure.unknown_functional)
 
         self._compare_structures(unpickled, structure)
 
@@ -155,6 +158,10 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(structure.version, unpickled.version)
         self.assertEqual(structure.name, unpickled.name)
         self.assertIs(pmd.amber.AmberParm, type(unpickled))
+
+        # Now check that unknown_functional gets properly deserialized
+        structure.unknown_functional = True
+        self.assertTrue(pickle.loads(pickle.dumps(structure)).unknown_functional)
 
     def test_chamberparm_serialization(self):
         """ Tests the serialization of ChamberParm """
@@ -210,7 +217,7 @@ class TestParmedSerialization(unittest.TestCase):
         # Check metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
-                    'resolution', 'related_entries'):
+                    'resolution', 'related_entries', 'space_group'):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
     def test_pdbtraj_serialization(self):
@@ -235,7 +242,7 @@ class TestParmedSerialization(unittest.TestCase):
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacstop_serialization(self):
         """ Tests the serialization of a GromacsTopologyFile """
         structure = pmd.load_file(os.path.join(utils.get_fn('03.AlaGlu'),
@@ -249,7 +256,7 @@ class TestParmedSerialization(unittest.TestCase):
         self._compare_parametersets(structure.parameterset,
                                     unpickled.parameterset)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacscharmm_serialization(self):
         """ Tests the serialization of a CHARMM FF Gromacs topology """
         structure = pmd.load_file(utils.get_fn('1aki.charmm27.solv.top'))

@@ -5,14 +5,6 @@ from __future__ import print_function, division, absolute_import
 
 __all__ = ['genopen']
 
-try:
-    import bz2
-except ImportError:
-    bz2 = None
-try:
-    import gzip
-except ImportError:
-    gzip = None
 from io import TextIOWrapper, BytesIO
 import os
 from parmed.utils.six import PY2
@@ -78,8 +70,7 @@ def genopen(name, mode='r'):
             raise IOError('Could not open %s: %s' % (name, e))
 
     if name.endswith('.bz2'):
-        if bz2 is None:
-            raise ImportError('bz2 unavailable; cannot read %s' % name)
+        import bz2
         # BZ2File does not have a way of taking an arbitrary file-like object in
         # Python 2, so we have to read everything into memory, decompress it,
         # and then pass it back as a BytesIO object wrapped with TextIOWrapper
@@ -115,8 +106,7 @@ def genopen(name, mode='r'):
                 name = open_url
             return TextIOWrapper(bz2.BZ2File(name, mode+'b'))
     elif name.endswith('.gz'):
-        if gzip is None:
-            raise ImportError('gzip is unavailable; cannot read %s' % name)
+        import gzip
         if PY2:
             if is_url:
                 # addinfourl in Python 2 does not have a "tell" attribute, so we

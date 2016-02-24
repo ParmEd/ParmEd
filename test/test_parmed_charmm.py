@@ -17,12 +17,16 @@ import random
 import unittest
 import utils
 from utils import HAS_GROMACS
+import warnings
 
+# Suppress warning from overwriting parameters
+warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
 get_fn = utils.get_fn
+
 
 class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
-    
+
     def test_charmm_crd(self):
         """ Test CHARMM coordinate file parser """
         self.assertTrue(charmmcrds.CharmmCrdFile.id_format(get_fn('1tnm.crd')))
@@ -118,7 +122,7 @@ class TestCharmmCoords(utils.FileIOTestCase):
 
 class TestCharmmPsf(utils.FileIOTestCase):
     """ Test CHARMM PSF file capabilities """
-    
+
     def test_private_internals(self):
         """ Test private internal functions for CHARMM psf file """
         # _catchindexerror
@@ -326,7 +330,7 @@ class TestCharmmPsf(utils.FileIOTestCase):
         self.assertEqual(len(cpsf.impropers), 295)
         self.assertEqual(len(cpsf.residues), 109)
         self.assertEqual(len(cpsf.title), 3)
-    
+
     def test_vmd_psf(self):
         """ Test parsing of CHARMM PSF from VMD """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala_autopsf.psf'))
@@ -577,8 +581,10 @@ class TestCharmmParameters(utils.FileIOTestCase):
     def test_single_parameterset(self):
         """ Test reading a single parameter set """
         # Make sure we error if trying to load parameters before topology
-        self.assertRaises(RuntimeError, lambda: parameters.CharmmParameterSet(
-                                                get_fn('par_all22_prot.inp')))
+        warnings.filterwarnings('error', category=exceptions.ParameterWarning)
+        self.assertRaises(exceptions.ParameterWarning, lambda:
+                parameters.CharmmParameterSet(get_fn('par_all22_prot.inp')))
+        warnings.filterwarnings('always', category=exceptions.ParameterWarning)
         # Test error handling for loading files with unsupported extensions
         self.assertRaises(ValueError, lambda:
                 parameters.CharmmParameterSet(get_fn('trx.prmtop'))
@@ -664,6 +670,9 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(uniques(params.dihedral_types), 81)
         self.assertEqual(uniques(params.improper_types), 20)
         self.assertEqual(uniques(params.urey_bradley_types), 42)
+        # Make sure all cmaps have 8 atom type keys
+        for key in params.cmap_types:
+            self.assertEqual(len(key), 8)
 
     def test_param_file_only(self):
         """ Test reading only a parameter file with no RTF (CHARMM36) """
@@ -677,7 +686,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
     def test_collection(self):
         """ Test reading a large number of parameter files """
         p = parameters.CharmmParameterSet(
-                    get_fn('top_all36_prot.rtf'), 
+                    get_fn('top_all36_prot.rtf'),
                     get_fn('top_all36_carb.rtf'),
                     get_fn('par_all36_prot.prm'),
                     get_fn('par_all36_carb.prm'),
@@ -698,6 +707,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(uniques(p.improper_types), 15)
         self.assertEqual(uniques(p.nbfix_types), 6)
         self.assertEqual(uniques(p.urey_bradley_types), 45)
+        for key in p.cmap_types:
+            self.assertEqual(len(key), 8)
 
     def test_write_params(self):
         """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
@@ -855,13 +866,6 @@ class TestCharmmParameters(utils.FileIOTestCase):
                 os.path.join(pmd.gromacs.GROMACS_TOPDIR,
                              'charmm27.ff', 'forcefield.itp')
         )
-        # Make sure it can handle 8-key CMAPs
-        types = OrderedDict()
-        for key, typ in iteritems(gmx.parameterset.cmap_types):
-            assert len(key) == 5, 'Unexpected cmap key length'
-            types[(key[0], key[1], key[2], key[3],
-                   key[1], key[2], key[3], key[4])] = typ
-        gmx.parameterset.cmap_types = types
         gmx.parameterset.nbfix_types[('X', 'Y')] = (2.0, 3.0)
         from_gmx2 = parameters.CharmmParameterSet.from_parameterset(gmx.parameterset)
         for (key1, typ1), (key2, typ2) in zip(iteritems(from_gmx.cmap_types),
@@ -870,6 +874,14 @@ class TestCharmmParameters(utils.FileIOTestCase):
             self.assertEqual(typ1, typ2)
         self.assertEqual(len(from_gmx2.nbfix_types), 1)
         self.assertEqual(from_gmx2.nbfix_types[('X', 'Y')], (2.0, 3.0))
+
+    def test_warning(self):
+        """ Tests warning when overwriting parameters"""
+        warnings.filterwarnings('error', category=exceptions.ParameterWarning)
+        self.assertRaises(exceptions.ParameterWarning, lambda: parameters.CharmmParameterSet(
+                get_fn('toppar_all36_prot_aldehydes.str'),
+                get_fn('toppar_all36_na_modifications.str')))
+
 
     def _check_uppercase_types(self, params):
         for aname, atom_type in iteritems(params.atom_types):
@@ -956,6 +968,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         else:
             self.assertEqual(d1, d2)
         for key, item2 in iteritems(set2.cmap_types):
+            self.assertEqual(len(key), 8)
             self.assertEqual(set1.cmap_types[typenames(key)], item2)
         # Atom types
         a1, a2 = get_typeset(set1.atom_types, set2.atom_types)
