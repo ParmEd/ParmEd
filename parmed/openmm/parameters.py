@@ -219,7 +219,7 @@ class OpenMMParameterSet(ParameterSet):
                     if tag not in sub_content:
                         raise KeyError('Content of an attribute-containing element '
                                        'specified incorrectly.')
-                    attributes = [key for key in content if key != tag]
+                    attributes = [key for key in sub_content if key != tag]
                     element_content = sub_content[tag]
                     dest.write('  <%s' % tag)
                     for attribute in attributes:
