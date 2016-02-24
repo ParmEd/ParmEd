@@ -210,23 +210,23 @@ class OpenMMParameterSet(ParameterSet):
         provenance = provenance if provenance is not None else {}
         for tag, content in iteritems(provenance):
             if tag == 'DateGenerated': continue
-            if isinstance(content, string_types):
-                dest.write('  <%s>%s</%s>\n' % (tag, content, tag))
-            elif isinstance(content, list):
-                for sub in content:
-                    dest.write('  <%s>%s</%s>\n' % (tag, sub, tag))
-            elif isinstance(content, dict):
-                if tag not in content:
-                    raise KeyError('Content of an attribute-containing element '
-                                   'specified incorrectly.')
-                attributes = [key for key in content if key != tag]
-                element_content = content[tag]
-                dest.write('  <%s' % tag)
-                for attribute in attributes:
-                    dest.write(' %s="%s"' % (attribute, content[attribute]))
-                dest.write('>%s</%s>\n' % (element_content, tag))
-            else:
-                raise TypeError('Incorrect type of the %s element content' % tag)
+            if not isinstance(content, list):
+                content = [content]
+            for sub_content in content:
+                if isinstance(sub_content, string_types):
+                    dest.write('  <%s>%s</%s>\n' % (tag, sub_content, tag))
+                elif isinstance(sub_content, dict):
+                    if tag not in sub_content:
+                        raise KeyError('Content of an attribute-containing element '
+                                       'specified incorrectly.')
+                    attributes = [key for key in sub_content if key != tag]
+                    element_content = sub_content[tag]
+                    dest.write('  <%s' % tag)
+                    for attribute in attributes:
+                        dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
+                    dest.write('>%s</%s>\n' % (element_content, tag))
+                else:
+                    raise TypeError('Incorrect type of the %s element content' % tag)
         dest.write(' </Info>\n')
 
     def _write_omm_atom_types(self, dest, skip_types):
