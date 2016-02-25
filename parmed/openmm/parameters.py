@@ -260,7 +260,7 @@ class OpenMMParameterSet(ParameterSet):
             if residue.head is not None:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.head.name)
-            if residue.tail is not None and residue.tail != residue.head:
+            if residue.tail is not None and residue.tail is not residue.head:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.tail.name)
             dest.write('  </Residue>\n')
