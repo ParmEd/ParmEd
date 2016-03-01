@@ -392,11 +392,11 @@ def _process_nonbonded(struct, force):
     bond_graph_exceptions = defaultdict(set)
     for atom in struct.atoms:
         for a2 in atom.bond_partners:
-            if atom != a2:
+            if atom is not a2:
                 bond_graph_exceptions[atom].add(a2)
             for a3 in a2.bond_partners:
                 if a3 is atom: continue
-                if atom != a3:
+                if atom is not a3:
                     bond_graph_exceptions[atom].add(a3)
 
     # TODO should we compress exception types?
