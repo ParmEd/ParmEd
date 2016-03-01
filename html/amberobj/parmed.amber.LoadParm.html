@@ -23,13 +23,13 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The parmed.amber package" href="../amber.html" />
     <link rel="next" title="parmed.amber.AmberMask" href="parmed.amber.AmberMask.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -41,27 +41,27 @@
         <li class="right" >
           <a href="parmed.amber.AmberMask.html" title="parmed.amber.AmberMask"
              accesskey="N">next</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../amber.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.amber</span></code> package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-amber-loadparm">
 <h1>parmed.amber.LoadParm<a class="headerlink" href="#parmed-amber-loadparm" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="parmed.amber.LoadParm">
-<tt class="descclassname">parmed.amber.</tt><tt class="descname">LoadParm</tt><big>(</big><em>parmname</em>, <em>xyz=None</em>, <em>box=None</em>, <em>rst7_name=None</em><big>)</big><a class="headerlink" href="#parmed.amber.LoadParm" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.amber.</code><code class="descname">LoadParm</code><span class="sig-paren">(</span><em>parmname</em>, <em>xyz=None</em>, <em>box=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/readparm.html#LoadParm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.LoadParm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a topology file using the correct class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parmname</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parmname</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The name of the topology file to load</p>
 </div></blockquote>
@@ -78,7 +78,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>parm</strong> : <a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><tt class="xref py py-class docutils literal"><span class="pre">AmberParm</span></tt></a> (or subclass)</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>parm</strong> : <a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><code class="xref py py-class docutils literal"><span class="pre">AmberParm</span></code></a> (or subclass)</p>
 <blockquote class="last">
 <div><p>This function parses the topology file, determines if it is an
 Amber-style (i.e., <em>traditional</em> Amber force field), Chamber-style
@@ -97,14 +97,16 @@ and then returns an instance of the appropriate type.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/amberobj/parmed.amber.LoadParm.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/amberobj/parmed.amber.LoadParm.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -121,7 +123,7 @@ and then returns an instance of the appropriate type.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -133,13 +135,13 @@ and then returns an instance of the appropriate type.</p>
         <li class="right" >
           <a href="parmed.amber.AmberMask.html" title="parmed.amber.AmberMask"
              >next</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../amber.html" >The <code class="docutils literal"><span class="pre">parmed.amber</span></code> package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

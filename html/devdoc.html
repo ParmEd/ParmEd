@@ -23,11 +23,11 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
@@ -65,9 +65,9 @@ fails! If the test doesn&#8217;t fail before you&#8217;ve written any code, then
 is clearly not being run, or not being run correctly (which means there is no
 way that your test could prevent a breakage in the future).</p>
 <p>Once you have a failing test case, write code until the test case passes. Then
-add more test until the test case fails again. Then update the test case until
-it fails again. Rinse-and-repeat until the functionality you are adding is
-complete.</p>
+add more test until the test case fails again. Then update the code until the
+test passes again. Rinse-and-repeat until the functionality you are adding is
+complete and fully-tested.</p>
 </div>
 <div class="section" id="coding-style">
 <h1>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h1>
@@ -80,8 +80,8 @@ tabstops, and all indentation must be consistent.</li>
 <li>Source code should be ASCII encoded</li>
 <li>Please make sure comments and docstrings are written in English</li>
 <li>Use only absolute imports or <em>explicit</em> relative imports</li>
-<li>Always use <tt class="docutils literal"><span class="pre">print</span></tt> as a function (via the <tt class="docutils literal"><span class="pre">print_function</span></tt> futures
-import)</li>
+<li>Always use <code class="docutils literal"><span class="pre">print</span></code> as a function (via the <code class="docutils literal"><span class="pre">print_function</span></code> futures
+import) &#8211; see below for why this is a hard requirement.</li>
 </ul>
 </div></blockquote>
 <p>Things I would like to see, but are not as important:</p>
@@ -89,40 +89,40 @@ import)</li>
 <div><ul class="simple">
 <li>Try to keep lines limited to 80 characters, but do not sacrifice
 readability</li>
-<li>Class definitions should be done in <tt class="docutils literal"><span class="pre">CamelCase</span></tt> naming style. Method,
+<li>Class definitions should be done in <code class="docutils literal"><span class="pre">CamelCase</span></code> naming style. Method,
 attribute, and variable names should be done in
-<tt class="docutils literal"><span class="pre">underscore_separated_style</span></tt>. Constants should be named in <tt class="docutils literal"><span class="pre">ALL_CAPS</span></tt>.</li>
+<code class="docutils literal"><span class="pre">underscore_separated_style</span></code>. Constants should be named in <code class="docutils literal"><span class="pre">ALL_CAPS</span></code>.</li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="target-python-version">
 <h1>Target Python Version<a class="headerlink" href="#target-python-version" title="Permalink to this headline">¶</a></h1>
 <p>ParmEd officially supports Python 2.7 and Python 3.3+ in the same code base
-through the use of the <tt class="docutils literal"><span class="pre">six</span></tt> module (although some earlier versions of Python
+through the use of the <code class="docutils literal"><span class="pre">six</span></code> module (although some earlier versions of Python
 <em>may</em> work, no effort is made to support Python 2.6 and lower or Python 3.2 and
-lower). The <tt class="docutils literal"><span class="pre">six</span></tt> module is included as a subpackage in the <tt class="docutils literal"><span class="pre">parmed.utils</span></tt>
+lower). The <code class="docutils literal"><span class="pre">six</span></code> module is included as a subpackage in the <code class="docutils literal"><span class="pre">parmed.utils</span></code>
 package, and all components should be imported from there.</p>
-<p>In particular, the <tt class="docutils literal"><span class="pre">range</span></tt> and <tt class="docutils literal"><span class="pre">zip</span></tt> builtins should be imported from
-<tt class="docutils literal"><span class="pre">parmed.utils.six.moves</span></tt> rather than relying on the standard versions. This is
-because in Python 3, <tt class="docutils literal"><span class="pre">range</span></tt> and <tt class="docutils literal"><span class="pre">zip</span></tt> return efficient iterators, while in
-Python 2 they return (sometimes <em>very</em> inefficient lists). The Python
-2-equivalent versions of the <tt class="docutils literal"><span class="pre">range</span></tt> and <tt class="docutils literal"><span class="pre">zip</span></tt> iterators are <tt class="docutils literal"><span class="pre">xrange</span></tt> and
-<tt class="docutils literal"><span class="pre">itertools.izip</span></tt>, respectively, which are the <em>actual</em> functions defined
-within <tt class="docutils literal"><span class="pre">parmed.utils.six.moves</span></tt> for Python 2.</p>
+<p>In particular, the <code class="docutils literal"><span class="pre">range</span></code> and <code class="docutils literal"><span class="pre">zip</span></code> builtins should be imported from
+<code class="docutils literal"><span class="pre">parmed.utils.six.moves</span></code> rather than relying on the standard versions. This is
+because in Python 3, <code class="docutils literal"><span class="pre">range</span></code> and <code class="docutils literal"><span class="pre">zip</span></code> return efficient iterators, while in
+Python 2 they return potentially inefficient lists. The Python 2-equivalent
+versions of the <code class="docutils literal"><span class="pre">range</span></code> and <code class="docutils literal"><span class="pre">zip</span></code> iterators are <code class="docutils literal"><span class="pre">xrange</span></code> and
+<code class="docutils literal"><span class="pre">itertools.izip</span></code>, respectively, which are the <em>actual</em> functions defined
+within <code class="docutils literal"><span class="pre">parmed.utils.six.moves</span></code> for Python 2.</p>
 <p>Supporting both Python 2 and Python 3 in the same code base means that you must
-never use the <tt class="docutils literal"><span class="pre">print</span></tt> statement, implicit integer division, or relative
+never use the <code class="docutils literal"><span class="pre">print</span></code> statement, implicit integer division, or relative
 imports (as those will <em>not</em> work in Python 3). You are encouraged to put the
 following line at the top of each Python module in ParmEd:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_imports</span><span class="p">,</span> <span class="n">print_function</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_imports</span><span class="p">,</span> <span class="n">print_function</span>
 </pre></div>
 </div>
 <p>In addition to supporting CPython 2.7 and 3.3+, ParmEd also strives to support
-the <tt class="docutils literal"><span class="pre">pypy</span></tt> interpreter.  Under the <tt class="docutils literal"><span class="pre">pypy</span></tt> interpreter, PDB file parsing
+the <code class="docutils literal"><span class="pre">pypy</span></code> interpreter.  Under the <code class="docutils literal"><span class="pre">pypy</span></code> interpreter, PDB file parsing
 is about 3-5x faster <em>using the same code</em>. Since ParmEd parses a substantial
 amount of metadata from RCSB/wwPDB files, the added efficiency can be useful for
-mining the PDB. As such, modules that require CPython (such as <tt class="docutils literal"><span class="pre">scipy</span></tt>,
-<tt class="docutils literal"><span class="pre">scikit-learn</span></tt>, <tt class="docutils literal"><span class="pre">matplotlib</span></tt>, ... etc.) must be made optional so that the
-functionality <em>not</em> relying on those modules can be used within <tt class="docutils literal"><span class="pre">pypy</span></tt>.</p>
+mining the PDB. As such, modules that require CPython (such as <code class="docutils literal"><span class="pre">scipy</span></code>,
+<code class="docutils literal"><span class="pre">scikit-learn</span></code>, <code class="docutils literal"><span class="pre">matplotlib</span></code>, ... etc.) must be made optional so that the
+functionality <em>not</em> relying on those modules can be used within <code class="docutils literal"><span class="pre">pypy</span></code>.</p>
 </div>
 <div class="section" id="tests">
 <h1>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h1>
@@ -131,30 +131,30 @@ under 1 GB in size, so test files should be relatively small. They should also
 be kept small enough to run in a short amount of time, but they should also
 ensure that the function being tested has as close to full coverage as can be
 managed.</p>
-<p>The ParmEd tests are run in the <tt class="docutils literal"><span class="pre">ParmEd/tests</span></tt> directory with the command:</p>
-<div class="highlight-python"><div class="highlight"><pre>nosetests -vs .
+<p>The ParmEd tests are run in the <code class="docutils literal"><span class="pre">ParmEd/tests</span></code> directory with the command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>nosetests -vs .
 </pre></div>
 </div>
-<p>which will automatically find and run all <tt class="docutils literal"><span class="pre">test_*.py</span></tt> files. The tests are
-implemented using the <tt class="docutils literal"><span class="pre">unittest</span></tt> module in the Python standard library. Look
+<p>which will automatically find and run all <code class="docutils literal"><span class="pre">test_*.py</span></code> files. The tests are
+implemented using the <code class="docutils literal"><span class="pre">unittest</span></code> module in the Python standard library. Look
 at existing tests for examples.</p>
 <p>While developing new functionality, I find it helpful to run the tests directly
 from the ParmEd directory with the following command:</p>
-<div class="highlight-python"><div class="highlight"><pre>nosetests -vs test/test_parmed_structure.py
+<div class="highlight-python"><div class="highlight"><pre><span></span>nosetests -vs test/test_parmed_structure.py
 </pre></div>
 </div>
-<p>Obviously in this case, <tt class="docutils literal"><span class="pre">test_parmed_structure.py</span></tt> is replaced with whichever
-test module you are working on. You can select <em>specific</em> tests using the <tt class="docutils literal"><span class="pre">-m</span></tt>
+<p>Obviously in this case, <code class="docutils literal"><span class="pre">test_parmed_structure.py</span></code> is replaced with whichever
+test module you are working on. You can select <em>specific</em> tests using the <code class="docutils literal"><span class="pre">-m</span></code>
 flag specifying a regex that matches the test case method.  For example:</p>
-<div class="highlight-python"><div class="highlight"><pre>nosetests -vs test/test_parmed_structure.py -m AddAtom
+<div class="highlight-python"><div class="highlight"><pre><span></span>nosetests -vs test/test_parmed_structure.py -m add_atom
 </pre></div>
 </div>
-<p>will test both the <tt class="docutils literal"><span class="pre">tesAddAtom</span></tt> and <tt class="docutils literal"><span class="pre">testAddAtomToResidue</span></tt> methods. This is
-an easy way to run tests quickly while working on new methods <em>without</em> having
-to run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt> after every change. Note that when you run
-tests from the root ParmEd directory, however, the imported ParmEd repository
-will not have any Python extensions installed (meaning that the tests relying on
-them &#8211; like the test for the Amber optimized reader &#8211; will fail).</p>
+<p>will test both the <code class="docutils literal"><span class="pre">test_add_atom</span></code> and <code class="docutils literal"><span class="pre">test_add_atom_to_residue</span></code> methods.
+This is an easy way to run tests quickly while working on new methods <em>without</em>
+having to run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> after every change. Note that when you
+run tests from the root ParmEd directory, however, the imported ParmEd
+repository will not have any Python extensions installed (meaning that the tests
+relying on them &#8211; like the test for the Amber optimized reader &#8211; will fail).</p>
 <p>ParmEd utilizes the Travis continuous integration server to perform automatic
 tests of all pull requests. Tests generally must pass these tests before being
 considered for merge into the master branch.</p>
@@ -162,20 +162,20 @@ considered for merge into the master branch.</p>
 <div class="section" id="documentation">
 <h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
 <p>Just as important as the code is <em>documenting</em> the code so that users can learn
-how to use it. Documentation is tracked as reStructuredText (<tt class="docutils literal"><span class="pre">.rst</span></tt>), and
+how to use it. Documentation is tracked as reStructuredText (<code class="docutils literal"><span class="pre">.rst</span></code>), and
 <a class="reference external" href="http://sphinx-doc.org/">Sphinx</a> is used to render the documentation. Changes
 to the documentation can be made part of the pull request adding new
 functionality, or it can be its own pull request dedicated entirely to
 documentation improvements.</p>
 <p>The actual web docs are generated periodically and pushed directly to the
-<tt class="docutils literal"><span class="pre">gh-pages</span></tt> branch. This process is not handled by PRs.</p>
+<code class="docutils literal"><span class="pre">gh-pages</span></code> branch. This process is not handled by PRs.</p>
 </div>
 
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -187,12 +187,14 @@ documentation improvements.</p>
 <li><a class="reference internal" href="#documentation">Documentation</a></li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/devdoc.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/devdoc.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -209,7 +211,7 @@ documentation improvements.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -218,12 +220,12 @@ documentation improvements.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

@@ -370,7 +370,7 @@ interpolate
 
 .. code-block:: none
 
-    interpolate <nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] [startnum <num>
+    interpolate <nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] [startnum <num>]
 
 Interpolates between two topology files (VDW and electrostatic terms only). If ``[eleconly]`` is present, only the charges will be interpolated. ``<nparm>`` is the number of 'interpolated' topology files you want (in addition to the two end-points). The second prmtop must be specified if there are more than 2 parms currently loaded in the ParmEd parm_ list. startnum has no effect on the generated prmtops, but it can be used to control the names of the outputted topology files.
 
@@ -621,7 +621,7 @@ printLJTypes
 
 .. code-block:: none
 
-    printLJTypes [<mask>|<type name>]
+    printLJTypes [<mask>|<type idx>]
 
 Prints the Lennard Jones type index for the given atom mask or, if no value is given, the LJ type index for each atom.
 
@@ -724,9 +724,9 @@ strip
 
 .. code-block:: none
 
-    strip <mask>
+    strip <mask> [nobox]
 
-Deletes the atoms specified by ``<mask>`` from the topology file and rebuilds the topology file according to the parameters that remain.
+Deletes the atoms specified by ``<mask>`` from the topology file and rebuilds the topology file according to the parameters that remain. If nobox is provided, the unit cell information is discarded (useful when stripping solvent to run an aperiodic implicit solvent calculation).
 
 summary
 ~~~~~~~

@@ -14,30 +14,28 @@ parmed.amber.ChamberParm
    .. autosummary::
    
       ~ChamberParm.__init__
-      ~ChamberParm.addFlag
       ~ChamberParm.add_atom
       ~ChamberParm.add_atom_to_residue
       ~ChamberParm.add_flag
       ~ChamberParm.copy
       ~ChamberParm.createSystem
-      ~ChamberParm.deleteFlag
       ~ChamberParm.delete_flag
       ~ChamberParm.fill_LJ
       ~ChamberParm.from_rawdata
       ~ChamberParm.from_structure
+      ~ChamberParm.get_box
+      ~ChamberParm.get_coordinates
       ~ChamberParm.has_1012
       ~ChamberParm.has_NBFIX
       ~ChamberParm.id_format
       ~ChamberParm.initialize_topology
       ~ChamberParm.is_changed
+      ~ChamberParm.join_dihedrals
       ~ChamberParm.load_atom_info
-      ~ChamberParm.load_coordinates
-      ~ChamberParm.load_from_rawdata
-      ~ChamberParm.load_from_structure
+      ~ChamberParm.load_dataframe
       ~ChamberParm.load_pointers
       ~ChamberParm.load_rst7
       ~ChamberParm.load_structure
-      ~ChamberParm.load_velocities
       ~ChamberParm.omm_add_constraints
       ~ChamberParm.omm_angle_force
       ~ChamberParm.omm_bond_force
@@ -63,14 +61,14 @@ parmed.amber.ChamberParm
       ~ChamberParm.recalculate_LJ
       ~ChamberParm.rediscover_molecules
       ~ChamberParm.remake_parm
+      ~ChamberParm.save
       ~ChamberParm.set_version
       ~ChamberParm.split
       ~ChamberParm.strip
       ~ChamberParm.to_dataframe
       ~ChamberParm.unchange
       ~ChamberParm.update_dihedral_exclusions
-      ~ChamberParm.view
-      ~ChamberParm.writeParm
+      ~ChamberParm.view_as
       ~ChamberParm.write_cif
       ~ChamberParm.write_parm
       ~ChamberParm.write_pdb
@@ -103,14 +101,17 @@ parmed.amber.ChamberParm
       ~ChamberParm.angles_without_h
       ~ChamberParm.bonds_inc_h
       ~ChamberParm.bonds_without_h
+      ~ChamberParm.box
       ~ChamberParm.box_vectors
       ~ChamberParm.chamber
+      ~ChamberParm.combining_rule
+      ~ChamberParm.coordinates
       ~ChamberParm.dihedrals_inc_h
       ~ChamberParm.dihedrals_without_h
       ~ChamberParm.has_cmap
       ~ChamberParm.positions
-      ~ChamberParm.solvent_residues
       ~ChamberParm.topology
       ~ChamberParm.velocities
+      ~ChamberParm.view
    
    

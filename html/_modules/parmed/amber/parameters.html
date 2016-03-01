@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.amber" href="../amber.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,20 +37,18 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">parmed.amber</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.amber.parameters</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains classes for parsing and processing Amber parameter files.</span>
 
 <span class="sd">Author: Jason M. Swails</span>
@@ -59,12 +57,15 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">TINY</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">AmberWarning</span><span class="p">,</span> <span class="n">ParameterWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.modeller.residue</span> <span class="kn">import</span> <span class="n">ResidueTemplateContainer</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="kn">import</span> <span class="n">Mol2File</span>
 <span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">parmed.parameters</span> <span class="kn">import</span> <span class="n">ParameterSet</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">element_by_mass</span><span class="p">,</span> <span class="n">AtomicNum</span>
@@ -72,27 +73,32 @@
                                     <span class="n">DihedralTypeList</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">map</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="c"># parameter file regexes</span>
-<span class="n">subs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">FLOATRE</span><span class="o">=</span><span class="s">r&#39;([+-]?(?:\d+(?:\.\d*)?|\.\d+))&#39;</span><span class="p">)</span>
-<span class="n">_bondre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;(..?)-(..?) *</span><span class="si">%(FLOATRE)s</span><span class="s"> *</span><span class="si">%(FLOATRE)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
-<span class="n">_anglere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;(..?)-(..?)-(..?) &#39;</span> <span class="s">&#39;*</span><span class="si">%(FLOATRE)s</span><span class="s"> *</span><span class="si">%(FLOATRE)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
-<span class="n">_dihedre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;(..?)-(..?)-(..?)-(..?) *</span><span class="si">%(FLOATRE)s</span><span class="s"> &#39;</span>
-                      <span class="s">&#39;*</span><span class="si">%(FLOATRE)s</span><span class="s"> *</span><span class="si">%(FLOATRE)s</span><span class="s"> *</span><span class="si">%(FLOATRE)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
-<span class="n">_sceere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;SCEE=</span><span class="si">%(FLOATRE)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
-<span class="n">_scnbre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;SCNB=</span><span class="si">%(FLOATRE)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
-<span class="n">_impropre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;(..?)-(..?)-(..?)-(..?) &#39;</span>
-                       <span class="s">&#39;*</span><span class="si">%(FLOATRE)s</span><span class="s"> *</span><span class="si">%(FLOATRE)s</span><span class="s"> *</span><span class="si">%(FLOATRE)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="c1"># parameter file regexes</span>
+<span class="n">subs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">FLOATRE</span><span class="o">=</span><span class="s1">r&#39;([+-]?(?:\d+(?:\.\d*)?|\.\d+))&#39;</span><span class="p">,</span>
+            <span class="n">FILENAMERE</span><span class="o">=</span><span class="s1">r&#39;&#39;&#39;(&quot;.+?&quot;|&#39;.+?&#39;|[\S]*)&#39;&#39;&#39;</span><span class="p">)</span>
+<span class="n">_bondre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(..?)-(..?)\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="n">_anglere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(..?)-(..?)-(..?)\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="n">_dihedre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(..?)-(..?)-(..?)-(..?)\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+&#39;</span>
+                      <span class="s1">&#39;</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="n">_dihed2re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;\s*</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+&#39;</span>
+                       <span class="s1">&#39;</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="n">_sceere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;SCEE=\s*</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="n">_scnbre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;SCNB=\s*</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="n">_impropre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(..?)-(..?)-(..?)-(..?)\s+&#39;</span>
+                       <span class="s1">&#39;</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">\s+</span><span class="si">%(FLOATRE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">)</span>
+<span class="c1"># Leaprc regexes</span>
+<span class="n">_atomtypere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;&quot;&quot;({\s*[&quot;&#39;]([\w\+\-]+)[&quot;&#39;]\s*[&quot;&#39;](\w+)[&quot;&#39;]\s*&quot;&quot;&quot;</span>
+                         <span class="sd">r&quot;&quot;&quot;[&quot;&#39;](\w+)[&quot;&#39;]\s*})&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="n">_loadparamsre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;loadamberparams\s+</span><span class="si">%(FILENAMERE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+<span class="n">_loadoffre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;loadoff\s+</span><span class="si">%(FILENAMERE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+<span class="n">_loadmol2re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(\S+)\s*=\s*loadmol[23]\s*</span><span class="si">%(FILENAMERE)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subs</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
 <span class="k">del</span> <span class="n">subs</span>
 
-<span class="c"># Leaprc regexes</span>
-<span class="n">_atomtypere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;&quot;&quot;({\s*[&quot;&#39;]([\w\+\-]+)[&quot;&#39;]\s*[&quot;&#39;](\w+)[&quot;&#39;]\s*&quot;&quot;&quot;</span>
-                         <span class="sd">r&quot;&quot;&quot;[&quot;&#39;](\w+)[&quot;&#39;]\s*})&quot;&quot;&quot;</span><span class="p">)</span>
-<span class="n">_loadparamsre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;loadamberparams (\S*)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
-<span class="n">_loadoffre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;loadoff (\S*)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">search_oldff</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds an Amber file. Looks in the current directory, then the following</span>
 <span class="sd">    locations:</span>
@@ -103,20 +109,25 @@
     <span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AMBERHOME</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">fname</span>
-    <span class="n">leapdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AMBERHOME</span><span class="p">,</span> <span class="s">&#39;dat&#39;</span><span class="p">,</span> <span class="s">&#39;leap&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s">&#39;lib&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s">&#39;lib&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s">&#39;parm&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s">&#39;parm&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Cannot find Amber file </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="n">leapdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AMBERHOME</span><span class="p">,</span> <span class="s1">&#39;dat&#39;</span><span class="p">,</span> <span class="s1">&#39;leap&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s1">&#39;parm&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s1">&#39;parm&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">search_oldff</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">,</span> <span class="s1">&#39;oldff&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapdir</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">,</span> <span class="s1">&#39;oldff&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+<span class="c1">#       if os.path.exists(os.path.join(leapdir, &#39;parm&#39;, &#39;oldff&#39;, fname)):</span>
+<span class="c1">#           return os.path.join(leapdir, &#39;parm&#39;, &#39;oldff&#39;, fname)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot find Amber file [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
-<div class="viewcode-block" id="AmberParameterSet"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.parameters.AmberParameterSet">[docs]</a><span class="k">class</span> <span class="nc">AmberParameterSet</span><span class="p">(</span><span class="n">ParameterSet</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberParameterSet"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.AmberParameterSet">[docs]</a><span class="k">class</span> <span class="nc">AmberParameterSet</span><span class="p">(</span><span class="n">ParameterSet</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class storing parameters from an Amber parameter set</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    filenames : str or list of str</span>
+<span class="sd">    filenames : str, list of str, file-like, or list of file-like; optional</span>
 <span class="sd">        Either the name of a file or a list of filenames from which parameters</span>
 <span class="sd">        should be parsed.</span>
 
@@ -126,12 +137,16 @@
 <span class="sd">    in the order they are provided, and any parameters that are specified in</span>
 <span class="sd">    multiple places are overwritten (that is, the *last* occurrence is the</span>
 <span class="sd">    parameter type that is used)</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    :class:`parmed.parameters.ParameterSet`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="AmberParameterSet.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.parameters.AmberParameterSet.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberParameterSet.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.AmberParameterSet.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Identifies the file type as either an Amber-style frcmod or parm.dat</span>
 <span class="sd">        file.</span>
@@ -146,30 +161,30 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an Amber-style parameter file. False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="c"># Must be an frcmod file</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="c1"># Must be an frcmod file</span>
                 <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">False</span>
-                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;MASS&#39;</span><span class="p">,</span> <span class="s">&#39;BOND&#39;</span><span class="p">,</span> <span class="s">&#39;ANGLE&#39;</span><span class="p">,</span> <span class="s">&#39;ANGL&#39;</span><span class="p">,</span>
-                                         <span class="s">&#39;DIHE&#39;</span><span class="p">,</span> <span class="s">&#39;DIHED&#39;</span><span class="p">,</span> <span class="s">&#39;DIHEDRAL&#39;</span><span class="p">,</span> <span class="s">&#39;IMPR&#39;</span><span class="p">,</span>
-                                         <span class="s">&#39;IMPROP&#39;</span><span class="p">,</span> <span class="s">&#39;IMPROPER&#39;</span><span class="p">,</span> <span class="s">&#39;NONB&#39;</span><span class="p">,</span> <span class="s">&#39;NONBON&#39;</span><span class="p">,</span>
-                                         <span class="s">&#39;NONBOND&#39;</span><span class="p">,</span> <span class="s">&#39;NONBONDED&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;MASS&#39;</span><span class="p">,</span> <span class="s1">&#39;BOND&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGLE&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGL&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;DIHE&#39;</span><span class="p">,</span> <span class="s1">&#39;DIHED&#39;</span><span class="p">,</span> <span class="s1">&#39;DIHEDRAL&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPR&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;IMPROP&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPROPER&#39;</span><span class="p">,</span> <span class="s1">&#39;NONB&#39;</span><span class="p">,</span> <span class="s1">&#39;NONBON&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;NONBOND&#39;</span><span class="p">,</span> <span class="s1">&#39;NONBONDED&#39;</span><span class="p">):</span>
                     <span class="k">return</span> <span class="bp">False</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;MASS&#39;</span><span class="p">,</span> <span class="s">&#39;BOND&#39;</span><span class="p">,</span> <span class="s">&#39;ANGLE&#39;</span><span class="p">,</span> <span class="s">&#39;ANGL&#39;</span><span class="p">,</span> <span class="s">&#39;DIHE&#39;</span><span class="p">,</span>
-                                 <span class="s">&#39;DIHED&#39;</span><span class="p">,</span> <span class="s">&#39;DIHEDRAL&#39;</span><span class="p">,</span> <span class="s">&#39;IMPR&#39;</span><span class="p">,</span> <span class="s">&#39;IMPROP&#39;</span><span class="p">,</span>
-                                 <span class="s">&#39;IMPROPER&#39;</span><span class="p">,</span> <span class="s">&#39;NONB&#39;</span><span class="p">,</span> <span class="s">&#39;NONBON&#39;</span><span class="p">,</span> <span class="s">&#39;NONBOND&#39;</span><span class="p">,</span>
-                                 <span class="s">&#39;NONBONDED&#39;</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">True</span> <span class="c"># frcmod file</span>
-            <span class="c"># This must be an atom definition in the parm.dat file</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;MASS&#39;</span><span class="p">,</span> <span class="s1">&#39;BOND&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGLE&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGL&#39;</span><span class="p">,</span> <span class="s1">&#39;DIHE&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;DIHED&#39;</span><span class="p">,</span> <span class="s1">&#39;DIHEDRAL&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPR&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPROP&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;IMPROPER&#39;</span><span class="p">,</span> <span class="s1">&#39;NONB&#39;</span><span class="p">,</span> <span class="s1">&#39;NONBON&#39;</span><span class="p">,</span> <span class="s1">&#39;NONBOND&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;NONBONDED&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">True</span> <span class="c1"># frcmod file</span>
+            <span class="c1"># This must be an atom definition in the parm.dat file</span>
             <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">False</span>
-            <span class="c"># The first word is the atom type (must be &lt;= 2 characters, and not</span>
-            <span class="c"># an integer)</span>
+            <span class="c1"># The first word is the atom type (must be &lt;= 2 characters, and not</span>
+            <span class="c1"># an integer)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -180,30 +195,30 @@
                 <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">False</span>
-            <span class="c"># Polarizability might not be present...</span>
+            <span class="c1"># Polarizability might not be present...</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-                <span class="c"># UGLY: Check the mass and make sure it matches the element&#39;s</span>
-                <span class="c"># mass to within 1 amu. Do our best to guess the element. If</span>
-                <span class="c"># it&#39;s a two-letter element, the element might be a 2-letter</span>
-                <span class="c"># element (like Br), or it might be a 1-letter element specified</span>
-                <span class="c"># by either the first or second letter. Check all possibilities.</span>
-                <span class="c"># Special-case instances like CA, which are just as likely (more</span>
-                <span class="c"># likely?) to be a carbon atom as it is to be a calcium (i.e.,</span>
-                <span class="c"># check for carbon atoms in anything that starts with C). If at</span>
-                <span class="c"># any point, what *should* be the mass doesn&#39;t match the mass of</span>
-                <span class="c"># the guessed element, tag this as *not* a parameter file</span>
+                <span class="c1"># UGLY: Check the mass and make sure it matches the element&#39;s</span>
+                <span class="c1"># mass to within 1 amu. Do our best to guess the element. If</span>
+                <span class="c1"># it&#39;s a two-letter element, the element might be a 2-letter</span>
+                <span class="c1"># element (like Br), or it might be a 1-letter element specified</span>
+                <span class="c1"># by either the first or second letter. Check all possibilities.</span>
+                <span class="c1"># Special-case instances like CA, which are just as likely (more</span>
+                <span class="c1"># likely?) to be a carbon atom as it is to be a calcium (i.e.,</span>
+                <span class="c1"># check for carbon atoms in anything that starts with C). If at</span>
+                <span class="c1"># any point, what *should* be the mass doesn&#39;t match the mass of</span>
+                <span class="c1"># the guessed element, tag this as *not* a parameter file</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
                         <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
                             <span class="n">key</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                             <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">Mass</span> <span class="ow">and</span>
                                     <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;C&#39;</span> <span class="ow">and</span>
-                                        <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;C&#39;</span> <span class="ow">and</span>
+                                        <span class="nb">abs</span><span class="p">(</span><span class="n">Mass</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
                                     <span class="k">return</span> <span class="bp">False</span>
-                                <span class="k">elif</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;C&#39;</span><span class="p">:</span>
+                                <span class="k">elif</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span>
                                     <span class="k">return</span> <span class="bp">False</span>
                             <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Mass</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">Mass</span> <span class="ow">and</span>
@@ -233,34 +248,44 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">return</span> <span class="bp">False</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="c"># Heuristic, but anything that comes after the polarizability is</span>
-                <span class="c"># a comment, and I have yet to see a leading comment that is a</span>
-                <span class="c"># number</span>
+                <span class="c1"># Heuristic, but anything that comes after the polarizability is</span>
+                <span class="c1"># a comment, and I have yet to see a leading comment that is a</span>
+                <span class="c1"># number</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
                     <span class="k">return</span> <span class="bp">False</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="bp">True</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">filenames</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AmberParameterSet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_scee</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_scnb</span> <span class="o">=</span> <span class="mf">2.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">id_format</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Assume open file object</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="AmberParameterSet.from_leaprc"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.parameters.AmberParameterSet.from_leaprc">[docs]</a>    <span class="k">def</span> <span class="nf">from_leaprc</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberParameterSet.from_leaprc"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.AmberParameterSet.from_leaprc">[docs]</a>    <span class="k">def</span> <span class="nf">from_leaprc</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">search_oldff</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Load a parameter set from a leaprc file</span>
 
 <span class="sd">        Parameters</span>
@@ -268,6 +293,10 @@
 <span class="sd">        fname : str or file-like</span>
 <span class="sd">            Name of the file or open file-object from which a leaprc-style file</span>
 <span class="sd">            will be read</span>
+
+<span class="sd">        search_oldff : bool, optional, default=False</span>
+<span class="sd">            If True, search the oldff directories in the main Amber leap</span>
+<span class="sd">            folders. Default is False</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -278,74 +307,107 @@
 <span class="sd">        - addAtomTypes</span>
 <span class="sd">        - loadAmberParams</span>
 <span class="sd">        - loadOFF</span>
+<span class="sd">        - loadMol2</span>
+<span class="sd">        - loadMol3</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">fname</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="c"># To make parsing easier, and because leaprc files are usually quite</span>
-        <span class="c"># short, I&#39;ll read the whole file into memory</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="c1"># To make parsing easier, and because leaprc files are usually quite</span>
+        <span class="c1"># short, I&#39;ll read the whole file into memory</span>
+        <span class="k">def</span> <span class="nf">joinlines</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="n">newlines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">composite</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">composite</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">composite</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">newlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">composite</span><span class="p">))</span>
+                <span class="n">composite</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">composite</span><span class="p">:</span>
+                <span class="n">newlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">composite</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">newlines</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">joinlines</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="k">if</span> <span class="s1">&#39;#&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">else</span> <span class="n">line</span><span class="p">[:</span><span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)],</span> <span class="n">f</span><span class="p">))</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">lowertext</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="c"># commands are case-insensitive</span>
+        <span class="n">lowertext</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="c1"># commands are case-insensitive</span>
+        <span class="c1"># Now process the parameter files</span>
+        <span class="k">def</span> <span class="nf">process_fname</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">):</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_BSTOKEN_&#39;</span><span class="p">,</span> <span class="s1">r&#39;\ &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">r&#39;\ &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fname</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">r&#39;\ &#39;</span><span class="p">,</span> <span class="s1">&#39;_BSTOKEN_&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_loadparamsre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">process_fname</span><span class="p">(</span><span class="n">_loadparamsre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">search_oldff</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">_loadoffre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">process_fname</span><span class="p">(</span><span class="n">_loadoffre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">search_oldff</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">_loadmol2re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="o">=</span> <span class="n">_loadmol2re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">residue</span> <span class="o">=</span> <span class="n">Mol2File</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">search_oldff</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">residue</span><span class="p">,</span> <span class="n">ResidueTemplateContainer</span><span class="p">):</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Multi-residue mol2 files not supported by &#39;</span>
+                                  <span class="s1">&#39;tleap. Loading anyway using names in mol2&#39;</span><span class="p">,</span>
+                                  <span class="n">AmberWarning</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">residue</span>
+        <span class="c1"># Now process the addAtomTypes</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">idx</span> <span class="o">=</span> <span class="n">lowertext</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;addatomtypes&#39;</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">lowertext</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;addatomtypes&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="c"># Does not exist in this file</span>
-            <span class="n">atom_types_str</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="c1"># Does not exist in this file</span>
+            <span class="n">atom_types_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c"># Now process the addAtomTypes</span>
-            <span class="n">i</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s">&#39;addatomtypes&#39;</span><span class="p">)</span>
-            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;{&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;</span><span class="se">\r\n\t</span><span class="s"> &#39;</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unsupported addAtomTypes syntax in &#39;</span>
-                                         <span class="s">&#39;leaprc file&#39;</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s1">&#39;addatomtypes&#39;</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;</span><span class="se">\r\n\t</span><span class="s1"> &#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Unsupported addAtomTypes syntax in &#39;</span>
+                                         <span class="s1">&#39;leaprc file&#39;</span><span class="p">)</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Unsupported addAtomTypes syntax in &#39;</span>
-                                     <span class="s">&#39;leaprc file&#39;</span><span class="p">)</span>
-            <span class="c"># We are at our first brace</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Unsupported addAtomTypes syntax in &#39;</span>
+                                     <span class="s1">&#39;leaprc file&#39;</span><span class="p">)</span>
+            <span class="c1"># We are at our first brace</span>
             <span class="n">chars</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">nopen</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
                 <span class="n">char</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;{&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
                     <span class="n">nopen</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;}&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;}&#39;</span><span class="p">:</span>
                     <span class="n">nopen</span> <span class="o">-=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">nopen</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">break</span>
-                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">:</span>
-                    <span class="n">char</span> <span class="o">=</span> <span class="s">&#39; &#39;</span>
+                <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
                 <span class="n">chars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">atom_types_str</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">atom_types_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symb</span><span class="p">,</span> <span class="n">hyb</span> <span class="ow">in</span> <span class="n">_atomtypere</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">atom_types_str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">symb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AtomicNum</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> is not a recognized element&#39;</span> <span class="o">%</span> <span class="n">symb</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a recognized element&#39;</span> <span class="o">%</span> <span class="n">symb</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">symb</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> \
-                        <span class="n">AtomType</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">Mass</span><span class="p">[</span><span class="n">symb</span><span class="p">],</span>
-                                 <span class="n">AtomicNum</span><span class="p">[</span><span class="n">symb</span><span class="p">])</span>
-        <span class="c"># Now process the parameter files</span>
-        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">_loadparamsre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
-        <span class="c"># Now process the library file</span>
-        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">_loadoffre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">_find_amber_file</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">params</span>
+        <span class="k">return</span> <span class="n">params</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="AmberParameterSet.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.parameters.AmberParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberParameterSet.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.AmberParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extracts known parameters from a Structure instance</span>
 
 <span class="sd">        Parameters</span>
@@ -361,11 +423,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AmberParameterSet</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span>
                 <span class="n">struct</span><span class="p">,</span> <span class="n">allow_unequal_duplicates</span><span class="o">=</span><span class="bp">False</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
-<div class="viewcode-block" id="AmberParameterSet.load_parameters"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.parameters.AmberParameterSet.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="c1">#===================================================</span>
+
+<div class="viewcode-block" id="AmberParameterSet.load_parameters"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.AmberParameterSet.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Load a set of parameters from a single parameter file</span>
 
 <span class="sd">        Parameters</span>
@@ -374,7 +436,7 @@
 <span class="sd">            Parameter file to parse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">fname</span>
@@ -384,110 +446,110 @@
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_frcmod</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;MASS&#39;</span><span class="p">,</span> <span class="s">&#39;BOND&#39;</span><span class="p">,</span> <span class="s">&#39;ANGLE&#39;</span><span class="p">,</span> <span class="s">&#39;ANGL&#39;</span><span class="p">,</span> <span class="s">&#39;DIHE&#39;</span><span class="p">,</span>
-                                      <span class="s">&#39;DIHED&#39;</span><span class="p">,</span> <span class="s">&#39;DIHEDRAL&#39;</span><span class="p">,</span> <span class="s">&#39;IMPR&#39;</span><span class="p">,</span> <span class="s">&#39;IMPROP&#39;</span><span class="p">,</span>
-                                      <span class="s">&#39;IMPROPER&#39;</span><span class="p">,</span> <span class="s">&#39;NONB&#39;</span><span class="p">,</span> <span class="s">&#39;NONBON&#39;</span><span class="p">,</span> <span class="s">&#39;NONBOND&#39;</span><span class="p">,</span>
-                                      <span class="s">&#39;NONBONDED&#39;</span><span class="p">):</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;MASS&#39;</span><span class="p">,</span> <span class="s1">&#39;BOND&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGLE&#39;</span><span class="p">,</span> <span class="s1">&#39;ANGL&#39;</span><span class="p">,</span> <span class="s1">&#39;DIHE&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;DIHED&#39;</span><span class="p">,</span> <span class="s1">&#39;DIHEDRAL&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPR&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPROP&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;IMPROPER&#39;</span><span class="p">,</span> <span class="s1">&#39;NONB&#39;</span><span class="p">,</span> <span class="s1">&#39;NONBON&#39;</span><span class="p">,</span> <span class="s1">&#39;NONBOND&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;NONBONDED&#39;</span><span class="p">):</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_frcmod</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_parm_dat</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_periodic_improper_key</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The central atom must always come third &quot;&quot;&quot;</span>
         <span class="n">all_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">atom2</span> <span class="ow">is</span> <span class="n">atom</span><span class="p">:</span> <span class="k">continue</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a2</span> <span class="ow">is</span> <span class="n">a</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c"># We found our central atom</span>
-                <span class="n">others</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_atoms</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom</span><span class="p">]))</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                <span class="c1"># We found our central atom</span>
+                <span class="n">others</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_atoms</span> <span class="o">-</span> <span class="p">{</span><span class="n">a</span><span class="p">},</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">type</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                        <span class="n">others</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
                 <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c"># No atom identified as &quot;central&quot;. Just assume that the third is</span>
+            <span class="c1"># No atom identified as &quot;central&quot;. Just assume that the third is</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom2</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom3</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom4</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">key</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="k">def</span> <span class="nf">_parse_frcmod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parses an frcmod file from an open file object &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">fiter</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">line</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span> <span class="k">yield</span> <span class="n">l</span>
-            <span class="k">yield</span> <span class="s">&#39;&#39;</span> <span class="c"># Keep yielding empty string after file has ended</span>
         <span class="n">section</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">finished_diheds</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fiter</span><span class="p">():</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;MASS&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;MASS&#39;</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MASS&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;MASS&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;BOND&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;BOND&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;BOND&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;BOND&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ANGL&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;ANGLE&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ANGL&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;ANGLE&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;DIHE&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;DIHEDRAL&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;DIHE&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;DIHEDRAL&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;IMPR&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;IMPROPER&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;IMPR&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;IMPROPER&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;NONB&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;NONBOND&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;NONB&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;NONBOND&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;LJEDIT&#39;</span><span class="p">):</span>
-                <span class="n">section</span> <span class="o">=</span> <span class="s">&#39;NBFIX&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;LJEDIT&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;NBFIX&#39;</span>
                 <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;MASS&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;MASS&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_mass_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;BOND&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;BOND&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_bond_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;ANGLE&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;ANGLE&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_angle_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;DIHEDRAL&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_process_dihedral_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">finished_diheds</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;IMPROPER&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;DIHEDRAL&#39;</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_dihedral_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">finished_diheds</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;IMPROPER&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_improper_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;NONBOND&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;NONBOND&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_nonbond_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;NBFIX&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;NBFIX&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_nbfix_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="k">def</span> <span class="nf">_parse_parm_dat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Internal parser for parm.dat files from open file handle &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">fiter</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">line</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span> <span class="k">yield</span> <span class="n">l</span>
-            <span class="c"># Keep yielding empty string after file has ended</span>
-            <span class="k">yield</span> <span class="s">&#39;&#39;</span>
+            <span class="c1"># Keep yielding empty string after file has ended</span>
+            <span class="k">yield</span> <span class="s1">&#39;&#39;</span>
         <span class="n">fiter</span> <span class="o">=</span> <span class="n">fiter</span><span class="p">()</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="n">finished_diheds</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">True</span><span class="p">)</span>
-        <span class="c"># Parse the masses</span>
+        <span class="c1"># Parse the masses</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_mass_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span> <span class="c"># Skip the list of hydrophobic atom types</span>
-        <span class="c"># Process the bonds</span>
+        <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span> <span class="c1"># Skip the list of hydrophobic atom types</span>
+        <span class="c1"># Process the bonds</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -495,7 +557,7 @@
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_bond_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="c"># Process the angles</span>
+        <span class="c1"># Process the angles</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -503,15 +565,16 @@
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_angle_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="c"># Process the dihedrals</span>
+        <span class="c1"># Process the dihedrals</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
                 <span class="k">break</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_process_dihedral_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">finished_diheds</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_dihedral_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">finished_diheds</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="c"># Process the impropers</span>
+        <span class="c1"># Process the impropers</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -519,7 +582,7 @@
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_improper_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="c"># Process the 10-12 terms</span>
+        <span class="c1"># Process the 10-12 terms</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -530,12 +593,12 @@
                 <span class="n">acoef</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">acoef</span><span class="p">)</span>
                 <span class="n">bcoef</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">bcoef</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Trouble parsing 10-12 terms&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Trouble parsing 10-12 terms&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">acoef</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">bcoef</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;10-12 potential not supported in &#39;</span>
-                                     <span class="s">&#39;AmberParameterSet currently&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;10-12 potential not supported in &#39;</span>
+                                     <span class="s1">&#39;AmberParameterSet currently&#39;</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="c"># Process 12-6 terms. Get Equivalencing first</span>
+        <span class="c1"># Process 12-6 terms. Get Equivalencing first</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="n">equivalent_ljtypes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">equivalent_types</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
@@ -550,10 +613,10 @@
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="n">words</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not parse the kind of nonbonded &#39;</span>
-                                 <span class="s">&#39;parameters in Amber parameter file&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;RE&#39;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Only RE nonbonded parameters supported&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not parse the kind of nonbonded &#39;</span>
+                                 <span class="s1">&#39;parameters in Amber parameter file&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;RE&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Only RE nonbonded parameters supported&#39;</span><span class="p">)</span>
         <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -561,12 +624,23 @@
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_nonbond_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
-        <span class="c"># Now assign all of the equivalenced atoms</span>
+        <span class="c1"># Now assign all of the equivalenced atoms</span>
         <span class="k">for</span> <span class="n">atyp</span><span class="p">,</span> <span class="n">otyp</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">equivalent_ljtypes</span><span class="p">):</span>
             <span class="n">otyp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">otyp</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">set_lj_params</span><span class="p">(</span><span class="n">otyp</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">otyp</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">atyp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">rmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">otyp</span><span class="o">.</span><span class="n">epsilon</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">epsilon</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span>
+                            <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">otyp</span><span class="o">.</span><span class="n">rmin</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span><span class="p">):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Equivalency defined between </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1"> &#39;</span>
+                                      <span class="s1">&#39;but parameters are not equal&#39;</span> <span class="o">%</span>
+                                      <span class="p">(</span><span class="n">otyp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atyp</span><span class="p">),</span> <span class="n">AmberWarning</span><span class="p">)</span>
+                        <span class="c1"># Remove from equivalent types</span>
+                        <span class="n">equivalent_types</span><span class="p">[</span><span class="n">otyp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">atyp</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">set_lj_params</span><span class="p">(</span><span class="n">otyp</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">otyp</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span>
         <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s">&#39;LJEDIT&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;LJEDIT&#39;</span><span class="p">:</span>
             <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
             <span class="k">while</span> <span class="n">rawline</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">rawline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -575,31 +649,34 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_nbfix_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">equivalent_types</span><span class="p">)</span>
                 <span class="n">rawline</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fiter</span><span class="p">)</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
-    <span class="c"># Private methods for processing parts of the file</span>
+    <span class="c1"># Private methods for processing parts of the file</span>
     <span class="k">def</span> <span class="nf">_process_mass_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mass</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not convert mass to float [</span><span class="si">%s</span><span class="s">]&#39;</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not convert mass to float [</span><span class="si">%s</span><span class="s1">]&#39;</span>
                                     <span class="o">%</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Error parsing MASS line. Not enough tokens&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Error parsing MASS line. Not enough tokens&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
+        <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;EP&#39;</span><span class="p">,</span> <span class="s1">&#39;LP&#39;</span><span class="p">):</span>
+            <span class="n">atype</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">atype</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">atype</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span>
                              <span class="n">AtomicNum</span><span class="p">[</span><span class="n">element_by_mass</span><span class="p">(</span><span class="n">mass</span><span class="p">)])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">atype</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="k">def</span> <span class="nf">_process_bond_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="n">rematch</span> <span class="o">=</span> <span class="n">_bondre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not understand BOND line [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand BOND line [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
         <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">eq</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
         <span class="n">a1</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">typ</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">eq</span><span class="p">))</span>
@@ -609,48 +686,87 @@
     <span class="k">def</span> <span class="nf">_process_angle_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="n">rematch</span> <span class="o">=</span> <span class="n">_anglere</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not understand ANGLE line [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand ANGLE line [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
         <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">eq</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
         <span class="n">a1</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">a3</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">typ</span> <span class="o">=</span> <span class="n">AngleType</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">eq</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)]</span> <span class="o">=</span> <span class="n">typ</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">typ</span>
 
-    <span class="k">def</span> <span class="nf">_process_dihedral_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">finished_diheds</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_process_dihedral_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">finished_diheds</span><span class="p">,</span> <span class="n">last_key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Processes a dihedral line, possibly part of a multi-term dihedral</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        line : str</span>
+<span class="sd">            Line of the file that contains a dihedral term</span>
+<span class="sd">        finished_diheds : dict</span>
+<span class="sd">            Dictionary of dihedral parameters whose final term has been read in</span>
+<span class="sd">            already (which means additional terms will overwrite, not add)</span>
+<span class="sd">        last_key : str or None</span>
+<span class="sd">            If not None, this is the key for the last dihedral type that should</span>
+<span class="sd">            be implied if the atom types are missing. Atom types seem to only be</span>
+<span class="sd">            required for the first term in a multi-term torsion definition</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        key or None</span>
+<span class="sd">            If a negative periodicity indicates another term is coming, the</span>
+<span class="sd">            current key is returned so it can be passed as key to the next</span>
+<span class="sd">            _process_dihedral_call</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rematch</span> <span class="o">=</span> <span class="n">_dihedre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not understand DIHEDRAL line &#39;</span>
-                                 <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
-        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">per</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span> <span class="ow">and</span> <span class="n">last_key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand DIHEDRAL line &#39;</span>
+                                 <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
+            <span class="n">rematch</span> <span class="o">=</span> <span class="n">_dihed2re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand DIHEDRAL line &#39;</span>
+                                     <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="n">div</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">per</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">last_key</span>
+            <span class="n">rkey</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">finished_diheds</span>
+            <span class="k">if</span> <span class="n">finished_diheds</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;Cannot have an implied torsion that &#39;</span>
+                                     <span class="s1">&#39;has already finished!&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">per</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span>  <span class="n">a1</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">a2</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">a3</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">a4</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
+            <span class="n">rkey</span> <span class="o">=</span> <span class="p">(</span><span class="n">a4</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">last_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">last_key</span> <span class="o">!=</span> <span class="n">key</span> <span class="ow">and</span> <span class="n">last_key</span> <span class="o">!=</span> <span class="n">rkey</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Expecting next term in dihedral </span><span class="si">%r</span><span class="s1">, got &#39;</span>
+                              <span class="s1">&#39;definition for dihedral </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">last_key</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span>
+                              <span class="n">ParameterWarning</span><span class="p">)</span>
         <span class="n">scee</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_sceere</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">)]</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">]</span>
         <span class="n">scnb</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_scnbre</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">line</span><span class="p">)]</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">]</span>
-        <span class="n">a1</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span>
-        <span class="n">a3</span> <span class="o">=</span> <span class="n">a3</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">a4</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">per</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">per</span><span class="p">)</span>
         <span class="n">typ</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">div</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">per</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
                            <span class="n">scee</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scnb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
-        <span class="n">rkey</span> <span class="o">=</span> <span class="p">(</span><span class="n">a4</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">finished_diheds</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-            <span class="c"># This dihedral is already finished its definition, which means we</span>
-            <span class="c"># go ahead and add a new one to override it</span>
+            <span class="c1"># This dihedral is already finished its definition, which means</span>
+            <span class="c1"># we go ahead and add a new one to override it</span>
             <span class="n">typs</span> <span class="o">=</span> <span class="n">DihedralTypeList</span><span class="p">()</span>
             <span class="n">typs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">rkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">typs</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
         <span class="n">finished_diheds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">finished_diheds</span><span class="p">[</span><span class="n">rkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">per</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">per</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">key</span>
 
     <span class="k">def</span> <span class="nf">_process_improper_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="n">rematch</span> <span class="o">=</span> <span class="n">_impropre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not understand IMPROPER line &#39;</span>
-                                    <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand IMPROPER line &#39;</span>
+                                    <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
         <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">per</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
         <span class="n">a1</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span>
         <span class="n">a3</span> <span class="o">=</span> <span class="n">a3</span><span class="o">.</span><span class="n">strip</span><span class="p">();</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">a4</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="c"># Pre-sort the improper types, assuming atom3 is the central atom (which</span>
-        <span class="c"># it must be in Amber parameter files!!!!)</span>
+        <span class="c1"># Pre-sort the improper types, assuming atom3 is the central atom (which</span>
+        <span class="c1"># it must be in Amber parameter files!!!!)</span>
         <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a4</span><span class="p">])</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> \
@@ -660,50 +776,50 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">atyp</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not understand nonbond parameter line &#39;</span>
-                                 <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand nonbond parameter line &#39;</span>
+                                 <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">[</span><span class="n">atyp</span><span class="p">]</span><span class="o">.</span><span class="n">set_lj_params</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">eps</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">rmin</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Atom type </span><span class="si">%s</span><span class="s"> not present in the database.&#39;</span> <span class="o">%</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Atom type </span><span class="si">%s</span><span class="s1"> not present in the database.&#39;</span> <span class="o">%</span>
                                  <span class="n">atyp</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not convert nonbond parameters to &#39;</span>
-                                 <span class="s">&#39;floats [</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rmin</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not convert nonbond parameters to &#39;</span>
+                                 <span class="s1">&#39;floats [</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rmin</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_process_nbfix_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">equivalents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">rmin1</span><span class="p">,</span> <span class="n">eps1</span><span class="p">,</span> <span class="n">rmin2</span><span class="p">,</span> <span class="n">eps2</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not understand LJEDIT line [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not understand LJEDIT line [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">rmin1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rmin1</span><span class="p">)</span>
             <span class="n">eps1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps1</span><span class="p">)</span>
             <span class="n">rmin2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rmin2</span><span class="p">)</span>
             <span class="n">eps2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps2</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s">&#39;Could not convert LJEDIT parameters &#39;</span>
-                                 <span class="s">&#39;to floats.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Could not convert LJEDIT parameters &#39;</span>
+                                 <span class="s1">&#39;to floats.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">[(</span><span class="nb">min</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">))]</span> <span class="o">=</span> \
                 <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eps1</span><span class="o">*</span><span class="n">eps2</span><span class="p">),</span> <span class="n">rmin1</span><span class="o">+</span><span class="n">rmin2</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">equivalents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c"># We need to add the same nbfixes to all atom types that are</span>
-            <span class="c"># equivalent to the atom types defined in the LJEDIT line</span>
+            <span class="c1"># We need to add the same nbfixes to all atom types that are</span>
+            <span class="c1"># equivalent to the atom types defined in the LJEDIT line</span>
             <span class="k">for</span> <span class="n">oa1</span> <span class="ow">in</span> <span class="n">equivalents</span><span class="p">[</span><span class="n">a1</span><span class="p">]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">[(</span><span class="nb">min</span><span class="p">(</span><span class="n">oa1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">oa1</span><span class="p">,</span> <span class="n">a2</span><span class="p">))]</span> <span class="o">=</span> \
                         <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eps1</span><span class="o">*</span><span class="n">eps2</span><span class="p">),</span> <span class="n">rmin1</span><span class="o">+</span><span class="n">rmin2</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">oa2</span> <span class="ow">in</span> <span class="n">equivalents</span><span class="p">[</span><span class="n">a2</span><span class="p">]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">[(</span><span class="nb">min</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">oa2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">oa2</span><span class="p">))]</span> <span class="o">=</span> \
                         <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eps1</span><span class="o">*</span><span class="n">eps2</span><span class="p">),</span> <span class="n">rmin1</span><span class="o">+</span><span class="n">rmin2</span><span class="p">)</span>
-            <span class="c"># Now do the equivalenced of atom 1 with the equivalenced of atom 2</span>
+            <span class="c1"># Now do the equivalenced of atom 1 with the equivalenced of atom 2</span>
             <span class="k">for</span> <span class="n">oa1</span> <span class="ow">in</span> <span class="n">equivalents</span><span class="p">[</span><span class="n">a1</span><span class="p">]:</span>
                 <span class="k">for</span> <span class="n">oa2</span> <span class="ow">in</span> <span class="n">equivalents</span><span class="p">[</span><span class="n">a2</span><span class="p">]:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">[(</span><span class="nb">min</span><span class="p">(</span><span class="n">oa1</span><span class="p">,</span> <span class="n">oa2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">oa1</span><span class="p">,</span> <span class="n">oa2</span><span class="p">))]</span> <span class="o">=</span> \
                             <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eps1</span><span class="o">*</span><span class="n">eps2</span><span class="p">),</span> <span class="n">rmin1</span><span class="o">+</span><span class="n">rmin2</span><span class="p">)</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
-<div class="viewcode-block" id="AmberParameterSet.write"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.parameters.AmberParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Created by ParmEd&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;frcmod&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberParameterSet.write"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.parameters.html#parmed.amber.AmberParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Created by ParmEd&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;frcmod&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Writes a parm.dat file with the current parameters</span>
 
 <span class="sd">        Parameters</span>
@@ -717,44 +833,44 @@
 <span class="sd">            the parameters are written in parm.dat-format. Default is &#39;frcmod&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">outfile</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">outfile</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">outfile</span> <span class="o">=</span> <span class="n">dest</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
 
-        <span class="k">if</span> <span class="n">style</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;frcmod&#39;</span><span class="p">,</span> <span class="s">&#39;parm&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;style must be either frcmod or parm, not </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;frcmod&#39;</span><span class="p">,</span> <span class="s1">&#39;parm&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;style must be either frcmod or parm, not </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                              <span class="n">style</span><span class="p">)</span>
 
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\r\n</span><span class="s">&#39;</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the atom mass</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;MASS</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the atom mass</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;MASS</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">):</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s%6.3f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">mass</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the bonds</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;BOND</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%6.3f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">mass</span><span class="p">))</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the bonds</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;BOND</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">done</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">done</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">))</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">   </span><span class="si">%8.3f</span><span class="s">  </span><span class="si">%6.3f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">   </span><span class="si">%8.3f</span><span class="s1">  </span><span class="si">%6.3f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">req</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the angles</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;ANGLE</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the angles</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ANGLE</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">done</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">),</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">done</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">))</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">   </span><span class="si">%8.3f</span><span class="s">  </span><span class="si">%6.3f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">   </span><span class="si">%8.3f</span><span class="s1">  </span><span class="si">%6.3f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
                            <span class="n">typ</span><span class="o">.</span><span class="n">theteq</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the dihedrals</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;DIHE</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the dihedrals</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;DIHE</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">done</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">),</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span> <span class="k">continue</span>
@@ -762,46 +878,46 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">):</span>
                     <span class="n">typ</span> <span class="o">=</span> <span class="n">typ</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s"> </span><span class="si">%4i</span><span class="s"> </span><span class="si">%14.8f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%5.1f</span><span class="s">    &#39;</span>
-                              <span class="s">&#39;SCEE=</span><span class="si">%s</span><span class="s"> SCNB=</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1"> </span><span class="si">%4i</span><span class="s1"> </span><span class="si">%14.8f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%5.1f</span><span class="s1">    &#39;</span>
+                              <span class="s1">&#39;SCEE=</span><span class="si">%s</span><span class="s1"> SCNB=</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                               <span class="n">a3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
                               <span class="n">typ</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">dtyp</span> <span class="ow">in</span> <span class="n">typ</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s"> </span><span class="si">%4i</span><span class="s"> </span><span class="si">%14.8f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%5.1f</span><span class="s">    &#39;</span>
-                                  <span class="s">&#39;SCEE=</span><span class="si">%s</span><span class="s"> SCNB=</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                    <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1"> </span><span class="si">%4i</span><span class="s1"> </span><span class="si">%14.8f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%5.1f</span><span class="s1">    &#39;</span>
+                                  <span class="s1">&#39;SCEE=</span><span class="si">%s</span><span class="s1"> SCNB=</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                                   <span class="n">a3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
                                   <span class="n">dtyp</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="o">-</span><span class="n">dtyp</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
                 <span class="n">dtyp</span> <span class="o">=</span> <span class="n">typ</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s"> </span><span class="si">%4i</span><span class="s"> </span><span class="si">%14.8f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%5.1f</span><span class="s">    &#39;</span>
-                              <span class="s">&#39;SCEE=</span><span class="si">%s</span><span class="s"> SCNB=</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1"> </span><span class="si">%4i</span><span class="s1"> </span><span class="si">%14.8f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%5.1f</span><span class="s1">    &#39;</span>
+                              <span class="s1">&#39;SCEE=</span><span class="si">%s</span><span class="s1"> SCNB=</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                               <span class="n">a3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span>
                               <span class="n">dtyp</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">per</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="n">dtyp</span><span class="o">.</span><span class="n">scnb</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the impropers</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;IMPROPER</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the impropers</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;IMPROPER</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">),</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">):</span>
-            <span class="c"># Make sure wild-cards come at the beginning</span>
-            <span class="k">if</span> <span class="n">a2</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">a4</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">,</span> <span class="s">&#39;Malformed generic improper!&#39;</span>
+            <span class="c1"># Make sure wild-cards come at the beginning</span>
+            <span class="k">if</span> <span class="n">a2</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">a4</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Malformed generic improper!&#39;</span>
                 <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a1</span>
-            <span class="k">elif</span> <span class="n">a4</span> <span class="o">==</span> <span class="s">&#39;X&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">a4</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
                 <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a2</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s"> </span><span class="si">%14.8f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%5.1f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1"> </span><span class="si">%14.8f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%5.1f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a3</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a4</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                            <span class="n">typ</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">per</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the LJ terms</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;NONB</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the LJ terms</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;NONB</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">):</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">  </span><span class="si">%8.4f</span><span class="s"> </span><span class="si">%8.4f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">  </span><span class="si">%8.4f</span><span class="s1"> </span><span class="si">%8.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">rmin</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">epsilon</span><span class="p">))</span>
-        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Write the NBFIX terms</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Write the NBFIX terms</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">:</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;LJEDIT</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;LJEDIT</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">rmin</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">):</span>
-                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%8.3f</span><span class="s"> </span><span class="si">%8.3f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                               <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">a2</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">eps</span><span class="p">,</span> <span class="n">rmin</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
                                <span class="n">eps</span><span class="p">,</span> <span class="n">rmin</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
 
@@ -812,9 +928,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -831,7 +947,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -840,15 +956,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../amber.html" >parmed.amber</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

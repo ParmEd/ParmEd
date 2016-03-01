@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +37,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-topologyobjects-ureybradley">
 <h1>parmed.topologyobjects.UreyBradley<a class="headerlink" href="#parmed-topologyobjects-ureybradley" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.topologyobjects.UreyBradley">
-<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">UreyBradley</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">UreyBradley</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Urey-Bradley angle type with a set of parameters. It has the same
 functional form as a bond, but it is defined between two atoms forming a
 valence angle separated by two bonds.</p>
@@ -59,15 +59,15 @@ valence angle separated by two bonds.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>The first atom involved in the Urey-Bradley bond</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<p><strong>atom2</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>The other atom involved in the Urey-Bradley bond</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><tt class="xref py py-class docutils literal"><span class="pre">BondType</span></tt></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a></p>
 <blockquote class="last">
 <div><p>The Urey-Bradley bond type that defines the parameters for this bond</p>
 </div></blockquote>
@@ -76,12 +76,12 @@ valence angle separated by two bonds.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>You can test whether an <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a> is contained within the bond using the
-<cite>in</cite> operator. A <tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> is raised if <cite>atom1</cite> and <cite>atom2</cite> are
-identical.  You can also test that a <a class="reference internal" href="parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><tt class="xref py py-class docutils literal"><span class="pre">Bond</span></tt></a> is contained in this
+<p>You can test whether an <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a> is contained within the bond using the
+<cite>in</cite> operator. A <code class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></code> is raised if <cite>atom1</cite> and <cite>atom2</cite> are
+identical.  You can also test that a <a class="reference internal" href="parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> is contained in this
 Urey-Bradley valence angle</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">=</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b2</span> <span class="o">=</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle</span> <span class="o">=</span> <span class="n">Angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
@@ -92,18 +92,6 @@ Urey-Bradley valence angle</p>
 <span class="go">True</span>
 </pre></div>
 </div>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.UreyBradley.ub_type" title="parmed.topologyobjects.UreyBradley.ub_type"><tt class="xref py py-obj docutils literal"><span class="pre">ub_type</span></tt></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -111,14 +99,14 @@ Urey-Bradley valence angle</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.UreyBradley.delete" title="parmed.topologyobjects.UreyBradley.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.UreyBradley.delete" title="parmed.topologyobjects.UreyBradley.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this Urey-Bradley from the atoms that make it up.</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.UreyBradley.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#UreyBradley.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#UreyBradley.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bond constructor</p>
 </dd></dl>
 
@@ -129,29 +117,17 @@ Urey-Bradley valence angle</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.UreyBradley.__init__" title="parmed.topologyobjects.UreyBradley.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(atom1,&nbsp;atom2[,&nbsp;type])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.UreyBradley.__init__" title="parmed.topologyobjects.UreyBradley.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2[,&nbsp;type])</td>
 <td>Bond constructor</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.UreyBradley.delete" title="parmed.topologyobjects.UreyBradley.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.UreyBradley.delete" title="parmed.topologyobjects.UreyBradley.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this Urey-Bradley from the atoms that make it up.</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.UreyBradley.ub_type" title="parmed.topologyobjects.UreyBradley.ub_type"><tt class="xref py py-obj docutils literal"><span class="pre">ub_type</span></tt></a></td>
-<td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.UreyBradley.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#UreyBradley.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#UreyBradley.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this Urey-Bradley from the atoms that make it up. This method
 removes this urey-bradley from the <cite>urey_bradleys</cite> list for atom1 and
 atom2.</p>
@@ -165,14 +141,16 @@ atom2.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/parmed.topologyobjects.UreyBradley.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/parmed.topologyobjects.UreyBradley.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -189,7 +167,7 @@ atom2.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -198,13 +176,13 @@ atom2.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

@@ -14,30 +14,28 @@ parmed.amber.AmberParm
    .. autosummary::
    
       ~AmberParm.__init__
-      ~AmberParm.addFlag
       ~AmberParm.add_atom
       ~AmberParm.add_atom_to_residue
       ~AmberParm.add_flag
       ~AmberParm.copy
       ~AmberParm.createSystem
-      ~AmberParm.deleteFlag
       ~AmberParm.delete_flag
       ~AmberParm.fill_LJ
       ~AmberParm.from_rawdata
       ~AmberParm.from_structure
+      ~AmberParm.get_box
+      ~AmberParm.get_coordinates
       ~AmberParm.has_1012
       ~AmberParm.has_NBFIX
       ~AmberParm.id_format
       ~AmberParm.initialize_topology
       ~AmberParm.is_changed
+      ~AmberParm.join_dihedrals
       ~AmberParm.load_atom_info
-      ~AmberParm.load_coordinates
-      ~AmberParm.load_from_rawdata
-      ~AmberParm.load_from_structure
+      ~AmberParm.load_dataframe
       ~AmberParm.load_pointers
       ~AmberParm.load_rst7
       ~AmberParm.load_structure
-      ~AmberParm.load_velocities
       ~AmberParm.omm_add_constraints
       ~AmberParm.omm_angle_force
       ~AmberParm.omm_bond_force
@@ -63,14 +61,14 @@ parmed.amber.AmberParm
       ~AmberParm.recalculate_LJ
       ~AmberParm.rediscover_molecules
       ~AmberParm.remake_parm
+      ~AmberParm.save
       ~AmberParm.set_version
       ~AmberParm.split
       ~AmberParm.strip
       ~AmberParm.to_dataframe
       ~AmberParm.unchange
       ~AmberParm.update_dihedral_exclusions
-      ~AmberParm.view
-      ~AmberParm.writeParm
+      ~AmberParm.view_as
       ~AmberParm.write_cif
       ~AmberParm.write_parm
       ~AmberParm.write_pdb
@@ -103,14 +101,17 @@ parmed.amber.AmberParm
       ~AmberParm.angles_without_h
       ~AmberParm.bonds_inc_h
       ~AmberParm.bonds_without_h
+      ~AmberParm.box
       ~AmberParm.box_vectors
       ~AmberParm.chamber
+      ~AmberParm.combining_rule
+      ~AmberParm.coordinates
       ~AmberParm.dihedrals_inc_h
       ~AmberParm.dihedrals_without_h
       ~AmberParm.has_cmap
       ~AmberParm.positions
-      ~AmberParm.solvent_residues
       ~AmberParm.topology
       ~AmberParm.velocities
+      ~AmberParm.view
    
    

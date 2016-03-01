@@ -22,11 +22,4 @@ parmed.topologyobjects.TorsionTorsion
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~TorsionTorsion.cmap_type
-      ~TorsionTorsion.tortor_type
-   
    

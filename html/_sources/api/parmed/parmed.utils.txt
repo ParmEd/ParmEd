@@ -15,6 +15,7 @@ Submodules
 
    parmed.utils.decorators
    parmed.utils.io
+   parmed.utils.netcdf
    parmed.utils.pandautils
    parmed.utils.six
    parmed.utils.timer

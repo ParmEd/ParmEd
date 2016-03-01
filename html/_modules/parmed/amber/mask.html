@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.amber" href="../amber.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,31 +37,30 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">parmed.amber</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.amber.mask</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module for evaluating Amber Mask strings and translating them into lists in</span>
 <span class="sd">which a selected atom is 1 and one that&#39;s not is 0.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">MaskError</span>
+<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 
-<span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+<span class="c1">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 
-<div class="viewcode-block" id="AmberMask"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.mask.AmberMask">[docs]</a><span class="k">class</span> <span class="nc">AmberMask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMask"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.AmberMask">[docs]</a><span class="k">class</span> <span class="nc">AmberMask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    What is hopefully a fully-fledged Amber mask parser implemented in Python.</span>
 
@@ -73,20 +72,20 @@
 <span class="sd">        The mask string that selects a subset of atoms</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMask.__init__"><a class="viewcode-back" href="../../../amberobj/parmed.amber.AmberMask.html#parmed.amber.AmberMask.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span></div>
       
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
-<div class="viewcode-block" id="AmberMask.Selected"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.mask.AmberMask.Selected">[docs]</a>    <span class="k">def</span> <span class="nf">Selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AmberMask.Selected"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.AmberMask.Selected">[docs]</a>    <span class="k">def</span> <span class="nf">Selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generator that returns the indexes of selected atoms</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -102,11 +101,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Selection</span><span class="p">(</span><span class="n">invert</span><span class="o">=</span><span class="n">invert</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">i</span>
+                <span class="k">yield</span> <span class="n">i</span></div>
 
-    <span class="c">#======================================================</span>
-</div>
-<div class="viewcode-block" id="AmberMask.Selection"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.mask.AmberMask.Selection">[docs]</a>    <span class="k">def</span> <span class="nf">Selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prnlev</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="c1">#======================================================</span>
+
+<div class="viewcode-block" id="AmberMask.Selection"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.AmberMask.Selection">[docs]</a>    <span class="k">def</span> <span class="nf">Selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prnlev</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses the mask and analyzes the result to return an atom</span>
 <span class="sd">        selection array</span>
@@ -131,28 +130,28 @@
 <span class="sd">            return list while atoms not selected will be assigned 0.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">stdout</span>
-        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span> <span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;In AmberMask.Selection(), debug active!</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;original mask: ==</span><span class="si">%s</span><span class="s">==</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span> <span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;In AmberMask.Selection(), debug active!</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;original mask: ==</span><span class="si">%s</span><span class="s1">==</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
 
-        <span class="c"># 0) See if we got the default &quot;all&quot; mask(*) and return accordingly</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
+        <span class="c1"># 0) See if we got the default &quot;all&quot; mask(*) and return accordingly</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
 
-        <span class="c"># 1) preprocess input expression</span>
+        <span class="c1"># 1) preprocess input expression</span>
         <span class="n">infix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tokenize</span><span class="p">(</span><span class="n">prnlev</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;tokenized mask: ==</span><span class="si">%s</span><span class="s">==</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">infix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;tokenized mask: ==</span><span class="si">%s</span><span class="s1">==</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">infix</span><span class="p">)</span>
 
-        <span class="c"># 2) construct postfix (RPN) notation</span>
+        <span class="c1"># 2) construct postfix (RPN) notation</span>
         <span class="n">postfix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_torpn</span><span class="p">(</span><span class="n">infix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;postfix mask: ==</span><span class="si">%s</span><span class="s">==</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">postfix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span> <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;postfix mask: ==</span><span class="si">%s</span><span class="s1">==</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">postfix</span><span class="p">)</span>
 
-        <span class="c"># 3) evaluate the postfix notation</span>
+        <span class="c1"># 3) evaluate the postfix notation</span>
         <span class="k">if</span> <span class="n">invert</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">postfix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">postfix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">postfix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">)</span></div>
 
-    <span class="c">#======================================================</span>
-</div>
+    <span class="c1">#======================================================</span>
+
     <span class="k">def</span> <span class="nf">_tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Tokenizes the mask string into individual selections:</span>
 <span class="sd">            1. remove spaces</span>
@@ -163,150 +162,153 @@
 <span class="sd">               (...); i.e. :1-10@CA,CB is split into (:1-10 &amp; @CA,CB)</span>
 <span class="sd">            4. do basic error checking</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="c"># keeping track of a single operand</span>
-        <span class="n">infix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>  <span class="c"># value that is returned at the end</span>
-        <span class="c"># flag == 0: means new operand or operand was completed &amp; ended with ]</span>
-        <span class="c"># flag == 1: means operand with &quot;:&quot; read</span>
-        <span class="c"># flag == 2: means operand with &quot;@&quot; read</span>
-        <span class="c"># flag == 3: means &#39;&lt;&#39; or &#39;&gt;&#39; read, waiting for numbers</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="c1"># keeping track of a single operand</span>
+        <span class="n">infix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># value that is returned at the end</span>
+        <span class="c1"># flag == 0: means new operand or operand was completed &amp; ended with ]</span>
+        <span class="c1"># flag == 1: means operand with &quot;:&quot; read</span>
+        <span class="c1"># flag == 2: means operand with &quot;@&quot; read</span>
+        <span class="c1"># flag == 3: means &#39;&lt;&#39; or &#39;&gt;&#39; read, waiting for numbers</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="c"># skip whitespace</span>
+            <span class="c1"># skip whitespace</span>
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span> 
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
-            <span class="c"># If p is an operator, is the last character, or is a ()...</span>
+            <span class="c1"># If p is an operator, is the last character, or is a ()...</span>
             <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_isOperator</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">or</span>
-                  <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;(&#39;</span><span class="p">,</span><span class="s">&#39;)&#39;</span><span class="p">]):</span>
-                <span class="c"># Deal with the last character being a wildcard that we have to</span>
-                <span class="c"># convert</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;=&#39;</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># wildcard</span>
+                  <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;)&#39;</span><span class="p">]):</span>
+                <span class="c1"># Deal with the last character being a wildcard that we have to</span>
+                <span class="c1"># convert</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># wildcard</span>
                     <span class="k">if</span> <span class="n">flag</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;*&#39;</span>
+                        <span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&quot;AmberMask: &#39;=&#39; not in name &quot;</span>
-                                        <span class="s">&quot;list syntax&quot;</span><span class="p">)</span>
-                <span class="c"># If this is the end of an operand, terminate the buffer, flush</span>
-                <span class="c"># it to infix, and reset flag to 0 and empty the buffer</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s2">&quot;AmberMask: &#39;=&#39; not in name &quot;</span>
+                                        <span class="s2">&quot;list syntax&quot;</span><span class="p">)</span>
+                <span class="c1"># If this is the end of an operand, terminate the buffer, flush</span>
+                <span class="c1"># it to infix, and reset flag to 0 and empty the buffer</span>
                 <span class="k">if</span> <span class="n">flag</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="s">&#39;)&#39;</span><span class="p">:</span> <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s">&#39;])&#39;</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
+                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s1">&#39;])&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">infix</span> <span class="o">+=</span> <span class="nb">buffer</span>
-                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;)&#39;</span><span class="p">:</span> <span class="n">infix</span> <span class="o">+=</span> <span class="n">p</span>
-                <span class="c"># else if p is &gt;,&lt;</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="s">&#39;&gt;&#39;</span><span class="p">]:</span>
-                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;([</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">p</span>
+                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="n">infix</span> <span class="o">+=</span> <span class="n">p</span>
+                <span class="c1"># else if p is &gt;,&lt;</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">]:</span>
+                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;([</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">p</span>
                     <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Bad distance syntax [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
                     <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">3</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;xx&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;&lt;,&gt; operators require coordinates&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="s">&#39;@&#39;</span><span class="p">]:</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Bad syntax [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;&lt;,&gt; operators require coordinates&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="s1">&#39;@&#39;</span><span class="p">]:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Bad syntax [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isOperand</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;([&#39;</span>
+                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;([&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
-                    <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Bad syntax [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;=&#39;</span><span class="p">:</span> <span class="c"># wildcard</span>
+                    <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Bad syntax [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span><span class="p">:</span> <span class="c1"># wildcard</span>
                     <span class="k">if</span> <span class="n">flag</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;*&#39;</span>
+                        <span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&quot;&#39;=&#39; not in name list syntax&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s2">&quot;&#39;=&#39; not in name list syntax&quot;</span><span class="p">)</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;:&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;([:&#39;</span>
+                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;([:&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s">&#39;])|([:&#39;</span>
+                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s1">&#39;])|([:&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;@&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;@&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;([@&#39;</span>
+                    <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;([@&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">2</span>
                 <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s">&#39;]&amp;[@&#39;</span>
+                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s1">&#39;]&amp;[@&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">2</span>
                 <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s">&#39;])|([@&#39;</span>
+                    <span class="nb">buffer</span> <span class="o">+=</span> <span class="s1">&#39;])|([@&#39;</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">2</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown symbol (</span><span class="si">%s</span><span class="s">) expression&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown symbol (</span><span class="si">%s</span><span class="s1">) expression&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># end while i &lt; len(self.mask):</span>
-        <span class="c"># Check that each operand has at least 4 characters: [:1] and [@C], etc.</span>
+        <span class="c1"># end while i &lt; len(self.mask):</span>
+        <span class="c1"># Check that each operand has at least 4 characters: [:1] and [@C], etc.</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># number of characters in current operand</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># number of characters in current operand</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">infix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
                 <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;]&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">infix</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;empty token in infix&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">infix</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;empty token in infix&#39;</span><span class="p">)</span>
                 <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
       
-        <span class="k">return</span> <span class="n">infix</span> <span class="o">+</span> <span class="s">&#39;_&#39;</span> <span class="c"># terminating _ for next step</span>
+        <span class="k">return</span> <span class="n">infix</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="c1"># terminating _ for next step</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
     <span class="k">def</span> <span class="nf">_isOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if a character is an operator &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">char</span> <span class="ow">in</span> <span class="s">&#39;!&amp;|&lt;&gt;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">char</span> <span class="ow">in</span> <span class="s1">&#39;!&amp;|&lt;&gt;&#39;</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_isOperand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if a character is an operand &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">char</span> <span class="ow">in</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">*/%-?,&#39;.=+&quot;</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isalnum</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">char</span> <span class="ow">in</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">*/%-?,&#39;.=+&quot;</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isalnum</span><span class="p">())</span>
    
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_torpn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts the infix to an RPN array &quot;&quot;&quot;</span>
-        <span class="n">postfix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;_&#39;</span><span class="p">]</span>  <span class="c"># use a list as a stack. Then pop() works as expected</span>
+        <span class="n">postfix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="p">]</span>  <span class="c1"># use a list as a stack. Then pop() works as expected</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">infix</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">infix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
                 <span class="n">postfix</span> <span class="o">+=</span> <span class="n">p</span>
                 <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;]&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span>
                 <span class="n">postfix</span> <span class="o">+=</span> <span class="n">p</span>
                 <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">elif</span> <span class="n">flag</span><span class="p">:</span>
                 <span class="n">postfix</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;(&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
                 <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;)&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
                 <span class="n">pp</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-                <span class="k">while</span> <span class="n">pp</span> <span class="o">!=</span> <span class="s">&#39;(&#39;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">pp</span> <span class="o">==</span> <span class="s">&#39;_&#39;</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unbalanced parentheses in Mask.&#39;</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">pp</span> <span class="o">!=</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pp</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unbalanced parentheses in Mask.&#39;</span><span class="p">)</span>
                     <span class="n">postfix</span> <span class="o">+=</span> <span class="n">pp</span>
                     <span class="n">pp</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-            <span class="c"># At this point both ()s are discarded</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;_&#39;</span><span class="p">:</span>
+            <span class="c1"># At this point both ()s are discarded</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span><span class="p">:</span>
                 <span class="n">pp</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-                <span class="k">while</span> <span class="n">pp</span> <span class="o">!=</span> <span class="s">&#39;_&#39;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">pp</span> <span class="o">==</span> <span class="s">&#39;(&#39;</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unbalanced parentheses in Mask.&#39;</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">pp</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pp</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unbalanced parentheses in Mask.&#39;</span><span class="p">)</span>
                     <span class="n">postfix</span> <span class="o">+=</span> <span class="n">pp</span>
                     <span class="n">pp</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isOperator</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
@@ -322,30 +324,30 @@
                         <span class="n">P2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                     <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown symbol </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown symbol </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span> <span class="c1"># should not reach here</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># end while i &lt; len(infix):</span>
+        <span class="c1"># end while i &lt; len(infix):</span>
         <span class="k">return</span> <span class="n">postfix</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">postfix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Evaluates a postfix in RPN format and returns a selection array &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stderr</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># position in postfix</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># position in postfix</span>
         <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">postfix</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">postfix</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span> <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;]&#39;</span><span class="p">:</span> <span class="c"># end of the token</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span> <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span> <span class="c1"># end of the token</span>
                 <span class="n">ptoken</span> <span class="o">=</span> <span class="nb">buffer</span>
                 <span class="n">pmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selectElemMask</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span>
                 <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pmask</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isOperand</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="s">&#39;@&#39;</span><span class="p">]:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isOperand</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="s1">&#39;@&#39;</span><span class="p">]:</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&amp;&#39;</span><span class="p">,</span><span class="s">&#39;|&#39;</span><span class="p">]:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span><span class="s1">&#39;|&#39;</span><span class="p">]:</span>
                 <span class="n">pmask1</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="n">pmask2</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -353,74 +355,77 @@
                     <span class="n">pmask2</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                     <span class="n">pmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binop</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">pmask1</span><span class="p">,</span> <span class="n">pmask2</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Illegal binary operation&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Illegal binary operation&#39;</span><span class="p">)</span>
                 <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pmask</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="s">&#39;&gt;&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">postfix</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">postfix</span><span class="p">[</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="s">&#39;@&#39;</span><span class="p">]:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">postfix</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">postfix</span><span class="p">[</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="s1">&#39;@&#39;</span><span class="p">]:</span>
                     <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">pmask1</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="c"># distance criteria</span>
+                        <span class="n">pmask1</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="c1"># distance criteria</span>
                         <span class="n">pmask2</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                         <span class="n">pmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selectDistd</span><span class="p">(</span><span class="n">pmask1</span><span class="p">,</span> <span class="n">pmask2</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                         <span class="k">return</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
                     <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pmask</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;!&#39;</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">pmask1</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Illegal ! operation&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Illegal ! operation&#39;</span><span class="p">)</span>
                 <span class="n">pmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neg</span><span class="p">(</span><span class="n">pmask1</span><span class="p">)</span>
                 <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pmask</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown symbol evaluating RPN: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown symbol evaluating RPN: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># end while i &lt; len(postfix)</span>
+        <span class="c1"># end while i &lt; len(postfix)</span>
 
-        <span class="n">pmask</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pmask</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Empty stack -- no available operands&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">stack</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;There may be missing operands in the mask!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;There may be missing operands in the mask&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">prnlev</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
-            <span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> atoms selected by </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">pmask</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span>
+            <span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> atoms selected by </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">pmask</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">pmask</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
     <span class="k">def</span> <span class="nf">_neg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmask1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Negates a given mask &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pmask1</span><span class="o">.</span><span class="n">Not</span><span class="p">()</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_selectDistd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmask1</span><span class="p">,</span> <span class="n">pmask2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Selects atoms based on a distance criteria &quot;&quot;&quot;</span>
-        <span class="c"># pmask1 is either @&lt;number&gt; or :&lt;number&gt;, and represents the distance</span>
-        <span class="c"># criteria. pmask2 is the selection of atoms from which the distance is</span>
-        <span class="c"># evaluated.</span>
+        <span class="c1"># pmask1 is either @&lt;number&gt; or :&lt;number&gt;, and represents the distance</span>
+        <span class="c1"># criteria. pmask2 is the selection of atoms from which the distance is</span>
+        <span class="c1"># evaluated.</span>
         <span class="n">pmask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
-        <span class="c"># Determine if we want &gt; or &lt;</span>
-        <span class="k">if</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;&lt;&#39;</span><span class="p">:</span>
-            <span class="nb">cmp</span> <span class="o">=</span> <span class="nb">float</span><span class="o">.</span><span class="n">__lt__</span>
-        <span class="k">elif</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;&gt;&#39;</span><span class="p">:</span>
-            <span class="nb">cmp</span> <span class="o">=</span> <span class="nb">float</span><span class="o">.</span><span class="n">__gt__</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown comparison criteria for distance mask: </span><span class="si">%s</span><span class="s">&#39;</span>
+        <span class="c1"># Determine if we want &gt; or &lt;</span>
+        <span class="k">if</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>
+            <span class="nb">cmp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span>
+        <span class="k">elif</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
+            <span class="nb">cmp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># Should never execute this</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown comparison criteria for distance mask: </span><span class="si">%s</span><span class="s1">&#39;</span>
                             <span class="o">%</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">pmask1</span> <span class="o">=</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">if</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s">&#39;:@&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Bad distance criteria for mask: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pmask1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;:@&#39;</span><span class="p">:</span> <span class="c1"># Should never execute this</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Bad distance criteria for mask: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pmask1</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">distance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pmask1</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Distance must be a number: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-        <span class="n">distance</span> <span class="o">*=</span> <span class="n">distance</span> <span class="c"># Faster to compare square of distance</span>
-        <span class="c"># First select all atoms that satisfy the distance. If we ended up</span>
-        <span class="c"># choosing residues, then we will go back through afterwards and select</span>
-        <span class="c"># entire residues when one of the atoms in that residue is selected.</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Distance must be a number: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">distance</span> <span class="o">*=</span> <span class="n">distance</span> <span class="c1"># Faster to compare square of distance</span>
+        <span class="c1"># First select all atoms that satisfy the distance. If we ended up</span>
+        <span class="c1"># choosing residues, then we will go back through afterwards and select</span>
+        <span class="c1"># entire residues when one of the atoms in that residue is selected.</span>
         <span class="n">idxlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pmask2</span><span class="p">)</span> <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atomi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">idxlist</span><span class="p">:</span>
@@ -432,9 +437,9 @@
                 <span class="k">if</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">d2</span><span class="p">,</span> <span class="n">distance</span><span class="p">):</span>
                     <span class="n">pmask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="k">break</span>
-        <span class="c"># Now see if we have to select all atoms in residues with any selected</span>
-        <span class="c"># atoms</span>
-        <span class="k">if</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;:&#39;</span><span class="p">:</span>
+        <span class="c1"># Now see if we have to select all atoms in residues with any selected</span>
+        <span class="c1"># atoms</span>
+        <span class="k">if</span> <span class="n">pmask1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">pmask</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -443,35 +448,35 @@
                         <span class="k">break</span>
         <span class="k">return</span> <span class="n">pmask</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_selectElemMask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptoken</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Selects an element mask &quot;&quot;&quot;</span>
-        <span class="c"># some constants</span>
+        <span class="c1"># some constants</span>
         <span class="n">ALL</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">NUMLIST</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">NAMELIST</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">TYPELIST</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">ELEMLIST</span> <span class="o">=</span> <span class="mi">4</span>
-        <span class="c"># define the mask object and empty buffer</span>
+        <span class="c1"># define the mask object and empty buffer</span>
         <span class="n">pmask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">buffer_p</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c"># This is a residue NUMber LIST</span>
-        <span class="k">if</span> <span class="n">ptoken</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">):</span>
+        <span class="c1"># This is a residue NUMber LIST</span>
+        <span class="k">if</span> <span class="n">ptoken</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">):</span>
             <span class="n">reslist</span> <span class="o">=</span> <span class="n">NUMLIST</span>
             <span class="n">pos</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">):</span>
                 <span class="n">p</span> <span class="o">=</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
                 <span class="n">buffer_p</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span> <span class="ow">and</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">and</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">buffer_p</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> 
-                                          <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;,&#39;</span><span class="p">):</span>
+                                          <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span><span class="p">):</span>
                         <span class="n">reslist</span> <span class="o">=</span> <span class="n">ALL</span>
                     <span class="k">elif</span> <span class="n">reslist</span> <span class="o">==</span> <span class="n">NUMLIST</span><span class="p">:</span>
                         <span class="n">reslist</span> <span class="o">=</span> <span class="n">NAMELIST</span>
-                <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s">&#39;?*&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s1">&#39;?*&#39;</span><span class="p">:</span>
                     <span class="n">reslist</span> <span class="o">=</span> <span class="n">NAMELIST</span>
                 <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">buffer_p</span> <span class="o">=</span> <span class="mi">0</span>
@@ -484,25 +489,22 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">_residue_namelist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">pmask</span><span class="p">)</span>
                     <span class="n">reslist</span> <span class="o">=</span> <span class="n">NUMLIST</span>
                 <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">elif</span> <span class="n">ptoken</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;@&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">ptoken</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">):</span>
             <span class="n">atomlist</span> <span class="o">=</span> <span class="n">NUMLIST</span>
             <span class="n">pos</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">):</span>
                 <span class="n">p</span> <span class="o">=</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
                 <span class="n">buffer_p</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span> <span class="ow">and</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">&quot;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">buffer_p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span>
-                                          <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;,&#39;</span><span class="p">):</span>
-                        <span class="n">atomlist</span> <span class="o">=</span> <span class="n">ALL</span>
-                    <span class="k">elif</span> <span class="n">atomlist</span> <span class="o">==</span> <span class="n">NUMLIST</span><span class="p">:</span>
-                        <span class="n">atomlist</span> <span class="o">=</span> <span class="n">NAMELIST</span>
-                <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s">&#39;?*&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">and</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">atomlist</span> <span class="o">==</span> <span class="n">NUMLIST</span><span class="p">:</span>
                         <span class="n">atomlist</span> <span class="o">=</span> <span class="n">NAMELIST</span>
-                <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;%&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s1">&#39;?*&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">atomlist</span> <span class="o">==</span> <span class="n">NUMLIST</span><span class="p">:</span>
+                        <span class="n">atomlist</span> <span class="o">=</span> <span class="n">NAMELIST</span>
+                <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;%&#39;</span><span class="p">:</span>
                     <span class="n">atomlist</span> <span class="o">=</span> <span class="n">TYPELIST</span>
-                <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
                     <span class="n">atomlist</span> <span class="o">=</span> <span class="n">ELEMLIST</span>
                 <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">buffer_p</span> <span class="o">=</span> <span class="mi">0</span>
@@ -519,28 +521,28 @@
                     <span class="k">elif</span> <span class="n">atomlist</span> <span class="o">==</span> <span class="n">ELEMLIST</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_atom_elemlist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">pmask</span><span class="p">)</span>
                 <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">elif</span> <span class="n">ptoken</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ptoken</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
             <span class="n">pmask</span><span class="o">.</span><span class="n">select_all</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">ptoken</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="s">&#39;&gt;&#39;</span><span class="p">]:</span>
+        <span class="k">elif</span> <span class="n">ptoken</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">ptoken</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Mask is missing : and @&#39;</span><span class="p">)</span>
-        <span class="c"># end if &#39;:&#39; in ptoken:</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># Should never reach here</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Mask is missing : and @&#39;</span><span class="p">)</span>
+        <span class="c1"># end if &#39;:&#39; in ptoken:</span>
 
         <span class="k">return</span> <span class="n">pmask</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_atom_numlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask based on atom numbers &quot;&quot;&quot;</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">at1</span> <span class="o">=</span> <span class="n">at2</span> <span class="o">=</span> <span class="n">dash</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">instring</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">dash</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
                     <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_atnum_select</span><span class="p">(</span><span class="n">at1</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
@@ -548,108 +550,108 @@
                     <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_atnum_select</span><span class="p">(</span><span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                     <span class="n">dash</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
                 <span class="n">dash</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;,&#39;</span><span class="p">,</span><span class="s">&#39;-&#39;</span><span class="p">]):</span>
-                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown symbol in atom number parsing [</span><span class="si">%s</span><span class="s">]&#39;</span><span class="o">%</span><span class="n">p</span><span class="p">)</span>
+                <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown symbol in atom number parsing [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="o">%</span><span class="n">p</span><span class="p">)</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
-    <span class="k">def</span> <span class="nf">_atom_namelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&#39;name&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_atom_namelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask based on atom names/types &quot;&quot;&quot;</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">instring</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">*?+&#39;-&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">*?+&#39;-&quot;</span><span class="p">:</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s">&#39;-&#39;</span> <span class="ow">in</span> <span class="nb">buffer</span> <span class="ow">and</span> <span class="nb">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;-&#39;</span> <span class="ow">in</span> <span class="nb">buffer</span> <span class="ow">and</span> <span class="nb">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_atom_numlist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_atname_select</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-                <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s">&quot;</span><span class="se">\\</span><span class="s">,?*&#39;+-&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unrecognized symbol in atom name &#39;</span>
-                                <span class="s">&#39;parsing [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+                <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">,?*&#39;+-&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unrecognized symbol in atom name &#39;</span>
+                                <span class="s1">&#39;parsing [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_atom_typelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask based on atom types &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_namelist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&#39;type&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_namelist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_atom_elemlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fills a _mask based on atom elements. For now it will just be Atom</span>
 <span class="sd">        names, since elements are not stored in the prmtop anywhere.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_namelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_namelist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;element&#39;</span><span class="p">)</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_residue_numlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask based on residue numbers &quot;&quot;&quot;</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">at1</span> <span class="o">=</span> <span class="n">at2</span> <span class="o">=</span> <span class="n">dash</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">instring</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">dash</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
                     <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_resnum_select</span><span class="p">(</span><span class="n">at1</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">at2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Bad mask: error in integer conversion&#39;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_resnum_select</span><span class="p">(</span><span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                     <span class="n">dash</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
                 <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
                 <span class="n">dash</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;,&#39;</span><span class="p">,</span><span class="s">&#39;-&#39;</span><span class="p">]):</span>
-                    <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown symbol in residue number &#39;</span>
-                                    <span class="s">&#39;parsing [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+                <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_residue_namelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask based on residue names &quot;&quot;&quot;</span>
-        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">instring</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;*&#39;</span><span class="p">,</span><span class="s">&#39;?&#39;</span><span class="p">,</span><span class="s">&#39;+&#39;</span><span class="p">,</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span><span class="s">&#39;-&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">]:</span>
                 <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">p</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s">&#39;-&#39;</span> <span class="ow">in</span> <span class="nb">buffer</span> <span class="ow">and</span> <span class="nb">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;-&#39;</span> <span class="ow">in</span> <span class="nb">buffer</span> <span class="ow">and</span> <span class="nb">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_residue_numlist</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_resname_select</span><span class="p">(</span><span class="nb">buffer</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
-                <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s">&quot;,?*&#39;+-&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown symbol in residue name &#39;</span>
-                                <span class="s">&#39;parsing [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+                <span class="nb">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">in</span> <span class="s2">&quot;,?*&#39;+-&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown symbol in residue name &#39;</span>
+                                <span class="s1">&#39;parsing [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
     <span class="k">def</span> <span class="nf">_atnum_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array between atom numbers at1 and at2 &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">at1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">at2</span><span class="p">):</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
     <span class="k">def</span> <span class="nf">_resnum_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res1</span><span class="p">,</span> <span class="n">res2</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array between residues res1 and res2 &quot;&quot;&quot;</span>
@@ -657,19 +659,26 @@
             <span class="n">res</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">res</span> <span class="o">&gt;=</span> <span class="n">res1</span> <span class="ow">and</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">res2</span><span class="p">:</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
-    <span class="k">def</span> <span class="nf">_atname_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atname</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&#39;name&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_atname_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atname</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array with all atom names of a given name &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">atname</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
             <span class="n">atname</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atname</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">(</span><span class="n">atname</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;element&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                    <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">(</span><span class="n">AtomicNum</span><span class="p">[</span><span class="n">atname</span><span class="p">]</span> <span class="o">==</span>
+                                                <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown element </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">atname</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">(</span><span class="n">_nameMatch</span><span class="p">(</span><span class="n">atname</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">key</span><span class="p">)))</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
     <span class="k">def</span> <span class="nf">_resname_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array with all residue names of a given name &quot;&quot;&quot;</span>
@@ -679,31 +688,31 @@
             <span class="k">elif</span> <span class="n">resname</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span> <span class="o">==</span> <span class="n">atm</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
    
     <span class="k">def</span> <span class="nf">_binop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">pmask1</span><span class="p">,</span> <span class="n">pmask2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Does a binary operation on a pair of masks &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s">&#39;&amp;&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pmask1</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">pmask2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s">&#39;|&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pmask1</span><span class="o">.</span><span class="n">Or</span><span class="p">(</span><span class="n">pmask2</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown operator [</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">op</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown operator [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">op</span><span class="p">)</span>
 
-    <span class="c">#======================================================</span>
+    <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_priority</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span><span class="s">&#39;&lt;&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">6</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;!&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">5</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&amp;&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">4</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;|&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">3</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;(&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">2</span>
-        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;_&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">6</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;!&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">5</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&amp;&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">4</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;|&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="p">]:</span> <span class="k">return</span> <span class="mi">1</span>
 
-        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;Unknown operator [</span><span class="si">%s</span><span class="s">] in Mask ==</span><span class="si">%s</span><span class="s">==&#39;</span> <span class="o">%</span>
-                        <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;Unknown operator [</span><span class="si">%s</span><span class="s1">] in Mask ==</span><span class="si">%s</span><span class="s1">==&#39;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span></div>
 
-<span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-</div>
+<span class="c1">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+
 <span class="k">def</span> <span class="nf">_nameMatch</span><span class="p">(</span><span class="n">atnam1</span><span class="p">,</span> <span class="n">atnam2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines if atnam1 matches atnam2, where atnam1 can have * as a wildcard</span>
@@ -722,23 +731,19 @@
 <span class="sd">    match and should return False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">re</span>
-    <span class="n">atnam1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">atnam1</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">atnam2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">atnam2</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-    <span class="c"># Replace amber mask wildcards with appropriate regex wildcards and protect</span>
-    <span class="c"># the + (but protect backslashes)</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="s">&#39;&lt;!PROTECT!&gt;&#39;</span>
-    <span class="n">atnam1</span> <span class="o">=</span> <span class="n">atnam1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">*&#39;</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">,</span><span class="s">r&#39;\S*&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="s">&#39;*&#39;</span><span class="p">)</span>
-    <span class="n">atnam1</span> <span class="o">=</span> <span class="n">atnam1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">?&#39;</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;?&#39;</span><span class="p">,</span><span class="s">r&#39;\S&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="s">&#39;?&#39;</span><span class="p">)</span>
-    <span class="n">atnam1</span> <span class="o">=</span> <span class="n">atnam1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">+&#39;</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">,</span><span class="s">r&#39;\+&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="s">&#39;+&#39;</span><span class="p">)</span>
-    <span class="c"># Now replace just the first instance of atnam2 in atnam2 with &#39;&#39;, and</span>
-    <span class="c"># return *not* that</span>
-    <span class="c"># DEBUG:</span>
-<span class="c">#   print &#39;Comparing ==%s== with ==%s==&#39; % (atnam1, atnam2)</span>
-<span class="c">#   print not bool(re.sub(atnam1, &#39;&#39;, atnam2, 1))</span>
-    <span class="c"># END DEBUG</span>
-    <span class="k">return</span> <span class="n">atnam1</span> <span class="o">==</span> <span class="n">atnam2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">atnam1</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">atnam2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">atnam1</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">atnam1</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">atnam2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">atnam2</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="c1"># Replace amber mask wildcards with appropriate regex wildcards and protect</span>
+    <span class="c1"># the + (but protect backslashes)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="s1">&#39;&lt;!PROTECT!&gt;&#39;</span>
+    <span class="n">atnam1</span> <span class="o">=</span> <span class="n">atnam1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">*&#39;</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="s1">r&#39;\S*&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+    <span class="n">atnam1</span> <span class="o">=</span> <span class="n">atnam1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">?&#39;</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="s1">r&#39;\S&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">)</span>
+    <span class="n">atnam1</span> <span class="o">=</span> <span class="n">atnam1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">+&#39;</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">r&#39;\+&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">)</span>
+    <span class="c1"># Now replace just the first instance of atnam2 in atnam2 with &#39;&#39;, and</span>
+    <span class="c1"># return *not* that</span>
+    <span class="k">return</span> <span class="n">atnam1</span> <span class="o">==</span> <span class="n">atnam2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">atnam1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">atnam2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-<span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+<span class="c1">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 
 <span class="k">class</span> <span class="nc">_mask</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Mask array; only used by AmberMask &quot;&quot;&quot;</span>
@@ -748,20 +753,20 @@
         <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natom</span><span class="p">)])</span>
 
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">And</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span> 
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&quot;_mask: and() requires another mask of equal size!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s2">&quot;_mask: and() requires another mask of equal size!&quot;</span><span class="p">)</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -769,7 +774,7 @@
 
     <span class="k">def</span> <span class="nf">Or</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s">&#39;_mask: or() requires another mask of equal size!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;_mask: or() requires another mask of equal size!&#39;</span><span class="p">)</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">or</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -778,22 +783,22 @@
     <span class="k">def</span> <span class="nf">Not</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
-            <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">new_mask</span>
 
     <span class="k">def</span> <span class="nf">select_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="c">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
+<span class="c1">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -810,7 +815,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -819,15 +824,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../amber.html" >parmed.amber</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

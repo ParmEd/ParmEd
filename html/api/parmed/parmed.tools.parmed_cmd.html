@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,22 +36,22 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.tools.parmed_cmd">
 <span id="parmed-tools-parmed-cmd-module"></span><h1>parmed.tools.parmed_cmd module<a class="headerlink" href="#module-parmed.tools.parmed_cmd" title="Permalink to this headline">¶</a></h1>
 <p>This sets up the command interpreter for textual ParmEd (parmed).</p>
 <dl class="class">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd">
-<em class="property">class </em><tt class="descclassname">parmed.tools.parmed_cmd.</tt><tt class="descname">ParmedCmd</tt><big>(</big><em>parm</em>, <em>stdin=None</em>, <em>stdout=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">cmd.Cmd</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tools.parmed_cmd.</code><code class="descname">ParmedCmd</code><span class="sig-paren">(</span><em>parm</em>, <em>stdin=None</em>, <em>stdout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cmd.Cmd</span></code></p>
 <p>ParmEd command interpreter. The docstrings for each do_* command are simply
 copied from the docstring for that Action&#8217;s docstring</p>
 <p class="rubric">Attributes</p>
@@ -73,89 +73,89 @@ copied from the docstring for that Action&#8217;s docstring</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.cmdloop" title="parmed.tools.parmed_cmd.ParmedCmd.cmdloop"><tt class="xref py py-obj docutils literal"><span class="pre">cmdloop</span></tt></a>([intro])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.cmdloop" title="parmed.tools.parmed_cmd.ParmedCmd.cmdloop"><code class="xref py py-obj docutils literal"><span class="pre">cmdloop</span></code></a>([intro])</td>
 <td>Repeatedly issue a prompt, accept input, parse an initial prefix off the received input, and dispatch to action methods, passing them the remainder of the line as argument.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.columnize" title="parmed.tools.parmed_cmd.ParmedCmd.columnize"><tt class="xref py py-obj docutils literal"><span class="pre">columnize</span></tt></a>(list[,&nbsp;displaywidth])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.columnize" title="parmed.tools.parmed_cmd.ParmedCmd.columnize"><code class="xref py py-obj docutils literal"><span class="pre">columnize</span></code></a>(list[,&nbsp;displaywidth])</td>
 <td>Display a list of strings as a compact set of columns.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.complete" title="parmed.tools.parmed_cmd.ParmedCmd.complete"><tt class="xref py py-obj docutils literal"><span class="pre">complete</span></tt></a>(text,&nbsp;state)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.complete" title="parmed.tools.parmed_cmd.ParmedCmd.complete"><code class="xref py py-obj docutils literal"><span class="pre">complete</span></code></a>(text,&nbsp;state)</td>
 <td>Return the next possible completion for &#8216;text&#8217;.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.complete_help" title="parmed.tools.parmed_cmd.ParmedCmd.complete_help"><tt class="xref py py-obj docutils literal"><span class="pre">complete_help</span></tt></a>(*args)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.complete_help" title="parmed.tools.parmed_cmd.ParmedCmd.complete_help"><code class="xref py py-obj docutils literal"><span class="pre">complete_help</span></code></a>(*args)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.completedefault" title="parmed.tools.parmed_cmd.ParmedCmd.completedefault"><tt class="xref py py-obj docutils literal"><span class="pre">completedefault</span></tt></a>(text,&nbsp;line,&nbsp;begidx,&nbsp;endidx)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.completedefault" title="parmed.tools.parmed_cmd.ParmedCmd.completedefault"><code class="xref py py-obj docutils literal"><span class="pre">completedefault</span></code></a>(text,&nbsp;line,&nbsp;begidx,&nbsp;endidx)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.completenames" title="parmed.tools.parmed_cmd.ParmedCmd.completenames"><tt class="xref py py-obj docutils literal"><span class="pre">completenames</span></tt></a>(text,&nbsp;*ignored)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.completenames" title="parmed.tools.parmed_cmd.ParmedCmd.completenames"><code class="xref py py-obj docutils literal"><span class="pre">completenames</span></code></a>(text,&nbsp;*ignored)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.default" title="parmed.tools.parmed_cmd.ParmedCmd.default"><tt class="xref py py-obj docutils literal"><span class="pre">default</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.default" title="parmed.tools.parmed_cmd.ParmedCmd.default"><code class="xref py py-obj docutils literal"><span class="pre">default</span></code></a>(line)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_EOF" title="parmed.tools.parmed_cmd.ParmedCmd.do_EOF"><tt class="xref py py-obj docutils literal"><span class="pre">do_EOF</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_EOF" title="parmed.tools.parmed_cmd.ParmedCmd.do_EOF"><code class="xref py py-obj docutils literal"><span class="pre">do_EOF</span></code></a>(line)</td>
 <td>Stops reading commands and executes any &#8216;parmout&#8217; command that had</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_go" title="parmed.tools.parmed_cmd.ParmedCmd.do_go"><tt class="xref py py-obj docutils literal"><span class="pre">do_go</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_go" title="parmed.tools.parmed_cmd.ParmedCmd.do_go"><code class="xref py py-obj docutils literal"><span class="pre">do_go</span></code></a>(line)</td>
 <td>Stops reading commands and executes any &#8216;parmout&#8217; command that had</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_help" title="parmed.tools.parmed_cmd.ParmedCmd.do_help"><tt class="xref py py-obj docutils literal"><span class="pre">do_help</span></tt></a>(arg)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_help" title="parmed.tools.parmed_cmd.ParmedCmd.do_help"><code class="xref py py-obj docutils literal"><span class="pre">do_help</span></code></a>(arg)</td>
 <td>Modify the original do_help to pull docstrings from actions</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_history" title="parmed.tools.parmed_cmd.ParmedCmd.do_history"><tt class="xref py py-obj docutils literal"><span class="pre">do_history</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_history" title="parmed.tools.parmed_cmd.ParmedCmd.do_history"><code class="xref py py-obj docutils literal"><span class="pre">do_history</span></code></a>(line)</td>
 <td>Print the command history</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_parmout" title="parmed.tools.parmed_cmd.ParmedCmd.do_parmout"><tt class="xref py py-obj docutils literal"><span class="pre">do_parmout</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_parmout" title="parmed.tools.parmed_cmd.ParmedCmd.do_parmout"><code class="xref py py-obj docutils literal"><span class="pre">do_parmout</span></code></a>(line)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_quit" title="parmed.tools.parmed_cmd.ParmedCmd.do_quit"><tt class="xref py py-obj docutils literal"><span class="pre">do_quit</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_quit" title="parmed.tools.parmed_cmd.ParmedCmd.do_quit"><code class="xref py py-obj docutils literal"><span class="pre">do_quit</span></code></a>(line)</td>
 <td>Stops reading commands and quits WITHOUT running the last &#8216;parmout&#8217;</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_shell" title="parmed.tools.parmed_cmd.ParmedCmd.do_shell"><tt class="xref py py-obj docutils literal"><span class="pre">do_shell</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_shell" title="parmed.tools.parmed_cmd.ParmedCmd.do_shell"><code class="xref py py-obj docutils literal"><span class="pre">do_shell</span></code></a>(line)</td>
 <td>Support the limited interpreter</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_source" title="parmed.tools.parmed_cmd.ParmedCmd.do_source"><tt class="xref py py-obj docutils literal"><span class="pre">do_source</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.do_source" title="parmed.tools.parmed_cmd.ParmedCmd.do_source"><code class="xref py py-obj docutils literal"><span class="pre">do_source</span></code></a>(line)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.emptyline" title="parmed.tools.parmed_cmd.ParmedCmd.emptyline"><tt class="xref py py-obj docutils literal"><span class="pre">emptyline</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.emptyline" title="parmed.tools.parmed_cmd.ParmedCmd.emptyline"><code class="xref py py-obj docutils literal"><span class="pre">emptyline</span></code></a>()</td>
 <td>Override emptyline so that empty lines are simply ignored</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.get_names" title="parmed.tools.parmed_cmd.ParmedCmd.get_names"><tt class="xref py py-obj docutils literal"><span class="pre">get_names</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.get_names" title="parmed.tools.parmed_cmd.ParmedCmd.get_names"><code class="xref py py-obj docutils literal"><span class="pre">get_names</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.onecmd" title="parmed.tools.parmed_cmd.ParmedCmd.onecmd"><tt class="xref py py-obj docutils literal"><span class="pre">onecmd</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.onecmd" title="parmed.tools.parmed_cmd.ParmedCmd.onecmd"><code class="xref py py-obj docutils literal"><span class="pre">onecmd</span></code></a>(line)</td>
 <td>Interpret the argument as though it had been typed in response to the prompt.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.parseline" title="parmed.tools.parmed_cmd.ParmedCmd.parseline"><tt class="xref py py-obj docutils literal"><span class="pre">parseline</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.parseline" title="parmed.tools.parmed_cmd.ParmedCmd.parseline"><code class="xref py py-obj docutils literal"><span class="pre">parseline</span></code></a>(line)</td>
 <td>Override parseline so that it will set args as ArgumentList</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.populate_actions" title="parmed.tools.parmed_cmd.ParmedCmd.populate_actions"><tt class="xref py py-obj docutils literal"><span class="pre">populate_actions</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.populate_actions" title="parmed.tools.parmed_cmd.ParmedCmd.populate_actions"><code class="xref py py-obj docutils literal"><span class="pre">populate_actions</span></code></a>()</td>
 <td>This will create all of the do_Command methods to trigger command auto-complete.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.postcmd" title="parmed.tools.parmed_cmd.ParmedCmd.postcmd"><tt class="xref py py-obj docutils literal"><span class="pre">postcmd</span></tt></a>(stop,&nbsp;line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.postcmd" title="parmed.tools.parmed_cmd.ParmedCmd.postcmd"><code class="xref py py-obj docutils literal"><span class="pre">postcmd</span></code></a>(stop,&nbsp;line)</td>
 <td>Hook method executed just after a command dispatch is finished.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.postloop" title="parmed.tools.parmed_cmd.ParmedCmd.postloop"><tt class="xref py py-obj docutils literal"><span class="pre">postloop</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.postloop" title="parmed.tools.parmed_cmd.ParmedCmd.postloop"><code class="xref py py-obj docutils literal"><span class="pre">postloop</span></code></a>()</td>
 <td>Hook method executed once when the cmdloop() method is about to return.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.precmd" title="parmed.tools.parmed_cmd.ParmedCmd.precmd"><tt class="xref py py-obj docutils literal"><span class="pre">precmd</span></tt></a>(line,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.precmd" title="parmed.tools.parmed_cmd.ParmedCmd.precmd"><code class="xref py py-obj docutils literal"><span class="pre">precmd</span></code></a>(line,&nbsp;*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.preloop" title="parmed.tools.parmed_cmd.ParmedCmd.preloop"><tt class="xref py py-obj docutils literal"><span class="pre">preloop</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.preloop" title="parmed.tools.parmed_cmd.ParmedCmd.preloop"><code class="xref py py-obj docutils literal"><span class="pre">preloop</span></code></a>()</td>
 <td>Hook method executed once when the cmdloop() method is called.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.print_topics" title="parmed.tools.parmed_cmd.ParmedCmd.print_topics"><tt class="xref py py-obj docutils literal"><span class="pre">print_topics</span></tt></a>(header,&nbsp;cmds,&nbsp;cmdlen,&nbsp;maxcol)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.print_topics" title="parmed.tools.parmed_cmd.ParmedCmd.print_topics"><code class="xref py py-obj docutils literal"><span class="pre">print_topics</span></code></a>(header,&nbsp;cmds,&nbsp;cmdlen,&nbsp;maxcol)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.setlog" title="parmed.tools.parmed_cmd.ParmedCmd.setlog"><tt class="xref py py-obj docutils literal"><span class="pre">setlog</span></tt></a>(f)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.ParmedCmd.setlog" title="parmed.tools.parmed_cmd.ParmedCmd.setlog"><code class="xref py py-obj docutils literal"><span class="pre">setlog</span></code></a>(f)</td>
 <td>Open up a log file to start logging the commands.</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.cmdloop">
-<tt class="descname">cmdloop</tt><big>(</big><em>intro=None</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.cmdloop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cmdloop</code><span class="sig-paren">(</span><em>intro=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.cmdloop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Repeatedly issue a prompt, accept input, parse an initial prefix
 off the received input, and dispatch to action methods, passing them
 the remainder of the line as argument.</p>
@@ -163,7 +163,7 @@ the remainder of the line as argument.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.columnize">
-<tt class="descname">columnize</tt><big>(</big><em>list</em>, <em>displaywidth=80</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.columnize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">columnize</code><span class="sig-paren">(</span><em>list</em>, <em>displaywidth=80</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.columnize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display a list of strings as a compact set of columns.</p>
 <p>Each column is only as wide as necessary.
 Columns are separated by two spaces (one was not legible enough).</p>
@@ -171,7 +171,7 @@ Columns are separated by two spaces (one was not legible enough).</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.complete">
-<tt class="descname">complete</tt><big>(</big><em>text</em>, <em>state</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.complete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">complete</code><span class="sig-paren">(</span><em>text</em>, <em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.complete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the next possible completion for &#8216;text&#8217;.</p>
 <p>If a command has not been entered, then complete against command list.
 Otherwise try to call complete_&lt;command&gt; to get list of completions.</p>
@@ -179,122 +179,122 @@ Otherwise try to call complete_&lt;command&gt; to get list of completions.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.complete_help">
-<tt class="descname">complete_help</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.complete_help" title="Permalink to this definition">¶</a></dt>
+<code class="descname">complete_help</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.complete_help" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.completedefault">
-<tt class="descname">completedefault</tt><big>(</big><em>text</em>, <em>line</em>, <em>begidx</em>, <em>endidx</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.completedefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.completedefault" title="Permalink to this definition">¶</a></dt>
+<code class="descname">completedefault</code><span class="sig-paren">(</span><em>text</em>, <em>line</em>, <em>begidx</em>, <em>endidx</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.completedefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.completedefault" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.completenames">
-<tt class="descname">completenames</tt><big>(</big><em>text</em>, <em>*ignored</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.completenames" title="Permalink to this definition">¶</a></dt>
+<code class="descname">completenames</code><span class="sig-paren">(</span><em>text</em>, <em>*ignored</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.completenames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.default">
-<tt class="descname">default</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.default" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.default" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_EOF">
-<tt class="descname">do_EOF</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_EOF" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_EOF</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_EOF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops reading commands and executes any &#8216;parmout&#8217; command that had
 been issued</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_go">
-<tt class="descname">do_go</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_go"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_go" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_go</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_go"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_go" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops reading commands and executes any &#8216;parmout&#8217; command that had
 been issued</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_help">
-<tt class="descname">do_help</tt><big>(</big><em>arg</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_help" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_help</code><span class="sig-paren">(</span><em>arg</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_help" title="Permalink to this definition">¶</a></dt>
 <dd><p>Modify the original do_help to pull docstrings from actions</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_history">
-<tt class="descname">do_history</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_history"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_history" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_history</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_history"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_history" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print the command history</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_parmout">
-<tt class="descname">do_parmout</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_parmout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_parmout" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_parmout</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_parmout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_parmout" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_quit">
-<tt class="descname">do_quit</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_quit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_quit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_quit</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_quit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_quit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops reading commands and quits WITHOUT running the last &#8216;parmout&#8217; 
 command that had been issued</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_shell">
-<tt class="descname">do_shell</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_shell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_shell" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_shell</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_shell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_shell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Support the limited interpreter</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.do_source">
-<tt class="descname">do_source</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_source" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_source</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.do_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.do_source" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.doc_header">
-<tt class="descname">doc_header</tt><em class="property"> = 'Documented commands (type help &lt;topic&gt;):'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.doc_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">doc_header</code><em class="property"> = 'Documented commands (type help &lt;topic&gt;):'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.doc_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.doc_leader">
-<tt class="descname">doc_leader</tt><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.doc_leader" title="Permalink to this definition">¶</a></dt>
+<code class="descname">doc_leader</code><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.doc_leader" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.emptyline">
-<tt class="descname">emptyline</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.emptyline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.emptyline" title="Permalink to this definition">¶</a></dt>
+<code class="descname">emptyline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.emptyline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.emptyline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override emptyline so that empty lines are simply ignored</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.get_names">
-<tt class="descname">get_names</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.get_names" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.get_names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.identchars">
-<tt class="descname">identchars</tt><em class="property"> = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.identchars" title="Permalink to this definition">¶</a></dt>
+<code class="descname">identchars</code><em class="property"> = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.identchars" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.intro">
-<tt class="descname">intro</tt><em class="property"> = None</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.intro" title="Permalink to this definition">¶</a></dt>
+<code class="descname">intro</code><em class="property"> = None</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.intro" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.lastcmd">
-<tt class="descname">lastcmd</tt><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.lastcmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lastcmd</code><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.lastcmd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.misc_header">
-<tt class="descname">misc_header</tt><em class="property"> = 'Miscellaneous help topics:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.misc_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">misc_header</code><em class="property"> = 'Miscellaneous help topics:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.misc_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.nohelp">
-<tt class="descname">nohelp</tt><em class="property"> = '*** No help on %s'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.nohelp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nohelp</code><em class="property"> = '*** No help on %s'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.nohelp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.onecmd">
-<tt class="descname">onecmd</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.onecmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onecmd</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.onecmd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interpret the argument as though it had been typed in response
 to the prompt.</p>
 <p>This may be overridden, but should not normally need to be;
@@ -305,13 +305,13 @@ commands by the interpreter should stop.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.parseline">
-<tt class="descname">parseline</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.parseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.parseline" title="Permalink to this definition">¶</a></dt>
+<code class="descname">parseline</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.parseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.parseline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override parseline so that it will set args as ArgumentList</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.populate_actions">
-<em class="property">classmethod </em><tt class="descname">populate_actions</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.populate_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.populate_actions" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">populate_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.populate_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.populate_actions" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will create all of the do_Command methods to trigger command
 auto-complete. This eliminates the need to modify the ParmedCmd class
 when a new command is added</p>
@@ -319,65 +319,65 @@ when a new command is added</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.postcmd">
-<tt class="descname">postcmd</tt><big>(</big><em>stop</em>, <em>line</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.postcmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">postcmd</code><span class="sig-paren">(</span><em>stop</em>, <em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.postcmd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method executed just after a command dispatch is finished.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.postloop">
-<tt class="descname">postloop</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.postloop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">postloop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.postloop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method executed once when the cmdloop() method is about to
 return.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.precmd">
-<tt class="descname">precmd</tt><big>(</big><em>line</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.precmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.precmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">precmd</code><span class="sig-paren">(</span><em>line</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.precmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.precmd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.preloop">
-<tt class="descname">preloop</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.preloop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">preloop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.preloop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method executed once when the cmdloop() method is called.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.print_topics">
-<tt class="descname">print_topics</tt><big>(</big><em>header</em>, <em>cmds</em>, <em>cmdlen</em>, <em>maxcol</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.print_topics" title="Permalink to this definition">¶</a></dt>
+<code class="descname">print_topics</code><span class="sig-paren">(</span><em>header</em>, <em>cmds</em>, <em>cmdlen</em>, <em>maxcol</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.print_topics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.prompt">
-<tt class="descname">prompt</tt><em class="property"> = '&gt; '</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.prompt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prompt</code><em class="property"> = '&gt; '</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.prompt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.ruler">
-<tt class="descname">ruler</tt><em class="property"> = '='</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.ruler" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ruler</code><em class="property"> = '='</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.ruler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.setlog">
-<tt class="descname">setlog</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.setlog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.setlog" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setlog</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#ParmedCmd.setlog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.setlog" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open up a log file to start logging the commands.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.undoc_header">
-<tt class="descname">undoc_header</tt><em class="property"> = 'Undocumented commands:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.undoc_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">undoc_header</code><em class="property"> = 'Undocumented commands:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.undoc_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.ParmedCmd.use_rawinput">
-<tt class="descname">use_rawinput</tt><em class="property"> = 1</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.use_rawinput" title="Permalink to this definition">¶</a></dt>
+<code class="descname">use_rawinput</code><em class="property"> = 1</em><a class="headerlink" href="#parmed.tools.parmed_cmd.ParmedCmd.use_rawinput" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.tools.parmed_cmd.PythonCmd">
-<em class="property">class </em><tt class="descclassname">parmed.tools.parmed_cmd.</tt><tt class="descname">PythonCmd</tt><big>(</big><em>stdin=None</em>, <em>stdout=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">cmd.Cmd</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tools.parmed_cmd.</code><code class="descname">PythonCmd</code><span class="sig-paren">(</span><em>stdin=None</em>, <em>stdout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cmd.Cmd</span></code></p>
 <p>Command interpreter for limited Python interpreter</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
@@ -398,71 +398,71 @@ return.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.cmdloop" title="parmed.tools.parmed_cmd.PythonCmd.cmdloop"><tt class="xref py py-obj docutils literal"><span class="pre">cmdloop</span></tt></a>([intro])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.cmdloop" title="parmed.tools.parmed_cmd.PythonCmd.cmdloop"><code class="xref py py-obj docutils literal"><span class="pre">cmdloop</span></code></a>([intro])</td>
 <td>Repeatedly issue a prompt, accept input, parse an initial prefix off the received input, and dispatch to action methods, passing them the remainder of the line as argument.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.columnize" title="parmed.tools.parmed_cmd.PythonCmd.columnize"><tt class="xref py py-obj docutils literal"><span class="pre">columnize</span></tt></a>(list[,&nbsp;displaywidth])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.columnize" title="parmed.tools.parmed_cmd.PythonCmd.columnize"><code class="xref py py-obj docutils literal"><span class="pre">columnize</span></code></a>(list[,&nbsp;displaywidth])</td>
 <td>Display a list of strings as a compact set of columns.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.complete" title="parmed.tools.parmed_cmd.PythonCmd.complete"><tt class="xref py py-obj docutils literal"><span class="pre">complete</span></tt></a>(text,&nbsp;state)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.complete" title="parmed.tools.parmed_cmd.PythonCmd.complete"><code class="xref py py-obj docutils literal"><span class="pre">complete</span></code></a>(text,&nbsp;state)</td>
 <td>Return the next possible completion for &#8216;text&#8217;.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.complete_help" title="parmed.tools.parmed_cmd.PythonCmd.complete_help"><tt class="xref py py-obj docutils literal"><span class="pre">complete_help</span></tt></a>(*args)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.complete_help" title="parmed.tools.parmed_cmd.PythonCmd.complete_help"><code class="xref py py-obj docutils literal"><span class="pre">complete_help</span></code></a>(*args)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.completedefault" title="parmed.tools.parmed_cmd.PythonCmd.completedefault"><tt class="xref py py-obj docutils literal"><span class="pre">completedefault</span></tt></a>(*ignored)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.completedefault" title="parmed.tools.parmed_cmd.PythonCmd.completedefault"><code class="xref py py-obj docutils literal"><span class="pre">completedefault</span></code></a>(*ignored)</td>
 <td>Method called to complete an input line when no command-specific complete_*() method is available.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.completenames" title="parmed.tools.parmed_cmd.PythonCmd.completenames"><tt class="xref py py-obj docutils literal"><span class="pre">completenames</span></tt></a>(text,&nbsp;*ignored)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.completenames" title="parmed.tools.parmed_cmd.PythonCmd.completenames"><code class="xref py py-obj docutils literal"><span class="pre">completenames</span></code></a>(text,&nbsp;*ignored)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.default" title="parmed.tools.parmed_cmd.PythonCmd.default"><tt class="xref py py-obj docutils literal"><span class="pre">default</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.default" title="parmed.tools.parmed_cmd.PythonCmd.default"><code class="xref py py-obj docutils literal"><span class="pre">default</span></code></a>(line)</td>
 <td>Add this onto the command string</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.do_EOF" title="parmed.tools.parmed_cmd.PythonCmd.do_EOF"><tt class="xref py py-obj docutils literal"><span class="pre">do_EOF</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.do_EOF" title="parmed.tools.parmed_cmd.PythonCmd.do_EOF"><code class="xref py py-obj docutils literal"><span class="pre">do_EOF</span></code></a>(line)</td>
 <td>Break out of the shell</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.do_help" title="parmed.tools.parmed_cmd.PythonCmd.do_help"><tt class="xref py py-obj docutils literal"><span class="pre">do_help</span></tt></a>(arg)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.do_help" title="parmed.tools.parmed_cmd.PythonCmd.do_help"><code class="xref py py-obj docutils literal"><span class="pre">do_help</span></code></a>(arg)</td>
 <td>List available commands with &#8220;help&#8221; or detailed help with &#8220;help cmd&#8221;.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.do_shell" title="parmed.tools.parmed_cmd.PythonCmd.do_shell"><tt class="xref py py-obj docutils literal"><span class="pre">do_shell</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.do_shell" title="parmed.tools.parmed_cmd.PythonCmd.do_shell"><code class="xref py py-obj docutils literal"><span class="pre">do_shell</span></code></a>(line)</td>
 <td>Break out of the shell</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.emptyline" title="parmed.tools.parmed_cmd.PythonCmd.emptyline"><tt class="xref py py-obj docutils literal"><span class="pre">emptyline</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.emptyline" title="parmed.tools.parmed_cmd.PythonCmd.emptyline"><code class="xref py py-obj docutils literal"><span class="pre">emptyline</span></code></a>()</td>
 <td>Ignore all empty lines</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.get_names" title="parmed.tools.parmed_cmd.PythonCmd.get_names"><tt class="xref py py-obj docutils literal"><span class="pre">get_names</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.get_names" title="parmed.tools.parmed_cmd.PythonCmd.get_names"><code class="xref py py-obj docutils literal"><span class="pre">get_names</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.onecmd" title="parmed.tools.parmed_cmd.PythonCmd.onecmd"><tt class="xref py py-obj docutils literal"><span class="pre">onecmd</span></tt></a>(line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.onecmd" title="parmed.tools.parmed_cmd.PythonCmd.onecmd"><code class="xref py py-obj docutils literal"><span class="pre">onecmd</span></code></a>(line)</td>
 <td>Interpret the argument as though it had been typed in response to the prompt.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.parseline" title="parmed.tools.parmed_cmd.PythonCmd.parseline"><tt class="xref py py-obj docutils literal"><span class="pre">parseline</span></tt></a>(line)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.parseline" title="parmed.tools.parmed_cmd.PythonCmd.parseline"><code class="xref py py-obj docutils literal"><span class="pre">parseline</span></code></a>(line)</td>
 <td>Override parseline</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.postcmd" title="parmed.tools.parmed_cmd.PythonCmd.postcmd"><tt class="xref py py-obj docutils literal"><span class="pre">postcmd</span></tt></a>(stop,&nbsp;line)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.postcmd" title="parmed.tools.parmed_cmd.PythonCmd.postcmd"><code class="xref py py-obj docutils literal"><span class="pre">postcmd</span></code></a>(stop,&nbsp;line)</td>
 <td>Hook method executed just after a command dispatch is finished.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.postloop" title="parmed.tools.parmed_cmd.PythonCmd.postloop"><tt class="xref py py-obj docutils literal"><span class="pre">postloop</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.postloop" title="parmed.tools.parmed_cmd.PythonCmd.postloop"><code class="xref py py-obj docutils literal"><span class="pre">postloop</span></code></a>()</td>
 <td>Hook method executed once when the cmdloop() method is about to return.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.precmd" title="parmed.tools.parmed_cmd.PythonCmd.precmd"><tt class="xref py py-obj docutils literal"><span class="pre">precmd</span></tt></a>(line,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.precmd" title="parmed.tools.parmed_cmd.PythonCmd.precmd"><code class="xref py py-obj docutils literal"><span class="pre">precmd</span></code></a>(line,&nbsp;*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.preloop" title="parmed.tools.parmed_cmd.PythonCmd.preloop"><tt class="xref py py-obj docutils literal"><span class="pre">preloop</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.preloop" title="parmed.tools.parmed_cmd.PythonCmd.preloop"><code class="xref py py-obj docutils literal"><span class="pre">preloop</span></code></a>()</td>
 <td>Hook method executed once when the cmdloop() method is called.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.print_topics" title="parmed.tools.parmed_cmd.PythonCmd.print_topics"><tt class="xref py py-obj docutils literal"><span class="pre">print_topics</span></tt></a>(header,&nbsp;cmds,&nbsp;cmdlen,&nbsp;maxcol)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.print_topics" title="parmed.tools.parmed_cmd.PythonCmd.print_topics"><code class="xref py py-obj docutils literal"><span class="pre">print_topics</span></code></a>(header,&nbsp;cmds,&nbsp;cmdlen,&nbsp;maxcol)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.setlog" title="parmed.tools.parmed_cmd.PythonCmd.setlog"><tt class="xref py py-obj docutils literal"><span class="pre">setlog</span></tt></a>(f)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.parmed_cmd.PythonCmd.setlog" title="parmed.tools.parmed_cmd.PythonCmd.setlog"><code class="xref py py-obj docutils literal"><span class="pre">setlog</span></code></a>(f)</td>
 <td>Open up a log file to start logging the commands</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.cmdloop">
-<tt class="descname">cmdloop</tt><big>(</big><em>intro=None</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.cmdloop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cmdloop</code><span class="sig-paren">(</span><em>intro=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.cmdloop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Repeatedly issue a prompt, accept input, parse an initial prefix
 off the received input, and dispatch to action methods, passing them
 the remainder of the line as argument.</p>
@@ -470,7 +470,7 @@ the remainder of the line as argument.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.columnize">
-<tt class="descname">columnize</tt><big>(</big><em>list</em>, <em>displaywidth=80</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.columnize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">columnize</code><span class="sig-paren">(</span><em>list</em>, <em>displaywidth=80</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.columnize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display a list of strings as a compact set of columns.</p>
 <p>Each column is only as wide as necessary.
 Columns are separated by two spaces (one was not legible enough).</p>
@@ -478,7 +478,7 @@ Columns are separated by two spaces (one was not legible enough).</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.complete">
-<tt class="descname">complete</tt><big>(</big><em>text</em>, <em>state</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.complete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">complete</code><span class="sig-paren">(</span><em>text</em>, <em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.complete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the next possible completion for &#8216;text&#8217;.</p>
 <p>If a command has not been entered, then complete against command list.
 Otherwise try to call complete_&lt;command&gt; to get list of completions.</p>
@@ -486,12 +486,12 @@ Otherwise try to call complete_&lt;command&gt; to get list of completions.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.complete_help">
-<tt class="descname">complete_help</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.complete_help" title="Permalink to this definition">¶</a></dt>
+<code class="descname">complete_help</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.complete_help" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.completedefault">
-<tt class="descname">completedefault</tt><big>(</big><em>*ignored</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.completedefault" title="Permalink to this definition">¶</a></dt>
+<code class="descname">completedefault</code><span class="sig-paren">(</span><em>*ignored</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.completedefault" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method called to complete an input line when no command-specific
 complete_*() method is available.</p>
 <p>By default, it returns an empty list.</p>
@@ -499,82 +499,82 @@ complete_*() method is available.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.completenames">
-<tt class="descname">completenames</tt><big>(</big><em>text</em>, <em>*ignored</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.completenames" title="Permalink to this definition">¶</a></dt>
+<code class="descname">completenames</code><span class="sig-paren">(</span><em>text</em>, <em>*ignored</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.completenames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.default">
-<tt class="descname">default</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.default" title="Permalink to this definition">¶</a></dt>
+<code class="descname">default</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add this onto the command string</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.do_EOF">
-<tt class="descname">do_EOF</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.do_EOF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.do_EOF" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_EOF</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.do_EOF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.do_EOF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Break out of the shell</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.do_help">
-<tt class="descname">do_help</tt><big>(</big><em>arg</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.do_help" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_help</code><span class="sig-paren">(</span><em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.do_help" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available commands with &#8220;help&#8221; or detailed help with &#8220;help cmd&#8221;.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.do_shell">
-<tt class="descname">do_shell</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.do_shell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.do_shell" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_shell</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.do_shell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.do_shell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Break out of the shell</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.doc_header">
-<tt class="descname">doc_header</tt><em class="property"> = 'Documented commands (type help &lt;topic&gt;):'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.doc_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">doc_header</code><em class="property"> = 'Documented commands (type help &lt;topic&gt;):'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.doc_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.doc_leader">
-<tt class="descname">doc_leader</tt><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.doc_leader" title="Permalink to this definition">¶</a></dt>
+<code class="descname">doc_leader</code><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.doc_leader" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.emptyline">
-<tt class="descname">emptyline</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.emptyline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.emptyline" title="Permalink to this definition">¶</a></dt>
+<code class="descname">emptyline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.emptyline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.emptyline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ignore all empty lines</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.get_names">
-<tt class="descname">get_names</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.get_names" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.get_names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.identchars">
-<tt class="descname">identchars</tt><em class="property"> = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.identchars" title="Permalink to this definition">¶</a></dt>
+<code class="descname">identchars</code><em class="property"> = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.identchars" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.intro">
-<tt class="descname">intro</tt><em class="property"> = None</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.intro" title="Permalink to this definition">¶</a></dt>
+<code class="descname">intro</code><em class="property"> = None</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.intro" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.lastcmd">
-<tt class="descname">lastcmd</tt><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.lastcmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lastcmd</code><em class="property"> = ''</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.lastcmd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.misc_header">
-<tt class="descname">misc_header</tt><em class="property"> = 'Miscellaneous help topics:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.misc_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">misc_header</code><em class="property"> = 'Miscellaneous help topics:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.misc_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.nohelp">
-<tt class="descname">nohelp</tt><em class="property"> = '*** No help on %s'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.nohelp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nohelp</code><em class="property"> = '*** No help on %s'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.nohelp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.onecmd">
-<tt class="descname">onecmd</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.onecmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onecmd</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.onecmd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interpret the argument as though it had been typed in response
 to the prompt.</p>
 <p>This may be overridden, but should not normally need to be;
@@ -585,70 +585,70 @@ commands by the interpreter should stop.</p>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.parseline">
-<tt class="descname">parseline</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.parseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.parseline" title="Permalink to this definition">¶</a></dt>
+<code class="descname">parseline</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.parseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.parseline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override parseline</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.postcmd">
-<tt class="descname">postcmd</tt><big>(</big><em>stop</em>, <em>line</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.postcmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">postcmd</code><span class="sig-paren">(</span><em>stop</em>, <em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.postcmd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method executed just after a command dispatch is finished.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.postloop">
-<tt class="descname">postloop</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.postloop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">postloop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.postloop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method executed once when the cmdloop() method is about to
 return.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.precmd">
-<tt class="descname">precmd</tt><big>(</big><em>line</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.precmd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">precmd</code><span class="sig-paren">(</span><em>line</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.precmd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.preloop">
-<tt class="descname">preloop</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.preloop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">preloop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.preloop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook method executed once when the cmdloop() method is called.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.print_topics">
-<tt class="descname">print_topics</tt><big>(</big><em>header</em>, <em>cmds</em>, <em>cmdlen</em>, <em>maxcol</em><big>)</big><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.print_topics" title="Permalink to this definition">¶</a></dt>
+<code class="descname">print_topics</code><span class="sig-paren">(</span><em>header</em>, <em>cmds</em>, <em>cmdlen</em>, <em>maxcol</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.print_topics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.prompt">
-<tt class="descname">prompt</tt><em class="property"> = 'py &gt;&gt;&gt; '</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.prompt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prompt</code><em class="property"> = 'py &gt;&gt;&gt; '</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.prompt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.ruler">
-<tt class="descname">ruler</tt><em class="property"> = '='</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.ruler" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ruler</code><em class="property"> = '='</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.ruler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.setlog">
-<tt class="descname">setlog</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.setlog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.setlog" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setlog</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#PythonCmd.setlog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.setlog" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open up a log file to start logging the commands</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.undoc_header">
-<tt class="descname">undoc_header</tt><em class="property"> = 'Undocumented commands:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.undoc_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">undoc_header</code><em class="property"> = 'Undocumented commands:'</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.undoc_header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tools.parmed_cmd.PythonCmd.use_rawinput">
-<tt class="descname">use_rawinput</tt><em class="property"> = 1</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.use_rawinput" title="Permalink to this definition">¶</a></dt>
+<code class="descname">use_rawinput</code><em class="property"> = 1</em><a class="headerlink" href="#parmed.tools.parmed_cmd.PythonCmd.use_rawinput" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="parmed.tools.parmed_cmd.log_commands">
-<tt class="descclassname">parmed.tools.parmed_cmd.</tt><tt class="descname">log_commands</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#log_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.log_commands" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.tools.parmed_cmd.</code><code class="descname">log_commands</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/parmed_cmd.html#log_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.parmed_cmd.log_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorator to write the line to a file</p>
 </dd></dl>
 
@@ -658,14 +658,16 @@ return.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.tools.parmed_cmd.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.tools.parmed_cmd.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -682,7 +684,7 @@ return.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -691,12 +693,12 @@ return.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

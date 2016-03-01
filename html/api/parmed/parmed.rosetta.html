@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-rosetta-package">
 <h1>parmed.rosetta package<a class="headerlink" href="#parmed-rosetta-package" title="Permalink to this headline">¶</a></h1>
@@ -62,8 +62,8 @@
 <p>A package dealing with PyRosetta integration.</p>
 <dl class="class">
 <dt id="parmed.rosetta.RosettaPose">
-<em class="property">class </em><tt class="descclassname">parmed.rosetta.</tt><tt class="descname">RosettaPose</tt><a class="headerlink" href="#parmed.rosetta.RosettaPose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.rosetta.</code><code class="descname">RosettaPose</code><a class="reference internal" href="../../_modules/parmed/rosetta/pose.html#RosettaPose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rosetta.RosettaPose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -71,23 +71,23 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.rosetta.RosettaPose.load" title="parmed.rosetta.RosettaPose.load"><tt class="xref py py-obj docutils literal"><span class="pre">load</span></tt></a>(pose)</td>
-<td>Load a <tt class="xref py py-class docutils literal"><span class="pre">Pose</span></tt> object and return a populated <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.rosetta.RosettaPose.load" title="parmed.rosetta.RosettaPose.load"><code class="xref py py-obj docutils literal"><span class="pre">load</span></code></a>(pose)</td>
+<td>Load a <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> object and return a populated <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.rosetta.RosettaPose.load">
-<em class="property">static </em><tt class="descname">load</tt><big>(</big><em>pose</em><big>)</big><a class="headerlink" href="#parmed.rosetta.RosettaPose.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load a <tt class="xref py py-class docutils literal"><span class="pre">Pose</span></tt> object and return a populated <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>
+<em class="property">static </em><code class="descname">load</code><span class="sig-paren">(</span><em>pose</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rosetta/pose.html#RosettaPose.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rosetta.RosettaPose.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> object and return a populated <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>
 instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pose</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Pose</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pose</strong> : <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code></p>
 <blockquote class="last">
-<div><p>PyRosetta <tt class="xref py py-class docutils literal"><span class="pre">Pose</span></tt> object to convert</p>
+<div><p>PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> object to convert</p>
 </div></blockquote>
 </td>
 </tr>
@@ -104,7 +104,7 @@ instance</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
@@ -115,12 +115,14 @@ instance</p>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.rosetta.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.rosetta.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -137,7 +139,7 @@ instance</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -146,12 +148,12 @@ instance</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

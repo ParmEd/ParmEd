@@ -23,14 +23,14 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
     <link rel="up" title="PyRosetta Integration" href="rosetta.html" />
-    <link rel="next" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" />
+    <link rel="next" title="Using parmed" href="parmed.html" />
     <link rel="prev" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -40,36 +40,36 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
+          <a href="parmed.html" title="Using parmed"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="rosetta.html" accesskey="U">PyRosetta Integration</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="rosetta.html" accesskey="U">PyRosetta Integration</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="seeding-openmm-simulations-with-pyrosetta-and-parmed">
 <h1>Seeding OpenMM Simulations with PyRosetta and ParmEd<a class="headerlink" href="#seeding-openmm-simulations-with-pyrosetta-and-parmed" title="Permalink to this headline">¶</a></h1>
 <p>In this example, we&#8217;ll go over starting a small protein
 (dodeca-alanine) simulation from scratch, using PyRosetta and OpenMM.</p>
 <p>You can also follow along with the script called
-<tt class="code docutils literal"><span class="pre">simulate_ala12_mutant.py</span></tt> in <tt class="code docutils literal"><span class="pre">examples/rosetta/</span></tt>.</p>
+<code class="code docutils literal"><span class="pre">simulate_ala12_mutant.py</span></code> in <code class="code docutils literal"><span class="pre">examples/rosetta/</span></code>.</p>
 <div class="section" id="generate-pose-from-primary-structure">
 <h2>Generate pose from primary structure<a class="headerlink" href="#generate-pose-from-primary-structure" title="Permalink to this headline">¶</a></h2>
-<p>To start, let&#8217;s create a PyRosetta <tt class="xref py py-class docutils literal"><span class="pre">Pose</span></tt>
+<p>To start, let&#8217;s create a PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code>
 directly from a sequence of twelve alanines:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rosetta</span> <span class="kn">import</span> <span class="n">init</span><span class="p">,</span> <span class="n">pose_from_sequence</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rosetta</span> <span class="kn">import</span> <span class="n">init</span><span class="p">,</span> <span class="n">pose_from_sequence</span>
 
 <span class="n">init</span><span class="p">()</span>
 
-<span class="n">seq</span> <span class="o">=</span> <span class="mi">12</span><span class="o">*</span><span class="s">&#39;A&#39;</span>
+<span class="n">seq</span> <span class="o">=</span> <span class="mi">12</span><span class="o">*</span><span class="s1">&#39;A&#39;</span>
 <span class="n">pose</span> <span class="o">=</span> <span class="n">pose_from_sequence</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -78,17 +78,17 @@ directly from a sequence of twelve alanines:</p>
 <h2>Mutate a residue<a class="headerlink" href="#mutate-a-residue" title="Permalink to this headline">¶</a></h2>
 <p>Want to mutate the fifth residue to a lysine? PyRosetta
 makes it as easy as:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">toolbox</span> <span class="kn">import</span> <span class="n">mutate_residue</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">toolbox</span> <span class="kn">import</span> <span class="n">mutate_residue</span>
 
-<span class="n">mutant</span> <span class="o">=</span> <span class="n">mutate_residue</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;K&#39;</span><span class="p">)</span>
+<span class="n">mutant</span> <span class="o">=</span> <span class="n">mutate_residue</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="load-pose-into-parmed">
 <h2>Load Pose into ParmEd<a class="headerlink" href="#load-pose-into-parmed" title="Permalink to this headline">¶</a></h2>
-<p>The next step is to use ParmEd&#8217;s <tt class="xref py py-func docutils literal"><span class="pre">load_rosetta()</span></tt> function
-to convert our mutant into a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_rosetta</span>
+<p>The next step is to use ParmEd&#8217;s <code class="xref py py-func docutils literal"><span class="pre">load_rosetta()</span></code> function
+to convert our mutant into a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_rosetta</span>
 
 <span class="n">struct</span> <span class="o">=</span> <span class="n">load_rosetta</span><span class="p">(</span><span class="n">mutant</span><span class="p">)</span>
 </pre></div>
@@ -97,20 +97,20 @@ to convert our mutant into a <tt class="xref py py-class docutils literal"><span
 <div class="section" id="start-an-openmm-simulation">
 <h2>Start an OpenMM simulation<a class="headerlink" href="#start-an-openmm-simulation" title="Permalink to this headline">¶</a></h2>
 <p>Finally, we can use the following code to solvate and
-start simulating our ParmEd <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="o">*</span>
+start simulating our ParmEd <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">simtk.openmm.app</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">simtk.unit</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="n">ff</span> <span class="o">=</span> <span class="n">ForceField</span><span class="p">(</span><span class="s">&#39;amber99sbildn.xml&#39;</span><span class="p">,</span> <span class="s">&#39;tip3p.xml&#39;</span><span class="p">)</span>
+<span class="n">ff</span> <span class="o">=</span> <span class="n">ForceField</span><span class="p">(</span><span class="s1">&#39;amber99sbildn.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">)</span>
 
-<span class="c"># Solvate Structure</span>
+<span class="c1"># Solvate Structure</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">Modeller</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="n">mod</span><span class="o">.</span><span class="n">addSolvent</span><span class="p">(</span><span class="n">ff</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s">&#39;tip3p&#39;</span><span class="p">,</span> <span class="n">boxSize</span><span class="o">=</span><span class="n">Vec3</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">nanometers</span><span class="p">,</span>
-               <span class="n">positiveIon</span><span class="o">=</span><span class="s">&#39;Na+&#39;</span><span class="p">,</span> <span class="n">negativeIon</span><span class="o">=</span><span class="s">&#39;Cl-&#39;</span><span class="p">,</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">addSolvent</span><span class="p">(</span><span class="n">ff</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;tip3p&#39;</span><span class="p">,</span> <span class="n">boxSize</span><span class="o">=</span><span class="n">Vec3</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">nanometers</span><span class="p">,</span>
+               <span class="n">positiveIon</span><span class="o">=</span><span class="s1">&#39;Na+&#39;</span><span class="p">,</span> <span class="n">negativeIon</span><span class="o">=</span><span class="s1">&#39;Cl-&#39;</span><span class="p">,</span>
                <span class="n">ionicStrength</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">molar</span><span class="p">)</span>
 
-<span class="c"># Create OpenMM System</span>
+<span class="c1"># Create OpenMM System</span>
 <span class="n">system</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">PME</span><span class="p">,</span>
                          <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="n">nanometers</span><span class="p">,</span>
                          <span class="n">constraints</span><span class="o">=</span><span class="n">HBonds</span><span class="p">)</span>
@@ -122,12 +122,12 @@ start simulating our ParmEd <tt class="xref py py-class docutils literal"><span 
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">)</span>
 <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
-<span class="c"># Minimize System</span>
+<span class="c1"># Minimize System</span>
 <span class="n">simulation</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">maxIterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 
-<span class="c"># Equilibrate System</span>
+<span class="c1"># Equilibrate System</span>
 <span class="n">simulation</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-    <span class="n">PDBReporter</span><span class="p">(</span><span class="s">&#39;dodecaalanine.solv.pdb&#39;</span><span class="p">,</span> <span class="mi">50000</span><span class="p">))</span>
+    <span class="n">PDBReporter</span><span class="p">(</span><span class="s1">&#39;dodecaalanine.solv.pdb&#39;</span><span class="p">,</span> <span class="mi">50000</span><span class="p">))</span>
 
 <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setVelocitiesToTemperature</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
 
@@ -141,7 +141,7 @@ start simulating our ParmEd <tt class="xref py py-class docutils literal"><span 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -154,12 +154,14 @@ start simulating our ParmEd <tt class="xref py py-class docutils literal"><span 
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/omm_rosetta.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/omm_rosetta.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -176,7 +178,7 @@ start simulating our ParmEd <tt class="xref py py-class docutils literal"><span 
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -186,18 +188,18 @@ start simulating our ParmEd <tt class="xref py py-class docutils literal"><span 
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
+          <a href="parmed.html" title="Using parmed"
              >next</a> |</li>
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              >previous</a> |</li>
-        <li><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="rosetta.html" >PyRosetta Integration</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="rosetta.html" >PyRosetta Integration</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

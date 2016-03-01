@@ -20,10 +20,4 @@ parmed.topologyobjects.Bond
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~Bond.bond_type
-   
    

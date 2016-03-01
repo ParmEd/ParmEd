@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,22 +36,22 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.tinker.tinkerfiles">
 <span id="parmed-tinker-tinkerfiles-module"></span><h1>parmed.tinker.tinkerfiles module<a class="headerlink" href="#module-parmed.tinker.tinkerfiles" title="Permalink to this headline">¶</a></h1>
 <p>This module contains classes for reading various TINKER-style files</p>
 <dl class="class">
 <dt id="parmed.tinker.tinkerfiles.DynFile">
-<em class="property">class </em><tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">DynFile</tt><big>(</big><em>fname=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#DynFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.DynFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tinker.tinkerfiles.</code><code class="descname">DynFile</code><span class="sig-paren">(</span><em>fname=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#DynFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.DynFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Reads and processes a Tinker DYN file</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -60,14 +60,14 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.DynFile.read" title="parmed.tinker.tinkerfiles.DynFile.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(fname)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.DynFile.read" title="parmed.tinker.tinkerfiles.DynFile.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(fname)</td>
 <td>Parses the .dyn file</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.tinker.tinkerfiles.DynFile.read">
-<tt class="descname">read</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#DynFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.DynFile.read" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#DynFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.DynFile.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the .dyn file</p>
 </dd></dl>
 
@@ -75,21 +75,1439 @@
 
 <dl class="class">
 <dt id="parmed.tinker.tinkerfiles.KeywordControlFile">
-<em class="property">class </em><tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">KeywordControlFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#KeywordControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.KeywordControlFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tinker.tinkerfiles.</code><code class="descname">KeywordControlFile</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#KeywordControlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.KeywordControlFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Reads and processes a keyword control file for TINKER simulations</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.tinker.tinkerfiles.XyzFile">
-<em class="property">class </em><tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">XyzFile</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#XyzFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tinker.tinkerfiles.</code><code class="descname">XyzFile</code><span class="sig-paren">(</span><em>fname</em>, <em>seq=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#XyzFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
 <p>Reads and processes a Tinker XYZ file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like</p>
+<blockquote>
+<div><p>Name of the file, or the file object containing the XYZ file contents</p>
+</div></blockquote>
+<p><strong>seq</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>Name of the file containing the residue (and chain) sequence. Default is
+None (so every atom will be part of the same residue)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.box" title="parmed.tinker.tinkerfiles.XyzFile.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.box_vectors" title="parmed.tinker.tinkerfiles.XyzFile.box_vectors"><code class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></code></a></td>
+<td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.combining_rule" title="parmed.tinker.tinkerfiles.XyzFile.combining_rule"><code class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.coordinates" title="parmed.tinker.tinkerfiles.XyzFile.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.positions" title="parmed.tinker.tinkerfiles.XyzFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
+<td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.topology" title="parmed.tinker.tinkerfiles.XyzFile.topology"><code class="xref py py-obj docutils literal"><span class="pre">topology</span></code></a></td>
+<td>The OpenMM Topology object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.velocities" title="parmed.tinker.tinkerfiles.XyzFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
+<td>A (natom, 3)-shape numpy array with atomic velocities for every atom in</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.view" title="parmed.tinker.tinkerfiles.XyzFile.view"><code class="xref py py-obj docutils literal"><span class="pre">view</span></code></a></td>
+<td>Returns an indexable object that can be indexed like a standard</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.add_atom" title="parmed.tinker.tinkerfiles.XyzFile.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
+<td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.add_atom_to_residue" title="parmed.tinker.tinkerfiles.XyzFile.add_atom_to_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></code></a>(atom,&nbsp;residue)</td>
+<td>Adds a new atom to the Structure at the end if the given residue</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.copy" title="parmed.tinker.tinkerfiles.XyzFile.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
+<td>Makes a copy of the current structure as an instance of a specified</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.createSystem" title="parmed.tinker.tinkerfiles.XyzFile.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.get_box" title="parmed.tinker.tinkerfiles.XyzFile.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
+<td>In some cases, multiple conformations may be stored in the Structure.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.get_coordinates" title="parmed.tinker.tinkerfiles.XyzFile.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
+<td>In some cases, multiple conformations may be stored in the Structure.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.has_NBFIX" title="parmed.tinker.tinkerfiles.XyzFile.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
+<td>Returns whether or not any pairs of atom types have their LJ</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.id_format" title="parmed.tinker.tinkerfiles.XyzFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<td>Identify the file as a Tinker XYZ file</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.is_changed" title="parmed.tinker.tinkerfiles.XyzFile.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
+<td>Determines if any of the topology has changed for this structure</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.join_dihedrals" title="parmed.tinker.tinkerfiles.XyzFile.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
+<td>Joins multi-term torsions into a single term and makes all of the parameters DihedralTypeList instances.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.load_dataframe" title="parmed.tinker.tinkerfiles.XyzFile.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
+<td>Loads atomic properties from an input DataFrame</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_add_constraints" title="parmed.tinker.tinkerfiles.XyzFile.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Adds constraints to a given system</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_angle_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_bond_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_cmap_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM CMAP torsion force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_dihedral_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_gbsa_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates a Generalized Born force for running implicit solvent</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_improper_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM improper torsion force (quadratic bias)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_nonbonded_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM NonbondedForce instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_out_of_plane_bend_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba out-of-plane bend force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_pi_torsion_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba pi-torsion force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_rb_torsion_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_set_virtual_sites" title="parmed.tinker.tinkerfiles.XyzFile.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_stretch_bend_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba stretch-bend force for this system</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_torsion_torsion_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_trigonal_angle_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the Amoeba trigonal-angle force</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.omm_urey_bradley_force" title="parmed.tinker.tinkerfiles.XyzFile.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Creates the OpenMM Urey-Bradley force</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.prune_empty_terms" title="parmed.tinker.tinkerfiles.XyzFile.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
+<td>Looks through all of the topological lists and gets rid of terms</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.save" title="parmed.tinker.tinkerfiles.XyzFile.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<td>Saves the current Structure in the requested file format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.split" title="parmed.tinker.tinkerfiles.XyzFile.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
+<td>Split the current Structure into separate Structure instances for each unique molecule.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.strip" title="parmed.tinker.tinkerfiles.XyzFile.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
+<td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.to_dataframe" title="parmed.tinker.tinkerfiles.XyzFile.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
+<td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.unchange" title="parmed.tinker.tinkerfiles.XyzFile.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
+<td>Toggles all lists so that they do not indicate any changes</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.update_dihedral_exclusions" title="parmed.tinker.tinkerfiles.XyzFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
+<td>Nonbonded exclusions and exceptions have the following priority:</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.write_cif" title="parmed.tinker.tinkerfiles.XyzFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from the current Structure instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.write_pdb" title="parmed.tinker.tinkerfiles.XyzFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<td>Write a PDB file from a Structure instance</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.tinkerfiles.XyzFile.write_psf" title="parmed.tinker.tinkerfiles.XyzFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<td>Writes a PSF file from the stored molecule</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.ANGLE_FORCE_GROUP">
+<code class="descname">ANGLE_FORCE_GROUP</code><em class="property"> = 1</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.BOND_FORCE_GROUP">
+<code class="descname">BOND_FORCE_GROUP</code><em class="property"> = 0</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.BOND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.CMAP_FORCE_GROUP">
+<code class="descname">CMAP_FORCE_GROUP</code><em class="property"> = 5</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.CMAP_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.DIHEDRAL_FORCE_GROUP">
+<code class="descname">DIHEDRAL_FORCE_GROUP</code><em class="property"> = 2</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.DIHEDRAL_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.IMPROPER_FORCE_GROUP">
+<code class="descname">IMPROPER_FORCE_GROUP</code><em class="property"> = 4</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.IMPROPER_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.NONBONDED_FORCE_GROUP">
+<code class="descname">NONBONDED_FORCE_GROUP</code><em class="property"> = 11</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.NONBONDED_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.OUT_OF_PLANE_BEND_FORCE_GROUP">
+<code class="descname">OUT_OF_PLANE_BEND_FORCE_GROUP</code><em class="property"> = 7</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.OUT_OF_PLANE_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.PI_TORSION_FORCE_GROUP">
+<code class="descname">PI_TORSION_FORCE_GROUP</code><em class="property"> = 8</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.PI_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.RB_TORSION_FORCE_GROUP">
+<code class="descname">RB_TORSION_FORCE_GROUP</code><em class="property"> = 12</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.RB_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.STRETCH_BEND_FORCE_GROUP">
+<code class="descname">STRETCH_BEND_FORCE_GROUP</code><em class="property"> = 9</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.STRETCH_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.TORSION_TORSION_FORCE_GROUP">
+<code class="descname">TORSION_TORSION_FORCE_GROUP</code><em class="property"> = 10</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.TORSION_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.TRIGONAL_ANGLE_FORCE_GROUP">
+<code class="descname">TRIGONAL_ANGLE_FORCE_GROUP</code><em class="property"> = 6</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.TRIGONAL_ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.UREY_BRADLEY_FORCE_GROUP">
+<code class="descname">UREY_BRADLEY_FORCE_GROUP</code><em class="property"> = 3</em><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.UREY_BRADLEY_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.add_atom">
+<code class="descname">add_atom</code><span class="sig-paren">(</span><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.add_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
+it has a different name or number as the last residue added and adding
+it to the <cite>atoms</cite> list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></p>
+<blockquote>
+<div><p>The atom to add to this residue list</p>
+</div></blockquote>
+<p><strong>resname</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
+<blockquote>
+<div><p>The name of the residue this atom belongs to</p>
+</div></blockquote>
+<p><strong>resnum</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
+<blockquote>
+<div><p>The number of the residue this atom belongs to</p>
+</div></blockquote>
+<p><strong>chain</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
+<blockquote>
+<div><p>The chain ID character for this residue</p>
+</div></blockquote>
+<p><strong>inscode</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
+<blockquote>
+<div><p>The insertion code ID character for this residue (it is stripped)</p>
+</div></blockquote>
+<p><strong>segid</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
+<blockquote class="last">
+<div><p>The segment identifier for this residue (it is stripped)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If the residue name and number differ from the last residue in this
+list, a new residue is added and the atom is added to that residue</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.add_atom_to_residue">
+<code class="descname">add_atom_to_residue</code><span class="sig-paren">(</span><em>atom</em>, <em>residue</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new atom to the Structure at the end if the given residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></p>
+<blockquote>
+<div><p>The atom to add to the system</p>
+</div></blockquote>
+<p><strong>residue</strong> : <code class="xref py py-class docutils literal"><span class="pre">Residue</span></code></p>
+<blockquote class="last">
+<div><p>The residue to which to add this atom. It MUST be part of this
+Structure instance already or a ValueError is raised</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This atom is added at the end of the residue and is inserted into the
+<cite>atoms</cite> list in such a way that all residues are composed of atoms
+contiguous in the atoms list. For large systems, this may be a
+relatively expensive operation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.box">
+<code class="descname">box</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.box_vectors">
+<code class="descname">box_vectors</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.box_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>3, 3-element tuple of unit cell vectors that are Quantity objects of
+dimension length</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.combining_rule">
+<code class="descname">combining_rule</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.combining_rule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.coordinates">
+<code class="descname">coordinates</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>cls</em>, <em>split_dihedrals=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a copy of the current structure as an instance of a specified
+subclass</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cls</strong> : Structure subclass</p>
+<blockquote>
+<div><p>The returned object is a copy of this structure as a <cite>cls</cite> instance</p>
+</div></blockquote>
+<p><strong>split_dihedrals</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
+<blockquote>
+<div><p>If True, then the Dihedral entries will be split up so that each one
+is paired with a single DihedralType (rather than a
+DihedralTypeList)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>cls</em> instance</p>
+<blockquote class="last">
+<div><p>The instance of the Structure subclass <cite>cls</cite> with a copy of the
+current Structure&#8217;s topology information</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.createSystem">
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an OpenMM System representing the topology described by the
+prmtop file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating point number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff.</p>
+</div></blockquote>
+<p><strong>switchDistance</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The distance at which the switching function is turned on for van
+der Waals interactions. This is ignored when no cutoff is used, and
+no switch is used if switchDistance is 0, negative, or greater than
+the cutoff</p>
+</div></blockquote>
+<p><strong>constraints</strong> : None, app.HBonds, app.HAngles, or app.AllBonds</p>
+<blockquote>
+<div><p>Which type of constraints to add to the system (e.g., SHAKE). None
+means no bonds are constrained. HBonds means bonds with hydrogen are
+constrained</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, water is kept rigid regardless of the value of constraints.
+A value of False is ignored if constraints is not None.</p>
+</div></blockquote>
+<p><strong>implicitSolvent</strong> : None, app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2</p>
+<blockquote>
+<div><p>The Generalized Born implicit solvent model to use.</p>
+</div></blockquote>
+<p><strong>implicitSolventKappa</strong> : float or 1/distance Quantity = None</p>
+<blockquote>
+<div><p>This is the Debye kappa property related to modeling saltwater
+conditions in GB. It should have units of 1/distance (1/nanometers
+is assumed if no units present). A value of None means that kappa
+will be calculated from implicitSolventSaltConc (below)</p>
+</div></blockquote>
+<p><strong>implicitSolventSaltConc</strong> : float or amount/volume Quantity=0 moles/liter</p>
+<blockquote>
+<div><p>If implicitSolventKappa is None, the kappa will be computed from the
+salt concentration. It should have units compatible with mol/L</p>
+</div></blockquote>
+<p><strong>temperature</strong> : float or temperature Quantity = 298.15 kelvin</p>
+<blockquote>
+<div><p>This is only used to compute kappa from implicitSolventSaltConc</p>
+</div></blockquote>
+<p><strong>soluteDielectric</strong> : float=1.0</p>
+<blockquote>
+<div><p>The dielectric constant of the protein interior used in GB</p>
+</div></blockquote>
+<p><strong>solventDielectric</strong> : float=78.5</p>
+<blockquote>
+<div><p>The dielectric constant of the water used in GB</p>
+</div></blockquote>
+<p><strong>useSASA</strong> : bool=False</p>
+<blockquote>
+<div><p>If True, use the ACE non-polar solvation model. Otherwise, use no
+SASA-based nonpolar solvation model.</p>
+</div></blockquote>
+<p><strong>removeCMMotion</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, the center-of-mass motion will be removed periodically
+during the simulation. If False, it will not.</p>
+</div></blockquote>
+<p><strong>hydrogenMass</strong> : float or mass quantity = None</p>
+<blockquote>
+<div><p>If not None, hydrogen masses will be changed to this mass and the
+difference subtracted from the attached heavy atom (hydrogen mass
+repartitioning)</p>
+</div></blockquote>
+<p><strong>ewaldErrorTolerance</strong> : float=0.0005</p>
+<blockquote>
+<div><p>When using PME or Ewald, the Ewald parameters will be calculated
+from this value</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If False, the energies and forces from the constrained degrees of
+freedom will NOT be computed. If True, they will (but those degrees
+of freedom will <em>still</em> be constrained).</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool=False</p>
+<blockquote>
+<div><p>If True, the progress of this subroutine will be printed to stdout</p>
+</div></blockquote>
+<p><strong>splitDihedrals</strong> : bool=False</p>
+<blockquote class="last">
+<div><p>If True, the dihedrals will be split into two forces &#8211; proper and
+impropers. This is primarily useful for debugging torsion parameter
+assignments.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function calls prune_empty_terms if any Topology lists have changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.get_box">
+<code class="descname">get_box</code><span class="sig-paren">(</span><em>frame='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.get_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>In some cases, multiple conformations may be stored in the Structure.
+This function retrieves a particular frame&#8217;s unit cell (box) dimensions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
+<blockquote>
+<div><p>The frame number whose coordinates should be retrieved. Default is
+&#8216;all&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<blockquote>
+<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
+(#, natom, 3). Otherwise the requested frame is returned with shape
+(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError if there are fewer than ``frame`` unit cell dimensions</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.get_coordinates">
+<code class="descname">get_coordinates</code><span class="sig-paren">(</span><em>frame='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>In some cases, multiple conformations may be stored in the Structure.
+This function retrieves a particular frame&#8217;s coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
+<blockquote>
+<div><p>The frame number whose coordinates should be retrieved. Default is
+&#8216;all&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>coords</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<blockquote>
+<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
+(#, natom, 3). Otherwise the requested frame is returned with shape
+(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError if there are fewer than ``frame`` coordinates</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.has_NBFIX">
+<code class="descname">has_NBFIX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether or not any pairs of atom types have their LJ
+interactions modified by an NBFIX definition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>has_nbfix</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, at least two atom types have NBFIX mod definitions</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.id_format">
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#XyzFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify the file as a Tinker XYZ file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to test whether or not it is a mol2 file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a xyz file, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.is_changed">
+<code class="descname">is_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.is_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if any of the topology has changed for this structure</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.join_dihedrals">
+<code class="descname">join_dihedrals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.join_dihedrals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins multi-term torsions into a single term and makes all of the
+parameters DihedralTypeList instances. If any dihedrals are <em>already</em>
+DihedralTypeList instances, or any are not parametrized, or there are no
+dihedral_types, this method returns without doing anything</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.load_dataframe">
+<code class="descname">load_dataframe</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads atomic properties from an input DataFrame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>df</strong> : pandas.DataFrame</p>
+<blockquote class="last">
+<div><p>A pandas DataFrame with atomic properties that will be used to set
+the properties on the current list of atoms</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.load_dataframe" title="parmed.utils.pandautils.load_dataframe"><code class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.load_dataframe()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_add_constraints">
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds constraints to a given system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>system</strong> : mm.System</p>
+<blockquote>
+<div><p>The OpenMM system for which constraints should be added</p>
+</div></blockquote>
+<p><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>Which kind of constraints should be used</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, water bonds are constrained regardless of whether
+constrains is None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_angle_force">
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
+angles are for an Amoeba-parametrized system)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>The types of constraints that are on the system. If
+flexibleConstraints is False, then the constrained bonds will not be
+added to the resulting Force</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, all bonds are added to the force regardless of
+<cite>constraints</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force</p>
+<blockquote class="last">
+<div><p>HarmonicAngleForce (or AmoebaAngleForce if this is an Amoeba
+system), or None if there are no angles to add</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_bond_force">
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
+for an Amoeba-parametrized system)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>constraints</strong> : None, app.HBonds, app.AllBonds, or app.HAngles</p>
+<blockquote>
+<div><p>The types of constraints that are on the system. If
+flexibleConstraints is False, then the constrained bonds will not be
+added to the resulting Force</p>
+</div></blockquote>
+<p><strong>rigidWater</strong> : bool=True</p>
+<blockquote>
+<div><p>Should water-H bonds be constrained regardless of <cite>constraints</cite>?</p>
+</div></blockquote>
+<p><strong>flexibleConstraints</strong> : bool=True</p>
+<blockquote>
+<div><p>If True, all bonds are added to the force regardless of
+<cite>constraints</cite></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force</p>
+<blockquote class="last">
+<div><p>HarmonicBondForce (or AmoebaBondForce if this is an Amoeba system),
+or None if there are no bonds to add</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_cmap_force">
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM CMAP torsion force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CMAPTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None, if no CMAP terms are present</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_dihedral_force">
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>split</strong> : bool, optional, default=False</p>
+<blockquote>
+<div><p>If True, separate PeriodicTorsionForce instances with the propers in
+the first and impropers in the second return item. If no impropers
+or propers are present, the instances with zero terms are not
+returned.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">PeriodicTorsionForce[, PeriodicTorsionForce]</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_gbsa_force">
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Generalized Born force for running implicit solvent
+calculations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>implicitSolvent</strong> : app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2</p>
+<blockquote>
+<div><p>The Generalized Born implicit solvent model to use.</p>
+</div></blockquote>
+<p><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace. Default is NoCutoff</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating opint number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff</p>
+</div></blockquote>
+<p><strong>implicitSolventKappa</strong> : float or 1/distance Quantity = None</p>
+<blockquote>
+<div><p>This is the Debye kappa property related to modeling saltwater
+conditions in GB. It should have units of 1/distance (1/nanometers
+is assumed if no units present). A value of None means that kappa
+will be calculated from implicitSolventSaltConc (below)</p>
+</div></blockquote>
+<p><strong>implicitSolventSaltConc</strong> : float or amount/volume Quantity=0 moles/liter</p>
+<blockquote>
+<div><p>If implicitSolventKappa is None, the kappa will be computed from the
+salt concentration. It should have units compatible with mol/L</p>
+</div></blockquote>
+<p><strong>temperature</strong> : float or temperature Quantity = 298.15 kelvin</p>
+<blockquote>
+<div><p>This is only used to compute kappa from implicitSolventSaltConc</p>
+</div></blockquote>
+<p><strong>soluteDielectric</strong> : float=1.0</p>
+<blockquote>
+<div><p>The dielectric constant of the protein interior used in GB</p>
+</div></blockquote>
+<p><strong>solventDielectric</strong> : float=78.5</p>
+<blockquote class="last">
+<div><p>The dielectric constant of the water used in GB</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_improper_force">
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CustomTorsionForce</p>
+<blockquote class="last">
+<div><p>With the formula k*(phi-phi0)^2, or None if there are no impropers</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_nonbonded_force">
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM NonbondedForce instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nonbondedMethod</strong> : cutoff method</p>
+<blockquote>
+<div><p>This is the cutoff method. It can be either the NoCutoff,
+CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
+simtk.openmm.app namespace</p>
+</div></blockquote>
+<p><strong>nonbondedCutoff</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The nonbonded cutoff must be either a floating point number
+(interpreted as nanometers) or a Quantity with attached units. This
+is ignored if nonbondedMethod is NoCutoff.</p>
+</div></blockquote>
+<p><strong>switchDistance</strong> : float or distance Quantity</p>
+<blockquote>
+<div><p>The distance at which the switching function is turned on for van
+der Waals interactions. This is ignored when no cutoff is used, and
+no switch is used if switchDistance is 0, negative, or greater than
+the cutoff</p>
+</div></blockquote>
+<p><strong>ewaldErrorTolerance</strong> : float=0.0005</p>
+<blockquote>
+<div><p>When using PME or Ewald, the Ewald parameters will be calculated
+from this value</p>
+</div></blockquote>
+<p><strong>reactionFieldDielectric</strong> : float=78.5</p>
+<blockquote>
+<div><p>If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
+region beyond the cutoff is treated using a reaction field method
+with this dielectric constant. It should be set to 1 if another
+implicit solvent model is being used (e.g., GB)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">NonbondedForce</p>
+<blockquote class="last">
+<div><p>This just implements the very basic NonbondedForce with the typical
+charge-charge and 12-6 Lennard-Jones interactions with the
+Lorentz-Berthelot combining rules.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This method calls update_dihedral_exclusions, which might alter the
+<code class="docutils literal"><span class="pre">ignore_end</span></code> attribute of some
+<a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Dihedral</span></code></a> instances based on any
+changes that might have been made to the bonds and angles since the last
+time it was called.</p>
+<p>Subclasses of Structure for which this nonbonded treatment is inadequate
+should override this method to implement what is needed.</p>
+<p>If nrexcl is set to 3 and no exception parameters are stored in the
+adjusts list, the 1-4 interactions are determined from the list of
+dihedrals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_out_of_plane_bend_force">
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba out-of-plane bend force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaOutOfPlaneBendForce</p>
+<blockquote class="last">
+<div><p>The out-of-plane bend Angle force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_pi_torsion_force">
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba pi-torsion force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaPiTorsionForce</p>
+<blockquote class="last">
+<div><p>The pi-torsion force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_rb_torsion_force">
+<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">RBTorsionForce</p>
+<blockquote class="last">
+<div><p>Or None if no torsions are present in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_set_virtual_sites">
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
+points defined in this system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>system</strong> : mm.System</p>
+<blockquote class="last">
+<div><p>The system for which the virtual sites will be set. All particles
+must have already been added to this System before calling this
+method</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_stretch_bend_force">
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaStretchBendForce</p>
+<blockquote class="last">
+<div><p>The stretch-bend force containing all terms in this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_torsion_torsion_force">
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaTorsionTorsionForce</p>
+<blockquote class="last">
+<div><p>The torsion-torsion (CMAP) force with all coupled-torsion parameters
+for this system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_trigonal_angle_force">
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the Amoeba trigonal-angle force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">AmoebaInPlaneAngleForce</p>
+<blockquote class="last">
+<div><p>The trigonal in-plane Angle force</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.omm_urey_bradley_force">
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the OpenMM Urey-Bradley force</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">HarmonicBondForce</p>
+<blockquote class="last">
+<div><p>Or None, if no urey-bradleys are present</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.positions">
+<code class="descname">positions</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of 3-element Quantity tuples of dimension length representing the
+atomic positions for every atom in the system. If set with unitless
+numbers, those numbers are assumed to be in angstroms. If any atoms do
+not have coordinates, this is simply <code class="docutils literal"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.prune_empty_terms">
+<code class="descname">prune_empty_terms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks through all of the topological lists and gets rid of terms
+in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
+to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>fname</em>, <em>format=None</em>, <em>overwrite=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current Structure in the requested file format. Supported
+formats can be specified explicitly or determined by file-name
+extension. The following formats are supported, with the recognized
+suffix and <code class="docutils literal"><span class="pre">format</span></code> keyword shown in parentheses:</p>
+<blockquote>
+<div><ul class="simple">
+<li>PDB (.pdb, pdb)</li>
+<li>PDBx/mmCIF (.cif, cif)</li>
+<li>PQR (.pqr, pqr)</li>
+<li>Amber topology file (.prmtop/.parm7, amber)</li>
+<li>CHARMM PSF file (.psf, psf)</li>
+<li>CHARMM coordinate file (.crd, charmmcrd)</li>
+<li>Gromacs topology file (.top, gromacs)</li>
+<li>Gromacs GRO file (.gro, gro)</li>
+<li>Mol2 file (.mol2, mol2)</li>
+<li>Mol3 file (.mol3, mol3)</li>
+<li>Amber ASCII restart (.rst7/.inpcrd/.restrt, rst7)</li>
+<li>Amber NetCDF restart (.ncrst, ncrst)</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
+file type will be determined based on the filename extension. If the
+type cannot be determined, a ValueError is raised.</p>
+</div></blockquote>
+<p><strong>format</strong> : str, optional</p>
+<blockquote>
+<div><p>The case-insensitive keyword specifying what type of file <code class="docutils literal"><span class="pre">fname</span></code>
+should be saved as. If <code class="docutils literal"><span class="pre">None</span></code> (default), the file type will be
+determined from filename extension of <code class="docutils literal"><span class="pre">fname</span></code></p>
+</div></blockquote>
+<p><strong>overwrite</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, allow the target file to be overwritten. Otherwise, an
+IOError is raised if the file exists. Default is False</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword-arguments</p>
+<blockquote>
+<div><p>Remaining arguments are passed on to the file writing routines that
+are called by this function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if either filename extension or ``format`` are not recognized</strong></p>
+<p><strong>TypeError if the structure cannot be converted to the desired format for</strong></p>
+<p><strong>whatever reason</strong></p>
+<p><strong>IOError if the file cannot be written either because it exists and</strong></p>
+<p><strong>``overwrite`` is ``False``, the filesystem is read-only, or write</strong></p>
+<p class="last"><strong>permissions are not granted for the user</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.split">
+<code class="descname">split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the current Structure into separate Structure instances for each
+unique molecule. A molecule is defined as all atoms connected by a graph
+of covalent bonds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>, list) tuples</p>
+<blockquote class="last">
+<div><p>List of all molecules in the order that they appear first in the
+parent structure accompanied by the list of the molecule numbers
+in which that molecule appears in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.strip">
+<code class="descname">strip</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.strip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : <code class="xref py py-class docutils literal"><span class="pre">AmberMask</span></code>, <code class="docutils literal"><span class="pre">str</span></code>, or <code class="docutils literal"><span class="pre">iterable</span></code></p>
+<blockquote class="last">
+<div><p>This is the selection of atoms that will be deleted from this
+structure. If it is a string, it will be interpreted as an
+AmberMask. If it is an AmberMask, it will be converted to a
+selection of atoms. If it is an iterable, it must be the same length
+as the <cite>atoms</cite> list.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.to_dataframe">
+<code class="descname">to_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a DataFrame from the current Structure&#8217;s atomic properties</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df</strong> : DataFrame</p>
+<blockquote class="last">
+<div><p>DataFrame with all atomic properties</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.create_dataframe" title="parmed.utils.pandautils.create_dataframe"><code class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.create_dataframe()</span></code></a>, <code class="xref py py-obj docutils literal"><span class="pre">documentation</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.topology">
+<code class="descname">topology</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
+Structure instance results in the topology being deleted and rebuilt</p>
+<p class="rubric">Notes</p>
+<p>This function calls <code class="docutils literal"><span class="pre">prune_empty_terms</span></code> if any topology lists have
+changed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.unchange">
+<code class="descname">unchange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.unchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggles all lists so that they do not indicate any changes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.update_dihedral_exclusions">
+<code class="descname">update_dihedral_exclusions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nonbonded exclusions and exceptions have the following priority:</p>
+<p>bond -&gt; angle -&gt; dihedral</p>
+<p>Since bonds and angles are completely excluded, any ring systems in
+which two atoms are attached by a bond or angle as well as a dihedral
+should be completely excluded as the bond and angle exclusion rules take
+precedence.  If a Bond or Angle was _added_ to the structure between a
+pair of atoms previously connected only by a dihedral term, it&#8217;s
+possible that those two atoms have both an exclusion <em>and</em> an exception
+defined. The result of this scenario is that sander and pmemd will
+happily compute an energy, _including_ the 1-4 nonbonded terms between
+atoms now connected by a bond or an Angle.  OpenMM, on the other hand,
+will complain about an exception specified multiple times. This method
+scans through all of the dihedrals in which <cite>ignore_end</cite> is <cite>False</cite> and
+turns it to <cite>True</cite> if the two end atoms are in the bond or angle
+partners arrays</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.velocities">
+<code class="descname">velocities</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p>A (natom, 3)-shape numpy array with atomic velocities for every atom in
+the system (in units of angstrom/picosecond), or None if there are no
+velocities</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.view">
+<code class="descname">view</code><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an indexable object that can be indexed like a standard
+Structure, but returns a <em>view</em> rather than a copy</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.write_cif">
+<code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from the current Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
+<blockquote>
+<div><p>The structure from which to write the PDBx/mmCIF file</p>
+</div></blockquote>
+<p><strong>dest</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : <code class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>altlocs</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
+<blockquote>
+<div><p>Keyword controlling which alternate locations are printed to the
+resulting PDB file. Allowable options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;first&#8217; : print only the first alternate locations</li>
+<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+conformers have the same occupancy, the first one to occur is
+printed</li>
+</ul>
+</div></blockquote>
+<p>Input is case-insensitive, and partial strings are permitted as long
+as it is a substring of one of the above options that uniquely
+identifies the choice.</p>
+</div></blockquote>
+<p><strong>write_anisou</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
+<blockquote>
+<div><p>If True, an ANISOU record is written for every atom that has one. If
+False, ANISOU records are not written</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values. Default is False</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.write_pdb">
+<code class="descname">write_pdb</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a PDB file from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
+<blockquote>
+<div><p>The structure from which to write the PDB file</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+method to which to write the PDB file. If it is a filename that
+ends with .gz or .bz2, a compressed version will be written using
+either gzip or bzip2, respectively.</p>
+</div></blockquote>
+<p><strong>renumber</strong> : bool, optional, default True</p>
+<blockquote>
+<div><p>If True, renumber the atoms and residues sequentially as they are
+stored in the structure.  If False, use the original numbering if
+it was assigned previously.</p>
+</div></blockquote>
+<p><strong>coordinates</strong> : array-like of float, optional</p>
+<blockquote>
+<div><p>If provided, these coordinates will be written to the PDB file
+instead of the coordinates stored in the structure. These
+coordinates should line up with the atom order in the structure
+(not necessarily the order of the &#8220;original&#8221; PDB file if they
+differ)</p>
+</div></blockquote>
+<p><strong>altlocs</strong> : str, optional, default &#8216;all&#8217;</p>
+<blockquote>
+<div><p>Keyword controlling which alternate locations are printed to the
+resulting PDB file. Allowable options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>&#8216;all&#8217; : print all alternate locations</li>
+<li>&#8216;first&#8217; : print only the first alternate locations</li>
+<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+conformers have the same occupancy, the first one to occur is
+printed</li>
+</ul>
+</div></blockquote>
+<p>Input is case-insensitive, and partial strings are permitted as long
+as it is a substring of one of the above options that uniquely
+identifies the choice.</p>
+</div></blockquote>
+<p><strong>write_anisou</strong> : bool, optional, default False</p>
+<blockquote>
+<div><p>If True, an ANISOU record is written for every atom that has one. If
+False, ANISOU records are not written.</p>
+</div></blockquote>
+<p><strong>charmm</strong> : bool, optional, default False</p>
+<blockquote>
+<div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
+in the typical CHARMM-style PDB output. This will be omitted for any
+atom that does not contain a SEGID identifier.</p>
+</div></blockquote>
+<p><strong>standard_resnames</strong> : bool, optional, default False</p>
+<blockquote class="last">
+<div><p>If True, common aliases for various amino and nucleic acid residues
+will be converted into the PDB-standard values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.tinkerfiles.XyzFile.write_psf">
+<code class="descname">write_psf</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>vmd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.tinkerfiles.XyzFile.write_psf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a PSF file from the stored molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
+<blockquote>
+<div><p>The Structure instance from which the PSF should be written</p>
+</div></blockquote>
+<p><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The place to write the output PSF file.  If it has a &#8220;write&#8221;
+attribute, it will be used to print the PSF file. Otherwise, it will
+be treated like a string and a file will be opened, printed, then
+closed</p>
+</div></blockquote>
+<p><strong>vmd</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True, it will write out a PSF in the format that VMD prints it in
+(i.e., no NUMLP/NUMLPH or MOLNT sections)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
 <dt id="parmed.tinker.tinkerfiles.is_float">
-<tt class="descclassname">parmed.tinker.tinkerfiles.</tt><tt class="descname">is_float</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#is_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.is_float" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.tinker.tinkerfiles.</code><code class="descname">is_float</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/tinkerfiles.html#is_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.tinkerfiles.is_float" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -98,14 +1516,16 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.tinker.tinkerfiles.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.tinker.tinkerfiles.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -122,7 +1542,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -131,12 +1551,12 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

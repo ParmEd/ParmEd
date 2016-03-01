@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,22 +36,22 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.formats.pqr">
 <span id="parmed-formats-pqr-module"></span><h1>parmed.formats.pqr module<a class="headerlink" href="#module-parmed.formats.pqr" title="Permalink to this headline">¶</a></h1>
 <p>This module contains classes for reading and writing PQR files</p>
 <dl class="class">
 <dt id="parmed.formats.pqr.PQRFile">
-<em class="property">class </em><tt class="descclassname">parmed.formats.pqr.</tt><tt class="descname">PQRFile</tt><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.pqr.</code><code class="descname">PQRFile</code><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -60,20 +60,20 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.id_format" title="parmed.formats.pqr.PQRFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.id_format" title="parmed.formats.pqr.PQRFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.parse" title="parmed.formats.pqr.PQRFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.parse" title="parmed.formats.pqr.PQRFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
 <td>Read a PQR file and return a populated <cite>Structure</cite> class</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.write" title="parmed.formats.pqr.PQRFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.write" title="parmed.formats.pqr.PQRFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.pqr.PQRFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDB file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -97,7 +97,7 @@
 
 <dl class="staticmethod">
 <dt id="parmed.formats.pqr.PQRFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PQR file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -112,7 +112,7 @@ file.pqr.bz2)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by
@@ -126,13 +126,13 @@ default.</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.pqr.PQRFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>standard_resnames=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDB file</p>
 </div></blockquote>
@@ -176,14 +176,16 @@ will be converted into the PDB-standard values. Default is False</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.formats.pqr.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.formats.pqr.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -200,7 +202,7 @@ will be converted into the PDB-standard values. Default is False</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -209,12 +211,12 @@ will be converted into the PDB-standard values. Default is False</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

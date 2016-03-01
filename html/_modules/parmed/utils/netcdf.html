@@ -1,0 +1,1067 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.utils.netcdf &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="up" title="parmed.utils" href="../utils.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for parmed.utils.netcdf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">NetCDF reader/writer module.</span>
+
+<span class="sd">This module is used to read and create NetCDF files. NetCDF files are</span>
+<span class="sd">accessed through the `netcdf_file` object. Data written to and from NetCDF</span>
+<span class="sd">files are contained in `netcdf_variable` objects. Attributes are given</span>
+<span class="sd">as member variables of the `netcdf_file` and `netcdf_variable` objects.</span>
+
+<span class="sd">This module implements the Scientific.IO.NetCDF API to read and create</span>
+<span class="sd">NetCDF files. The same API is also used in the PyNIO and pynetcdf</span>
+<span class="sd">modules, allowing these modules to be used interchangeably when working</span>
+<span class="sd">with NetCDF files.</span>
+
+<span class="sd">This file is taken from the scipy source code. The scipy license is included</span>
+<span class="sd">below:</span>
+
+<span class="sd">Copyright (C) 2001, 2002 Enthought, Inc.</span>
+<span class="sd">All rights reserved.</span>
+
+<span class="sd">Copyright (C) 2003-2013 SciPy Developers.</span>
+<span class="sd">All rights reserved.</span>
+<span class="sd">Redistribution and use in source and binary forms, with or without modification,</span>
+<span class="sd">are permitted provided that the following conditions are met:</span>
+
+<span class="sd">Redistributions of source code must retain the above copyright notice, this</span>
+<span class="sd">list of conditions and the following disclaimer.</span>
+<span class="sd">Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="sd">this list of conditions and the following disclaimer in the documentation</span>
+<span class="sd">and/or other materials provided with the distribution.</span>
+<span class="sd">Neither the name of Enthought nor the names of the SciPy Developers may be</span>
+<span class="sd">used to endorse or promote products derived from this software without</span>
+<span class="sd">specific prior written permission.</span>
+
+<span class="sd">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
+<span class="sd">AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span class="sd">IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span class="sd">ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR</span>
+<span class="sd">ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="sd">DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</span>
+<span class="sd">SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<span class="sd">CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR</span>
+<span class="sd">TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF</span>
+<span class="sd">THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="c1"># TODO:</span>
+<span class="c1"># * properly implement ``_FillValue``.</span>
+<span class="c1"># * implement Jeff Whitaker&#39;s patch for masked variables.</span>
+<span class="c1"># * fix character variables.</span>
+<span class="c1"># * implement PAGESIZE for Python 2.6?</span>
+
+<span class="c1"># The Scientific.IO.NetCDF API allows attributes to be added directly to</span>
+<span class="c1"># instances of ``netcdf_file`` and ``netcdf_variable``. To differentiate</span>
+<span class="c1"># between user-set attributes and instance attributes, user-set attributes</span>
+<span class="c1"># are automatically stored in the ``_attributes`` attribute by overloading</span>
+<span class="c1">#``__setattr__``. This is the reason why the code sometimes uses</span>
+<span class="c1">#``obj.__dict__[&#39;key&#39;] = value``, instead of simply ``obj.key = value``;</span>
+<span class="c1"># otherwise the key would be inserted into userspace attributes.</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;netcdf_file&#39;</span><span class="p">]</span>
+
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">mul</span>
+<span class="kn">import</span> <span class="nn">mmap</span> <span class="kn">as</span> <span class="nn">mm</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.compat</span> <span class="kn">import</span> <span class="n">asbytes</span><span class="p">,</span> <span class="n">asstr</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">fromstring</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">asarray</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">little_endian</span> <span class="k">as</span> <span class="n">LITTLE_ENDIAN</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">text_type</span><span class="p">,</span> <span class="n">binary_type</span>
+
+<span class="n">ABSENT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+<span class="n">ZERO</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+<span class="n">NC_BYTE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+<span class="n">NC_CHAR</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x02</span><span class="s1">&#39;</span>
+<span class="n">NC_SHORT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x03</span><span class="s1">&#39;</span>
+<span class="n">NC_INT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x04</span><span class="s1">&#39;</span>
+<span class="n">NC_FLOAT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x05</span><span class="s1">&#39;</span>
+<span class="n">NC_DOUBLE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x06</span><span class="s1">&#39;</span>
+<span class="n">NC_DIMENSION</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\n</span><span class="s1">&#39;</span>
+<span class="n">NC_VARIABLE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x0b</span><span class="s1">&#39;</span>
+<span class="n">NC_ATTRIBUTE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x0c</span><span class="s1">&#39;</span>
+
+
+<span class="n">TYPEMAP</span> <span class="o">=</span> <span class="p">{</span><span class="n">NC_BYTE</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">NC_CHAR</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">NC_SHORT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">NC_INT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="n">NC_FLOAT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="n">NC_DOUBLE</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)}</span>
+
+<span class="n">REVERSE</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_BYTE</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="n">NC_SHORT</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_INT</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_FLOAT</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="n">NC_DOUBLE</span><span class="p">,</span>
+
+            <span class="c1"># these come from asarray(1).dtype.char and asarray(&#39;foo&#39;).dtype.char,</span>
+            <span class="c1"># used when getting the types from generic attributes.</span>
+            <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_INT</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="netcdf_file"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file">[docs]</a><span class="k">class</span> <span class="nc">netcdf_file</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A file object for NetCDF data.</span>
+
+<span class="sd">    A `netcdf_file` object has two standard attributes: `dimensions` and</span>
+<span class="sd">    `variables`. The values of both are dictionaries, mapping dimension</span>
+<span class="sd">    names to their associated lengths and variable names to variables,</span>
+<span class="sd">    respectively. Application programs should never modify these</span>
+<span class="sd">    dictionaries.</span>
+
+<span class="sd">    All other attributes correspond to global attributes defined in the</span>
+<span class="sd">    NetCDF file. Global file attributes are created by assigning to an</span>
+<span class="sd">    attribute of the `netcdf_file` object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : string or file-like</span>
+<span class="sd">        string -&gt; filename</span>
+<span class="sd">    mode : {&#39;r&#39;, &#39;w&#39;, &#39;a&#39;}, optional</span>
+<span class="sd">        read-write-append mode, default is &#39;r&#39;</span>
+<span class="sd">    mmap : None or bool, optional</span>
+<span class="sd">        Whether to mmap `filename` when reading.  Default is True</span>
+<span class="sd">        when `filename` is a file name, False when `filename` is a</span>
+<span class="sd">        file-like object. Note that when mmap is in use, data arrays</span>
+<span class="sd">        returned refer directly to the mmapped data on disk, and the</span>
+<span class="sd">        file cannot be closed as long as references to it exist.</span>
+<span class="sd">    version : {1, 2}, optional</span>
+<span class="sd">        version of netcdf to read / write, where 1 means *Classic</span>
+<span class="sd">        format* and 2 means *64-bit offset format*.  Default is 1.  See</span>
+<span class="sd">        `here &lt;http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Which-Format.html&gt;`__</span>
+<span class="sd">        for more info.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The major advantage of this module over other modules is that it doesn&#39;t</span>
+<span class="sd">    require the code to be linked to the NetCDF libraries. This module is</span>
+<span class="sd">    derived from `pupynere &lt;https://bitbucket.org/robertodealmeida/pupynere/&gt;`_.</span>
+
+<span class="sd">    NetCDF files are a self-describing binary data format. The file contains</span>
+<span class="sd">    metadata that describes the dimensions and variables in the file. More</span>
+<span class="sd">    details about NetCDF files can be found `here</span>
+<span class="sd">    &lt;http://www.unidata.ucar.edu/software/netcdf/docs/netcdf.html&gt;`__. There</span>
+<span class="sd">    are three main sections to a NetCDF data structure:</span>
+
+<span class="sd">    1. Dimensions</span>
+<span class="sd">    2. Variables</span>
+<span class="sd">    3. Attributes</span>
+
+<span class="sd">    The dimensions section records the name and length of each dimension used</span>
+<span class="sd">    by the variables. The variables would then indicate which dimensions it</span>
+<span class="sd">    uses and any attributes such as data units, along with containing the data</span>
+<span class="sd">    values for the variable. It is good practice to include a</span>
+<span class="sd">    variable that is the same name as a dimension to provide the values for</span>
+<span class="sd">    that axes. Lastly, the attributes section would contain additional</span>
+<span class="sd">    information such as the name of the file creator or the instrument used to</span>
+<span class="sd">    collect the data.</span>
+
+<span class="sd">    When writing data to a NetCDF file, there is often the need to indicate the</span>
+<span class="sd">    &#39;record dimension&#39;. A record dimension is the unbounded dimension for a</span>
+<span class="sd">    variable. For example, a temperature variable may have dimensions of</span>
+<span class="sd">    latitude, longitude and time. If one wants to add more temperature data to</span>
+<span class="sd">    the NetCDF file as time progresses, then the temperature variable should</span>
+<span class="sd">    have the time dimension flagged as the record dimension.</span>
+
+<span class="sd">    In addition, the NetCDF file header contains the position of the data in</span>
+<span class="sd">    the file, so access can be done in an efficient manner without loading</span>
+<span class="sd">    unnecessary data into memory. It uses the ``mmap`` module to create</span>
+<span class="sd">    Numpy arrays mapped to the data on disk, for the same purpose.</span>
+
+<span class="sd">    Note that when `netcdf_file` is used to open a file with mmap=True</span>
+<span class="sd">    (default for read-only), arrays returned by it refer to data</span>
+<span class="sd">    directly on the disk. The file should not be closed, and cannot be cleanly</span>
+<span class="sd">    closed when asked, if such arrays are alive. You may want to copy data arrays</span>
+<span class="sd">    obtained from mmapped Netcdf file if they are to be processed after the file</span>
+<span class="sd">    is closed, see the example below.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To create a NetCDF file:</span>
+
+<span class="sd">    &gt;&gt;&gt; from scipy.io import netcdf</span>
+<span class="sd">    &gt;&gt;&gt; f = netcdf.netcdf_file(&#39;simple.nc&#39;, &#39;w&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; f.history = &#39;Created for a test&#39;</span>
+<span class="sd">    &gt;&gt;&gt; f.createDimension(&#39;time&#39;, 10)</span>
+<span class="sd">    &gt;&gt;&gt; time = f.createVariable(&#39;time&#39;, &#39;i&#39;, (&#39;time&#39;,))</span>
+<span class="sd">    &gt;&gt;&gt; time[:] = np.arange(10)</span>
+<span class="sd">    &gt;&gt;&gt; time.units = &#39;days since 2008-01-01&#39;</span>
+<span class="sd">    &gt;&gt;&gt; f.close()</span>
+
+<span class="sd">    Note the assignment of ``range(10)`` to ``time[:]``.  Exposing the slice</span>
+<span class="sd">    of the time variable allows for the data to be set in the object, rather</span>
+<span class="sd">    than letting ``range(10)`` overwrite the ``time`` variable.</span>
+
+<span class="sd">    To read the NetCDF file we just created:</span>
+
+<span class="sd">    &gt;&gt;&gt; from scipy.io import netcdf</span>
+<span class="sd">    &gt;&gt;&gt; f = netcdf.netcdf_file(&#39;simple.nc&#39;, &#39;r&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(f.history)</span>
+<span class="sd">    Created for a test</span>
+<span class="sd">    &gt;&gt;&gt; time = f.variables[&#39;time&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; print(time.units)</span>
+<span class="sd">    days since 2008-01-01</span>
+<span class="sd">    &gt;&gt;&gt; print(time.shape)</span>
+<span class="sd">    (10,)</span>
+<span class="sd">    &gt;&gt;&gt; print(time[-1])</span>
+<span class="sd">    9</span>
+
+<span class="sd">    NetCDF files, when opened read-only, return arrays that refer</span>
+<span class="sd">    directly to memory-mapped data on disk:</span>
+
+<span class="sd">    &gt;&gt;&gt; data = time[:]</span>
+<span class="sd">    &gt;&gt;&gt; data.base.base</span>
+<span class="sd">    &lt;mmap.mmap object at 0x7fe753763180&gt;</span>
+
+<span class="sd">    If the data is to be processed after the file is closed, it needs</span>
+<span class="sd">    to be copied to main memory:</span>
+
+<span class="sd">    &gt;&gt;&gt; data = time[:].copy()</span>
+<span class="sd">    &gt;&gt;&gt; f.close()</span>
+<span class="sd">    &gt;&gt;&gt; data.mean()</span>
+<span class="sd">    4.5</span>
+
+<span class="sd">    A NetCDF file can also be used as context manager:</span>
+
+<span class="sd">    &gt;&gt;&gt; from scipy.io import netcdf</span>
+<span class="sd">    &gt;&gt;&gt; with netcdf.netcdf_file(&#39;simple.nc&#39;, &#39;r&#39;) as f:</span>
+<span class="sd">    ...     print(f.history)</span>
+<span class="sd">    Created for a test</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize netcdf_file from fileobj (str or file-like).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;rwa&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mode must be either &#39;r&#39;, &#39;w&#39; or &#39;a&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;seek&#39;</span><span class="p">):</span>  <span class="c1"># file-like</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="n">filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+            <span class="k">if</span> <span class="n">mmap</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">mmap</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">elif</span> <span class="n">mmap</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;fileno&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot use file object for mmap&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># maybe it&#39;s a string</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+            <span class="n">omode</span> <span class="o">=</span> <span class="s1">&#39;r+&#39;</span> <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span> <span class="k">else</span> <span class="n">mode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">b&#39;</span> <span class="o">%</span> <span class="n">omode</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mmap</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">mmap</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
+            <span class="c1"># Cannot read write-only files</span>
+            <span class="n">mmap</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_mmap</span> <span class="o">=</span> <span class="n">mmap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span> <span class="o">=</span> <span class="n">version</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mm</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mmap</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mm</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">mmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">access</span><span class="o">=</span><span class="n">mm</span><span class="o">.</span><span class="n">ACCESS_READ</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="s1">&#39;ra&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># Store user defined attributes in a separate dict,</span>
+        <span class="c1"># so we can save them to file later.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="netcdf_file.close"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Closes the NetCDF file.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fp&#39;</span><span class="p">):</span> <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">ref</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">if</span> <span class="n">ref</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="c1"># self._mm_buf is gc&#39;d, and we can close the mmap</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_mm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># we cannot close self._mm, since self._mm_buf is</span>
+                        <span class="c1"># alive and there may still be arrays referring to it</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span>
+                            <span class="s2">&quot;Cannot close a netcdf_file opened with mmap=True, when &quot;</span>
+                            <span class="s2">&quot;netcdf_variables or arrays referring to its data still exist. &quot;</span>
+                            <span class="s2">&quot;All data arrays obtained from such files refer directly to &quot;</span>
+                            <span class="s2">&quot;data on disk, and must be copied before the file can be cleanly &quot;</span>
+                            <span class="s2">&quot;closed. (See netcdf_file docstring for more information on mmap.)&quot;</span>
+                        <span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mm</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+    <span class="n">__del__</span> <span class="o">=</span> <span class="n">close</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="netcdf_file.createDimension"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.createDimension">[docs]</a>    <span class="k">def</span> <span class="nf">createDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a dimension to the Dimension section of the NetCDF data structure.</span>
+
+<span class="sd">        Note that this function merely adds a new dimension that the variables can</span>
+<span class="sd">        reference.  The values for the dimension, if desired, should be added as</span>
+<span class="sd">        a variable using `createVariable`, referring to this dimension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the dimension (Eg, &#39;lat&#39; or &#39;time&#39;).</span>
+<span class="sd">        length : int</span>
+<span class="sd">            Length of the dimension.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        createVariable</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="netcdf_file.createVariable"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.createVariable">[docs]</a>    <span class="k">def</span> <span class="nf">createVariable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an empty variable for the `netcdf_file` object, specifying its data</span>
+<span class="sd">        type and the dimensions it uses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the new variable.</span>
+<span class="sd">        type : dtype or str</span>
+<span class="sd">            Data type of the variable.</span>
+<span class="sd">        dimensions : sequence of str</span>
+<span class="sd">            List of the dimension names used by the variable, in the desired order.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        variable : netcdf_variable</span>
+<span class="sd">            The newly created ``netcdf_variable`` object.</span>
+<span class="sd">            This object has also been added to the `netcdf_file` object as well.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        createDimension</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Any dimensions to be used by the variable should already exist in the</span>
+<span class="sd">        NetCDF data structure or should be created by `createDimension` prior to</span>
+<span class="sd">        creating the NetCDF variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">])</span>
+        <span class="n">shape_</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">dim</span> <span class="ow">or</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">])</span>  <span class="c1"># replace None with 0 for numpy</span>
+
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+        <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="nb">type</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">REVERSE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NetCDF 3 does not support type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">shape_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">type</span><span class="o">.</span><span class="n">newbyteorder</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">))</span>  <span class="c1"># convert to big endian always for NetCDF 3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_variable</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="netcdf_file.flush"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a sync-to-disk flush if the `netcdf_file` object is in write mode.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        sync : Identical function</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mode&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="s1">&#39;wa&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">()</span></div>
+    <span class="n">sync</span> <span class="o">=</span> <span class="n">flush</span>
+
+    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;CDF&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span><span class="p">,</span> <span class="s1">&#39;&gt;b&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+
+        <span class="c1"># Write headers and data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_numrecs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_dim_array</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_gatt_array</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_var_array</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_write_numrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Get highest record count from all record variables.</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_dim_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">NC_DIMENSION</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pack_string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">length</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># replace None with 0 for record dimension</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ABSENT</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_gatt_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_att_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_att_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">NC_ATTRIBUTE</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pack_string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ABSENT</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_var_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">NC_VARIABLE</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">))</span>
+
+            <span class="c1"># Sort variable names non-recs first, then recs.</span>
+            <span class="k">def</span> <span class="nf">sortkey</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">isrec</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)</span>
+                <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">_shape</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">sortkey</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+            <span class="c1"># Set the metadata for all variables.</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_var_metadata</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># Now that we have the metadata, we know the vsize of</span>
+            <span class="c1"># each record variable, so we can calculate recsize.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span>
+                    <span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span><span class="p">])</span>
+            <span class="c1"># Set the data for all variables.</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_var_data</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ABSENT</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_var_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dimensions</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">dimname</span> <span class="ow">in</span> <span class="n">var</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
+            <span class="n">dimid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dimname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">dimid</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_att_array</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_attributes</span><span class="p">)</span>
+
+        <span class="n">nc_type</span> <span class="o">=</span> <span class="n">REVERSE</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">typecode</span><span class="p">(),</span> <span class="n">var</span><span class="o">.</span><span class="n">itemsize</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">nc_type</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span><span class="p">:</span>
+            <span class="n">vsize</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemsize</span>
+            <span class="n">vsize</span> <span class="o">+=</span> <span class="o">-</span><span class="n">vsize</span> <span class="o">%</span> <span class="mi">4</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># record variable</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">vsize</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemsize</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">vsize</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">rec_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">isrec</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">rec_vars</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">vsize</span> <span class="o">+=</span> <span class="o">-</span><span class="n">vsize</span> <span class="o">%</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_vsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">vsize</span><span class="p">)</span>
+
+        <span class="c1"># Pack a bogus begin, and set the real value later.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_begin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_begin</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_var_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="c1"># Set begin in file header.</span>
+        <span class="n">the_beguine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_begin</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_begin</span><span class="p">(</span><span class="n">the_beguine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">the_beguine</span><span class="p">)</span>
+
+        <span class="c1"># Write data.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemsize</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="o">-</span> <span class="n">count</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># record variable</span>
+            <span class="c1"># Handle rec vars with shape[0] &lt; nrecs.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recs</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">,)</span> <span class="o">+</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="n">pos0</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                <span class="c1"># Apparently scalars cannot be converted to big endian. If we</span>
+                <span class="c1"># try to convert a ``=i4`` scalar to, say, &#39;&gt;i4&#39; the dtype</span>
+                <span class="c1"># will remain as ``=i4``.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span> <span class="ow">or</span>
+                        <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="ow">and</span> <span class="n">LITTLE_ENDIAN</span><span class="p">)):</span>
+                    <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+                <span class="c1"># Padding</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">rec</span><span class="o">.</span><span class="n">itemsize</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="o">-</span> <span class="n">count</span><span class="p">))</span>
+                <span class="n">pos</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos0</span> <span class="o">+</span> <span class="n">var</span><span class="o">.</span><span class="n">_vsize</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">):</span>
+            <span class="n">nc_type</span> <span class="o">=</span> <span class="n">REVERSE</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span><span class="p">,</span> <span class="n">NC_INT</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">integer_types</span><span class="p">]</span>
+            <span class="n">types</span> <span class="o">+=</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">NC_FLOAT</span><span class="p">),</span>
+                    <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">NC_CHAR</span><span class="p">)</span>
+                    <span class="p">]</span>
+            <span class="c1"># bytes index into scalars in py3k.  Check for &quot;string&quot; types</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">text_type</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+                <span class="n">sample</span> <span class="o">=</span> <span class="n">values</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sample</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># subscriptable?</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="n">sample</span> <span class="o">=</span> <span class="n">values</span>     <span class="c1"># scalar</span>
+
+            <span class="k">for</span> <span class="n">class_</span><span class="p">,</span> <span class="n">nc_type</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">class_</span><span class="p">):</span>
+                    <span class="k">break</span>
+
+        <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">TYPEMAP</span><span class="p">[</span><span class="n">nc_type</span><span class="p">]</span>
+        <span class="n">dtype_</span> <span class="o">=</span> <span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typecode</span>
+        <span class="c1"># asarray() dies with bytes and &#39;&gt;c&#39; in py3k.  Change to &#39;S&#39;</span>
+        <span class="n">dtype_</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span> <span class="k">if</span> <span class="n">dtype_</span> <span class="o">==</span> <span class="s1">&#39;&gt;c&#39;</span> <span class="k">else</span> <span class="n">dtype_</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">nc_type</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+            <span class="n">nelems</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nelems</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">nelems</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="ow">and</span> <span class="n">LITTLE_ENDIAN</span><span class="p">)):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">values</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># pad</span>
+
+    <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Check magic bytes and version</span>
+        <span class="n">magic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">magic</span> <span class="o">==</span> <span class="n">b</span><span class="s1">&#39;CDF&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Error: </span><span class="si">%s</span><span class="s2"> is not a valid NetCDF 3 file&quot;</span> <span class="o">%</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;version_byte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;&gt;b&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Read file headers and set data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_numrecs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_dim_array</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_gatt_array</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_var_array</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_read_numrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_read_dim_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ZERO</span><span class="p">,</span> <span class="n">NC_DIMENSION</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected header.&quot;</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">asstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unpack_string</span><span class="p">())</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">None</span>  <span class="c1"># None for record dimension</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">length</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># preserve order</span>
+
+    <span class="k">def</span> <span class="nf">_read_gatt_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_att_array</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_att_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ZERO</span><span class="p">,</span> <span class="n">NC_ATTRIBUTE</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected header.&quot;</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">asstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unpack_string</span><span class="p">())</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_values</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">attributes</span>
+
+    <span class="k">def</span> <span class="nf">_read_var_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ZERO</span><span class="p">,</span> <span class="n">NC_VARIABLE</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected header.&quot;</span><span class="p">)</span>
+
+        <span class="n">begin</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">rec_vars</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span>
+             <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype_</span><span class="p">,</span> <span class="n">begin_</span><span class="p">,</span> <span class="n">vsize</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_var</span><span class="p">()</span>
+            <span class="c1"># http://www.unidata.ucar.edu/software/netcdf/docs/netcdf.html</span>
+            <span class="c1"># Note that vsize is the product of the dimension lengths</span>
+            <span class="c1"># (omitting the record dimension) and the number of bytes</span>
+            <span class="c1"># per value (determined from the type), increased to the</span>
+            <span class="c1"># next multiple of 4, for each variable. If a record</span>
+            <span class="c1"># variable, this is the amount of space per record. The</span>
+            <span class="c1"># netCDF &quot;record size&quot; is calculated as the sum of the</span>
+            <span class="c1"># vsize&#39;s of all the record variables.</span>
+            <span class="c1">#</span>
+            <span class="c1"># The vsize field is actually redundant, because its value</span>
+            <span class="c1"># may be computed from other information in the header. The</span>
+            <span class="c1"># 32-bit vsize field is not large enough to contain the size</span>
+            <span class="c1"># of variables that require more than 2^32 - 4 bytes, so</span>
+            <span class="c1"># 2^32 - 1 is used in the vsize field for such variables.</span>
+            <span class="k">if</span> <span class="n">shape</span> <span class="ow">and</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># record variable</span>
+                <span class="n">rec_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="c1"># The netCDF &quot;record size&quot; is calculated as the sum of</span>
+                <span class="c1"># the vsize&#39;s of all the record variables.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recsize&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">vsize</span>
+                <span class="k">if</span> <span class="n">begin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">begin</span> <span class="o">=</span> <span class="n">begin_</span>
+                <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="n">dtype_</span><span class="p">)</span>
+
+                <span class="c1"># Handle padding with a virtual variable.</span>
+                <span class="k">if</span> <span class="n">typecode</span> <span class="ow">in</span> <span class="s1">&#39;bch&#39;</span><span class="p">:</span>
+                    <span class="n">actual_size</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">*</span> <span class="n">size</span>
+                    <span class="n">padding</span> <span class="o">=</span> <span class="o">-</span><span class="n">actual_size</span> <span class="o">%</span> <span class="mi">4</span>
+                    <span class="k">if</span> <span class="n">padding</span><span class="p">:</span>
+                        <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;_padding_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">var</span><span class="p">)</span>
+                        <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">%d</span><span class="s1">,)&gt;b&#39;</span> <span class="o">%</span> <span class="n">padding</span><span class="p">)</span>
+
+                <span class="c1"># Data will be set later.</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># not a record variable</span>
+                <span class="c1"># Calculate size to avoid problems with vsize (above)</span>
+                <span class="n">a_size</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">size</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mmap</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span><span class="p">[</span><span class="n">begin_</span><span class="p">:</span><span class="n">begin_</span><span class="o">+</span><span class="n">a_size</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">begin_</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">a_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+            <span class="c1"># Add variable.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_variable</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rec_vars</span><span class="p">:</span>
+            <span class="c1"># Remove padding when only one record variable.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec_vars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">][:</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;formats&#39;</span><span class="p">][:</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># Build rec array.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mmap</span><span class="p">:</span>
+                <span class="n">rec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span><span class="p">[</span><span class="n">begin</span><span class="p">:</span><span class="n">begin</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span>
+                <span class="n">rec_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">,)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
+                <span class="n">rec_array</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span>
+                <span class="n">rec_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">,)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">rec_vars</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_array</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_read_var</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">asstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unpack_string</span><span class="p">())</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dims</span><span class="p">):</span>
+            <span class="n">dimid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+            <span class="n">dimname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">[</span><span class="n">dimid</span><span class="p">]</span>
+            <span class="n">dimensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dimname</span><span class="p">)</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dimname</span><span class="p">]</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_att_array</span><span class="p">()</span>
+        <span class="n">nc_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">vsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+        <span class="n">begin</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int64</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span><span class="o">-</span><span class="mi">1</span><span class="p">]()</span>
+
+        <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">TYPEMAP</span><span class="p">[</span><span class="n">nc_type</span><span class="p">]</span>
+        <span class="n">dtype_</span> <span class="o">=</span> <span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typecode</span>
+
+        <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype_</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">vsize</span>
+
+    <span class="k">def</span> <span class="nf">_read_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">nc_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+
+        <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">TYPEMAP</span><span class="p">[</span><span class="n">nc_type</span><span class="p">]</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="n">size</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># read padding</span>
+
+        <span class="k">if</span> <span class="n">typecode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typecode</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,):</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">def</span> <span class="nf">_pack_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int64</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pack_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+    <span class="n">_pack_int32</span> <span class="o">=</span> <span class="n">_pack_int</span>
+
+    <span class="k">def</span> <span class="nf">_unpack_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">_unpack_int32</span> <span class="o">=</span> <span class="n">_unpack_int</span>
+
+    <span class="k">def</span> <span class="nf">_pack_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&gt;q&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_unpack_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="s1">&#39;&gt;q&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_pack_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># pad</span>
+
+    <span class="k">def</span> <span class="nf">_unpack_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># read padding</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<span class="k">class</span> <span class="nc">netcdf_variable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A data object for the `netcdf` module.</span>
+
+<span class="sd">    `netcdf_variable` objects are constructed by calling the method</span>
+<span class="sd">    `netcdf_file.createVariable` on the `netcdf_file` object. `netcdf_variable`</span>
+<span class="sd">    objects behave much like array objects defined in numpy, except that their</span>
+<span class="sd">    data resides in a file. Data is read by indexing and written by assigning</span>
+<span class="sd">    to an indexed subset; the entire array can be accessed by the index ``[:]``</span>
+<span class="sd">    or (for scalars) by using the methods `getValue` and `assignValue`.</span>
+<span class="sd">    `netcdf_variable` objects also have attribute `shape` with the same meaning</span>
+<span class="sd">    as for arrays, but the shape cannot be modified. There is another read-only</span>
+<span class="sd">    attribute `dimensions`, whose value is the tuple of dimension names.</span>
+
+<span class="sd">    All other attributes correspond to variable attributes defined in</span>
+<span class="sd">    the NetCDF file. Variable attributes are created by assigning to an</span>
+<span class="sd">    attribute of the `netcdf_variable` object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : array_like</span>
+<span class="sd">        The data array that holds the values for the variable.</span>
+<span class="sd">        Typically, this is initialized as empty, but with the proper shape.</span>
+<span class="sd">    typecode : dtype character code</span>
+<span class="sd">        Desired data-type for the data array.</span>
+<span class="sd">    size : int</span>
+<span class="sd">        Desired element size for the data array.</span>
+<span class="sd">    shape : sequence of ints</span>
+<span class="sd">        The shape of the array.  This should match the lengths of the</span>
+<span class="sd">        variable&#39;s dimensions.</span>
+<span class="sd">    dimensions : sequence of strings</span>
+<span class="sd">        The names of the dimensions used by the variable.  Must be in the</span>
+<span class="sd">        same order of the dimension lengths given by `shape`.</span>
+<span class="sd">    attributes : dict, optional</span>
+<span class="sd">        Attribute values (any type) keyed by string names.  These attributes</span>
+<span class="sd">        become attributes for the netcdf_variable object.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dimensions : list of str</span>
+<span class="sd">        List of names of dimensions used by the variable object.</span>
+<span class="sd">    isrec, shape</span>
+<span class="sd">        Properties</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    isrec, shape</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_typecode</span> <span class="o">=</span> <span class="n">typecode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">dimensions</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># Store user defined attributes in a separate dict,</span>
+        <span class="c1"># so we can save them to file later.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">isrec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns whether the variable has a record dimension or not.</span>
+
+<span class="sd">        A record dimension is a dimension along which additional data could be</span>
+<span class="sd">        easily appended in the netcdf data structure without much rewriting of</span>
+<span class="sd">        the data file. This attribute is a read-only property of the</span>
+<span class="sd">        `netcdf_variable`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">isrec</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">isrec</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the shape tuple of the data variable.</span>
+
+<span class="sd">        This is a read-only attribute and can not be modified in the</span>
+<span class="sd">        same manner of other numpy arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a scalar value from a `netcdf_variable` of length one.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the netcdf variable is an array of length greater than one,</span>
+<span class="sd">            this exception will be raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">assignValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign a scalar value to a `netcdf_variable` of length one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : scalar</span>
+<span class="sd">            Scalar value (of compatible type) to assign to a length-one netcdf</span>
+<span class="sd">            variable. This value will be written to file.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input is not a scalar, or if the destination is not a length-one</span>
+<span class="sd">            netcdf variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span><span class="p">:</span>
+            <span class="c1"># Work-around for a bug in NumPy.  Calling itemset() on a read-only</span>
+            <span class="c1"># memory-mapped array causes a seg. fault.</span>
+            <span class="c1"># See NumPy ticket #1622, and SciPy ticket #1202.</span>
+            <span class="c1"># This check for `writeable` can be removed when the oldest version</span>
+            <span class="c1"># of numpy still supported by scipy contains the fix for #1622.</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;variable is not writeable&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemset</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">typecode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the typecode of the variable.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        typecode : char</span>
+<span class="sd">            The character typecode of the variable (eg, &#39;i&#39; for int).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typecode</span>
+
+    <span class="k">def</span> <span class="nf">itemsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the itemsize of the variable.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        itemsize : int</span>
+<span class="sd">            The element size of the variable (eg, 8 for float64).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># Expand data for record vars?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isrec</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">rec_index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rec_index</span> <span class="o">=</span> <span class="n">index</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec_index</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">recs</span> <span class="o">=</span> <span class="p">(</span><span class="n">rec_index</span><span class="o">.</span><span class="n">start</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">recs</span> <span class="o">=</span> <span class="n">rec_index</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">recs</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">recs</span><span class="p">,)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+
+<span class="n">NetCDFFile</span> <span class="o">=</span> <span class="n">netcdf_file</span>
+<span class="n">NetCDFVariable</span> <span class="o">=</span> <span class="n">netcdf_variable</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../utils.html" >parmed.utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

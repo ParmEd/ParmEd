@@ -1,0 +1,7 @@
+parmed.openmm.parameters module
+===============================
+
+.. automodule:: parmed.openmm.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:

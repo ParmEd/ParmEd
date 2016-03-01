@@ -6,6 +6,7 @@ Submodules
 
 .. toctree::
 
+   parmed.openmm.parameters
    parmed.openmm.reporters
    parmed.openmm.topsystem
    parmed.openmm.utils

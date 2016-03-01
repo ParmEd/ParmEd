@@ -18,8 +18,12 @@ parmed.structure.Structure
       ~Structure.add_atom_to_residue
       ~Structure.copy
       ~Structure.createSystem
+      ~Structure.get_box
+      ~Structure.get_coordinates
       ~Structure.has_NBFIX
       ~Structure.is_changed
+      ~Structure.join_dihedrals
+      ~Structure.load_dataframe
       ~Structure.omm_add_constraints
       ~Structure.omm_angle_force
       ~Structure.omm_bond_force
@@ -37,6 +41,7 @@ parmed.structure.Structure
       ~Structure.omm_trigonal_angle_force
       ~Structure.omm_urey_bradley_force
       ~Structure.prune_empty_terms
+      ~Structure.save
       ~Structure.split
       ~Structure.strip
       ~Structure.to_dataframe
@@ -67,9 +72,13 @@ parmed.structure.Structure
       ~Structure.TORSION_TORSION_FORCE_GROUP
       ~Structure.TRIGONAL_ANGLE_FORCE_GROUP
       ~Structure.UREY_BRADLEY_FORCE_GROUP
+      ~Structure.box
       ~Structure.box_vectors
+      ~Structure.combining_rule
+      ~Structure.coordinates
       ~Structure.positions
       ~Structure.topology
       ~Structure.velocities
+      ~Structure.view
    
    

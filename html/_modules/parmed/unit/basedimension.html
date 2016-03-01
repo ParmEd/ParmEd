@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.unit" href="../unit.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,20 +37,18 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../unit.html" accesskey="U">parmed.unit</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.unit.basedimension</h1><div class="highlight"><pre>
-<span class="c">#!/bin/env python</span>
+<span></span><span class="ch">#!/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module simtk.unit.basedimension</span>
 
@@ -86,8 +84,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Christopher M. Bruns&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.6&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Christopher M. Bruns&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.6&quot;</span>
 
 
 <div class="viewcode-block" id="BaseDimension"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.basedimension.html#parmed.unit.basedimension.BaseDimension">[docs]</a><span class="k">class</span> <span class="nc">BaseDimension</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -96,16 +94,16 @@
 
 <span class="sd">    It is unlikely the user will need to create new ones.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="c"># Keep deterministic order of dimensions</span>
+    <span class="c1"># Keep deterministic order of dimensions</span>
     <span class="n">_index_by_name</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&#39;mass&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s">&#39;length&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s">&#39;time&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-        <span class="s">&#39;amount&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="s">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-        <span class="s">&#39;luminous intensity&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-        <span class="s">&#39;angle&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s1">&#39;mass&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;temperature&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;amount&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s1">&#39;luminous intensity&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">_next_unused_index</span> <span class="o">=</span> <span class="mi">9</span>
 
@@ -139,7 +137,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;BaseDimension(&quot;</span><span class="si">%s</span><span class="s">&quot;)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="s1">&#39;BaseDimension(&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
     
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseDimension</span><span class="p">):</span>
@@ -149,22 +147,23 @@
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseDimension</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">_index</span>
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
 
 
-<span class="c"># run module directly for testing</span></div>
-<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c"># Test the examples in the docstrings</span>
+<span class="c1"># run module directly for testing</span>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Test the examples in the docstrings</span>
     <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">sys</span>
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">])</span>
+
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -181,7 +180,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -190,15 +189,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../unit.html" >parmed.unit</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

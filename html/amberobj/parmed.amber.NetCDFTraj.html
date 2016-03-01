@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The parmed.amber package" href="../amber.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +37,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../amber.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.amber</span></code> package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-amber-netcdftraj">
 <h1>parmed.amber.NetCDFTraj<a class="headerlink" href="#parmed-amber-netcdftraj" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.amber.NetCDFTraj">
-<em class="property">class </em><tt class="descclassname">parmed.amber.</tt><tt class="descname">NetCDFTraj</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.amber.</code><code class="descname">NetCDFTraj</code><span class="sig-paren">(</span><em>fname</em>, <em>mode='r'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to read or write NetCDF restart files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -86,31 +86,31 @@ the default constructor</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.box" title="parmed.amber.NetCDFTraj.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.box" title="parmed.amber.NetCDFTraj.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.cell_lengths_angles" title="parmed.amber.NetCDFTraj.cell_lengths_angles"><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.cell_lengths_angles" title="parmed.amber.NetCDFTraj.cell_lengths_angles"><code class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.coordinates" title="parmed.amber.NetCDFTraj.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.coordinates" title="parmed.amber.NetCDFTraj.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><code class="xref py py-obj docutils literal"><span class="pre">forces</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_dimtype" title="parmed.amber.NetCDFTraj.remd_dimtype"><tt class="xref py py-obj docutils literal"><span class="pre">remd_dimtype</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_dimtype" title="parmed.amber.NetCDFTraj.remd_dimtype"><code class="xref py py-obj docutils literal"><span class="pre">remd_dimtype</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_indices" title="parmed.amber.NetCDFTraj.remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_indices" title="parmed.amber.NetCDFTraj.remd_indices"><code class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.temp0" title="parmed.amber.NetCDFTraj.temp0"><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.temp0" title="parmed.amber.NetCDFTraj.temp0"><code class="xref py py-obj docutils literal"><span class="pre">temp0</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.time" title="parmed.amber.NetCDFTraj.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.time" title="parmed.amber.NetCDFTraj.time"><code class="xref py py-obj docutils literal"><span class="pre">time</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -122,50 +122,50 @@ the default constructor</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_box" title="parmed.amber.NetCDFTraj.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(lengths[,&nbsp;angles])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_box" title="parmed.amber.NetCDFTraj.add_box"><code class="xref py py-obj docutils literal"><span class="pre">add_box</span></code></a>(lengths[,&nbsp;angles])</td>
 <td>Adds a new cell length and angle frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_cell_lengths_angles" title="parmed.amber.NetCDFTraj.add_cell_lengths_angles"><tt class="xref py py-obj docutils literal"><span class="pre">add_cell_lengths_angles</span></tt></a>(lengths[,&nbsp;angles])</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_cell_lengths_angles" title="parmed.amber.NetCDFTraj.add_cell_lengths_angles"><code class="xref py py-obj docutils literal"><span class="pre">add_cell_lengths_angles</span></code></a>(lengths[,&nbsp;angles])</td>
 <td>Adds a new cell length and angle frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_coordinates" title="parmed.amber.NetCDFTraj.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_coordinates" title="parmed.amber.NetCDFTraj.add_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></code></a>(stuff)</td>
 <td>Adds a new coordinate frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_forces" title="parmed.amber.NetCDFTraj.add_forces"><tt class="xref py py-obj docutils literal"><span class="pre">add_forces</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_forces" title="parmed.amber.NetCDFTraj.add_forces"><code class="xref py py-obj docutils literal"><span class="pre">add_forces</span></code></a>(stuff)</td>
 <td>Adds a new coordinate frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_remd_indices" title="parmed.amber.NetCDFTraj.add_remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">add_remd_indices</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_remd_indices" title="parmed.amber.NetCDFTraj.add_remd_indices"><code class="xref py py-obj docutils literal"><span class="pre">add_remd_indices</span></code></a>(stuff)</td>
 <td>Add REMD indices to the current frame of the NetCDF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_temp0" title="parmed.amber.NetCDFTraj.add_temp0"><tt class="xref py py-obj docutils literal"><span class="pre">add_temp0</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_temp0" title="parmed.amber.NetCDFTraj.add_temp0"><code class="xref py py-obj docutils literal"><span class="pre">add_temp0</span></code></a>(stuff)</td>
 <td>The temperature to add to the current frame of the NetCDF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_time" title="parmed.amber.NetCDFTraj.add_time"><tt class="xref py py-obj docutils literal"><span class="pre">add_time</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_time" title="parmed.amber.NetCDFTraj.add_time"><code class="xref py py-obj docutils literal"><span class="pre">add_time</span></code></a>(stuff)</td>
 <td>Adds the time to the current frame of the NetCDF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><tt class="xref py py-obj docutils literal"><span class="pre">add_velocities</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><code class="xref py py-obj docutils literal"><span class="pre">add_velocities</span></code></a>(stuff)</td>
 <td>Adds a new velocities frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.close" title="parmed.amber.NetCDFTraj.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.close" title="parmed.amber.NetCDFTraj.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
 <td>Closes the NetCDF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.flush" title="parmed.amber.NetCDFTraj.flush"><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.flush" title="parmed.amber.NetCDFTraj.flush"><code class="xref py py-obj docutils literal"><span class="pre">flush</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an Amber NetCDF trajectory file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><code class="xref py py-obj docutils literal"><span class="pre">open_new</span></code></a>(fname,&nbsp;natom,&nbsp;box[,&nbsp;crds,&nbsp;vels,&nbsp;...])</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><code class="xref py py-obj docutils literal"><span class="pre">open_old</span></code></a>(fname)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fname</em>, <em>mode='r'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens a NetCDF File</p>
 </dd></dl>
 
@@ -176,71 +176,47 @@ the default constructor</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.__init__" title="parmed.amber.NetCDFTraj.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.NetCDFTraj.__init__" title="parmed.amber.NetCDFTraj.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(fname[,&nbsp;mode])</td>
 <td>Opens a NetCDF File</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_box" title="parmed.amber.NetCDFTraj.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(lengths[,&nbsp;angles])</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_box" title="parmed.amber.NetCDFTraj.add_box"><code class="xref py py-obj docutils literal"><span class="pre">add_box</span></code></a>(lengths[,&nbsp;angles])</td>
 <td>Adds a new cell length and angle frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_cell_lengths_angles" title="parmed.amber.NetCDFTraj.add_cell_lengths_angles"><tt class="xref py py-obj docutils literal"><span class="pre">add_cell_lengths_angles</span></tt></a>(lengths[,&nbsp;angles])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_cell_lengths_angles" title="parmed.amber.NetCDFTraj.add_cell_lengths_angles"><code class="xref py py-obj docutils literal"><span class="pre">add_cell_lengths_angles</span></code></a>(lengths[,&nbsp;angles])</td>
 <td>Adds a new cell length and angle frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_coordinates" title="parmed.amber.NetCDFTraj.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_coordinates" title="parmed.amber.NetCDFTraj.add_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></code></a>(stuff)</td>
 <td>Adds a new coordinate frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_forces" title="parmed.amber.NetCDFTraj.add_forces"><tt class="xref py py-obj docutils literal"><span class="pre">add_forces</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_forces" title="parmed.amber.NetCDFTraj.add_forces"><code class="xref py py-obj docutils literal"><span class="pre">add_forces</span></code></a>(stuff)</td>
 <td>Adds a new coordinate frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_remd_indices" title="parmed.amber.NetCDFTraj.add_remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">add_remd_indices</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_remd_indices" title="parmed.amber.NetCDFTraj.add_remd_indices"><code class="xref py py-obj docutils literal"><span class="pre">add_remd_indices</span></code></a>(stuff)</td>
 <td>Add REMD indices to the current frame of the NetCDF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_temp0" title="parmed.amber.NetCDFTraj.add_temp0"><tt class="xref py py-obj docutils literal"><span class="pre">add_temp0</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_temp0" title="parmed.amber.NetCDFTraj.add_temp0"><code class="xref py py-obj docutils literal"><span class="pre">add_temp0</span></code></a>(stuff)</td>
 <td>The temperature to add to the current frame of the NetCDF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_time" title="parmed.amber.NetCDFTraj.add_time"><tt class="xref py py-obj docutils literal"><span class="pre">add_time</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_time" title="parmed.amber.NetCDFTraj.add_time"><code class="xref py py-obj docutils literal"><span class="pre">add_time</span></code></a>(stuff)</td>
 <td>Adds the time to the current frame of the NetCDF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><tt class="xref py py-obj docutils literal"><span class="pre">add_velocities</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><code class="xref py py-obj docutils literal"><span class="pre">add_velocities</span></code></a>(stuff)</td>
 <td>Adds a new velocities frame to the end of a NetCDF trajectory.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.box" title="parmed.amber.NetCDFTraj.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.cell_lengths_angles" title="parmed.amber.NetCDFTraj.cell_lengths_angles"><tt class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.close" title="parmed.amber.NetCDFTraj.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.close" title="parmed.amber.NetCDFTraj.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
 <td>Closes the NetCDF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.coordinates" title="parmed.amber.NetCDFTraj.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.flush" title="parmed.amber.NetCDFTraj.flush"><code class="xref py py-obj docutils literal"><span class="pre">flush</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.flush" title="parmed.amber.NetCDFTraj.flush"><tt class="xref py py-obj docutils literal"><span class="pre">flush</span></tt></a>()</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><tt class="xref py py-obj docutils literal"><span class="pre">forces</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.id_format" title="parmed.amber.NetCDFTraj.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an Amber NetCDF trajectory file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><tt class="xref py py-obj docutils literal"><span class="pre">open_new</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><code class="xref py py-obj docutils literal"><span class="pre">open_new</span></code></a>(fname,&nbsp;natom,&nbsp;box[,&nbsp;crds,&nbsp;vels,&nbsp;...])</td>
 <td>Opens a new NetCDF file and sets the attributes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><tt class="xref py py-obj docutils literal"><span class="pre">open_old</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><code class="xref py py-obj docutils literal"><span class="pre">open_old</span></code></a>(fname)</td>
 <td>Opens the NetCDF file and sets the global attributes that the file sets</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_indices" title="parmed.amber.NetCDFTraj.remd_indices"><tt class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.temp0" title="parmed.amber.NetCDFTraj.temp0"><tt class="xref py py-obj docutils literal"><span class="pre">temp0</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.time" title="parmed.amber.NetCDFTraj.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -251,14 +227,38 @@ the default constructor</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_dimtype" title="parmed.amber.NetCDFTraj.remd_dimtype"><tt class="xref py py-obj docutils literal"><span class="pre">remd_dimtype</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.box" title="parmed.amber.NetCDFTraj.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.cell_lengths_angles" title="parmed.amber.NetCDFTraj.cell_lengths_angles"><code class="xref py py-obj docutils literal"><span class="pre">cell_lengths_angles</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.coordinates" title="parmed.amber.NetCDFTraj.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.forces" title="parmed.amber.NetCDFTraj.forces"><code class="xref py py-obj docutils literal"><span class="pre">forces</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_dimtype" title="parmed.amber.NetCDFTraj.remd_dimtype"><code class="xref py py-obj docutils literal"><span class="pre">remd_dimtype</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.remd_indices" title="parmed.amber.NetCDFTraj.remd_indices"><code class="xref py py-obj docutils literal"><span class="pre">remd_indices</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.temp0" title="parmed.amber.NetCDFTraj.temp0"><code class="xref py py-obj docutils literal"><span class="pre">temp0</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.time" title="parmed.amber.NetCDFTraj.time"><code class="xref py py-obj docutils literal"><span class="pre">time</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.velocities" title="parmed.amber.NetCDFTraj.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_box">
-<tt class="descname">add_box</tt><big>(</big><em>lengths</em>, <em>angles=None</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_box" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_box</code><span class="sig-paren">(</span><em>lengths</em>, <em>angles=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new cell length and angle frame to the end of a NetCDF
 trajectory.  This should only be called on objects created with the
 &#8220;open_new&#8221; constructor.</p>
@@ -286,7 +286,7 @@ includes angles as well.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_cell_lengths_angles">
-<tt class="descname">add_cell_lengths_angles</tt><big>(</big><em>lengths</em>, <em>angles=None</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_cell_lengths_angles" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_cell_lengths_angles</code><span class="sig-paren">(</span><em>lengths</em>, <em>angles=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_cell_lengths_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_cell_lengths_angles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new cell length and angle frame to the end of a NetCDF
 trajectory.  This should only be called on objects created with the
 &#8220;open_new&#8221; constructor.</p>
@@ -314,7 +314,7 @@ includes angles as well.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_coordinates">
-<tt class="descname">add_coordinates</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_coordinates</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new coordinate frame to the end of a NetCDF trajectory. This
 should only be called on objects created with the &#8220;open_new&#8221;
 constructor.</p>
@@ -337,7 +337,7 @@ constructor.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_forces">
-<tt class="descname">add_forces</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_forces" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_forces</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_forces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_forces" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new coordinate frame to the end of a NetCDF trajectory. This
 should only be called on objects created with the &#8220;open_new&#8221;
 constructor.</p>
@@ -360,7 +360,7 @@ constructor.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_remd_indices">
-<tt class="descname">add_remd_indices</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_remd_indices" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_remd_indices</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_remd_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_remd_indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add REMD indices to the current frame of the NetCDF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -378,7 +378,7 @@ constructor.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_temp0">
-<tt class="descname">add_temp0</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_temp0" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_temp0</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_temp0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_temp0" title="Permalink to this definition">¶</a></dt>
 <dd><p>The temperature to add to the current frame of the NetCDF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -396,7 +396,7 @@ constructor.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_time">
-<tt class="descname">add_time</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_time" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_time</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the time to the current frame of the NetCDF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -414,7 +414,7 @@ constructor.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.add_velocities">
-<tt class="descname">add_velocities</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_velocities" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_velocities</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.add_velocities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.add_velocities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new velocities frame to the end of a NetCDF trajectory. This
 should only be called on objects created with the &#8220;open_new&#8221;
 constructor.</p>
@@ -437,13 +437,13 @@ constructor.</p>
 
 <dl class="method">
 <dt id="parmed.amber.NetCDFTraj.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.close" title="Permalink to this definition">¶</a></dt>
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes the NetCDF file</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="parmed.amber.NetCDFTraj.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as an Amber NetCDF trajectory file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -469,7 +469,7 @@ constructor.</p>
 
 <dl class="classmethod">
 <dt id="parmed.amber.NetCDFTraj.open_new">
-<em class="property">classmethod </em><tt class="descname">open_new</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_new" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">open_new</code><span class="sig-paren">(</span><em>fname</em>, <em>natom</em>, <em>box</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em>, <em>remd=None</em>, <em>remd_dimension=None</em>, <em>title=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.open_new"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_new" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens a new NetCDF file and sets the attributes</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -521,7 +521,7 @@ None if no REMD information is written</p>
 
 <dl class="classmethod">
 <dt id="parmed.amber.NetCDFTraj.open_old">
-<em class="property">classmethod </em><tt class="descname">open_old</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_old" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">open_old</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/netcdffiles.html#NetCDFTraj.open_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.NetCDFTraj.open_old" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens the NetCDF file and sets the global attributes that the file sets</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -545,14 +545,16 @@ None if no REMD information is written</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/amberobj/parmed.amber.NetCDFTraj.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/amberobj/parmed.amber.NetCDFTraj.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -569,7 +571,7 @@ None if no REMD information is written</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -578,13 +580,13 @@ None if no REMD information is written</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../amber.html" >The <code class="docutils literal"><span class="pre">parmed.amber</span></code> package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

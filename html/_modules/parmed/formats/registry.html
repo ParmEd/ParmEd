@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.formats" href="../formats.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,20 +37,18 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../formats.html" accesskey="U">parmed.formats</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.formats.registry</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the metaclass for defining and registering a particular</span>
 <span class="sd">file format. Any class with this metaclass will be added to the registry and</span>
 <span class="sd">therefore automatically be added to the &#39;automatic&#39; file type identification.</span>
@@ -78,7 +76,7 @@
 <span class="n">PARSER_REGISTRY</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="n">PARSER_ARGUMENTS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-<div class="viewcode-block" id="FileFormatType"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.registry.html#parmed.formats.registry.FileFormatType">[docs]</a><span class="k">class</span> <span class="nc">FileFormatType</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+<div class="viewcode-block" id="FileFormatType"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.registry.html#parmed.FileFormatType">[docs]</a><span class="k">class</span> <span class="nc">FileFormatType</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Metaclass for registering parsers for different formats of different types</span>
 <span class="sd">    of files.</span>
@@ -97,16 +95,16 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
         <span class="k">global</span> <span class="n">PARSER_REGISTRY</span><span class="p">,</span> <span class="n">_CLASS_REGISTRY</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">PARSER_REGISTRY</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Duplicate name </span><span class="si">%s</span><span class="s"> in parser registry&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s">&#39;id_format&#39;</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Duplicate name </span><span class="si">%s</span><span class="s1"> in parser registry&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;id_format&#39;</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
             <span class="n">PARSER_REGISTRY</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span>
-            <span class="k">if</span> <span class="s">&#39;extra_args&#39;</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
-                <span class="n">PARSER_ARGUMENTS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dct</span><span class="p">[</span><span class="s">&#39;extra_args&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;extra_args&#39;</span> <span class="ow">in</span> <span class="n">dct</span><span class="p">:</span>
+                <span class="n">PARSER_ARGUMENTS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;extra_args&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">PARSER_ARGUMENTS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="load_file"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.registry.html#parmed.formats.registry.load_file">[docs]</a><span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_file"><a class="viewcode-back" href="../../../structobj/parmed.formats.registry.load_file.html#parmed.load_file">[docs]</a><span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Identifies the file format of the specified file and returns its parsed</span>
 <span class="sd">    contents.</span>
@@ -164,19 +162,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">PARSER_REGISTRY</span><span class="p">,</span> <span class="n">PARSER_ARGUMENTS</span>
 
-    <span class="c"># Check that the file actually exists and that we can read it</span>
-    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">)</span>\
-            <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;ftp://&#39;</span><span class="p">):</span>
-        <span class="c"># This raises IOError if it does not exist; assert silences linters</span>
+    <span class="c1"># Check that the file actually exists and that we can read it</span>
+    <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">)</span>\
+            <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ftp://&#39;</span><span class="p">):</span>
+        <span class="c1"># This raises IOError if it does not exist; assert silences linters</span>
         <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">f</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not exist&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> does not have read permissions set&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not have read permissions set&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">PARSER_REGISTRY</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;id_format&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;id_format&#39;</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
@@ -184,37 +182,37 @@
         <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
             <span class="k">continue</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c"># We found no file format</span>
-        <span class="k">raise</span> <span class="n">FormatNotFound</span><span class="p">(</span><span class="s">&#39;Could not identify file format&#39;</span><span class="p">)</span>
+        <span class="c1"># We found no file format</span>
+        <span class="k">raise</span> <span class="n">FormatNotFound</span><span class="p">(</span><span class="s1">&#39;Could not identify file format&#39;</span><span class="p">)</span>
 
-    <span class="c"># We found a file format that is compatible. Parse it!</span>
+    <span class="c1"># We found a file format that is compatible. Parse it!</span>
     <span class="n">other_args</span> <span class="o">=</span> <span class="n">PARSER_ARGUMENTS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">other_args</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> constructor expects </span><span class="si">%s</span><span class="s"> keyword argument&#39;</span> <span class="o">%</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> constructor expects </span><span class="si">%s</span><span class="s1"> keyword argument&#39;</span> <span class="o">%</span>
                             <span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
-    <span class="c"># Pass on the &quot;structure&quot; keyword IFF the target function accepts a target</span>
-    <span class="c"># keyword. Otherwise, get rid of it.</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;parse&#39;</span><span class="p">):</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;structure&#39;</span><span class="p">)</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;natom&#39;</span><span class="p">)</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;hasbox&#39;</span><span class="p">)</span>
+    <span class="c1"># Pass on the &quot;structure&quot; keyword IFF the target function accepts a target</span>
+    <span class="c1"># keyword. Otherwise, get rid of it.</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;parse&#39;</span><span class="p">):</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;open_old&#39;</span><span class="p">):</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;structure&#39;</span><span class="p">)</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;natom&#39;</span><span class="p">)</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;hasbox&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;open_old&#39;</span><span class="p">):</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;open&#39;</span><span class="p">):</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;structure&#39;</span><span class="p">)</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;natom&#39;</span><span class="p">)</span>
-        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;hasbox&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;open&#39;</span><span class="p">):</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;structure&#39;</span><span class="p">)</span>
-    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;natom&#39;</span><span class="p">)</span>
-    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s">&#39;hasbox&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</div>
+    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
+    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 <span class="k">def</span> <span class="nf">_prune_argument</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">keyword</span> <span class="ow">not</span> <span class="ow">in</span>
@@ -225,9 +223,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -244,7 +242,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -253,15 +251,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../formats.html" >parmed.formats</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

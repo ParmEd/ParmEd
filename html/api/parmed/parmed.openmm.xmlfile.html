@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,22 +36,22 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.openmm.xmlfile">
 <span id="parmed-openmm-xmlfile-module"></span><h1>parmed.openmm.xmlfile module<a class="headerlink" href="#module-parmed.openmm.xmlfile" title="Permalink to this headline">¶</a></h1>
 <p>XML file parsing utilities for OpenMM serialized objects</p>
 <dl class="class">
 <dt id="parmed.openmm.xmlfile.XmlFile">
-<em class="property">class </em><tt class="descclassname">parmed.openmm.xmlfile.</tt><tt class="descname">XmlFile</tt><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.xmlfile.XmlFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.openmm.xmlfile.</code><code class="descname">XmlFile</code><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.xmlfile.XmlFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Wrapper for parsing OpenMM-serialized objects. Supports serialized State,
 System, Integrator, and ForceField objects.</p>
 <p class="rubric">Methods</p>
@@ -61,17 +61,17 @@ System, Integrator, and ForceField objects.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.xmlfile.XmlFile.id_format" title="parmed.openmm.xmlfile.XmlFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.xmlfile.XmlFile.id_format" title="parmed.openmm.xmlfile.XmlFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an XML file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.xmlfile.XmlFile.parse" title="parmed.openmm.xmlfile.XmlFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.xmlfile.XmlFile.parse" title="parmed.openmm.xmlfile.XmlFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Parses XML file and returns deserialized object.</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.openmm.xmlfile.XmlFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.xmlfile.XmlFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.xmlfile.XmlFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as an XML file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -95,7 +95,7 @@ System, Integrator, and ForceField objects.</p>
 
 <dl class="staticmethod">
 <dt id="parmed.openmm.xmlfile.XmlFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.xmlfile.XmlFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.xmlfile.XmlFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses XML file and returns deserialized object. The return value
 depends on the serialized object, summarized below</p>
 <blockquote>
@@ -137,14 +137,16 @@ result, this function may require a significant amount of memory.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.openmm.xmlfile.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.openmm.xmlfile.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -161,7 +163,7 @@ result, this function may require a significant amount of memory.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -170,12 +172,12 @@ result, this function may require a significant amount of memory.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

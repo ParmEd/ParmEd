@@ -20,7 +20,6 @@ parmed.topologyobjects.Atom
       ~Atom.exclude
       ~Atom.nonbonded_exclusions
       ~Atom.prune_exclusions
-      ~Atom.reset_topology
       ~Atom.tortor_to
    
    
@@ -32,9 +31,8 @@ parmed.topologyobjects.Atom
    .. autosummary::
    
       ~Atom.angle_partners
-      ~Atom.atname
-      ~Atom.attype
       ~Atom.bond_partners
+      ~Atom.charge
       ~Atom.dihedral_partners
       ~Atom.element
       ~Atom.epsilon
@@ -43,9 +41,9 @@ parmed.topologyobjects.Atom
       ~Atom.idx
       ~Atom.rmin
       ~Atom.rmin_14
+      ~Atom.segid
       ~Atom.sigma
       ~Atom.sigma_14
-      ~Atom.starting_index
       ~Atom.tortor_partners
    
    

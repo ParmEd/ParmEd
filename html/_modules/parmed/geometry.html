@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
-    <link rel="up" title="parmed" href="../parmed.html" /> 
+    <link rel="up" title="Module code" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,19 +37,18 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.geometry</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains the functionality for carrying out geometrical calculations</span>
 <span class="sd">for molecules and molecular systems</span>
 
@@ -119,8 +118,8 @@
     <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">gamma</span><span class="p">):</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">alpha</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span> <span class="ow">and</span> <span class="n">beta</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span> <span class="ow">and</span> <span class="n">gamma</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Strange unit cell vector angles detected. They &#39;</span>
-                      <span class="s">&#39;appear to be in radians...&#39;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Strange unit cell vector angles detected. They &#39;</span>
+                      <span class="s1">&#39;appear to be in radians...&#39;</span><span class="p">)</span>
 
     <span class="n">alpha</span> <span class="o">*=</span> <span class="n">DEG_TO_RAD</span>
     <span class="n">beta</span> <span class="o">*=</span> <span class="n">DEG_TO_RAD</span>
@@ -135,15 +134,15 @@
     <span class="n">cz</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">cx</span><span class="o">*</span><span class="n">cx</span> <span class="o">-</span> <span class="n">cy</span><span class="o">*</span><span class="n">cy</span><span class="p">)</span>
     <span class="n">cv</span> <span class="o">=</span> <span class="p">[</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">]</span>
 
-    <span class="c"># Make sure that any tiny components are exactly 0</span>
+    <span class="c1"># Make sure that any tiny components are exactly 0</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">bx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">bv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">bv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">cv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cy</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">cv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cz</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span><span class="p">:</span> <span class="n">cv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">av</span><span class="p">,</span> <span class="n">bv</span><span class="p">,</span> <span class="n">cv</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
-</div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">av</span><span class="p">,</span> <span class="n">bv</span><span class="p">,</span> <span class="n">cv</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span></div>
+
 <div class="viewcode-block" id="box_vectors_to_lengths_and_angles"><a class="viewcode-back" href="../../api/parmed/parmed.geometry.html#parmed.geometry.box_vectors_to_lengths_and_angles">[docs]</a><span class="k">def</span> <span class="nf">box_vectors_to_lengths_and_angles</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function takes the lengths of the unit cell vectors and the angles</span>
@@ -173,21 +172,21 @@
     <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">a</span><span class="p">):</span> <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">b</span><span class="p">):</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">c</span><span class="p">):</span> <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
-    <span class="c"># Get the lengths</span>
+    <span class="c1"># Get the lengths</span>
     <span class="n">la</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">lb</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">lc</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-    <span class="c"># Angles</span>
+    <span class="c1"># Angles</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">acos</span><span class="p">((</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">lb</span><span class="o">*</span><span class="n">lc</span><span class="p">))</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="n">acos</span><span class="p">((</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">la</span><span class="o">*</span><span class="n">lc</span><span class="p">))</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="n">acos</span><span class="p">((</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">lb</span><span class="o">*</span><span class="n">la</span><span class="p">))</span>
-    <span class="c"># Convert to degrees</span>
+    <span class="c1"># Convert to degrees</span>
     <span class="n">alpha</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
     <span class="n">beta</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
     <span class="n">gamma</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">la</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">lc</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span>
-</div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">la</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">lc</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span></div>
+
 <div class="viewcode-block" id="reduce_box_vectors"><a class="viewcode-back" href="../../api/parmed/parmed.geometry.html#parmed.geometry.reduce_box_vectors">[docs]</a><span class="k">def</span> <span class="nf">reduce_box_vectors</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function puts three unit cell vectors in a reduced form where a is</span>
@@ -228,9 +227,9 @@
     <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="nb">round</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span></div>
 
-</div>
+
 <div class="viewcode-block" id="center_of_mass"><a class="viewcode-back" href="../../api/parmed/parmed.geometry.html#parmed.geometry.center_of_mass">[docs]</a><span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">masses</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Compute the center of mass of a group of coordinates.</span>
 
@@ -260,9 +259,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -279,7 +278,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -288,14 +287,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../parmed.html" >parmed</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

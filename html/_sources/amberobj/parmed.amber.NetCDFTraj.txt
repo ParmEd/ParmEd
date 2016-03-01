@@ -22,19 +22,11 @@ parmed.amber.NetCDFTraj
       ~NetCDFTraj.add_temp0
       ~NetCDFTraj.add_time
       ~NetCDFTraj.add_velocities
-      ~NetCDFTraj.box
-      ~NetCDFTraj.cell_lengths_angles
       ~NetCDFTraj.close
-      ~NetCDFTraj.coordinates
       ~NetCDFTraj.flush
-      ~NetCDFTraj.forces
       ~NetCDFTraj.id_format
       ~NetCDFTraj.open_new
       ~NetCDFTraj.open_old
-      ~NetCDFTraj.remd_indices
-      ~NetCDFTraj.temp0
-      ~NetCDFTraj.time
-      ~NetCDFTraj.velocities
    
    
 
@@ -44,6 +36,14 @@ parmed.amber.NetCDFTraj
 
    .. autosummary::
    
+      ~NetCDFTraj.box
+      ~NetCDFTraj.cell_lengths_angles
+      ~NetCDFTraj.coordinates
+      ~NetCDFTraj.forces
       ~NetCDFTraj.remd_dimtype
+      ~NetCDFTraj.remd_indices
+      ~NetCDFTraj.temp0
+      ~NetCDFTraj.time
+      ~NetCDFTraj.velocities
    
    

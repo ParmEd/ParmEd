@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.formats" href="../formats.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,20 +37,18 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../formats.html" accesskey="U">parmed.formats</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.formats.mol2</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains parsers for mol2-format files (with support for the mol3</span>
 <span class="sd">extension described at http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -67,13 +65,13 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
-<div class="viewcode-block" id="Mol2File"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.mol2.Mol2File">[docs]</a><span class="k">class</span> <span class="nc">Mol2File</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Mol2File"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.Mol2File">[docs]</a><span class="k">class</span> <span class="nc">Mol2File</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class to read and write TRIPOS Mol2 files &quot;&quot;&quot;</span>
 
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Mol2File.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.mol2.Mol2File.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="Mol2File.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.Mol2File.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identify the file as a Mol2 (or Mol3) file format or not</span>
 
 <span class="sd">        Parameters</span>
@@ -86,20 +84,20 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is a mol2 (or mol3) file, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">):</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span> <span class="k">continue</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">continue</span>
-                <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">False</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Mol2File.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.mol2.Mol2File.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Mol2File.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.Mol2File.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parses a mol2 file (or mol3) file</span>
 
 <span class="sd">        Parameters</span>
@@ -128,7 +126,7 @@
 <span class="sd">            @&lt;MOLECULE&gt; entries with ``structure=True``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">filename</span>
@@ -141,20 +139,20 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">section</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="n">last_residue</span> <span class="o">=</span> <span class="bp">None</span>
-            <span class="n">headtail</span> <span class="o">=</span> <span class="s">&#39;head&#39;</span>
+            <span class="n">headtail</span> <span class="o">=</span> <span class="s1">&#39;head&#39;</span>
             <span class="n">molecule_number</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">):</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span> <span class="k">continue</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="n">section</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;&#39;</span><span class="p">):</span>
                     <span class="n">section</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;MOLECULE&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">restemp</span><span class="o">.</span><span class="n">atoms</span> <span class="ow">or</span> <span class="n">rescont</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;MOLECULE&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">restemp</span><span class="o">.</span><span class="n">atoms</span> <span class="ow">or</span> <span class="n">rescont</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">structure</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Cannot convert MOL2 with multiple &#39;</span>
-                                            <span class="s">&#39;@&lt;MOLECULE&gt;s to a Structure&#39;</span><span class="p">)</span>
-                        <span class="c"># Set the residue name from the MOL2 title if the</span>
-                        <span class="c"># molecule had only 1 residue and it was given a name in</span>
-                        <span class="c"># the title</span>
+                            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s1">&#39;Cannot convert MOL2 with multiple &#39;</span>
+                                            <span class="s1">&#39;@&lt;MOLECULE&gt;s to a Structure&#39;</span><span class="p">)</span>
+                        <span class="c1"># Set the residue name from the MOL2 title if the</span>
+                        <span class="c1"># molecule had only 1 residue and it was given a name in</span>
+                        <span class="c1"># the title</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">multires_structure</span> <span class="ow">and</span> <span class="n">mol_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                             <span class="n">restemp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">mol_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                         <span class="n">multires_structure</span> <span class="o">=</span> <span class="bp">False</span>
@@ -166,16 +164,16 @@
                         <span class="n">mol_info</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Bad mol2 file format&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;MOLECULE&#39;</span><span class="p">:</span>
-                    <span class="c"># Section formatted as follows:</span>
-                    <span class="c">#   mol_name</span>
-                    <span class="c">#   num_atoms [num_bonds [num_substr [num_feat [num_sets]]]]</span>
-                    <span class="c">#   mol_type</span>
-                    <span class="c">#   charge_type</span>
-                    <span class="c">#   [status_bits]</span>
-                    <span class="c">#   [mol_comment]</span>
-                    <span class="c"># TODO: Do something with the name.</span>
+                    <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s1">&#39;Bad mol2 file format&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;MOLECULE&#39;</span><span class="p">:</span>
+                    <span class="c1"># Section formatted as follows:</span>
+                    <span class="c1">#   mol_name</span>
+                    <span class="c1">#   num_atoms [num_bonds [num_substr [num_feat [num_sets]]]]</span>
+                    <span class="c1">#   mol_type</span>
+                    <span class="c1">#   charge_type</span>
+                    <span class="c1">#   [status_bits]</span>
+                    <span class="c1">#   [mol_comment]</span>
+                    <span class="c1"># TODO: Do something with the name.</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol_info</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="n">mol_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol_info</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -184,20 +182,20 @@
                         <span class="n">mol_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol_info</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                         <span class="n">mol_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-                    <span class="c"># Ignore the rest</span>
+                    <span class="c1"># Ignore the rest</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;ATOM&#39;</span><span class="p">:</span>
-                    <span class="c"># Section formatted as follows:</span>
-                    <span class="c">#   atom_id -- serial number of atom</span>
-                    <span class="c">#   atom_name -- name of the atom</span>
-                    <span class="c">#   x -- X-coordinate of the atom</span>
-                    <span class="c">#   y -- Y-coordinate of the atom</span>
-                    <span class="c">#   z -- Z-coordinate of the atom</span>
-                    <span class="c">#   atom_type -- type of the atom</span>
-                    <span class="c">#   subst_id -- Residue serial number</span>
-                    <span class="c">#   subst_name -- Residue name</span>
-                    <span class="c">#   charge -- partial atomic charge</span>
-                    <span class="c">#   status_bit -- ignored</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;ATOM&#39;</span><span class="p">:</span>
+                    <span class="c1"># Section formatted as follows:</span>
+                    <span class="c1">#   atom_id -- serial number of atom</span>
+                    <span class="c1">#   atom_name -- name of the atom</span>
+                    <span class="c1">#   x -- X-coordinate of the atom</span>
+                    <span class="c1">#   y -- Y-coordinate of the atom</span>
+                    <span class="c1">#   z -- Z-coordinate of the atom</span>
+                    <span class="c1">#   atom_type -- type of the atom</span>
+                    <span class="c1">#   subst_id -- Residue serial number</span>
+                    <span class="c1">#   subst_name -- Residue name</span>
+                    <span class="c1">#   charge -- partial atomic charge</span>
+                    <span class="c1">#   status_bit -- ignored</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -212,8 +210,8 @@
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">resname</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                        <span class="n">resname</span> <span class="o">=</span> <span class="s">&#39;UNK&#39;</span>
-                    <span class="k">if</span> <span class="s">&#39;NO_CHARGES&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mol_info</span><span class="p">:</span>
+                        <span class="n">resname</span> <span class="o">=</span> <span class="s1">&#39;UNK&#39;</span>
+                    <span class="k">if</span> <span class="s1">&#39;NO_CHARGES&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mol_info</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="n">charge</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>
                         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
@@ -232,38 +230,42 @@
                         <span class="n">restemp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">resname</span>
                         <span class="n">last_residue</span> <span class="o">=</span> <span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">resname</span><span class="p">)</span>
                         <span class="n">multires_structure</span> <span class="o">=</span> <span class="bp">True</span>
-                    <span class="n">restemp</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">restemp</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="c1"># Allow mol2 files being parsed as a Structure to have</span>
+                        <span class="c1"># duplicate atom names</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">structure</span><span class="p">:</span>
+                            <span class="k">raise</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;BOND&#39;</span><span class="p">:</span>
-                    <span class="c"># Section formatted as follows:</span>
-                    <span class="c">#   bond_id -- serial number of bond (ignored)</span>
-                    <span class="c">#   origin_atom_id -- serial number of first atom in bond</span>
-                    <span class="c">#   target_atom_id -- serial number of other atom in bond</span>
-                    <span class="c">#   bond_type -- string describing bond type (ignored)</span>
-                    <span class="c">#   status_bits -- ignored</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;BOND&#39;</span><span class="p">:</span>
+                    <span class="c1"># Section formatted as follows:</span>
+                    <span class="c1">#   bond_id -- serial number of bond (ignored)</span>
+                    <span class="c1">#   origin_atom_id -- serial number of first atom in bond</span>
+                    <span class="c1">#   target_atom_id -- serial number of other atom in bond</span>
+                    <span class="c1">#   bond_type -- string describing bond type (ignored)</span>
+                    <span class="c1">#   status_bits -- ignored</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                    <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c"># Bond serial number... redundant and ignored</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Bond serial number... redundant and ignored</span>
                     <span class="n">a1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="n">a2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
                     <span class="n">atom1</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">find_original_index</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
                     <span class="n">atom2</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">find_original_index</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">))</span>
-                    <span class="c"># Now add it to our residue container</span>
-                    <span class="c"># See if it&#39;s a head/tail connection</span>
+                    <span class="c1"># Now add it to our residue container</span>
+                    <span class="c1"># See if it&#39;s a head/tail connection</span>
                     <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                             <span class="n">res1</span> <span class="o">=</span> <span class="n">restemp</span>
                         <span class="k">elif</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                             <span class="n">res1</span> <span class="o">=</span> <span class="n">rescont</span><span class="p">[</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Bad bonding pattern detected&#39;</span><span class="p">)</span>
+                        <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">),</span> <span class="s1">&#39;Bad bond!&#39;</span>
                         <span class="k">if</span> <span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                             <span class="n">res2</span> <span class="o">=</span> <span class="n">restemp</span>
-                        <span class="k">elif</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
+                        <span class="k">elif</span> <span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                             <span class="n">res2</span> <span class="o">=</span> <span class="n">rescont</span><span class="p">[</span><span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Bad bonding pattern detected&#39;</span><span class="p">)</span>
-                        <span class="k">assert</span> <span class="n">res1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">res2</span><span class="p">,</span> <span class="s">&#39;BAD identical residues&#39;</span>
+                        <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">),</span> <span class="s1">&#39;Bad bond!&#39;</span>
+                        <span class="k">assert</span> <span class="n">res1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">res2</span><span class="p">,</span> <span class="s1">&#39;BAD identical residues&#39;</span>
                         <span class="n">idx1</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">idx</span> <span class="o">-</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
                         <span class="n">idx2</span> <span class="o">=</span> <span class="n">atom2</span><span class="o">.</span><span class="n">idx</span> <span class="o">-</span> <span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
                         <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">:</span>
@@ -273,9 +275,10 @@
                             <span class="n">res1</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">idx1</span><span class="p">]</span>
                             <span class="n">res2</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">res2</span><span class="p">[</span><span class="n">idx2</span><span class="p">]</span>
                     <span class="k">elif</span> <span class="ow">not</span> <span class="n">multires_structure</span><span class="p">:</span>
-                        <span class="n">restemp</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">a1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">a2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">structure</span><span class="p">:</span>
+                            <span class="n">restemp</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">a1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">a2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="c"># Same residue, add the bond</span>
+                        <span class="c1"># Same residue, add the bond</span>
                         <span class="n">offset</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
                         <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                             <span class="n">res</span> <span class="o">=</span> <span class="n">restemp</span>
@@ -283,36 +286,36 @@
                             <span class="n">res</span> <span class="o">=</span> <span class="n">rescont</span><span class="p">[</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span>
                         <span class="n">res</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">offset</span><span class="p">,</span> <span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">-</span><span class="n">offset</span><span class="p">)</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;CRYSIN&#39;</span><span class="p">:</span>
-                    <span class="c"># Section formatted as follows:</span>
-                    <span class="c">#   a -- length of first unit cell vector</span>
-                    <span class="c">#   b -- length of second unit cell vector</span>
-                    <span class="c">#   c -- length of third unit cell vector</span>
-                    <span class="c">#   alpha -- angle b/w b and c</span>
-                    <span class="c">#   beta -- angle b/w a and c</span>
-                    <span class="c">#   gamma -- angle b/w a and b</span>
-                    <span class="c">#   space group -- number of space group (ignored)</span>
-                    <span class="c">#   space group setting -- ignored</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;CRYSIN&#39;</span><span class="p">:</span>
+                    <span class="c1"># Section formatted as follows:</span>
+                    <span class="c1">#   a -- length of first unit cell vector</span>
+                    <span class="c1">#   b -- length of second unit cell vector</span>
+                    <span class="c1">#   c -- length of third unit cell vector</span>
+                    <span class="c1">#   alpha -- angle b/w b and c</span>
+                    <span class="c1">#   beta -- angle b/w a and c</span>
+                    <span class="c1">#   gamma -- angle b/w a and b</span>
+                    <span class="c1">#   space group -- number of space group (ignored)</span>
+                    <span class="c1">#   space group setting -- ignored</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[:</span><span class="mi">6</span><span class="p">]]</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">box</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> box dimensions found; needed 6&#39;</span> <span class="o">%</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> box dimensions found; needed 6&#39;</span> <span class="o">%</span>
                                          <span class="nb">len</span><span class="p">(</span><span class="n">box</span><span class="p">))</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
                     <span class="n">rescont</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;SUBSTRUCTURE&#39;</span><span class="p">:</span>
-                    <span class="c"># Section formatted as follows:</span>
-                    <span class="c">#   subst_id -- residue number</span>
-                    <span class="c">#   subst_name -- residue name</span>
-                    <span class="c">#   root_atom -- first atom of residue</span>
-                    <span class="c">#   subst_type -- ignored (usually &#39;RESIDUE&#39;)</span>
-                    <span class="c">#   dict_type -- type of substructure (ignored)</span>
-                    <span class="c">#   chain -- chain ID of residue</span>
-                    <span class="c">#   sub_type -- type of the chain</span>
-                    <span class="c">#   inter_bonds -- # of inter-substructure bonds</span>
-                    <span class="c">#   status -- ignored</span>
-                    <span class="c">#   comment -- ignored</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;SUBSTRUCTURE&#39;</span><span class="p">:</span>
+                    <span class="c1"># Section formatted as follows:</span>
+                    <span class="c1">#   subst_id -- residue number</span>
+                    <span class="c1">#   subst_name -- residue name</span>
+                    <span class="c1">#   root_atom -- first atom of residue</span>
+                    <span class="c1">#   subst_type -- ignored (usually &#39;RESIDUE&#39;)</span>
+                    <span class="c1">#   dict_type -- type of substructure (ignored)</span>
+                    <span class="c1">#   chain -- chain ID of residue</span>
+                    <span class="c1">#   sub_type -- type of the chain</span>
+                    <span class="c1">#   inter_bonds -- # of inter-substructure bonds</span>
+                    <span class="c1">#   status -- ignored</span>
+                    <span class="c1">#   comment -- ignored</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">:</span> <span class="k">continue</span>
                     <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -320,14 +323,14 @@
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">chain</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                        <span class="n">chain</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-                    <span class="c"># Set the chain ID</span>
+                        <span class="n">chain</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="c1"># Set the chain ID</span>
                     <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="nb">id</span> <span class="ow">and</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">resname</span><span class="p">:</span>
                             <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chain</span>
                     <span class="k">continue</span>
-                <span class="c"># MOL3 sections</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;HEADTAIL&#39;</span><span class="p">:</span>
+                <span class="c1"># MOL3 sections</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;HEADTAIL&#39;</span><span class="p">:</span>
                     <span class="n">atname</span><span class="p">,</span> <span class="n">residx</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="n">residx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">residx</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">residx</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="n">residx</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
@@ -335,23 +338,23 @@
                     <span class="k">elif</span> <span class="n">residx</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                         <span class="n">res</span> <span class="o">=</span> <span class="n">rescont</span><span class="p">[</span><span class="n">residx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Residue out of range in head/tail&#39;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s1">&#39;Residue out of range in head/tail&#39;</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">atname</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="n">headtail</span> <span class="o">==</span> <span class="s">&#39;head&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">headtail</span> <span class="o">==</span> <span class="s1">&#39;head&#39;</span><span class="p">:</span>
                                 <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">atom</span>
-                                <span class="n">headtail</span> <span class="o">=</span> <span class="s">&#39;tail&#39;</span>
+                                <span class="n">headtail</span> <span class="o">=</span> <span class="s1">&#39;tail&#39;</span>
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="n">res</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">atom</span>
-                                <span class="n">headtail</span> <span class="o">=</span> <span class="s">&#39;head&#39;</span>
+                                <span class="n">headtail</span> <span class="o">=</span> <span class="s1">&#39;head&#39;</span>
                             <span class="k">break</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">headtail</span> <span class="o">==</span> <span class="s">&#39;head&#39;</span><span class="p">:</span>
-                            <span class="n">headtail</span> <span class="o">=</span> <span class="s">&#39;tail&#39;</span>
+                        <span class="k">if</span> <span class="n">headtail</span> <span class="o">==</span> <span class="s1">&#39;head&#39;</span><span class="p">:</span>
+                            <span class="n">headtail</span> <span class="o">=</span> <span class="s1">&#39;tail&#39;</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">headtail</span> <span class="o">=</span> <span class="s">&#39;head&#39;</span>
+                            <span class="n">headtail</span> <span class="o">=</span> <span class="s1">&#39;head&#39;</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s">&#39;RESIDUECONNECT&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;RESIDUECONNECT&#39;</span><span class="p">:</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="n">residx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">residx</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
@@ -359,17 +362,17 @@
                     <span class="k">elif</span> <span class="n">residx</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">):</span>
                         <span class="n">res</span> <span class="o">=</span> <span class="n">rescont</span><span class="p">[</span><span class="n">residx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Residue out of range in &#39;</span>
-                                        <span class="s">&#39;residueconnect&#39;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s1">&#39;Residue out of range in &#39;</span>
+                                        <span class="s1">&#39;residueconnect&#39;</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">:]:</span>
-                        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="s">&#39;0&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span> <span class="k">continue</span>
                         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
                                 <span class="n">res</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
                                 <span class="k">break</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;Residue connection atom </span><span class="si">%s</span><span class="s"> not &#39;</span>
-                                            <span class="s">&#39;found in residue </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">residx</span><span class="p">))</span>
+                            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s1">&#39;Residue connection atom </span><span class="si">%s</span><span class="s1"> not &#39;</span>
+                                            <span class="s1">&#39;found in residue </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">residx</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">structure</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">struct</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescont</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -380,14 +383,14 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">restemp</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s">&#39;String conversion trouble: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">Mol2Error</span><span class="p">(</span><span class="s1">&#39;String conversion trouble: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Mol2File.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.mol2.Mol2File.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Mol2File.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.mol2.html#parmed.formats.Mol2File.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Writes a mol2 file from a structure or residue template</span>
 
 <span class="sd">        Parameters</span>
@@ -406,25 +409,31 @@
 <span class="sd">            @&lt;MOLECULE&gt; section that appear sequentially in the output file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
-            <span class="c"># Write sequentially if it is a multi-residue container or Structure</span>
+            <span class="c1"># Write sequentially if it is a multi-residue container or Structure</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">ResidueTemplateContainer</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="p">:</span>
-                    <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="p">:</span>
+                        <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                 <span class="k">return</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">Structure</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">ResidueTemplateContainer</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
-                    <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">ResidueTemplateContainer</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
+                        <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                 <span class="k">return</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">ResidueTemplateContainer</span><span class="p">):</span>
                 <span class="n">natom</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">struct</span><span class="p">])</span>
-                <span class="c"># To find the number of bonds, we need to total number of bonds</span>
-                <span class="c"># + the number of bonds that would be formed by &quot;stitching&quot;</span>
-                <span class="c"># together residues via their head and tail</span>
+                <span class="c1"># To find the number of bonds, we need to total number of bonds</span>
+                <span class="c1"># + the number of bonds that would be formed by &quot;stitching&quot;</span>
+                <span class="c1"># together residues via their head and tail</span>
                 <span class="n">bonds</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">charges</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">bases</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="p">]</span>
@@ -441,10 +450,7 @@
                                       <span class="n">struct</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="n">bases</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
                     <span class="n">charges</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">res</span><span class="p">])</span>
                 <span class="n">residues</span> <span class="o">=</span> <span class="n">struct</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">struct</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="n">struct</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">struct</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">natom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
                 <span class="n">bonds</span> <span class="o">=</span> <span class="p">[(</span><span class="n">b</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">]</span>
@@ -455,31 +461,36 @@
                     <span class="n">residues</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span>
                     <span class="n">name</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
                 <span class="n">charges</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;MOLECULE</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> 0 1</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bonds</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)))</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;MOLECULE</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> 0 1</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">natom</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bonds</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;SMALL</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SMALL</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;PROTEIN</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;PROTEIN</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                         <span class="k">break</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span>
                             <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
-                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;NUCLEIC</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;NUCLEIC</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                         <span class="k">break</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;BIOPOLYMER</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;BIOPOLYMER</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">charges</span><span class="p">):</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;NO_CHARGES</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;NO_CHARGES</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">printchg</span> <span class="o">=</span> <span class="bp">False</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;USER_CHARGES</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;USER_CHARGES</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">printchg</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="c"># Now do ATOM section</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;ATOM</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="c1"># See if we want to print box info</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">box</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;CRYSIN</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1">  1  1</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
+            <span class="c1"># Now do ATOM section</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;ATOM</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
@@ -495,22 +506,22 @@
                         <span class="n">z</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span>
                     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                         <span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%10.4f</span><span class="s"> </span><span class="si">%10.4f</span><span class="s"> </span><span class="si">%10.4f</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%6d</span><span class="s"> </span><span class="si">%-8s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%8d</span><span class="s1"> </span><span class="si">%-8s</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%10.4f</span><span class="s1"> </span><span class="si">%-8s</span><span class="s1"> </span><span class="si">%6d</span><span class="s1"> </span><span class="si">%-8s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                                <span class="n">j</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
                                <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">printchg</span><span class="p">:</span>
-                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; </span><span class="si">%10.6f</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span>
+                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%10.6f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                     <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;BOND</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;BOND</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bond</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bonds</span><span class="p">):</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%8d</span><span class="s"> </span><span class="si">%8d</span><span class="s"> 1</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;SUBSTRUCTURE</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%8d</span><span class="s1"> </span><span class="si">%8d</span><span class="s1"> </span><span class="si">%8d</span><span class="s1"> 1</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;SUBSTRUCTURE</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">first_atom</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s">&#39;chain&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span>
-                    <span class="n">chain</span> <span class="o">=</span> <span class="s">&#39;****&#39;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s1">&#39;chain&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span>
+                    <span class="n">chain</span> <span class="o">=</span> <span class="s1">&#39;****&#39;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">chain</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span>
                 <span class="n">intresbonds</span> <span class="o">=</span> <span class="mi">0</span>
@@ -526,21 +537,21 @@
                         <span class="k">for</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">a2</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
                                 <span class="n">intresbonds</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%8d</span><span class="s"> </span><span class="si">%-8s</span><span class="s"> </span><span class="si">%8d</span><span class="s"> RESIDUE </span><span class="si">%4d</span><span class="s"> </span><span class="si">%-4s</span><span class="s"> ROOT </span><span class="si">%6d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%8d</span><span class="s1"> </span><span class="si">%-8s</span><span class="s1"> </span><span class="si">%8d</span><span class="s1"> RESIDUE </span><span class="si">%4d</span><span class="s1"> </span><span class="si">%-4s</span><span class="s1"> ROOT </span><span class="si">%6d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
                            <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">first_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">chain</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">intresbonds</span><span class="p">))</span>
                 <span class="n">first_atom</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mol3</span><span class="p">:</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;HEADTAIL</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;HEADTAIL</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ResidueTemplate</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;0 0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;0 0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">head</span> <span class="o">=</span> <span class="n">tail</span> <span class="o">=</span> <span class="bp">None</span>
                         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
@@ -550,14 +561,14 @@
                                 <span class="k">if</span> <span class="n">a2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
                                     <span class="n">tail</span> <span class="o">=</span> <span class="n">atom</span>
                         <span class="k">if</span> <span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;0 0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;0 0</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;@&lt;TRIPOS&gt;RESIDUECONNECT</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;0 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;RESIDUECONNECT</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ResidueTemplate</span><span class="p">):</span>
                         <span class="n">con</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">tail</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
@@ -575,13 +586,13 @@
                                 <span class="k">elif</span> <span class="n">a2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">!=</span> <span class="n">res</span><span class="o">.</span><span class="n">idx</span><span class="p">:</span>
                                     <span class="n">con</span><span class="p">[</span><span class="n">ncon</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
                                     <span class="n">ncon</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
                     <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">con</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; 0&#39;</span><span class="p">)</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; 0&#39;</span><span class="p">)</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
@@ -589,9 +600,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -608,7 +619,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -617,15 +628,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../formats.html" >parmed.formats</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

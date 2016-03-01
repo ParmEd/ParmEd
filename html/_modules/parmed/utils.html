@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
-    <link rel="up" title="parmed" href="../parmed.html" /> 
+    <link rel="up" title="Module code" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,22 +37,25 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.utils</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; Various utilities used by ParmEd that don&#39;t really fit elsewhere &quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot; Various utilities used by ParmEd that don&#39;t really fit elsewhere &quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">MoleculeError</span> <span class="k">as</span> <span class="n">_MoleculeError</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;six&#39;</span><span class="p">,</span> <span class="s">&#39;io&#39;</span><span class="p">,</span> <span class="s">&#39;timer&#39;</span><span class="p">,</span> <span class="s">&#39;which&#39;</span><span class="p">,</span> <span class="s">&#39;tag_molecules&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;six&#39;</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="s1">&#39;which&#39;</span><span class="p">,</span> <span class="s1">&#39;tag_molecules&#39;</span><span class="p">,</span> <span class="s1">&#39;PYPY&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;canonical_improper_order&#39;</span><span class="p">]</span>
+
+<span class="n">PYPY</span> <span class="o">=</span> <span class="s1">&#39;__pypy__&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">builtin_module_names</span>
 
 <div class="viewcode-block" id="which"><a class="viewcode-back" href="../../api/parmed/parmed.utils.html#parmed.utils.which">[docs]</a><span class="k">def</span> <span class="nf">which</span><span class="p">(</span><span class="n">prog</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Returns the full path of a program if it exists in PATH</span>
@@ -76,12 +79,12 @@
         <span class="k">if</span> <span class="n">is_exe</span><span class="p">(</span><span class="n">prog</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">prog</span>
         <span class="k">return</span> <span class="bp">None</span>
-    <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
         <span class="n">trial</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">prog</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_exe</span><span class="p">(</span><span class="n">trial</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">trial</span>
-    <span class="k">return</span> <span class="bp">None</span>
-</div>
+    <span class="k">return</span> <span class="bp">None</span></div>
+
 <div class="viewcode-block" id="tag_molecules"><a class="viewcode-back" href="../../api/parmed/parmed.utils.html#parmed.utils.tag_molecules">[docs]</a><span class="k">def</span> <span class="nf">tag_molecules</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets the ``marked`` attribute of every Atom in struct to the molecule number</span>
@@ -92,7 +95,7 @@
 <span class="sd">    struct : :class:`parmed.Structure`</span>
 <span class="sd">        Input structure to tag the molecules for</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># Make sure our recursion limit is large enough, but never shrink it</span>
+    <span class="c1"># Make sure our recursion limit is large enough, but never shrink it</span>
     <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">setrecursionlimit</span><span class="p">,</span> <span class="n">getrecursionlimit</span>
     <span class="n">setrecursionlimit</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="n">getrecursionlimit</span><span class="p">()))</span>
 
@@ -100,15 +103,15 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">return</span>
-    <span class="c"># We do have bonds, this is the interesting part</span>
+    <span class="c1"># We do have bonds, this is the interesting part</span>
     <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">unmark</span><span class="p">()</span>
     <span class="n">mol_id</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">marked</span><span class="p">:</span> <span class="k">continue</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="n">mol_id</span>
         <span class="n">_set_owner</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">mol_id</span><span class="p">)</span>
-        <span class="n">mol_id</span> <span class="o">+=</span> <span class="mi">1</span>
-</div>
+        <span class="n">mol_id</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
 <span class="k">def</span> <span class="nf">_set_owner</span><span class="p">(</span><span class="n">atm</span><span class="p">,</span> <span class="n">mol_id</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Recursively sets ownership of given atom and all bonded partners &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">partner</span> <span class="ow">in</span> <span class="n">atm</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
@@ -116,16 +119,73 @@
             <span class="n">partner</span><span class="o">.</span><span class="n">marked</span> <span class="o">=</span> <span class="n">mol_id</span>
             <span class="n">_set_owner</span><span class="p">(</span><span class="n">partner</span><span class="p">,</span> <span class="n">mol_id</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">partner</span><span class="o">.</span><span class="n">marked</span> <span class="o">!=</span> <span class="n">mol_id</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_MoleculeError</span><span class="p">(</span><span class="s">&#39;Atom </span><span class="si">%d</span><span class="s"> in multiple molecules&#39;</span> <span class="o">%</span>
+            <span class="k">raise</span> <span class="n">_MoleculeError</span><span class="p">(</span><span class="s1">&#39;Atom </span><span class="si">%d</span><span class="s1"> in multiple molecules&#39;</span> <span class="o">%</span>
                                  <span class="n">partner</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+
+<div class="viewcode-block" id="canonical_improper_order"><a class="viewcode-back" href="../../api/parmed/parmed.utils.html#parmed.utils.canonical_improper_order">[docs]</a><span class="k">def</span> <span class="nf">canonical_improper_order</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Controls how improper torsion keys are generated from Structures.</span>
+<span class="sd">    Different programs have different conventions as far as where the</span>
+<span class="sd">    &quot;central&quot; atom is placed. This function should be overridden for each</span>
+<span class="sd">    subclass</span>
+
+<span class="sd">    The default is to *always* put the central atom first, and assume it</span>
+<span class="sd">    comes first already if no central atom is detected. A central atom is</span>
+<span class="sd">    defined as one that is bonded to the other 3</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom1 : :class:`parmed.topologyobjects.Atom`</span>
+<span class="sd">        The first atom in the improper</span>
+<span class="sd">    atom2 : :class:`parmed.topologyobjects.Atom`</span>
+<span class="sd">        The second atom in the improper</span>
+<span class="sd">    atom3 : :class:`parmed.topologyobjects.Atom`</span>
+<span class="sd">        The third atom in the improper</span>
+<span class="sd">    atom4 : :class:`parmed.topologyobjects.Atom`</span>
+<span class="sd">        The fourth atom in the improper</span>
+<span class="sd">    center : int, optional</span>
+<span class="sd">        Which location represents the *center* atom. Default is 1 (first</span>
+<span class="sd">        location).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    a1, a2, a3, a4 : tuple of :class:`parmed.topologyobjects.Atom`</span>
+<span class="sd">        The atoms in the necessary parameter order</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">center</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;center must be 1, 2, 3, or 4&#39;</span><span class="p">)</span>
+    <span class="n">all_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom2</span> <span class="ow">is</span> <span class="n">atom</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># We found our central atom</span>
+            <span class="n">others</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_atoms</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom</span><span class="p">]))</span>
+            <span class="n">central</span> <span class="o">=</span> <span class="n">atom</span>
+            <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># No atom identified as &quot;central&quot;. Just assume that the third is</span>
+        <span class="n">central</span> <span class="o">=</span> <span class="n">atom3</span>
+        <span class="n">others</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom4</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">central</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">others</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">central</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">others</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">central</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">others</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">others</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">others</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">central</span>
+    <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;Should not be here&#39;</span></div>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -142,7 +202,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -151,14 +211,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../parmed.html" >parmed</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

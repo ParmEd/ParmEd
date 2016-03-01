@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.openmm" href="../openmm.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,26 +37,25 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../openmm.html" accesskey="U">parmed.openmm</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.openmm.xmlfile</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">XML file parsing utilities for OpenMM serialized objects</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed.vec3</span> <span class="kn">import</span> <span class="n">Vec3</span>
 <span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="kn">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
 <span class="kn">import</span> <span class="nn">parmed.unit</span> <span class="kn">as</span> <span class="nn">u</span>
@@ -64,24 +63,19 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="n">StringIO</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
-    <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">mm</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
-<span class="n">_xmlre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;&lt;(.*?)/?&gt;&#39;</span><span class="p">)</span>
+<span class="n">_xmlre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;&lt;(.*?)/?&gt;&#39;</span><span class="p">)</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
-<div class="viewcode-block" id="XmlFile"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.xmlfile.html#parmed.openmm.xmlfile.XmlFile">[docs]</a><span class="k">class</span> <span class="nc">XmlFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="XmlFile"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile">[docs]</a><span class="k">class</span> <span class="nc">XmlFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrapper for parsing OpenMM-serialized objects. Supports serialized State,</span>
 <span class="sd">    System, Integrator, and ForceField objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="XmlFile.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.xmlfile.html#parmed.openmm.xmlfile.XmlFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="XmlFile.id_format"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identifies the file type as an XML file</span>
 
 <span class="sd">        Parameters</span>
@@ -94,7 +88,7 @@
 <span class="sd">        is_fmt : bool</span>
 <span class="sd">            True if it is an XML format, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">continue</span>
@@ -102,16 +96,16 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">rematch</span><span class="p">:</span>
                     <span class="k">return</span> <span class="bp">False</span>
                 <span class="n">stuff</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s">&#39;?!&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;?!&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">kind</span> <span class="o">=</span> <span class="n">stuff</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;System&#39;</span><span class="p">,</span> <span class="s">&#39;State&#39;</span><span class="p">,</span> <span class="s">&#39;ForceField&#39;</span><span class="p">,</span> <span class="s">&#39;Integrator&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="s1">&#39;ForceField&#39;</span><span class="p">,</span> <span class="s1">&#39;Integrator&#39;</span><span class="p">):</span>
                     <span class="k">return</span> <span class="bp">True</span>
-                <span class="k">return</span> <span class="bp">False</span>
-</div>
+                <span class="k">return</span> <span class="bp">False</span></div>
+
     <span class="nd">@staticmethod</span>
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="XmlFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.xmlfile.html#parmed.openmm.xmlfile.XmlFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="XmlFile.parse"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses XML file and returns deserialized object. The return value</span>
 <span class="sd">        depends on the serialized object, summarized below</span>
@@ -136,26 +130,25 @@
 <span class="sd">        OpenMM requires the entire contents of this file read into memory. As a</span>
 <span class="sd">        result, this function may require a significant amount of memory.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+        <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="c"># ForceField is not handled by XmlSerializer</span>
-        <span class="k">if</span> <span class="s">&#39;&lt;ForceField&#39;</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="c1"># ForceField is not handled by XmlSerializer</span>
+        <span class="k">if</span> <span class="s1">&#39;&lt;ForceField&#39;</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
-            <span class="k">del</span> <span class="n">contents</span> <span class="c"># Save some memory</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">ForceField</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
         <span class="n">obj</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">System</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">Integrator</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="n">obj</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">_OpenMMStateContents</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-        <span class="k">return</span> 
-</div></div>
+        <span class="k">return</span> <span class="n">obj</span></div></div>
+
 <span class="k">class</span> <span class="nc">_OpenMMStateContents</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A container that holds all of the information present in the OpenMM State</span>
@@ -200,18 +193,18 @@
             <span class="k">return</span> <span class="n">stuff</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;getPositions&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;getPositions&#39;</span><span class="p">,</span>
                                 <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">asNumpy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">velocities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;getVelocities&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">velocities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;getVelocities&#39;</span><span class="p">,</span>
                                 <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
                                 <span class="n">asNumpy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">forces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;getForces&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;getForces&#39;</span><span class="p">,</span>
                                 <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie_per_mole</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                                 <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">asNumpy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;getPotentialEnergy&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;getPotentialEnergy&#39;</span><span class="p">,</span>
                                 <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie_per_mole</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;getTime&#39;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">)</span>
-        <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&#39;getPeriodicBoxVectors&#39;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;getTime&#39;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">picosecond</span><span class="p">)</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s1">&#39;getPeriodicBoxVectors&#39;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                              <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">asNumpy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">leng</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">(</span><span class="o">*</span><span class="n">box</span><span class="p">)</span>
@@ -223,15 +216,15 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">mm</span><span class="o">.</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="n">xyz</span><span class="p">)</span> <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="n">xyz</span><span class="p">)</span> <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -248,7 +241,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -257,15 +250,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../openmm.html" >parmed.openmm</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

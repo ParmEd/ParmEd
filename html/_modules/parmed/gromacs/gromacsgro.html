@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.gromacs" href="../gromacs.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,25 +37,24 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../gromacs.html" accesskey="U">parmed.gromacs</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.gromacs.gromacsgro</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains functionality relevant to loading and parsing GROMACS GRO</span>
 <span class="sd">(coordinate) files and building a stripped-down Structure from it</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span>
 
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
 <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">TINY</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">GromacsError</span>
 <span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
@@ -68,19 +67,64 @@
 <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">np</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="k">class</span> <span class="nc">_AtomLineParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parses atom lines from GRO files &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_digits</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pdeci</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ndeci</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reads a line</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        line : str</span>
+<span class="sd">            A line with an atom record from a GRO file</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        atom, resname, resnum : Atom, str, int</span>
+<span class="sd">            The Atom instance, residue name, and residue number containing the</span>
+<span class="sd">            atom</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">atomname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">elem</span> <span class="o">=</span> <span class="n">element_by_name</span><span class="p">(</span><span class="n">atomname</span><span class="p">)</span>
+        <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">Mass</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
+        <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">20</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">ExtraPoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">atomname</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">atomic_number</span><span class="o">=</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">atomname</span><span class="p">,</span>
+                        <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digits</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pdeci</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ndeci</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pdeci</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_digits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndeci</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pdeci</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">20</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_digits</span><span class="p">:</span><span class="mi">20</span><span class="o">+</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_digits</span><span class="p">])</span><span class="o">*</span><span class="mi">10</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">wbeg</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digits</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="n">wend</span> <span class="o">=</span> <span class="n">wbeg</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digits</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">wbeg</span><span class="p">:</span><span class="n">wend</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vz</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">wbeg</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_digits</span><span class="p">:</span><span class="n">wend</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_digits</span><span class="p">])</span><span class="o">*</span><span class="mi">10</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
-<div class="viewcode-block" id="GromacsGroFile"><a class="viewcode-back" href="../../../api/parmed/parmed.gromacs.gromacsgro.html#parmed.gromacs.gromacsgro.GromacsGroFile">[docs]</a><span class="k">class</span> <span class="nc">GromacsGroFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="GromacsGroFile"><a class="viewcode-back" href="../../../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile">[docs]</a><span class="k">class</span> <span class="nc">GromacsGroFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Parses and writes Gromacs GRO files &quot;&quot;&quot;</span>
-    <span class="c">#===================================================</span>
+    <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="GromacsGroFile.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.gromacs.gromacsgro.html#parmed.gromacs.gromacsgro.GromacsGroFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="GromacsGroFile.id_format"><a class="viewcode-back" href="../../../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identifies the file as a GROMACS GRO file</span>
 
 <span class="sd">        Parameters</span>
@@ -95,9 +139,9 @@
 <span class="sd">            otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="c"># Title line</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="c1"># Title line</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="c"># number of atoms</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="c1"># number of atoms</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">False</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -106,7 +150,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">20</span><span class="p">])</span>
-                <span class="n">pdeci</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s">&#39;.&#39;</span><span class="p">]</span>
+                <span class="n">pdeci</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">]</span>
                 <span class="n">ndeci</span> <span class="o">=</span> <span class="n">pdeci</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pdeci</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">5</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
                     <span class="n">wbeg</span> <span class="o">=</span> <span class="p">(</span><span class="n">pdeci</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">5</span><span class="o">+</span><span class="n">ndeci</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -122,12 +166,12 @@
                         <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">wbeg</span><span class="p">:</span><span class="n">wend</span><span class="p">])</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">False</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="bp">True</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="GromacsGroFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.gromacs.gromacsgro.html#parmed.gromacs.gromacsgro.GromacsGroFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="GromacsGroFile.parse"><a class="viewcode-back" href="../../../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parses a Gromacs GRO file</span>
 
 <span class="sd">        Parameters</span>
@@ -143,67 +187,47 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="c"># Ignore the title line</span>
+            <span class="c1"># Ignore the title line</span>
             <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">natom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s">&#39;Could not parse </span><span class="si">%s</span><span class="s"> as GRO file&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
-            <span class="n">digits</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s1">&#39;Could not parse </span><span class="si">%s</span><span class="s1"> as GRO file&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">line_parser</span> <span class="o">=</span> <span class="n">_AtomLineParser</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fileobj</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">natom</span><span class="p">:</span> <span class="k">break</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">resnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
-                    <span class="n">resname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="n">atomname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="n">elem</span> <span class="o">=</span> <span class="n">element_by_name</span><span class="p">(</span><span class="n">atomname</span><span class="p">)</span>
-                    <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
-                    <span class="n">mass</span> <span class="o">=</span> <span class="n">Mass</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
-                    <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">20</span><span class="p">])</span>
-                    <span class="k">if</span> <span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">atom</span> <span class="o">=</span> <span class="n">ExtraPoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">atomname</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">atomic_number</span><span class="o">=</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">atomname</span><span class="p">,</span>
-                                    <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">digits</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                        <span class="n">pdeci</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-                        <span class="n">ndeci</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">pdeci</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="n">digits</span> <span class="o">=</span> <span class="n">ndeci</span> <span class="o">-</span> <span class="n">pdeci</span>
-                    <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="p">(</span>
-                            <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">20</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="n">digits</span><span class="p">:</span><span class="mi">20</span><span class="o">+</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">digits</span><span class="p">])</span><span class="o">*</span><span class="mi">10</span>
-                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="n">i</span> <span class="o">=</span> <span class="mi">4</span>
-                    <span class="n">wbeg</span> <span class="o">=</span> <span class="p">(</span><span class="n">pdeci</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">5</span><span class="o">+</span><span class="n">ndeci</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-                    <span class="n">wend</span> <span class="o">=</span> <span class="p">(</span><span class="n">pdeci</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">5</span><span class="o">+</span><span class="n">ndeci</span><span class="p">)</span><span class="o">*</span><span class="n">i</span>
-                    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">wbeg</span><span class="p">:</span><span class="n">wend</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                        <span class="n">atom</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vz</span> <span class="o">=</span> <span class="p">(</span>
-                                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[(</span><span class="n">pdeci</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">6</span><span class="o">+</span><span class="n">ndeci</span><span class="p">)</span><span class="o">*</span><span class="n">i</span><span class="p">:</span>
-                                           <span class="p">(</span><span class="n">pdeci</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">6</span><span class="o">+</span><span class="n">ndeci</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span><span class="o">*</span><span class="mi">10</span>
-                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
-                        <span class="p">)</span>
+                    <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span> <span class="o">=</span> <span class="n">line_parser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s">&#39;Could not parse the atom record of &#39;</span>
-                                       <span class="s">&#39;GRO file </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s1">&#39;Could not parse the atom record of &#39;</span>
+                                       <span class="s1">&#39;GRO file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
                 <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">)</span>
-            <span class="c"># Get the box from the last line if it&#39;s present</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If no box exists, the break did not hit, so line still</span>
+                <span class="c1"># contains the last atom (which cannot be interpreted as a box).</span>
+                <span class="c1"># This wipes out line (IFF fileobj reached the line)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="o">!=</span> <span class="n">natom</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s1">&#39;Truncated GRO file. Found </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1"> &#39;</span>
+                                       <span class="s1">&#39;atoms&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">natom</span><span class="p">))</span>
+            <span class="c1"># Get the box from the last line if it&#39;s present</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s">&#39;Could not understand box line of GRO &#39;</span>
-                                       <span class="s">&#39;file </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">GromacsError</span><span class="p">(</span><span class="s1">&#39;Could not understand box line of GRO &#39;</span>
+                                       <span class="s1">&#39;file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">box</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span>
                                   <span class="mf">90.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">]</span>
                 <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">box</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
-                    <span class="c"># Assume we have vectors</span>
+                    <span class="c1"># Assume we have vectors</span>
                     <span class="n">leng</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">(</span>
                                 <span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
                                 <span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">6</span><span class="p">]]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
@@ -211,18 +235,16 @@
                     <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">leng</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span>
                     <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">ang</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">np</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
                 <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">struct</span>
+        <span class="k">return</span> <span class="n">struct</span></div>
 
-    <span class="c">#===================================================</span>
-</div>
+    <span class="c1">#===================================================</span>
+
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="GromacsGroFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.gromacs.gromacsgro.html#parmed.gromacs.gromacsgro.GromacsGroFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nobox</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="GromacsGroFile.write"><a class="viewcode-back" href="../../../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nobox</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a Gromacs Topology File from a Structure</span>
 
 <span class="sd">        Parameters</span>
@@ -240,21 +262,21 @@
 <span class="sd">            periodic box dimensions *are* defined, this variable has no effect.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;dest must be a file name or file-like object&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;dest must be a file name or file-like object&#39;</span><span class="p">)</span>
 
-        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;GROningen MAchine for Chemical Simulation</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%5d</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
-        <span class="n">has_vels</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;vx&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;GROningen MAchine for Chemical Simulation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
+        <span class="n">has_vels</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;vx&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
         <span class="n">varwidth</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">+</span> <span class="n">precision</span>
-        <span class="n">crdfmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%%%d</span><span class="s">.</span><span class="si">%d</span><span class="s">f&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">varwidth</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span>
-        <span class="n">velfmt</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%%%d</span><span class="s">.</span><span class="si">%d</span><span class="s">f&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">varwidth</span><span class="p">,</span> <span class="n">precision</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">crdfmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%%%d</span><span class="s1">.</span><span class="si">%d</span><span class="s1">f&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">varwidth</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span>
+        <span class="n">velfmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%%%d</span><span class="s1">.</span><span class="si">%d</span><span class="s1">f&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">varwidth</span><span class="p">,</span> <span class="n">precision</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="n">resid</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100000</span>
             <span class="n">atid</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100000</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%5d%-5s%5s%5d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5d%-5s%5s%5d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span>
                                           <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="n">atid</span><span class="p">))</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">crdfmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="o">/</span><span class="mi">10</span><span class="p">))[:</span><span class="n">varwidth</span><span class="p">])</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">crdfmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="o">/</span><span class="mi">10</span><span class="p">))[:</span><span class="n">varwidth</span><span class="p">])</span>
@@ -263,24 +285,24 @@
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">velfmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">vx</span><span class="o">/</span><span class="mi">10</span><span class="p">))[:</span><span class="n">varwidth</span><span class="p">])</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">velfmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">vy</span><span class="o">/</span><span class="mi">10</span><span class="p">))[:</span><span class="n">varwidth</span><span class="p">])</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">velfmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">vz</span><span class="o">/</span><span class="mi">10</span><span class="p">))[:</span><span class="n">varwidth</span><span class="p">])</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-        <span class="c"># Box, in the weird format...</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># Box, in the weird format...</span>
         <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">reduce_box_vectors</span><span class="p">(</span><span class="o">*</span><span class="n">box_lengths_and_angles_to_vectors</span><span class="p">(</span>
                             <span class="o">*</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">90</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TINY</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">:]]):</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%10.5f</span><span class="s">&#39;</span><span class="o">*</span><span class="mi">3</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%10.5f</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">3</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%10.5f</span><span class="s">&#39;</span><span class="o">*</span><span class="mi">9</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%10.5f</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">9</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span>
                            <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span><span class="p">))</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">nobox</span> <span class="ow">and</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
-            <span class="c"># Find the extent of the molecule in all dimensions, and buffer it</span>
-            <span class="c"># by 5 A</span>
+            <span class="c1"># Find the extent of the molecule in all dimensions, and buffer it</span>
+            <span class="c1"># by 5 A</span>
             <span class="n">crds</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span>
             <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">crds</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">crds</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">+</span> <span class="mf">0.5</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%10.5f</span><span class="s">&#39;</span><span class="o">*</span><span class="mi">3</span> <span class="o">%</span> <span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">diff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%10.5f</span><span class="s1">&#39;</span><span class="o">*</span><span class="mi">3</span> <span class="o">%</span> <span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">diff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
@@ -288,9 +310,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -307,7 +329,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -316,15 +338,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../gromacs.html" >parmed.gromacs</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-formats-pdbx-package">
 <h1>parmed.formats.pdbx package<a class="headerlink" href="#parmed-formats-pdbx-package" title="Permalink to this headline">¶</a></h1>
@@ -70,8 +70,8 @@
 exception handling)</p>
 <dl class="class">
 <dt id="parmed.formats.pdbx.PdbxReader">
-<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.</tt><tt class="descname">PdbxReader</tt><big>(</big><em>ifh</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxReader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.pdbx.</code><code class="descname">PdbxReader</code><span class="sig-paren">(</span><em>ifh</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxReader.html#PdbxReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>PDBx reader for data files and dictionaries.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -80,14 +80,14 @@ exception handling)</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxReader.read" title="parmed.formats.pdbx.PdbxReader.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxReader.read" title="parmed.formats.pdbx.PdbxReader.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.formats.pdbx.PdbxReader.read">
-<tt class="descname">read</tt><big>(</big><em>containerList</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxReader.read" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read</code><span class="sig-paren">(</span><em>containerList</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxReader.html#PdbxReader.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxReader.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Appends to the input list of definition and data containers.</p>
 </dd></dl>
 
@@ -95,8 +95,8 @@ exception handling)</p>
 
 <dl class="class">
 <dt id="parmed.formats.pdbx.PdbxWriter">
-<em class="property">class </em><tt class="descclassname">parmed.formats.pdbx.</tt><tt class="descname">PdbxWriter</tt><big>(</big><em>ofh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w' at 0x10028e150&gt;</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.pdbx.</code><code class="descname">PdbxWriter</code><span class="sig-paren">(</span><em>ofh=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxWriter.html#PdbxWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Write PDBx data files or dictionaries using the input container
 or container list.</p>
 <p class="rubric">Methods</p>
@@ -106,31 +106,31 @@ or container list.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.setRowPartition" title="parmed.formats.pdbx.PdbxWriter.setRowPartition"><tt class="xref py py-obj docutils literal"><span class="pre">setRowPartition</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.setRowPartition" title="parmed.formats.pdbx.PdbxWriter.setRowPartition"><code class="xref py py-obj docutils literal"><span class="pre">setRowPartition</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.write" title="parmed.formats.pdbx.PdbxWriter.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.write" title="parmed.formats.pdbx.PdbxWriter.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.writeContainer" title="parmed.formats.pdbx.PdbxWriter.writeContainer"><tt class="xref py py-obj docutils literal"><span class="pre">writeContainer</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdbx.PdbxWriter.writeContainer" title="parmed.formats.pdbx.PdbxWriter.writeContainer"><code class="xref py py-obj docutils literal"><span class="pre">writeContainer</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.formats.pdbx.PdbxWriter.setRowPartition">
-<tt class="descname">setRowPartition</tt><big>(</big><em>numRows</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.setRowPartition" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setRowPartition</code><span class="sig-paren">(</span><em>numRows</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxWriter.html#PdbxWriter.setRowPartition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.setRowPartition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximum number of rows checked for value length and format</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.formats.pdbx.PdbxWriter.write">
-<tt class="descname">write</tt><big>(</big><em>containerList</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>containerList</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxWriter.html#PdbxWriter.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.formats.pdbx.PdbxWriter.writeContainer">
-<tt class="descname">writeContainer</tt><big>(</big><em>container</em><big>)</big><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.writeContainer" title="Permalink to this definition">¶</a></dt>
+<code class="descname">writeContainer</code><span class="sig-paren">(</span><em>container</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdbx/PdbxWriter.html#PdbxWriter.writeContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdbx.PdbxWriter.writeContainer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -142,7 +142,7 @@ or container list.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
@@ -155,12 +155,14 @@ or container list.</p>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.formats.pdbx.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.formats.pdbx.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -177,7 +179,7 @@ or container list.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -186,12 +188,12 @@ or container list.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

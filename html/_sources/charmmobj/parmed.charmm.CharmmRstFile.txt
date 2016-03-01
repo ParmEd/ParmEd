@@ -15,7 +15,6 @@ parmed.charmm.CharmmRstFile
    
       ~CharmmRstFile.__init__
       ~CharmmRstFile.id_format
-      ~CharmmRstFile.printcoords
       ~CharmmRstFile.scan
    
    
@@ -26,7 +25,9 @@ parmed.charmm.CharmmRstFile
 
    .. autosummary::
    
+      ~CharmmRstFile.box
       ~CharmmRstFile.coordinates
+      ~CharmmRstFile.coordinatesold
       ~CharmmRstFile.positions
       ~CharmmRstFile.positionsold
       ~CharmmRstFile.velocities

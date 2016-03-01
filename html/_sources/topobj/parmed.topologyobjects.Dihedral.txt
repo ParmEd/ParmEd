@@ -25,7 +25,6 @@ parmed.topologyobjects.Dihedral
 
    .. autosummary::
    
-      ~Dihedral.dihed_type
       ~Dihedral.funct
    
    

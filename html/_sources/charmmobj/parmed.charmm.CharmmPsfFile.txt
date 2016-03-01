@@ -19,8 +19,13 @@ parmed.charmm.CharmmPsfFile
       ~CharmmPsfFile.clear_cmap
       ~CharmmPsfFile.copy
       ~CharmmPsfFile.createSystem
+      ~CharmmPsfFile.from_structure
+      ~CharmmPsfFile.get_box
+      ~CharmmPsfFile.get_coordinates
       ~CharmmPsfFile.has_NBFIX
       ~CharmmPsfFile.is_changed
+      ~CharmmPsfFile.join_dihedrals
+      ~CharmmPsfFile.load_dataframe
       ~CharmmPsfFile.load_parameters
       ~CharmmPsfFile.omm_add_constraints
       ~CharmmPsfFile.omm_angle_force
@@ -39,6 +44,7 @@ parmed.charmm.CharmmPsfFile
       ~CharmmPsfFile.omm_trigonal_angle_force
       ~CharmmPsfFile.omm_urey_bradley_force
       ~CharmmPsfFile.prune_empty_terms
+      ~CharmmPsfFile.save
       ~CharmmPsfFile.split
       ~CharmmPsfFile.strip
       ~CharmmPsfFile.to_dataframe
@@ -69,9 +75,13 @@ parmed.charmm.CharmmPsfFile
       ~CharmmPsfFile.TORSION_TORSION_FORCE_GROUP
       ~CharmmPsfFile.TRIGONAL_ANGLE_FORCE_GROUP
       ~CharmmPsfFile.UREY_BRADLEY_FORCE_GROUP
+      ~CharmmPsfFile.box
       ~CharmmPsfFile.box_vectors
+      ~CharmmPsfFile.combining_rule
+      ~CharmmPsfFile.coordinates
       ~CharmmPsfFile.positions
       ~CharmmPsfFile.topology
       ~CharmmPsfFile.velocities
+      ~CharmmPsfFile.view
    
    

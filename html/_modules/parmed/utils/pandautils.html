@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
     <link rel="up" title="parmed.utils" href="../utils.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,20 +37,19 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../utils.html" accesskey="U">parmed.utils</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.utils.pandautils</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; A collection of utilities for use with Pandas objects &quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot; A collection of utilities for use with Pandas objects &quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -63,8 +62,8 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="c"># Utility function for generating a DataFrame based on a collection of items.</span>
-<span class="c"># The passed object must have an `atoms` attribute</span>
+<span class="c1"># Utility function for generating a DataFrame based on a collection of items.</span>
+<span class="c1"># The passed object must have an `atoms` attribute</span>
 
 <div class="viewcode-block" id="create_dataframe"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.pandautils.html#parmed.utils.pandautils.create_dataframe">[docs]</a><span class="k">def</span> <span class="nf">create_dataframe</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Creates a pandas.DataFrame object from the current instance</span>
@@ -89,7 +88,7 @@
 <span class="sd">        - charge : float</span>
 <span class="sd">        - mass : float</span>
 <span class="sd">        - nb_idx : int</span>
-<span class="sd">        - radii : float</span>
+<span class="sd">        - solvent_radius : float</span>
 <span class="sd">        - screen : float</span>
 <span class="sd">        - occupancy : float</span>
 <span class="sd">        - bfactor : float</span>
@@ -137,96 +136,96 @@
 <span class="sd">        - U23 : float (U[2][3] of anisotropic b-factor tensor)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">pd</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;pandas is not available; cannot create a pandas &#39;</span>
-                          <span class="s">&#39;DataFrame from this Structure&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;pandas is not available; cannot create a pandas &#39;</span>
+                          <span class="s1">&#39;DataFrame from this Structure&#39;</span><span class="p">)</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
     <span class="n">atoms</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">atoms</span>
 
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;atomic_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;mass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;nb_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;radii&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">radii</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;screen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">screen</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;bfactor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">bfactor</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;altloc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">altloc</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;tree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">tree</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;join&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">join</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;irotat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">irotat</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;rmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;epsilon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;rmin_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;epsilon_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;resnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
-    <span class="n">ret</span><span class="p">[</span><span class="s">&#39;segid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;atomic_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;nb_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;solvent_radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">solvent_radius</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;screen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">screen</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;bfactor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">bfactor</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;altloc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">altloc</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;tree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">tree</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;join&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">join</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;irotat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">irotat</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;rmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;epsilon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;rmin_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">rmin_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;epsilon_14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;resname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;resnum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;segid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
 
-    <span class="c"># Now for optional attributes</span>
-    <span class="c"># Coordinates</span>
+    <span class="c1"># Now for optional attributes</span>
+    <span class="c1"># Coordinates</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="p">[[</span><span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">],</span>
-                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">,</span> <span class="s">&#39;xy&#39;</span><span class="p">,</span> <span class="s">&#39;xz&#39;</span><span class="p">]</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;xx&#39;</span><span class="p">,</span> <span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="s1">&#39;xz&#39;</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-    <span class="c"># Velocities</span>
+    <span class="c1"># Velocities</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">vels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="p">[[</span><span class="n">atom</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">vz</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">],</span>
-                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;vx&#39;</span><span class="p">,</span> <span class="s">&#39;vy&#39;</span><span class="p">,</span> <span class="s">&#39;vz&#39;</span><span class="p">]</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;vx&#39;</span><span class="p">,</span> <span class="s1">&#39;vy&#39;</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
-    <span class="c"># AMOEBA LJ type</span>
+    <span class="c1"># AMOEBA LJ type</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;type_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;type_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">type_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="c"># AMOEBA class type</span>
+    <span class="c1"># AMOEBA class type</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;class_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">class_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;class_idx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">class_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="c"># AMOEBA multipoles</span>
+    <span class="c1"># AMOEBA multipoles</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">multipoles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">multipoles</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">],</span>
-                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;multipole_111&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_211&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_212&#39;</span><span class="p">,</span>
-                         <span class="s">&#39;multipole_222&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_411&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_412&#39;</span><span class="p">,</span>
-                         <span class="s">&#39;multipole_422&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_413&#39;</span><span class="p">,</span> <span class="s">&#39;multipole_423&#39;</span><span class="p">,</span>
-                         <span class="s">&#39;multipole_433&#39;</span><span class="p">]</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;multipole_111&#39;</span><span class="p">,</span> <span class="s1">&#39;multipole_211&#39;</span><span class="p">,</span> <span class="s1">&#39;multipole_212&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;multipole_222&#39;</span><span class="p">,</span> <span class="s1">&#39;multipole_411&#39;</span><span class="p">,</span> <span class="s1">&#39;multipole_412&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;multipole_422&#39;</span><span class="p">,</span> <span class="s1">&#39;multipole_413&#39;</span><span class="p">,</span> <span class="s1">&#39;multipole_423&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;multipole_433&#39;</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multipoles</span><span class="p">)</span>
-    <span class="c"># AMOEBA polarizabilities</span>
+    <span class="c1"># AMOEBA polarizabilities</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;polarizability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">polarizability</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;polarizability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">polarizability</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="c"># AMOEBA vdw parent atom</span>
+    <span class="c1"># AMOEBA vdw parent atom</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;vdw_parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;vdw_parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span><span class="o">.</span><span class="n">idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="c"># anisotropic b-factors</span>
+    <span class="c1"># anisotropic b-factors</span>
     <span class="n">none6</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
     <span class="n">anisos</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aniso</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">anisos</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aniso</span><span class="p">,</span> <span class="s">&#39;tolist&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aniso</span><span class="p">,</span> <span class="s1">&#39;tolist&#39;</span><span class="p">):</span>
             <span class="n">anisos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aniso</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="n">all_nones</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aniso</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">anisos</span><span class="p">):</span>
@@ -237,10 +236,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">all_nones</span><span class="p">:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">anisos</span><span class="p">,</span>
-                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;U11&#39;</span><span class="p">,</span> <span class="s">&#39;U22&#39;</span><span class="p">,</span> <span class="s">&#39;U33&#39;</span><span class="p">,</span> <span class="s">&#39;U12&#39;</span><span class="p">,</span> <span class="s">&#39;U13&#39;</span><span class="p">,</span> <span class="s">&#39;U23&#39;</span><span class="p">])</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;U11&#39;</span><span class="p">,</span> <span class="s1">&#39;U22&#39;</span><span class="p">,</span> <span class="s1">&#39;U33&#39;</span><span class="p">,</span> <span class="s1">&#39;U12&#39;</span><span class="p">,</span> <span class="s1">&#39;U13&#39;</span><span class="p">,</span> <span class="s1">&#39;U23&#39;</span><span class="p">])</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="n">ret</span>
-</div>
+    <span class="k">return</span> <span class="n">ret</span></div>
+
 <div class="viewcode-block" id="load_dataframe"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.pandautils.html#parmed.utils.pandautils.load_dataframe">[docs]</a><span class="k">def</span> <span class="nf">load_dataframe</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads a DataFrame into the current object, setting atomic properties based</span>
@@ -253,7 +252,7 @@
 <span class="sd">        - charge : float</span>
 <span class="sd">        - mass : float</span>
 <span class="sd">        - nb_idx : int</span>
-<span class="sd">        - radii : float</span>
+<span class="sd">        - solvent_radius : float</span>
 <span class="sd">        - screen : float</span>
 <span class="sd">        - occupancy : float</span>
 <span class="sd">        - bfactor : float</span>
@@ -301,131 +300,131 @@
     <span class="k">def</span> <span class="nf">set_attribute</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the attribute list from the data &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Data does not match length of atoms list&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data does not match length of atoms list&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_residue_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Data does not match length of atoms list&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data does not match length of atoms list&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
     <span class="n">multipoles</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
     <span class="n">anisous</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;number&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;number&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;name&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;type&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;atomic_number&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;atomic_number&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;charge&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;charge&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;mass&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;mass&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;nb_idx&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;nb_idx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;radii&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;radii&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;screen&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;screen&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;occupancy&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;occupancy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;bfactor&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;bfactor&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;altloc&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;altloc&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;tree&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;tree&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;join&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;join&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;irotat&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;irotat&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;rmin&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;rmin&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;epsilon&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;epsilon&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;rmin_14&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;rmin_14&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;epsilon_14&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;epsilon_14&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;xx&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;xx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;xy&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;xy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;xz&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;xz&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;vx&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;vx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;vy&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;vy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;vz&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;vz&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;type_idx&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;type_idx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;class_idx&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;class_idx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;vdw_parent&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;number&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;atomic_number&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;atomic_number&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;charge&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;charge&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;mass&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;nb_idx&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;nb_idx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;solvent_radius&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;solvent_radius&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;screen&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;occupancy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;bfactor&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;bfactor&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;altloc&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;altloc&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;tree&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;tree&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;join&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;irotat&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;irotat&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;rmin&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;rmin&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;epsilon&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;rmin_14&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;rmin_14&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;epsilon_14&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;epsilon_14&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;xx&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;xx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;xy&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;xz&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;xz&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vx&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;vx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vy&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;vy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vz&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;vz&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;type_idx&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;type_idx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;class_idx&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;class_idx&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vdw_parent&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;vdw_parent length not equal to natom&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;vdw_parent length not equal to natom&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">parent</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
                 <span class="n">atom</span><span class="o">.</span><span class="n">vdw_parent</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;polarizability&#39;</span><span class="p">:</span>
-            <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;polarizability&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_111&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;polarizability&#39;</span><span class="p">:</span>
+            <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;polarizability&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_111&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_211&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_211&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_212&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_212&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_213&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_213&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_411&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_411&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_412&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_412&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_422&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_422&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_413&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_413&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_423&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_423&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;multipole_433&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multipole_433&#39;</span><span class="p">:</span>
             <span class="n">multipoles</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U11&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;U11&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U22&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;U22&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U33&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;U33&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U12&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;U12&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U13&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;U13&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;U23&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;U23&#39;</span><span class="p">:</span>
             <span class="n">anisous</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;resname&#39;</span><span class="p">,</span> <span class="s">&#39;resid&#39;</span><span class="p">,</span> <span class="s">&#39;resnum&#39;</span><span class="p">,</span> <span class="s">&#39;chain&#39;</span><span class="p">,</span> <span class="s">&#39;segid&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;resname&#39;</span><span class="p">,</span> <span class="s1">&#39;resid&#39;</span><span class="p">,</span> <span class="s1">&#39;resnum&#39;</span><span class="p">,</span> <span class="s1">&#39;chain&#39;</span><span class="p">,</span> <span class="s1">&#39;segid&#39;</span><span class="p">):</span>
             <span class="n">set_residue_attr</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Atomic property </span><span class="si">%s</span><span class="s"> not recognized&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">,</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Atomic property </span><span class="si">%s</span><span class="s1"> not recognized&#39;</span> <span class="o">%</span> <span class="n">key</span><span class="p">,</span>
                           <span class="n">ParameterWarning</span><span class="p">)</span>
 
-    <span class="c"># Now combine the multipoles and anisous if they are all specified</span>
+    <span class="c1"># Now combine the multipoles and anisous if they are all specified</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">in</span> <span class="n">anisous</span><span class="p">:</span>
-        <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;anisou&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">anisous</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;anisou&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">anisous</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">in</span> <span class="n">multipoles</span><span class="p">:</span>
-        <span class="n">set_attribute</span><span class="p">(</span><span class="s">&#39;multipoles&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">multipoles</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+        <span class="n">set_attribute</span><span class="p">(</span><span class="s1">&#39;multipoles&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">multipoles</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -442,7 +441,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -451,15 +450,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../utils.html" >parmed.utils</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li class="nav-item nav-item-2"><a href="../utils.html" >parmed.utils</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

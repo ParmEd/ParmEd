@@ -14,30 +14,28 @@ parmed.amber.AmoebaParm
    .. autosummary::
    
       ~AmoebaParm.__init__
-      ~AmoebaParm.addFlag
       ~AmoebaParm.add_atom
       ~AmoebaParm.add_atom_to_residue
       ~AmoebaParm.add_flag
       ~AmoebaParm.copy
       ~AmoebaParm.createSystem
-      ~AmoebaParm.deleteFlag
       ~AmoebaParm.delete_flag
       ~AmoebaParm.fill_LJ
       ~AmoebaParm.from_rawdata
       ~AmoebaParm.from_structure
+      ~AmoebaParm.get_box
+      ~AmoebaParm.get_coordinates
       ~AmoebaParm.has_1012
       ~AmoebaParm.has_NBFIX
       ~AmoebaParm.id_format
       ~AmoebaParm.initialize_topology
       ~AmoebaParm.is_changed
+      ~AmoebaParm.join_dihedrals
       ~AmoebaParm.load_atom_info
-      ~AmoebaParm.load_coordinates
-      ~AmoebaParm.load_from_rawdata
-      ~AmoebaParm.load_from_structure
+      ~AmoebaParm.load_dataframe
       ~AmoebaParm.load_pointers
       ~AmoebaParm.load_rst7
       ~AmoebaParm.load_structure
-      ~AmoebaParm.load_velocities
       ~AmoebaParm.mdin_skeleton
       ~AmoebaParm.omm_add_constraints
       ~AmoebaParm.omm_angle_force
@@ -64,14 +62,14 @@ parmed.amber.AmoebaParm
       ~AmoebaParm.recalculate_LJ
       ~AmoebaParm.rediscover_molecules
       ~AmoebaParm.remake_parm
+      ~AmoebaParm.save
       ~AmoebaParm.set_version
       ~AmoebaParm.split
       ~AmoebaParm.strip
       ~AmoebaParm.to_dataframe
       ~AmoebaParm.unchange
       ~AmoebaParm.update_dihedral_exclusions
-      ~AmoebaParm.view
-      ~AmoebaParm.writeParm
+      ~AmoebaParm.view_as
       ~AmoebaParm.write_cif
       ~AmoebaParm.write_parm
       ~AmoebaParm.write_pdb
@@ -104,14 +102,17 @@ parmed.amber.AmoebaParm
       ~AmoebaParm.angles_without_h
       ~AmoebaParm.bonds_inc_h
       ~AmoebaParm.bonds_without_h
+      ~AmoebaParm.box
       ~AmoebaParm.box_vectors
       ~AmoebaParm.chamber
+      ~AmoebaParm.combining_rule
+      ~AmoebaParm.coordinates
       ~AmoebaParm.dihedrals_inc_h
       ~AmoebaParm.dihedrals_without_h
       ~AmoebaParm.has_cmap
       ~AmoebaParm.positions
-      ~AmoebaParm.solvent_residues
       ~AmoebaParm.topology
       ~AmoebaParm.velocities
+      ~AmoebaParm.view
    
    

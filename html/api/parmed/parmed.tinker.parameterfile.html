@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.tinker.parameterfile">
 <span id="parmed-tinker-parameterfile-module"></span><h1>parmed.tinker.parameterfile module<a class="headerlink" href="#module-parmed.tinker.parameterfile" title="Permalink to this headline">¶</a></h1>
@@ -51,8 +51,8 @@
 TINKER-based parameter file.</p>
 <dl class="class">
 <dt id="parmed.tinker.parameterfile.AmoebaParameterSet">
-<em class="property">class </em><tt class="descclassname">parmed.tinker.parameterfile.</tt><tt class="descname">AmoebaParameterSet</tt><big>(</big><em>fname=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#AmoebaParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tinker.parameterfile.</code><code class="descname">AmoebaParameterSet</code><span class="sig-paren">(</span><em>fname=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#AmoebaParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Contains all of the parameters found in an Amoeba parameter file from TINKER</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -61,24 +61,24 @@ TINKER-based parameter file.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file" title="parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file"><tt class="xref py py-obj docutils literal"><span class="pre">load_parameter_file</span></tt></a>(fname)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file" title="parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file"><code class="xref py py-obj docutils literal"><span class="pre">load_parameter_file</span></code></a>(fname)</td>
 <td>Parses a parameter file and loads all of the parameters found into data structures.</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="parmed.tinker.parameterfile.AmoebaParameterSet.anglere">
-<tt class="descname">anglere</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x121ff7558&gt;</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.anglere" title="Permalink to this definition">¶</a></dt>
+<code class="descname">anglere</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.anglere" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.parameterfile.AmoebaParameterSet.atomre">
-<tt class="descname">atomre</tt><em class="property"> = &lt;_sre.SRE_Pattern object at 0x121e39550&gt;</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.atomre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atomre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.atomre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file">
-<tt class="descname">load_parameter_file</tt><big>(</big><em>fname</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#AmoebaParameterSet.load_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_parameter_file</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#AmoebaParameterSet.load_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.load_parameter_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses a parameter file and loads all of the parameters found into data
 structures.</p>
 </dd></dl>
@@ -87,8 +87,8 @@ structures.</p>
 
 <dl class="class">
 <dt id="parmed.tinker.parameterfile.BookmarkedFile">
-<em class="property">class </em><tt class="descclassname">parmed.tinker.parameterfile.</tt><tt class="descname">BookmarkedFile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#BookmarkedFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.BookmarkedFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.tinker.parameterfile.</code><code class="descname">BookmarkedFile</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#BookmarkedFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.BookmarkedFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Allows setting a bookmark and rewinding to that bookmark</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -97,42 +97,42 @@ structures.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.parameterfile.BookmarkedFile.mark" title="parmed.tinker.parameterfile.BookmarkedFile.mark"><tt class="xref py py-obj docutils literal"><span class="pre">mark</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.parameterfile.BookmarkedFile.mark" title="parmed.tinker.parameterfile.BookmarkedFile.mark"><code class="xref py py-obj docutils literal"><span class="pre">mark</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.parameterfile.BookmarkedFile.rewind" title="parmed.tinker.parameterfile.BookmarkedFile.rewind"><tt class="xref py py-obj docutils literal"><span class="pre">rewind</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.parameterfile.BookmarkedFile.rewind" title="parmed.tinker.parameterfile.BookmarkedFile.rewind"><code class="xref py py-obj docutils literal"><span class="pre">rewind</span></code></a>()</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.tinker.parameterfile.BookmarkedFile.mark">
-<tt class="descname">mark</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#BookmarkedFile.mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.BookmarkedFile.mark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#BookmarkedFile.mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.BookmarkedFile.mark" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tinker.parameterfile.BookmarkedFile.rewind">
-<tt class="descname">rewind</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#BookmarkedFile.rewind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.BookmarkedFile.rewind" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rewind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#BookmarkedFile.rewind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.BookmarkedFile.rewind" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="parmed.tinker.parameterfile.get_angle_type">
-<tt class="descclassname">parmed.tinker.parameterfile.</tt><tt class="descname">get_angle_type</tt><big>(</big><em>typecode</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#get_angle_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.get_angle_type" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.tinker.parameterfile.</code><code class="descname">get_angle_type</code><span class="sig-paren">(</span><em>typecode</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#get_angle_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.get_angle_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory that returns the appropriate angle type</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="parmed.tinker.parameterfile.get_atom_type">
-<tt class="descclassname">parmed.tinker.parameterfile.</tt><tt class="descname">get_atom_type</tt><big>(</big><em>index</em>, <em>atomic_number</em>, <em>mass</em>, <em>valence</em><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#get_atom_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.get_atom_type" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.tinker.parameterfile.</code><code class="descname">get_atom_type</code><span class="sig-paren">(</span><em>index</em>, <em>atomic_number</em>, <em>mass</em>, <em>valence</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#get_atom_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.get_atom_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory for getting an _AtomType, but making sure that only one instance of
 a particular type is created</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="parmed.tinker.parameterfile.reset">
-<tt class="descclassname">parmed.tinker.parameterfile.</tt><tt class="descname">reset</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.reset" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.tinker.parameterfile.</code><code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/parameterfile.html#reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.parameterfile.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets all of the TypeList instances (without destroying the data inside
 them) so we can load multiple parameter sets</p>
 </dd></dl>
@@ -143,14 +143,16 @@ them) so we can load multiple parameter sets</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.tinker.parameterfile.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.tinker.parameterfile.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -167,7 +169,7 @@ them) so we can load multiple parameter sets</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -176,12 +178,12 @@ them) so we can load multiple parameter sets</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

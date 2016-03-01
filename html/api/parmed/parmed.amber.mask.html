@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.amber.mask">
 <span id="parmed-amber-mask-module"></span><h1>parmed.amber.mask module<a class="headerlink" href="#module-parmed.amber.mask" title="Permalink to this headline">¶</a></h1>
@@ -51,8 +51,8 @@
 which a selected atom is 1 and one that&#8217;s not is 0.</p>
 <dl class="class">
 <dt id="parmed.amber.mask.AmberMask">
-<em class="property">class </em><tt class="descclassname">parmed.amber.mask.</tt><tt class="descname">AmberMask</tt><big>(</big><em>parm</em>, <em>mask</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/mask.html#AmberMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mask.AmberMask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.amber.mask.</code><code class="descname">AmberMask</code><span class="sig-paren">(</span><em>parm</em>, <em>mask</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mask.html#AmberMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mask.AmberMask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>What is hopefully a fully-fledged Amber mask parser implemented in Python.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -77,17 +77,17 @@ which a selected atom is 1 and one that&#8217;s not is 0.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mask.AmberMask.Selected" title="parmed.amber.mask.AmberMask.Selected"><tt class="xref py py-obj docutils literal"><span class="pre">Selected</span></tt></a>([invert])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mask.AmberMask.Selected" title="parmed.amber.mask.AmberMask.Selected"><code class="xref py py-obj docutils literal"><span class="pre">Selected</span></code></a>([invert])</td>
 <td>Generator that returns the indexes of selected atoms</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mask.AmberMask.Selection" title="parmed.amber.mask.AmberMask.Selection"><tt class="xref py py-obj docutils literal"><span class="pre">Selection</span></tt></a>([prnlev,&nbsp;invert])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mask.AmberMask.Selection" title="parmed.amber.mask.AmberMask.Selection"><code class="xref py py-obj docutils literal"><span class="pre">Selection</span></code></a>([prnlev,&nbsp;invert])</td>
 <td>Parses the mask and analyzes the result to return an atom</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.mask.AmberMask.Selected">
-<tt class="descname">Selected</tt><big>(</big><em>invert=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/mask.html#AmberMask.Selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mask.AmberMask.Selected" title="Permalink to this definition">¶</a></dt>
+<code class="descname">Selected</code><span class="sig-paren">(</span><em>invert=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mask.html#AmberMask.Selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mask.AmberMask.Selected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generator that returns the indexes of selected atoms</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -112,7 +112,7 @@ selected by the mask. Atom indices are 0-based</p>
 
 <dl class="method">
 <dt id="parmed.amber.mask.AmberMask.Selection">
-<tt class="descname">Selection</tt><big>(</big><em>prnlev=0</em>, <em>invert=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/amber/mask.html#AmberMask.Selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mask.AmberMask.Selection" title="Permalink to this definition">¶</a></dt>
+<code class="descname">Selection</code><span class="sig-paren">(</span><em>prnlev=0</em>, <em>invert=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mask.html#AmberMask.Selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mask.AmberMask.Selection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the mask and analyzes the result to return an atom
 selection array</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -136,7 +136,7 @@ of output (larger values produce more output). Default 0</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>mask</strong> : list of int</p>
 <blockquote class="last">
 <div><p>A list with length equal to the number of atoms in the assigned
-<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a> instance. Selected
+<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance. Selected
 atoms will have a value of 1 placed in the corresponding slot in the
 return list while atoms not selected will be assigned 0.</p>
 </div></blockquote>
@@ -154,14 +154,16 @@ return list while atoms not selected will be assigned 0.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.amber.mask.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.amber.mask.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -178,7 +180,7 @@ return list while atoms not selected will be assigned 0.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -187,12 +189,12 @@ return list while atoms not selected will be assigned 0.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,47 +37,47 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-topologyobjects-dihedraltype">
 <h1>parmed.topologyobjects.DihedralType<a class="headerlink" href="#parmed-topologyobjects-dihedraltype" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.topologyobjects.DihedralType">
-<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">DihedralType</tt><big>(</big><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">DihedralType</code><span class="sig-paren">(</span><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralType" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dihedral type with a set of dihedral parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>phi_k</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>phi_k</strong> : <code class="docutils literal"><span class="pre">float</span></code></p>
 <blockquote>
 <div><p>The force constant in kcal/mol</p>
 </div></blockquote>
-<p><strong>per</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>per</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote>
 <div><p>The dihedral periodicity</p>
 </div></blockquote>
-<p><strong>phase</strong> : <tt class="docutils literal"><span class="pre">float</span></tt></p>
+<p><strong>phase</strong> : <code class="docutils literal"><span class="pre">float</span></code></p>
 <blockquote>
 <div><p>The dihedral phase in degrees</p>
 </div></blockquote>
-<p><strong>scee</strong> : <tt class="docutils literal"><span class="pre">float</span></tt>, optional</p>
+<p><strong>scee</strong> : <code class="docutils literal"><span class="pre">float</span></code>, optional</p>
 <blockquote>
 <div><p>1-4 electrostatic scaling factor. Default is 1.0</p>
 </div></blockquote>
-<p><strong>scnb</strong> : <tt class="docutils literal"><span class="pre">float</span></tt>, optional</p>
+<p><strong>scnb</strong> : <code class="docutils literal"><span class="pre">float</span></code>, optional</p>
 <blockquote>
 <div><p>1-4 Lennard-Jones scaling factor. Default is 1.0</p>
 </div></blockquote>
-<p><strong>list</strong> : <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><tt class="xref py py-class docutils literal"><span class="pre">TrackedList</span></tt></a></p>
+<p><strong>list</strong> : <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a></p>
 <blockquote class="last">
 <div><p>A list of <a href="#id1"><span class="problematic" id="id2">`</span></a>DihedralType`s in which this is a member</p>
 </div></blockquote>
@@ -86,21 +86,21 @@
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Two <tt class="xref py py-class docutils literal"><span class="pre">DihedralType`s</span> <span class="pre">are</span> <span class="pre">equal</span> <span class="pre">if</span> <span class="pre">their</span> <span class="pre">`phi_k</span></tt>, <cite>per</cite>, <cite>phase</cite>,
+<p>Two <code class="xref py py-class docutils literal"><span class="pre">DihedralType`s</span> <span class="pre">are</span> <span class="pre">equal</span> <span class="pre">if</span> <span class="pre">their</span> <span class="pre">`phi_k</span></code>, <cite>per</cite>, <cite>phase</cite>,
 <cite>scee</cite>, and <cite>scnb</cite> attributes are equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt2</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="ow">is</span> <span class="n">dt2</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">==</span> <span class="n">dt2</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span><span class="o">.</span><span class="n">idx</span> <span class="c"># not part of any list or iterable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span><span class="o">.</span><span class="n">idx</span> <span class="c1"># not part of any list or iterable</span>
 <span class="go">-1</span>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
 <span class="gp">... </span>                                  <span class="nb">list</span><span class="o">=</span><span class="n">dihedral_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
@@ -118,14 +118,14 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralType.idx" title="parmed.topologyobjects.DihedralType.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralType.idx" title="parmed.topologyobjects.DihedralType.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralType.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralType.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralType.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>DihedralType constructor</p>
 </dd></dl>
 
@@ -136,7 +136,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralType.__init__" title="parmed.topologyobjects.DihedralType.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(phi_k,&nbsp;per,&nbsp;phase[,&nbsp;scee,&nbsp;scnb,&nbsp;list])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralType.__init__" title="parmed.topologyobjects.DihedralType.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(phi_k,&nbsp;per,&nbsp;phase[,&nbsp;scee,&nbsp;scnb,&nbsp;list])</td>
 <td>DihedralType constructor</td>
 </tr>
 </tbody>
@@ -148,7 +148,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralType.idx" title="parmed.topologyobjects.DihedralType.idx"><tt class="xref py py-obj docutils literal"><span class="pre">idx</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralType.idx" title="parmed.topologyobjects.DihedralType.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -161,14 +161,16 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/parmed.topologyobjects.DihedralType.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/parmed.topologyobjects.DihedralType.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -185,7 +187,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -194,13 +196,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

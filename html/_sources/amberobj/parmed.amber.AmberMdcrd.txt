@@ -16,9 +16,7 @@ parmed.amber.AmberMdcrd
       ~AmberMdcrd.__init__
       ~AmberMdcrd.add_box
       ~AmberMdcrd.add_coordinates
-      ~AmberMdcrd.box
       ~AmberMdcrd.close
-      ~AmberMdcrd.coordinates
       ~AmberMdcrd.id_format
    
    
@@ -31,6 +29,10 @@ parmed.amber.AmberMdcrd
    
       ~AmberMdcrd.CRDS_PER_LINE
       ~AmberMdcrd.DEFAULT_TITLE
+      ~AmberMdcrd.box
+      ~AmberMdcrd.coordinates
       ~AmberMdcrd.extra_args
+      ~AmberMdcrd.frame
+      ~AmberMdcrd.positions
    
    

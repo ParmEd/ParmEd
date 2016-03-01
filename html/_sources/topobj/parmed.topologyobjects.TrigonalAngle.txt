@@ -20,10 +20,4 @@ parmed.topologyobjects.TrigonalAngle
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~TrigonalAngle.trigang_type
-   
    

@@ -20,10 +20,4 @@ parmed.topologyobjects.Angle
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~Angle.angle_type
-   
    

@@ -27,7 +27,6 @@ parmed.amber.Rst7
    .. autosummary::
    
       ~Rst7.box_vectors
-      ~Rst7.coords
       ~Rst7.hasbox
       ~Rst7.hasvels
       ~Rst7.positions

@@ -34,7 +34,6 @@ parmed.amber.NetCDFRestart
       ~NetCDFRestart.cell_lengths
       ~NetCDFRestart.coordinates
       ~NetCDFRestart.remd_dimtype
-      ~NetCDFRestart.remd_groups
       ~NetCDFRestart.remd_indices
       ~NetCDFRestart.temp0
       ~NetCDFRestart.time

@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.gromacs.gromacstop">
 <span id="parmed-gromacs-gromacstop-module"></span><h1>parmed.gromacs.gromacstop module<a class="headerlink" href="#module-parmed.gromacs.gromacstop" title="Permalink to this headline">¶</a></h1>
@@ -51,8 +51,8 @@
 and building a Structure from it</p>
 <dl class="class">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile">
-<em class="property">class </em><tt class="descclassname">parmed.gromacs.gromacstop.</tt><tt class="descname">GromacsTopologyFile</tt><big>(</big><em>fname=None</em>, <em>defines=None</em>, <em>parametrize=True</em>, <em>xyz=None</em>, <em>box=None</em><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">parmed.gromacs.gromacstop.</code><code class="descname">GromacsTopologyFile</code><span class="sig-paren">(</span><em>fname=None</em>, <em>defines=None</em>, <em>parametrize=True</em>, <em>xyz=None</em>, <em>box=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
 <p>Class providing a parser and writer for a GROMACS topology file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -93,10 +93,10 @@ is None.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>If the <tt class="docutils literal"><span class="pre">xyz</span></tt> argument is a file name that contains the unit cell
-information, this unit cell information is set. However, the <tt class="docutils literal"><span class="pre">box</span></tt>
+<p>If the <code class="docutils literal"><span class="pre">xyz</span></code> argument is a file name that contains the unit cell
+information, this unit cell information is set. However, the <code class="docutils literal"><span class="pre">box</span></code>
 argument takes precedence and will override values given in the coordinate
-file unless it has its default value of <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+file unless it has its default value of <code class="docutils literal"><span class="pre">None</span></code>.</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -104,28 +104,28 @@ file unless it has its default value of <tt class="docutils literal"><span class
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box" title="parmed.gromacs.gromacstop.GromacsTopologyFile.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box" title="parmed.gromacs.gromacstop.GromacsTopologyFile.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors" title="parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors"><tt class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors" title="parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors"><code class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></code></a></td>
 <td>3, 3-element tuple of unit cell vectors that are Quantity objects of</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule" title="parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule"><tt class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule" title="parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule"><code class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates" title="parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates" title="parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.positions" title="parmed.gromacs.gromacstop.GromacsTopologyFile.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.positions" title="parmed.gromacs.gromacstop.GromacsTopologyFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td>A list of 3-element Quantity tuples of dimension length representing the atomic positions for every atom in the system.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.topology" title="parmed.gromacs.gromacstop.GromacsTopologyFile.topology"><tt class="xref py py-obj docutils literal"><span class="pre">topology</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.topology" title="parmed.gromacs.gromacstop.GromacsTopologyFile.topology"><code class="xref py py-obj docutils literal"><span class="pre">topology</span></code></a></td>
 <td>The OpenMM Topology object.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.velocities" title="parmed.gromacs.gromacstop.GromacsTopologyFile.velocities"><tt class="xref py py-obj docutils literal"><span class="pre">velocities</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.velocities" title="parmed.gromacs.gromacstop.GromacsTopologyFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td>A (natom, 3)-shape numpy array with atomic velocities for every atom in</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.view" title="parmed.gromacs.gromacstop.GromacsTopologyFile.view"><tt class="xref py py-obj docutils literal"><span class="pre">view</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.view" title="parmed.gromacs.gromacstop.GromacsTopologyFile.view"><code class="xref py py-obj docutils literal"><span class="pre">view</span></code></a></td>
 <td>Returns an indexable object that can be indexed like a standard</td>
 </tr>
 </tbody>
@@ -137,193 +137,199 @@ file unless it has its default value of <tt class="docutils literal"><span class
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom" title="parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom" title="parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if it has a different name or number as the last residue added and adding it to the <cite>atoms</cite> list.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue" title="parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></tt></a>(atom,&nbsp;residue)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue" title="parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></code></a>(atom,&nbsp;residue)</td>
 <td>Adds a new atom to the Structure at the end if the given residue</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.copy" title="parmed.gromacs.gromacstop.GromacsTopologyFile.copy"><tt class="xref py py-obj docutils literal"><span class="pre">copy</span></tt></a>(cls[,&nbsp;split_dihedrals])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.copy" title="parmed.gromacs.gromacstop.GromacsTopologyFile.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem" title="parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem"><tt class="xref py py-obj docutils literal"><span class="pre">createSystem</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem" title="parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure" title="parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure"><tt class="xref py py-obj docutils literal"><span class="pre">from_structure</span></tt></a>(struct[,&nbsp;copy])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure" title="parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
 <td>Instantiates a GromacsTopologyFile instance from a Structure</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates" title="parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></tt></a>([frame])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.get_box" title="parmed.gromacs.gromacstop.GromacsTopologyFile.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX" title="parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX"><tt class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates" title="parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
+<td>In some cases, multiple conformations may be stored in the Structure.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX" title="parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
 <td>Returns whether or not any pairs of atom types have their LJ</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.id_format" title="parmed.gromacs.gromacstop.GromacsTopologyFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.id_format" title="parmed.gromacs.gromacstop.GromacsTopologyFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file as a GROMACS topology file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed" title="parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed"><tt class="xref py py-obj docutils literal"><span class="pre">is_changed</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed" title="parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
 <td>Determines if any of the topology has changed for this structure</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe" title="parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></tt></a>(df)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.join_dihedrals" title="parmed.gromacs.gromacstop.GromacsTopologyFile.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
+<td>Joins multi-term torsions into a single term and makes all of the parameters DihedralTypeList instances.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe" title="parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
 <td>Loads atomic properties from an input DataFrame</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints"><tt class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM NonbondedForce instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites"><tt class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force"><tt class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force" title="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize" title="parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize"><tt class="xref py py-obj docutils literal"><span class="pre">parametrize</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize" title="parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize"><code class="xref py py-obj docutils literal"><span class="pre">parametrize</span></code></a>()</td>
 <td>Assign parameters to the current structure.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms" title="parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms"><tt class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms" title="parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.read" title="parmed.gromacs.gromacstop.GromacsTopologyFile.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(fname[,&nbsp;defines,&nbsp;parametrize])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.read" title="parmed.gromacs.gromacstop.GromacsTopologyFile.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(fname[,&nbsp;defines,&nbsp;parametrize])</td>
 <td>Reads the topology file into the current instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.save" title="parmed.gromacs.gromacstop.GromacsTopologyFile.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.save" title="parmed.gromacs.gromacstop.GromacsTopologyFile.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
 <td>Saves the current Structure in the requested file format.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.split" title="parmed.gromacs.gromacstop.GromacsTopologyFile.split"><tt class="xref py py-obj docutils literal"><span class="pre">split</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.split" title="parmed.gromacs.gromacstop.GromacsTopologyFile.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
 <td>Split the current Structure into separate Structure instances for each unique molecule.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.strip" title="parmed.gromacs.gromacstop.GromacsTopologyFile.strip"><tt class="xref py py-obj docutils literal"><span class="pre">strip</span></tt></a>(selection)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.strip" title="parmed.gromacs.gromacstop.GromacsTopologyFile.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe" title="parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe" title="parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
 <td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.unchange" title="parmed.gromacs.gromacstop.GromacsTopologyFile.unchange"><tt class="xref py py-obj docutils literal"><span class="pre">unchange</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.unchange" title="parmed.gromacs.gromacstop.GromacsTopologyFile.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions" title="parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions"><tt class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions" title="parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(dest[,&nbsp;combine,&nbsp;parameters])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest[,&nbsp;combine,&nbsp;parameters])</td>
 <td>Write a Gromacs Topology File from a Structure</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif"><tt class="xref py py-obj docutils literal"><span class="pre">write_cif</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb"><tt class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf"><tt class="xref py py-obj docutils literal"><span class="pre">write_psf</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf" title="parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.ANGLE_FORCE_GROUP">
-<tt class="descname">ANGLE_FORCE_GROUP</tt><em class="property"> = 1</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ANGLE_FORCE_GROUP</code><em class="property"> = 1</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.BOND_FORCE_GROUP">
-<tt class="descname">BOND_FORCE_GROUP</tt><em class="property"> = 0</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.BOND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">BOND_FORCE_GROUP</code><em class="property"> = 0</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.BOND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.CMAP_FORCE_GROUP">
-<tt class="descname">CMAP_FORCE_GROUP</tt><em class="property"> = 5</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.CMAP_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CMAP_FORCE_GROUP</code><em class="property"> = 5</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.CMAP_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.DIHEDRAL_FORCE_GROUP">
-<tt class="descname">DIHEDRAL_FORCE_GROUP</tt><em class="property"> = 2</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.DIHEDRAL_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DIHEDRAL_FORCE_GROUP</code><em class="property"> = 2</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.DIHEDRAL_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.IMPROPER_FORCE_GROUP">
-<tt class="descname">IMPROPER_FORCE_GROUP</tt><em class="property"> = 4</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.IMPROPER_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">IMPROPER_FORCE_GROUP</code><em class="property"> = 4</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.IMPROPER_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.NONBONDED_FORCE_GROUP">
-<tt class="descname">NONBONDED_FORCE_GROUP</tt><em class="property"> = 11</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.NONBONDED_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">NONBONDED_FORCE_GROUP</code><em class="property"> = 11</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.NONBONDED_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.OUT_OF_PLANE_BEND_FORCE_GROUP">
-<tt class="descname">OUT_OF_PLANE_BEND_FORCE_GROUP</tt><em class="property"> = 7</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.OUT_OF_PLANE_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OUT_OF_PLANE_BEND_FORCE_GROUP</code><em class="property"> = 7</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.OUT_OF_PLANE_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.PI_TORSION_FORCE_GROUP">
-<tt class="descname">PI_TORSION_FORCE_GROUP</tt><em class="property"> = 8</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.PI_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PI_TORSION_FORCE_GROUP</code><em class="property"> = 8</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.PI_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.RB_TORSION_FORCE_GROUP">
-<tt class="descname">RB_TORSION_FORCE_GROUP</tt><em class="property"> = 12</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.RB_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">RB_TORSION_FORCE_GROUP</code><em class="property"> = 12</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.RB_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.STRETCH_BEND_FORCE_GROUP">
-<tt class="descname">STRETCH_BEND_FORCE_GROUP</tt><em class="property"> = 9</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.STRETCH_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">STRETCH_BEND_FORCE_GROUP</code><em class="property"> = 9</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.STRETCH_BEND_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.TORSION_TORSION_FORCE_GROUP">
-<tt class="descname">TORSION_TORSION_FORCE_GROUP</tt><em class="property"> = 10</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.TORSION_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">TORSION_TORSION_FORCE_GROUP</code><em class="property"> = 10</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.TORSION_TORSION_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.TRIGONAL_ANGLE_FORCE_GROUP">
-<tt class="descname">TRIGONAL_ANGLE_FORCE_GROUP</tt><em class="property"> = 6</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.TRIGONAL_ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">TRIGONAL_ANGLE_FORCE_GROUP</code><em class="property"> = 6</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.TRIGONAL_ANGLE_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.UREY_BRADLEY_FORCE_GROUP">
-<tt class="descname">UREY_BRADLEY_FORCE_GROUP</tt><em class="property"> = 3</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.UREY_BRADLEY_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
+<code class="descname">UREY_BRADLEY_FORCE_GROUP</code><em class="property"> = 3</em><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.UREY_BRADLEY_FORCE_GROUP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_atom</code><span class="sig-paren">(</span><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure, adding a new residue to <cite>residues</cite> if
 it has a different name or number as the last residue added and adding
 it to the <cite>atoms</cite> list.</p>
@@ -331,27 +337,27 @@ it to the <cite>atoms</cite> list.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></p>
 <blockquote>
 <div><p>The atom to add to this residue list</p>
 </div></blockquote>
-<p><strong>resname</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>resname</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The name of the residue this atom belongs to</p>
 </div></blockquote>
-<p><strong>resnum</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>resnum</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote>
 <div><p>The number of the residue this atom belongs to</p>
 </div></blockquote>
-<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>chain</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The chain ID character for this residue</p>
 </div></blockquote>
-<p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>inscode</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The insertion code ID character for this residue (it is stripped)</p>
 </div></blockquote>
-<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>segid</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote class="last">
 <div><p>The segment identifier for this residue (it is stripped)</p>
 </div></blockquote>
@@ -366,17 +372,17 @@ list, a new residue is added and the atom is added to that residue</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue">
-<tt class="descname">add_atom_to_residue</tt><big>(</big><em>atom</em>, <em>residue</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_atom_to_residue</code><span class="sig-paren">(</span><em>atom</em>, <em>residue</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.add_atom_to_residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the Structure at the end if the given residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></p>
 <blockquote>
 <div><p>The atom to add to the system</p>
 </div></blockquote>
-<p><strong>residue</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Residue</span></tt></p>
+<p><strong>residue</strong> : <code class="xref py py-class docutils literal"><span class="pre">Residue</span></code></p>
 <blockquote class="last">
 <div><p>The residue to which to add this atom. It MUST be part of this
 Structure instance already or a ValueError is raised</p>
@@ -394,29 +400,29 @@ relatively expensive operation</p>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.box">
-<tt class="descname">box</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box" title="Permalink to this definition">¶</a></dt>
+<code class="descname">box</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors">
-<tt class="descname">box_vectors</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">box_vectors</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.box_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>3, 3-element tuple of unit cell vectors that are Quantity objects of
 dimension length</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule">
-<tt class="descname">combining_rule</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule" title="Permalink to this definition">¶</a></dt>
+<code class="descname">combining_rule</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.combining_rule" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates">
-<tt class="descname">coordinates</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">coordinates</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.copy">
-<tt class="descname">copy</tt><big>(</big><em>cls</em>, <em>split_dihedrals=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.copy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">copy</code><span class="sig-paren">(</span><em>cls</em>, <em>split_dihedrals=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a copy of the current structure as an instance of a specified
 subclass</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -427,7 +433,7 @@ subclass</p>
 <blockquote>
 <div><p>The returned object is a copy of this structure as a <cite>cls</cite> instance</p>
 </div></blockquote>
-<p><strong>split_dihedrals</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>split_dihedrals</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, then the Dihedral entries will be split up so that each one
 is paired with a single DihedralType (rather than a
@@ -448,7 +454,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem">
-<tt class="descname">createSystem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an OpenMM System representing the topology described by the
 prmtop file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -541,8 +547,14 @@ freedom will NOT be computed. If True, they will (but those degrees
 of freedom will <em>still</em> be constrained).</p>
 </div></blockquote>
 <p><strong>verbose</strong> : bool=False</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True, the progress of this subroutine will be printed to stdout</p>
+</div></blockquote>
+<p><strong>splitDihedrals</strong> : bool=False</p>
+<blockquote class="last">
+<div><p>If True, the dihedrals will be split into two forces &#8211; proper and
+impropers. This is primarily useful for debugging torsion parameter
+assignments.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -554,24 +566,24 @@ of freedom will <em>still</em> be constrained).</p>
 
 <dl class="classmethod">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure">
-<em class="property">classmethod </em><tt class="descname">from_structure</tt><big>(</big><em>struct</em>, <em>copy=False</em><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_structure</code><span class="sig-paren">(</span><em>struct</em>, <em>copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.from_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiates a GromacsTopologyFile instance from a Structure</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.html#parmed.Structure" title="parmed.Structure"><tt class="xref py py-class docutils literal"><span class="pre">parmed.Structure</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.Structure</span></code></a></p>
 <blockquote>
 <div><p>The input structure to generate from</p>
 </div></blockquote>
 <p><strong>copy</strong> : bool, optional</p>
 <blockquote>
-<div><p>If True, assign from a <em>copy</em> of <tt class="docutils literal"><span class="pre">struct</span></tt> (this is a lot slower).
+<div><p>If True, assign from a <em>copy</em> of <code class="docutils literal"><span class="pre">struct</span></code> (this is a lot slower).
 Default is False</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>gmxtop</strong> : <a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile" title="parmed.gromacs.gromacstop.GromacsTopologyFile"><tt class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>gmxtop</strong> : <a class="reference internal" href="#parmed.gromacs.gromacstop.GromacsTopologyFile" title="parmed.gromacs.gromacstop.GromacsTopologyFile"><code class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></code></a></p>
 <blockquote class="last">
 <div><p>The topology file defined by the given struct</p>
 </div></blockquote>
@@ -582,8 +594,40 @@ Default is False</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.get_box">
+<code class="descname">get_box</code><span class="sig-paren">(</span><em>frame='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.get_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>In some cases, multiple conformations may be stored in the Structure.
+This function retrieves a particular frame&#8217;s unit cell (box) dimensions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
+<blockquote>
+<div><p>The frame number whose coordinates should be retrieved. Default is
+&#8216;all&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<blockquote>
+<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
+(#, natom, 3). Otherwise the requested frame is returned with shape
+(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>IndexError if there are fewer than ``frame`` unit cell dimensions</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates">
-<tt class="descname">get_coordinates</tt><big>(</big><em>frame='all'</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_coordinates</code><span class="sig-paren">(</span><em>frame='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>In some cases, multiple conformations may be stored in the Structure.
 This function retrieves a particular frame&#8217;s coordinates</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -615,7 +659,7 @@ returned</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX">
-<tt class="descname">has_NBFIX</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
+<code class="descname">has_NBFIX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.has_NBFIX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns whether or not any pairs of atom types have their LJ
 interactions modified by an NBFIX definition</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -634,7 +678,7 @@ interactions modified by an NBFIX definition</p>
 
 <dl class="staticmethod">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file as a GROMACS topology file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -659,13 +703,22 @@ otherwise</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed">
-<tt class="descname">is_changed</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_changed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.is_changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if any of the topology has changed for this structure</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.join_dihedrals">
+<code class="descname">join_dihedrals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.join_dihedrals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins multi-term torsions into a single term and makes all of the
+parameters DihedralTypeList instances. If any dihedrals are <em>already</em>
+DihedralTypeList instances, or any are not parametrized, or there are no
+dihedral_types, this method returns without doing anything</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe">
-<tt class="descname">load_dataframe</tt><big>(</big><em>df</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_dataframe</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.load_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads atomic properties from an input DataFrame</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -682,13 +735,13 @@ the properties on the current list of atoms</p>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.load_dataframe" title="parmed.utils.pandautils.load_dataframe"><tt class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.load_dataframe()</span></tt></a></p>
+<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.load_dataframe" title="parmed.utils.pandautils.load_dataframe"><code class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.load_dataframe()</span></code></a></p>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints">
-<tt class="descname">omm_add_constraints</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -715,7 +768,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force">
-<tt class="descname">omm_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -748,7 +801,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force">
-<tt class="descname">omm_bond_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -785,7 +838,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force">
-<tt class="descname">omm_cmap_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -803,13 +856,22 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force">
-<tt class="descname">omm_dihedral_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">PeriodicTorsionForce</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>split</strong> : bool, optional, default=False</p>
+<blockquote>
+<div><p>If True, separate PeriodicTorsionForce instances with the propers in
+the first and impropers in the second return item. If no impropers
+or propers are present, the instances with zero terms are not
+returned.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">PeriodicTorsionForce[, PeriodicTorsionForce]</p>
 <blockquote class="last">
 <div><p>Or None if no torsions are present in this system</p>
 </div></blockquote>
@@ -821,7 +883,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force">
-<tt class="descname">omm_gbsa_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -876,7 +938,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force">
-<tt class="descname">omm_improper_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -894,7 +956,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force">
-<tt class="descname">omm_nonbonded_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -945,8 +1007,8 @@ Lorentz-Berthelot combining rules.</p>
 </table>
 <p class="rubric">Notes</p>
 <p>This method calls update_dihedral_exclusions, which might alter the
-<tt class="docutils literal"><span class="pre">ignore_end</span></tt> attribute of some
-<a class="reference internal" href="parmed.topologyobjects.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><tt class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Dihedral</span></tt></a> instances based on any
+<code class="docutils literal"><span class="pre">ignore_end</span></code> attribute of some
+<a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Dihedral</span></code></a> instances based on any
 changes that might have been made to the bonds and angles since the last
 time it was called.</p>
 <p>Subclasses of Structure for which this nonbonded treatment is inadequate
@@ -958,7 +1020,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force">
-<tt class="descname">omm_out_of_plane_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -976,7 +1038,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force">
-<tt class="descname">omm_pi_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -994,7 +1056,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force">
-<tt class="descname">omm_rb_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1012,7 +1074,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites">
-<tt class="descname">omm_set_virtual_sites</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1033,7 +1095,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force">
-<tt class="descname">omm_stretch_bend_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1051,7 +1113,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force">
-<tt class="descname">omm_torsion_torsion_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1070,7 +1132,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force">
-<tt class="descname">omm_trigonal_angle_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1088,7 +1150,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force">
-<tt class="descname">omm_urey_bradley_force</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1106,23 +1168,23 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize">
-<tt class="descname">parametrize</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.parametrize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">parametrize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.parametrize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.parametrize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assign parameters to the current structure. This should be called
 <em>after</em> <cite>read</cite></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.positions">
-<tt class="descname">positions</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.positions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">positions</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.positions" title="Permalink to this definition">¶</a></dt>
 <dd><p>A list of 3-element Quantity tuples of dimension length representing the
 atomic positions for every atom in the system. If set with unitless
 numbers, those numbers are assumed to be in angstroms. If any atoms do
-not have coordinates, this is simply <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+not have coordinates, this is simply <code class="docutils literal"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms">
-<tt class="descname">prune_empty_terms</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prune_empty_terms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.prune_empty_terms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Looks through all of the topological lists and gets rid of terms
 in which at least one of the atoms is None or has an <cite>idx</cite> attribute set
 to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list)</p>
@@ -1130,24 +1192,24 @@ to -1 (indicating that it has been removed from the <cite>atoms</cite> atom list
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.read">
-<tt class="descname">read</tt><big>(</big><em>fname</em>, <em>defines=None</em>, <em>parametrize=True</em><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.read" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read</code><span class="sig-paren">(</span><em>fname</em>, <em>defines=None</em>, <em>parametrize=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the topology file into the current instance</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.save">
-<tt class="descname">save</tt><big>(</big><em>fname</em>, <em>format=None</em>, <em>overwrite=False</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.save" title="Permalink to this definition">¶</a></dt>
+<code class="descname">save</code><span class="sig-paren">(</span><em>fname</em>, <em>format=None</em>, <em>overwrite=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves the current Structure in the requested file format. Supported
 formats can be specified explicitly or determined by file-name
 extension. The following formats are supported, with the recognized
-suffix and <tt class="docutils literal"><span class="pre">format</span></tt> keyword shown in parentheses:</p>
+suffix and <code class="docutils literal"><span class="pre">format</span></code> keyword shown in parentheses:</p>
 <blockquote>
 <div><ul class="simple">
 <li>PDB (.pdb, pdb)</li>
 <li>PDBx/mmCIF (.cif, cif)</li>
 <li>PQR (.pqr, pqr)</li>
 <li>Amber topology file (.prmtop/.parm7, amber)</li>
-<li>CHARMM PSF file (.psf, charmm)</li>
+<li>CHARMM PSF file (.psf, psf)</li>
 <li>CHARMM coordinate file (.crd, charmmcrd)</li>
 <li>Gromacs topology file (.top, gromacs)</li>
 <li>Gromacs GRO file (.gro, gro)</li>
@@ -1163,15 +1225,15 @@ suffix and <tt class="docutils literal"><span class="pre">format</span></tt> key
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
 <blockquote>
-<div><p>Name of the file to save. If <tt class="docutils literal"><span class="pre">format</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt> (see below), the
+<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
 file type will be determined based on the filename extension. If the
 type cannot be determined, a ValueError is raised.</p>
 </div></blockquote>
 <p><strong>format</strong> : str, optional</p>
 <blockquote>
-<div><p>The case-insensitive keyword specifying what type of file <tt class="docutils literal"><span class="pre">fname</span></tt>
-should be saved as. If <tt class="docutils literal"><span class="pre">None</span></tt> (default), the file type will be
-determined from filename extension of <tt class="docutils literal"><span class="pre">fname</span></tt></p>
+<div><p>The case-insensitive keyword specifying what type of file <code class="docutils literal"><span class="pre">fname</span></code>
+should be saved as. If <code class="docutils literal"><span class="pre">None</span></code> (default), the file type will be
+determined from filename extension of <code class="docutils literal"><span class="pre">fname</span></code></p>
 </div></blockquote>
 <p><strong>overwrite</strong> : bool, optional</p>
 <blockquote>
@@ -1199,7 +1261,7 @@ are called by this function</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.split">
-<tt class="descname">split</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.split" title="Permalink to this definition">¶</a></dt>
+<code class="descname">split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Split the current Structure into separate Structure instances for each
 unique molecule. A molecule is defined as all atoms connected by a graph
 of covalent bonds.</p>
@@ -1207,7 +1269,7 @@ of covalent bonds.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>, list) tuples</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>[structs, counts]</strong> : list of (<code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>, list) tuples</p>
 <blockquote class="last">
 <div><p>List of all molecules in the order that they appear first in the
 parent structure accompanied by the list of the molecule numbers
@@ -1221,13 +1283,13 @@ in which that molecule appears in the Structure</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.strip">
-<tt class="descname">strip</tt><big>(</big><em>selection</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.strip" title="Permalink to this definition">¶</a></dt>
+<code class="descname">strip</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.strip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes a subset of the atoms corresponding to an atom-based selection.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : <tt class="xref py py-class docutils literal"><span class="pre">AmberMask</span></tt>, <tt class="docutils literal"><span class="pre">str</span></tt>, or <tt class="docutils literal"><span class="pre">iterable</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>selection</strong> : <code class="xref py py-class docutils literal"><span class="pre">AmberMask</span></code>, <code class="docutils literal"><span class="pre">str</span></code>, or <code class="docutils literal"><span class="pre">iterable</span></code></p>
 <blockquote class="last">
 <div><p>This is the selection of atoms that will be deleted from this
 structure. If it is a string, it will be interpreted as an
@@ -1243,7 +1305,7 @@ as the <cite>atoms</cite> list.</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe">
-<tt class="descname">to_dataframe</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.to_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a DataFrame from the current Structure&#8217;s atomic properties</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1259,29 +1321,29 @@ as the <cite>atoms</cite> list.</p>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.create_dataframe" title="parmed.utils.pandautils.create_dataframe"><tt class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.create_dataframe()</span></tt></a>, <tt class="xref py py-obj docutils literal"><span class="pre">documentation</span></tt></p>
+<p class="last"><a class="reference internal" href="parmed.utils.pandautils.html#parmed.utils.pandautils.create_dataframe" title="parmed.utils.pandautils.create_dataframe"><code class="xref py py-func docutils literal"><span class="pre">parmed.utils.pandautils.create_dataframe()</span></code></a>, <code class="xref py py-obj docutils literal"><span class="pre">documentation</span></code></p>
 </div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.topology">
-<tt class="descname">topology</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.topology" title="Permalink to this definition">¶</a></dt>
+<code class="descname">topology</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>The OpenMM Topology object. Cached when possible, but any changes to the
 Structure instance results in the topology being deleted and rebuilt</p>
 <p class="rubric">Notes</p>
-<p>This function calls <tt class="docutils literal"><span class="pre">prune_empty_terms</span></tt> if any topology lists have
+<p>This function calls <code class="docutils literal"><span class="pre">prune_empty_terms</span></code> if any topology lists have
 changed.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.unchange">
-<tt class="descname">unchange</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.unchange" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unchange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.unchange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggles all lists so that they do not indicate any changes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions">
-<tt class="descname">update_dihedral_exclusions</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_dihedral_exclusions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.update_dihedral_exclusions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Nonbonded exclusions and exceptions have the following priority:</p>
 <p>bond -&gt; angle -&gt; dihedral</p>
 <p>Since bonds and angles are completely excluded, any ring systems in
@@ -1301,7 +1363,7 @@ partners arrays</p>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.velocities">
-<tt class="descname">velocities</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.velocities" title="Permalink to this definition">¶</a></dt>
+<code class="descname">velocities</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.velocities" title="Permalink to this definition">¶</a></dt>
 <dd><p>A (natom, 3)-shape numpy array with atomic velocities for every atom in
 the system (in units of angstrom/picosecond), or None if there are no
 velocities</p>
@@ -1309,18 +1371,18 @@ velocities</p>
 
 <dl class="attribute">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.view">
-<tt class="descname">view</tt><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.view" title="Permalink to this definition">¶</a></dt>
+<code class="descname">view</code><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an indexable object that can be indexed like a standard
 Structure, but returns a <em>view</em> rather than a copy</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><tt class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></tt></p>
+<p class="last"><code class="xref py py-obj docutils literal"><span class="pre">Structure.__getitem__</span></code></p>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.write">
-<tt class="descname">write</tt><big>(</big><em>dest</em>, <em>combine=None</em>, <em>parameters='inline'</em><big>)</big><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>dest</em>, <em>combine=None</em>, <em>parameters='inline'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a Gromacs Topology File from a Structure</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1334,8 +1396,8 @@ Structure, but returns a <em>view</em> rather than a copy</p>
 <blockquote>
 <div><p>If None, no molecules are combined into a single moleculetype. If
 &#8216;all&#8217;, all molecules are combined into a single moleculetype.
-Otherwise, the list of molecule indices will control which atoms are
-combined into single moleculetype&#8217;s. Default is None</p>
+Otherwise, the list of molecule indices (start from 0) will control
+which atoms are combined into single moleculetype&#8217;s. Default is None</p>
 </div></blockquote>
 <p><strong>parameters</strong> : &#8216;inline&#8217; or str or file-like object, optional</p>
 <blockquote>
@@ -1344,7 +1406,7 @@ combined into single moleculetype&#8217;s. Default is None</p>
 valence terms are defined on. Any other string is interpreted as a
 filename for an ITP that will be written to and then included at the
 top of <cite>dest</cite>. If it is a file-like object, parameters will be
-written there.  If parameters is the same as <tt class="docutils literal"><span class="pre">dest</span></tt>, then the
+written there.  If parameters is the same as <code class="docutils literal"><span class="pre">dest</span></code>, then the
 parameter types will be written to the same topologyfile.</p>
 </div></blockquote>
 </td>
@@ -1358,30 +1420,30 @@ parameter types will be written to the same topologyfile.</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif">
-<tt class="descname">write_cif</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDBx/mmCIF file</p>
 </div></blockquote>
-<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<p><strong>dest</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
 it was assigned previously</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : <code class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -1389,7 +1451,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -1406,7 +1468,7 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
@@ -1424,13 +1486,13 @@ will be converted into the PDB-standard values. Default is False</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb">
-<tt class="descname">write_pdb</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_pdb</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDB file</p>
 </div></blockquote>
@@ -1441,11 +1503,11 @@ method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : bool, optional</p>
+<p><strong>renumber</strong> : bool, optional, default True</p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
-it was assigned previously. Default is True</p>
+it was assigned previously.</p>
 </div></blockquote>
 <p><strong>coordinates</strong> : array-like of float, optional</p>
 <blockquote>
@@ -1455,13 +1517,13 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : str, optional</p>
+<p><strong>altlocs</strong> : str, optional, default &#8216;all&#8217;</p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;all&#8217; : print all alternate locations</li>
 <li>&#8216;first&#8217; : print only the first alternate locations</li>
 <li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
 conformers have the same occupancy, the first one to occur is
@@ -1472,21 +1534,21 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : bool, optional</p>
+<p><strong>write_anisou</strong> : bool, optional, default False</p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
-False, ANISOU records are not written. Default is False</p>
+False, ANISOU records are not written.</p>
 </div></blockquote>
-<p><strong>charmm</strong> : bool, optional</p>
+<p><strong>charmm</strong> : bool, optional, default False</p>
 <blockquote>
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
-atom that does not contain a SEGID identifier. Default is False</p>
+atom that does not contain a SEGID identifier.</p>
 </div></blockquote>
-<p><strong>standard_resnames</strong> : bool, optional</p>
+<p><strong>standard_resnames</strong> : bool, optional, default False</p>
 <blockquote class="last">
 <div><p>If True, common aliases for various amino and nucleic acid residues
-will be converted into the PDB-standard values. Default is False</p>
+will be converted into the PDB-standard values.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1496,13 +1558,13 @@ will be converted into the PDB-standard values. Default is False</p>
 
 <dl class="method">
 <dt id="parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf">
-<tt class="descname">write_psf</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_psf</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>vmd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.gromacstop.GromacsTopologyFile.write_psf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a PSF file from the stored molecule</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The Structure instance from which the PSF should be written</p>
 </div></blockquote>
@@ -1523,8 +1585,8 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1537,14 +1599,16 @@ closed</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.gromacs.gromacstop.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.gromacs.gromacstop.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -1561,7 +1625,7 @@ closed</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1570,12 +1634,12 @@ closed</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

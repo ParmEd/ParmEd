@@ -20,10 +20,4 @@ parmed.topologyobjects.OutOfPlaneBend
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~OutOfPlaneBend.oopbend_type
-   
    

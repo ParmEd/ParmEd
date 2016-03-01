@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.periodic_table">
 <span id="parmed-periodic-table-module"></span><h1>parmed.periodic_table module<a class="headerlink" href="#module-parmed.periodic_table" title="Permalink to this headline">¶</a></h1>
@@ -55,7 +55,7 @@ or any other meaningful attribute. It&#8217;s just a container to put an extra
 charge</p>
 <dl class="function">
 <dt id="parmed.periodic_table.element_by_mass">
-<tt class="descclassname">parmed.periodic_table.</tt><tt class="descname">element_by_mass</tt><big>(</big><em>mass</em><big>)</big><a class="reference internal" href="../../_modules/parmed/periodic_table.html#element_by_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.periodic_table.element_by_mass" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.periodic_table.</code><code class="descname">element_by_mass</code><span class="sig-paren">(</span><em>mass</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/periodic_table.html#element_by_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.periodic_table.element_by_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the element that has a mass closest to the input mass</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -84,7 +84,7 @@ repartitioning.</p>
 
 <dl class="function">
 <dt id="parmed.periodic_table.element_by_name">
-<tt class="descclassname">parmed.periodic_table.</tt><tt class="descname">element_by_name</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../../_modules/parmed/periodic_table.html#element_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.periodic_table.element_by_name" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.periodic_table.</code><code class="descname">element_by_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/periodic_table.html#element_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.periodic_table.element_by_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the element based on the name of an atom. This is very naive. It
 first tries to match the first letter of the element. If that doesn&#8217;t work,
 it tries to match the first <em>two</em> letters. If that still doesn&#8217;t work, it
@@ -121,14 +121,16 @@ appropriate representation of the atomic number to begin with</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.periodic_table.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.periodic_table.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -145,7 +147,7 @@ appropriate representation of the atomic number to begin with</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -154,12 +156,12 @@ appropriate representation of the atomic number to begin with</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

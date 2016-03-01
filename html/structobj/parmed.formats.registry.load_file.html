@@ -23,13 +23,13 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The structure module" href="../structure.html" />
     <link rel="next" title="Dimensional Analysis (working with parmed.unit)" href="../dimensional_analysis.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -41,21 +41,21 @@
         <li class="right" >
           <a href="../dimensional_analysis.html" title="Dimensional Analysis (working with parmed.unit)"
              accesskey="N">next</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../structure.html" accesskey="U">The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../structure.html" accesskey="U">The <code class="docutils literal"><span class="pre">structure</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-formats-registry-load-file">
 <h1>parmed.formats.registry.load_file<a class="headerlink" href="#parmed-formats-registry-load-file" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="parmed.formats.registry.load_file">
-<tt class="descclassname">parmed.formats.registry.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/parmed/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.registry.load_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.formats.registry.</code><code class="descname">load_file</code><span class="sig-paren">(</span><em>filename</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.registry.load_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file format of the specified file and returns its parsed
 contents.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -72,19 +72,19 @@ loaded directly from its remote location on the web</p>
 <blockquote>
 <div><p>For some classes, such as the Mol2 file class, the default return object
 is not a Structure, but can be made to return a Structure if the
-<tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword argument is passed. To facilitate writing
-easy code, the <tt class="docutils literal"><span class="pre">structure</span></tt> keyword is always processed and only passed
+<code class="docutils literal"><span class="pre">structure=True</span></code> keyword argument is passed. To facilitate writing
+easy code, the <code class="docutils literal"><span class="pre">structure</span></code> keyword is always processed and only passed
 on to the correct file parser if that parser accepts the structure
 keyword. There is no default, as each parser has its own default.</p>
 </div></blockquote>
 <p><strong>natom</strong> : int, optional</p>
 <blockquote>
 <div><p>This is needed for some coordinate file classes, but not others. This is
-treated the same as <tt class="docutils literal"><span class="pre">structure</span></tt>, above. It is the # of atoms expected</p>
+treated the same as <code class="docutils literal"><span class="pre">structure</span></code>, above. It is the # of atoms expected</p>
 </div></blockquote>
 <p><strong>hasbox</strong> : bool, optional</p>
 <blockquote>
-<div><p>Same as <tt class="docutils literal"><span class="pre">natom</span></tt>, but indicates whether the coordinate file has unit
+<div><p>Same as <code class="docutils literal"><span class="pre">natom</span></code>, but indicates whether the coordinate file has unit
 cell dimensions</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
@@ -107,7 +107,7 @@ associated with the file format being parsed</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong></p>
 <blockquote>
-<div><p>If <tt class="docutils literal"><span class="pre">filename</span></tt> does not exist</p>
+<div><p>If <code class="docutils literal"><span class="pre">filename</span></code> does not exist</p>
 </div></blockquote>
 <p><strong>parmed.exceptions.FormatNotFound</strong></p>
 <blockquote>
@@ -127,8 +127,8 @@ provided as keyword arguments in addition to the file name</p>
 applies both to local and remote files. The following names are supported:</p>
 <blockquote>
 <div><ul class="simple">
-<li><tt class="docutils literal"><span class="pre">.gz</span></tt> : gzip compressed file</li>
-<li><tt class="docutils literal"><span class="pre">.bz2</span></tt> : bzip2 compressed file</li>
+<li><code class="docutils literal"><span class="pre">.gz</span></code> : gzip compressed file</li>
+<li><code class="docutils literal"><span class="pre">.bz2</span></code> : bzip2 compressed file</li>
 </ul>
 </div></blockquote>
 </dd></dl>
@@ -139,14 +139,16 @@ applies both to local and remote files. The following names are supported:</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/structobj/parmed.formats.registry.load_file.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/structobj/parmed.formats.registry.load_file.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -163,7 +165,7 @@ applies both to local and remote files. The following names are supported:</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -175,13 +177,13 @@ applies both to local and remote files. The following names are supported:</p>
         <li class="right" >
           <a href="../dimensional_analysis.html" title="Dimensional Analysis (working with parmed.unit)"
              >next</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../structure.html" >The <tt class="docutils literal"><span class="pre">structure</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../structure.html" >The <code class="docutils literal"><span class="pre">structure</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

@@ -14,16 +14,9 @@ parmed.topologyobjects.StretchBend
    .. autosummary::
    
       ~StretchBend.__init__
-      ~StretchBend.delete
    
    
 
    
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~StretchBend.strbnd_type
    
    

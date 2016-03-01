@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.openmm" href="../openmm.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,26 +37,24 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../openmm.html" accesskey="U">parmed.openmm</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.openmm.topsystem</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Convert an OpenMM Topology into a Structure instance, optionally filling in</span>
 <span class="sd">parameters from a System</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;load_topology&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;load_topology&#39;</span><span class="p">]</span>
 
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -73,14 +71,10 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">mm</span> <span class="o">=</span> <span class="bp">None</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="load_topology"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.topsystem.html#parmed.openmm.topsystem.load_topology">[docs]</a><span class="k">def</span> <span class="nf">load_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="load_topology"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.load_topology.html#parmed.openmm.load_topology">[docs]</a><span class="k">def</span> <span class="nf">load_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a :class:`parmed.structure.Structure` instance from an OpenMM</span>
 <span class="sd">    Topology, optionally filling in parameters from a System</span>
@@ -128,6 +122,7 @@
 <span class="sd">    NBFIX (off-diagonal L-J modifications) and the 12-6-4 potential, will not be</span>
 <span class="sd">    processed and will result in an unknown functional form</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
     <span class="n">struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">()</span>
     <span class="n">atommap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">chains</span><span class="p">():</span>
@@ -180,13 +175,13 @@
         <span class="n">system</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">System</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;system must be an OpenMM System object or serialized &#39;</span>
-                        <span class="s">&#39;XML of an OpenMM System object&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;system must be an OpenMM System object or serialized &#39;</span>
+                        <span class="s1">&#39;XML of an OpenMM System object&#39;</span><span class="p">)</span>
 
-    <span class="c"># We have a system, try to extract parameters from it</span>
+    <span class="c1"># We have a system, try to extract parameters from it</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">!=</span> <span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Topology and System have different numbers of atoms &#39;</span>
-                <span class="s">&#39;(</span><span class="si">%d</span><span class="s"> vs. </span><span class="si">%d</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()))</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Topology and System have different numbers of atoms &#39;</span>
+                <span class="s1">&#39;(</span><span class="si">%d</span><span class="s1"> vs. </span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()))</span>
 
     <span class="n">processed_forces</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">ignored_forces</span> <span class="o">=</span> <span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CMMotionRemover</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">AndersenThermostat</span><span class="p">,</span>
@@ -209,7 +204,7 @@
     <span class="k">for</span> <span class="n">force</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">getForces</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">mm</span><span class="o">.</span><span class="n">HarmonicBondForce</span> <span class="ow">in</span> <span class="n">processed_forces</span><span class="p">:</span>
-                <span class="c"># Try to process this HarmonicBondForce as a Urey-Bradley term</span>
+                <span class="c1"># Try to process this HarmonicBondForce as a Urey-Bradley term</span>
                 <span class="n">_process_urey_bradley</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">_process_bond</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
@@ -222,7 +217,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">CustomTorsionForce</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">_process_improper</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
                 <span class="n">struct</span><span class="o">.</span><span class="n">unknown_functional</span> <span class="o">=</span> <span class="bp">True</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unknown functional form of CustomTorsionForce&#39;</span><span class="p">,</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unknown functional form of CustomTorsionForce&#39;</span><span class="p">,</span>
                               <span class="n">OpenMMWarning</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">CMAPTorsionForce</span><span class="p">):</span>
             <span class="n">_process_cmap</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
@@ -232,12 +227,12 @@
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">unknown_functional</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unsupported Force type </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">force</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unsupported Force type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">force</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
                           <span class="n">OpenMMWarning</span><span class="p">)</span>
         <span class="n">processed_forces</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">force</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">struct</span>
-</div>
+    <span class="k">return</span> <span class="n">struct</span></div>
+
 <span class="k">def</span> <span class="nf">_process_bond</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Adds bond parameters to the structure &quot;&quot;&quot;</span>
     <span class="n">typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -256,8 +251,8 @@
                 <span class="k">if</span> <span class="n">aj</span> <span class="ow">in</span> <span class="n">bond</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&#39;aj in ai.bond_partners, but couldn</span><span class="se">\&#39;</span><span class="s">t find &#39;</span>
-                                   <span class="s">&#39;that bond!&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;aj in ai.bond_partners, but couldn</span><span class="se">\&#39;</span><span class="s1">t find &#39;</span>
+                                   <span class="s1">&#39;that bond!&#39;</span><span class="p">)</span>
             <span class="n">bond</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">bond_type</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">bond_type</span><span class="p">))</span>
@@ -282,19 +277,19 @@
 <span class="k">def</span> <span class="nf">_process_urey_bradley</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Adds Urey-Bradley parameters to the structure &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">struct</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Adding what seems to be Urey-Bradley terms before &#39;</span>
-                      <span class="s">&#39;Angles. This is unexpected, but the parameters will &#39;</span>
-                      <span class="s">&#39;all be present in one form or another.&#39;</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Adding what seems to be Urey-Bradley terms before &#39;</span> <span class="c1"># pragma: no cover</span>
+                      <span class="s1">&#39;Angles. This is unexpected, but the parameters will &#39;</span>
+                      <span class="s1">&#39;all be present in one form or another.&#39;</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
     <span class="n">typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">getNumBonds</span><span class="p">()):</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getBondParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
         <span class="n">ai</span><span class="p">,</span> <span class="n">aj</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">angles</span> <span class="ow">and</span> <span class="n">ai</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aj</span><span class="o">.</span><span class="n">angle_partners</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Adding what seems to be Urey-Bradley terms, but &#39;</span>
-                          <span class="s">&#39;atoms </span><span class="si">%d</span><span class="s"> and </span><span class="si">%d</span><span class="s"> do not appear to be angled to each &#39;</span>
-                          <span class="s">&#39;other. Parameters will all be present, but may not &#39;</span>
-                          <span class="s">&#39;be in expected places.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">aj</span><span class="o">.</span><span class="n">idx</span><span class="p">),</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Adding what seems to be Urey-Bradley terms, but &#39;</span> <span class="c1"># pragma: no cover</span>
+                          <span class="s1">&#39;atoms </span><span class="si">%d</span><span class="s1"> and </span><span class="si">%d</span><span class="s1"> do not appear to be angled to each &#39;</span>
+                          <span class="s1">&#39;other. Parameters will all be present, but may not &#39;</span>
+                          <span class="s1">&#39;be in expected places.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">aj</span><span class="o">.</span><span class="n">idx</span><span class="p">),</span>
                           <span class="n">OpenMMWarning</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
             <span class="n">urey_type</span> <span class="o">=</span> <span class="n">typemap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -332,14 +327,14 @@
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">c5</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getTorsionParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
         <span class="n">ai</span><span class="p">,</span> <span class="n">aj</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
         <span class="n">ak</span><span class="p">,</span> <span class="n">al</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
-        <span class="c"># TODO -- Fix this when OpenMM is fixed</span>
+        <span class="c1"># TODO -- Fix this when OpenMM is fixed</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">c0</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">c1</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">c2</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span>
                    <span class="n">c3</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">c4</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">c5</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">c5</span><span class="p">)</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilojoules_per_mole</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="mi">1</span>                          <span class="c1"># pragma: no cover</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>             <span class="c1"># pragma: no cover</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">c5</span><span class="p">)</span> <span class="c1"># pragma: no cover</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilojoules_per_mole</span>      <span class="c1"># pragma: no cover</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
             <span class="n">dihed_type</span> <span class="o">=</span> <span class="n">typemap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -359,20 +354,20 @@
 <span class="sd">        Returns True if the energy expression is recognized as a quadratic</span>
 <span class="sd">        improper, and False otherwise</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">eqn</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getEnergyFunction</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
-    <span class="c"># Don&#39;t try to be fancy with regexes for fear of making a possible mistake.</span>
-    <span class="c"># ParmEd and OpenMM use only these two eqns for the improper torsions:</span>
-    <span class="c">#  k*(theta-theta0)^2 vs. 0.5*k*(theta-theta0)^2</span>
-    <span class="c"># So only recognize the above 2 forms</span>
-    <span class="k">if</span> <span class="n">eqn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;0.5*k*(theta-theta0)^2&#39;</span><span class="p">,</span> <span class="s">&#39;k*(theta-theta0)^2&#39;</span><span class="p">):</span>
+    <span class="n">eqn</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getEnergyFunction</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="c1"># Don&#39;t try to be fancy with regexes for fear of making a possible mistake.</span>
+    <span class="c1"># ParmEd and OpenMM use only these two eqns for the improper torsions:</span>
+    <span class="c1">#  k*(theta-theta0)^2 vs. 0.5*k*(theta-theta0)^2</span>
+    <span class="c1"># So only recognize the above 2 forms</span>
+    <span class="k">if</span> <span class="n">eqn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;0.5*k*(theta-theta0)^2&#39;</span><span class="p">,</span> <span class="s1">&#39;k*(theta-theta0)^2&#39;</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">if</span> <span class="n">eqn</span> <span class="o">==</span> <span class="s">&#39;0.5*k*(theta-theta0)^2&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">eqn</span> <span class="o">==</span> <span class="s1">&#39;0.5*k*(theta-theta0)^2&#39;</span><span class="p">:</span>
         <span class="n">fac</span> <span class="o">=</span> <span class="mf">0.5</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">fac</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">getNumTorsions</span><span class="p">()):</span>
-        <span class="c"># All formulations put k first and equilibrium angle second, in radians</span>
+        <span class="c1"># All formulations put k first and equilibrium angle second, in radians</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="p">(</span><span class="n">psi_k</span><span class="p">,</span> <span class="n">psi_eq</span><span class="p">)</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getTorsionParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
         <span class="n">ai</span><span class="p">,</span> <span class="n">aj</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
         <span class="n">ak</span><span class="p">,</span> <span class="n">al</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
@@ -390,25 +385,25 @@
 
 <span class="k">def</span> <span class="nf">_process_cmap</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Adds CMAPs to the structure &quot;&quot;&quot;</span>
-    <span class="c"># store the list of cmap types</span>
+    <span class="c1"># store the list of cmap types</span>
     <span class="n">cmap_types</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">getNumMaps</span><span class="p">()):</span>
         <span class="n">size</span><span class="p">,</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getMapParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
-        <span class="c"># Future-proof in case units start getting added to these maps</span>
+        <span class="c1"># Future-proof in case units start getting added to these maps</span>
         <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
-            <span class="n">typ</span> <span class="o">=</span> <span class="n">CmapType</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">CmapType</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>                       <span class="c1"># pragma: no cover</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">typ</span> <span class="o">=</span> <span class="n">CmapType</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">grid</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">)</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">CmapType</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">grid</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">)</span> <span class="c1"># pragma: no cover</span>
         <span class="n">cmap_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
         <span class="n">typ</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">typ</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">switch_range</span><span class="p">()</span>
         <span class="n">typ</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="c"># Add all cmaps</span>
+    <span class="c1"># Add all cmaps</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">getNumTorsions</span><span class="p">()):</span>
         <span class="n">mapidx</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ij</span><span class="p">,</span> <span class="n">ik</span><span class="p">,</span> <span class="n">il</span><span class="p">,</span> <span class="n">ji</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">jk</span><span class="p">,</span> <span class="n">jl</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getTorsionParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ij</span> <span class="o">!=</span> <span class="n">ji</span> <span class="ow">or</span> <span class="n">ik</span> <span class="o">!=</span> <span class="n">jj</span> <span class="ow">or</span> <span class="n">il</span> <span class="o">!=</span> <span class="n">jk</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Non-continuous CMAP torsions detected. Not &#39;</span>
-                          <span class="s">&#39;supported.&#39;</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
-            <span class="k">continue</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Non-continuous CMAP torsions detected. Not &#39;</span> <span class="c1"># pragma: no cover</span>
+                          <span class="s1">&#39;supported.&#39;</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
+            <span class="k">continue</span> <span class="c1"># pragma: no cover</span>
         <span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">,</span> <span class="n">ak</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ij</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span>
         <span class="n">al</span><span class="p">,</span> <span class="n">am</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">il</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">jl</span><span class="p">]</span>
         <span class="n">cmap_type</span> <span class="o">=</span> <span class="n">cmap_types</span><span class="p">[</span><span class="n">mapidx</span><span class="p">]</span>
@@ -423,7 +418,7 @@
     <span class="sd">&quot;&quot;&quot; Adds nonbonded parameters to the structure &quot;&quot;&quot;</span>
     <span class="n">typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">element_typemap</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">force</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="s">&quot;Atom # mismatch&quot;</span>
+    <span class="k">assert</span> <span class="n">force</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="s2">&quot;Atom # mismatch&quot;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
         <span class="n">atom</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">chg</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -433,11 +428,11 @@
             <span class="n">atom_type</span> <span class="o">=</span> <span class="n">typemap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">element_typemap</span><span class="p">[</span><span class="n">atype_name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">atype_name</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atype_name</span><span class="p">,</span> <span class="n">element_typemap</span><span class="p">[</span><span class="n">atype_name</span><span class="p">])</span>
-            <span class="n">atom_type</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">atype_name</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
-                                 <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)</span>
+            <span class="n">atype_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atype_name</span><span class="p">,</span> <span class="n">element_typemap</span><span class="p">[</span><span class="n">atype_name</span><span class="p">])</span>
+            <span class="n">typemap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_type</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="n">atype_name</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+                                                <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">chg</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">elementary_charge</span><span class="p">)</span>
-        <span class="n">rmin</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="c"># to rmin/2</span>
+        <span class="n">rmin</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="c1"># to rmin/2</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">)</span>
         <span class="n">atom_type</span><span class="o">.</span><span class="n">set_lj_params</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">rmin</span><span class="p">)</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span> <span class="o">=</span> <span class="n">atom_type</span>
@@ -447,11 +442,14 @@
     <span class="n">bond_graph_exceptions</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
-            <span class="n">bond_graph_exceptions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a2</span><span class="p">:</span>
+                <span class="n">bond_graph_exceptions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">a3</span> <span class="ow">in</span> <span class="n">a2</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
-                <span class="n">bond_graph_exceptions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a3</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">a3</span> <span class="ow">is</span> <span class="n">atom</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">atom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a3</span><span class="p">:</span>
+                    <span class="n">bond_graph_exceptions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a3</span><span class="p">)</span>
 
-    <span class="c"># TODO should we compress exception types?</span>
+    <span class="c1"># TODO should we compress exception types?</span>
     <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">()):</span>
         <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">elementary_charge</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
@@ -466,28 +464,29 @@
             <span class="n">chgscale</span> <span class="o">=</span> <span class="n">q</span> <span class="o">/</span> <span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">charge</span> <span class="o">*</span> <span class="n">aj</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">q</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Cannot scale charge product of 0 to match &#39;</span>
-                                <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">q</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot scale charge product of 0 to match &#39;</span>
+                                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">q</span><span class="p">)</span>
             <span class="n">chgscale</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">nbtype</span> <span class="o">=</span> <span class="n">NonbondedExceptionType</span><span class="p">(</span><span class="n">sig</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">),</span> <span class="n">eps</span><span class="p">,</span> <span class="n">chgscale</span><span class="p">)</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">adjusts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NonbondedException</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">nbtype</span><span class="p">))</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">adjust_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nbtype</span><span class="p">)</span>
     <span class="n">struct</span><span class="o">.</span><span class="n">adjust_types</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
 
-    <span class="c"># Check that all of our exceptions are accounted for</span>
+    <span class="c1"># Check that all of our exceptions are accounted for</span>
     <span class="k">for</span> <span class="n">ai</span><span class="p">,</span> <span class="n">exceptions</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">bond_graph_exceptions</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">exceptions</span> <span class="o">-</span> <span class="n">explicit_exceptions</span><span class="p">[</span><span class="n">ai</span><span class="p">]:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Detected incomplete exceptions. Not supported.&#39;</span><span class="p">,</span>
-                          <span class="n">OpenMMWarning</span><span class="p">)</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">unknown_functional</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Detected incomplete exceptions. Not supported.&#39;</span><span class="p">,</span>
+                          <span class="n">OpenMMWarning</span><span class="p">)</span>
+            <span class="k">break</span>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -504,7 +503,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -513,15 +512,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../openmm.html" >parmed.openmm</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

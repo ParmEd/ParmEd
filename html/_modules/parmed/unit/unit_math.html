@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
-    <link rel="up" title="parmed.unit" href="../unit.html" /> 
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,20 +37,18 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../unit.html" accesskey="U">parmed.unit</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.unit.unit_math</h1><div class="highlight"><pre>
-<span class="c">#!/bin/env python</span>
+<span></span><span class="ch">#!/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module simtk.unit.math</span>
 
@@ -86,17 +84,17 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 
-<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Christopher M. Bruns&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s">&quot;0.5&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Christopher M. Bruns&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.5&quot;</span>
 
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">.quantity</span> <span class="kn">import</span> <span class="n">is_quantity</span>
 <span class="kn">from</span> <span class="nn">.unit_definitions</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="c">####################</span>
-<span class="c">### TRIGONOMETRY ###</span>
-<span class="c">####################</span>
+<span class="c1">####################</span>
+<span class="c1">### TRIGONOMETRY ###</span>
+<span class="c1">####################</span>
 
 <div class="viewcode-block" id="sin"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.sin">[docs]</a><span class="k">def</span> <span class="nf">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -108,14 +106,14 @@
     <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="sinh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.sinh">[docs]</a><span class="k">def</span> <span class="nf">sinh</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sinh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="cos"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.cos">[docs]</a><span class="k">def</span> <span class="nf">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Examples</span>
@@ -126,26 +124,26 @@
     <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="cosh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.cosh">[docs]</a><span class="k">def</span> <span class="nf">cosh</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="tan"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.tan">[docs]</a><span class="k">def</span> <span class="nf">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="tanh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.tanh">[docs]</a><span class="k">def</span> <span class="nf">tanh</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">is_quantity</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">radians</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="acos"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.acos">[docs]</a><span class="k">def</span> <span class="nf">acos</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; acos(1.0)</span>
@@ -153,30 +151,30 @@
 <span class="sd">    &gt;&gt;&gt; print(acos(1.0))</span>
 <span class="sd">    0.0 rad</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
-</div>
-<div class="viewcode-block" id="acosh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.acosh">[docs]</a><span class="k">def</span> <span class="nf">acosh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acosh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
-</div>
-<div class="viewcode-block" id="asin"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.asin">[docs]</a><span class="k">def</span> <span class="nf">asin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">asin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
-</div>
-<div class="viewcode-block" id="asinh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.asinh">[docs]</a><span class="k">def</span> <span class="nf">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
-</div>
-<div class="viewcode-block" id="atan"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.atan">[docs]</a><span class="k">def</span> <span class="nf">atan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
-</div>
-<div class="viewcode-block" id="atanh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.atanh">[docs]</a><span class="k">def</span> <span class="nf">atanh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
-</div>
-<div class="viewcode-block" id="atan2"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.atan2">[docs]</a><span class="k">def</span> <span class="nf">atan2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
 
-<span class="c">###################</span>
-<span class="c">### SQUARE ROOT ###</span>
-<span class="c">###################</span>
-</div>
+<div class="viewcode-block" id="acosh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.acosh">[docs]</a><span class="k">def</span> <span class="nf">acosh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">acosh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
+
+<div class="viewcode-block" id="asin"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.asin">[docs]</a><span class="k">def</span> <span class="nf">asin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">asin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
+
+<div class="viewcode-block" id="asinh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.asinh">[docs]</a><span class="k">def</span> <span class="nf">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">asinh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
+
+<div class="viewcode-block" id="atan"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.atan">[docs]</a><span class="k">def</span> <span class="nf">atan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
+
+<div class="viewcode-block" id="atanh"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.atanh">[docs]</a><span class="k">def</span> <span class="nf">atanh</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
+
+<div class="viewcode-block" id="atan2"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.atan2">[docs]</a><span class="k">def</span> <span class="nf">atan2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">radians</span></div>
+
+<span class="c1">###################</span>
+<span class="c1">### SQUARE ROOT ###</span>
+<span class="c1">###################</span>
+
 <div class="viewcode-block" id="sqrt"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.sqrt">[docs]</a><span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; sqrt(9.0)</span>
@@ -193,12 +191,12 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 
-<span class="c">###########</span>
-<span class="c">### SUM ###</span>
-<span class="c">###########</span>
-</div>
+<span class="c1">###########</span>
+<span class="c1">### SUM ###</span>
+<span class="c1">###########</span>
+
 <div class="viewcode-block" id="sum"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.sum">[docs]</a><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; sum((1.0, 2.0))</span>
@@ -217,12 +215,12 @@
     <span class="n">result</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)):</span>
         <span class="n">result</span> <span class="o">+=</span> <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
-<span class="c">###################</span>
-<span class="c">### VECTOR MATH ###</span>
-<span class="c">###################</span>
-</div>
+<span class="c1">###################</span>
+<span class="c1">### VECTOR MATH ###</span>
+<span class="c1">###################</span>
+
 <div class="viewcode-block" id="dot"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.dot">[docs]</a><span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; dot((2, 3)*meter, (4, 5)*meter)</span>
@@ -231,18 +229,18 @@
     <span class="nb">sum</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
         <span class="nb">sum</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="k">return</span> <span class="nb">sum</span>
-</div>
+    <span class="k">return</span> <span class="nb">sum</span></div>
+
 <div class="viewcode-block" id="norm"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.unit_math.html#parmed.unit.unit_math.norm">[docs]</a><span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; norm((3, 4)*meter)</span>
 <span class="sd">    Quantity(value=5.0, unit=meter)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span></div>
 
-<span class="c"># run module directly for testing</span></div>
-<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c"># Test the examples in the docstrings</span>
+<span class="c1"># run module directly for testing</span>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Test the examples in the docstrings</span>
     <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">sys</span>
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">])</span>
 </pre></div>
@@ -250,9 +248,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -269,7 +267,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -278,15 +276,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../unit.html" >parmed.unit</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

@@ -21,10 +21,4 @@ parmed.topologyobjects.Improper
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~Improper.improp_type
-   
    

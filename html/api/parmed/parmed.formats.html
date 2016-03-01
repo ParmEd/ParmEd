@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-formats-package">
 <h1>parmed.formats package<a class="headerlink" href="#parmed-formats-package" title="Permalink to this headline">¶</a></h1>
@@ -100,7 +100,7 @@
 formats</p>
 <dl class="function">
 <dt id="parmed.formats.load_file">
-<tt class="descclassname">parmed.formats.</tt><tt class="descname">load_file</tt><big>(</big><em>filename</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#parmed.formats.load_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.formats.</code><code class="descname">load_file</code><span class="sig-paren">(</span><em>filename</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/registry.html#load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.load_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file format of the specified file and returns its parsed
 contents.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -117,19 +117,19 @@ loaded directly from its remote location on the web</p>
 <blockquote>
 <div><p>For some classes, such as the Mol2 file class, the default return object
 is not a Structure, but can be made to return a Structure if the
-<tt class="docutils literal"><span class="pre">structure=True</span></tt> keyword argument is passed. To facilitate writing
-easy code, the <tt class="docutils literal"><span class="pre">structure</span></tt> keyword is always processed and only passed
+<code class="docutils literal"><span class="pre">structure=True</span></code> keyword argument is passed. To facilitate writing
+easy code, the <code class="docutils literal"><span class="pre">structure</span></code> keyword is always processed and only passed
 on to the correct file parser if that parser accepts the structure
 keyword. There is no default, as each parser has its own default.</p>
 </div></blockquote>
 <p><strong>natom</strong> : int, optional</p>
 <blockquote>
 <div><p>This is needed for some coordinate file classes, but not others. This is
-treated the same as <tt class="docutils literal"><span class="pre">structure</span></tt>, above. It is the # of atoms expected</p>
+treated the same as <code class="docutils literal"><span class="pre">structure</span></code>, above. It is the # of atoms expected</p>
 </div></blockquote>
 <p><strong>hasbox</strong> : bool, optional</p>
 <blockquote>
-<div><p>Same as <tt class="docutils literal"><span class="pre">natom</span></tt>, but indicates whether the coordinate file has unit
+<div><p>Same as <code class="docutils literal"><span class="pre">natom</span></code>, but indicates whether the coordinate file has unit
 cell dimensions</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
@@ -152,7 +152,7 @@ associated with the file format being parsed</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>IOError</strong></p>
 <blockquote>
-<div><p>If <tt class="docutils literal"><span class="pre">filename</span></tt> does not exist</p>
+<div><p>If <code class="docutils literal"><span class="pre">filename</span></code> does not exist</p>
 </div></blockquote>
 <p><strong>parmed.exceptions.FormatNotFound</strong></p>
 <blockquote>
@@ -172,16 +172,16 @@ provided as keyword arguments in addition to the file name</p>
 applies both to local and remote files. The following names are supported:</p>
 <blockquote>
 <div><ul class="simple">
-<li><tt class="docutils literal"><span class="pre">.gz</span></tt> : gzip compressed file</li>
-<li><tt class="docutils literal"><span class="pre">.bz2</span></tt> : bzip2 compressed file</li>
+<li><code class="docutils literal"><span class="pre">.gz</span></code> : gzip compressed file</li>
+<li><code class="docutils literal"><span class="pre">.bz2</span></code> : bzip2 compressed file</li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.formats.PDBFile">
-<em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PDBFile</tt><a class="headerlink" href="#parmed.formats.PDBFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.</code><code class="descname">PDBFile</code><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -190,25 +190,25 @@ applies both to local and remote files. The following names are supported:</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.download" title="parmed.formats.PDBFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.download" title="parmed.formats.PDBFile.download"><code class="xref py py-obj docutils literal"><span class="pre">download</span></code></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
 <td>Goes to the wwPDB website and downloads the requested PDB, loading it</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.id_format" title="parmed.formats.PDBFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.id_format" title="parmed.formats.PDBFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.parse" title="parmed.formats.PDBFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.parse" title="parmed.formats.PDBFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
 <td>Read a PDB file and return a populated <cite>Structure</cite> class</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.write" title="parmed.formats.PDBFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.write" title="parmed.formats.PDBFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.PDBFile.download">
-<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><big>)</big><a class="headerlink" href="#parmed.formats.PDBFile.download" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">download</code><span class="sig-paren">(</span><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Goes to the wwPDB website and downloads the requested PDB, loading it
-as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance</p>
+as a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -228,11 +228,11 @@ Default is 10 seconds</p>
 file will be saved. If None (default), no PDB file will be written.
 This will be a verbatim copy of the downloaded PDB file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></tt></a></p>
+<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><code class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></code></a></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDB</p>
 </div></blockquote>
@@ -252,7 +252,7 @@ somewhat-stripped version you would get by using
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PDBFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDB file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -276,7 +276,7 @@ somewhat-stripped version you would get by using
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PDBFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDB file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -291,7 +291,7 @@ file.pdb.bz2)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by
@@ -305,13 +305,13 @@ default.</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PDBFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.formats.PDBFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDB file</p>
 </div></blockquote>
@@ -322,11 +322,11 @@ method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : bool, optional</p>
+<p><strong>renumber</strong> : bool, optional, default True</p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
-it was assigned previously. Default is True</p>
+it was assigned previously.</p>
 </div></blockquote>
 <p><strong>coordinates</strong> : array-like of float, optional</p>
 <blockquote>
@@ -336,13 +336,13 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : str, optional</p>
+<p><strong>altlocs</strong> : str, optional, default &#8216;all&#8217;</p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>&#8216;all&#8217; : (default) print all alternate locations</li>
+<li>&#8216;all&#8217; : print all alternate locations</li>
 <li>&#8216;first&#8217; : print only the first alternate locations</li>
 <li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
 conformers have the same occupancy, the first one to occur is
@@ -353,21 +353,21 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : bool, optional</p>
+<p><strong>write_anisou</strong> : bool, optional, default False</p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
-False, ANISOU records are not written. Default is False</p>
+False, ANISOU records are not written.</p>
 </div></blockquote>
-<p><strong>charmm</strong> : bool, optional</p>
+<p><strong>charmm</strong> : bool, optional, default False</p>
 <blockquote>
 <div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
-atom that does not contain a SEGID identifier. Default is False</p>
+atom that does not contain a SEGID identifier.</p>
 </div></blockquote>
-<p><strong>standard_resnames</strong> : bool, optional</p>
+<p><strong>standard_resnames</strong> : bool, optional, default False</p>
 <blockquote class="last">
 <div><p>If True, common aliases for various amino and nucleic acid residues
-will be converted into the PDB-standard values. Default is False</p>
+will be converted into the PDB-standard values.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -379,8 +379,8 @@ will be converted into the PDB-standard values. Default is False</p>
 
 <dl class="class">
 <dt id="parmed.formats.CIFFile">
-<em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">CIFFile</tt><a class="headerlink" href="#parmed.formats.CIFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.</code><code class="descname">CIFFile</code><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Standard PDBx/mmCIF file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -389,25 +389,25 @@ will be converted into the PDB-standard values. Default is False</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.download" title="parmed.formats.CIFFile.download"><tt class="xref py py-obj docutils literal"><span class="pre">download</span></tt></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.download" title="parmed.formats.CIFFile.download"><code class="xref py py-obj docutils literal"><span class="pre">download</span></code></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
 <td>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.id_format" title="parmed.formats.CIFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.id_format" title="parmed.formats.CIFFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDBx/mmCIF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.parse" title="parmed.formats.CIFFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.parse" title="parmed.formats.CIFFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
 <td>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.write" title="parmed.formats.CIFFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.write" title="parmed.formats.CIFFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.CIFFile.download">
-<em class="property">static </em><tt class="descname">download</tt><big>(</big><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><big>)</big><a class="headerlink" href="#parmed.formats.CIFFile.download" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">download</code><span class="sig-paren">(</span><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
-loading it as a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance</p>
+loading it as a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -427,11 +427,11 @@ Default is 10 seconds</p>
 file will be saved. If None (default), no CIF file will be written.
 This will be a verbatim copy of the downloaded CIF file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><tt class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></tt></a></p>
+<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><code class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></code></a></p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a></p>
 <blockquote>
 <div><p>Structure instance populated by the requested PDBx/mmCIF</p>
 </div></blockquote>
@@ -450,7 +450,7 @@ somewhat-stripped version you would get by using
 
 <dl class="staticmethod">
 <dt id="parmed.formats.CIFFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDBx/mmCIF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -474,13 +474,13 @@ somewhat-stripped version you would get by using
 
 <dl class="staticmethod">
 <dt id="parmed.formats.CIFFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
 <blockquote>
 <div><p>Name of PDB file to read, or a file-like object that can iterate
 over the lines of a PDB. Compressed file names can be specified and
@@ -490,7 +490,7 @@ file.pdb.bz2)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure1 [, structure2 [, structure3 [, ...] ] ]</p>
-<p><strong>structure#</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<p><strong>structure#</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDBx/mmCIF file.  No bonds or other topological features are
@@ -505,30 +505,30 @@ file, multiple Structure instances will be returned as a tuple.</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.CIFFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.formats.CIFFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDBx/mmCIF file</p>
 </div></blockquote>
-<p><strong>dest</strong> : <tt class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></tt></p>
+<p><strong>dest</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
 <blockquote>
 <div><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
 </div></blockquote>
-<p><strong>renumber</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>renumber</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
 it was assigned previously</p>
 </div></blockquote>
-<p><strong>coordinates</strong> : <tt class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></tt></p>
+<p><strong>coordinates</strong> : <code class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></p>
 <blockquote>
 <div><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
@@ -536,7 +536,7 @@ coordinates should line up with the atom order in the structure
 (not necessarily the order of the &#8220;original&#8221; PDB file if they
 differ)</p>
 </div></blockquote>
-<p><strong>altlocs</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>altlocs</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
@@ -553,7 +553,7 @@ printed</li>
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
 </div></blockquote>
-<p><strong>write_anisou</strong> : <tt class="docutils literal"><span class="pre">bool</span></tt></p>
+<p><strong>write_anisou</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
 <blockquote>
 <div><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
@@ -573,8 +573,8 @@ will be converted into the PDB-standard values. Default is False</p>
 
 <dl class="class">
 <dt id="parmed.formats.Mol2File">
-<em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">Mol2File</tt><a class="headerlink" href="#parmed.formats.Mol2File" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.</code><code class="descname">Mol2File</code><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Class to read and write TRIPOS Mol2 files</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -583,20 +583,20 @@ will be converted into the PDB-standard values. Default is False</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.id_format" title="parmed.formats.Mol2File.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.id_format" title="parmed.formats.Mol2File.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identify the file as a Mol2 (or Mol3) file format or not</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.Mol2File.parse" title="parmed.formats.Mol2File.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename[,&nbsp;structure])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.Mol2File.parse" title="parmed.formats.Mol2File.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;structure])</td>
 <td>Parses a mol2 file (or mol3) file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.write" title="parmed.formats.Mol2File.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;mol3,&nbsp;split])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.write" title="parmed.formats.Mol2File.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;mol3,&nbsp;split])</td>
 <td>Writes a mol2 file from a structure or residue template</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.Mol2File.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.Mol2File.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identify the file as a Mol2 (or Mol3) file format or not</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -620,7 +620,7 @@ will be converted into the PDB-standard values. Default is False</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.Mol2File.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em>, <em>structure=False</em><big>)</big><a class="headerlink" href="#parmed.formats.Mol2File.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>structure=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses a mol2 file (or mol3) file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -632,18 +632,18 @@ will be converted into the PDB-standard values. Default is False</p>
 </div></blockquote>
 <p><strong>structure</strong> : bool, optional</p>
 <blockquote>
-<div><p>If True, the return value is a <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> instance. If
-False, it is either a <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt> or
-<tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainter</span></tt> instance, depending on whether
+<div><p>If True, the return value is a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instance. If
+False, it is either a <code class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></code> or
+<code class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainter</span></code> instance, depending on whether
 there is one or more than one residue defined in it. Default is
 False</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>molecule</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt>, or</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>molecule</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>, <code class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></code>, or</p>
 <blockquote>
 <div><blockquote>
-<div><p><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></p>
+<div><p><code class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></code></p>
 </div></blockquote>
 <p>The molecule defined by this mol2 file</p>
 </div></blockquote>
@@ -654,7 +654,7 @@ False</p>
 <div><p>If the file format is not recognized or non-numeric values are
 present where integers or floating point numbers are expected. Also
 raises Mol2Error if you try to parse a mol2 file that has multiple
-&#64;&lt;MOLECULE&gt; entries with <tt class="docutils literal"><span class="pre">structure=True</span></tt>.</p>
+&#64;&lt;MOLECULE&gt; entries with <code class="docutils literal"><span class="pre">structure=True</span></code>.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -664,16 +664,16 @@ raises Mol2Error if you try to parse a mol2 file that has multiple
 
 <dl class="staticmethod">
 <dt id="parmed.formats.Mol2File.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>mol3=False</em>, <em>split=False</em><big>)</big><a class="headerlink" href="#parmed.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>mol3=False</em>, <em>split=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a mol2 file from a structure or residue template</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></tt> or</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> or <code class="xref py py-class docutils literal"><span class="pre">ResidueTemplate</span></code> or</p>
 <blockquote>
 <div><blockquote>
-<div><p><tt class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></tt></p>
+<div><p><code class="xref py py-class docutils literal"><span class="pre">ResidueTemplateContainer</span></code></p>
 </div></blockquote>
 <p>The input structure to write the mol2 file from</p>
 </div></blockquote>
@@ -683,12 +683,12 @@ raises Mol2Error if you try to parse a mol2 file that has multiple
 </div></blockquote>
 <p><strong>mol3</strong> : bool, optional</p>
 <blockquote>
-<div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplate or container, write
+<div><p>If True and <code class="docutils literal"><span class="pre">struct</span></code> is a ResidueTemplate or container, write
 HEAD/TAIL sections. Default is False</p>
 </div></blockquote>
 <p><strong>split</strong> : bool, optional</p>
 <blockquote class="last">
-<div><p>If True and <tt class="docutils literal"><span class="pre">struct</span></tt> is a ResidueTemplateContainer or a Structure
+<div><p>If True and <code class="docutils literal"><span class="pre">struct</span></code> is a ResidueTemplateContainer or a Structure
 with multiple residues, each residue is printed in a separate
 &#64;&lt;MOLECULE&gt; section that appear sequentially in the output file</p>
 </div></blockquote>
@@ -702,13 +702,13 @@ with multiple residues, each residue is printed in a separate
 
 <dl class="class">
 <dt id="parmed.formats.PSFFile">
-<em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PSFFile</tt><a class="headerlink" href="#parmed.formats.PSFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.</code><code class="descname">PSFFile</code><a class="reference internal" href="../../_modules/parmed/formats/psf.html#PSFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PSFFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>CHARMM- or XPLOR-style PSF file parser and writer. This class is
 specifically a holder for the writing functionality and a vessel for
 automatic file type detection. If you wish to instantiate a PSF file
-directly, use <a class="reference internal" href="parmed.charmm.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><tt class="xref py py-class docutils literal"><span class="pre">parmed.charmm.CharmmPsfFile</span></tt></a> or the
-<a class="reference internal" href="#parmed.formats.load_file" title="parmed.formats.load_file"><tt class="xref py py-func docutils literal"><span class="pre">parmed.formats.load_file()</span></tt></a> function instead.</p>
+directly, use <a class="reference internal" href="../../charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><code class="xref py py-class docutils literal"><span class="pre">parmed.charmm.CharmmPsfFile</span></code></a> or the
+<a class="reference internal" href="#parmed.formats.load_file" title="parmed.formats.load_file"><code class="xref py py-func docutils literal"><span class="pre">parmed.formats.load_file()</span></code></a> function instead.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -716,20 +716,20 @@ directly, use <a class="reference internal" href="parmed.charmm.html#parmed.char
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PSFFile.id_format" title="parmed.formats.PSFFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PSFFile.id_format" title="parmed.formats.PSFFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a CHARMM PSF file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PSFFile.parse" title="parmed.formats.PSFFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PSFFile.parse" title="parmed.formats.PSFFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
 <td>Read a CHARMM- or XPLOR-style PSF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PSFFile.write" title="parmed.formats.PSFFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PSFFile.write" title="parmed.formats.PSFFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.PSFFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PSFFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/psf.html#PSFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PSFFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a CHARMM PSF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -753,7 +753,7 @@ directly, use <a class="reference internal" href="parmed.charmm.html#parmed.char
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PSFFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PSFFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/psf.html#PSFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PSFFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a CHARMM- or XPLOR-style PSF file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -765,7 +765,7 @@ directly, use <a class="reference internal" href="parmed.charmm.html#parmed.char
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>psf_file</strong> : <tt class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></tt></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>psf_file</strong> : <code class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></code></p>
 <blockquote class="last">
 <div><p>The PSF file instance with all information loaded</p>
 </div></blockquote>
@@ -777,13 +777,13 @@ directly, use <a class="reference internal" href="parmed.charmm.html#parmed.char
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PSFFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>vmd=False</em><big>)</big><a class="headerlink" href="#parmed.formats.PSFFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>vmd=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/psf.html#PSFFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PSFFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a PSF file from the stored molecule</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The Structure instance from which the PSF should be written</p>
 </div></blockquote>
@@ -804,8 +804,8 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -814,8 +814,8 @@ closed</p>
 
 <dl class="class">
 <dt id="parmed.formats.PQRFile">
-<em class="property">class </em><tt class="descclassname">parmed.formats.</tt><tt class="descname">PQRFile</tt><a class="headerlink" href="#parmed.formats.PQRFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.formats.</code><code class="descname">PQRFile</code><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PQRFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -824,20 +824,20 @@ closed</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.id_format" title="parmed.formats.PQRFile.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.id_format" title="parmed.formats.PQRFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PQRFile.parse" title="parmed.formats.PQRFile.parse"><tt class="xref py py-obj docutils literal"><span class="pre">parse</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PQRFile.parse" title="parmed.formats.PQRFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
 <td>Read a PQR file and return a populated <cite>Structure</cite> class</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.write" title="parmed.formats.PQRFile.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.write" title="parmed.formats.PQRFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
 </tbody>
 </table>
 <dl class="staticmethod">
 <dt id="parmed.formats.PQRFile.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PQRFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PQRFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDB file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -861,7 +861,7 @@ closed</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PQRFile.parse">
-<em class="property">static </em><tt class="descname">parse</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.formats.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PQR file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -876,7 +876,7 @@ file.pqr.bz2)</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote class="last">
 <div><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by
@@ -890,13 +890,13 @@ default.</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PQRFile.write">
-<em class="property">static </em><tt class="descname">write</tt><big>(</big><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>standard_resnames=False</em><big>)</big><a class="headerlink" href="#parmed.formats.PQRFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PQRFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <tt class="xref py py-class docutils literal"><span class="pre">Structure</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
 <blockquote>
 <div><p>The structure from which to write the PDB file</p>
 </div></blockquote>
@@ -941,7 +941,7 @@ will be converted into the PDB-standard values. Default is False</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
@@ -955,12 +955,14 @@ will be converted into the PDB-standard values. Default is False</p>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.formats.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.formats.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -977,7 +979,7 @@ will be converted into the PDB-standard values. Default is False</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -986,12 +988,12 @@ will be converted into the PDB-standard values. Default is False</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

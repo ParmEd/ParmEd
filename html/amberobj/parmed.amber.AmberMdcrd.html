@@ -23,13 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
-    <link rel="up" title="The parmed.amber package" href="../amber.html" />
-    <link rel="prev" title="parmed.amber.netcdffiles.use" href="parmed.amber.netcdffiles.use.html" /> 
+    <link rel="up" title="The parmed.amber package" href="../amber.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -38,24 +37,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="parmed.amber.netcdffiles.use.html" title="parmed.amber.netcdffiles.use"
-             accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" accesskey="U">The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../amber.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.amber</span></code> package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-amber-ambermdcrd">
 <h1>parmed.amber.AmberMdcrd<a class="headerlink" href="#parmed-amber-ambermdcrd" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.amber.AmberMdcrd">
-<em class="property">class </em><tt class="descclassname">parmed.amber.</tt><tt class="descname">AmberMdcrd</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.amber.</code><code class="descname">AmberMdcrd</code><span class="sig-paren">(</span><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/asciicrd.html#AmberMdcrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberMdcrd" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to parse Amber ASCII trajectory files. This is <em>much</em> slower than
 parsing NetCDF files (or the equivalent parsing done in a compiled language
 like C or C++). For large trajectories, this may be significant.</p>
@@ -66,16 +62,16 @@ like C or C++). For large trajectories, this may be significant.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.frame" title="parmed.amber.AmberMdcrd.frame"><tt class="xref py py-obj docutils literal"><span class="pre">frame</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.frame" title="parmed.amber.AmberMdcrd.frame"><code class="xref py py-obj docutils literal"><span class="pre">frame</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.positions" title="parmed.amber.AmberMdcrd.positions"><tt class="xref py py-obj docutils literal"><span class="pre">positions</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.positions" title="parmed.amber.AmberMdcrd.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -87,23 +83,23 @@ like C or C++). For large trajectories, this may be significant.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><code class="xref py py-obj docutils literal"><span class="pre">add_box</span></code></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></code></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
 <td>Close the open file handler</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.id_format" title="parmed.amber.AmberMdcrd.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.id_format" title="parmed.amber.AmberMdcrd.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an Amber mdcrd file</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.AmberMdcrd.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberMdcrd.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -113,25 +109,19 @@ like C or C++). For large trajectories, this may be significant.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.__init__" title="parmed.amber.AmberMdcrd.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(fname,&nbsp;natom,&nbsp;hasbox[,&nbsp;mode,&nbsp;title])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberMdcrd.__init__" title="parmed.amber.AmberMdcrd.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(fname,&nbsp;natom,&nbsp;hasbox[,&nbsp;mode,&nbsp;title])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><tt class="xref py py-obj docutils literal"><span class="pre">add_box</span></tt></a>(stuff)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><code class="xref py py-obj docutils literal"><span class="pre">add_box</span></code></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></tt></a>(stuff)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></code></a>(stuff)</td>
 <td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><tt class="xref py py-obj docutils literal"><span class="pre">box</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.close" title="parmed.amber.AmberMdcrd.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
 <td>Close the open file handler</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><tt class="xref py py-obj docutils literal"><span class="pre">coordinates</span></tt></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.id_format" title="parmed.amber.AmberMdcrd.id_format"><tt class="xref py py-obj docutils literal"><span class="pre">id_format</span></tt></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.id_format" title="parmed.amber.AmberMdcrd.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an Amber mdcrd file</td>
 </tr>
 </tbody>
@@ -143,20 +133,32 @@ like C or C++). For large trajectories, this may be significant.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.CRDS_PER_LINE" title="parmed.amber.AmberMdcrd.CRDS_PER_LINE"><tt class="xref py py-obj docutils literal"><span class="pre">CRDS_PER_LINE</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.CRDS_PER_LINE" title="parmed.amber.AmberMdcrd.CRDS_PER_LINE"><code class="xref py py-obj docutils literal"><span class="pre">CRDS_PER_LINE</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.DEFAULT_TITLE" title="parmed.amber.AmberMdcrd.DEFAULT_TITLE"><tt class="xref py py-obj docutils literal"><span class="pre">DEFAULT_TITLE</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.DEFAULT_TITLE" title="parmed.amber.AmberMdcrd.DEFAULT_TITLE"><code class="xref py py-obj docutils literal"><span class="pre">DEFAULT_TITLE</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.extra_args" title="parmed.amber.AmberMdcrd.extra_args"><tt class="xref py py-obj docutils literal"><span class="pre">extra_args</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.extra_args" title="parmed.amber.AmberMdcrd.extra_args"><code class="xref py py-obj docutils literal"><span class="pre">extra_args</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.frame" title="parmed.amber.AmberMdcrd.frame"><code class="xref py py-obj docutils literal"><span class="pre">frame</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.positions" title="parmed.amber.AmberMdcrd.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.AmberMdcrd.add_box">
-<tt class="descname">add_box</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.add_box" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_box</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/asciicrd.html#AmberMdcrd.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberMdcrd.add_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or
 np.ndarray) as the box lengths for this frame</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -181,7 +183,7 @@ np.ndarray) as the box lengths for this frame</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberMdcrd.add_coordinates">
-<tt class="descname">add_coordinates</tt><big>(</big><em>stuff</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.add_coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_coordinates</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/asciicrd.html#AmberMdcrd.add_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberMdcrd.add_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an
 attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the
 open file handler. Can only be called on a &#8216;new&#8217; mdcrd, and adds these
@@ -210,13 +212,13 @@ be flattened to a 3*natom-length array</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberMdcrd.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.close" title="Permalink to this definition">¶</a></dt>
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberMdcrd.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close the open file handler</p>
 </dd></dl>
 
 <dl class="staticmethod">
 <dt id="parmed.amber.AmberMdcrd.id_format">
-<em class="property">static </em><tt class="descname">id_format</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#parmed.amber.AmberMdcrd.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/amber/asciicrd.html#AmberMdcrd.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberMdcrd.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as an Amber mdcrd file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -246,14 +248,16 @@ be flattened to a 3*natom-length array</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/amberobj/parmed.amber.AmberMdcrd.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/amberobj/parmed.amber.AmberMdcrd.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -270,7 +274,7 @@ be flattened to a 3*natom-length array</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -279,16 +283,13 @@ be flattened to a 3*natom-length array</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="parmed.amber.netcdffiles.use.html" title="parmed.amber.netcdffiles.use"
-             >previous</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../amber.html" >The <tt class="docutils literal"><span class="pre">parmed.amber</span></tt> package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../amber.html" >The <code class="docutils literal"><span class="pre">parmed.amber</span></code> package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

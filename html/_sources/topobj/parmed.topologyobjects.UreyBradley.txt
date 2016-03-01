@@ -20,10 +20,4 @@ parmed.topologyobjects.UreyBradley
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~UreyBradley.ub_type
-   
    

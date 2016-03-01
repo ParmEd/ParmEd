@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,14 +36,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-amber-mdin-package">
 <h1>parmed.amber.mdin package<a class="headerlink" href="#parmed-amber-mdin-package" title="Permalink to this headline">¶</a></h1>
@@ -63,16 +63,10 @@
 </div>
 <div class="section" id="module-parmed.amber.mdin">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-parmed.amber.mdin" title="Permalink to this headline">¶</a></h2>
-<dl class="attribute">
-<dt id="parmed.amber.mdin.mdin">
-<tt class="descclassname">parmed.amber.mdin.</tt><tt class="descname">mdin</tt><a class="headerlink" href="#parmed.amber.mdin.mdin" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#parmed.amber.mdin.Mdin" title="parmed.amber.mdin.Mdin"><tt class="xref py py-class docutils literal"><span class="pre">Mdin</span></tt></a></p>
-</dd></dl>
-
 <dl class="class">
 <dt id="parmed.amber.mdin.Mdin">
-<em class="property">class </em><tt class="descclassname">parmed.amber.mdin.</tt><tt class="descname">Mdin</tt><big>(</big><em>program='sander'</em>, <em>verbosity=1</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<em class="property">class </em><code class="descclassname">parmed.amber.mdin.</code><code class="descname">Mdin</code><span class="sig-paren">(</span><em>program='sander'</em>, <em>verbosity=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -80,159 +74,159 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.AddCard" title="parmed.amber.mdin.Mdin.AddCard"><tt class="xref py py-obj docutils literal"><span class="pre">AddCard</span></tt></a>([title,&nbsp;cardString])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.AddCard" title="parmed.amber.mdin.Mdin.AddCard"><code class="xref py py-obj docutils literal"><span class="pre">AddCard</span></code></a>([title,&nbsp;cardString])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.SHAKE" title="parmed.amber.mdin.Mdin.SHAKE"><tt class="xref py py-obj docutils literal"><span class="pre">SHAKE</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.SHAKE" title="parmed.amber.mdin.Mdin.SHAKE"><code class="xref py py-obj docutils literal"><span class="pre">SHAKE</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.TI" title="parmed.amber.mdin.Mdin.TI"><tt class="xref py py-obj docutils literal"><span class="pre">TI</span></tt></a>([clambda])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.TI" title="parmed.amber.mdin.Mdin.TI"><code class="xref py py-obj docutils literal"><span class="pre">TI</span></code></a>([clambda])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.change" title="parmed.amber.mdin.Mdin.change"><tt class="xref py py-obj docutils literal"><span class="pre">change</span></tt></a>(namelist,&nbsp;variable,&nbsp;value)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.change" title="parmed.amber.mdin.Mdin.change"><code class="xref py py-obj docutils literal"><span class="pre">change</span></code></a>(namelist,&nbsp;variable,&nbsp;value)</td>
 <td>Change the value of a variable without adding a new key-pair</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.check" title="parmed.amber.mdin.Mdin.check"><tt class="xref py py-obj docutils literal"><span class="pre">check</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.check" title="parmed.amber.mdin.Mdin.check"><code class="xref py py-obj docutils literal"><span class="pre">check</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constPressure" title="parmed.amber.mdin.Mdin.constPressure"><tt class="xref py py-obj docutils literal"><span class="pre">constPressure</span></tt></a>([press,&nbsp;taup])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constPressure" title="parmed.amber.mdin.Mdin.constPressure"><code class="xref py py-obj docutils literal"><span class="pre">constPressure</span></code></a>([press,&nbsp;taup])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constTemp" title="parmed.amber.mdin.Mdin.constTemp"><tt class="xref py py-obj docutils literal"><span class="pre">constTemp</span></tt></a>([ntt,&nbsp;temp,&nbsp;gamma_ln,&nbsp;ig,&nbsp;tautp])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constTemp" title="parmed.amber.mdin.Mdin.constTemp"><code class="xref py py-obj docutils literal"><span class="pre">constTemp</span></code></a>([ntt,&nbsp;temp,&nbsp;gamma_ln,&nbsp;ig,&nbsp;tautp])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constVolume" title="parmed.amber.mdin.Mdin.constVolume"><tt class="xref py py-obj docutils literal"><span class="pre">constVolume</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constVolume" title="parmed.amber.mdin.Mdin.constVolume"><code class="xref py py-obj docutils literal"><span class="pre">constVolume</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constpH" title="parmed.amber.mdin.Mdin.constpH"><tt class="xref py py-obj docutils literal"><span class="pre">constpH</span></tt></a>([solvph,&nbsp;igb,&nbsp;ntcnstph])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.constpH" title="parmed.amber.mdin.Mdin.constpH"><code class="xref py py-obj docutils literal"><span class="pre">constpH</span></code></a>([solvph,&nbsp;igb,&nbsp;ntcnstph])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.genBorn" title="parmed.amber.mdin.Mdin.genBorn"><tt class="xref py py-obj docutils literal"><span class="pre">genBorn</span></tt></a>([igb,&nbsp;rgbmax])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.genBorn" title="parmed.amber.mdin.Mdin.genBorn"><code class="xref py py-obj docutils literal"><span class="pre">genBorn</span></code></a>([igb,&nbsp;rgbmax])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.heat" title="parmed.amber.mdin.Mdin.heat"><tt class="xref py py-obj docutils literal"><span class="pre">heat</span></tt></a>([tempi,&nbsp;temp0,&nbsp;ntt,&nbsp;tautp,&nbsp;ig,&nbsp;gamma_ln])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.heat" title="parmed.amber.mdin.Mdin.heat"><code class="xref py py-obj docutils literal"><span class="pre">heat</span></code></a>([tempi,&nbsp;temp0,&nbsp;ntt,&nbsp;tautp,&nbsp;ig,&nbsp;gamma_ln])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.minimization" title="parmed.amber.mdin.Mdin.minimization"><tt class="xref py py-obj docutils literal"><span class="pre">minimization</span></tt></a>([imin,&nbsp;maxcyc,&nbsp;ncyc,&nbsp;ntmin])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.minimization" title="parmed.amber.mdin.Mdin.minimization"><code class="xref py py-obj docutils literal"><span class="pre">minimization</span></code></a>([imin,&nbsp;maxcyc,&nbsp;ncyc,&nbsp;ntmin])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.read" title="parmed.amber.mdin.Mdin.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>([filename])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.read" title="parmed.amber.mdin.Mdin.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>([filename])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.restart" title="parmed.amber.mdin.Mdin.restart"><tt class="xref py py-obj docutils literal"><span class="pre">restart</span></tt></a>([ntx])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.restart" title="parmed.amber.mdin.Mdin.restart"><code class="xref py py-obj docutils literal"><span class="pre">restart</span></code></a>([ntx])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.restrainBackbone" title="parmed.amber.mdin.Mdin.restrainBackbone"><tt class="xref py py-obj docutils literal"><span class="pre">restrainBackbone</span></tt></a>([restraint_wt])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.restrainBackbone" title="parmed.amber.mdin.Mdin.restrainBackbone"><code class="xref py py-obj docutils literal"><span class="pre">restrainBackbone</span></code></a>([restraint_wt])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.restrainHeavyAtoms" title="parmed.amber.mdin.Mdin.restrainHeavyAtoms"><tt class="xref py py-obj docutils literal"><span class="pre">restrainHeavyAtoms</span></tt></a>([restraint_wt])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.restrainHeavyAtoms" title="parmed.amber.mdin.Mdin.restrainHeavyAtoms"><code class="xref py py-obj docutils literal"><span class="pre">restrainHeavyAtoms</span></code></a>([restraint_wt])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.softcore_TI" title="parmed.amber.mdin.Mdin.softcore_TI"><tt class="xref py py-obj docutils literal"><span class="pre">softcore_TI</span></tt></a>([scalpha,&nbsp;scmask,&nbsp;crgmask,&nbsp;logdvdl])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.softcore_TI" title="parmed.amber.mdin.Mdin.softcore_TI"><code class="xref py py-obj docutils literal"><span class="pre">softcore_TI</span></code></a>([scalpha,&nbsp;scmask,&nbsp;crgmask,&nbsp;logdvdl])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.time" title="parmed.amber.mdin.Mdin.time"><tt class="xref py py-obj docutils literal"><span class="pre">time</span></tt></a>([time,&nbsp;dt])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.time" title="parmed.amber.mdin.Mdin.time"><code class="xref py py-obj docutils literal"><span class="pre">time</span></code></a>([time,&nbsp;dt])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.write" title="parmed.amber.mdin.Mdin.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>([filename])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.mdin.Mdin.write" title="parmed.amber.mdin.Mdin.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>([filename])</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.AddCard">
-<tt class="descname">AddCard</tt><big>(</big><em>title='Residues in card'</em>, <em>cardString='RES 1'</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.AddCard" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AddCard</code><span class="sig-paren">(</span><em>title='Residues in card'</em>, <em>cardString='RES 1'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.AddCard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.AddCard" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.SHAKE">
-<tt class="descname">SHAKE</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.SHAKE" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SHAKE</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.SHAKE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.SHAKE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.TI">
-<tt class="descname">TI</tt><big>(</big><em>clambda=0.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.TI" title="Permalink to this definition">¶</a></dt>
+<code class="descname">TI</code><span class="sig-paren">(</span><em>clambda=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.TI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.TI" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.change">
-<tt class="descname">change</tt><big>(</big><em>namelist</em>, <em>variable</em>, <em>value</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.change" title="Permalink to this definition">¶</a></dt>
+<code class="descname">change</code><span class="sig-paren">(</span><em>namelist</em>, <em>variable</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.change" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the value of a variable without adding a new key-pair</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.check">
-<tt class="descname">check</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.check" title="Permalink to this definition">¶</a></dt>
+<code class="descname">check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.check" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.constPressure">
-<tt class="descname">constPressure</tt><big>(</big><em>press=1.0</em>, <em>taup=1.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.constPressure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">constPressure</code><span class="sig-paren">(</span><em>press=1.0</em>, <em>taup=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.constPressure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.constPressure" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.constTemp">
-<tt class="descname">constTemp</tt><big>(</big><em>ntt=3</em>, <em>temp=300.0</em>, <em>gamma_ln=2.0</em>, <em>ig=-1</em>, <em>tautp=1.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.constTemp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">constTemp</code><span class="sig-paren">(</span><em>ntt=3</em>, <em>temp=300.0</em>, <em>gamma_ln=2.0</em>, <em>ig=-1</em>, <em>tautp=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.constTemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.constTemp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.constVolume">
-<tt class="descname">constVolume</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.constVolume" title="Permalink to this definition">¶</a></dt>
+<code class="descname">constVolume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.constVolume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.constVolume" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.constpH">
-<tt class="descname">constpH</tt><big>(</big><em>solvph=7.0</em>, <em>igb=2</em>, <em>ntcnstph=10</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.constpH" title="Permalink to this definition">¶</a></dt>
+<code class="descname">constpH</code><span class="sig-paren">(</span><em>solvph=7.0</em>, <em>igb=2</em>, <em>ntcnstph=10</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.constpH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.constpH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.genBorn">
-<tt class="descname">genBorn</tt><big>(</big><em>igb=5</em>, <em>rgbmax=25.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.genBorn" title="Permalink to this definition">¶</a></dt>
+<code class="descname">genBorn</code><span class="sig-paren">(</span><em>igb=5</em>, <em>rgbmax=25.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.genBorn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.genBorn" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.heat">
-<tt class="descname">heat</tt><big>(</big><em>tempi=0.0</em>, <em>temp0=300.0</em>, <em>ntt=3</em>, <em>tautp=5.0</em>, <em>ig=-1</em>, <em>gamma_ln=5.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.heat" title="Permalink to this definition">¶</a></dt>
+<code class="descname">heat</code><span class="sig-paren">(</span><em>tempi=0.0</em>, <em>temp0=300.0</em>, <em>ntt=3</em>, <em>tautp=5.0</em>, <em>ig=-1</em>, <em>gamma_ln=5.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.heat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.minimization">
-<tt class="descname">minimization</tt><big>(</big><em>imin=1</em>, <em>maxcyc=1</em>, <em>ncyc=10</em>, <em>ntmin=1</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.minimization" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimization</code><span class="sig-paren">(</span><em>imin=1</em>, <em>maxcyc=1</em>, <em>ncyc=10</em>, <em>ntmin=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.minimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.minimization" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.read">
-<tt class="descname">read</tt><big>(</big><em>filename='mdin'</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.read" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read</code><span class="sig-paren">(</span><em>filename='mdin'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.read" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.restart">
-<tt class="descname">restart</tt><big>(</big><em>ntx=5</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.restart" title="Permalink to this definition">¶</a></dt>
+<code class="descname">restart</code><span class="sig-paren">(</span><em>ntx=5</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.restart" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.restrainBackbone">
-<tt class="descname">restrainBackbone</tt><big>(</big><em>restraint_wt=0.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.restrainBackbone" title="Permalink to this definition">¶</a></dt>
+<code class="descname">restrainBackbone</code><span class="sig-paren">(</span><em>restraint_wt=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.restrainBackbone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.restrainBackbone" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.restrainHeavyAtoms">
-<tt class="descname">restrainHeavyAtoms</tt><big>(</big><em>restraint_wt=0.0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.restrainHeavyAtoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">restrainHeavyAtoms</code><span class="sig-paren">(</span><em>restraint_wt=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.restrainHeavyAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.restrainHeavyAtoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.softcore_TI">
-<tt class="descname">softcore_TI</tt><big>(</big><em>scalpha=0.5</em>, <em>scmask=''</em>, <em>crgmask=''</em>, <em>logdvdl=0</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.softcore_TI" title="Permalink to this definition">¶</a></dt>
+<code class="descname">softcore_TI</code><span class="sig-paren">(</span><em>scalpha=0.5</em>, <em>scmask=''</em>, <em>crgmask=''</em>, <em>logdvdl=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.softcore_TI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.softcore_TI" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.time">
-<tt class="descname">time</tt><big>(</big><em>time=1000.0</em>, <em>dt=-1</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.time" title="Permalink to this definition">¶</a></dt>
+<code class="descname">time</code><span class="sig-paren">(</span><em>time=1000.0</em>, <em>dt=-1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.time" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.mdin.Mdin.write">
-<tt class="descname">write</tt><big>(</big><em>filename='mdin'</em><big>)</big><a class="headerlink" href="#parmed.amber.mdin.Mdin.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>filename='mdin'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/mdin/mdin.html#Mdin.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.mdin.Mdin.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -244,7 +238,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
@@ -255,12 +249,14 @@
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.amber.mdin.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.amber.mdin.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -277,7 +273,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -286,12 +282,12 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

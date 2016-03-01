@@ -23,11 +23,11 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,27 +36,27 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-parmed.utils.pandautils">
 <span id="parmed-utils-pandautils-module"></span><h1>parmed.utils.pandautils module<a class="headerlink" href="#module-parmed.utils.pandautils" title="Permalink to this headline">¶</a></h1>
 <p>A collection of utilities for use with Pandas objects</p>
 <dl class="function">
 <dt id="parmed.utils.pandautils.create_dataframe">
-<tt class="descclassname">parmed.utils.pandautils.</tt><tt class="descname">create_dataframe</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#create_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.create_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.utils.pandautils.</code><code class="descname">create_dataframe</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#create_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.create_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a pandas.DataFrame object from the current instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <tt class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></tt></td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -64,7 +64,7 @@
 <p>The DataFrame will be over all atoms. The columns will be the attributes
 of the atom (as well as its containing residue). Some columns will
 <em>always</em> exist. Others will only exist if those attributes have been set
-on the Atom instances (see the <tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt> docs for possible
+on the Atom instances (see the <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code> docs for possible
 attributes and their meaning). The columns that will always be present
 are:</p>
 <blockquote>
@@ -76,7 +76,7 @@ are:</p>
 <li>charge : float</li>
 <li>mass : float</li>
 <li>nb_idx : int</li>
-<li>radii : float</li>
+<li>solvent_radius : float</li>
 <li>screen : float</li>
 <li>occupancy : float</li>
 <li>bfactor : float</li>
@@ -130,7 +130,7 @@ the original file defining the structure:</p>
 
 <dl class="function">
 <dt id="parmed.utils.pandautils.load_dataframe">
-<tt class="descclassname">parmed.utils.pandautils.</tt><tt class="descname">load_dataframe</tt><big>(</big><em>obj</em>, <em>dataframe</em><big>)</big><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#load_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.utils.pandautils.</code><code class="descname">load_dataframe</code><span class="sig-paren">(</span><em>obj</em>, <em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#load_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.load_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a DataFrame into the current object, setting atomic properties based
 on the entries of the DataFrame.  Supported atomic properties are:</p>
 <blockquote>
@@ -142,7 +142,7 @@ on the entries of the DataFrame.  Supported atomic properties are:</p>
 <li>charge : float</li>
 <li>mass : float</li>
 <li>nb_idx : int</li>
-<li>radii : float</li>
+<li>solvent_radius : float</li>
 <li>screen : float</li>
 <li>occupancy : float</li>
 <li>bfactor : float</li>
@@ -193,14 +193,16 @@ attributes emit a ParameterWarning</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/api/parmed/parmed.utils.pandautils.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.utils.pandautils.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -217,7 +219,7 @@ attributes emit a ParameterWarning</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -226,12 +228,12 @@ attributes emit a ParameterWarning</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

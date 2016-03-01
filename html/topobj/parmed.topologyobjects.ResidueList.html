@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +37,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-topologyobjects-residuelist">
 <h1>parmed.topologyobjects.ResidueList<a class="headerlink" href="#parmed-topologyobjects-residuelist" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.topologyobjects.ResidueList">
-<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">ResidueList</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#ResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">ResidueList</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#ResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Array of <cite>Residue</cite> instances</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -60,53 +60,53 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.add_atom" title="parmed.topologyobjects.ResidueList.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.add_atom" title="parmed.topologyobjects.ResidueList.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the ResidueList, adding a new residue to this list if</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.append" title="parmed.topologyobjects.ResidueList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.append" title="parmed.topologyobjects.ResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.claim" title="parmed.topologyobjects.ResidueList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.claim" title="parmed.topologyobjects.ResidueList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.count" title="parmed.topologyobjects.ResidueList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.count" title="parmed.topologyobjects.ResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.extend" title="parmed.topologyobjects.ResidueList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.extend" title="parmed.topologyobjects.ResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index" title="parmed.topologyobjects.ResidueList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index" title="parmed.topologyobjects.ResidueList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index_members" title="parmed.topologyobjects.ResidueList.index_members"><tt class="xref py py-obj docutils literal"><span class="pre">index_members</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index_members" title="parmed.topologyobjects.ResidueList.index_members"><code class="xref py py-obj docutils literal"><span class="pre">index_members</span></code></a>()</td>
 <td>Assigns the idx variable for every member of this list to its place in</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.insert" title="parmed.topologyobjects.ResidueList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.insert" title="parmed.topologyobjects.ResidueList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.pop" title="parmed.topologyobjects.ResidueList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.pop" title="parmed.topologyobjects.ResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune" title="parmed.topologyobjects.ResidueList.prune"><tt class="xref py py-obj docutils literal"><span class="pre">prune</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune" title="parmed.topologyobjects.ResidueList.prune"><code class="xref py py-obj docutils literal"><span class="pre">prune</span></code></a>()</td>
 <td>This function goes through the residue list and removes all empty residues from the list.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune_unused" title="parmed.topologyobjects.ResidueList.prune_unused"><tt class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune_unused" title="parmed.topologyobjects.ResidueList.prune_unused"><code class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></code></a>()</td>
 <td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.remove" title="parmed.topologyobjects.ResidueList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.remove" title="parmed.topologyobjects.ResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.reverse" title="parmed.topologyobjects.ResidueList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.reverse" title="parmed.topologyobjects.ResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -116,83 +116,83 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.__init__" title="parmed.topologyobjects.ResidueList.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.__init__" title="parmed.topologyobjects.ResidueList.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(*args)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.add_atom" title="parmed.topologyobjects.ResidueList.add_atom"><tt class="xref py py-obj docutils literal"><span class="pre">add_atom</span></tt></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.add_atom" title="parmed.topologyobjects.ResidueList.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the ResidueList, adding a new residue to this list if</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.append" title="parmed.topologyobjects.ResidueList.append"><tt class="xref py py-obj docutils literal"><span class="pre">append</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.append" title="parmed.topologyobjects.ResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.claim" title="parmed.topologyobjects.ResidueList.claim"><tt class="xref py py-obj docutils literal"><span class="pre">claim</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.claim" title="parmed.topologyobjects.ResidueList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.count" title="parmed.topologyobjects.ResidueList.count"><tt class="xref py py-obj docutils literal"><span class="pre">count</span></tt></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.count" title="parmed.topologyobjects.ResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.extend" title="parmed.topologyobjects.ResidueList.extend"><tt class="xref py py-obj docutils literal"><span class="pre">extend</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.extend" title="parmed.topologyobjects.ResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index" title="parmed.topologyobjects.ResidueList.index"><tt class="xref py py-obj docutils literal"><span class="pre">index</span></tt></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index" title="parmed.topologyobjects.ResidueList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index_members" title="parmed.topologyobjects.ResidueList.index_members"><tt class="xref py py-obj docutils literal"><span class="pre">index_members</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.index_members" title="parmed.topologyobjects.ResidueList.index_members"><code class="xref py py-obj docutils literal"><span class="pre">index_members</span></code></a>()</td>
 <td>Assigns the idx variable for every member of this list to its place in</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.insert" title="parmed.topologyobjects.ResidueList.insert"><tt class="xref py py-obj docutils literal"><span class="pre">insert</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.insert" title="parmed.topologyobjects.ResidueList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.pop" title="parmed.topologyobjects.ResidueList.pop"><tt class="xref py py-obj docutils literal"><span class="pre">pop</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.pop" title="parmed.topologyobjects.ResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune" title="parmed.topologyobjects.ResidueList.prune"><tt class="xref py py-obj docutils literal"><span class="pre">prune</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune" title="parmed.topologyobjects.ResidueList.prune"><code class="xref py py-obj docutils literal"><span class="pre">prune</span></code></a>()</td>
 <td>This function goes through the residue list and removes all empty residues from the list.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune_unused" title="parmed.topologyobjects.ResidueList.prune_unused"><tt class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.prune_unused" title="parmed.topologyobjects.ResidueList.prune_unused"><code class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></code></a>()</td>
 <td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.remove" title="parmed.topologyobjects.ResidueList.remove"><tt class="xref py py-obj docutils literal"><span class="pre">remove</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.ResidueList.remove" title="parmed.topologyobjects.ResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(*args,&nbsp;**kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.reverse" title="parmed.topologyobjects.ResidueList.reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.reverse" title="parmed.topologyobjects.ResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><tt class="xref py py-obj docutils literal"><span class="pre">sort</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
 <td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.add_atom">
-<tt class="descname">add_atom</tt><big>(</big><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#ResidueList.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList.add_atom" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_atom</code><span class="sig-paren">(</span><em>atom</em>, <em>resname</em>, <em>resnum</em>, <em>chain=''</em>, <em>inscode=''</em>, <em>segid=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#ResidueList.add_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList.add_atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a new atom to the ResidueList, adding a new residue to this list if
 it has a different name or number as the last residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>The atom to add to this residue list</p>
 </div></blockquote>
-<p><strong>resname</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>resname</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The name of the residue this atom belongs to</p>
 </div></blockquote>
-<p><strong>resnum</strong> : <tt class="docutils literal"><span class="pre">int</span></tt></p>
+<p><strong>resnum</strong> : <code class="docutils literal"><span class="pre">int</span></code></p>
 <blockquote>
 <div><p>The number of the residue this atom belongs to</p>
 </div></blockquote>
-<p><strong>chain</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>chain</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The chain ID character for this residue</p>
 </div></blockquote>
-<p><strong>inscode</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>inscode</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote>
 <div><p>The insertion code ID character for this residue (it is stripped)</p>
 </div></blockquote>
-<p><strong>segid</strong> : <tt class="docutils literal"><span class="pre">str</span></tt></p>
+<p><strong>segid</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
 <blockquote class="last">
 <div><p>The segment identifier for this residue (it is stripped)</p>
 </div></blockquote>
@@ -207,32 +207,32 @@ list, a new residue is added and the atom is added to that residue</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.claim">
-<tt class="descname">claim</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.claim" title="Permalink to this definition">¶</a></dt>
+<code class="descname">claim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.claim" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.count">
-<tt class="descname">count</tt><big>(</big><em>value</em><big>)</big> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.topologyobjects.ResidueList.count" title="Permalink to this definition">¶</a></dt>
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.topologyobjects.ResidueList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.index">
-<tt class="descname">index</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><big>)</big> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.topologyobjects.ResidueList.index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.topologyobjects.ResidueList.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.index_members">
-<tt class="descname">index_members</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.index_members" title="Permalink to this definition">¶</a></dt>
+<code class="descname">index_members</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.index_members" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns the idx variable for every member of this list to its place in
 the list, if the members of this list permit</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.prune">
-<tt class="descname">prune</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#ResidueList.prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList.prune" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prune</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#ResidueList.prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ResidueList.prune" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function goes through the residue list and removes all empty
 residues from the list. This isn&#8217;t done automatically when atoms are
 deleted, since it will become very slow. You must remember to do this to
@@ -241,20 +241,20 @@ avoid including empty residues</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.prune_unused">
-<tt class="descname">prune_unused</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.prune_unused" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prune_unused</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.prune_unused" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method inspects the <cite>used</cite> attribute of all of its members, if it
 has one, and deletes any item in which it is set to <cite>False</cite></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.reverse">
-<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.sort">
-<tt class="descname">sort</tt><big>(</big><big>)</big><a class="headerlink" href="#parmed.topologyobjects.ResidueList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
 cmp(x, y) -&gt; -1, 0, 1</p>
 </dd></dl>
@@ -267,14 +267,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/parmed.topologyobjects.ResidueList.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/parmed.topologyobjects.ResidueList.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -291,7 +293,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -300,13 +302,13 @@ cmp(x, y) -&gt; -1, 0, 1</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

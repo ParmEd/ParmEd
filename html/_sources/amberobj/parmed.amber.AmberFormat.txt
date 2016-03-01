@@ -14,9 +14,7 @@ parmed.amber.AmberFormat
    .. autosummary::
    
       ~AmberFormat.__init__
-      ~AmberFormat.addFlag
       ~AmberFormat.add_flag
-      ~AmberFormat.deleteFlag
       ~AmberFormat.delete_flag
       ~AmberFormat.id_format
       ~AmberFormat.parse
@@ -24,8 +22,7 @@ parmed.amber.AmberFormat
       ~AmberFormat.rdparm_old
       ~AmberFormat.rdparm_slow
       ~AmberFormat.set_version
-      ~AmberFormat.view
-      ~AmberFormat.writeParm
+      ~AmberFormat.view_as
       ~AmberFormat.write_parm
    
    

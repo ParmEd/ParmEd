@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,21 +37,21 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" accesskey="U">The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="parmed-topologyobjects-improper">
 <h1>parmed.topologyobjects.Improper<a class="headerlink" href="#parmed-topologyobjects-improper" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.topologyobjects.Improper">
-<em class="property">class </em><tt class="descclassname">parmed.topologyobjects.</tt><tt class="descname">Improper</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">Improper</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper" title="Permalink to this definition">¶</a></dt>
 <dd><p>A CHARMM-style improper torsion between 4 atoms. The first atom must be the
 central atom, as shown in the schematic below</p>
 <blockquote>
@@ -65,23 +65,23 @@ central atom, as shown in the schematic below</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>The central atom A1 in the schematic above</p>
 </div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<p><strong>atom2</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>An atom in the improper, A2 in the schematic above</p>
 </div></blockquote>
-<p><strong>atom3</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<p><strong>atom3</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>An atom in the improper, A3 in the schematic above</p>
 </div></blockquote>
-<p><strong>atom4</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><tt class="xref py py-class docutils literal"><span class="pre">Atom</span></tt></a></p>
+<p><strong>atom4</strong> : <a class="reference internal" href="parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></p>
 <blockquote>
 <div><p>An atom in the improper, A4 in the schematic above</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.ImproperType.html#parmed.topologyobjects.ImproperType" title="parmed.topologyobjects.ImproperType"><tt class="xref py py-class docutils literal"><span class="pre">ImproperType</span></tt></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.ImproperType.html#parmed.topologyobjects.ImproperType" title="parmed.topologyobjects.ImproperType"><code class="xref py py-class docutils literal"><span class="pre">ImproperType</span></code></a></p>
 <blockquote class="last">
 <div><p>The ImproperType object containing the parameters for this improper
 torsion</p>
@@ -92,10 +92,10 @@ torsion</p>
 </table>
 <p class="rubric">Notes</p>
 <p>An Improper torsion can contain bonds or atoms. A bond is contained if it
-exists between atom 1 and any other atom. Raises <tt class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></tt> if any
+exists between atom 1 and any other atom. Raises <code class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></code> if any
 of the atoms are duplicates.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">imp</span> <span class="o">=</span> <span class="n">Improper</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">imp</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">imp</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span> <span class="ow">in</span> <span class="n">imp</span>
 <span class="go">True</span>
@@ -103,18 +103,6 @@ of the atoms are duplicates.</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Improper.improp_type" title="parmed.topologyobjects.Improper.improp_type"><tt class="xref py py-obj docutils literal"><span class="pre">improp_type</span></tt></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -122,17 +110,17 @@ of the atoms are duplicates.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.delete" title="parmed.topologyobjects.Improper.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.delete" title="parmed.topologyobjects.Improper.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this Improper from the atoms that make it up.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.same_atoms" title="parmed.topologyobjects.Improper.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.same_atoms" title="parmed.topologyobjects.Improper.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
 <td>An improper has the same 4 atoms if atom1 is the same for both and the</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.Improper.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -142,32 +130,20 @@ of the atoms are duplicates.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.__init__" title="parmed.topologyobjects.Improper.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4[,&nbsp;type])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.__init__" title="parmed.topologyobjects.Improper.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2,&nbsp;atom3,&nbsp;atom4[,&nbsp;type])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.delete" title="parmed.topologyobjects.Improper.delete"><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.delete" title="parmed.topologyobjects.Improper.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this Improper from the atoms that make it up.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.same_atoms" title="parmed.topologyobjects.Improper.same_atoms"><tt class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></tt></a>(thing)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Improper.same_atoms" title="parmed.topologyobjects.Improper.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
 <td>An improper has the same 4 atoms if atom1 is the same for both and the</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.Improper.improp_type" title="parmed.topologyobjects.Improper.improp_type"><tt class="xref py py-obj docutils literal"><span class="pre">improp_type</span></tt></a></td>
-<td></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.Improper.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.delete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes this Improper from the atoms that make it up. This method
 removes this Improper from the <cite>impropers</cite> list for atom1, atom2, atom3,
 and atom4</p>
@@ -175,7 +151,7 @@ and atom4</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.Improper.same_atoms">
-<tt class="descname">same_atoms</tt><big>(</big><em>thing</em><big>)</big><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.same_atoms" title="Permalink to this definition">¶</a></dt>
+<code class="descname">same_atoms</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Improper.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>An improper has the same 4 atoms if atom1 is the same for both and the
 other 3 can be in any order</p>
 </dd></dl>
@@ -188,14 +164,16 @@ other 3 can be in any order</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/topobj/parmed.topologyobjects.Improper.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topobj/parmed.topologyobjects.Improper.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -212,7 +190,7 @@ other 3 can be in any order</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -221,13 +199,13 @@ other 3 can be in any order</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../topologyobjects.html" >The <tt class="docutils literal"><span class="pre">topologyobjects</span></tt> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

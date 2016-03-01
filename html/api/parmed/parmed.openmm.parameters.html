@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>parmed.openmm.parameters module &mdash; ParmEd 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-parmed.openmm.parameters">
+<span id="parmed-openmm-parameters-module"></span><h1>parmed.openmm.parameters module<a class="headerlink" href="#module-parmed.openmm.parameters" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the class for storing and creating/converting/writing
+OpenMM-style ffxml files defining a force field</p>
+<p>Author(s): Jason Swails</p>
+<dl class="class">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet">
+<em class="property">class </em><code class="descclassname">parmed.openmm.parameters.</code><code class="descname">OpenMMParameterSet</code><span class="sig-paren">(</span><em>*filenames</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/parameters.html#OpenMMParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></code></a></p>
+<p>Class storing parameters from an OpenMM parameter set</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filenames</strong> : str, list of str, file-like, or list of file-like; optional</p>
+<blockquote class="last">
+<div><p>Either the name of a file or a list of filenames from which parameters
+should be parsed.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Order is important in the list of files provided. The parameters are loaded
+in the order they are provided, and any parameters that are specified in
+multiple places are overwritten (that is, the <em>last</em> occurrence is the
+parameter type that is used)</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.combining_rule" title="parmed.openmm.parameters.OpenMMParameterSet.combining_rule"><code class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.condense" title="parmed.openmm.parameters.OpenMMParameterSet.condense"><code class="xref py py-obj docutils literal"><span class="pre">condense</span></code></a>([do_dihedrals])</td>
+<td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.from_parameterset" title="parmed.openmm.parameters.OpenMMParameterSet.from_parameterset"><code class="xref py py-obj docutils literal"><span class="pre">from_parameterset</span></code></a>(params[,&nbsp;copy])</td>
+<td>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.from_structure" title="parmed.openmm.parameters.OpenMMParameterSet.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;...])</td>
+<td>Extracts known parameters from a Structure instance</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.id_format" title="parmed.openmm.parameters.OpenMMParameterSet.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<td>Identifies the file type as either an Amber-style frcmod or parm.dat file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.typeify_templates" title="parmed.openmm.parameters.OpenMMParameterSet.typeify_templates"><code class="xref py py-obj docutils literal"><span class="pre">typeify_templates</span></code></a>()</td>
+<td>Assign atom types to atom names in templates</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.parameters.OpenMMParameterSet.write" title="parmed.openmm.parameters.OpenMMParameterSet.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest[,&nbsp;provenance,&nbsp;write_unused])</td>
+<td>Write the parameter set to an XML file for use with OpenMM</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.combining_rule">
+<code class="descname">combining_rule</code><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.combining_rule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.condense">
+<code class="descname">condense</code><span class="sig-paren">(</span><em>do_dihedrals=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.condense" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function goes through each of the parameter type dicts and
+eliminates duplicate types. After calling this function, every unique
+bond, angle, dihedral, improper, or cmap type will pair with EVERY key
+in the type mapping dictionaries that points to the equivalent type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>do_dihedrals</strong> : bool=True</p>
+<blockquote>
+<div><p>Dihedrals can take the longest time to compress since testing their
+equality takes the longest (this is complicated by the existence of
+multi-term torsions). This flag will allow you to <em>skip</em> condensing
+the dihedral parameter types (for large parameter sets, this can cut
+the compression time in half)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">self</p>
+<blockquote class="last">
+<div><p>The instance that is being condensed</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The return value allows you to condense the types at construction time.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.from_parameterset">
+<em class="property">classmethod </em><code class="descname">from_parameterset</code><span class="sig-paren">(</span><em>params</em>, <em>copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/parameters.html#OpenMMParameterSet.from_parameterset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.from_parameterset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates a CharmmParameterSet from another ParameterSet (or
+subclass). The main thing this feature is responsible for is converting
+lower-case atom type names into all upper-case and decorating the name
+to ensure each atom type name is unique.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>params</strong> : <a class="reference internal" href="parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></code></a></p>
+<blockquote>
+<div><p>ParameterSet containing the list of parameters to be converted to a
+CHARMM-compatible set</p>
+</div></blockquote>
+<p><strong>copy</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, the returned parameter set is a deep copy of <code class="docutils literal"><span class="pre">params</span></code>. If
+False, the returned parameter set is a shallow copy. Default False.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>new_params</strong> : OpenMMParameterSet</p>
+<blockquote class="last">
+<div><p>OpenMMParameterSet with the same parameters as that defined in the
+input parameter set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.from_structure">
+<code class="descname">from_structure</code><span class="sig-paren">(</span><em>struct</em>, <em>allow_unequal_duplicates=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts known parameters from a Structure instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
+<blockquote>
+<div><p>The parametrized <code class="docutils literal"><span class="pre">Structure</span></code> instance from which to extract
+parameters into a ParameterSet</p>
+</div></blockquote>
+<p><strong>allow_unequal_duplicates</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, if two or more unequal parameter types are defined by the
+same atom types, the last one encountered will be assigned. If
+False, an exception will be raised. Default is True</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : <code class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></code></p>
+<blockquote>
+<div><p>The parameter set with all parameters defined in the Structure</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>:class:`parmed.exceptions.ParameterError` if allow_unequal_duplicates is</strong></p>
+<p><strong>False and 2+ unequal parameters are defined between the same atom types.</strong></p>
+<p><strong>`NotImplementedError` if any AMOEBA potential terms are defined in the</strong></p>
+<p class="last"><strong>input structure</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The parameters here are copies of the ones in the Structure, so
+modifying the generated ParameterSet will have no effect on <code class="docutils literal"><span class="pre">struct</span></code>.
+Furthermore, the <em>first</em> occurrence of each parameter will be used. If
+future ones differ, they will be silently ignored, since this is
+expected behavior in some instances (like with Gromacs topologies in the
+ff99sb-ildn force field) unless <code class="docutils literal"><span class="pre">allow_unequal_duplicates</span></code> is set to
+<code class="docutils literal"><span class="pre">False</span></code></p>
+<p>Dihedrals are a little trickier. They can be multi-term, which can be
+represented either as a <em>single</em> entry in dihedrals with a type of
+DihedralTypeList or multiple entries in dihedrals with a DihedralType
+parameter type. In this case, the parameter is constructed from either
+the first DihedralTypeList found or the first DihedralType of each
+periodicity found if no matching DihedralTypeList is found.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.id_format">
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/parameters.html#OpenMMParameterSet.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the file type as either an Amber-style frcmod or parm.dat
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to check format for</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is an Amber-style parameter file. False otherwise.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.typeify_templates">
+<code class="descname">typeify_templates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.typeify_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign atom types to atom names in templates</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.openmm.parameters.OpenMMParameterSet.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>dest</em>, <em>provenance=None</em>, <em>write_unused=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/parameters.html#OpenMMParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.parameters.OpenMMParameterSet.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the parameter set to an XML file for use with OpenMM</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dest</strong> : str or file-like</p>
+<blockquote>
+<div><p>The name of the file or the file-like object (with a <code class="docutils literal"><span class="pre">write</span></code>
+attribute) to which the XML file will be written</p>
+</div></blockquote>
+<p><strong>provenance</strong> : dict, optional</p>
+<blockquote>
+<div><p>If present, the XML file will be tagged with the available fields.
+Keys of the dictionary become XML element tags, the values of the
+dictionary must be instances of any of:
+- str / unicode (Py2) or str (Py3) - one XML element with this
+content is written
+- list - one XML element per each item of the list is written, all
+these XML elements use the same tag (key in provenance dict)
+- dict - one of the keys of this dict must be the same as the key of
+of the provenance dict under which this dict is nested. The value
+under this key becomes the content of the XML element. Remaining keys
+and their values are used to construct attributes of the XML element.
+Note that OrderedDict&#8217;s should be used to ensure appropriate order
+of the XML elements and their attributes.
+Default is no provenance.
+Example (unordered):
+provenance = {&#8216;Reference&#8217; : [&#8216;Nature&#8217;, &#8216;Cell&#8217;],</p>
+<blockquote>
+<div><p>&#8216;Source&#8217; : {&#8216;Source&#8217;: &#8216;leaprc.ff14SB&#8217;, sourcePackage :
+&#8216;AmberTools&#8217;, sourcePackageVersion : &#8216;15&#8217;},
+&#8216;User&#8217; : &#8216;Mark&#8217;}</p>
+</div></blockquote>
+</div></blockquote>
+<p><strong>write_unused</strong> : bool</p>
+<blockquote class="last">
+<div><p>If False, atom types that are not used in any of the residue templates
+and parameters including those atom types will not be written</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The generated XML file will have the XML tag <code class="docutils literal"><span class="pre">DateGenerated</span></code> added to
+the provenance information set to the current date. Therefore, you
+should not provide this information in <code class="docutils literal"><span class="pre">provenance</span></code> (it will be
+removed if it is provided).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/parmed/parmed.openmm.parameters.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

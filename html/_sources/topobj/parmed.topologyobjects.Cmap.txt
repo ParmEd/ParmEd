@@ -22,10 +22,4 @@ parmed.topologyobjects.Cmap
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~Cmap.cmap_type
-   
    

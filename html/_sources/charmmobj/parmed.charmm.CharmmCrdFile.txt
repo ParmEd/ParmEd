@@ -15,6 +15,7 @@ parmed.charmm.CharmmCrdFile
    
       ~CharmmCrdFile.__init__
       ~CharmmCrdFile.id_format
+      ~CharmmCrdFile.write
    
    
 
@@ -24,6 +25,7 @@ parmed.charmm.CharmmCrdFile
 
    .. autosummary::
    
+      ~CharmmCrdFile.box
       ~CharmmCrdFile.coordinates
       ~CharmmCrdFile.positions
    

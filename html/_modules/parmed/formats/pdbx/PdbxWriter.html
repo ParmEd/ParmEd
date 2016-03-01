@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../../../index.html" />
-    <link rel="up" title="parmed.formats.pdbx" href="../pdbx.html" /> 
+    <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,38 +37,35 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../../formats.html" >parmed.formats</a> &raquo;</li>
-          <li><a href="../pdbx.html" accesskey="U">parmed.formats.pdbx</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.formats.pdbx.PdbxWriter</h1><div class="highlight"><pre>
-<span class="c">##</span>
-<span class="c"># File:  PdbxWriter.py</span>
-<span class="c"># Date:  2011-10-09 Jdw  Adapted from PdbxParser.py</span>
-<span class="c">#</span>
-<span class="c"># Updates:</span>
-<span class="c">#    5-Apr-2011 jdw  Using the double quote format preference</span>
-<span class="c">#   23-Oct-2012 jdw  update path details and reorganize.</span>
-<span class="c">#</span>
-<span class="c">###</span>
+<span></span><span class="c1">##</span>
+<span class="c1"># File:  PdbxWriter.py</span>
+<span class="c1"># Date:  2011-10-09 Jdw  Adapted from PdbxParser.py</span>
+<span class="c1">#</span>
+<span class="c1"># Updates:</span>
+<span class="c1">#    5-Apr-2011 jdw  Using the double quote format preference</span>
+<span class="c1">#   23-Oct-2012 jdw  update path details and reorganize.</span>
+<span class="c1">#</span>
+<span class="c1">###</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Classes for writing data and dictionary containers in PDBx/mmCIF format.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__docformat__</span> <span class="o">=</span> <span class="s">&quot;restructuredtext en&quot;</span>
-<span class="n">__author__</span>    <span class="o">=</span> <span class="s">&quot;John Westbrook&quot;</span>
-<span class="n">__email__</span>     <span class="o">=</span> <span class="s">&quot;jwest@rcsb.rutgers.edu&quot;</span>
-<span class="n">__license__</span>   <span class="o">=</span> <span class="s">&quot;Creative Commons Attribution 3.0 Unported&quot;</span>
-<span class="n">__version__</span>   <span class="o">=</span> <span class="s">&quot;V0.01&quot;</span>
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext en&quot;</span>
+<span class="n">__author__</span>    <span class="o">=</span> <span class="s2">&quot;John Westbrook&quot;</span>
+<span class="n">__email__</span>     <span class="o">=</span> <span class="s2">&quot;jwest@rcsb.rutgers.edu&quot;</span>
+<span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;Creative Commons Attribution 3.0 Unported&quot;</span>
+<span class="n">__version__</span>   <span class="o">=</span> <span class="s2">&quot;V0.01&quot;</span>
 
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">from</span> <span class="nn">parmed.formats.pdbx.PdbxContainers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DefinitionContainer</span><span class="p">,</span>
@@ -76,7 +73,7 @@
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">PdbxError</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<div class="viewcode-block" id="PdbxWriter"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.PdbxWriter">[docs]</a><span class="k">class</span> <span class="nc">PdbxWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PdbxWriter"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter">[docs]</a><span class="k">class</span> <span class="nc">PdbxWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Write PDBx data files or dictionaries using the input container</span>
 <span class="sd">       or container list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -86,115 +83,115 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__MAXIMUM_LINE_LENGTH</span> <span class="o">=</span> <span class="mi">2048</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__SPACING</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span> <span class="o">=</span> <span class="mi">3</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span> <span class="o">=</span> <span class="s">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">False</span>
-        <span class="c"># Maximum number of rows checked for value length and format</span>
+        <span class="c1"># Maximum number of rows checked for value length and format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="o">=</span><span class="bp">None</span>
 
-<div class="viewcode-block" id="PdbxWriter.setRowPartition"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.PdbxWriter.setRowPartition">[docs]</a>    <span class="k">def</span> <span class="nf">setRowPartition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">numRows</span><span class="p">):</span>
+<div class="viewcode-block" id="PdbxWriter.setRowPartition"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.setRowPartition">[docs]</a>    <span class="k">def</span> <span class="nf">setRowPartition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">numRows</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Maximum number of rows checked for value length and format</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="o">=</span><span class="n">numRows</span>
-        </div>
-<div class="viewcode-block" id="PdbxWriter.write"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.PdbxWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">containerList</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="o">=</span><span class="n">numRows</span></div>
+        
+<div class="viewcode-block" id="PdbxWriter.write"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">containerList</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__containerList</span><span class="o">=</span><span class="n">containerList</span>
         <span class="k">for</span>  <span class="n">container</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__containerList</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">writeContainer</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="PdbxWriter.writeContainer"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.PdbxWriter.writeContainer">[docs]</a>    <span class="k">def</span> <span class="nf">writeContainer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">container</span><span class="p">):</span>
-        <span class="n">indS</span><span class="o">=</span><span class="s">&quot; &quot;</span> <span class="o">*</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">writeContainer</span><span class="p">(</span><span class="n">container</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PdbxWriter.writeContainer"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.writeContainer">[docs]</a>    <span class="k">def</span> <span class="nf">writeContainer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">container</span><span class="p">):</span>
+        <span class="n">indS</span><span class="o">=</span><span class="s2">&quot; &quot;</span> <span class="o">*</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">DefinitionContainer</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;save_</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">container</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;save_</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">container</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="n">indS</span><span class="o">+</span><span class="s">&quot;#</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>            
+            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="n">indS</span><span class="o">+</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>            
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getGlobal</span><span class="p">()):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;global_</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;global_</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">False</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>            
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>            
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;data_</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">container</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;data_</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">container</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">False</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;#</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>                            
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>                            
         
         <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">getObjNameList</span><span class="p">():</span>
             <span class="n">obj</span><span class="o">=</span><span class="n">container</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="n">nm</span><span class="p">)</span>
             <span class="n">objL</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">getRowList</span><span class="p">()</span>
 
-            <span class="c"># Skip empty objects</span>
+            <span class="c1"># Skip empty objects</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">objL</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="c"># Item - value formattting </span>
+            <span class="c1"># Item - value formattting </span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">objL</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__writeItemValueFormat</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
-            <span class="c"># Table formatting - </span>
+            <span class="c1"># Table formatting - </span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">objL</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__writeTableFormat</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">PdbxError</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="n">indS</span><span class="o">+</span><span class="s">&quot;#&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="n">indS</span><span class="o">+</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
 
-        <span class="c"># Add a trailing saveframe reserved word </span>
+        <span class="c1"># Add a trailing saveframe reserved word </span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">DefinitionContainer</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">save_</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;#</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>            
-</div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">save_</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>            </div>
+
     <span class="k">def</span> <span class="nf">__write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">st</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ofh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__writeItemValueFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">myCategory</span><span class="p">):</span>
 
-        <span class="c"># Compute the maximum item name length within this category - </span>
+        <span class="c1"># Compute the maximum item name length within this category - </span>
         <span class="n">attributeNameLengthMax</span>  <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">attributeName</span> <span class="ow">in</span> <span class="n">myCategory</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">():</span>
             <span class="n">attributeNameLengthMax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">attributeNameLengthMax</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributeName</span><span class="p">))</span>
         <span class="n">itemNameLengthMax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SPACING</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span> <span class="o">+</span> <span class="n">attributeNameLengthMax</span> <span class="o">+</span> <span class="mi">2</span>
-        <span class="c">#</span>
+        <span class="c1">#</span>
         <span class="n">lineList</span><span class="o">=</span><span class="p">[]</span>
-        <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;#</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>        
+        <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>        
         <span class="k">for</span> <span class="n">attributeName</span><span class="p">,</span><span class="n">iPos</span> <span class="ow">in</span> <span class="n">myCategory</span><span class="o">.</span><span class="n">getAttributeListWithOrder</span><span class="p">():</span>        
             <span class="k">if</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="p">:</span>
-                <span class="c">#        - add indent --                </span>
+                <span class="c1">#        - add indent --                </span>
                 <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span><span class="p">)</span>
                 
-            <span class="n">itemName</span> <span class="o">=</span> <span class="s">&quot;_</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span> <span class="n">attributeName</span><span class="p">)</span>                
+            <span class="n">itemName</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span> <span class="n">attributeName</span><span class="p">)</span>                
             <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">itemName</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">itemNameLengthMax</span><span class="p">))</span>
             
             <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getValueFormatted</span><span class="p">(</span><span class="n">attributeName</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>            
-            <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             
-        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lineList</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lineList</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__writeTableFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">myCategory</span><span class="p">):</span>
         
-        <span class="c"># Write the declaration of the loop_</span>
-        <span class="c">#</span>
+        <span class="c1"># Write the declaration of the loop_</span>
+        <span class="c1">#</span>
         <span class="n">lineList</span><span class="o">=</span><span class="p">[]</span>
-        <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;#</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="p">:</span>            
             <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span><span class="p">)</span>
-        <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;loop_&quot;</span><span class="p">)</span>
+        <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;loop_&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">attributeName</span> <span class="ow">in</span> <span class="n">myCategory</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">():</span>
-            <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>            
+            <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>            
             <span class="k">if</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="p">:</span>            
                 <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span><span class="p">)</span>
-            <span class="n">itemName</span> <span class="o">=</span> <span class="s">&quot;_</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span> <span class="n">attributeName</span><span class="p">)</span>
+            <span class="n">itemName</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span> <span class="n">attributeName</span><span class="p">)</span>
             <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">itemName</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lineList</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lineList</span><span class="p">))</span>
 
-        <span class="c">#</span>
-        <span class="c"># Write the data in tabular format - </span>
-        <span class="c">#</span>
-        <span class="c">#print myCategory.getName()</span>
-        <span class="c">#print myCategory.getAttributeList()</span>
+        <span class="c1">#</span>
+        <span class="c1"># Write the data in tabular format - </span>
+        <span class="c1">#</span>
+        <span class="c1">#print myCategory.getName()</span>
+        <span class="c1">#print myCategory.getAttributeList()</span>
 
-        <span class="c">#    For speed make the following evaluation on a portion of the table</span>
+        <span class="c1">#    For speed make the following evaluation on a portion of the table</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">numSteps</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -202,52 +199,52 @@
             
         <span class="n">formatTypeList</span><span class="p">,</span><span class="n">dataTypeList</span><span class="o">=</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getFormatTypeList</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">numSteps</span><span class="p">)</span>
         <span class="n">maxLengthList</span><span class="o">=</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getAttributeValueMaxLengthList</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">numSteps</span><span class="p">)</span>
-        <span class="n">spacing</span>   <span class="o">=</span> <span class="s">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SPACING</span>
-        <span class="c">#</span>
+        <span class="n">spacing</span>   <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__SPACING</span>
+        <span class="c1">#</span>
 
-        <span class="c">#print formatTypeList</span>
-        <span class="c">#print dataTypeList</span>
-        <span class="c">#print maxLengthList</span>
-        <span class="c">#</span>
+        <span class="c1">#print formatTypeList</span>
+        <span class="c1">#print dataTypeList</span>
+        <span class="c1">#print maxLengthList</span>
+        <span class="c1">#</span>
         <span class="k">for</span> <span class="n">iRow</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()):</span>
             <span class="n">lineList</span>     <span class="o">=</span> <span class="p">[]</span>            
-            <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">if</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="p">:</span>
-                <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span> <span class="o">+</span> <span class="s">&quot;  &quot;</span><span class="p">)</span>
+                <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span> <span class="o">+</span> <span class="s2">&quot;  &quot;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">iAt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getAttributeCount</span><span class="p">()):</span>
                 <span class="n">formatType</span> <span class="o">=</span> <span class="n">formatTypeList</span><span class="p">[</span><span class="n">iAt</span><span class="p">]</span>
                 <span class="n">maxLength</span>  <span class="o">=</span> <span class="n">maxLengthList</span><span class="p">[</span><span class="n">iAt</span><span class="p">]</span>
 
-                <span class="k">if</span> <span class="p">(</span><span class="n">formatType</span> <span class="o">==</span> <span class="s">&#39;FT_UNQUOTED_STRING&#39;</span> <span class="ow">or</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s">&#39;FT_NULL_VALUE&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">formatType</span> <span class="o">==</span> <span class="s1">&#39;FT_UNQUOTED_STRING&#39;</span> <span class="ow">or</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s1">&#39;FT_NULL_VALUE&#39;</span><span class="p">):</span>
                     <span class="n">val</span><span class="o">=</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getValueFormattedByIndex</span><span class="p">(</span><span class="n">iAt</span><span class="p">,</span><span class="n">iRow</span><span class="p">)</span>
                     <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">maxLength</span><span class="p">))</span>
 
-                <span class="k">elif</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s">&#39;FT_NUMBER&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s1">&#39;FT_NUMBER&#39;</span><span class="p">:</span>
                     <span class="n">val</span><span class="o">=</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getValueFormattedByIndex</span><span class="p">(</span><span class="n">iAt</span><span class="p">,</span><span class="n">iRow</span><span class="p">)</span>
                     <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="n">maxLength</span><span class="p">))</span>
                     
-                <span class="k">elif</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s">&#39;FT_QUOTED_STRING&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s1">&#39;FT_QUOTED_STRING&#39;</span><span class="p">:</span>
                     <span class="n">val</span><span class="o">=</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getValueFormattedByIndex</span><span class="p">(</span><span class="n">iAt</span><span class="p">,</span><span class="n">iRow</span><span class="p">)</span>
 
                     <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">maxLength</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
 
-                <span class="k">elif</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s">&quot;FT_MULTI_LINE_STRING&quot;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">formatType</span> <span class="o">==</span> <span class="s2">&quot;FT_MULTI_LINE_STRING&quot;</span><span class="p">:</span>
                     <span class="n">val</span><span class="o">=</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getValueFormattedByIndex</span><span class="p">(</span><span class="n">iAt</span><span class="p">,</span><span class="n">iRow</span><span class="p">)</span>
                     <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
                     
                 <span class="n">lineList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spacing</span><span class="p">)</span>                    
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lineList</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lineList</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
@@ -264,7 +261,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -273,16 +270,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../../../parmed.html" >parmed</a> &raquo;</li>
-          <li><a href="../../formats.html" >parmed.formats</a> &raquo;</li>
-          <li><a href="../pdbx.html" >parmed.formats.pdbx</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

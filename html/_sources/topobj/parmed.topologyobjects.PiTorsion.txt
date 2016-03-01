@@ -14,16 +14,9 @@ parmed.topologyobjects.PiTorsion
    .. autosummary::
    
       ~PiTorsion.__init__
-      ~PiTorsion.delete
    
    
 
    
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~PiTorsion.pitor_type
    
    

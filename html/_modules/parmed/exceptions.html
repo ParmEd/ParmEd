@@ -23,12 +23,12 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" />
-    <link rel="up" title="parmed" href="../parmed.html" /> 
+    <link rel="up" title="Module code" href="../index.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,127 +37,126 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../parmed.html" accesskey="U">parmed</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for parmed.exceptions</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains all of the exceptions that are used in the chemistry</span>
 <span class="sd">package</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="c"># Hard errors</span>
+<span class="c1"># Hard errors</span>
 
-<div class="viewcode-block" id="ParmedError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParmedError">[docs]</a><span class="k">class</span> <span class="nc">ParmedError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Base class for all non-trivial exceptions raised by ParmEd &quot;&quot;&quot;</span>
-</div>
+<div class="viewcode-block" id="ParmedError"><a class="viewcode-back" href="../../api/parmed/parmed.tools.exceptions.html#parmed.exceptions.ParmedError">[docs]</a><span class="k">class</span> <span class="nc">ParmedError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Base class for all non-trivial exceptions raised by ParmEd &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="ParsingError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParsingError">[docs]</a><span class="k">class</span> <span class="nc">ParsingError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there was a problem parsing any kind of file &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there was a problem parsing any kind of file &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="PDBError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PDBError">[docs]</a><span class="k">class</span> <span class="nc">PDBError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there was a problem parsing a PDB file &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there was a problem parsing a PDB file &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="Mol2Error"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.Mol2Error">[docs]</a><span class="k">class</span> <span class="nc">Mol2Error</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there was a problem parsing a Mol2 file &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there was a problem parsing a Mol2 file &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="MaskError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.MaskError">[docs]</a><span class="k">class</span> <span class="nc">MaskError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Error when a Mask is poorly formed &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; Error when a Mask is poorly formed &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="OpenMMError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.OpenMMError">[docs]</a><span class="k">class</span> <span class="nc">OpenMMError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there&#39;s a problem making an OpenMM system &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there&#39;s a problem making an OpenMM system &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="AmberError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.AmberError">[docs]</a><span class="k">class</span> <span class="nc">AmberError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This is a generic AmberParmError &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; This is a generic AmberParmError &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="TinkerError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.TinkerError">[docs]</a><span class="k">class</span> <span class="nc">TinkerError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Raised when one of the TINKER parsing routines hits a bad file &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; Raised when one of the TINKER parsing routines hits a bad file &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="CharmmError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.CharmmError">[docs]</a><span class="k">class</span> <span class="nc">CharmmError</span><span class="p">(</span><span class="n">ParsingError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is a problem parsing CHARMM PSF files &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there is a problem parsing CHARMM PSF files &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="ResidueError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ResidueError">[docs]</a><span class="k">class</span> <span class="nc">ResidueError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; For when there are problems defining a residue &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; For when there are problems defining a residue &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="ParameterError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParameterError">[docs]</a><span class="k">class</span> <span class="nc">ParameterError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If a parameter is missing from a database &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If a parameter is missing from a database &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="GromacsError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.GromacsError">[docs]</a><span class="k">class</span> <span class="nc">GromacsError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is a problem parsing GROMACS topology files &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there is a problem parsing GROMACS topology files &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="FormatNotFound"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.FormatNotFound">[docs]</a><span class="k">class</span> <span class="nc">FormatNotFound</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If the file format does not have a registered parser with it &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If the file format does not have a registered parser with it &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="RosettaError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.RosettaError">[docs]</a><span class="k">class</span> <span class="nc">RosettaError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is a problem loading a Rosetta pose object &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there is a problem loading a Rosetta pose object &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="PreProcessorError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PreProcessorError">[docs]</a><span class="k">class</span> <span class="nc">PreProcessorError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is a problem running the C-like preprocessor &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there is a problem running the C-like preprocessor &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="MoleculeError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.MoleculeError">[docs]</a><span class="k">class</span> <span class="nc">MoleculeError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is a problem defining a molecule via the bond graph &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; If there is a problem defining a molecule via the bond graph &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="PdbxError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PdbxError">[docs]</a><span class="k">class</span> <span class="nc">PdbxError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Class for catching general errors with PDBx/mmCIF parsing &quot;&quot;&quot;</span>
-</div>
+    <span class="sd">&quot;&quot;&quot; Class for catching general errors with PDBx/mmCIF parsing &quot;&quot;&quot;</span></div>
+
 <div class="viewcode-block" id="PdbxSyntaxError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PdbxSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">PdbxSyntaxError</span><span class="p">(</span><span class="n">PdbxError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class for catching errors in mmCIF/PDBx syntax &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineNumber</span><span class="o">=</span><span class="s">&#39;-1&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineNumber</span><span class="o">=</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lineNumber</span> <span class="o">=</span> <span class="n">lineNumber</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">ERROR - [at line: </span><span class="si">%d</span><span class="s">] </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineNumber</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="InputError"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.InputError">[docs]</a><span class="k">class</span> <span class="nc">InputError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; When there is an error with input &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">ERROR - [at line: </span><span class="si">%d</span><span class="s2">] </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lineNumber</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
 
-<span class="c"># Warnings</span>
-</div>
-<div class="viewcode-block" id="ParmedWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParmedWarning">[docs]</a><span class="k">class</span> <span class="nc">ParmedWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Base class for all warnings raised by ParmEd &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="InputError"><a class="viewcode-back" href="../../api/parmed/parmed.tools.exceptions.html#parmed.exceptions.InputError">[docs]</a><span class="k">class</span> <span class="nc">InputError</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; When there is an error with input &quot;&quot;&quot;</span></div>
 
-<span class="c"># Make sure that all warnings are always printed</span></div>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;always&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">ParmedWarning</span><span class="p">)</span>
+<span class="c1"># Warnings</span>
+
+<div class="viewcode-block" id="ParmedWarning"><a class="viewcode-back" href="../../api/parmed/parmed.tools.exceptions.html#parmed.exceptions.ParmedWarning">[docs]</a><span class="k">class</span> <span class="nc">ParmedWarning</span><span class="p">(</span><span class="ne">Warning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Base class for all warnings raised by ParmEd &quot;&quot;&quot;</span></div>
+
+<span class="c1"># Make sure that all warnings are always printed</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;always&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">ParmedWarning</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PDBWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PDBWarning">[docs]</a><span class="k">class</span> <span class="nc">PDBWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A non-fatal error to indicate a problematic PDB file &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="AmberWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.AmberWarning">[docs]</a><span class="k">class</span> <span class="nc">AmberWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is something that is non-fatal &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="SplitResidueWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.SplitResidueWarning">[docs]</a><span class="k">class</span> <span class="nc">SplitResidueWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; For if a residue with the same number but different names is split &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="CharmmWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.CharmmWarning">[docs]</a><span class="k">class</span> <span class="nc">CharmmWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; For non-fatal PSF parsing issues &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="GromacsWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.GromacsWarning">[docs]</a><span class="k">class</span> <span class="nc">GromacsWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="s">&quot; If we are uncertain about something regarding the GROMACS topology file &quot;</span>
-</div>
-<div class="viewcode-block" id="ParameterWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParameterWarning">[docs]</a><span class="k">class</span> <span class="nc">ParameterWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If a type of parameter is missing, but you don&#39;t want it to be fatal &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="TinkerWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.TinkerWarning">[docs]</a><span class="k">class</span> <span class="nc">TinkerWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="k">pass</span>
-</div>
-<div class="viewcode-block" id="PreProcessorWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PreProcessorWarning">[docs]</a><span class="k">class</span> <span class="nc">PreProcessorWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is something we should warn about in preprocessing &quot;&quot;&quot;</span>
-</div>
-<div class="viewcode-block" id="OpenMMWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.OpenMMWarning">[docs]</a><span class="k">class</span> <span class="nc">OpenMMWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; If there is something we should warn when processing OpenMM objects &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; A non-fatal error to indicate a problematic PDB file &quot;&quot;&quot;</span></div>
 
-<span class="c"># Control flow exceptions</span>
-</div>
+<div class="viewcode-block" id="AmberWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.AmberWarning">[docs]</a><span class="k">class</span> <span class="nc">AmberWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is something that is non-fatal &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="SplitResidueWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.SplitResidueWarning">[docs]</a><span class="k">class</span> <span class="nc">SplitResidueWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For if a residue with the same number but different names is split &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="CharmmWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.CharmmWarning">[docs]</a><span class="k">class</span> <span class="nc">CharmmWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For non-fatal PSF parsing issues &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="GromacsWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.GromacsWarning">[docs]</a><span class="k">class</span> <span class="nc">GromacsWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="s2">&quot; If we are uncertain about something regarding the GROMACS topology file &quot;</span></div>
+
+<div class="viewcode-block" id="ParameterWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.ParameterWarning">[docs]</a><span class="k">class</span> <span class="nc">ParameterWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If a type of parameter is missing, but you don&#39;t want it to be fatal &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="TinkerWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.TinkerWarning">[docs]</a><span class="k">class</span> <span class="nc">TinkerWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="PreProcessorWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.PreProcessorWarning">[docs]</a><span class="k">class</span> <span class="nc">PreProcessorWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is something we should warn about in preprocessing &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="OpenMMWarning"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.OpenMMWarning">[docs]</a><span class="k">class</span> <span class="nc">OpenMMWarning</span><span class="p">(</span><span class="n">ParmedWarning</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; If there is something we should warn when processing OpenMM objects &quot;&quot;&quot;</span></div>
+
+<span class="c1"># Control flow exceptions</span>
+
 <div class="viewcode-block" id="CharmmPsfEOF"><a class="viewcode-back" href="../../api/parmed/parmed.exceptions.html#parmed.exceptions.CharmmPsfEOF">[docs]</a><span class="k">class</span> <span class="nc">CharmmPsfEOF</span><span class="p">(</span><span class="n">ParmedError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; If we hit an end-of-file in parsing CHARMM files &quot;&quot;&quot;</span></div>
 </pre></div>
@@ -165,9 +164,9 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
@@ -184,7 +183,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -193,14 +192,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li>
-          <li><a href="../parmed.html" >parmed</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>
