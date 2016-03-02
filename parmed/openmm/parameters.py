@@ -161,22 +161,25 @@ class OpenMMParameterSet(ParameterSet):
             own_handle = True
         else:
             own_handle = False
-        typeified = False
-        if self.atom_types:
-            try:
-                self.typeify_templates()
-                typeified = True
-            except KeyError:
-                warnings.warn('Some residue templates are using unavailable '
-                              'AtomTypes', ParameterWarning)
+        unused_residues = False
         if not write_unused:
-            if not typeified:
-                warnings.warn('Typification of the templates was not successful. '
-                              'Proceeding with write_unused=False is not advised',
-                               ParameterWarning)
+            for name, residue in iteritems(self.residues):
+                if any((atom.type not in parm.atom_types for atom in residue)):
+                        del self.residues[name]
+                        unused_residues = True
+            if unused_residues:
+                warnings.warn('Some residue templates using unavailable AtomTypes '
+                              'were found. They were removed as write_unused is '
+                              'set to False', ParameterWarning)
             skip_types = self._find_unused_types()
         else:
             skip_types = set()
+        if self.atom_types:
+            try:
+                self.typeify_templates()
+            except KeyError:
+                warnings.warn('Some residue templates are using unavailable '
+                              'AtomTypes', ParameterWarning)
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
