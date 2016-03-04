@@ -512,6 +512,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                   os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
         )
         ffxml = StringIO()
+        warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 231)
