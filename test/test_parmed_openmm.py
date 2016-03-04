@@ -492,8 +492,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
 
     def test_write_xml_parameters_amber_write_unused(self):
-        """ Test writing XML parameters loaded from part of the ff14SB forcefield
-        files, using the write_unused argument"""
+        """Test the write_unused argument in writing XML files"""
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.amber.AmberParameterSet(get_fn('amino12.lib'),
                 os.path.join(get_fn('parm'), 'parm10.dat'),
@@ -507,6 +506,20 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 1646)
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
+                  os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
+        )
+        ffxml = StringIO()
+        warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
+        params.write(ffxml)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 231)
+        ffxml = StringIO()
+        params.write(ffxml, write_unused=False)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 66)
 
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
