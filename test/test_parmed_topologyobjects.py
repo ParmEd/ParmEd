@@ -142,15 +142,15 @@ class TestTopologyObjects(unittest.TestCase):
     def test_atom(self):
         """ Tests the Atom object """
         a1 = Atom(atomic_number=6, name='C1', type='CT', charge=-0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a3 = Atom(atomic_number=6, name='C3', type='CT', charge=0.0,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a4 = Atom(atomic_number=6, name='C4', type='CT', charge=-0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         a5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
-                  mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                  mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         self.assertRaises(IndexError, a1.nonbonded_exclusions)
         # Make sure the atom attributes are transferred correctly (only check
         # the first atom)
@@ -162,7 +162,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a1.mass, 12.01)
         self.assertEqual(a1.tree, 'M')
         self.assertEqual(a1.nb_idx, 1)
-        self.assertEqual(a1.radii, 1.8)
+        self.assertEqual(a1.solvent_radius, 1.8)
         self.assertEqual(a1.idx, -1)
         self.assertEqual(a1.marked, 0)
         self.assertEqual(a1.screen, 0)
@@ -249,7 +249,7 @@ class TestTopologyObjects(unittest.TestCase):
 
         # Test L-J handling
         lja1 = Atom(atomic_number=6, name='C1', type='CT', charge=-0.1,
-                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                    mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         self.assertEqual(lja1.sigma, 0.0)
         lja1.atom_type = AtomType('CT', 1, 12.01, 6)
         lja1.atom_type.set_lj_params(1.0, 2.0, 1.1, 2.1)
@@ -257,7 +257,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(lja1.rmin, 2.0)
         self.assertEqual(lja1.sigma, 2.0*2**(-1/6)*2)
         lja2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
-                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                    mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         lja2.sigma = 1.0
         self.assertEqual(lja2.sigma, 1.0)
         self.assertEqual(lja2.sigma_14, 1.0)
@@ -266,14 +266,14 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(lja2.rmin_14, 1.5*2**(1/6)/2)
         self.assertAlmostEqual(lja2.rmin, 2**(1/6)/2)
         lja3 = Atom(atomic_number=6, name='C3', type='CT', charge=0.0,
-                    mass=12.01, nb_idx=1, radii=1.8, tree='M')
+                    mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         lja3.atom_type = AtomType('CX', 2, 12.01, 6)
         lja3.atom_type.set_lj_params(2.0, 3.0)
         self.assertEqual(lja3.sigma_14, 3*2**(-1/6)*2)
 #       lja4 = Atom(atomic_number=6, name='C4', type='CT', charge=-0.1,
-#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+#                   mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
 #       lja5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
-#                   mass=12.01, nb_idx=1, radii=1.8, tree='M')
+#                   mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
 
         a1.element = 7
         self.assertEqual(a1.atomic_number, 7)
@@ -1542,16 +1542,17 @@ class TestTopologyObjects(unittest.TestCase):
         # Check segid assignment
         self.assertEqual(res.segid, 'SYS')
         # Deprecated behavior
-        warnings.filterwarnings('error', category=DeprecationWarning)
         self.assertRaises(DeprecationWarning, lambda: res[0].segid)
         def tmp():
             res[0].segid = 'SYS1'
         self.assertRaises(DeprecationWarning, tmp)
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='parmed')
         tmp()
         self.assertEqual(res[0].segid, 'SYS1')
         self.assertEqual(res.segid, 'SYS1')
-        warnings.filterwarnings('always', category=DeprecationWarning)
+        warnings.filterwarnings('error', category=DeprecationWarning,
+                                module='parmed')
 
         # __repr__ testing
         self.assertEqual(repr(atoms[0]), '<Atom CA [0]; In ALA -1>')

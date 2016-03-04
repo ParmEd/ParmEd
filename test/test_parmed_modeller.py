@@ -33,16 +33,26 @@ class TestResidueTemplate(unittest.TestCase):
 
     def setUp(self):
         self.templ = templ = ResidueTemplate('ACE')
-        templ.add_atom(Atom(name='HH31', type='HC'))
-        templ.add_atom(Atom(name='CH3', type='CT'))
-        templ.add_atom(Atom(name='HH32', type='HC'))
-        templ.add_atom(Atom(name='HH33', type='HC'))
-        templ.add_atom(Atom(name='C', type='C'))
-        templ.add_atom(Atom(name='O', type='O'))
+        templ.add_atom(Atom(name='HH31', type='HC', atomic_number=1))
+        templ.add_atom(Atom(name='CH3', type='CT', atomic_number=6))
+        templ.add_atom(Atom(name='HH32', type='HC', atomic_number=1))
+        templ.add_atom(Atom(name='HH33', type='HC', atomic_number=1))
+        templ.add_atom(Atom(name='C', type='C', atomic_number=6))
+        templ.add_atom(Atom(name='O', type='O', atomic_number=8))
         templ.type = PROTEIN
         templ.tail = templ.atoms[4]
+        repr(PROTEIN) # make sure it works, don't care what its value is
+        assert str(PROTEIN) == 'PROTEIN'
 
-    def testAddAtom(self):
+    @unittest.skipIf(pd is None, "Cannot test without pandas")
+    def test_data_frame(self):
+        """ Test converting ResidueTemplate to a DataFrame """
+        df = self.templ.to_dataframe()
+        self.assertEqual(df.shape, (6, 20))
+        self.assertAlmostEqual(df.charge.sum(), 0)
+        self.assertEqual(df.atomic_number.sum(), 23)
+
+    def test_add_atom(self):
         """ Tests the ResidueTemplate.add_atom function """
         templ = self.templ
         self.assertEqual(len(templ), 6)
@@ -55,8 +65,11 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(templ.head, None)
         self.assertIs(templ.tail, templ[-2])
         self.assertRaises(ValueError, lambda: templ.add_atom(Atom(name='C')))
+        self.assertRaises(IndexError, lambda: templ['NOAT'])
+        # Make sure we can print an atom's repr when it is in a ResidueTemplate
+        repr(templ.atoms[0])
 
-    def testToStructure(self):
+    def test_to_structure(self):
         """ Tests the ResidueTemplate.to_structure function """
         a1, a2, a3, a4, a5, a6 = self.templ.atoms
         self.templ.add_bond(a1, a2)
@@ -71,7 +84,7 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertEqual(len(struct.residues), 1)
         self.assertEqual(len(struct.bonds), 5)
 
-    def testCopy(self):
+    def test_copy(self):
         """ Tests ResidueTemplate __copy__ functionality """
         for atom in self.templ:
             atom.xx = random.random() * 20 - 10
@@ -126,7 +139,7 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIs(self.templ.first_patch, templcopy.first_patch)
         self.assertIs(self.templ.last_patch, templcopy.last_patch)
 
-    def testFixCharge(self):
+    def test_fix_charge(self):
         """ Tests charge fixing for ResidueTemplate """
         self.assertRaises(ValueError, lambda:
                 ResidueTemplate().fix_charges())
@@ -152,7 +165,7 @@ class TestResidueTemplate(unittest.TestCase):
         # Check that the return value is the residue itself
         self.assertIs(return_value, self.templ)
 
-    def testFixCharge2(self):
+    def test_fix_charge_2(self):
         """ Tests charge fixing to a specific value for ResidueTemplate """
         desired_charge = random.choice(range(-10, 11))
         charges = [random.random()*2 - 2 for a in self.templ]
@@ -177,9 +190,10 @@ class TestResidueTemplate(unittest.TestCase):
         # Check that the return value is the residue itself
         self.assertIs(return_value, self.templ)
 
-    def testFixChargeContainer(self):
+    def test_fix_charge_container(self):
         """ Tests charge fixing for ResidueTemplateContainer """
         rescont = ResidueTemplateContainer()
+        self.assertRaises(ValueError, rescont.fix_charges)
         for i in range(10):
             templcopy = copy(self.templ)
             templcopy.name = '%s%d' % (templcopy.name, i)
@@ -210,8 +224,17 @@ class TestResidueTemplate(unittest.TestCase):
             self.assertAlmostEqual(round(oc), sum(float(x) for x in strchgs),
                                    places=precision+3)
             self.assertAlmostEqual(sum(a.charge for a in res), nc, places=10)
+        # Make all charges alternate between 1.0 and -1.0 for the first residue,
+        # then show that fixing charges does not change them
+        charges = []
+        for i, atom in enumerate(rescont[0].atoms):
+            atom.charge = 1**(-i)
+            charges.append(1**(-i))
+        rescont[0].fix_charges()
+        for a, c in zip(rescont[0].atoms, charges):
+            self.assertEqual(a.charge, c)
 
-    def testAddBondsAtoms(self):
+    def test_add_bonds_atoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
         templ = self.templ
         a1, a2, a3, a4, a5, a6 = templ.atoms
@@ -233,7 +256,7 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIn(a6, a5.bond_partners)
         self.assertEqual(len(templ.bonds), 5)
 
-    def testAddBondsIdx(self):
+    def test_add_bonds_idx(self):
         """ Tests the ResidueTemplate.add_bond function w/ atoms """
         templ = self.templ
         a1, a2, a3, a4, a5, a6 = range(6)
@@ -256,12 +279,26 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertIn(a6, a5.bond_partners)
         self.assertEqual(len(templ.bonds), 5)
 
-    def testFromResidue(self):
+    def test_from_residue(self):
         """ Tests the ResidueTemplate.from_residue function """
         # Grab this residue from an amber prmtop file
         struct = AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         for res in struct.residues:
             self._check_arbitrary_res(struct, res)
+
+    def test_from_residue_noorder(self):
+        """ Tests the from_residue function when residue order unknown """
+        struct = AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
+        residues = struct.residues[:]
+        del struct.residues[:]
+        for res in residues:
+            self.assertEqual(res.idx, -1)
+        self.assertGreater(len(residues), 0)
+        # Check what should be a warning
+        warnings.filterwarnings('error', category=UserWarning)
+        self.assertRaises(UserWarning, lambda:
+                ResidueTemplate.from_residue(residues[1]))
+        warnings.filterwarnings('always', category=UserWarning)
 
     def _check_arbitrary_res(self, struct, res):
         orig_indices = [a.idx for a in res]
@@ -282,6 +319,8 @@ class TestResidueTemplate(unittest.TestCase):
             self.assertEqual(a1.xx, a2.xx)
             self.assertEqual(a1.xy, a2.xy)
             self.assertEqual(a1.xz, a2.xz)
+            self.assertIn(a2, templ)
+            self.assertNotIn(a1, templ)
         # Make sure we have the correct number of bonds in the residue
         bondset = set()
         for atom in res:
@@ -321,11 +360,13 @@ class TestResidueTemplate(unittest.TestCase):
         # Make sure that our coordinates come as a numpy array
         self.assertIsInstance(templ.coordinates, np.ndarray)
         self.assertEqual(templ.coordinates.shape, (len(templ), 3))
+        # Check that repr doesn't fail
+        repr(templ)
 
 class TestResidueTemplateContainer(unittest.TestCase):
     """ Tests the ResidueTemplateContainer class """
 
-    def testFromStructure(self):
+    def test_from_structure(self):
         """ Tests building ResidueTemplateContainer from a Structure """
         struct = AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         cont = ResidueTemplateContainer.from_structure(struct)
@@ -339,8 +380,10 @@ class TestResidueTemplateContainer(unittest.TestCase):
                 self.assertEqual(a1.xx, a2.xx)
                 self.assertEqual(a1.xy, a2.xy)
                 self.assertEqual(a1.xz, a2.xz)
+        # Check accessor
+        self.assertIs(cont[0], cont[cont[0].name])
 
-    def testToLibrary(self):
+    def test_to_library(self):
         """ Tests converting a ResidueTemplateContainer to a library/dict """
         lib = ResidueTemplateContainer.from_structure(
                 AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
@@ -399,7 +442,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         self.container.append(self.ace)
         self.container.append(self.nme)
 
-    def testResidueTemplateMol2Save(self):
+    def test_residue_template_mol2_save(self):
         """ Tests ResidueTemplate.save() method for Mol2 file """
         # Check saving mol2 files by keyword
         self.ace.save(get_fn('test', written=True), format='mol2')
@@ -437,7 +480,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         x = Mol2File.parse(get_fn('test.mol2.bz2', written=True))
         self._check_templates(x, self.nme, preserve_headtail=False)
 
-    def testResidueTemplatePDBSave(self):
+    def test_residue_template_pdb_save(self):
         """ Tests ResidueTemplate.save() method for PDB file """
         # Check saving pdb files by keyword
         self.ace.save(get_fn('test', written=True), format='pdb')
@@ -456,7 +499,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
             self.assertEqual(a1.name, a2.name)
             self.assertEqual(a1.residue.name, a2.residue.name)
 
-    def testResidueTemplateMol3Save(self):
+    def test_residue_template_mol3_save(self):
         """ Tests ResidueTemplate.save() method for Mol3 file """
         # Check saving mol3 files by keyword
         self.ace.save(get_fn('test', written=True), format='mol3')
@@ -494,7 +537,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         x = Mol2File.parse(get_fn('test.mol3.bz2', written=True))
         self._check_templates(x, self.nme, preserve_headtail=True)
 
-    def testResidueTemplateOFFSave(self):
+    def test_residue_template_off_save(self):
         """ Tests ResidueTemplate.save() method for OFF lib file """
         # Check saving OFF files by keyword
         self.ace.save(get_fn('test', written=True), format='offlib')
@@ -532,7 +575,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         x = AmberOFFLibrary.parse(get_fn('test.off.bz2', written=True))['NME']
         self._check_templates(x, self.nme, preserve_headtail=True)
 
-    def testResidueTemplateSaveBadFormat(self):
+    def test_residue_template_save_bad_format(self):
         """ Tests proper exceptions for bad format types to ResidueTemplate """
         self.assertRaises(ValueError, lambda:
                 self.ace.save(get_fn('noextension', written=True)))
@@ -543,7 +586,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         self.assertRaises(ValueError, lambda:
                 self.nme.save(get_fn('test.mol2', written=True), format='SOMETHING'))
 
-    def testResidueTemplateContainerMol2Save(self):
+    def test_residue_template_container_mol2_save(self):
         """ Tests ResidueTemplateContainer.save() method for mol2 files """
         # Check saving mol2 files by keyword
         self.container.save(get_fn('test', written=True), format='mol2')
@@ -577,7 +620,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         self._check_templates(x[0], self.ace, preserve_headtail=False)
         self._check_templates(x[1], self.nme, preserve_headtail=False)
 
-    def testResidueTemplateContainerMol3Save(self):
+    def test_residue_template_container_mol3_save(self):
         """ Tests ResidueTemplateContainer.save() method for mol3 files """
         # Check saving mol3 files by keyword
         self.container.save(get_fn('test', written=True), format='mol3')
@@ -611,7 +654,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         self._check_templates(x[0], self.ace, preserve_headtail=True)
         self._check_templates(x[1], self.nme, preserve_headtail=True)
 
-    def testResidueTemplateContainerOFFSave(self):
+    def test_residue_template_container_off_save(self):
         """ Tests ResidueTemplateContainer.save() method for Amber OFF files """
         # Check saving Amber OFF files by keyword
         self.container.save(get_fn('test', written=True), format='offlib')
@@ -636,6 +679,15 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
         x = AmberOFFLibrary.parse(get_fn('test.lib.bz2', written=True))
         self._check_templates(x['ACE'], self.ace, preserve_headtail=True)
         self._check_templates(x['NME'], self.nme, preserve_headtail=True)
+
+    def test_bad_save(self):
+        """ Test error handling in ResidueTemplateContainer.save """
+        self.assertRaises(ValueError, lambda:
+                self.container.save('unrecognized.file.bz2'))
+        self.assertRaises(ValueError, lambda:
+                self.container.save('unrecognized.file'))
+        self.assertRaises(ValueError, lambda:
+                self.container.save('something', format='NOPE'))
 
     def _check_templates(self, templ1, templ2, preserve_headtail=True):
         self.assertEqual(len(templ1.atoms), len(templ2.atoms))
@@ -668,7 +720,7 @@ class TestResidueTemplateSaver(utils.FileIOTestCase):
 class TestAmberOFFLibrary(utils.FileIOTestCase):
     """ Tests the AmberOFFLibrary class """
 
-    def testFromLibrary(self):
+    def test_from_library(self):
         """ Tests ResidueTemplateContainer.from_library functionality """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         lib = ResidueTemplateContainer.from_library(offlib)
@@ -682,7 +734,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
             r1 = offlib[r1]
             self.assertIsNot(r1, r2)
 
-    def testReadInternal(self):
+    def test_read_internal(self):
         """ Tests reading Amber amino12 OFF library (internal residues) """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         self.assertEqual(len(offlib), 28)
@@ -782,7 +834,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         self.assertEqual(len(cyx.connections), 1)
         self.assertEqual(cyx.connections[0].name, 'SG')
 
-    def testReadNTerm(self):
+    def test_read_n_term(self):
         """ Test reading N-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
         self.assertEqual(len(offlib), 24)
@@ -793,7 +845,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
             self.assertEqual(res.tail.name, 'C')
             self.assertIs(res.type, PROTEIN)
 
-    def testReadCTerm(self):
+    def test_read_c_term(self):
         """ Test reading C-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
         self.assertEqual(len(offlib), 26)
@@ -803,7 +855,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
             self.assertEqual(res.head.name, 'N')
             self.assertIs(res.type, PROTEIN)
 
-    def testReadSolvents(self):
+    def test_read_solvents(self):
         """ Test reading solvent Amber OFF lib (multi-res units) """
         # Turn off warnings... the solvents.lib file is SO broken.
         warnings.filterwarnings('ignore', module='.', category=AmberWarning)
@@ -852,8 +904,12 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         self.assertAlmostEqual(chcl3[1][0].xx, -9.668111)
         self.assertAlmostEqual(chcl3[1][0].xy, -15.097137)
         self.assertAlmostEqual(chcl3[1][0].xz, -18.569579)
+        # We can't convert the solvents library to a ResidueTemplateContainer,
+        # since it contains ResidueTemplateContainer instances
+        self.assertRaises(ValueError, lambda:
+                ResidueTemplateContainer.from_library(offlib))
 
-    def testReadWriteInternal(self):
+    def test_read_write_internal(self):
         """ Tests reading/writing of Amber OFF internal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         outfile = StringIO()
@@ -862,7 +918,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         offlib2 = AmberOFFLibrary.parse(outfile)
         self._check_read_written_libs(offlib, offlib2)
 
-    def testReadWriteCTerm(self):
+    def test_read_write_c_term(self):
         """ Tests reading/writing of Amber OFF C-terminal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
         outfile = StringIO()
@@ -871,7 +927,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         offlib2 = AmberOFFLibrary.parse(outfile)
         self._check_read_written_libs(offlib, offlib2)
 
-    def testReadWriteNTerm(self):
+    def test_read_write_n_term(self):
         """ Tests reading/writing of Amber OFF N-terminal AA libs """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
         outfile = StringIO()
@@ -880,7 +936,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         offlib2 = AmberOFFLibrary.parse(outfile)
         self._check_read_written_libs(offlib, offlib2)
 
-    def testReadWriteSolventLib(self):
+    def test_read_write_solvent_lib(self):
         """ Tests reading/writing of Amber OFF solvent libs """
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         outfile = StringIO()
@@ -888,7 +944,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         outfile.seek(0)
         offlib2 = AmberOFFLibrary.parse(outfile)
 
-    def testBadOFFFiles(self):
+    def test_bad_off_files(self):
         """ Tests error checking in OFF library files """
         self.assertRaises(ValueError, lambda:
                 AmberOFFLibrary.parse(get_fn('trx.prmtop')))
@@ -901,7 +957,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         )
 
     @unittest.skipIf(pd is None, "Cannot test without pandas")
-    def testDataFrame(self):
+    def test_data_frame(self):
         """ Test converting ResidueTemplate to a DataFrame """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         df = offlib['ALA'].to_dataframe()
@@ -965,7 +1021,7 @@ class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
         utils.FileIOTestCase.tearDown(self)
 
     @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
-    def testAmberAminoInternal(self):
+    def test_amber_amino_internal(self):
         """ Test that the internal AA OFF library writes work with LEaP """
         # First create the parm to test against... we are in "writes" right now
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
@@ -1008,7 +1064,7 @@ quit
         self._check_corresponding_files(pdb1, pdb2, parm1, parm2)
 
     @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
-    def testAmberAminoTermini(self):
+    def test_amber_amino_termini(self):
         """ Test that the terminal AA OFF library writes work with LEaP """
         offlib1 = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
         offlib2 = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
@@ -1068,7 +1124,7 @@ quit
             self.assertEqual(a1.atomic_number, a2.atomic_number)
             self.assertEqual(a1.atom_type.rmin, a2.atom_type.rmin)
             self.assertEqual(a1.atom_type.epsilon, a2.atom_type.epsilon)
-            self.assertEqual(a1.radii, a2.radii)
+            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
             self.assertEqual(a1.screen, a2.screen)
             # Ugh. OFF libs are inconsistent
             if tree:
@@ -1091,7 +1147,7 @@ quit
 class TestSlice(unittest.TestCase):
     '''Test slicing ResidueTemplate'''
 
-    def testSliceFromArrayLike(self):
+    def test_slice_from_array_like(self):
         """ Test slicing by a tuple/list"""
         residue = pmd.load_file(get_fn('aminont12.lib'))['NALA']
 

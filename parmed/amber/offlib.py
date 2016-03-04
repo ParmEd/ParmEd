@@ -181,6 +181,9 @@ class AmberOFFLibrary(object):
                 templ = ResidueTemplate(name)
             templ.add_atom(atom)
             line = fileobj.readline()
+            # Skip blank lines
+            while line and not line.strip():
+                line = fileobj.readline()
         container.append(templ)
         if nres > 1:
             start_atoms = []
@@ -327,10 +330,12 @@ class AmberOFFLibrary(object):
                                (rematch.groups()[0], name))
         for i in range(nres):
             c1,c2,c3,c4,c5,c6 = (int(x) for x in fileobj.readline().split())
-            if templ.head is not None and templ.head is not templ[c1-1]:
-                warnings.warn('HEAD atom is not connect0')
-            if templ.tail is not None and templ.tail is not templ[c2-1]:
-                warnings.warn('TAIL atom is not connect1')
+            if (c1 > 0 and templ.head is not None and
+                    templ.head is not templ[c1-1]):
+                raise RuntimeError('HEAD atom is not connect0')
+            if (c2 > 0 and templ.tail is not None and
+                    templ.tail is not templ[c2-1]):
+                raise RuntimeError('TAIL atom is not connect1')
             for i in (c3, c4, c5, c6):
                 if i == 0: continue
                 templ.connections.append(templ[i-1])
@@ -361,8 +366,8 @@ class AmberOFFLibrary(object):
             elif typ == 'w':
                 container[i].type = SOLVENT
             elif typ != '?':
-                warnings.warn('Unknown residue type "%s"' % typ,
-                              AmberWarning)
+                warnings.warn('Unknown residue type "%s"' % typ, AmberWarning)
+# TODO delete
             if nres > 1:
                 container[i].name = resname
         # Get the residues sequence table
@@ -474,7 +479,7 @@ class AmberOFFLibrary(object):
             if res.box[3] == res.box[4] == res.box[5]:
                 dest.write(' %f\n' % res.box[3])
             else:
-                raise ValueError('Cannot write boxes with different angles')
+                raise RuntimeError('Cannot write boxes with different angles')
             dest.write(' %f\n' % res.box[0])
             dest.write(' %f\n' % res.box[1])
             dest.write(' %f\n' % res.box[2])

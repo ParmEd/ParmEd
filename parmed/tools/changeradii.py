@@ -8,23 +8,32 @@ def bondi(parm):
         # Radius of C atom depends on what type it is
         if atom.atomic_number == 6:
             if atom.type.startswith('C1') and atom.mass > 13.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C2') and atom.mass > 14.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C3') and atom.mass > 15.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             else:
-                atom.radii = 1.7
+                atom.solvent_radius = 1.7
         # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 1: atom.radii = 1.2
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
+        elif atom.atomic_number == 1:
+            atom.solvent_radius = 1.2
+        elif atom.atomic_number == 7:
+            atom.solvent_radius = 1.55
+        elif atom.atomic_number == 8:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 9:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 14:
+            atom.solvent_radius = 2.1
+        elif atom.atomic_number == 15:
+            atom.solvent_radius = 1.85
+        elif atom.atomic_number == 16:
+            atom.solvent_radius = 1.8
+        elif atom.atomic_number == 17:
+            atom.solvent_radius = 1.5
+        else:
+            atom.solvent_radius = 1.5
 
     try:
         parm.parm_data['RADIUS_SET'][0] = 'Bondi radii (bondi)'
@@ -41,31 +50,38 @@ def amber6(parm):
         bondeds = list(atom.bond_partners)
         if atom.atomic_number == 1:
             if bondeds[0].atomic_number == 6: # carbon
-                atom.radii = 1.3
+                atom.solvent_radius = 1.3
             elif bondeds[0].atomic_number in (8, 16): # oxygen or sulfur
-                atom.radii = 0.8
+                atom.solvent_radius = 0.8
             else: # anything else
-                atom.radii = 1.2
+                atom.solvent_radius = 1.2
         # Radius of C atom depends on what type it is
         elif atom.atomic_number == 6:
             if atom.type.startswith('C1') and atom.mass > 13.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C2') and atom.mass > 14.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C3') and atom.mass > 15.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             else:
-                atom.radii = 1.7
-        # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
-
+                atom.solvent_radius = 1.7
+        # All other elements have fixed solvent_radius for all types/partners
+        elif atom.atomic_number == 7:
+            atom.solvent_radius = 1.55
+        elif atom.atomic_number == 8:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 9:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 14:
+            atom.solvent_radius = 2.1
+        elif atom.atomic_number == 15:
+            atom.solvent_radius = 1.85
+        elif atom.atomic_number == 16:
+            atom.solvent_radius = 1.8
+        elif atom.atomic_number == 17:
+            atom.solvent_radius = 1.5
+        else:
+            atom.solvent_radius = 1.5
     try:
         parm.parm_data['RADIUS_SET'][0] = 'amber6 modified Bondi radii (amber6)'
     except AttributeError:
@@ -81,31 +97,38 @@ def mbondi(parm):
         if atom.atomic_number == 1:
             bondeds = list(atom.bond_partners)
             if bondeds[0].atomic_number in (6, 7): # C or N
-                atom.radii = 1.3
+                atom.solvent_radius = 1.3
             elif bondeds[0].atomic_number in (8, 16): # O or S
-                atom.radii = 0.8
+                atom.solvent_radius = 0.8
             else:
-                atom.radii = 1.2
+                atom.solvent_radius = 1.2
         # Radius of C atom depends on what type it is
         elif atom.atomic_number == 6:
             if atom.type.startswith('C1') and atom.mass > 13.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C2') and atom.mass > 14.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C3') and atom.mass > 15.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             else:
-                atom.radii = 1.7
-        # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8:  atom.radii = 1.5
-        elif atom.atomic_number == 9:  atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
-
+                atom.solvent_radius = 1.7
+        # All other elements have fixed solvent_radius for all types/partners
+        elif atom.atomic_number == 7:
+            atom.solvent_radius = 1.55
+        elif atom.atomic_number == 8:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 9:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 14:
+            atom.solvent_radius = 2.1
+        elif atom.atomic_number == 15:
+            atom.solvent_radius = 1.85
+        elif atom.atomic_number == 16:
+            atom.solvent_radius = 1.8
+        elif atom.atomic_number == 17:
+            atom.solvent_radius = 1.5
+        else:
+            atom.solvent_radius = 1.5
     try:
         parm.parm_data['RADIUS_SET'][0] = 'modified Bondi radii (mbondi)'
     except AttributeError:
@@ -120,29 +143,36 @@ def mbondi2(parm):
         # Radius of H atom depends on element it is bonded to
         if atom.atomic_number == 1:
             if atom.bond_partners[0].atomic_number == 7:
-                atom.radii = 1.3
+                atom.solvent_radius = 1.3
             else:
-                atom.radii = 1.2
+                atom.solvent_radius = 1.2
         # Radius of C atom depends on what type it is
         elif atom.atomic_number == 6:
             if atom.type.startswith('C1') and atom.mass > 13.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C2') and atom.mass > 14.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             if atom.type.startswith('C3') and atom.mass > 15.0:
-                atom.radii = 2.2
+                atom.solvent_radius = 2.2
             else:
-                atom.radii = 1.7
-        # All other elements have fixed radii for all types/partners
-        elif atom.atomic_number == 7: atom.radii = 1.55
-        elif atom.atomic_number == 8: atom.radii = 1.5
-        elif atom.atomic_number == 9: atom.radii = 1.5
-        elif atom.atomic_number == 14: atom.radii = 2.1
-        elif atom.atomic_number == 15: atom.radii = 1.85
-        elif atom.atomic_number == 16: atom.radii = 1.8
-        elif atom.atomic_number == 17: atom.radii = 1.5
-        else: atom.radii = 1.5
-
+                atom.solvent_radius = 1.7
+        # All other elements have fixed solvent_radius for all types/partners
+        elif atom.atomic_number == 7:
+            atom.solvent_radius = 1.55
+        elif atom.atomic_number == 8:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 9:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 14:
+            atom.solvent_radius = 2.1
+        elif atom.atomic_number == 15:
+            atom.solvent_radius = 1.85
+        elif atom.atomic_number == 16:
+            atom.solvent_radius = 1.8
+        elif atom.atomic_number == 17:
+            atom.solvent_radius = 1.5
+        else:
+            atom.solvent_radius = 1.5
     try:
         parm.parm_data['RADIUS_SET'][0] = 'H(N)-modified Bondi radii (mbondi2)'
     except AttributeError:
@@ -158,16 +188,16 @@ def mbondi3(parm):
         # Adjust OE (GLU), OD (ASP), and HH/HE (ARG)
         if atom.residue.name in ('GLU', 'ASP', 'GL4', 'AS4'):
             if atom.name.startswith('OE') or atom.name.startswith('OD'):
-                atom.radii = 1.4
+                atom.solvent_radius = 1.4
         elif atom.residue.name == 'ARG':
             if atom.name.startswith('HH') or atom.name.startswith('HE'):
-                atom.radii = 1.17
+                atom.solvent_radius = 1.17
         # Adjust carboxylate O radii on C-Termini. Don't just do the end
         # residue, since we can have C-termini in the middle as well
         # (i.e., 2-chain dimers)
         if atom.name == 'OXT':
-            atom.radii = 1.4
-            parm.atoms[i-1].radii = 1.4
+            atom.solvent_radius = 1.4
+            parm.atoms[i-1].solvent_radius = 1.4
 
     try:
         parm.parm_data['RADIUS_SET'][0] = \

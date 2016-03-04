@@ -180,7 +180,13 @@ class Mol2File(object):
                         restemp.name = resname
                         last_residue = (resid, resname)
                         multires_structure = True
-                    restemp.add_atom(copy.copy(atom))
+                    try:
+                        restemp.add_atom(copy.copy(atom))
+                    except ValueError:
+                        # Allow mol2 files being parsed as a Structure to have
+                        # duplicate atom names
+                        if not structure:
+                            raise
                     continue
                 if section == 'BOND':
                     # Section formatted as follows:
@@ -219,7 +225,8 @@ class Mol2File(object):
                             res1.head = res1[idx1]
                             res2.tail = res2[idx2]
                     elif not multires_structure:
-                        restemp.add_bond(a1-1, a2-1)
+                        if not structure:
+                            restemp.add_bond(a1-1, a2-1)
                     else:
                         # Same residue, add the bond
                         offset = atom1.residue[0].idx

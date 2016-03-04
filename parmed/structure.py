@@ -28,10 +28,6 @@ from copy import copy
 import math
 import numpy as np
 import os
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
@@ -40,58 +36,26 @@ from parmed.residue import SOLVENT_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
-        NonbondedException, AcceptorDonor, Group, Atom, ExtraPoint,
-        TwoParticleExtraPointFrame, ChiralFrame, MultipoleFrame, NoUreyBradley,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame)
+        NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
+        TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
 from parmed import unit as u
 from parmed.utils import tag_molecules, PYPY
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
-import re
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
     from simtk import openmm as mm
     from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
-except ImportError:
-    app = mm = None
+except ImportError:  # pragma: no cover
+    app = mm = None  # pragma: no cover
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # Private attributes and methods
-
-relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
-
-def _compare_atoms(old_atom, new_atom, resname, resid, chain):
-    """
-    Compares two atom instances, along with the residue name, number, and chain
-    identifier, to determine if two atoms are actually the *same* atom, but
-    simply different conformations
-
-    Parameters
-    ----------
-    old_atom : :class:`Atom`
-        The original atom that has been added to the structure already
-    new_atom : :class:`Atom`
-        The new atom that we want to see if it is the same as the old atom
-    resname : ``str``
-        The name of the residue that the new atom would belong to
-    resid : ``int``
-        The number of the residue that the new atom would belong to
-    chain : ``str``
-        The chain identifier that the new atom would belong to
-
-    Returns
-    -------
-    True if they are the same atom, False otherwise
-    """
-    if old_atom.name != new_atom.name: return False
-    if old_atom.residue.name != resname: return False
-    if old_atom.residue.number != resid: return False
-    if old_atom.residue.chain != chain.strip(): return False
-    return True
 
 def _strip_box_units(args):
     new_args = []
@@ -564,10 +528,12 @@ class Structure(object):
                 )
                 c.dihedrals[-1]._funct = d._funct
         for ub in self.urey_bradleys:
-            if ub.type is NoUreyBradley: continue
+            if ub.type is NoUreyBradley:
+                typ = NoUreyBradley
+            else:
+                typ = ub.type and c.urey_bradley_types[ub.type.idx]
             c.urey_bradleys.append(
-                    UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx],
-                                ub.type and c.urey_bradley_types[ub.type.idx])
+                    UreyBradley(atoms[ub.atom1.idx], atoms[ub.atom2.idx], typ)
             )
         for i in self.impropers:
             c.impropers.append(
@@ -647,7 +613,7 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
-        c._box = copy(self.box)
+        c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
         return c
@@ -836,7 +802,7 @@ class Structure(object):
                 sel = list(selection)
             except TypeError:
                 raise TypeError('Selection not a supported type [%s]' %
-                                type(selection))
+                                type(selection).__name__)
             if len(sel) != len(self.atoms):
                 raise ValueError('Selection iterable wrong length')
         atomlist = sorted([i for i, s in enumerate(sel) if s])
@@ -849,7 +815,7 @@ class Structure(object):
         if self._coordinates is not None:
             if PYPY:
                 # numpypy does not currently support advanced indexing it seems
-                self._coordinates = np.array(
+                self._coordinates = np.array( # pragma: no cover
                         [[[x, y, z] for i, (x, y, z) in enumerate(crd)
                             if sel[i]==0] for crd in self._coordinates]
                 )
@@ -952,7 +918,9 @@ class Structure(object):
                     continue
                 # Add the type if applicable
                 kws = dict()
-                if otypcp and val.type is not None:
+                if hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
+                elif otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
                     used_types[val.type.idx] = True
                 for i, at in enumerate(ats):
@@ -1061,6 +1029,7 @@ class Structure(object):
                         isinstance(ressel, integer_types) and
                         isinstance(atomsel, integer_types)):
                     # Special-case single-atom selection for efficiency
+                    chainmap = dict(chainmap) # no longer defaultdict
                     try:
                         return chainmap[chainsel][ressel][atomsel]
                     except KeyError:
@@ -1210,29 +1179,16 @@ class Structure(object):
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
                     for a1, a2 in zip(struct.atoms, sel):
-                        if a1.residue is None:
-                            if a2.residue is not None:
-                                break
-                        elif a2.residue is None:
-                            break
-                        elif a1.residue.name != a2.residue.name:
-                            break
-                        if not a1.type and not a2.type:
-                            if a1.name != a2.name: break
-                        else:
-                            if a1.type != a2.type: break
+                        assert None not in (a1.residue, a2.residue), \
+                                'Residues must all be set'
+                        if a1.residue.name != a2.residue.name: break
+                        if a1.name != a2.name: break
                     else:
                         counts[j].add(i)
                         is_duplicate = True
                         break
             if not is_duplicate:
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
-                if isinstance(mol, Atom):
-                    s = type(self)()
-                    s.add_atom(copy(mol), mol.residue.name,
-                               mol.residue.number, mol.residue.chain,
-                               mol.residue.insertion_code)
-                    mol = s
                 structs.append(mol)
                 counts.append(set([i]))
         return list(zip(structs, counts))
@@ -1310,7 +1266,8 @@ class Structure(object):
             raise IOError('%s exists; not overwriting' % fname)
         all_ints = True
         for atom in self.atoms:
-            if isinstance(atom.type, integer_types):
+            if (isinstance(atom.type, integer_types) and
+                    atom.atom_type is not UnassignedAtomType):
                 atom.type = str(atom.atom_type)
             else:
                 all_ints = False
@@ -1318,9 +1275,9 @@ class Structure(object):
             if format is not None:
                 format = format.upper()
             else:
-                _, ext = os.path.splitext(fname)
+                base, ext = os.path.splitext(fname)
                 if ext in ('.bz2', '.gz'):
-                    ext = os.path.splitext(ext)[1]
+                    ext = os.path.splitext(base)[1]
                 try:
                     format = extmap[ext]
                 except KeyError:
@@ -1363,11 +1320,12 @@ class Structure(object):
                         if 'Cannot translate exceptions' in str(e):
                             s = amber.ChamberParm.from_structure(self)
                         else:
-                            raise
+                            raise # pragma: no cover
                     s.write_parm(fname, **kwargs)
             elif format in ('RST7', 'NCRST'):
                 rst7 = amber.Rst7(natom=len(self.atoms), **kwargs)
                 rst7.coordinates = self.coordinates
+                rst7.vels = self.velocities
                 rst7.box = self.box
                 rst7.write(fname, netcdf=(format == 'NCRST'))
             else:
@@ -1376,6 +1334,44 @@ class Structure(object):
             if all_ints:
                 for atom in self.atoms:
                     atom.type = int(atom.atom_type)
+
+    #===================================================
+
+    def join_dihedrals(self):
+        """
+        Joins multi-term torsions into a single term and makes all of the
+        parameters DihedralTypeList instances. If any dihedrals are *already*
+        DihedralTypeList instances, or any are not parametrized, or there are no
+        dihedral_types, this method returns without doing anything
+        """
+        if not self.dihedral_types:
+            return # nothing to do
+        if any(isinstance(t, DihedralTypeList) for t in self.dihedral_types):
+            return # already done
+        if any(d.type is None for d in self.dihedrals):
+            return # Not fully parametrized
+        dihedrals_to_delete = list()
+        dihedrals_processed = dict()
+        new_dihedral_types = TrackedList()
+        for i, d in enumerate(self.dihedrals):
+            if d.atom1 < d.atom4:
+                key = (d.atom1, d.atom2, d.atom3, d.atom4)
+            else:
+                key = (d.atom4, d.atom3, d.atom2, d.atom1)
+            if key in dihedrals_processed:
+                dihedrals_processed[key].append(d.type)
+                dihedrals_to_delete.append(i)
+            else:
+                dihedrals_processed[key] = dtl = DihedralTypeList()
+                dtl.append(d.type)
+                new_dihedral_types.append(dtl)
+                d.type = dtl
+        # Now drop the new dihedral types into place
+        self.dihedral_types = new_dihedral_types
+        # Remove the "duplicate" dihedrals
+        for i in reversed(dihedrals_to_delete):
+            self.dihedrals[i].delete()
+            del self.dihedrals[i]
 
     #===================================================
 
@@ -1680,7 +1676,7 @@ class Structure(object):
         """
         typemap = dict()
         for a in self.atoms:
-            if a.atom_type is None: continue
+            if a.atom_type is UnassignedAtomType: continue
             typemap[str(a.atom_type)] = a.atom_type
         # Now we have a map of all atom types that we have defined in our
         # system. Look through all of the atom types and see if any of their
@@ -1715,7 +1711,7 @@ class Structure(object):
         A = A.value_in_unit(u.degrees)
         B = B.value_in_unit(u.degrees)
         G = G.value_in_unit(u.degrees)
-        self._box = np.array([a, b, c, A, B, G], dtype=np.float64)
+        self._box = np.array([[a, b, c, A, B, G]], dtype=np.float64)
 
     #===================================================
 
@@ -2035,8 +2031,8 @@ class Structure(object):
         if (hasattr(self.bond_types, 'degree') and
                 hasattr(self.bond_types, 'coeffs')):
             force = mm.AmoebaBondForce()
-            force.setGlobalBondCubic(self.bond_types.coeffs[3]/length_conv)
-            force.setGlobalBondQuartic(self.bond_types.coeffs[4]/length_conv**2)
+            force.setAmoebaGlobalBondCubic(self.bond_types.coeffs[3]/length_conv)
+            force.setAmoebaGlobalBondQuartic(self.bond_types.coeffs[4]/length_conv**2)
         else:
             force = mm.HarmonicBondForce()
         force.setForceGroup(self.BOND_FORCE_GROUP)
@@ -2095,7 +2091,7 @@ class Structure(object):
             num_h = (angle.atom1.element == 1) + (angle.atom3.element == 1)
             if constraints is app.HAngles and (num_h == 2 or (num_h == 1 and
                     angle.atom2.element == 8) and not flexibleConstraints):
-                continue
+                continue # pragma: no cover
             if angle.type is None:
                 raise ParameterError('Cannot find angle parameters')
             force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
@@ -2221,8 +2217,7 @@ class Structure(object):
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
         for imp in self.impropers:
             if imp.type is None:
-                raise ParameterError('Cannot find improper torsion '
-                                       'parameters')
+                raise ParameterError('Cannot find improper torsion parameters')
             force.addTorsion(imp.atom1.idx, imp.atom2.idx, imp.atom3.idx,
                              imp.atom4.idx, (imp.type.psi_k*frc_conv,
                              imp.type.psi_eq*DEG_TO_RAD))
@@ -2361,7 +2356,8 @@ class Structure(object):
             if level >= end: return
             for partner in atom.bond_partners:
                 if partner is origin: continue
-                force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
+                if atom is not origin:
+                    force.addException(origin.idx, atom.idx, 0.0, 0.5, 0.0, True)
                 # Exclude EP children, too
                 for child in origin.children:
                     force.addException(partner.idx, child.idx, 0.0, 0.5, 0.0,
@@ -2403,7 +2399,7 @@ class Structure(object):
                 try:
                     rij, wdij, rij14, wdij14 = dih.atom1.atom_type.nbfix[
                                                     str(dih.atom4.atom_type)]
-                except KeyError:
+                except (KeyError, AttributeError):
                     epsprod = abs(dih.atom1.epsilon_14 * dih.atom4.epsilon_14)
                     epsprod = math.sqrt(epsprod) * ene_conv / scnb
                     sigprod = comb_sig(dih.atom1.sigma_14, dih.atom4.sigma_14)
@@ -2451,13 +2447,6 @@ class Structure(object):
         # exclusions/exceptions
         for a2 in atom.exclusion_partners:
             force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
-            for c1 in atom.children:
-                force.addException(c1.idx, a2.idx, 0.0, 0.5, 0.0, True)
-            for c2 in a2.children:
-                force.addException(atom.idx, c2.idx, 0.0, 0.5, 0.0, True)
-            for c1 in atom.children:
-                for c2 in a2.children:
-                    force.addException(c1.idx, c2.idx, 0.0, 0.5, 0.0, True)
 
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
@@ -2561,8 +2550,8 @@ class Structure(object):
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         else:
-            raise ValueError('Unrecognized nonbonded method [%s]' %
-                             nonbondedMethod)
+            raise AssertionError('Unrecognized nonbonded method [%s]' %
+                                 nonbondedMethod)
         # Add the particles
         for i in lj_idx_list:
             force.addParticle((i-1,))
@@ -2583,8 +2572,8 @@ class Structure(object):
         elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         else:
-            raise ValueError('Unsupported nonbonded method %s' %
-                             nonbondedMethod)
+            raise AssertionError('Unsupported nonbonded method %s' %
+                                 nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -2630,8 +2619,8 @@ class Structure(object):
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         else:
-            raise ValueError('Unrecognized nonbonded method [%s]' %
-                             nonbondedMethod)
+            raise AssertionError('Unrecognized nonbonded method [%s]' %
+                                 nonbondedMethod)
         # Add the particles
         for atom in self.atoms:
             eps = math.sqrt(atom.epsilon*ene_conv) * 2
@@ -2654,8 +2643,8 @@ class Structure(object):
         elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         else:
-            raise ValueError('Unsupported nonbonded method %s' %
-                             nonbondedMethod)
+            raise AssertionError('Unsupported nonbonded method %s' %
+                                 nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -2765,8 +2754,8 @@ class Structure(object):
             force = GBSAGBn2Force(solventDielectric, soluteDielectric, sasa,
                                   cutoff, kappa=implicitSolventKappa)
         else:
-            raise ValueError('Unexpected implicit solvent model... '
-                             'should not be here')
+            raise AssertionError('Unexpected implicit solvent model... '
+                                 'should not be here')
         for atom, parms in zip(self.atoms, gb_parms):
             force.addParticle([atom.charge] + list(parms))
         # Set cutoff method
@@ -2800,12 +2789,12 @@ class Structure(object):
         if (not hasattr(self.trigonal_angle_types, 'degree') or not
                 hasattr(self.trigonal_angle_types, 'coeffs')):
             raise ParameterError('Do not have the trigonal angle force '
-                                   'table parameters')
+                                 'table parameters')
         force = mm.AmoebaInPlaneAngleForce()
         c = self.trigonal_angle_types.coeffs
         force.setAmoebaGlobalInPlaneAngleCubic(c[3])
         force.setAmoebaGlobalInPlaneAngleQuartic(c[4])
-        force.setAmoebaGlobalInPlaneAngleQuintic(c[5])
+        force.setAmoebaGlobalInPlaneAnglePentic(c[5])
         force.setAmoebaGlobalInPlaneAngleSextic(c[6])
         force.setForceGroup(self.TRIGONAL_ANGLE_FORCE_GROUP)
         for ang in self.trigonal_angles:
@@ -2837,7 +2826,7 @@ class Structure(object):
         c = self.out_of_plane_bend_types.coeffs
         force.setAmoebaGlobalOutOfPlaneBendCubic(c[3])
         force.setAmoebaGlobalOutOfPlaneBendQuartic(c[4])
-        force.setAmoebaGlobalOutOfPlaneBendQuintic(c[5])
+        force.setAmoebaGlobalOutOfPlaneBendPentic(c[5])
         force.setAmoebaGlobalOutOfPlaneBendSextic(c[6])
         force.setForceGroup(self.OUT_OF_PLANE_BEND_FORCE_GROUP)
         for ang in self.out_of_plane_bends:
@@ -2892,8 +2881,9 @@ class Structure(object):
                 raise ParameterError("Missing stretch-bend parameters")
             force.addStretchBend(strbnd.atom1.idx, strbnd.atom2.idx,
                                  strbnd.atom3.idx, strbnd.type.req1*length_conv,
-                                 strbnd.type.req2*length_conv,
-                                 strbnd.type.k*frc_conv)
+                                 strbnd.type.req2*length_conv, strbnd.type.theteq*math.pi/180,
+                                 strbnd.type.k1*frc_conv, strbnd.type.k2*frc_conv)
+        return force
 
     #===================================================
 
@@ -3127,7 +3117,7 @@ class Structure(object):
         """
         if implicitSolvent is app.GBn:
             screen = [0.5 for atom in self.atoms]
-            radii = [atom.radii for atom in self.atoms]
+            radii = [atom.solvent_radius for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 0.48435382330
@@ -3147,7 +3137,7 @@ class Structure(object):
             beta = [0.8 for i in self.atoms]
             gamma = [4.85 for i in self.atoms]
             screen = [0.5 for i in self.atoms]
-            radii = [atom.radii for atom in self.atoms]
+            radii = [atom.solvent_radius for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if atom.element == 6:
                     screen[i] = 1.058554
@@ -3177,7 +3167,7 @@ class Structure(object):
                 if not radii[i]:
                     radii[i] = _mbondi3(atom)
         else:
-            radii = [atom.radii for atom in self.atoms]
+            radii = [atom.solvent_radius for atom in self.atoms]
             screen = [atom.screen for atom in self.atoms]
             for i, atom in enumerate(self.atoms):
                 if not radii[i] or not screen[i]:
@@ -3244,7 +3234,9 @@ class Structure(object):
                     if isinstance(at, Atom):
                         ats[i] = self.atoms[at.idx+aoffset]
                 kws = dict()
-                if otypcp and val.type is not None:
+                if hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
+                elif otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
@@ -3339,7 +3331,9 @@ class Structure(object):
                     if isinstance(at, Atom):
                         ats[i] = self.atoms[at.idx+aoffset]
                 kws = dict()
-                if styp and val.type is not None:
+                if hasattr(val, 'type') and val.type is NoUreyBradley:
+                    kws['type'] = NoUreyBradley # special-case singleton
+                elif styp and val.type is not None:
                     kws['type'] = styp[val.type.idx]
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
@@ -3404,9 +3398,7 @@ class Structure(object):
             copy_valence_terms(other.groups, aoffset, self.groups, [],
                                ['atom', 'type', 'move'])
         if self._coordinates is not None:
-            coords = np.tile(self._coordinates.ravel(), ncopies).reshape(
-                    (-1, len(self.atoms), 3))
-            self._coordinates = coords
+            self._coordinates = np.hstack([self._coordinates for i in range(ncopies)])
         return self
 
     #===================================================
@@ -3431,9 +3423,7 @@ class Structure(object):
                     self.pi_torsion_types or self.torsion_torsion_types or
                     self.adjust_types)
 
-    def __nonzero__(self):
-        # For Python 2
-        return self.__bool__()
+    __nonzero__ = __bool__ # for Python 2
 
     #===================================================
 
@@ -3471,6 +3461,8 @@ class Structure(object):
                        _box=self._box,
                        nrexcl=self.nrexcl,
                        _combining_rule=self._combining_rule,
+                       unknown_functional=self.unknown_functional,
+                       space_group=self.space_group,
         )
         def idx(thing):
             if thing is None: return None
@@ -3545,7 +3537,8 @@ class Structure(object):
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
                     'resolution', 'related_entries', '_coordinates', '_box',
-                    'nrexcl', '_combining_rule'):
+                    'nrexcl', '_combining_rule', 'unknown_functional',
+                    'space_group'):
             if key in d:
                 setattr(self, key, d[key])
 
@@ -3893,9 +3886,7 @@ class StructureView(object):
         retstr.append('; %d bonds>' % nbond)
         return ''.join(retstr)
 
-    def __nonzero__(self):
-        # For Python 2
-        return self.__bool__()
+    __nonzero__ = __bool__ # For Python 2
 
     def __iter__(self):
         return iter(self.atoms)

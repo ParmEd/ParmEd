@@ -10,8 +10,9 @@ from parmed.amber import (AmberParm, AmberMdcrd,
                 AmberAsciiRestart, NetCDFTraj, NetCDFRestart)
 from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
                 ProgressReporter, RestartReporter, StateDataReporter,
-                EnergyMinimizerReporter)
-from parmed.utils.six.moves import range, zip
+                EnergyMinimizerReporter, _format_time)
+from parmed.utils.six.moves import range, zip, StringIO
+import sys
 import unittest
 from utils import (get_fn, mm, app, has_openmm, CPU, Reference, FileIOTestCase,
                    HAS_GROMACS)
@@ -128,6 +129,7 @@ class TestStateDataReporter(FileIOTestCase):
 
     def test_progress_reporter(self):
         """ Test ProgressReporter with various options """
+        self.assertRaises(ValueError, lambda: ProgressReporter(sys.stdout, 1, 5))
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
@@ -154,6 +156,12 @@ class TestTrajRestartReporter(FileIOTestCase):
 
     def test_reporters(self):
         """ Test NetCDF and ASCII restart and trajectory reporters (no PBC) """
+        self.assertRaises(ValueError, lambda:
+                NetCDFReporter(get_fn('blah', written=True), 1, crds=False))
+        self.assertRaises(ValueError, lambda:
+                MdcrdReporter(get_fn('blah', written=True), 1, crds=False))
+        self.assertRaises(ValueError, lambda:
+                MdcrdReporter(get_fn('blah', written=True), 1, crds=True, vels=True))
         system = amber_gas.createSystem()
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
@@ -242,6 +250,11 @@ class TestTrajRestartReporter(FileIOTestCase):
         # Compare to ncrst and make sure it's the same data
         np.testing.assert_allclose(ncrst.coordinates, f.coordinates, rtol=1e-4)
         np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-3)
+        # Make sure the EnergyMinimizerReporter does not fail
+        f = StringIO()
+        rep = EnergyMinimizerReporter(f)
+        rep.report(sim, frame=10)
+        rep.finalize()
 
     @unittest.skipUnless(HAS_GROMACS, 'Cannot test without GROMACS')
     def test_reporters_pbc(self):
@@ -259,7 +272,9 @@ class TestTrajRestartReporter(FileIOTestCase):
                 MdcrdReporter(get_fn('traj.mdcrd', written=True), 1),
                 RestartReporter(get_fn('restart.ncrst', written=True), 1,
                                 netcdf=True),
-                RestartReporter(get_fn('restart.rst7', written=True), 1)
+                RestartReporter(get_fn('restart.rst7', written=True), 1),
+                StateDataReporter(get_fn('state.o', written=True), 1,
+                                  volume=True, density=True, systemMass=1)
         ])
         sim.step(5)
         for reporter in sim.reporters: reporter.finalize()
@@ -277,3 +292,14 @@ class TestTrajRestartReporter(FileIOTestCase):
                 self.assertAlmostEqual(x1, x2, places=3)
         self.assertEqual(len(nrst.box), 6)
         self.assertEqual(len(arst.box), 6)
+        # Make sure the EnergyMinimizerReporter does not fail
+        f = StringIO()
+        rep = EnergyMinimizerReporter(f, volume=True)
+        rep.report(sim)
+        rep.finalize()
+
+    def test_private_functions(self):
+        """ Tests private helper functions for OMM reporters """
+        self.assertEqual(_format_time(7200), (2, 'hr.'))
+        self.assertEqual(_format_time(3600), (60, 'min.'))
+        self.assertEqual(_format_time(40), (40, 'sec.'))
