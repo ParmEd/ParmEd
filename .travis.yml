@@ -7,20 +7,21 @@ addons:
             - ubuntu-toolchain-r-test
         packages:
             - g++
+            - gfortran
             - gromacs
 
 matrix:
   include:
     - { os: linux, env: PYTHON_VERSION=2.7 }
+    - { os: linux, env: PYTHON_VERSION=3.3 MINIMAL_PACKAGES=yes }
     - { os: linux, env: PYTHON_VERSION=3.4 }
-    - { os: linux, env: PYTHON_VERSION=3.5 MINIMAL_PACKAGES=yes }
     - { os: linux, env: PYTHON_VERSION=pypy }
-    - { os: osx, env: PYTHON_VERSION=3.5 MINIMAL_PACKAGES=yes SETUPFLAGS="--no-setuptools"}
+    - { os: osx, env: PYTHON_VERSION=3.4 MINIMAL_PACKAGES=yes }
 
 install:
     - source devtools/travis-ci/install.sh
       # install our package
-    - python setup.py install $SETUPFLAGS
+    - python setup.py install
 
 script:
     - source devtools/travis-ci/runtest.sh
