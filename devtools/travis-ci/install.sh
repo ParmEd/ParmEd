@@ -21,7 +21,8 @@ else # Otherwise, CPython... go through conda
 
     export PATH=$HOME/miniconda/bin:$PATH
     conda install --yes conda-build jinja2 binstar pip
-    conda config --add channels omnia ambermd
+    conda config --add channels omnia
+    conda config --add channels ambermd
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
