@@ -541,9 +541,3 @@ class OpenMMParameterSet(ParameterSet):
         if self.combining_rule == 'geometric':
             raise NotImplementedError('Geometric combining rule not currently '
                                       'supported.')
-        # if len(self.nbfix_types) > 0:
-        #     for (a1, a2), nbfix in iteritems(self.nbfix_types):
-        #         if any((a in skip_types for a in (a1, a2))):
-        #             continue
-        #         else:
-        #             raise NotImplementedError('NBFIX not currently supported')
