@@ -227,7 +227,7 @@ IMPROPER
 !atom types           Kpsi                   psi0
 !
 
-NONBONDED nbxmod  5 atom cdiel shift vatom vdistance vswitch -
+NONBONDED nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
 cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 1.0 wmin 1.5
 
 !TIP3P LJ parameters
@@ -297,10 +297,31 @@ read para card flex append
 
 ! These NBFixes will only apply if the main files have been read in first!!!
 NBFIX
-SOD    OC       -0.075020   3.190 ! For prot carboxylate groups
-SOD    OCL      -0.075020   3.190 ! For lipid carboxylate groups
-SOD    OC2D2    -0.075020   3.190 ! For carb carboxylate groups
-SOD    OG2D2    -0.075020   3.190 ! For CGenFF carboxylate groups
+
+!new SOD NBFIX values
+! Simulations of Anionic Lipid Membranes: Development of Interaction-Specific
+! Ion Parameters and Validation using NMR Data. 
+! Venable, R.M.; Luo, Y,; Gawrisch, K.; Roux, B.; Pastor, R.W. 
+! J. Phys. Chem. B 2013, 117 (35), pp 10183–10192.  DOI: 10.1021/jp401512z
+!
+! prot
+SOD    OC       -0.07502    3.23  ! osmotic P; carboxylate =O
+SOD    OS       -0.07502    3.13  ! POPC optim.; ester =O
+!! NA
+!SOD    ON3      -0.07502    3.16  ! POPC optim.; phosphate =O UNVALIDATED
+!! lipid
+SOD    OCL      -0.07502    3.23  ! osmotic P; carboxylate =O
+SOD    OBL      -0.07502    3.13  ! POPC optim.; ester =O
+SOD    O2L      -0.07502    3.16  ! POPC optim.; phosphate =O
+!! carb
+SOD    OC2D2    -0.07502    3.23  ! osmotic P; carboxylate =O
+SOD    OC2DP    -0.07502    3.16  ! POPC optim.; phosphate =O
+!! CGenFF
+SOD    OG2D2    -0.07502    3.23  ! osmotic P; carboxylate =O
+! OG2D1 in CGenFF shared between esters, amides, aldehydes,...
+!SOD    OG2D1    -0.07502    3.13  ! POPC optim.; ester =O
+SOD    OG2P1    -0.07502    3.16  ! POPC optim.; phosphate =O
+
 END
 BOMLEV @bom @PARA
 WRNLEV @wrn @PARA
