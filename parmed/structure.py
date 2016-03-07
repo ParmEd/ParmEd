@@ -3462,6 +3462,7 @@ class Structure(object):
                        nrexcl=self.nrexcl,
                        _combining_rule=self._combining_rule,
                        unknown_functional=self.unknown_functional,
+                       space_group=self.space_group,
         )
         def idx(thing):
             if thing is None: return None
@@ -3536,7 +3537,8 @@ class Structure(object):
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
                     'pmid', 'journal_authors', 'volume_page', 'title', 'year',
                     'resolution', 'related_entries', '_coordinates', '_box',
-                    'nrexcl', '_combining_rule', 'unknown_functional'):
+                    'nrexcl', '_combining_rule', 'unknown_functional',
+                    'space_group'):
             if key in d:
                 setattr(self, key, d[key])
 
