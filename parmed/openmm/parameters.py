@@ -117,7 +117,7 @@ class OpenMMParameterSet(ParameterSet):
 
         return new_params
 
-    def write(self, dest, provenance=None, write_unused=True):
+    def write(self, dest, provenance=None, write_unused=True, write_ident_res=True):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -151,6 +151,12 @@ class OpenMMParameterSet(ParameterSet):
             templates remaining and parameters including those atom types will
             not be written. A ParameterWarning is issued if any such residues are
             found in a).
+        write_ident_res: bool
+            If False, if multiple identical residues are present, only the first
+            occurence will be written. This is implemented solely for cleaning
+            up monoatomic ions. 'Identical' is not defined for other types
+            of residues - setting this to False will only affect monoatomic residues.
+            Do not use for anything else!
 
         Notes
         -----
@@ -174,6 +180,8 @@ class OpenMMParameterSet(ParameterSet):
         else:
             skip_residues = set()
             skip_types = set()
+        if not write_ident_res:
+            skip_residues = skip_residues.union(self._find_identical_residues())
         if self.atom_types:
             try:
                 self.typeify_templates()
@@ -213,6 +221,19 @@ class OpenMMParameterSet(ParameterSet):
                 for atom in residue.atoms:
                     keep_types.add(atom.type)
         return {typ for typ in self.atom_types if typ not in keep_types}
+
+    def _find_identical_residues(self):
+        # this is meant for monoatomic ions ONLY
+        skip_ident_residues = set()
+        monoatomic_types = set()
+        for name, residue in iteritems(self.residues):
+            if len(residue.atoms) == 1:
+                typ = residue.atom[0].type
+                if typ in monoatomic_types:
+                    skip_ident_residues.add(name)
+                else:
+                    monoatomic_types.add(residue.atoms[0].type)
+        return skip_ident_residues
 
     def _write_omm_provenance(self, dest, provenance):
         dest.write(' <Info>\n')
