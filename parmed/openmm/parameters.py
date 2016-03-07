@@ -194,7 +194,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_cmaps(dest, skip_types)
             self._write_omm_scripts(dest, skip_types)
             self._write_omm_nonbonded(dest, skip_types)
-            self._write_omm_nbfix(dest)
+            self._write_omm_LennardJonesForce(dest, skip_types)
         finally:
             dest.write('</ForceField>\n')
             if own_handle:
@@ -467,6 +467,10 @@ class OpenMMParameterSet(ParameterSet):
                 sigma = 1.0
                 epsilon = 0.0
 
+            if self.nbfix_types:
+                # turn off L-J. Will use LennardJonesForce to use CostumNonbondedForce to compute L-J interactions
+                sigma = 1.0
+                epsilon = 0.0
             # Ensure we don't have sigma = 0
             if (sigma == 0.0):
                 if (epsilon == 0.0):
@@ -479,20 +483,56 @@ class OpenMMParameterSet(ParameterSet):
                        (name, sigma, abs(epsilon)))
         dest.write(' </NonbondedForce>\n')
 
-    def _write_omm_nbfix(self, dest):
+    def _write_omm_LennardJonesForce(self, dest, skip_types):
         if not self.nbfix_types: return
         # Convert Conversion factors for writing in natural OpenMM units
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
 
+        scnb = set()
+        for key in self.dihedral_types:
+            dt = self.dihedral_types[key]
+            for t in dt:
+                if t.scnb: scnb.add(t.scnb)
+        if len(scnb) > 1:
+            raise NotImplementedError('Cannot currently handle mixed 1-4 '
+                    'scaling: L-J Scaling factors %s detected' %
+                    (', '.join([str(x) for x in scnb])))
+        if len(scnb) > 0:
+            lj14scale = 1.0 / scnb.pop()
+        else:
+            lj14scale = 1.0 / self.default_scnb
+
+        # write L-J records
+        dest.write(' <LennardJonesForce lj14scale="%s">\n' % lj14scale)
+        for name, atom_type in iteritems(self.atom_types):
+            if name in skip_types: continue
+            if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
+                sigma = atom_type.sigma * length_conv  # in md_unit_system
+                epsilon = atom_type.epsilon * ene_conv # in md_unit_system
+            else:
+                # Dummy atom
+                sigma = 1.0
+                epsilon = 0.0
+
+            # Ensure we don't have sigma = 0
+            if (sigma == 0.0):
+                if (epsilon == 0.0):
+                    sigma = 1.0 # reset sigma = 1
+                else:
+                    raise ValueError("For atom type '%s', sigma = 0 but "
+                                     "epsilon != 0." % name)
+
+            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
+                       (name, sigma, abs(epsilon)))
+
         # write NBFIX records
-        dest.write(' <NBFixForce>\n')
         for (atom_types, value) in iteritems(self.nbfix_types):
             emin = value[0] * ene_conv
             rmin = value[1] * length_conv
-            dest.write('  <NBFix type1="%s" type2="%s" emin="%s" rmin="%s"/>\n' %
+            dest.write('  <AtomTypePair type1="%s" type2="%s" emin="%s" rmin="%s"/>\n' %
                        (atom_types[0], atom_types[1], emin, rmin))
-        dest.write(' </NBFixForce>\n')
+        dest.write(' </LennardJonesForce>\n')
 
 
     def _write_omm_scripts(self, dest, skip_types):
