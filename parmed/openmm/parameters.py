@@ -146,8 +146,11 @@ class OpenMMParameterSet(ParameterSet):
                           'AmberTools', sourcePackageVersion : '15'},
                           'User' : 'Mark'}
         write_unused : bool
-            If False, atom types that are not used in any of the residue templates
-            and parameters including those atom types will not be written
+            If False: a) residue templates using unavailable atom types will not
+            be written, b) atom types that are not used in any of the residue
+            templates remaining and parameters including those atom types will
+            not be written. A ParameterWarning is issued if any such residues are
+            found in a).
 
         Notes
         -----
@@ -161,27 +164,27 @@ class OpenMMParameterSet(ParameterSet):
             own_handle = True
         else:
             own_handle = False
-        typeified = False
+        if not write_unused:
+            skip_residues = self._find_unused_residues()
+            skip_types = self._find_unused_types(skip_residues)
+            if skip_residues:
+                warnings.warn('Some residue templates using unavailable AtomTypes '
+                              'were found. They will not be written to the ffxml '
+                              'as write_unused is set to False', ParameterWarning)
+        else:
+            skip_residues = set()
+            skip_types = set()
         if self.atom_types:
             try:
                 self.typeify_templates()
-                typeified = True
             except KeyError:
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes', ParameterWarning)
-        if not write_unused:
-            if not typeified:
-                warnings.warn('Typification of the templates was not successful. '
-                              'Proceeding with write_unused=False is not advised',
-                               ParameterWarning)
-            skip_types = self._find_unused_types()
-        else:
-            skip_types = set()
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
             self._write_omm_atom_types(dest, skip_types)
-            self._write_omm_residues(dest)
+            self._write_omm_residues(dest, skip_residues)
             self._write_omm_bonds(dest, skip_types)
             self._write_omm_angles(dest, skip_types)
             self._write_omm_urey_bradley(dest, skip_types)
@@ -196,11 +199,19 @@ class OpenMMParameterSet(ParameterSet):
             if own_handle:
                 dest.close()
 
-    def _find_unused_types(self):
+    def _find_unused_residues(self):
+        skip_residues = set()
+        for name, residue in iteritems(self.residues):
+            if any((atom.type not in self.atom_types for atom in residue.atoms)):
+                skip_residues.add(name)
+        return skip_residues
+
+    def _find_unused_types(self, skip_residues):
         keep_types = set()
         for name, residue in iteritems(self.residues):
-            for atom in residue.atoms:
-                keep_types.add(atom.type)
+            if name not in skip_residues:
+                for atom in residue.atoms:
+                    keep_types.add(atom.type)
         return {typ for typ in self.atom_types if typ not in keep_types}
 
     def _write_omm_provenance(self, dest, provenance):
@@ -244,11 +255,11 @@ class OpenMMParameterSet(ParameterSet):
                        )
         dest.write(' </AtomTypes>\n')
 
-    def _write_omm_residues(self, dest):
+    def _write_omm_residues(self, dest, skip_residues):
         if not self.residues: return
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
-            if not isinstance(residue, ResidueTemplate):
+            if not isinstance(residue, ResidueTemplate) or name in skip_residues:
                 continue
             dest.write('  <Residue name="%s">\n' % residue.name)
             for atom in residue.atoms:
@@ -260,7 +271,7 @@ class OpenMMParameterSet(ParameterSet):
             if residue.head is not None:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.head.name)
-            if residue.tail is not None:
+            if residue.tail is not None and residue.tail is not residue.head:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.tail.name)
             dest.write('  </Residue>\n')
