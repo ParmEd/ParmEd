@@ -228,11 +228,11 @@ class OpenMMParameterSet(ParameterSet):
         monoatomic_types = set()
         for name, residue in iteritems(self.residues):
             if len(residue.atoms) == 1:
-                typ = residue.atom[0].type
+                typ = residue.atoms[0].type
                 if typ in monoatomic_types:
                     skip_ident_residues.add(name)
                 else:
-                    monoatomic_types.add(residue.atoms[0].type)
+                    monoatomic_types.add(typ)
         return skip_ident_residues
 
     def _write_omm_provenance(self, dest, provenance):
