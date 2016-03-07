@@ -19,7 +19,7 @@ from parmed import exceptions, periodic_table, residue
 from parmed import unit, utils
 from parmed.topologyobjects import *
 from parmed.structure import Structure, StructureView
-from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker
+from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker, rdkit
 from parmed import formats
 from parmed.vec3 import Vec3
 from parmed.parameters import ParameterSet
@@ -30,6 +30,7 @@ read_CIF = formats.CIFFile.parse
 write_PDB = _deprecated(formats.PDBFile.write)
 write_CIF = _deprecated(formats.CIFFile.write)
 load_rosetta = rosetta.RosettaPose.load
+load_rdkit = rdkit.RDKit.load
 
 download_PDB = formats.PDBFile.download
 download_CIF = formats.CIFFile.download

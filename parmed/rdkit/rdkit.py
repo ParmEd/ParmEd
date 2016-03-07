@@ -3,7 +3,7 @@ This package contains classes responsible for loading rdkit objects
 """
 
 from __future__ import print_function
-from parmed.formats import Mol2File
+from parmed.formats import PDBFile
 
 try:
     from rdkit import Chem
@@ -37,5 +37,5 @@ class RDKit(object):
         >>> mol = Chem.MolFromSmiles('Cc1ccccc1')
         >>> struct = pmd.load_rdkit(mol)
         """
-        fh = StringIO(Chem.MolToMolBlock(rmol)
-        return Mol2File.parse(fh)
+        fh = StringIO(Chem.MolToPDBBlock(rmol))
+        return PDBFile.parse(fh)
