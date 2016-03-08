@@ -13,14 +13,15 @@ __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
            'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs',
            'tinker', 'openmm', 'rosetta', 'formats', 'Vec3', 'ParameterSet',
            'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF',
-           'load_rosetta', 'download_PDB', 'download_CIF', 'tools', 'version']
+           'load_rosetta', 'load_rdkit', 'download_PDB', 'download_CIF', 'tools', 'version']
 
 from parmed import exceptions, periodic_table, residue
 from parmed import unit, utils
 from parmed.topologyobjects import *
 from parmed.structure import Structure, StructureView
-from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker, rdkit
+from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker
 from parmed import formats
+from parmed.rdkit import rdkit
 from parmed.vec3 import Vec3
 from parmed.parameters import ParameterSet
 from parmed.utils.decorators import deprecated as _deprecated
