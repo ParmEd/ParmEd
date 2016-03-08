@@ -533,8 +533,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                              get_fn('top_all36_prot.rtf'),
-                                              get_fn('toppar_water_ions.str'))
+                                          get_fn('top_all36_prot.rtf'))
         )
         params.write(get_fn('charmm_conv.xml', written=True),
                      provenance=dict(
