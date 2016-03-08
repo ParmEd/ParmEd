@@ -37,4 +37,7 @@ else # Otherwise, CPython... go through conda
     fi
 
     source activate myenv
+    if [ "$TRAVIS_OS_NAME" != "osx" ]; then
+        conda install rdkit -c omnia
+    fi
 fi # CPython
