@@ -21,9 +21,10 @@ from parmed.topologyobjects import *
 from parmed.structure import Structure, StructureView
 from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker
 from parmed import formats
-from parmed.rdkit import rdkit
 from parmed.vec3 import Vec3
 from parmed.parameters import ParameterSet
+from parmed.rdkit import load_rdkit
+from parmed import rdkit
 from parmed.utils.decorators import deprecated as _deprecated
 load_file = formats.load_file
 read_PDB = formats.PDBFile.parse
@@ -31,7 +32,6 @@ read_CIF = formats.CIFFile.parse
 write_PDB = _deprecated(formats.PDBFile.write)
 write_CIF = _deprecated(formats.CIFFile.write)
 load_rosetta = rosetta.RosettaPose.load
-load_rdkit = rdkit.RDKit.load
 
 download_PDB = formats.PDBFile.download
 download_CIF = formats.CIFFile.download

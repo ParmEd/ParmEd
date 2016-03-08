@@ -4,18 +4,12 @@ This package contains classes responsible for loading rdkit objects
 
 from __future__ import print_function
 from parmed.formats import PDBFile
+from parmed.utils.six.moves import StringIO
 
 try:
     from rdkit import Chem
 except ImportError:
-    pass
-
-try:
-    # py2
-    import StringIO
-except ImportError:
-    import io
-    StringIO = io.StringIO
+    Chem = None
 
 class RDKit(object):
 
@@ -41,9 +35,9 @@ class RDKit(object):
         return PDBFile.parse(fh)
 
     @staticmethod
-    def from_smile(smile):
+    def from_smiles(smiles):
         """
-        Load smile string to :class:`Structure`
+        Load smiles string to :class:`Structure`
         """
-        return RDKit.load(Chem.MolFromSmiles(smile))
+        return RDKit.load(Chem.MolFromSmiles(smiles))
 
