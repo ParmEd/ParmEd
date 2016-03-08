@@ -39,3 +39,11 @@ class RDKit(object):
         """
         fh = StringIO(Chem.MolToPDBBlock(rmol))
         return PDBFile.parse(fh)
+
+    @staticmethod
+    def from_smile(smile):
+        """
+        Load smile string to :class:`Structure`
+        """
+        return RDKit.load(Chem.MolFromSmiles(smile))
+
