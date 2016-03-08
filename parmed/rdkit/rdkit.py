@@ -7,11 +7,6 @@ from parmed.formats import PDBFile
 from parmed.utils.six.moves import StringIO
 
 
-try:
-   from rdkit import Chem
-except ImportError:
-    Chem = None
-
 class RDKit(object):
 
     @staticmethod
@@ -32,7 +27,7 @@ class RDKit(object):
         >>> mol = Chem.MolFromSmiles('Cc1ccccc1')
         >>> struct = pmd.load_rdkit(mol)
         """
-        # from rdkit import Chem
+        from rdkit import Chem
         fh = StringIO(Chem.MolToPDBBlock(rmol))
         return PDBFile.parse(fh)
 
@@ -41,6 +36,6 @@ class RDKit(object):
         """
         Load smiles string to :class:`Structure`
         """
-        # from rdkit import Chem
+        from rdkit import Chem
         return RDKit.load(Chem.MolFromSmiles(smiles))
 
