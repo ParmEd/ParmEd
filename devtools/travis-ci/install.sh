@@ -26,7 +26,7 @@ else # Otherwise, CPython... go through conda
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
             numpy scipy pandas nose openmm coverage nose-timer \
-            python-coveralls ambermini
+            python-coveralls ambermini rdkit
         conda update -y -n myenv --all
         conda install -y -n myenv pyflakes=1.0.0
     else
