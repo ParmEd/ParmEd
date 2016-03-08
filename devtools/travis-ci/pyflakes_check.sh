@@ -23,7 +23,6 @@ pyflakes parmed 2>&1 | \
             -e "from parmed.tools.actions import \*" \
             -e "from parmed.utils.six.moves.tkinter import \*" \
             -e "^parmed\/unit" \
-            -e "'rdkit' imported but unused" \
             -e "^parmed\/utils\/six.py" \
             -e "^parmed\/utils\/fortranformat" | tee pyflakes.log
 

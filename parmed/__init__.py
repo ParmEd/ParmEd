@@ -11,7 +11,7 @@ __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
            'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs',
-           'tinker', 'openmm', 'rosetta', 'formats', 'Vec3', 'ParameterSet',
+           'tinker', 'openmm', 'rosetta', 'rdkit', 'formats', 'Vec3', 'ParameterSet',
            'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF',
            'load_rosetta', 'load_rdkit', 'download_PDB', 'download_CIF', 'tools', 'version']
 
