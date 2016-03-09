@@ -161,13 +161,14 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
 
 def _get_params(fname):
     params = dict()
-    f = open(fname, 'r')
-    for line in f:
-        atomtype, param = line.split()[:2]
-        param = float(param)
-        if atomtype in params and abs(param - params[atomtype]) > 0.0001:
-            warnings.warn('Atom type %s has multiple parameters in %s.' %
-                          (atomtype, fname), DuplicateParamWarning)
-        params[atomtype] = param
 
-    return params
+    with open(fname, 'r') as f:
+        for line in f:
+            atomtype, param = line.split()[:2]
+            param = float(param)
+            if atomtype in params and abs(param - params[atomtype]) > 0.0001:
+                warnings.warn('Atom type %s has multiple parameters in %s.' %
+                              (atomtype, fname), DuplicateParamWarning)
+            params[atomtype] = param
+
+        return params
