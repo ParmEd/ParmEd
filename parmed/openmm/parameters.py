@@ -530,7 +530,7 @@ class OpenMMParameterSet(ParameterSet):
         for (atom_types, value) in iteritems(self.nbfix_types):
             emin = value[0] * ene_conv
             rmin = value[1] * length_conv
-            dest.write('  <AtomTypePair type1="%s" type2="%s" emin="%s" rmin="%s"/>\n' %
+            dest.write('  <NBFixPair type1="%s" type2="%s" emin="%s" rmin="%s"/>\n' %
                        (atom_types[0], atom_types[1], emin, rmin))
         dest.write(' </LennardJonesForce>\n')
 
