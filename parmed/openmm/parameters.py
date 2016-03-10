@@ -271,11 +271,11 @@ class OpenMMParameterSet(ParameterSet):
                 or self._templhasher(residue) in written_residues):
                 continue
             written_residues.add(self._templhasher(residue))
-            if residue.omm_overloadLevel != 0:
+            if residue.omm_overloadLevel == 0:
+                dest.write('  <Residue name="%s">\n' % residue.name)
+            else:
                 dest.write('  <Residue name="%s" overload="%d">\n' % (residue.name,
                            residue.omm_overloadLevel))
-            else:
-                dest.write('  <Residue name="%s">\n' % residue.name)
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
