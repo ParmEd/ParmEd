@@ -32,7 +32,6 @@ from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles)
-from parmed.residue import SOLVENT_NAMES
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
@@ -1918,12 +1917,12 @@ class Structure(object):
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         # Rigid water only
         if constraints is None:
+            is_water = _settler(self)
             for bond in self.bonds:
                 # Skip all extra points... don't constrain those
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
-                if (bond.atom1.residue.name in SOLVENT_NAMES or
-                        bond.atom2.residue.name in SOLVENT_NAMES):
+                if is_water[bond.atom1.residue.idx]:
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,
                                          bond.type.req*length_conv)
             return
@@ -2037,9 +2036,18 @@ class Structure(object):
             force = mm.HarmonicBondForce()
         force.setForceGroup(self.BOND_FORCE_GROUP)
         # Add the bonds
+        if rigidWater:
+            is_water = _settler(self)
+        else:
+            is_water = [False for r in self.residues]
         for bond in self.bonds:
             if (bond.atom1.element == 1 or bond.atom2.element == 1) and (
                     not flexibleConstraints and constraints is app.HBonds):
+                continue
+            if not flexibleConstraints and is_water[bond.atom1.residue.idx]:
+                # is_water is False even for waters if rigidWater is False, so
+                # we can rely on is_water to be correct for our needs
+                # regardless
                 continue
             if bond.type is None:
                 raise ParameterError('Cannot find necessary parameters')
@@ -3892,3 +3900,30 @@ class StructureView(object):
         return iter(self.atoms)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _settler(parm):
+    """ Identifies residues that can have SETTLE applied to it """
+    is_water = []
+    for r in parm.residues:
+        na = sum(1 for a in r if not isinstance(a, ExtraPoint))
+        if na != 3:
+            is_water.append(False)
+            continue
+        # Make sure we are not bonded to any other residues
+        for a in r:
+            for a2 in a.bond_partners:
+                if a2.residue is not r:
+                    is_water.append(False)
+                    break
+            else:
+                # this atom is OK
+                continue
+            # We only hit here if we hit the break above. So break here
+            break
+        else:
+            # Don't check elements, since they may not *always* be accurate.
+            # It's more likely that a 3-atom residue not bonded to any other
+            # residue is water.
+            is_water.append(True)
+    assert len(is_water) == len(parm.residues), 'Incorrect length'
+    return is_water
