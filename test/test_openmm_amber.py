@@ -864,6 +864,19 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
             if atom.element == 1:
                 self.assertAlmostEqual(mass, 3)
         self.assertAlmostEqual(totmass, sum(parm.parm_data['MASS']))
+        # Now do rigid water and not flexible constraints, but no other constraints
+        system = parm.createSystem(nonbondedMethod=app.CutoffPeriodic,
+                                   nonbondedCutoff=20*u.angstroms,
+                                   constraints=None, rigidWater=True,
+                                   flexibleConstraints=False)
+        for f in system.getForces():
+            if isinstance(f, mm.HarmonicBondForce):
+                self.assertEqual(f.getNumBonds(), 119)
+                break
+        else:
+            assert False, 'Should not be here'
+        self.assertEqual(system.getNumConstraints(),
+                3*sum([r.name == 'WAT' for r in parm.residues]))
         # Trap some illegal options
         self.assertRaises(ValueError, lambda:
                 parm.createSystem(nonbondedMethod=0))
