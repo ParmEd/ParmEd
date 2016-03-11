@@ -268,11 +268,10 @@ class OpenMMParameterSet(ParameterSet):
         written_residues = set()
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
-            if name in skip_residues:
-                continue
-            if OpenMMParameterSet._templhasher(residue) in written_residues:
-                continue
-            written_residues.add(self._templhasher(residue))
+            if name in skip_residues: continue
+            templhash = OpenMMParameterSet._templhasher(residue)
+            if templhash in written_residues: continue
+            written_residues.add(templhash)
             if residue.overload_level == 0:
                 dest.write('  <Residue name="%s">\n' % residue.name)
             else:
