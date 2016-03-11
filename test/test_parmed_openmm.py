@@ -9,6 +9,7 @@ import parmed as pmd
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 import unittest
 from utils import get_fn, mm, app, has_openmm, FileIOTestCase
+from collections import OrderedDict
 
 import warnings
 
@@ -515,11 +516,11 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         params.write(ffxml)
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 231)
+        self.assertEqual(len(ffxml.readlines()), 222)
         ffxml = StringIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 66)
+        self.assertEqual(len(ffxml.readlines()), 57)
 
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
@@ -541,3 +542,39 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                          Reference='MacKerrell'
                      )
         )
+
+    def test_not_write_residues_with_same_templhash(self):
+        """Test that no identical residues are written to XML, using the
+           templhasher function."""
+        # TODO add testing for multiatomic residues when support for those added
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
+                 )
+        new_residues = OrderedDict()
+        for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
+            new_residues[name] = params.residues[name]
+        params.residues = new_residues
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 16)
+
+    def test_overload_level(self):
+        """Test correct support for the overload_level attribute of
+           ResidueTemplates and correct writing to XML tag"""
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
+                 )
+        new_residues = OrderedDict()
+        new_residues['K'] = params.residues['K']
+        new_residues['NA'] = params.residues['NA']
+        new_residues['K'].overload_level = 1
+        params.residues = new_residues
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        output_lines = ffxml.readlines()
+        control_line1 = '  <Residue name="K" overload="1">\n'
+        control_line2 = '  <Residue name="NA">\n'
+        self.assertEqual(output_lines[5], control_line1)
+        self.assertEqual(output_lines[8], control_line2)

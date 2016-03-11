@@ -70,6 +70,11 @@ class ResidueTemplate(object):
         atom of this residue when this residue is the last in a chain
     groups : list of list(:class:`Atom`)
         If set, each group is a list of Atom instances making up each group
+    overload_level : integer
+        For use with OpenMM ResidueTemplates. If OpenMM ForceField is given multiple
+        identically-matching residue templates with the same names it choses
+        (overloads with) the one with the highest overload_level
+        (overloadLevel in OpenMM). Default is 0.
     """
 
     def __init__(self, name=''):
@@ -84,6 +89,7 @@ class ResidueTemplate(object):
         self.first_patch = None
         self.last_patch = None
         self.groups = []
+        self.overload_level = 0
 
     def __repr__(self):
         if self.head is not None:
@@ -739,4 +745,3 @@ class ResidueTemplateContainer(list):
             AmberOFFLibrary.write(self.to_library(), fname, **kwargs)
         else:
             raise ValueError('Unrecognized format for ResidueTemplate save')
-

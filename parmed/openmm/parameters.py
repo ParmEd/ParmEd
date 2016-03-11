@@ -214,6 +214,14 @@ class OpenMMParameterSet(ParameterSet):
                     keep_types.add(atom.type)
         return {typ for typ in self.atom_types if typ not in keep_types}
 
+    @staticmethod
+    def _templhasher(residue):
+        if len(residue.atoms) == 1:
+            atom = residue.atoms[0]
+            return hash((atom.atomic_number, atom.type, atom.charge))
+        # TODO implement hash for polyatomic residues
+        return id(residue)
+
     def _write_omm_provenance(self, dest, provenance):
         dest.write(' <Info>\n')
         dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
@@ -257,11 +265,18 @@ class OpenMMParameterSet(ParameterSet):
 
     def _write_omm_residues(self, dest, skip_residues):
         if not self.residues: return
+        written_residues = set()
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
-            if not isinstance(residue, ResidueTemplate) or name in skip_residues:
-                continue
-            dest.write('  <Residue name="%s">\n' % residue.name)
+            if name in skip_residues: continue
+            templhash = OpenMMParameterSet._templhasher(residue)
+            if templhash in written_residues: continue
+            written_residues.add(templhash)
+            if residue.overload_level == 0:
+                dest.write('  <Residue name="%s">\n' % residue.name)
+            else:
+                dest.write('  <Residue name="%s" overload="%d">\n' % (residue.name,
+                           residue.overload_level))
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
