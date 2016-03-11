@@ -214,7 +214,8 @@ class OpenMMParameterSet(ParameterSet):
                     keep_types.add(atom.type)
         return {typ for typ in self.atom_types if typ not in keep_types}
 
-    def _templhasher(self, residue):
+    @staticmethod
+    def _templhasher(residue):
         if len(residue.atoms) == 1:
             atom = residue.atoms[0]
             return hash((atom.atomic_number, atom.type, atom.charge))
@@ -267,15 +268,16 @@ class OpenMMParameterSet(ParameterSet):
         written_residues = set()
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
-            if (not isinstance(residue, ResidueTemplate) or name in skip_residues
-                or self._templhasher(residue) in written_residues):
+            if name in skip_residues:
+                continue
+            if OpenMMParameterSet._templhasher(residue) in written_residues:
                 continue
             written_residues.add(self._templhasher(residue))
-            if residue.omm_overloadLevel == 0:
+            if residue.overload_level == 0:
                 dest.write('  <Residue name="%s">\n' % residue.name)
             else:
                 dest.write('  <Residue name="%s" overload="%d">\n' % (residue.name,
-                           residue.omm_overloadLevel))
+                           residue.overload_level))
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
