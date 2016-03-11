@@ -26,9 +26,9 @@ class NamdBinFile(object):
 
     See NamdBinCoor and NamdBinVel.
     """
-    SCALE_FACTOR = 1.0
+    _SCALE_FACTOR = 1.0
     def __init__(self, values=[]):
-        self._values = np.asarray(values,np.float64) * self.SCALE_FACTOR
+        self._values = np.asarray(values,np.float64) * self._SCALE_FACTOR
 
     @property
     def natom(self):
@@ -48,7 +48,7 @@ class NamdBinFile(object):
         """Write the current attributes to a file."""
         outfile = open(fname,'wb')
         outfile.write(pack('i',self.natom))
-        for x in self._values / self.SCALE_FACTOR:
+        for x in self._values / self._SCALE_FACTOR:
             outfile.write(pack('d',x))
         outfile.close()
 
@@ -102,7 +102,7 @@ class NamdBinVel(NamdBinFile):
     NAMD internal units are assumed. These can be converted to 
     Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.
     """
-    SCALE_FACTOR = 20.45482706
+    _SCALE_FACTOR = 20.45482706
 
     @property
     def velocities(self):
