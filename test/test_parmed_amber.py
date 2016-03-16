@@ -10,12 +10,14 @@ import numpy as np
 import os
 import re
 import sys
+import parmed as pmd
 from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
                           FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError, ParameterWarning)
 from parmed import topologyobjects, load_file, Structure
 import parmed.unit as u
+from parmed.utils import PYPY
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip, StringIO
 import random
@@ -1599,6 +1601,16 @@ class TestCoordinateFiles(FileIOTestCase):
         with open(fn, 'w') as f:
             f.write('Only one line\n')
         self.assertFalse(asciicrd.AmberAsciiRestart.id_format(fn))
+
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
+    def test_parsing_netcdf_file_without_unitcells(self):
+        """Parsing Amber netcdf file that does not have box info"""
+        fn, tn = get_fn('tz2.nc'), get_fn('tz2.parm7')
+        parm = pmd.load_file(tn, fn)
+        self.assertEqual(parm.get_coordinates().shape, (101, 223, 3))
+        self.assertEqual(len(parm.atoms), 223)
+        self.assertIs(parm.box, None)
+
 
 class TestAmberMask(unittest.TestCase):
     """ Test the Amber mask parser """
