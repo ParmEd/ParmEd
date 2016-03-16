@@ -746,7 +746,7 @@ class CharmmParameterSet(ParameterSet):
         try:
             while line:
                 line = line.strip()
-                if line[:4] == 'MASS':
+                if line[:4].upper() == 'MASS':
                     words = line.split()
                     try:
                         idx = conv(words[1], int, 'atom type')
