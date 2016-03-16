@@ -1609,7 +1609,7 @@ class TestCoordinateFiles(FileIOTestCase):
         parm = pmd.load_file(tn, fn)
         self.assertEqual(parm.get_coordinates().shape, (101, 223, 3))
         self.assertEqual(len(parm.atoms), 223)
-        self.assertEqual(parm.box, None)
+        self.assertIs(parm.box, None)
 
 
 class TestAmberMask(unittest.TestCase):
