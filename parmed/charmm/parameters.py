@@ -746,7 +746,7 @@ class CharmmParameterSet(ParameterSet):
         try:
             while line:
                 line = line.strip()
-                if line[:4] == 'MASS':
+                if line[:4].upper() == 'MASS':
                     words = line.split()
                     try:
                         idx = conv(words[1], int, 'atom type')
@@ -769,9 +769,9 @@ class CharmmParameterSet(ParameterSet):
                     self.atom_types_str[atype.name] = atype
                     self.atom_types_int[atype.number] = atype
                     self.atom_types_tuple[(atype.name, atype.number)] = atype
-                elif line[:4] == 'DECL':
+                elif line[:4].upper() == 'DECL':
                     pass # Not really sure what this means
-                elif line[:4] == 'DEFA':
+                elif line[:4].upper() == 'DEFA':
                     words = line.split()
                     if len(words) < 5:
                         warnings.warn('DEFA line has %d tokens; expected 5' %
