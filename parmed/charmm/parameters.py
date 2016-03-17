@@ -739,7 +739,6 @@ class CharmmParameterSet(ParameterSet):
             f = tfile
         hpatch = tpatch = None # default Head and Tail patches
         residues = dict()
-        patches = dict()
         hpatches = dict()
         tpatches = dict()
         line = next(f)
@@ -881,7 +880,7 @@ class CharmmParameterSet(ParameterSet):
                     if restype == 'RESI':
                         residues[resname] = res
                     elif restype == 'PRES':
-                        patches[resname] = res
+                        self.patches[resname] = res
                     else:
                         assert False, 'restype != RESI or PRES'
                     # We parsed a line we need to look at. So don't update the
@@ -896,17 +895,16 @@ class CharmmParameterSet(ParameterSet):
         for resname, res in iteritems(residues):
             if hpatches[resname] is not None:
                 try:
-                    res.first_patch = patches[hpatches[resname]]
+                    res.first_patch = self.patches[hpatches[resname]]
                 except KeyError:
                     warnings.warn('Patch %s not found' % hpatches[resname])
             if tpatches[resname] is not None:
                 try:
-                    res.last_patch = patches[tpatches[resname]]
+                    res.last_patch = self.patches[tpatches[resname]]
                 except KeyError:
                     warnings.warn('Patch %s not found' % tpatches[resname])
         # Now update the residues and patches with the ones we parsed here
         self.residues.update(residues)
-        self.patches.update(patches)
 
         if own_handle: f.close()
 
