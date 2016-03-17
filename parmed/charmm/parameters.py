@@ -321,25 +321,25 @@ class CharmmParameterSet(ParameterSet):
                 parameterset = line.strip()[1:78]
                 continue
             # Set section if this is a section header
-            if line.startswith('ATOM'):
+            if line.upper().startswith('ATOM'):
                 section = 'ATOMS'
                 continue
-            if line.startswith('BOND'):
+            if line.upper().startswith('BOND'):
                 section = 'BONDS'
                 continue
-            if line.startswith('ANGLE') or line.startswith('THETA'):
+            if line.upper().startswith('ANGLE') or line.upper().startswith('THETA'):
                 section = 'ANGLES'
                 continue
-            if line.startswith('DIHE') or line.startswith('PHI'):
+            if line.upper().startswith('DIHE') or line.upper().startswith('PHI'):
                 section = 'DIHEDRALS'
                 continue
-            if line.startswith('IMPROPER') or line.startswith('IMPHI'):
+            if line.upper().startswith('IMPROPER') or line.upper().startswith('IMPHI'):
                 section = 'IMPROPER'
                 continue
-            if line.startswith('CMAP'):
+            if line.upper().startswith('CMAP'):
                 section = 'CMAP'
                 continue
-            if line.startswith('NONBONDED'):
+            if line.upper().startswith('NONBONDED'):
                 read_first_nonbonded = declared_geometric = False
                 section = 'NONBONDED'
                 # Get nonbonded keywords
@@ -376,14 +376,14 @@ class CharmmParameterSet(ParameterSet):
                         self.combining_rule = 'geometric'
                         declared_geometric = True
                 continue
-            if line.startswith('NBFIX'):
+            if line.upper().startswith('NBFIX'):
                 section = 'NBFIX'
                 continue
-            if line.startswith('HBOND'):
+            if line.upper().startswith('HBOND'):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
-            if line[:3].upper() == 'END': # should this be case-insensitive?
+            if line[:3].upper() == 'END':
                 section = None
                 continue
             # If we have no section, skip
@@ -395,8 +395,8 @@ class CharmmParameterSet(ParameterSet):
             else:
                 penalty = None
             # Now handle each section specifically
-            if section == 'ATOMS':
-                if not line.startswith('MASS'): continue # Should this happen?
+            if section.upper() == 'ATOMS':
+                if not line.upper().startswith('MASS'): continue # Should this happen?
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
@@ -421,7 +421,7 @@ class CharmmParameterSet(ParameterSet):
                 self.atom_types_int[atype.number] = atype
                 self.atom_types_tuple[(atype.name, atype.number)] = atype
                 continue
-            if section == 'BONDS':
+            if section.upper() == 'BONDS':
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
@@ -447,7 +447,7 @@ class CharmmParameterSet(ParameterSet):
                     self.bond_types[(type2, type1)] = bond_type
                 bond_type.penalty = penalty
                 continue
-            if section == 'ANGLES':
+            if section.upper() == 'ANGLES':
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
@@ -487,7 +487,7 @@ class CharmmParameterSet(ParameterSet):
                 self.urey_bradley_types[(type3, type2, type1)] = ubtype
                 angle_type.penalty = penalty
                 continue
-            if section == 'DIHEDRALS':
+            if section.upper() == 'DIHEDRALS':
                 words = line.split()
                 if words[0].upper == 'END':
                     continue
@@ -527,7 +527,7 @@ class CharmmParameterSet(ParameterSet):
                     self.dihedral_types[(type1,type2,type3,type4)] = dtl
                     self.dihedral_types[(type4,type3,type2,type1)] = dtl
                 continue
-            if section == 'IMPROPER':
+            if section.upper() == 'IMPROPER':
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
@@ -565,7 +565,7 @@ class CharmmParameterSet(ParameterSet):
                     improp.improper = True
                 improp.penalty = penalty
                 continue
-            if section == 'CMAP':
+            if section.upper() == 'CMAP':
                 # This is the most complicated part, since cmap parameters span
                 # many lines. We won't do much error catching here.
                 words = line.split()
@@ -602,7 +602,7 @@ class CharmmParameterSet(ParameterSet):
                     current_cmap_res = res
                     current_cmap_data = []
                 continue
-            if section == 'NONBONDED':
+            if section.upper() == 'NONBONDED':
                 # Now get the nonbonded values
                 words = line.split()
                 if words[0].upper == 'END':
@@ -671,7 +671,7 @@ class CharmmParameterSet(ParameterSet):
                     eps14 = rmin14 = None
                 nonbonded_types[atype] = [epsilon, rmin, eps14, rmin14]
                 continue
-            if section == 'NBFIX':
+            if section.upper() == 'NBFIX':
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
@@ -768,9 +768,9 @@ class CharmmParameterSet(ParameterSet):
                     self.atom_types_str[atype.name] = atype
                     self.atom_types_int[atype.number] = atype
                     self.atom_types_tuple[(atype.name, atype.number)] = atype
-                elif line[:4] == 'DECL':
+                elif line[:4].upper() == 'DECL':
                     pass # Not really sure what this means
-                elif line[:4] == 'DEFA':
+                elif line[:4].upper() == 'DEFA':
                     words = line.split()
                     if len(words) < 5:
                         warnings.warn('DEFA line has %d tokens; expected 5' %
@@ -821,7 +821,7 @@ class CharmmParameterSet(ParameterSet):
                             atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
-                        elif line.strip() and line.split()[0].upper() in \
+                        elif line.strip().upper() and line.split()[0].upper() in \
                                 ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
