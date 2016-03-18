@@ -635,8 +635,11 @@ class NetCDFTraj(object):
 
     @property
     def cell_lengths_angles(self):
-        return np.hstack((self._ncfile.variables['cell_lengths'][:],
-                          self._ncfile.variables['cell_angles'][:]))
+        try:
+            return np.hstack((self._ncfile.variables['cell_lengths'][:],
+                              self._ncfile.variables['cell_angles'][:]))
+        except KeyError:
+            return None
 
     box = cell_lengths_angles
 

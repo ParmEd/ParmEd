@@ -6,14 +6,14 @@ between standard and amber file formats, manipulate structures, etc.
 # Version format should be "major.minor.patch". For beta releases, attach
 # "-beta#" to the end. The beta number will be turned into another number in the
 # version tuple
-__version__ = '2.3.2'
+__version__ = '2.4.0'
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
            'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs',
-           'tinker', 'openmm', 'rosetta', 'formats', 'Vec3', 'ParameterSet',
+           'tinker', 'openmm', 'rosetta', 'rdkit', 'formats', 'Vec3', 'ParameterSet',
            'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF',
-           'load_rosetta', 'download_PDB', 'download_CIF', 'tools', 'version']
+           'load_rosetta', 'load_rdkit', 'download_PDB', 'download_CIF', 'tools', 'version']
 
 from parmed import exceptions, periodic_table, residue
 from parmed import unit, utils
@@ -23,6 +23,8 @@ from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker
 from parmed import formats
 from parmed.vec3 import Vec3
 from parmed.parameters import ParameterSet
+from parmed.rdkit import load_rdkit
+from parmed import rdkit
 from parmed.utils.decorators import deprecated as _deprecated
 load_file = formats.load_file
 read_PDB = formats.PDBFile.parse

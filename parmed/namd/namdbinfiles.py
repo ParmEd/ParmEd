@@ -14,9 +14,9 @@ import numpy as np
 class NamdBinFile(object):
     """From the NAMD manual:
 
-        NAMD uses a trivial double-precision binary file format for 
-        coordinates, velocities, and forces ... The file consists of the atom 
-        count as a 32-bit integer followed by all three position or velocity 
+        NAMD uses a trivial double-precision binary file format for
+        coordinates, velocities, and forces ... The file consists of the atom
+        count as a 32-bit integer followed by all three position or velocity
         components for each atom as 64-bit double-precision floating point ...
 
     The main attributes are the number of atom entries (natom) and a (flat)
@@ -24,11 +24,13 @@ class NamdBinFile(object):
     effectively arbitrary, but for convenience derived classes are provided
     which alias the values to more descriptive names (e.g. "coordinates").
 
-    See NamdBinCoor and NamdBinVel.
+    See also
+    --------
+    :class:`NamdBinCoor` and :class:`NamdBinVel`
     """
-    SCALE_FACTOR = 1.0
+    _SCALE_FACTOR = 1.0
     def __init__(self, values=[]):
-        self._values = np.asarray(values,np.float64) * self.SCALE_FACTOR
+        self._values = np.asarray(values,np.float64) * self._SCALE_FACTOR
 
     @property
     def natom(self):
@@ -48,7 +50,7 @@ class NamdBinFile(object):
         """Write the current attributes to a file."""
         outfile = open(fname,'wb')
         outfile.write(pack('i',self.natom))
-        for x in self._values / self.SCALE_FACTOR:
+        for x in self._values / self._SCALE_FACTOR:
             outfile.write(pack('d',x))
         outfile.close()
 
@@ -62,7 +64,7 @@ class NamdBinFile(object):
         self._values = newvalues
 
     def insertatoms(self, start_index, natoms, values=None):
-        """Insert space for natom entries beginning at start_index. If 
+        """Insert space for natom entries beginning at start_index. If
         specified, give them the provided values, otherwise set them to zero.
         """
         if values is not None:
@@ -85,7 +87,7 @@ class NamdBinFile(object):
 
 
 class NamdBinCoor(NamdBinFile):
-    """Class to read or write NAMD "bincoordinates" files."""
+    """ Class to read or write NAMD "bincoordinates" files. """
     @property
     def coordinates(self):
         return self._values.reshape((-1, self.natom, 3))
@@ -97,12 +99,9 @@ class NamdBinCoor(NamdBinFile):
         self._values = np.array(value).flatten()
 
 class NamdBinVel(NamdBinFile):
-    """Class to read or write NAMD "binvelocities" files.
+    """ Class to read or write NAMD "binvelocities" files. """
 
-    NAMD internal units are assumed. These can be converted to 
-    Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.
-    """
-    SCALE_FACTOR = 20.45482706
+    _SCALE_FACTOR = 20.45482706
 
     @property
     def velocities(self):
