@@ -2525,6 +2525,48 @@ class DihedralTypeList(list, _ListItem):
         self._idx = -1
         self.used = False
 
+    @classmethod
+    def from_rbtorsion(cls, rbtorsion):
+        """
+        Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans
+        torsion.
+
+        Parameters
+        ----------
+        rbtorsion : RBTorsionType
+            The R-B torsion type to convert to a series of proper torsions
+
+        Raises
+        ------
+        AttributeError if rbtorsion does not have the attributes c0, c1, c2, c3,
+        c4, and c5.
+
+        ValueError if c5 is not 0 and c1+c2+c3+c4 != 0
+        """
+        # c0 is ignored (it only contributes a constant...)
+        c1 = rbtorsion.c1
+        c2 = rbtorsion.c2
+        c3 = rbtorsion.c3
+        c4 = rbtorsion.c4
+        c5 = rbtorsion.c5
+        if c5 != 0:
+            raise ValueError('Cannot convert R-B torsion with c5 != 0')
+        if abs(c1 + c2 + c3 + c4) > TINY:
+            raise ValueError('Cannot convert R-B torsion with c1+c2+c3+c4 != 0')
+        # These conversions are taken from InterMol
+        f1 = 2.0 * c1 + 3.0 * c3 / 2.0
+        f2 = -c2 - c4
+        f3 = c3 / 2.0
+        f4 = -c4 / 4.0
+        inst = cls()
+        for i, f in enumerate((f1, f2, f3, f4)):
+            if abs(f) > TINY:
+                inst.append(
+                        DihedralType(f, i, 180, scee=rbtorsion.scee,
+                                     scnb=rbtorsion.scnb)
+                )
+        return inst
+
     @_exception_to_notimplemented
     def __eq__(self, other):
         if len(self) != len(other): return False
