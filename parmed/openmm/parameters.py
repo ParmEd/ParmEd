@@ -255,12 +255,14 @@ class OpenMMParameterSet(ParameterSet):
             if name in skip_types: continue
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             if atom_type.atomic_number == 0:
-                element = ""
+                dest.write('  <Type name="%s" class="%s" mass="%s"/>\n'
+                           % (name, name, atom_type.mass)
+                           )
             else:
                 element = Element[atom_type.atomic_number]
-            dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
-                       % (name, name, element, atom_type.mass)
-                       )
+                dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
+                           % (name, name, element, atom_type.mass)
+                          )
         dest.write(' </AtomTypes>\n')
 
     def _write_omm_residues(self, dest, skip_residues):
