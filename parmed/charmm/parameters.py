@@ -791,6 +791,9 @@ class CharmmParameterSet(ParameterSet):
                     # Get the residue definition
                     words = line.split()
                     resname = words[1].upper()
+                    if resname in (self.residues):
+                        warnings.warn('Replacing residue %r' %
+                                              (resname), ParameterWarning)
                     # Assign default patches
                     hpatches[resname] = hpatch
                     tpatches[resname] = tpatch
