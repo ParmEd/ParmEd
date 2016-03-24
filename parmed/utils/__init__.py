@@ -116,6 +116,7 @@ def canonical_improper_order(atom1, atom2, atom3, atom4, center=1):
             central = atom
             break
     else:
+        # TODO use "center" keyword to determine which atom is center
         # No atom identified as "central". Just assume that the third is
         central = atom3
         others = sorted([atom1, atom2, atom4])
