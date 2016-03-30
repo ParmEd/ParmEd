@@ -419,7 +419,8 @@ class Structure(object):
         for atom in self.atoms:
             res = atom.residue
             a = copy(atom)
-            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code)
+            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code,
+                       res.segid)
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(copy(bt))
@@ -901,7 +902,7 @@ class Structure(object):
             else:
                 num = res.number
             struct.add_atom(copy(atom), res.name, num, res.chain,
-                            res.insertion_code)
+                            res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -3228,7 +3229,7 @@ class Structure(object):
         for atom in other.atoms:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                          res.insertion_code)
+                          res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -3353,7 +3354,7 @@ class Structure(object):
             for atom in other.atoms:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                              res.insertion_code)
+                              res.insertion_code, res.segid)
             copy_valence_terms(other.bonds, aoffset, self.bonds,
                                self.bond_types, ['atom1', 'atom2'])
             copy_valence_terms(other.angles, aoffset, self.angles,

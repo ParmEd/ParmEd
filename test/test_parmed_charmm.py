@@ -4,6 +4,7 @@ Tests for the parmed/charmm subpackage
 from __future__ import division, print_function
 
 from collections import OrderedDict, defaultdict
+import copy
 import numpy as np
 import os
 import parmed as pmd
@@ -237,6 +238,20 @@ class TestCharmmPsf(utils.FileIOTestCase):
         self.assertEqual(g, cpsf.groups[0])
         g.type = 0
         self.assertNotEqual(g, cpsf.groups[0])
+        # Check that copying preserves segid attributes
+        psf2 = copy.copy(cpsf)
+        for r1, r2 in zip(cpsf.residues, psf2.residues):
+            self.assertEqual(r1.chain, r2.chain)
+            self.assertEqual(r1.segid, r2.segid)
+            self.assertEqual(r1.number, r2.number)
+            self.assertEqual(r1.idx, r2.idx)
+        # Check that slicing preserves segid attributes as well
+        firstres = cpsf[0,:]
+        self.assertEqual(cpsf.residues[0].segid, firstres.residues[0].segid)
+        for res in (firstres + firstres).residues:
+            self.assertEqual(res.segid, firstres.residues[0].segid)
+        for res in (firstres * 3).residues:
+            self.assertEqual(res.segid, firstres.residues[0].segid)
 
     def test_xplor_psf(self):
         """ Test Xplor-format CHARMM PSF file parsing """
