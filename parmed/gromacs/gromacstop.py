@@ -20,9 +20,9 @@ import warnings
 
 try:
     from os import getuid, uname
-except ImportError:             # pragma: nocover
-    getuid = lambda: 0          # pragma: nocover
-    uname = lambda: ['Windows'] # pragma: nocover
+except ImportError:                   # pragma: nocover
+    getuid = lambda: 0                # pragma: nocover
+    uname = lambda: [None, 'Windows'] # pragma: nocover
 
 from parmed.constants import TINY, DEG_TO_RAD
 from parmed.exceptions import GromacsError, GromacsWarning, ParameterError
