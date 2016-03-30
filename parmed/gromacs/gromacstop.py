@@ -10,7 +10,6 @@ import copy
 from datetime import datetime
 import math
 import os
-import pwd
 import re
 try:
     from string import letters
@@ -18,6 +17,12 @@ except ImportError:
     from string import ascii_letters as letters
 import sys
 import warnings
+
+try:
+    from os import getuid, uname
+except ImportError:                   # pragma: nocover
+    getuid = lambda: 0                # pragma: nocover
+    uname = lambda: [None, 'Windows'] # pragma: nocover
 
 from parmed.constants import TINY, DEG_TO_RAD
 from parmed.exceptions import GromacsError, GromacsWarning, ParameterError
@@ -1356,7 +1361,7 @@ class GromacsTopologyFile(Structure):
 ;   Command line:
 ;     %s
 ;
-''' % (fname, pwd.getpwuid(os.getuid())[0], os.getuid(), os.uname()[1],
+''' % (fname, os.getlogin(), getuid(), uname()[1],
        now.strftime('%a. %B  %w %X %Y'), os.path.split(sys.argv[0])[1],
        __version__, os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
        ' '.join(sys.argv)))
