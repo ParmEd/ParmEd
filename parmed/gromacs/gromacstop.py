@@ -37,9 +37,9 @@ from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 
 if sys.platform.startswith('win'):
-    _username = os.getlogin()   # pragma: nocover
-    _userid = 0                 # pragma: nocover
-    _uname = 'Windows'          # pragma: nocover
+    _username = os.getlogin()   # pragma: no cover
+    _userid = 0                 # pragma: no cover
+    _uname = 'Windows'          # pragma: no cover
 else:
     import pwd
     _username = pwd.getpwuid(os.getuid())[0]
