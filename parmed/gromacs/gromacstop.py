@@ -10,7 +10,6 @@ import copy
 from datetime import datetime
 import math
 import os
-import pwd
 import re
 try:
     from string import letters
@@ -37,6 +36,15 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 
+if sys.platform.startswith('win'):
+    _username = os.getlogin()   # pragma: nocover
+    _userid = 0                 # pragma: nocover
+    _uname = 'Windows'          # pragma: nocover
+else:
+    import pwd
+    _username = pwd.getpwuid(os.getuid())[0]
+    _userid = os.getuid()
+    _uname = os.uname()[1]
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
 # functional form is used for each of its different parameter types. This is
@@ -1342,7 +1350,7 @@ class GromacsTopologyFile(Structure):
             now = datetime.now()
             dest.write('''\
 ;
-;   File %swas generated
+;   File %s was generated
 ;   By user: %s (%d)
 ;   On host: %s
 ;   At date: %s
@@ -1356,10 +1364,9 @@ class GromacsTopologyFile(Structure):
 ;   Command line:
 ;     %s
 ;
-''' % (fname, pwd.getpwuid(os.getuid())[0], os.getuid(), os.uname()[1],
-       now.strftime('%a. %B  %w %X %Y'), os.path.split(sys.argv[0])[1],
-       __version__, os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
-       ' '.join(sys.argv)))
+''' % (fname, _username, _userid, _uname, now.strftime('%a. %B  %w %X %Y'),
+       os.path.split(sys.argv[0])[1], __version__, os.path.split(sys.argv[0])[1],
+       gmx.GROMACS_TOPDIR, ' '.join(sys.argv)))
             dest.write('\n[ defaults ]\n')
             dest.write('; nbfunc        comb-rule       gen-pairs       '
                         'fudgeLJ fudgeQQ\n')
