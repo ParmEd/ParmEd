@@ -36,15 +36,18 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 
-if sys.platform.startswith('win'):
-    _username = os.getlogin()   # pragma: no cover
-    _userid = 0                 # pragma: no cover
-    _uname = 'Windows'          # pragma: no cover
-else:
+try:
     import pwd
     _username = pwd.getpwuid(os.getuid())[0]
     _userid = os.getuid()
     _uname = os.uname()[1]
+except ImportError:    
+    import getpass
+    _username = getpass.getuser()   # pragma: no cover
+    _userid = 0                     # pragma: no cover
+    import platform                 # pragma: no cover
+    _uname = platform.node()        # pragma: no cover
+
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
 # functional form is used for each of its different parameter types. This is
