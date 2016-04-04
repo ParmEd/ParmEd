@@ -1,6 +1,11 @@
 import os
 import sys
 
+if sys.version_info < (2, 7):
+    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
+                     'correctly.\n')
+    sys.exit(0)
+
 try:
     if '--no-setuptools' in sys.argv:
         sys.argv.remove('--no-setuptools')
@@ -42,12 +47,6 @@ class CleanCommand(Clean):
         self._clean('parmed')
         self._clean('test')
 
-
-
-if sys.version_info < (2, 7):
-    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
-                     'correctly.\n')
-    sys.exit(0)
 
 is_pypy = '__pypy__' in sys.builtin_module_names
 
