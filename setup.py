@@ -21,6 +21,7 @@ except ImportError:
 class CleanCommand(Clean):
     """python setup.py clean
     """
+    # lightly adapted from scikit-learn package
     description = "Remove build artifacts from the source tree"
 
     def _clean(self, folder):
