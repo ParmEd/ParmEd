@@ -4,7 +4,7 @@ import sys
 if sys.version_info < (2, 7):
     sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
                      'correctly.\n')
-    sys.exit(0)
+    sys.exit(1)
 
 try:
     if '--no-setuptools' in sys.argv:
