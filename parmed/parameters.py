@@ -360,6 +360,13 @@ class ParameterSet(object):
             typ = copy(urey.type)
             params.urey_bradley_types[key] = typ
             params.urey_bradley_types[tuple(reversed(key))] = typ
+        if not urey_brads_preassigned and len(params.urey_bradley_types) > 0:
+            # Go through all of our angle parameters and make sure there is a
+            # matching Urey-Bradley list. If there's not, that means there is no
+            # Urey-Bradley term for that angle
+            for key in params.angle_types:
+                if key in params.urey_bradleys: continue
+                params.urey_bradleys[key] = NoUreyBradley
         for adjust in struct.adjusts:
             if adjust.type is None: continue
             key = (adjust.atom1.type, adjust.atom2.type)
