@@ -24,6 +24,8 @@ import warnings
 warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
 get_fn = utils.get_fn
 
+param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                                        get_fn('par_all22_prot.inp'))
 
 class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
@@ -435,7 +437,7 @@ class TestCharmmPsf(utils.FileIOTestCase):
         self.assertEqual(len(cpsf.cmaps), 447)
         self.assertEqual(cpsf.residues[281].insertion_code, 'A')
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_from_structure(self):
         """ Tests the CharmmPsfFile.from_structure constructor """
         top1 = load_file(get_fn('benzene_cyclohexane_10_500.prmtop'))
@@ -814,7 +816,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG251O')].penalty, 49.5)
         self.assertEqual(p.dihedral_types[('HGA2','CG321','NG3C51','CG2R51')].penalty, 48.5)
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_charmm_parameter_set_conversion(self):
         """ Tests CharmmParameterSet.from_parameterset and from_structure """
         params1 = ParameterSet.from_structure(
@@ -889,6 +891,15 @@ class TestCharmmParameters(utils.FileIOTestCase):
             self.assertEqual(typ1, typ2)
         self.assertEqual(len(from_gmx2.nbfix_types), 1)
         self.assertEqual(from_gmx2.nbfix_types[('X', 'Y')], (2.0, 3.0))
+
+    def test_parameters_from_structure(self):
+        """ Test creation of CharmmParameterSet from a Structure """
+        top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        top.load_parameters(param22)
+        params = parameters.CharmmParameterSet.from_structure(top)
+        self.assertGreater(len(params.urey_bradley_types), 0)
+        for key in params.urey_bradley_types:
+            self.assertEqual(len(key), 3)
 
     def test_warning(self):
         """ Tests warning when overwriting parameters"""
