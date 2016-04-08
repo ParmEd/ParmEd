@@ -8,7 +8,7 @@ Author: Jason M. Swails
 from __future__ import print_function, division
 
 from parmed.exceptions import ParameterError
-from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
+from parmed.topologyobjects import (NoUreyBradley, BondType, DihedralTypeList,
                 AtomType, DihedralType, UnassignedAtomType)
 from parmed.utils import canonical_improper_order
 from parmed.utils.six.moves import range
@@ -350,12 +350,15 @@ class ParameterSet(object):
             params.cmap_types[key] = typ
             params.cmap_types[tuple(reversed(key))] = typ
         for urey in struct.urey_bradleys:
-            if urey.type is None or urey.type is NoUreyBradley: continue
-            key = (urey.atom1.type, urey.atom2.type)
+            key = (min(urey.atom1.type, urey.atom3.type), urey.atom2.type,
+                   max(urey.atom1.type, urey.atom3.type))
             if key not in params.urey_bradley_types:
                 warnings.warn('Angle corresponding to Urey-Bradley type not '
                               'found')
             typ = copy(urey.type)
+            if urey.type is None or urey.type is NoUreyBradley:
+                typ = BondType(0.0, 0.0)
+                print(typ)
             params.urey_bradley_types[key] = typ
             params.urey_bradley_types[tuple(reversed(key))] = typ
         for adjust in struct.adjusts:

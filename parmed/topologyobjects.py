@@ -2448,13 +2448,13 @@ class UreyBradley(object):
     >>> b1 = Bond(a1, a2)
     >>> b2 = Bond(a2, a3)
     >>> angle = Angle(a1, a2, a3)
-    >>> urey = UreyBradley(a1, a3)
+    >>> urey = UreyBradley(a1, a2, a3)
     >>> a1 in urey and a3 in urey
     True
     >>> b1 in urey and b2 in urey
     True
     """
-    def __init__(self, atom1, atom2, type=None):
+    def __init__(self, atom1, atom2, atom3, type=None):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
@@ -2462,32 +2462,33 @@ class UreyBradley(object):
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2
+        self.atom3 = atom3
         # Log this urey-bradley in the atoms
         atom1.urey_bradleys.append(self)
-        atom2.urey_bradleys.append(self)
+        atom3.urey_bradleys.append(self)
         # Load the force constant and equilibrium distance
         self.type = type
 
     def __contains__(self, thing):
         " Quick and easy way to see if an Atom or Bond is in this Urey-Bradley "
         if isinstance(thing, Atom):
-            return thing is self.atom1 or thing is self.atom2
+            return thing is self.atom1 or thing is self.atom3
         # If this is a bond things are a bit more complicated since we don't
         # know the central atom of this Urey-Bradley. We need to make sure that
         # one of the atoms of the bond is either atom1 or atom2 and that the
         # OTHER atom in Bond "thing" has the OTHER atom in this Urey-Bradley in
         # its list of bonded partners.
         if not thing.atom1 in self:
-            if not thing.atom2 in self:
+            if not thing.atom3 in self:
                 # Neither atom is in this Urey-Bradley...
                 return False
             # If we are here, thing.atom2 is in self
-            end1 = thing.atom2
+            end1 = thing.atom3
             cent = thing.atom1
         else:
             # If we are here, thing.atom1 is in self
             end1 = thing.atom1
-            cent = thing.atom2
+            cent = thing.atom3
         # If we are here, end1 and cent are set. Look through the bond
         # partners of cent(er) and see if any of them is in this
         # Urey-Bradley (but ONLY if that atom is not the original end1)
@@ -2509,12 +2510,13 @@ class UreyBradley(object):
         """
         _delete_from_list(self.atom1.urey_bradleys, self)
         _delete_from_list(self.atom2.urey_bradleys, self)
+        _delete_from_list(self.atom3.urey_bradleys, self)
 
-        self.atom1 = self.atom2 = self.type = None
+        self.atom1 = self.atom2 = self.atom3 = self.type = None
 
     def __repr__(self):
-        return '<%s %r--%r; type=%r>' % (type(self).__name__,
-                self.atom1, self.atom2, self.type)
+        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
+                self.atom1, self.atom2, self.atom3, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

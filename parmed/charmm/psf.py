@@ -519,7 +519,7 @@ class CharmmPsfFile(Structure):
                 ang.type.used = False
                 ubt = parmset.urey_bradley_types[key]
                 if ubt is not NoUreyBradley:
-                    ub = UreyBradley(ang.atom1, ang.atom3, ubt)
+                    ub = UreyBradley(ang.atom1, ang.atom2, ang.atom3, ubt)
                     self.urey_bradleys.append(ub)
                     ubt.used = False
             except KeyError:
