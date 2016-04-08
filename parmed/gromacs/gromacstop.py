@@ -21,7 +21,7 @@ import warnings
 from parmed.constants import TINY, DEG_TO_RAD
 from parmed.exceptions import GromacsError, GromacsWarning, ParameterError
 from parmed.formats.registry import FileFormatType
-from parmed.parameters import ParameterSet
+from parmed.parameters import ParameterSet, _find_ureybrad_key
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed.structure import Structure
 from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
@@ -41,7 +41,7 @@ try:
     _username = pwd.getpwuid(os.getuid())[0]
     _userid = os.getuid()
     _uname = os.uname()[1]
-except ImportError:    
+except ImportError:
     import getpass
     _username = getpass.getuser()   # pragma: no cover
     _userid = 0                     # pragma: no cover
@@ -394,8 +394,8 @@ class GromacsTopologyFile(Structure):
                     params.angle_types[(a, b, c)] = t
                     params.angle_types[(c, b, a)] = t
                     if ut is not None:
-                        params.urey_bradley_types[(a, c)] = ut
-                        params.urey_bradley_types[(c, a)] = ut
+                        params.urey_bradley_types[(a, b, c)] = ut
+                        params.urey_bradley_types[(c, b, a)] = ut
                 elif current_section == 'dihedraltypes':
                     key, knd, t, replace = self._parse_dihedraltypes(line)
                     rkey = tuple(reversed(key))
@@ -1037,7 +1037,7 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
-            key = (_gettype(ub.atom1), _gettype(ub.atom2))
+            key = _find_ureybrad_key(ub)
             if key in params.urey_bradley_types:
                 ub.type = params.urey_bradley_types[key]
                 if ub.type is not NoUreyBradley:
@@ -1454,8 +1454,8 @@ class GromacsTopologyFile(Structure):
                         part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
                                 key[0], key[1], key[2], param.theteq,
                                 param.k*conv)
-                        if (key[0], key[2]) in params.urey_bradley_types:
-                            ub = params.urey_bradley_types[(key[0], key[2])]
+                        if key in params.urey_bradley_types:
+                            ub = params.urey_bradley_types[key]
                             parfile.write(part % 5)
                             parfile.write('  %8.3f  %8.3f\n' % (ub.req/10,
                                           ub.k*bconv))
@@ -1812,10 +1812,9 @@ class GromacsTopologyFile(Structure):
                             break
                     else:
                         ubtype = NoUreyBradley
-                    ubkey = (key[0], key[2])
                     param_equal = param_equal and (
-                            ubkey in params.urey_bradley_types and
-                            ubtype == params.urey_bradley_types[ubkey])
+                            key in params.urey_bradley_types and
+                            ubtype == params.urey_bradley_types[key])
                 if writeparams or not param_equal:
                     dest.write('   %.5f %f' % (angle.type.theteq,
                                                angle.type.k*conv))
