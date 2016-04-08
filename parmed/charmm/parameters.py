@@ -222,8 +222,8 @@ class CharmmParameterSet(ParameterSet):
         periodicity found if no matching DihedralTypeList is found.
         """
         return cls.from_parameterset(
-                ParameterSet.from_structure(
-                        struct, allow_unequal_duplicates=False)
+                ParameterSet.from_structure(struct,
+                                            allow_unequal_duplicates=False)
         )
 
     @classmethod
