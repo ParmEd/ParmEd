@@ -365,8 +365,8 @@ class ParameterSet(object):
             # matching Urey-Bradley list. If there's not, that means there is no
             # Urey-Bradley term for that angle
             for key in params.angle_types:
-                if key in params.urey_bradleys: continue
-                params.urey_bradleys[key] = NoUreyBradley
+                if key in params.urey_bradley_types: continue
+                params.urey_bradley_types[key] = NoUreyBradley
         for adjust in struct.adjusts:
             if adjust.type is None: continue
             key = (adjust.atom1.type, adjust.atom2.type)
