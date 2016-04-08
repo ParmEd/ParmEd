@@ -2202,7 +2202,7 @@ class Structure(object):
         for urey in self.urey_bradleys:
             if urey.type is None:
                 raise ParameterError('Cannot find urey-bradley parameters')
-            force.addBond(urey.atom1.idx, urey.atom2.idx,
+            force.addBond(urey.atom1.idx, urey.atom3.idx,
                           urey.type.req*length_conv, 2*urey.type.k*frc_conv)
         return force
 
