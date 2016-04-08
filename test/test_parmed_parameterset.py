@@ -5,6 +5,7 @@ import parmed as pmd
 from parmed.utils.six import iteritems
 import unittest
 import utils
+import warnings
 
 class TestParameterSet(unittest.TestCase):
     """ Tests ParameterSet """
@@ -57,6 +58,7 @@ class TestParameterSet(unittest.TestCase):
 
     def test_urey_bradley_type(self):
         """ Tests handling getting urey-bradley types from Structure """
+        warnings.filterwarnings('error', category=pmd.exceptions.ParameterWarning)
         struct = pmd.Structure()
         struct.add_atom(pmd.Atom('CA', type='CX'), 'ALA', 1)
         struct.add_atom(pmd.Atom('CB', type='CY'), 'ALA', 1)
@@ -64,7 +66,7 @@ class TestParameterSet(unittest.TestCase):
         struct.add_atom(pmd.Atom('CD', type='CX'), 'GLY', 2)
         struct.add_atom(pmd.Atom('CE', type='CY'), 'GLY', 2)
         struct.add_atom(pmd.Atom('CF', type='CZ'), 'GLY', 2)
-        struct.bond_types.append(pmd.BondType(1.0, 100.0))
+        struct.bond_types.append(pmd.BondType(100.0, 1.0))
         struct.bond_types.claim()
         struct.bonds.extend([
                 pmd.Bond(struct[0], struct[1], type=struct.bond_types[0]),
@@ -83,7 +85,7 @@ class TestParameterSet(unittest.TestCase):
                 pmd.Angle(struct[3], struct[4], struct[5],
                           type=struct.angle_types[0])
         )
-        struct.urey_bradley_types.append(pmd.BondType(2.0, 150.0))
+        struct.urey_bradley_types.append(pmd.BondType(150.0, 2.0))
         struct.urey_bradley_types.claim()
         struct.urey_bradleys.extend([
                 pmd.UreyBradley(struct[0], struct[2],
@@ -98,3 +100,4 @@ class TestParameterSet(unittest.TestCase):
             self.assertEqual(len(key), 3)
             self.assertEqual(ubt.req, 2.0)
             self.assertEqual(ubt.k, 150.0)
+        warnings.filterwarnings('default', category=pmd.exceptions.ParameterWarning)
