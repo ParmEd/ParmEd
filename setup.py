@@ -1,24 +1,52 @@
 import os
 import sys
+
+if sys.version_info < (2, 7):
+    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
+                     'correctly.\n')
+    sys.exit(1)
+
 try:
     if '--no-setuptools' in sys.argv:
         sys.argv.remove('--no-setuptools')
         raise ImportError() # Don't import setuptools...
     from setuptools import setup, Extension
+    from setuptools.command.clean import clean as Clean
     kws = dict(entry_points={
             'console_scripts' : ['parmed = parmed.scripts:clapp'],
             'gui_scripts' : ['xparmed = parmed.scripts:guiapp']}
     )
 except ImportError:
     from distutils.core import setup, Extension
+    from distutils.command.clean import clean as Clean
     kws = {'scripts' : [os.path.join('scripts', 'parmed'),
                         os.path.join('scripts', 'xparmed')]
     }
 
-if sys.version_info < (2, 7):
-    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
-                     'correctly.\n')
-    sys.exit(0)
+class CleanCommand(Clean):
+    """python setup.py clean
+    """
+    # lightly adapted from scikit-learn package
+    description = "Remove build artifacts from the source tree"
+
+    def _clean(self, folder):
+        for dirpath, dirnames, filenames in os.walk(folder):
+            for filename in filenames:
+                if (filename.endswith('.so') or filename.endswith('.pyd')
+                        or filename.endswith('.dll')
+                        or filename.endswith('.pyc')):
+                    os.unlink(os.path.join(dirpath, filename))
+            for dirname in dirnames:
+                if dirname == '__pycache__':
+                    shutil.rmtree(os.path.join(dirpath, dirname))
+
+    def run(self):
+        Clean.run(self)
+        if os.path.exists('build'):
+            shutil.rmtree('build')
+        self._clean('parmed')
+        self._clean('test')
+
 
 is_pypy = '__pypy__' in sys.builtin_module_names
 
@@ -121,5 +149,6 @@ if __name__ == '__main__':
           license='LGPL (or GPL if released with AmberTools)',
           packages=packages,
           ext_modules=extensions,
+          cmdclass={'clean': CleanCommand},
           **kws
     )

@@ -64,7 +64,7 @@ class _ZeroDict(dict):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-_resre = re.compile(r'(\d+)([a-zA-Z]*)')
+_resre = re.compile(r'(-?\d+)([a-zA-Z]*)')
 
 class CharmmPsfFile(Structure):
     """
@@ -112,12 +112,12 @@ class CharmmPsfFile(Structure):
         psf : file
             Open file that is pointing to the first line of the section that is
             to be parsed
-        
+
         Returns
         -------
-        title : str 
+        title : str
             The label of the PSF section we are parsing
-        pointers : (int/tuple of ints) 
+        pointers : (int/tuple of ints)
             If one pointer is set, pointers is simply the integer that is value
             of that pointer. Otherwise it is a tuple with every pointer value
             defined in the first line
@@ -436,7 +436,7 @@ class CharmmPsfFile(Structure):
         ----------
         params : CharmmParameterSet=None
             If not None, this parameter set will be loaded
-        
+
         See Also
         --------
         :meth:`parmed.structure.Structure.createSystem`
@@ -665,12 +665,12 @@ def set_molecules(atoms):
     owner = []
     # The way I do this is via a recursive algorithm, in which
     # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and 
+    # has, which in turn calls set_owner for each of its partners and
     # so on until everything has been assigned.
     molecule_number = 1 # which molecule number we are on
     for i in range(len(atoms)):
         # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if 
+        # However, we only increment which molecule number we're on if
         # we actually assigned a new molecule (obviously)
         if not atoms[i].marked:
             tmp = [i]
