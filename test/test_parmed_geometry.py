@@ -29,6 +29,10 @@ class TestChemistryGeometry(unittest.TestCase):
         a2.xy = 4
         a2.xz = 0
         self.assertEqual(geo.distance(a1, a2), 5)
+        # Make sure it also works for tuples and a mixture of both
+        self.assertEqual(geo.distance((0, 0, 0), (3, 4, 0)), 5)
+        self.assertEqual(geo.distance(a1, (3, 4, 0)), 5)
+        self.assertEqual(geo.distance((0, 0, 0), a2), 5)
 
     def testBoxLengthsVectors(self):
         """ Test converting box lengths/angles to vectors and back again """
