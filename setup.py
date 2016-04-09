@@ -150,5 +150,6 @@ if __name__ == '__main__':
           packages=packages,
           ext_modules=extensions,
           cmdclass={'clean': CleanCommand},
+          package_data={'parmed.modeller': ['data/*.lib']},
           **kws
     )

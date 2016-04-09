@@ -15,7 +15,7 @@ from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
-                             PROTEIN, SOLVENT)
+                             PROTEIN, SOLVENT, StandardBiomolecularResidues)
 from parmed.formats import Mol2File, PDBFile
 from parmed.exceptions import MoleculeError
 from parmed.utils.six import iteritems
@@ -1165,5 +1165,15 @@ class TestSlice(unittest.TestCase):
             for atom in atomlist:
                 self.assertEqual(atom.name, residue[atom.name].name)
 
-if __name__ == '__main__':
-    unittest.main()
+class TestBondDetermination(unittest.TestCase):
+    """ Tests assigning bonds to structures """
+
+    def test_standard_residue_database(self):
+        """ Tests the availability of standard residue templates """
+        for resname in ('ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLU', 'GLN', 'GLY',
+                        'HIS', 'HYP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO',
+                        'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT', 'DG',
+                        'DC', 'A', 'U', 'G', 'C'):
+            self.assertIn(resname, StandardBiomolecularResidues)
+            self.assertIsInstance(StandardBiomolecularResidues[resname],
+                                  ResidueTemplate)
