@@ -23,7 +23,7 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
-from parmed import unit as u
+from parmed import unit as u, Atom
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from parmed.vec3 import Vec3
 from math import pi, cos, sin, sqrt, acos
@@ -204,3 +204,37 @@ def center_of_mass(coordinates, masses):
     masses = masses.flatten()
     coordinates = coordinates.reshape((masses.shape[0], 3))
     return np.average(coordinates, weights=masses, axis=0)
+
+def distance(a1, a2):
+    """
+    Computes the cartesian distance between two atoms. Ignores periodic boundary
+    conditions.
+
+    Parameters
+    ----------
+    a1, a2 : Atom or collection of 3 coordinates
+        The two atoms between whom the distance should be calculated
+
+    Notes
+    -----
+    This is done in pure Python, so it should not be used for large numbers of
+    distance calculations. For that, use numpy-vectorized routines and the numpy
+    coordinate arrays
+
+    Raises
+    ------
+    TypeError if a1 or a2 are not Atom or iterable
+    ValueError if a1 or a2 are iterable, but do not have exactly 3 items
+    """
+    if isinstance(a1, Atom):
+        x1, y1, z1 = a1.xx, a1.xy, a1.xz
+    else:
+        x1, y1, z1 = a1
+    if isinstance(a2, Atom):
+        x2, y2, z2 = a2.xx, a2.xy, a2.xz
+    else:
+        x2, y2, z2 = a2
+    dx = x1 - x2
+    dy = y1 - y2
+    dz = z1 - z2
+    return sqrt(dx*dx + dy*dy + dz*dz)
