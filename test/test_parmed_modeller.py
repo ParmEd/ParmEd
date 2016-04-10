@@ -1184,7 +1184,7 @@ class TestBondDetermination(unittest.TestCase):
             s = Structure()
             for a in res.atoms:
                 s.add_atom(copy(a), name, 1)
-            s.assign_bonds(res)
+            s.assign_bonds()
             # Now make sure we have the same bond
             self.assertEqual(len(res.atoms), len(s.atoms))
             self.assertEqual(len(res.bonds), len(s.bonds))

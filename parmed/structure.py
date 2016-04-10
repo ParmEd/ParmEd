@@ -38,7 +38,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
         TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
-from parmed import unit as u
+from parmed import unit as u, residue
 from parmed.utils import tag_molecules, PYPY
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
@@ -822,6 +822,46 @@ class Structure(object):
             else:
                 # Pure numpy is faster in CPython, so do that when we can
                 self._coordinates = self._coordinates[:, np.array(sel)==0]
+
+    #===================================================
+
+    def assign_bonds(self, *reslibs):
+        """
+        Assigns bonds to all atoms based on the provided residue template
+        libraries. Atoms whose names are *not* in the templates, as well as
+        those residues for whom no template is found, is assigned to bonds based
+        on distances.
+
+        Parameters
+        ----------
+        reslibs : dict{str: ResidueTemplate}
+            Any number of residue template libraries. By default, assign_bonds
+            knows about the standard amino acid, RNA, and DNA residues.
+        """
+        # Import here to avoid circular references
+        from parmed.modeller import StandardBiomolecularResidues
+        # Build a composite dict of all residue templates
+        all_residues = copy(StandardBiomolecularResidues)
+        for lib in reslibs:
+            all_residues.update(lib)
+        # Walk through every residue and assign bonds from the templates
+        unassigned_residues = []
+        unassigned_atoms = []
+        for res in self.residues:
+            templ = _res_in_templlib(res, all_residues)
+            if templ is None:
+                # Don't have a template for this residue. Keep a note and go on
+                unassigned_residues.append(res)
+                continue
+            resatoms = {a.name: a for a in res.atoms}
+            for a in res.atoms:
+                if a.name not in templ.map:
+                    unassigned_atoms.append(a)
+                    continue
+                for bp in templ.map[a.name].bond_partners:
+                    if (bp.name in resatoms and
+                            resatoms[bp.name] not in a.bond_partners):
+                        self.bonds.append(Bond(a, resatoms[bp.name]))
 
     #===================================================
 
@@ -3928,3 +3968,16 @@ def _settler(parm):
             is_water.append(True)
     assert len(is_water) == len(parm.residues), 'Incorrect length'
     return is_water
+
+def _res_in_templlib(res, lib):
+    """ Returns the residue template inside lib that matches res """
+    if res.name in lib:
+        return lib[res.name]
+    if len(res.name) == 3 and residue.AminoAcidResidue.has(res.name):
+        return lib[residue.AminoAcidResidue.get(res.name).abbr]
+    if residue.DNAResidue.has(res.name):
+        return lib[residue.DNAResidue.get(res.name).abbr]
+    if residue.RNAResidue.has(res.name):
+        return lib[residue.RNAResidue.get(res.name).abbr]
+    # Not present
+    return None

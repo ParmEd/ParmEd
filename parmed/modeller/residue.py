@@ -84,12 +84,12 @@ class ResidueTemplate(object):
         self.head = None
         self.tail = None
         self.connections = []
-        self._atomnames = set()
         self.type = UNKNOWN
         self.first_patch = None
         self.last_patch = None
         self.groups = []
         self.overload_level = 0
+        self._map = dict()
 
     def __repr__(self):
         if self.head is not None:
@@ -104,6 +104,10 @@ class ResidueTemplate(object):
                     type(self).__name__, self.name, len(self.atoms),
                     len(self.bonds), head, tail)
 
+    @property
+    def map(self):
+        return self._map
+
     def add_atom(self, atom):
         """ Adds an atom to this residue template
 
@@ -117,11 +121,11 @@ class ResidueTemplate(object):
         ValueError if ``atom`` has the same name as another atom in this
         residue already
         """
-        if atom.name in self._atomnames:
+        if atom.name in self._map:
             raise ValueError('Residue already has atom named %s' % atom.name)
         atom.residue = self
         self.atoms.append(atom)
-        self._atomnames.add(atom.name)
+        self._map[atom.name] = atom
 
     def add_bond(self, atom1, atom2):
         """ Adds a bond between the two provided atoms in the residue
@@ -223,10 +227,8 @@ class ResidueTemplate(object):
         if isinstance(atom, Atom):
             return atom in self.atoms
         if isinstance(atom, str):
-            for a in self.atoms:
-                if a.name == atom:
-                    return True
-        return False
+            return atom in self._map
+        raise AssertionError('Should not be here!')
 
     def __copy__(self):
         other = type(self)(name=self.name)
