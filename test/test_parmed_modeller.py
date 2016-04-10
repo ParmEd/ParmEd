@@ -1028,14 +1028,14 @@ class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
         AmberOFFLibrary.write(offlib, 'testinternal.lib')
         f = open('tleap_orig.in', 'w')
         f.write("""\
-source leaprc.ff12SB
+source %s
 l = sequence {ALA ARG ASH ASN ASP CYM CYS CYX GLH GLN GLU GLY HID HIE HIP \
               HYP ILE LEU LYN LYS MET PHE PRO SER THR TRP TYR VAL}
 set default PBRadii mbondi2
 savePDB l alphabet.pdb
 saveAmberParm l alphabet.parm7 alphabet.rst7
 quit
-""")
+""" % get_fn('leaprc.ff12SB'))
         f.close()
         # Now create the leaprc for our new files
         f = open('tleap_new.in', 'w')
@@ -1076,12 +1076,12 @@ quit
         for key1, key2 in zip(keys1, keys2):
             f = open('tleap_orig.in', 'w')
             f.write("""\
-source leaprc.ff12SB
+source %s
 l = sequence {%s %s}
 savePDB l alphabet.pdb
 saveAmberParm l alphabet.parm7 alphabet.rst7
 quit
-""" % (key1, key2))
+""" % (get_fn('leaprc.ff12SB'), key1, key2))
             f.close()
             f = open('tleap_new.in', 'w')
             f.write("""\
@@ -1177,3 +1177,19 @@ class TestBondDetermination(unittest.TestCase):
             self.assertIn(resname, StandardBiomolecularResidues)
             self.assertIsInstance(StandardBiomolecularResidues[resname],
                                   ResidueTemplate)
+
+    def test_simple_bond_assignment(self):
+        """ Tests the assignment of bonds to simple Structure instances """
+        for name, res in iteritems(StandardBiomolecularResidues):
+            s = Structure()
+            for a in res.atoms:
+                s.add_atom(copy(a), name, 1)
+            s.assign_bonds(res)
+            # Now make sure we have the same bond
+            self.assertEqual(len(res.atoms), len(s.atoms))
+            self.assertEqual(len(res.bonds), len(s.bonds))
+            for sa, ra in zip(res.atoms, s.atoms):
+                self.assertEqual(sa.name, ra.name)
+                self.assertEqual(len(sa.bond_partners), len(ra.bond_partners))
+                self.assertEqual({a.name for a in sa.bond_partners},
+                                 {a.name for a in ra.bond_partners})
