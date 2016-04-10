@@ -230,7 +230,7 @@ class PDBFile(object):
         --------
         The PDB parser also adds metadata to the returned Structure object that
         may be present in the PDB file
-    
+
         experimental : ``str``
             EXPDTA record
         journal : ``str``
@@ -257,7 +257,7 @@ class PDBFile(object):
             The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
-    
+
         Returns
         -------
         structure : :class:`Structure`
@@ -579,6 +579,9 @@ class PDBFile(object):
         finally:
             # Make sure our file is closed if we opened it
             if own_handle: fileobj.close()
+
+        # Assign bonds based on standard templates and simple distances
+        struct.assign_bonds()
 
         # Post-process some of the metadata to make it more reader-friendly
         struct.keywords = [s.strip() for s in struct.keywords.split(',')
@@ -1220,6 +1223,9 @@ class CIFFile(object):
                 struct._coordinates = np.array(all_coords).reshape(
                             (-1, len(struct.atoms), 3))
 
+        # Make sure we assign bonds for all of the structures we parsed
+        for struct in structures:
+            struct.assign_bonds()
         # Build the return value
         if len(structures) == 1:
             return structures[0]

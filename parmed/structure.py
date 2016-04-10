@@ -862,6 +862,7 @@ class Structure(object):
                     if (bp.name in resatoms and
                             resatoms[bp.name] not in a.bond_partners):
                         self.bonds.append(Bond(a, resatoms[bp.name]))
+        # Now go through each residue and assign heads and tails
 
     #===================================================
 

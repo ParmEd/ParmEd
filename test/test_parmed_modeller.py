@@ -1173,7 +1173,7 @@ class TestBondDetermination(unittest.TestCase):
         for resname in ('ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLU', 'GLN', 'GLY',
                         'HIS', 'HYP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO',
                         'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT', 'DG',
-                        'DC', 'A', 'U', 'G', 'C'):
+                        'DC', 'A', 'U', 'G', 'C', 'ACE', 'NME'):
             self.assertIn(resname, StandardBiomolecularResidues)
             self.assertIsInstance(StandardBiomolecularResidues[resname],
                                   ResidueTemplate)
@@ -1193,3 +1193,9 @@ class TestBondDetermination(unittest.TestCase):
                 self.assertEqual(len(sa.bond_partners), len(ra.bond_partners))
                 self.assertEqual({a.name for a in sa.bond_partners},
                                  {a.name for a in ra.bond_partners})
+
+    def test_headtail_bond_assignment(self):
+        """ Tests assignment of bonds to polymeric Structures """
+        s = read_PDB(get_fn('ava.pdb'))
+        # Make sure PDB files have their bond automatically determined
+        self.assertGreater(len(s.bonds), 0)
