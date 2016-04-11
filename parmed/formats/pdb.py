@@ -14,7 +14,7 @@ from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
-from parmed.topologyobjects import Atom, ExtraPoint
+from parmed.topologyobjects import Atom, ExtraPoint, Bond
 from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
@@ -576,6 +576,39 @@ class PDBFile(object):
                         except ValueError:
                             warnings.warn('Trouble converting resolution (%s) '
                                           'to float' % line[23:30])
+                elif rec == 'CONECT':
+                    b = int(line[6:11])
+                    try:
+                        i = int(line[11:16])
+                    except ValueError:
+                        warnings.warn('Corrupt CONECT record', PDBWarning)
+                        continue
+                    # last 3 integers are optional and may not exist
+                    j = line[16:21].strip()
+                    k = line[21:26].strip()
+                    l = line[26:31].strip()
+                    origin = _find_atom_index(struct, b)
+                    if origin is None:
+                        warnings.warn('CONECT record references non-existent '
+                                      'origin atom %d' % b, PDBWarning)
+                        continue # pragma: no cover
+                    partner = _find_atom_index(struct, i)
+                    if partner is None:
+                        warnings.warn('CONECT record references non-existent '
+                                      'destination atom %d' % i, PDBWarning)
+                    elif partner not in origin.bond_partners:
+                        struct.bonds.append(Bond(origin, partner))
+                    # Other atoms are optional, so loop through the
+                    # possibilities and bond them if they're set
+                    for i in (j, k, l):
+                        if not i: continue
+                        partner = _find_atom_index(struct, int(i))
+                        if partner is None:
+                            warnings.warn('CONECT record references non-'
+                                          'existent destination atom %d ' %
+                                          int(i), PDBWarning)
+                        elif partner not in origin.bond_partners:
+                            struct.bonds.append(Bond(origin, partner))
         finally:
             # Make sure our file is closed if we opened it
             if own_handle: fileobj.close()
@@ -1436,3 +1469,30 @@ class CIFFile(object):
             dest.close()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _find_atom_index(struct, idx):
+    """
+    Returns the atom with the given index in the structure. This is required
+    because atom indices may not start from 1 and may contain gaps in a PDB
+    file. This tries to find atoms quickly, assuming that indices *do* start
+    from 1 and have no gaps. It then looks up or down, depending on whether we
+    hit an index too high or too low. So it *assumes* that the sequence is
+    monotonically increasing. If the atom can't be found, None is returned
+    """
+    idx0 = min(max(idx - 1, 0), len(struct.atoms))
+    if struct[idx0].number == idx:
+        return struct[idx0]
+    if struct[idx0].number < idx:
+        idx0 += 1
+        while idx0 < len(struct.atoms):
+            if struct[idx0].number == idx:
+                return struct[idx0]
+            idx0 += 1
+        return None # not found
+    else:
+        idx0 -= 1
+        while idx0 > 0:
+            if struct[idx0].number == idx:
+                return struct[idx0]
+            idx0 -= 1
+        return None # not found

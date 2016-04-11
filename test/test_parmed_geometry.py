@@ -64,6 +64,3 @@ def strip_units(x):
     if u.is_quantity(x):
         return x.value_in_unit_system(u.akma_unit_system)
     return x
-
-if __name__ == '__main__':
-    unittest.main()

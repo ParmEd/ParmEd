@@ -862,7 +862,8 @@ class Structure(object):
                 for bp in templ.map[a.name].bond_partners:
                     if (bp.name in resatoms and
                             resatoms[bp.name] not in a.bond_partners):
-                        self.bonds.append(Bond(a, resatoms[bp.name]))
+                        if a not in resatoms[bp.name].bond_partners:
+                            self.bonds.append(Bond(a, resatoms[bp.name]))
         # Now go through each residue and assign heads and tails. This walks
         # through the residues and bonds residue i's tail with residue j's head.
         # So there is nothing to do for the last residue. Omit it from the loop
@@ -891,7 +892,8 @@ class Structure(object):
                     maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
                                                              head.atomic_number)]
                     if distance2(a, head) < maxdist:
-                        self.bonds.append(Bond(a, head))
+                        if a not in head.bond_partners:
+                            self.bonds.append(Bond(a, head))
                         break
                 continue
             if templ.tail is None:
@@ -908,7 +910,8 @@ class Structure(object):
                     maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
                                                              tail.atomic_number)]
                     if distance2(a, tail) < maxdist:
-                        self.bonds.append(Bond(a, tail))
+                        if a not in tail.bond_partners:
+                            self.bonds.append(Bond(a, tail))
                         break
                 continue
             if ntempl.head is None:
@@ -924,7 +927,8 @@ class Structure(object):
                     break
             else:
                 continue # tail could not be found
-            self.bonds.append(Bond(head, tail))
+            if head not in tail.bond_partners:
+                self.bonds.append(Bond(head, tail))
 
     #===================================================
 

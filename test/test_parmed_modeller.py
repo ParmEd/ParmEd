@@ -1213,3 +1213,9 @@ class TestBondDetermination(unittest.TestCase):
         self.assertIn(s.view[8, 'C'].atoms[0], s.view[9, 'N'].atoms[0].bond_partners)
         # Make sure we have exactly 86 bonds defined
         self.assertEqual(len(s.bonds), 86)
+
+    def test_connect_parsing(self):
+        """ Tests processing of PDB CONECT records and see that it adds bonds """
+        s = read_PDB(get_fn('4lzt.pdb'))
+        # Check that the CONECT record bond specs are actual bonds
+        self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
