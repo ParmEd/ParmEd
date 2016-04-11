@@ -21,18 +21,18 @@ class TestChemistryGeometry(unittest.TestCase):
         for x, y in zip(a, b):
             self.assertEqual(x, y)
 
-    def test_distance(self):
-        """ Tests the distance calculation """
+    def test_distance2(self):
+        """ Tests the distance2 calculation """
         a1, a2 = Atom(), Atom()
         a1.xx = a1.xy = a1.xz = 0
         a2.xx = 3
         a2.xy = 4
         a2.xz = 0
-        self.assertEqual(geo.distance(a1, a2), 5)
+        self.assertEqual(geo.distance2(a1, a2), 25)
         # Make sure it also works for tuples and a mixture of both
-        self.assertEqual(geo.distance((0, 0, 0), (3, 4, 0)), 5)
-        self.assertEqual(geo.distance(a1, (3, 4, 0)), 5)
-        self.assertEqual(geo.distance((0, 0, 0), a2), 5)
+        self.assertEqual(geo.distance2((0, 0, 0), (3, 4, 0)), 25)
+        self.assertEqual(geo.distance2(a1, (3, 4, 0)), 25)
+        self.assertEqual(geo.distance2((0, 0, 0), a2), 25)
 
     def testBoxLengthsVectors(self):
         """ Test converting box lengths/angles to vectors and back again """

@@ -31,7 +31,8 @@ import os
 from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
-        box_vectors_to_lengths_and_angles)
+        box_vectors_to_lengths_and_angles, STANDARD_BOND_LENGTHS_SQUARED,
+        distance2)
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
@@ -862,7 +863,68 @@ class Structure(object):
                     if (bp.name in resatoms and
                             resatoms[bp.name] not in a.bond_partners):
                         self.bonds.append(Bond(a, resatoms[bp.name]))
-        # Now go through each residue and assign heads and tails
+        # Now go through each residue and assign heads and tails. This walks
+        # through the residues and bonds residue i's tail with residue j's head.
+        # So there is nothing to do for the last residue. Omit it from the loop
+        # so self.residues[i+1] never raises an IndexError
+        for i, res in enumerate(self.residues[:-1]):
+            templ = _res_in_templlib(res, all_residues)
+            # TER cards and changing chains prevents bonding to the next residue
+            if res.ter or (res.chain and
+                    (res.chain != self.residues[i+1].chain)):
+                continue
+            ntempl = _res_in_templlib(self.residues[i+1], all_residues)
+            if templ is None and ntempl is None:
+                # Any cross-link here picked up later
+                continue
+            if templ is None:
+                if ntempl.head is None:
+                    continue # Next residue doesn't bond to the previous one
+                # See if any atom in templ is close enough to bond to the head
+                # atom of the next residue's template
+                for head in self.residues[i+1].atoms:
+                    if head.name == ntempl.head:
+                        break
+                else:
+                    continue # head atom not found!
+                for a in res.atoms:
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
+                                                             head.atomic_number)]
+                    if distance2(a, head) < maxdist:
+                        self.bonds.append(Bond(a, head))
+                        break
+                continue
+            if templ.tail is None:
+                continue # This residue does not bond with the next one
+            if ntempl is None:
+                # See if any atom in the next residue is bonding distance away
+                # from my tail
+                for tail in res.atoms:
+                    if tail.name == templ.tail.name:
+                        break
+                else:
+                    continue # tail not found
+                for a in self.residues[i+1].atoms:
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
+                                                             tail.atomic_number)]
+                    if distance2(a, tail) < maxdist:
+                        self.bonds.append(Bond(a, tail))
+                        break
+                continue
+            if ntempl.head is None:
+                continue # Next residue does not bond with this one
+            # We have templates for both atoms, and both have a head and a tail
+            for tail in res.atoms:
+                if tail.name == templ.tail.name:
+                    break
+            else:
+                continue # head could not be found
+            for head in self.residues[i+1].atoms:
+                if head.name == ntempl.head.name:
+                    break
+            else:
+                continue # tail could not be found
+            self.bonds.append(Bond(head, tail))
 
     #===================================================
 

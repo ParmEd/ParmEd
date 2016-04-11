@@ -206,6 +206,7 @@ class PQRFile(object):
             if own_handle: fileobj.close()
 
         struct.unchange()
+        struct.assign_bonds()
         if coordinates:
             if len(coordinates) != 3*len(struct.atoms):
                 raise PDBError('bad number of atoms in some PQR models')

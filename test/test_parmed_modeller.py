@@ -1199,3 +1199,17 @@ class TestBondDetermination(unittest.TestCase):
         s = read_PDB(get_fn('ava.pdb'))
         # Make sure PDB files have their bond automatically determined
         self.assertGreater(len(s.bonds), 0)
+        self.assertIn(s.view[0, 'C'].atoms[0], s.view[1, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[1, 'C'].atoms[0], s.view[2, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[2, 'C'].atoms[0], s.view[3, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[3, 'C'].atoms[0], s.view[4, 'N'].atoms[0].bond_partners)
+        # TER card -- nobody bonded to *next* residue
+        for a in s.residues[4].atoms:
+            for ba in a.bond_partners:
+                self.assertNotEqual(ba.residue.idx, 5)
+        self.assertIn(s.view[5, 'C'].atoms[0], s.view[6, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[6, 'C'].atoms[0], s.view[7, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[7, 'C'].atoms[0], s.view[8, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[8, 'C'].atoms[0], s.view[9, 'N'].atoms[0].bond_partners)
+        # Make sure we have exactly 86 bonds defined
+        self.assertEqual(len(s.bonds), 86)
