@@ -17,10 +17,10 @@ try:
     )
 except ImportError:
     from distutils.core import setup, Extension
-    from distutils.command.clean import clean as Clean
     kws = {'scripts' : [os.path.join('scripts', 'parmed'),
                         os.path.join('scripts', 'xparmed')]
     }
+
 from distutils.command.clean import clean as Clean
 
 class CleanCommand(Clean):
