@@ -11,7 +11,6 @@ try:
         sys.argv.remove('--no-setuptools')
         raise ImportError() # Don't import setuptools...
     from setuptools import setup, Extension
-    from setuptools.command.clean import clean as Clean
     kws = dict(entry_points={
             'console_scripts' : ['parmed = parmed.scripts:clapp'],
             'gui_scripts' : ['xparmed = parmed.scripts:guiapp']}
@@ -22,6 +21,7 @@ except ImportError:
     kws = {'scripts' : [os.path.join('scripts', 'parmed'),
                         os.path.join('scripts', 'xparmed')]
     }
+from distutils.command.clean import clean as Clean
 
 class CleanCommand(Clean):
     """python setup.py clean
