@@ -846,18 +846,19 @@ class Structure(object):
         for lib in reslibs:
             all_residues.update(lib)
         # Walk through every residue and assign bonds from the templates
-        unassigned_residues = []
-        unassigned_atoms = []
+        unassigned_residues = set()
+        unassigned_atoms = set()
         for res in self.residues:
             templ = _res_in_templlib(res, all_residues)
             if templ is None:
                 # Don't have a template for this residue. Keep a note and go on
-                unassigned_residues.append(res)
+                unassigned_atoms.update(res.atoms)
+                unassigned_residues.add(res)
                 continue
             resatoms = {a.name: a for a in res.atoms}
             for a in res.atoms:
                 if a.name not in templ.map:
-                    unassigned_atoms.append(a)
+                    unassigned_atoms.add(a)
                     continue
                 for bp in templ.map[a.name].bond_partners:
                     if (bp.name in resatoms and
@@ -929,6 +930,27 @@ class Structure(object):
                 continue # tail could not be found
             if head not in tail.bond_partners:
                 self.bonds.append(Bond(head, tail))
+        # Now time to find bonds based on distance. First thing to do is to find
+        # all CYS residues and pull out those that have an SG atom with only 1
+        # bond partner, since those are *very* commonly bonded by
+        # post-translational modifications.
+        for res in self.residues:
+            if len(res.name) != 3 or not residue.AminoAcidResidue.has(res.name):
+                continue
+            if residue.AminoAcidResidue.get(res.name).abbr != 'CYS':
+                continue
+            # Cysteine! Find the SG and add it to unassigned atoms if it only
+            # has 1 atom bonded to it
+            for a in res.atoms:
+                if a.name == 'SG' and len(a.bond_partners) < 2:
+                    unassigned_atoms.add(a)
+                    break
+        # OK, now go through all atoms that have not been assigned. If an atom
+        # has not been assigned, but its residue HAS been assigned, then that
+        # means the name is wrong. A likely culprit is bad nomenclature for
+        # atoms. So in this case (and this case only), look for bond partners in
+        # an 'assigned' residue (but only the same residue we are part of). One
+        # thing this misses is when the head or tail atom is misnamed.
 
     #===================================================
 
