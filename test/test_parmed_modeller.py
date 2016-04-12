@@ -1230,3 +1230,11 @@ class TestBondDetermination(utils.FileIOTestCase):
         s = read_PDB(fn)
         # Check that the disulfide is present even without CONECT records
         self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
+
+    def test_element_override(self):
+        """ Tests that templates improve element information """
+        f = StringIO("""\
+ATOM      1  CA   CA A   1      -0.641  26.272   5.586  1.00 24.68
+""")
+        s = read_PDB(f)
+        self.assertEqual(s[0].atomic_number, pmd.periodic_table.AtomicNum['Ca'])
