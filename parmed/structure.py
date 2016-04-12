@@ -848,6 +848,7 @@ class Structure(object):
         # Walk through every residue and assign bonds from the templates
         unassigned_residues = set()
         unassigned_atoms = set()
+        cysteine_sg = set()
         for res in self.residues:
             templ = _res_in_templlib(res, all_residues)
             if templ is None:
@@ -944,6 +945,7 @@ class Structure(object):
             for a in res.atoms:
                 if a.name == 'SG' and len(a.bond_partners) < 2:
                     unassigned_atoms.add(a)
+                    cysteine_sg.add(a)
                     break
         # OK, now go through all atoms that have not been assigned. If an atom
         # has not been assigned, but its residue HAS been assigned, then that
@@ -951,6 +953,32 @@ class Structure(object):
         # atoms. So in this case (and this case only), look for bond partners in
         # an 'assigned' residue (but only the same residue we are part of). One
         # thing this misses is when the head or tail atom is misnamed.
+        for atom in unassigned_atoms:
+            for partner in unassigned_atoms - {atom}:
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
+                                                         partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and
+                        atom not in partner.bond_partners):
+                    self.bonds.append(Bond(atom, partner))
+            # Now look through all atoms in this template if it's a template
+            # that's already been assigned. If it's already in an unassigned
+            # residue, then all that residue's atoms were in unassigned_atoms,
+            # so there's no need to look through the residue again. Also, we
+            # added cysteine SG atoms to the unassigned atoms list to see if it
+            # is involved in post-translational bonds. But there *was* a
+            # template match for cysteine and SG was paired correctly. So don't
+            # try to assign it to bonds with other atoms in the cysteine here.
+            if atom.residue in unassigned_residues or atom in cysteine_sg:
+                continue
+            for partner in atom.residue.atoms:
+                if partner is atom:
+                    continue
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
+                                                         partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and
+                        atom not in partner.bond_partners):
+                    self.bonds.append(Bond(atom, partner))
+        # All reasonable bonds have now been added
 
     #===================================================
 
