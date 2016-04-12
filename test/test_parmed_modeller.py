@@ -1165,7 +1165,7 @@ class TestSlice(unittest.TestCase):
             for atom in atomlist:
                 self.assertEqual(atom.name, residue[atom.name].name)
 
-class TestBondDetermination(unittest.TestCase):
+class TestBondDetermination(utils.FileIOTestCase):
     """ Tests assigning bonds to structures """
 
     def test_standard_residue_database(self):
@@ -1218,4 +1218,15 @@ class TestBondDetermination(unittest.TestCase):
         """ Tests processing of PDB CONECT records and see that it adds bonds """
         s = read_PDB(get_fn('4lzt.pdb'))
         # Check that the CONECT record bond specs are actual bonds
+        self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
+
+    def test_bond_distance_assignment(self):
+        """ Tests assignment of disulfides if no CONECT records available """
+        fn = get_fn('test.pdb', written=True)
+        with open(get_fn('4lzt.pdb'), 'r') as f, open(fn, 'w') as fw:
+            for line in f:
+                if line.startswith('CONECT'): continue
+                fw.write(line)
+        s = read_PDB(fn)
+        # Check that the disulfide is present even without CONECT records
         self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
