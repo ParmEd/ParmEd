@@ -861,6 +861,9 @@ class Structure(object):
                 if a.name not in templ.map:
                     unassigned_atoms.add(a)
                     continue
+                # We matched our template atom. Transfer the element
+                # information, as it is more reliable
+                a.atomic_number = templ.map[a.name].atomic_number
                 for bp in templ.map[a.name].bond_partners:
                     if (bp.name in resatoms and
                             resatoms[bp.name] not in a.bond_partners):
