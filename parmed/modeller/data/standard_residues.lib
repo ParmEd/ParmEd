@@ -36,7 +36,9 @@
  "PHE"
  "PRO"
  "SER"
+ "SOL"
  "THR"
+ "TIP3"
  "TRP"
  "TYR"
  "U"
@@ -4303,6 +4305,55 @@
  0 0 0
  0 0 0
  0 0 0
+!entry.SOL.unit.atoms table  str name  str type  int typex  int resx  int flags  int seq  int elmnt  dbl chg
+ "OW" "OW" 0 1 131072 1 8 -0.820000
+ "HW1" "HW" 0 1 131072 2 1 0.410000
+ "HW2" "HW" 0 1 131072 3 1 0.410000
+!entry.SOL.unit.atomspertinfo table  str pname  str ptype  int ptypex  int pelmnt  dbl pchg
+ "OW" "OW" 0 -1 0.0
+ "HW1" "HW" 0 -1 0.0
+ "HW2" "HW" 0 -1 0.0
+!entry.SOL.unit.boundbox array dbl
+ -1.000000
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+!entry.SOL.unit.childsequence single int
+ 2
+!entry.SOL.unit.connect array int
+ 0
+ 0
+!entry.SOL.unit.connectivity table  int atom1x  int atom2x  int flags
+ 1 2 1
+ 1 3 1
+!entry.SOL.unit.hierarchy table  str abovetype  int abovex  str belowtype  int belowx
+ "U" 0 "R" 1
+ "R" 1 "A" 1
+ "R" 1 "A" 2
+ "R" 1 "A" 3
+!entry.SOL.unit.name single str
+ "SOL"
+!entry.SOL.unit.positions table  dbl x  dbl y  dbl z
+ 0.705023 0.743831 0.16023
+ -0.070767 0.263875 0.450087
+ 1.35632 0.064396 -0.014154
+!entry.SOL.unit.residueconnect table  int c1x  int c2x  int c3x  int c4x  int c5x  int c6x
+ 1 1 0 0 0 0
+!entry.SOL.unit.residues table  str name  int seq  int childseq  int startatomx  str restype  int imagingx
+ "SOL" 1 4 1 "w" 0
+!entry.SOL.unit.residuesPdbSequenceNumber array int
+ 0
+!entry.SOL.unit.solventcap array dbl
+ -1.000000
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+!entry.SOL.unit.velocities table  dbl x  dbl y  dbl z
+ 0 0 0
+ 0 0 0
+ 0 0 0
 !entry.THR.unit.atoms table  str name  str type  int typex  int resx  int flags  int seq  int elmnt  dbl chg
  "N" "N" 0 1 131072 1 7 -0.415700
  "H" "H" 0 1 131072 2 1 0.271900
@@ -4415,6 +4466,55 @@
  0 0 0
  0 0 0
  0 0 0
+ 0 0 0
+ 0 0 0
+ 0 0 0
+!entry.TIP3.unit.atoms table  str name  str type  int typex  int resx  int flags  int seq  int elmnt  dbl chg
+ "O" "OW" 0 1 131072 1 8 -0.820000
+ "H1" "HW" 0 1 131072 2 1 0.410000
+ "H2" "HW" 0 1 131072 3 1 0.410000
+!entry.TIP3.unit.atomspertinfo table  str pname  str ptype  int ptypex  int pelmnt  dbl pchg
+ "O" "OW" 0 -1 0.0
+ "H1" "HW" 0 -1 0.0
+ "H2" "HW" 0 -1 0.0
+!entry.TIP3.unit.boundbox array dbl
+ -1.000000
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+!entry.TIP3.unit.childsequence single int
+ 2
+!entry.TIP3.unit.connect array int
+ 0
+ 0
+!entry.TIP3.unit.connectivity table  int atom1x  int atom2x  int flags
+ 1 2 1
+ 1 3 1
+!entry.TIP3.unit.hierarchy table  str abovetype  int abovex  str belowtype  int belowx
+ "U" 0 "R" 1
+ "R" 1 "A" 1
+ "R" 1 "A" 2
+ "R" 1 "A" 3
+!entry.TIP3.unit.name single str
+ "TIP3"
+!entry.TIP3.unit.positions table  dbl x  dbl y  dbl z
+ 0.705023 0.743831 0.16023
+ -0.070767 0.263875 0.450087
+ 1.35632 0.064396 -0.014154
+!entry.TIP3.unit.residueconnect table  int c1x  int c2x  int c3x  int c4x  int c5x  int c6x
+ 1 1 0 0 0 0
+!entry.TIP3.unit.residues table  str name  int seq  int childseq  int startatomx  str restype  int imagingx
+ "TIP3" 1 4 1 "w" 0
+!entry.TIP3.unit.residuesPdbSequenceNumber array int
+ 0
+!entry.TIP3.unit.solventcap array dbl
+ -1.000000
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+!entry.TIP3.unit.velocities table  dbl x  dbl y  dbl z
  0 0 0
  0 0 0
  0 0 0

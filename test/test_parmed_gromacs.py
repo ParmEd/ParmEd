@@ -13,7 +13,7 @@ from parmed.charmm import CharmmParameterSet
 from parmed.exceptions import GromacsWarning, GromacsError, ParameterError
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
-from parmed import gromacs as gmx
+from parmed import gromacs as gmx, periodic_table
 from parmed.topologyobjects import UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
 import unittest
@@ -1057,6 +1057,15 @@ class TestGromacsGro(FileIOTestCase):
         self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
         f = StringIO('Gromacs title line\n notanumber\nsome line\n')
         self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(f))
+
+    def test_gro_elements_bonds(self):
+        """ Tests improved element and bond assignment in GRO files """
+        gro = GromacsGroFile.parse(
+                os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'conf.gro')
+        )
+        self.assertGreater(len(gro.bonds), 0)
+        for atom in gro.view['NA', :].atoms:
+            self.assertEqual(atom.atomic_number, periodic_table.AtomicNum['Na'])
 
     def test_read_gro_file(self):
         """ Tests reading GRO file """

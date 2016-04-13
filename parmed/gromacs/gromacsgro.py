@@ -189,6 +189,9 @@ class GromacsGroFile(object):
             if own_handle:
                 fileobj.close()
 
+        # Assign bonds (and improved element guesses)
+        struct.assign_bonds()
+
         return struct
 
     #===================================================
