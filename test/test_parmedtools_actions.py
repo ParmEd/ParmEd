@@ -1794,8 +1794,10 @@ Basic MD simulation
         self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 1)
         self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 2)
         self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 5)
-        self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 7)
-        self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 8)
+        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        PT.changeRadii(parm, 'mbondi3').execute()
+        self._check_emin_omm(parm, 7)
+        self._check_emin_omm(parm, 8)
 
     def _check_emin_omm(self, parm, igb):
         if igb in (0, 6):
