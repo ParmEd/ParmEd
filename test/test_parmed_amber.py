@@ -2506,11 +2506,11 @@ class TestRst7Class(FileIOTestCase):
                 readparm.Rst7().write(get_fn('test.nc', written=True), netcdf=True)
         )
 
-class TestNetCDF(FileIOTestCase):
-    """ Test the Rst7 class """
+class TestNetCDFTrajectorywithBox(FileIOTestCase):
+    """ Test trajecotry with more than 1 frame and with box """
 
     def test_netcdf_long_trajectory(self):
-        """ Test the Rst7 class reading NetCDF coordinates """
+        """ Test netcdf trajectory with box """
         parmfile, ncfile = get_fn('tz2.ortho.parm7'), get_fn('tz2.ortho.nc')
         pmd.load_file(parmfile, ncfile)
 
