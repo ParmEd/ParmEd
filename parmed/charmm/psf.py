@@ -479,7 +479,7 @@ class CharmmPsfFile(Structure):
 
             a = parmset.angle_types[('a1', 'a2', 'a3')]
             a.k = 10
-            d.theteq = 100
+            a.theteq = 100
 
             Extra care should be taken when trying this with dihedral_types. Since dihedral_type is a Fourier sequence,
             ParameterSet stores DihedralType for every term in DihedralTypeList. Therefore, the example below will STILL
