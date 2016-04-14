@@ -478,7 +478,7 @@ class CharmmPsfFile(Structure):
             psf.load_parameters(parmset, copy_parameters=False)
 
             a = parmset.angle_types[('a1', 'a2', 'a3')]
-            a.k_k = 10
+            a.k = 10
             d.theteq = 100
 
             Extra care should be taken when trying this with dihedral_types. Since dihedral_type is a Fourier sequence,
