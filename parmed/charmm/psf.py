@@ -448,7 +448,7 @@ class CharmmPsfFile(Structure):
 
     #===================================================
 
-    def load_parameters(self, parmset, copy=True):
+    def load_parameters(self, parmset, copy_parameters=True):
         """
         Loads parameters from a parameter set that was loaded via CHARMM RTF,
         PAR, and STR files.
@@ -458,9 +458,31 @@ class CharmmPsfFile(Structure):
         parmset : :class:`CharmmParameterSet`
             List of all parameters
 
-        copy : bool
-            if False, parmset will not be copied. This will silently modify the references to types in the structure
-            type_list so use with caution. Default is True
+        copy_parameters : bool
+            if False, parmset will not be copied.
+
+            Warning:
+            -------
+            Not copying parmset will allow ParameterSet and Structure to share reference to types.
+            If you modify the original parameter set, the references in Structure list_types will be silently modified.
+            However, if you change any reference in the parameter set, then that reference will no longer be shared with
+            structure.
+
+            Example where the reference in ParameterSet is changed. This will NOT modify the paraemters in the psf.
+
+            psf.load_parameters(parmset, copy_parameters=False)
+            parmset.dihedral_type[('a1', 'a2', a3', a4)] = DihedralType(1, 2, 3)
+
+            This WILL change the parameter in the psf because the reference has not been changed in ParameterSet
+
+            psf.load_parameters(parmset, copy_parameters=False)
+
+            d = parmset.dihedral_types[('a1', 'a2', 'a3', 'a4')]
+            d.phi_k = 10
+            d.per = 2
+            d.phase = 180
+
+            Use with caution!
 
         Notes
         -----
@@ -477,7 +499,7 @@ class CharmmPsfFile(Structure):
         ------
         ParameterError if any parameters cannot be found
         """
-        if copy:
+        if copy_parameters:
             parmset = _copy(parmset)
         self.combining_rule = parmset.combining_rule
         # First load the atom types
