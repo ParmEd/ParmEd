@@ -2022,8 +2022,7 @@ class AmberParm(AmberFormat, Structure):
                 if u.is_quantity(box[5]):
                     box[5] = box[5].value_in_unit(u.degrees)
             box = np.array(box, dtype=np.float64, copy=False, subok=True)
-            if box.shape != (6,):
-                raise ValueError('Box information must be 6 floats')
+
             if self._box is None:
                 self._box = box
                 # We need to add topology information
