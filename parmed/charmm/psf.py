@@ -448,7 +448,7 @@ class CharmmPsfFile(Structure):
 
     #===================================================
 
-    def load_parameters(self, parmset):
+    def load_parameters(self, parmset, copy=True):
         """
         Loads parameters from a parameter set that was loaded via CHARMM RTF,
         PAR, and STR files.
@@ -457,6 +457,10 @@ class CharmmPsfFile(Structure):
         ----------
         parmset : :class:`CharmmParameterSet`
             List of all parameters
+
+        copy : bool
+            if False, parmset will not be copied. This will silently modify the references to types in the structure
+            type_list so use with caution. Default is True
 
         Notes
         -----
@@ -473,7 +477,8 @@ class CharmmPsfFile(Structure):
         ------
         ParameterError if any parameters cannot be found
         """
-        parmset = _copy(parmset)
+        if copy:
+            parmset = _copy(parmset)
         self.combining_rule = parmset.combining_rule
         # First load the atom types
         for atom in self.atoms:
