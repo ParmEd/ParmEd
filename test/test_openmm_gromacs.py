@@ -24,7 +24,7 @@ import os
 import unittest
 import warnings
 from utils import (get_fn, CPU, has_openmm, mm, app, TestCaseRelative,
-                   run_all_tests, Reference)
+                   run_all_tests)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -205,7 +205,7 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
                                   constraints=app.HBonds,
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 
@@ -236,7 +236,7 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
                                   nonbondedCutoff=0.9*u.nanometers,
                                   ewaldErrorTolerance=1.0e-5,
                                   switchDistance=0.7*u.nanometers)
-        context = mm.Context(system, mm.VerletIntegrator(0.001), Reference)
+        context = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
         context.setPositions(top.positions)
         energies = energy_decomposition(top, context, nrg=u.kilojoules_per_mole)
 

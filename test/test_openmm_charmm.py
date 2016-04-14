@@ -28,7 +28,7 @@ from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest
-from utils import get_fn, TestCaseRelative, mm, app, has_openmm, CPU, Reference
+from utils import get_fn, TestCaseRelative, mm, app, has_openmm, CPU
 import warnings
 
 # Suppress warning output from bad psf file... sigh.
@@ -249,7 +249,7 @@ class TestCharmmFiles(TestCaseRelative):
             elif isinstance(force, mm.CustomNonbondedForce):
                 force.setUseLongRangeCorrection(False)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = energy_decomposition(parm, sim.context)
         self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)
@@ -267,7 +267,7 @@ class TestCharmmFiles(TestCaseRelative):
                                    nonbondedCutoff=8*u.angstroms)
         self.assertEqual(parm.combining_rule, 'lorentz')
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
-        sim = app.Simulation(parm.topology, system, integrator, platform=Reference)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
         sim.context.setPositions(charmm_nbfix_crds.positions)
         energies = energy_decomposition(parm, sim.context)
         self.assertAlmostEqual(energies['bond'], 1.1324212, places=4)
