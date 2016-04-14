@@ -1605,15 +1605,15 @@ class Structure(object):
         Parameters
         ----------
         frame : int or 'all', optional
-            The frame number whose coordinates should be retrieved. Default is
+            The frame number whose unit cell should be retrieved. Default is
             'all'
 
         Returns
         -------
-        box : np.ndarray, shape([#,] natom, 3) or None
-            If frame is 'all', all coordinates are returned with shape
-            (#, natom, 3). Otherwise the requested frame is returned with shape
-            (natom, 3). If no coordinates exist and 'all' is requested, None is
+        box : np.ndarray, shape([#,] 6) or None
+            If frame is 'all', all unit cells are returned with shape
+            (#, 6). Otherwise the requested frame is returned with shape
+            (6,). If no unit cell exist and 'all' is requested, None is
             returned
 
         Raises
