@@ -2506,6 +2506,14 @@ class TestRst7Class(FileIOTestCase):
                 readparm.Rst7().write(get_fn('test.nc', written=True), netcdf=True)
         )
 
+class TestNetCDF(FileIOTestCase):
+    """ Test the Rst7 class """
+
+    def test_netcdf_long_trajectory(self):
+        """ Test the Rst7 class reading NetCDF coordinates """
+        parmfile, ncfile = get_fn('tz2.ortho.parm7'), get_fn('tz2.ortho.nc')
+        pmd.load_file(parmfile, ncfile)
+
 class TestAmberTitratableResidues(FileIOTestCase):
     """ Test Amber's titration module capabilities """
 
