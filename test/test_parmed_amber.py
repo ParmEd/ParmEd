@@ -2512,7 +2512,9 @@ class TestNetCDFTrajectorywithBox(FileIOTestCase):
     def test_netcdf_long_trajectory(self):
         """ Test netcdf trajectory with box """
         parmfile, ncfile = get_fn('tz2.ortho.parm7'), get_fn('tz2.ortho.nc')
-        pmd.load_file(parmfile, ncfile)
+        parm = pmd.load_file(parmfile, ncfile)
+        boxes = parm.get_box('all')
+        self.assertEqual(boxes.shape, (10, 6))
 
 class TestAmberTitratableResidues(FileIOTestCase):
     """ Test Amber's titration module capabilities """
