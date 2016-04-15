@@ -1243,6 +1243,7 @@ class TestBondDetermination(utils.FileIOTestCase):
         self.assertTrue(any(len(x) > 0 for x in pairs))
         for a1 in s.atoms:
             for a2 in s.atoms:
+                if a1 is a2: continue
                 if distance2(a1, a2) < 25:
                     self.assertIn(a1, pairs[a2.idx])
                     self.assertIn(a2, pairs[a1.idx])

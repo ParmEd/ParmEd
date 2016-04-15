@@ -1,9 +1,10 @@
 """ Various utilities used by ParmEd that don't really fit elsewhere """
 from parmed.exceptions import MoleculeError as _MoleculeError
+from parmed.utils.pairlist import find_atom_pairs
 import sys
 
 __all__ = ['six', 'io', 'timer', 'which', 'tag_molecules', 'PYPY',
-           'canonical_improper_order']
+           'canonical_improper_order', 'find_atom_pairs']
 
 PYPY = '__pypy__' in sys.builtin_module_names
 
