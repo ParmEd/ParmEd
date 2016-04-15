@@ -3,7 +3,6 @@ A module for efficiently building a pairlist with memory and CPU cost O(N)
 """
 from collections import defaultdict
 import numpy as np
-from parmed.utils.six.moves import zip
 
 def find_atom_pairs(struct, dist, subset=None):
     """ Finds all pairs of atoms in a structure within a requested distance
