@@ -17,7 +17,9 @@ from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
                              PROTEIN, SOLVENT, StandardBiomolecularResidues)
 from parmed.formats import Mol2File, PDBFile
+from parmed.geometry import distance2
 from parmed.exceptions import MoleculeError
+from parmed.utils import find_atom_pairs
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
 from parmed.tools import changeRadii
@@ -1230,6 +1232,20 @@ class TestBondDetermination(utils.FileIOTestCase):
         s = read_PDB(fn)
         # Check that the disulfide is present even without CONECT records
         self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
+
+    def test_pairlist(self):
+        """ Tests pairlist builder """
+        s = Structure()
+        for i in range(5000):
+            s.add_atom(Atom('XYZ'), 'RES', i)
+        s.coordinates = np.random.rand(5000, 3) * 40 - 20
+        pairs = find_atom_pairs(s, 5.0)
+        self.assertTrue(any(len(x) > 0 for x in pairs))
+        for a1 in s.atoms:
+            for a2 in s.atoms:
+                if distance2(a1, a2) < 25:
+                    self.assertIn(a1, pairs[a2.idx])
+                    self.assertIn(a2, pairs[a1.idx])
 
     def test_element_override(self):
         """ Tests that templates improve element information """

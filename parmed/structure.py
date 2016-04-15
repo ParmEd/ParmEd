@@ -40,7 +40,7 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
 from parmed import unit as u, residue
-from parmed.utils import tag_molecules, PYPY
+from parmed.utils import tag_molecules, PYPY, find_atom_pairs
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
@@ -950,14 +950,19 @@ class Structure(object):
                     unassigned_atoms.add(a)
                     cysteine_sg.add(a)
                     break
+        # Can't do distance-based bond determination without coordinates
+        if self.coordinates is None:
+            return
         # OK, now go through all atoms that have not been assigned. If an atom
         # has not been assigned, but its residue HAS been assigned, then that
         # means the name is wrong. A likely culprit is bad nomenclature for
         # atoms. So in this case (and this case only), look for bond partners in
         # an 'assigned' residue (but only the same residue we are part of). One
         # thing this misses is when the head or tail atom is misnamed.
+        mindist = math.sqrt(min(STANDARD_BOND_LENGTHS_SQUARED.values()))
+        pairs = find_atom_pairs(self, mindist)
         for atom in unassigned_atoms:
-            for partner in unassigned_atoms - {atom}:
+            for partner in pairs[atom.idx]:
                 maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
                                                          partner.atomic_number)]
                 if (distance2(atom, partner) < maxdist and
