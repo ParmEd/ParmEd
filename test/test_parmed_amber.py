@@ -2509,6 +2509,7 @@ class TestRst7Class(FileIOTestCase):
 class TestNetCDFTrajectorywithBox(FileIOTestCase):
     """ Test trajecotry with more than 1 frame and with box """
 
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
     def test_netcdf_long_trajectory(self):
         """ Test netcdf trajectory with box """
         parmfile, ncfile = get_fn('tz2.parm7'), get_fn('tz2.nc')
