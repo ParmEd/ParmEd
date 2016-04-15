@@ -293,6 +293,7 @@ class PDBFile(object):
         atom_hex = False
         atom_overflow = False
         ZEROSET = set('0')
+        altloc_ids = set()
 
         try:
             for line in fileobj:
@@ -425,6 +426,7 @@ class PDBFile(object):
                                        resid, chain, segid) and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
+                        altloc_ids.add(atom.number)
                         last_atom_added = atom
                         continue
                     last_atom = last_atom_added = atom
@@ -587,26 +589,31 @@ class PDBFile(object):
                     j = line[16:21].strip()
                     k = line[21:26].strip()
                     l = line[26:31].strip()
+                    if b in altloc_ids:
+                        continue # Do not handle altloc bonds yet.
                     origin = _find_atom_index(struct, b)
                     if origin is None:
                         warnings.warn('CONECT record references non-existent '
                                       'origin atom %d' % b, PDBWarning)
                         continue # pragma: no cover
-                    partner = _find_atom_index(struct, i)
-                    if partner is None:
-                        warnings.warn('CONECT record references non-existent '
-                                      'destination atom %d' % i, PDBWarning)
-                    elif partner not in origin.bond_partners:
-                        struct.bonds.append(Bond(origin, partner))
+                    if i not in altloc_ids:
+                        partner = _find_atom_index(struct, i)
+                        if partner is None:
+                            warnings.warn('CONECT record references non-existent '
+                                          'destination atom %d' % i, PDBWarning)
+                        elif partner not in origin.bond_partners:
+                            struct.bonds.append(Bond(origin, partner))
                     # Other atoms are optional, so loop through the
                     # possibilities and bond them if they're set
                     for i in (j, k, l):
                         if not i: continue
-                        partner = _find_atom_index(struct, int(i))
+                        i = int(i)
+                        if i in altloc_ids: continue
+                        partner = _find_atom_index(struct, i)
                         if partner is None:
                             warnings.warn('CONECT record references non-'
-                                          'existent destination atom %d ' %
-                                          int(i), PDBWarning)
+                                          'existent destination atom %d ' % i,
+                                          PDBWarning)
                         elif partner not in origin.bond_partners:
                             struct.bonds.append(Bond(origin, partner))
         finally:
