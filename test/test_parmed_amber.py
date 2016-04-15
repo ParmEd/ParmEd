@@ -2506,6 +2506,17 @@ class TestRst7Class(FileIOTestCase):
                 readparm.Rst7().write(get_fn('test.nc', written=True), netcdf=True)
         )
 
+class TestNetCDFTrajectorywithBox(FileIOTestCase):
+    """ Test trajecotry with more than 1 frame and with box """
+
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
+    def test_netcdf_long_trajectory(self):
+        """ Test netcdf trajectory with box """
+        parmfile, ncfile = get_fn('tz2.parm7'), get_fn('tz2.nc')
+        parm = pmd.load_file(parmfile, xyz=ncfile, box=np.random.rand(101, 6))
+        boxes = parm.get_box('all')
+        self.assertEqual(boxes.shape, (101, 6))
+
 class TestAmberTitratableResidues(FileIOTestCase):
     """ Test Amber's titration module capabilities """
 
