@@ -1236,9 +1236,9 @@ class TestBondDetermination(utils.FileIOTestCase):
     def test_pairlist(self):
         """ Tests pairlist builder """
         s = Structure()
-        for i in range(5000):
+        for i in range(2000):
             s.add_atom(Atom('XYZ'), 'RES', i)
-        s.coordinates = np.random.rand(5000, 3) * 40 - 20
+        s.coordinates = np.random.rand(2000, 3) * 20 - 10
         pairs = find_atom_pairs(s, 5.0)
         self.assertTrue(any(len(x) > 0 for x in pairs))
         for a1 in s.atoms:

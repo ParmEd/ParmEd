@@ -959,8 +959,8 @@ class Structure(object):
         # atoms. So in this case (and this case only), look for bond partners in
         # an 'assigned' residue (but only the same residue we are part of). One
         # thing this misses is when the head or tail atom is misnamed.
-        mindist = math.sqrt(min(STANDARD_BOND_LENGTHS_SQUARED.values()))
-        pairs = find_atom_pairs(self, mindist)
+        mindist = math.sqrt(max(STANDARD_BOND_LENGTHS_SQUARED.values()))
+        pairs = find_atom_pairs(self, mindist, unassigned_atoms)
         for atom in unassigned_atoms:
             for partner in pairs[atom.idx]:
                 maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
@@ -4102,7 +4102,8 @@ def _res_in_templlib(res, lib):
         return lib[residue.AminoAcidResidue.get(res.name).abbr]
     if residue.DNAResidue.has(res.name):
         return lib[residue.DNAResidue.get(res.name).abbr]
-    if residue.RNAResidue.has(res.name):
+    if (residue.RNAResidue.has(res.name) and
+            residue.RNAResidue.get(res.name).abbr != 'T'):
         return lib[residue.RNAResidue.get(res.name).abbr]
     # Not present
     return None

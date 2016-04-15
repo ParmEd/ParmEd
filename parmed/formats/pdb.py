@@ -1479,7 +1479,7 @@ def _find_atom_index(struct, idx):
     hit an index too high or too low. So it *assumes* that the sequence is
     monotonically increasing. If the atom can't be found, None is returned
     """
-    idx0 = min(max(idx - 1, 0), len(struct.atoms))
+    idx0 = min(max(idx - 1, 0), len(struct.atoms)-1)
     if struct[idx0].number == idx:
         return struct[idx0]
     if struct[idx0].number < idx:

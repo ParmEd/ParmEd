@@ -5,7 +5,7 @@ from collections import defaultdict
 import numpy as np
 from parmed.utils.six.moves import zip
 
-def find_atom_pairs(struct, dist):
+def find_atom_pairs(struct, dist, subset=None):
     """ Finds all pairs of atoms in a structure within a requested distance
 
     Parameters
@@ -16,6 +16,8 @@ def find_atom_pairs(struct, dist):
         The maximum distance between identified pairs. No pairs separated by
         less than dist will be omitted, although some pairs greater than dist
         will be identified.
+    subset : set of Atom, optional
+        If specified, the pairlist will be built *only* considering these atoms
 
     Returns
     -------
@@ -37,8 +39,10 @@ def find_atom_pairs(struct, dist):
     # origin is at lower left
     voxels = np.array((coords - coords.min(axis=0)) / dist, dtype=int)
     atom_voxel_map = defaultdict(set)
-    for a, v in zip(struct.atoms, voxels):
-        atom_voxel_map[tuple(v)].add(a)
+    if subset is None:
+        subset = set(struct.atoms)
+    for a in subset:
+        atom_voxel_map[tuple(voxels[a.idx])].add(a)
     pairs = [set() for a in struct.atoms]
     for i, v in enumerate(voxels):
         for ii in range(-1, 2):
