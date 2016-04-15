@@ -448,7 +448,7 @@ class CharmmPsfFile(Structure):
 
     #===================================================
 
-    def load_parameters(self, parmset):
+    def load_parameters(self, parmset, copy_parameters=True):
         """
         Loads parameters from a parameter set that was loaded via CHARMM RTF,
         PAR, and STR files.
@@ -457,6 +457,40 @@ class CharmmPsfFile(Structure):
         ----------
         parmset : :class:`CharmmParameterSet`
             List of all parameters
+
+        copy_parameters : bool
+            if False, parmset will not be copied.
+
+            WARNING:
+            -------
+            Not copying parmset will cause ParameterSet and Structure to share references to types.
+            If you modify the original parameter set, the references in Structure list_types will be silently modified.
+            However, if you change any reference in the parameter set, then that reference will no longer be shared with
+            structure.
+
+            Example where the reference in ParameterSet is changed. This will NOT modify the parameters in the psf.
+
+            psf.load_parameters(parmset, copy_parameters=False)
+            parmset.angle_types[('a1', 'a2', a3')] = AngleType(1, 2)
+
+            This WILL change the parameter in the psf because the reference has not been changed in ParameterSet
+
+            psf.load_parameters(parmset, copy_parameters=False)
+
+            a = parmset.angle_types[('a1', 'a2', 'a3')]
+            a.k = 10
+            a.theteq = 100
+
+            Extra care should be taken when trying this with dihedral_types. Since dihedral_type is a Fourier sequence,
+            ParameterSet stores DihedralType for every term in DihedralTypeList. Therefore, the example below will STILL
+            modify the type in the Structure list_types.
+
+            parmset.dihedral_types[('a', 'b', 'c', 'd')][0] = DihedralType(1, 2, 3)
+
+            This assigns a new instance of DihedralType to an existing DihedralTypeList that ParameterSet and Structure
+            are tracking and the shared reference is NOT changed.
+
+            Use with caution!
 
         Notes
         -----
@@ -473,7 +507,8 @@ class CharmmPsfFile(Structure):
         ------
         ParameterError if any parameters cannot be found
         """
-        parmset = _copy(parmset)
+        if copy_parameters:
+            parmset = _copy(parmset)
         self.combining_rule = parmset.combining_rule
         # First load the atom types
         for atom in self.atoms:

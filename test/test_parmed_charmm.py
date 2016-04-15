@@ -13,6 +13,7 @@ from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
+from parmed.topologyobjects import BondType, AngleType, DihedralType, DihedralTypeList
 import parmed.unit as u
 import random
 import unittest
@@ -531,6 +532,34 @@ class TestCharmmPsf(utils.FileIOTestCase):
         self.assertRaises(ValueError, lambda:
                 psf.CharmmPsfFile.from_structure(struct)
         )
+
+    def test_copy_parameters(self):
+        """ Tests copy_parameters option in load_parameters """
+
+        top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        top.load_parameters(parmset=param22, copy_parameters=False)
+        b = param22.bond_types[(top.atoms[0].type, top.atoms[1].type)]
+        b.k = 200
+        a = param22.angle_types[(top.atoms[1].type, top.atoms[0].type, top.atoms[2].type)]
+        a.k = 20
+        d = param22.dihedral_types[('X', top.atoms[4].type, top.atoms[6].type, 'X')]
+        d[0].phi_k = 0.300
+        self.assertEqual(top.bonds[0].type, param22.bond_types[(top.atoms[0].type, top.atoms[1].type)])
+        self.assertEqual(top.angles[0].type, param22.angle_types[(top.atoms[1].type, top.atoms[0].type, top.atoms[2].type)])
+        self.assertEqual(top.dihedrals[0].type, param22.dihedral_types[('X', top.atoms[4].type, top.atoms[6].type, 'X')])
+
+        param22.bond_types[(top.atoms[0].type, top.atoms[1].type)] = BondType(300, 1.040)
+        param22.angle_types[(top.atoms[1].type, top.atoms[0].type, top.atoms[2].type)] = AngleType(k=40, theteq=109.5)
+
+        dtl = DihedralTypeList()
+        param22.dihedral_types[('X', top.atoms[4].type, top.atoms[6].type, 'X')] = \
+            dtl.append(DihedralType(phi_k=0.200, per=3, phase=0.00, scee=1.00, scnb=1.00))
+        self.assertNotEqual(top.bonds[0].type, param22.bond_types[(top.atoms[0].type, top.atoms[1].type)])
+        self.assertNotEqual(top.angles[0].type, param22.angle_types[(top.atoms[1].type, top.atoms[0].type,
+                                                                     top.atoms[2].type)])
+        self.assertNotEqual(top.dihedrals[0].type, param22.dihedral_types[('X', top.atoms[4].type, top.atoms[6].type,
+                                                                           'X')])
+
 
 class TestCharmmParameters(utils.FileIOTestCase):
     """ Test CHARMM Parameter file parsing """
