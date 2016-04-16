@@ -121,13 +121,20 @@ class GromacsGroFile(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=False):
         """ Parses a Gromacs GRO file
 
         Parameters
         ----------
         filename : str or file-like
             Name of the file or the GRO file object
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the GRO file is
+            being parsed simply for its coordinates. This will also reduce the
+            accuracy of assigned atomic numbers for typical ions. Default is
+            False.
 
         Returns
         -------
@@ -190,7 +197,8 @@ class GromacsGroFile(object):
                 fileobj.close()
 
         # Assign bonds (and improved element guesses)
-        struct.assign_bonds()
+        if not skip_bonds:
+            struct.assign_bonds()
 
         return struct
 

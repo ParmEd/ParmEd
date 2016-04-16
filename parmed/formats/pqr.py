@@ -89,7 +89,7 @@ class PQRFile(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=True):
         """ Read a PQR file and return a populated `Structure` class
 
         Parameters
@@ -99,6 +99,11 @@ class PQRFile(object):
             over the lines of a PQR. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pqr.gz,
             file.pqr.bz2)
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the PQR file is
+            being parsed simply for its coordinates. Default is False.
 
         Returns
         -------
@@ -206,7 +211,8 @@ class PQRFile(object):
             if own_handle: fileobj.close()
 
         struct.unchange()
-        struct.assign_bonds()
+        if not skip_bonds:
+            struct.assign_bonds()
         if coordinates:
             if len(coordinates) != 3*len(struct.atoms):
                 raise PDBError('bad number of atoms in some PQR models')

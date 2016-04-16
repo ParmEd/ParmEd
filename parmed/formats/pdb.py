@@ -215,7 +215,7 @@ class PDBFile(object):
     _relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=False):
         """ Read a PDB file and return a populated `Structure` class
 
         Parameters
@@ -225,6 +225,13 @@ class PDBFile(object):
             over the lines of a PDB. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pdb.gz,
             file.pdb.bz2)
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the PDB file is
+            being parsed simply for its coordinates. This may also reduce
+            element assignment if element information is not present in the PDB
+            file already. Default is False.
 
         Metadata
         --------
@@ -578,7 +585,7 @@ class PDBFile(object):
                         except ValueError:
                             warnings.warn('Trouble converting resolution (%s) '
                                           'to float' % line[23:30])
-                elif rec == 'CONECT':
+                elif rec == 'CONECT' and not skip_bonds:
                     b = int(line[6:11])
                     try:
                         i = int(line[11:16])
@@ -621,7 +628,8 @@ class PDBFile(object):
             if own_handle: fileobj.close()
 
         # Assign bonds based on standard templates and simple distances
-        struct.assign_bonds()
+        if not skip_bonds:
+            struct.assign_bonds()
 
         # Post-process some of the metadata to make it more reader-friendly
         struct.keywords = [s.strip() for s in struct.keywords.split(',')
@@ -938,7 +946,7 @@ class CIFFile(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=False):
         """
         Read a PDBx or mmCIF file and return a populated `Structure` class
 
@@ -949,6 +957,11 @@ class CIFFile(object):
             over the lines of a PDB. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pdb.gz,
             file.pdb.bz2)
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the CIF file is
+            being parsed simply for its coordinates. Default is False.
 
         Metadata
         --------
@@ -1264,8 +1277,9 @@ class CIFFile(object):
                             (-1, len(struct.atoms), 3))
 
         # Make sure we assign bonds for all of the structures we parsed
-        for struct in structures:
-            struct.assign_bonds()
+        if not skip_bonds:
+            for struct in structures:
+                struct.assign_bonds()
         # Build the return value
         if len(structures) == 1:
             return structures[0]
