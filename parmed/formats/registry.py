@@ -76,8 +76,12 @@ def load_file(filename, *args, **kwargs):
         This is needed for some coordinate file classes, but not others. This is
         treated the same as ``structure``, above. It is the # of atoms expected
     hasbox : bool, optional
-        Same as ``natom``, but indicates whether the coordinate file has unit
-        cell dimensions
+        Same as ``structure``, but indicates whether the coordinate file has
+        unit cell dimensions
+    skip_bonds : bool, optional
+        Same as ``structure``, but indicates whether or not bond searching will
+        be skipped if the topology file format does not contain bond information
+        (like PDB, GRO, and PQR files).
     *args : other positional arguments
         Some formats accept positional arguments. These will be passed along
     **kwargs : other options
