@@ -141,26 +141,30 @@ def load_file(filename, *args, **kwargs):
         if not arg in kwargs:
             raise TypeError('%s constructor expects %s keyword argument' %
                             name, arg)
-    # Pass on the "structure" keyword IFF the target function accepts a target
-    # keyword. Otherwise, get rid of it.
+    # Pass on the following keywords IFF the target function accepts a target
+    # keyword. Otherwise, get rid of it: structure, natom, hasbox, skip_bonds
     if hasattr(cls, 'parse'):
         _prune_argument(cls.parse, kwargs, 'structure')
         _prune_argument(cls.parse, kwargs, 'natom')
         _prune_argument(cls.parse, kwargs, 'hasbox')
+        _prune_argument(cls.parse, kwargs, 'skip_bonds')
         return cls.parse(filename, *args, **kwargs)
     elif hasattr(cls, 'open_old'):
         _prune_argument(cls.open_old, kwargs, 'structure')
         _prune_argument(cls.open_old, kwargs, 'natom')
         _prune_argument(cls.open_old, kwargs, 'hasbox')
+        _prune_argument(cls.open_old, kwargs, 'skip_bonds')
         return cls.open_old(filename, *args, **kwargs)
     elif hasattr(cls, 'open'):
         _prune_argument(cls.open, kwargs, 'structure')
         _prune_argument(cls.open, kwargs, 'natom')
         _prune_argument(cls.open, kwargs, 'hasbox')
+        _prune_argument(cls.open, kwargs, 'skip_bonds')
         return cls.open(filename, *args, **kwargs)
     _prune_argument(cls.__init__, kwargs, 'structure')
     _prune_argument(cls.__init__, kwargs, 'natom')
     _prune_argument(cls.__init__, kwargs, 'hasbox')
+    _prune_argument(cls.__init__, kwargs, 'skip_bonds')
     return cls(filename, *args, **kwargs)
 
 def _prune_argument(func, kwargs, keyword):

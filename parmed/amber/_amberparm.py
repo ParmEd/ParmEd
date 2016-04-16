@@ -213,7 +213,7 @@ class AmberParm(AmberFormat, Structure):
         self.load_structure()
 
         if isinstance(xyz, string_types):
-            f = load_file(xyz)
+            f = load_file(xyz, skip_bonds=True)
             if not hasattr(f, 'coordinates') or f.coordinates is None:
                 raise TypeError('%s does not have coordinates' % xyz)
             self.coordinates = f.coordinates

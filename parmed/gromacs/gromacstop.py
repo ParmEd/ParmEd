@@ -248,7 +248,7 @@ class GromacsTopologyFile(Structure):
             # Fill in coordinates and unit cell information if appropriate
             if xyz is not None:
                 if isinstance(xyz, string_types):
-                    f = load_file(xyz)
+                    f = load_file(xyz, skip_bonds=True)
                     if not hasattr(f, 'coordinates') or f.coordinates is None:
                         raise TypeError('File %s does not have coordinates' %
                                         xyz)
