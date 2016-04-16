@@ -13,7 +13,7 @@ the auto-generated list in :doc:`the parmed page <parmed>`.
 Importing the actions
 ---------------------
 
-All actions can be imported from ``parmed.tools`` with the same camelcase shown
+All actions can be imported from ``parmed.tools`` with the same camelCase shown
 in the ``parmed`` page. Examples are shown below::
 
     >>> from parmed.tools import change, addLJType, changeRadii, tiMerge
@@ -61,7 +61,7 @@ above)::
 The informational message printed to the ParmEd output are available by casting
 the action to a string::
 
-    print str(action)
+    print(str(action))
 
     # Equivalent:
-    print '%s' % action
+    print('%s' % action)

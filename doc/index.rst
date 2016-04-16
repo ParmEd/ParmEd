@@ -102,6 +102,7 @@ I will post any slides pertaining to ParmEd from talks that I've given here, in
 the hopes that they may be helpful or informative.
 
 - `April 10, 2015 at MSKCC <http://parmed.github.io/ParmEd/ParmEd_Slides_08Apr2015.pdf>`_
+- `March 19, 2016 at the Amber developer meeting at UCSD <http://parmed.github.io/ParmEd/ParmEd_Amber_Meeting2016.pdf>`_
 
 Getting Started
 ---------------
@@ -133,7 +134,7 @@ number of atoms, residues, and even various citation information. For example::
 
     >>> import parmed as pmd
     >>> pmd.download_PDB('4lzt')
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized>
     >>> lysozyme = pmd.download_PDB('4lzt')
     >>> lysozyme.authors
     'M.A.WALSH,T.SCHNEIDER,L.C.SIEKER,Z.DAUTER,V.LAMZIN,K.S.WILSON'
@@ -145,7 +146,7 @@ number of atoms, residues, and even various citation information. For example::
     274
     >>> # Get all backbone atoms
     ... lysozyme['@CA,C,N']
-    <Structure 393 atoms; 135 residues; 0 bonds; NOT parametrized>
+    <Structure 393 atoms; 135 residues; 386 bonds; NOT parametrized>
 
 A simple example demonstrating the file conversion capabilities is to convert a
 PDBx/mmCIF file into the more commonly supported PDB format::
@@ -154,7 +155,7 @@ PDBx/mmCIF file into the more commonly supported PDB format::
     >>> pmd.download_CIF('4lzt').save('4lzt.pdb')
     >>> # Now read in the PDB file we just created
     ... pmd.load_file('4lzt.pdb')
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC; NOT parametrized>
 
 Program and API Reference
 -------------------------
