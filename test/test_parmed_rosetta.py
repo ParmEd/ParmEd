@@ -19,11 +19,11 @@ def _unpackLen(obj):
     return len(list(obj))
 
 
-@unittest.skipIf(not init, "Cannot test load_rosetta module without PyRosetta.")
+@unittest.skipIf(init is None, "Cannot test load_rosetta module without PyRosetta.")
 class TestRosetta(unittest.TestCase):
     """ Tests loading of a Rosetta pose object """
 
-    def testLoadedPositions(self):
+    def test_loaded_positions(self):
         """ Test that positions were properly loaded"""
 
         init()
@@ -41,7 +41,7 @@ class TestRosetta(unittest.TestCase):
 
         self.assertEqual(posexyz, structxyz)
 
-    def testLoadStruct(self):
+    def test_load_struct(self):
         """ Test load_rosetta against read_PDB"""
 
         init()
@@ -51,10 +51,11 @@ class TestRosetta(unittest.TestCase):
         pdb = read_PDB(get_fn('ala_ala_ala.pdb'))
 
         self.assertEqual(len(struct.atoms), len(pdb.atoms))
+        self.assertEqual(len(struct.bonds), len(pdb.bonds))
         self.assertEqual(len(struct.residues), len(pdb.residues))
 
-    @unittest.skipIf(not PDBFile, "Cannot compare topologies without OpenMM.")
-    def testLoadedTopology(self):
+    @unittest.skipIf(PDBFile is None, "Cannot compare topologies without OpenMM.")
+    def test_loaded_topology(self):
         """ Test load_rosetta against OpenMM topology"""
 
         init()
@@ -63,15 +64,11 @@ class TestRosetta(unittest.TestCase):
         struct = load_rosetta(pose)
         pdb = PDBFile(get_fn('ala_ala_ala.pdb'))
 
-        self.assertEqual(_unpackLen(struct.topology.atoms()),
-                         _unpackLen(pdb.topology.atoms()))
+        self.assertEqual(len(list(struct.topology.atoms())),
+                         len(list(pdb.topology.atoms())))
 
-        self.assertEqual(_unpackLen(struct.topology.bonds()),
-                         _unpackLen(pdb.topology.bonds()))
+        self.assertEqual(len(list(struct.topology.bonds())),
+                         len(list(pdb.topology.bonds())))
 
-        self.assertEqual(_unpackLen(struct.topology.residues()),
-                         _unpackLen(pdb.topology.residues()))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(len(list(struct.topology.residues())),
+                         len(list(pdb.topology.residues())))
