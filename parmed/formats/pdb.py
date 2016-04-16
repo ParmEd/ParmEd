@@ -14,7 +14,7 @@ from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
-from parmed.topologyobjects import Atom, ExtraPoint
+from parmed.topologyobjects import Atom, ExtraPoint, Bond
 from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
@@ -215,7 +215,7 @@ class PDBFile(object):
     _relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=False):
         """ Read a PDB file and return a populated `Structure` class
 
         Parameters
@@ -225,12 +225,19 @@ class PDBFile(object):
             over the lines of a PDB. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pdb.gz,
             file.pdb.bz2)
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the PDB file is
+            being parsed simply for its coordinates. This may also reduce
+            element assignment if element information is not present in the PDB
+            file already. Default is False.
 
         Metadata
         --------
         The PDB parser also adds metadata to the returned Structure object that
         may be present in the PDB file
-    
+
         experimental : ``str``
             EXPDTA record
         journal : ``str``
@@ -257,7 +264,7 @@ class PDBFile(object):
             The X-RAY resolution in Angstroms, or None if not found
         related_entries : ``list of (str, str)``
             List of entries in other databases
-    
+
         Returns
         -------
         structure : :class:`Structure`
@@ -293,6 +300,7 @@ class PDBFile(object):
         atom_hex = False
         atom_overflow = False
         ZEROSET = set('0')
+        altloc_ids = set()
 
         try:
             for line in fileobj:
@@ -425,6 +433,7 @@ class PDBFile(object):
                                        resid, chain, segid) and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
+                        altloc_ids.add(atom.number)
                         last_atom_added = atom
                         continue
                     last_atom = last_atom_added = atom
@@ -576,9 +585,51 @@ class PDBFile(object):
                         except ValueError:
                             warnings.warn('Trouble converting resolution (%s) '
                                           'to float' % line[23:30])
+                elif rec == 'CONECT' and not skip_bonds:
+                    b = int(line[6:11])
+                    try:
+                        i = int(line[11:16])
+                    except ValueError:
+                        warnings.warn('Corrupt CONECT record', PDBWarning)
+                        continue
+                    # last 3 integers are optional and may not exist
+                    j = line[16:21].strip()
+                    k = line[21:26].strip()
+                    l = line[26:31].strip()
+                    if b in altloc_ids:
+                        continue # Do not handle altloc bonds yet.
+                    origin = _find_atom_index(struct, b)
+                    if origin is None:
+                        warnings.warn('CONECT record references non-existent '
+                                      'origin atom %d' % b, PDBWarning)
+                        continue # pragma: no cover
+                    if i not in altloc_ids:
+                        partner = _find_atom_index(struct, i)
+                        if partner is None:
+                            warnings.warn('CONECT record references non-existent '
+                                          'destination atom %d' % i, PDBWarning)
+                        elif partner not in origin.bond_partners:
+                            struct.bonds.append(Bond(origin, partner))
+                    # Other atoms are optional, so loop through the
+                    # possibilities and bond them if they're set
+                    for i in (j, k, l):
+                        if not i: continue
+                        i = int(i)
+                        if i in altloc_ids: continue
+                        partner = _find_atom_index(struct, i)
+                        if partner is None:
+                            warnings.warn('CONECT record references non-'
+                                          'existent destination atom %d ' % i,
+                                          PDBWarning)
+                        elif partner not in origin.bond_partners:
+                            struct.bonds.append(Bond(origin, partner))
         finally:
             # Make sure our file is closed if we opened it
             if own_handle: fileobj.close()
+
+        # Assign bonds based on standard templates and simple distances
+        if not skip_bonds:
+            struct.assign_bonds()
 
         # Post-process some of the metadata to make it more reader-friendly
         struct.keywords = [s.strip() for s in struct.keywords.split(',')
@@ -895,7 +946,7 @@ class CIFFile(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=False):
         """
         Read a PDBx or mmCIF file and return a populated `Structure` class
 
@@ -906,6 +957,11 @@ class CIFFile(object):
             over the lines of a PDB. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pdb.gz,
             file.pdb.bz2)
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the CIF file is
+            being parsed simply for its coordinates. Default is False.
 
         Metadata
         --------
@@ -1220,6 +1276,10 @@ class CIFFile(object):
                 struct._coordinates = np.array(all_coords).reshape(
                             (-1, len(struct.atoms), 3))
 
+        # Make sure we assign bonds for all of the structures we parsed
+        if not skip_bonds:
+            for struct in structures:
+                struct.assign_bonds()
         # Build the return value
         if len(structures) == 1:
             return structures[0]
@@ -1430,3 +1490,30 @@ class CIFFile(object):
             dest.close()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _find_atom_index(struct, idx):
+    """
+    Returns the atom with the given index in the structure. This is required
+    because atom indices may not start from 1 and may contain gaps in a PDB
+    file. This tries to find atoms quickly, assuming that indices *do* start
+    from 1 and have no gaps. It then looks up or down, depending on whether we
+    hit an index too high or too low. So it *assumes* that the sequence is
+    monotonically increasing. If the atom can't be found, None is returned
+    """
+    idx0 = min(max(idx - 1, 0), len(struct.atoms)-1)
+    if struct[idx0].number == idx:
+        return struct[idx0]
+    if struct[idx0].number < idx:
+        idx0 += 1
+        while idx0 < len(struct.atoms):
+            if struct[idx0].number == idx:
+                return struct[idx0]
+            idx0 += 1
+        return None # not found
+    else:
+        idx0 -= 1
+        while idx0 > 0:
+            if struct[idx0].number == idx:
+                return struct[idx0]
+            idx0 -= 1
+        return None # not found

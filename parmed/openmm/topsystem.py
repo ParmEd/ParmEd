@@ -102,7 +102,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
 
     if xyz is not None:
         if isinstance(xyz, string_types):
-            xyz = load_file(xyz)
+            xyz = load_file(xyz, skip_bonds=True)
             struct.coordinates = xyz.coordinates
             if struct.box is not None:
                 if xyz.box is not None:

@@ -4,6 +4,7 @@ Tests the routines in the parmed.geometry module
 from __future__ import division
 import utils
 
+from parmed import Atom
 from parmed import geometry as geo
 from parmed import unit as u
 from parmed.utils.six.moves import zip
@@ -19,6 +20,19 @@ class TestChemistryGeometry(unittest.TestCase):
         b = strip_units(b)
         for x, y in zip(a, b):
             self.assertEqual(x, y)
+
+    def test_distance2(self):
+        """ Tests the distance2 calculation """
+        a1, a2 = Atom(), Atom()
+        a1.xx = a1.xy = a1.xz = 0
+        a2.xx = 3
+        a2.xy = 4
+        a2.xz = 0
+        self.assertEqual(geo.distance2(a1, a2), 25)
+        # Make sure it also works for tuples and a mixture of both
+        self.assertEqual(geo.distance2((0, 0, 0), (3, 4, 0)), 25)
+        self.assertEqual(geo.distance2(a1, (3, 4, 0)), 25)
+        self.assertEqual(geo.distance2((0, 0, 0), a2), 25)
 
     def testBoxLengthsVectors(self):
         """ Test converting box lengths/angles to vectors and back again """
@@ -50,6 +64,3 @@ def strip_units(x):
     if u.is_quantity(x):
         return x.value_in_unit_system(u.akma_unit_system)
     return x
-
-if __name__ == '__main__':
-    unittest.main()

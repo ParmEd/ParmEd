@@ -940,7 +940,7 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
-        pdbfile = read_PDB(self.overflow2)
+        pdbfile = read_PDB(self.overflow2, skip_bonds=True) # Big file... skip bond check
         allsegids = set(['PROA', 'PROB', 'CARA', 'CARE', 'CARC', 'CARD', 'CARB',
                          'MEMB', 'TIP3', 'POT', 'CLA'])
         foundsegids = set()

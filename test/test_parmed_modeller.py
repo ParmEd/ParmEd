@@ -15,9 +15,11 @@ from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
-                             PROTEIN, SOLVENT)
+                             PROTEIN, SOLVENT, StandardBiomolecularResidues)
 from parmed.formats import Mol2File, PDBFile
+from parmed.geometry import distance2
 from parmed.exceptions import MoleculeError
+from parmed.utils import find_atom_pairs
 from parmed.utils.six import iteritems
 from parmed.utils.six.moves import zip, range, StringIO
 from parmed.tools import changeRadii
@@ -1028,14 +1030,14 @@ class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
         AmberOFFLibrary.write(offlib, 'testinternal.lib')
         f = open('tleap_orig.in', 'w')
         f.write("""\
-source leaprc.ff12SB
+source %s
 l = sequence {ALA ARG ASH ASN ASP CYM CYS CYX GLH GLN GLU GLY HID HIE HIP \
               HYP ILE LEU LYN LYS MET PHE PRO SER THR TRP TYR VAL}
 set default PBRadii mbondi2
 savePDB l alphabet.pdb
 saveAmberParm l alphabet.parm7 alphabet.rst7
 quit
-""")
+""" % get_fn('leaprc.ff12SB'))
         f.close()
         # Now create the leaprc for our new files
         f = open('tleap_new.in', 'w')
@@ -1076,12 +1078,12 @@ quit
         for key1, key2 in zip(keys1, keys2):
             f = open('tleap_orig.in', 'w')
             f.write("""\
-source leaprc.ff12SB
+source %s
 l = sequence {%s %s}
 savePDB l alphabet.pdb
 saveAmberParm l alphabet.parm7 alphabet.rst7
 quit
-""" % (key1, key2))
+""" % (get_fn('leaprc.ff12SB'), key1, key2))
             f.close()
             f = open('tleap_new.in', 'w')
             f.write("""\
@@ -1165,5 +1167,91 @@ class TestSlice(unittest.TestCase):
             for atom in atomlist:
                 self.assertEqual(atom.name, residue[atom.name].name)
 
-if __name__ == '__main__':
-    unittest.main()
+class TestBondDetermination(utils.FileIOTestCase):
+    """ Tests assigning bonds to structures """
+
+    def test_standard_residue_database(self):
+        """ Tests the availability of standard residue templates """
+        for resname in ('ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLU', 'GLN', 'GLY',
+                        'HIS', 'HYP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO',
+                        'SER', 'THR', 'TRP', 'TYR', 'VAL', 'DA', 'DT', 'DG',
+                        'DC', 'A', 'U', 'G', 'C', 'ACE', 'NME'):
+            self.assertIn(resname, StandardBiomolecularResidues)
+            self.assertIsInstance(StandardBiomolecularResidues[resname],
+                                  ResidueTemplate)
+
+    def test_simple_bond_assignment(self):
+        """ Tests the assignment of bonds to simple Structure instances """
+        for name, res in iteritems(StandardBiomolecularResidues):
+            s = Structure()
+            for a in res.atoms:
+                s.add_atom(copy(a), name, 1)
+            s.assign_bonds()
+            # Now make sure we have the same bond
+            self.assertEqual(len(res.atoms), len(s.atoms))
+            self.assertEqual(len(res.bonds), len(s.bonds))
+            for sa, ra in zip(res.atoms, s.atoms):
+                self.assertEqual(sa.name, ra.name)
+                self.assertEqual(len(sa.bond_partners), len(ra.bond_partners))
+                self.assertEqual({a.name for a in sa.bond_partners},
+                                 {a.name for a in ra.bond_partners})
+
+    def test_headtail_bond_assignment(self):
+        """ Tests assignment of bonds to polymeric Structures """
+        s = read_PDB(get_fn('ava.pdb'))
+        # Make sure PDB files have their bond automatically determined
+        self.assertGreater(len(s.bonds), 0)
+        self.assertIn(s.view[0, 'C'].atoms[0], s.view[1, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[1, 'C'].atoms[0], s.view[2, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[2, 'C'].atoms[0], s.view[3, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[3, 'C'].atoms[0], s.view[4, 'N'].atoms[0].bond_partners)
+        # TER card -- nobody bonded to *next* residue
+        for a in s.residues[4].atoms:
+            for ba in a.bond_partners:
+                self.assertNotEqual(ba.residue.idx, 5)
+        self.assertIn(s.view[5, 'C'].atoms[0], s.view[6, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[6, 'C'].atoms[0], s.view[7, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[7, 'C'].atoms[0], s.view[8, 'N'].atoms[0].bond_partners)
+        self.assertIn(s.view[8, 'C'].atoms[0], s.view[9, 'N'].atoms[0].bond_partners)
+        # Make sure we have exactly 86 bonds defined
+        self.assertEqual(len(s.bonds), 86)
+
+    def test_connect_parsing(self):
+        """ Tests processing of PDB CONECT records and see that it adds bonds """
+        s = read_PDB(get_fn('4lzt.pdb'))
+        # Check that the CONECT record bond specs are actual bonds
+        self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
+
+    def test_bond_distance_assignment(self):
+        """ Tests assignment of disulfides if no CONECT records available """
+        fn = get_fn('test.pdb', written=True)
+        with open(get_fn('4lzt.pdb'), 'r') as f, open(fn, 'w') as fw:
+            for line in f:
+                if line.startswith('CONECT'): continue
+                fw.write(line)
+        s = read_PDB(fn)
+        # Check that the disulfide is present even without CONECT records
+        self.assertIn(s.view[5, 'SG'].atoms[0], s.view[126, 'SG'].atoms[0].bond_partners)
+
+    def test_pairlist(self):
+        """ Tests pairlist builder """
+        s = Structure()
+        for i in range(2000):
+            s.add_atom(Atom('XYZ'), 'RES', i)
+        s.coordinates = np.random.rand(2000, 3) * 20 - 10
+        pairs = find_atom_pairs(s, 5.0)
+        self.assertTrue(any(len(x) > 0 for x in pairs))
+        for a1 in s.atoms:
+            for a2 in s.atoms:
+                if a1 is a2: continue
+                if distance2(a1, a2) < 25:
+                    self.assertIn(a1, pairs[a2.idx])
+                    self.assertIn(a2, pairs[a1.idx])
+
+    def test_element_override(self):
+        """ Tests that templates improve element information """
+        f = StringIO("""\
+ATOM      1  CA   CA A   1      -0.641  26.272   5.586  1.00 24.68
+""")
+        s = read_PDB(f)
+        self.assertEqual(s[0].atomic_number, pmd.periodic_table.AtomicNum['Ca'])
