@@ -130,7 +130,7 @@
 <span class="kn">from</span> <span class="nn">.standard_dimensions</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.unit</span> <span class="kn">import</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">is_unit</span><span class="p">,</span> <span class="n">dimensionless</span>
 
-<div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Physical quantity, such as 1.3 meters per second.</span>
 
 <span class="sd">    Quantities contain both a value, such as 1.3; and a unit,</span>
@@ -146,7 +146,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">99</span>
 
-<div class="viewcode-block" id="Quantity.__init__"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new Quantity from a value and a unit.</span>
 
@@ -220,7 +220,7 @@
             <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -341,7 +341,7 @@
 
     <span class="n">_reduce_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="Quantity.reduce_unit"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.reduce_unit">[docs]</a>    <span class="k">def</span> <span class="nf">reduce_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">guide_unit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.reduce_unit"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.reduce_unit">[docs]</a>    <span class="k">def</span> <span class="nf">reduce_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">guide_unit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combine similar component units and scale, to form an</span>
 <span class="sd">        equal Quantity in simpler units.</span>
@@ -489,7 +489,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">exponent</span><span class="p">),</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">exponent</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Quantity.sqrt"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.sqrt">[docs]</a>    <span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.sqrt"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.sqrt">[docs]</a>    <span class="k">def</span> <span class="nf">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns square root of a Quantity.</span>
 
@@ -504,7 +504,7 @@
             <span class="n">new_value</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">unit_factor</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">new_value</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">new_unit</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.sum"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.sum">[docs]</a>    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.sum"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.sum">[docs]</a>    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the sum of a sequence, with the result having the same unit as</span>
 <span class="sd">        the current sequence.</span>
@@ -530,7 +530,7 @@
                     <span class="n">mysum</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mysum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.mean"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.mean"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the mean of a sequence, with the result having the same unit as</span>
 <span class="sd">        the current sequence.</span>
@@ -550,7 +550,7 @@
             <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">))</span><span class="o">.</span><span class="n">_value</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.std"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.std">[docs]</a>    <span class="k">def</span> <span class="nf">std</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.std"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.std">[docs]</a>    <span class="k">def</span> <span class="nf">std</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the square root of the variance of a sequence, with the result</span>
 <span class="sd">        having the same unit as the current sequence.</span>
@@ -576,7 +576,7 @@
             <span class="n">std</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.max"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.max"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the maximum value of the sequence, with the result having the</span>
 <span class="sd">        same unit as the current sequence.</span>
@@ -596,7 +596,7 @@
             <span class="n">mymax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mymax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.min"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.min"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes the minimum value of the sequence, with the result having the</span>
 <span class="sd">        same unit as the current sequence.</span>
@@ -616,7 +616,7 @@
             <span class="n">mymin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mymin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.reshape"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.reshape">[docs]</a>    <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.reshape"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.reshape">[docs]</a>    <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Same as numpy.ndarray.reshape, except the result is a Quantity with the</span>
 <span class="sd">        same units as the current object rather than a plain numpy.ndarray</span>
@@ -666,7 +666,7 @@
     <span class="k">def</span> <span class="nf">__long__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Quantity.value_in_unit"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.value_in_unit">[docs]</a>    <span class="k">def</span> <span class="nf">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.value_in_unit"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.value_in_unit">[docs]</a>    <span class="k">def</span> <span class="nf">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns underlying value, in the specified units.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -676,7 +676,7 @@
         <span class="k">else</span><span class="p">:</span> <span class="c1"># naked dimensionless</span>
             <span class="k">return</span> <span class="n">val</span></div>
 
-<div class="viewcode-block" id="Quantity.value_in_unit_system"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.value_in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.value_in_unit_system"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.value_in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">value_in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the underlying value type, after conversion to a particular unit system.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -686,7 +686,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">result</span> <span class="c1"># dimensionless</span></div>
 
-<div class="viewcode-block" id="Quantity.in_unit_system"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.in_unit_system"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.in_unit_system">[docs]</a>    <span class="k">def</span> <span class="nf">in_unit_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a new Quantity equal to this one, expressed in a particular unit system.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -694,7 +694,7 @@
         <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">new_units</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_units_with_factor</span><span class="p">(</span><span class="n">new_units</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Quantity.in_units_of"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Quantity.html#parmed.unit.quantity.Quantity.in_units_of">[docs]</a>    <span class="k">def</span> <span class="nf">in_units_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_unit</span><span class="p">):</span>
+<div class="viewcode-block" id="Quantity.in_units_of"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.Quantity.in_units_of">[docs]</a>    <span class="k">def</span> <span class="nf">in_units_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_unit</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an equal Quantity expressed in different units.</span>
 
@@ -836,7 +836,7 @@
 <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
     <span class="k">del</span> <span class="n">Quantity</span><span class="o">.</span><span class="n">__nonzero__</span>
 
-<div class="viewcode-block" id="is_quantity"><a class="viewcode-back" href="../../../unitobj/parmed.unit.is_quantity.html#parmed.unit.quantity.is_quantity">[docs]</a><span class="k">def</span> <span class="nf">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="is_quantity"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.quantity.html#parmed.unit.quantity.is_quantity">[docs]</a><span class="k">def</span> <span class="nf">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns True if x is a Quantity, False otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

@@ -114,7 +114,7 @@
 
 <span class="c1"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<span class="n">_resre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(\d+)([a-zA-Z]*)&#39;</span><span class="p">)</span>
+<span class="n">_resre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(-?\d+)([a-zA-Z]*)&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CharmmPsfFile"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile">[docs]</a><span class="k">class</span> <span class="nc">CharmmPsfFile</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -162,12 +162,12 @@
 <span class="sd">        psf : file</span>
 <span class="sd">            Open file that is pointing to the first line of the section that is</span>
 <span class="sd">            to be parsed</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        title : str </span>
+<span class="sd">        title : str</span>
 <span class="sd">            The label of the PSF section we are parsing</span>
-<span class="sd">        pointers : (int/tuple of ints) </span>
+<span class="sd">        pointers : (int/tuple of ints)</span>
 <span class="sd">            If one pointer is set, pointers is simply the integer that is value</span>
 <span class="sd">            of that pointer. Otherwise it is a tuple with every pointer value</span>
 <span class="sd">            defined in the first line</span>
@@ -486,7 +486,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        params : CharmmParameterSet=None</span>
 <span class="sd">            If not None, this parameter set will be loaded</span>
-<span class="sd">        </span>
+
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        :meth:`parmed.structure.Structure.createSystem`</span>
@@ -498,7 +498,7 @@
 
     <span class="c1">#===================================================</span>
 
-<div class="viewcode-block" id="CharmmPsfFile.load_parameters"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parmset</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmPsfFile.load_parameters"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile.load_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parmset</span><span class="p">,</span> <span class="n">copy_parameters</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads parameters from a parameter set that was loaded via CHARMM RTF,</span>
 <span class="sd">        PAR, and STR files.</span>
@@ -507,6 +507,45 @@
 <span class="sd">        ----------</span>
 <span class="sd">        parmset : :class:`CharmmParameterSet`</span>
 <span class="sd">            List of all parameters</span>
+
+<span class="sd">        copy_parameters : bool, optional, default=True</span>
+<span class="sd">            If False, parmset will not be copied.</span>
+
+<span class="sd">            WARNING:</span>
+<span class="sd">            -------</span>
+<span class="sd">            Not copying parmset will cause ParameterSet and Structure to share</span>
+<span class="sd">            references to types.  If you modify the original parameter set, the</span>
+<span class="sd">            references in Structure list_types will be silently modified.</span>
+<span class="sd">            However, if you change any reference in the parameter set, then that</span>
+<span class="sd">            reference will no longer be shared with structure.</span>
+
+<span class="sd">            Example where the reference in ParameterSet is changed. The</span>
+<span class="sd">            following will NOT modify the parameters in the psf::</span>
+
+<span class="sd">                psf.load_parameters(parmset, copy_parameters=False)</span>
+<span class="sd">                parmset.angle_types[(&#39;a1&#39;, &#39;a2&#39;, a3&#39;)] = AngleType(1, 2)</span>
+
+<span class="sd">            The following WILL change the parameter in the psf because the</span>
+<span class="sd">            reference has not been changed in ``ParameterSet``::</span>
+
+<span class="sd">                psf.load_parameters(parmset, copy_parameters=False)</span>
+<span class="sd">                a = parmset.angle_types[(&#39;a1&#39;, &#39;a2&#39;, &#39;a3&#39;)]</span>
+<span class="sd">                a.k = 10</span>
+<span class="sd">                a.theteq = 100</span>
+
+<span class="sd">            Extra care should be taken when trying this with dihedral_types.</span>
+<span class="sd">            Since dihedral_type is a Fourier sequence, ParameterSet stores</span>
+<span class="sd">            DihedralType for every term in DihedralTypeList. Therefore, the</span>
+<span class="sd">            example below will STILL modify the type in the :class:`Structure`</span>
+<span class="sd">            list_types::</span>
+
+<span class="sd">                parmset.dihedral_types[(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;)][0] = DihedralType(1, 2, 3)</span>
+
+<span class="sd">            This assigns a new instance of DihedralType to an existing</span>
+<span class="sd">            DihedralTypeList that ParameterSet and Structure are tracking and</span>
+<span class="sd">            the shared reference is NOT changed.</span>
+
+<span class="sd">            Use with caution!</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -523,7 +562,8 @@
 <span class="sd">        ------</span>
 <span class="sd">        ParameterError if any parameters cannot be found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">parmset</span> <span class="o">=</span> <span class="n">_copy</span><span class="p">(</span><span class="n">parmset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">copy_parameters</span><span class="p">:</span>
+            <span class="n">parmset</span> <span class="o">=</span> <span class="n">_copy</span><span class="p">(</span><span class="n">parmset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">combining_rule</span>
         <span class="c1"># First load the atom types</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
@@ -715,12 +755,12 @@
     <span class="n">owner</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># The way I do this is via a recursive algorithm, in which</span>
     <span class="c1"># the &quot;set_owner&quot; method is called for each bonded partner an atom</span>
-    <span class="c1"># has, which in turn calls set_owner for each of its partners and </span>
+    <span class="c1"># has, which in turn calls set_owner for each of its partners and</span>
     <span class="c1"># so on until everything has been assigned.</span>
     <span class="n">molecule_number</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># which molecule number we are on</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)):</span>
         <span class="c1"># If this atom has not yet been &quot;owned&quot;, make it the next molecule</span>
-        <span class="c1"># However, we only increment which molecule number we&#39;re on if </span>
+        <span class="c1"># However, we only increment which molecule number we&#39;re on if</span>
         <span class="c1"># we actually assigned a new molecule (obviously)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">marked</span><span class="p">:</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>

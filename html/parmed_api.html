@@ -63,7 +63,7 @@ Python script or program.</p>
 the auto-generated list in <a class="reference internal" href="parmed.html"><em>the parmed page</em></a>.</p>
 <div class="section" id="importing-the-actions">
 <h2>Importing the actions<a class="headerlink" href="#importing-the-actions" title="Permalink to this headline">¶</a></h2>
-<p>All actions can be imported from <code class="docutils literal"><span class="pre">parmed.tools</span></code> with the same camelcase shown
+<p>All actions can be imported from <code class="docutils literal"><span class="pre">parmed.tools</span></code> with the same camelCase shown
 in the <code class="docutils literal"><span class="pre">parmed</span></code> page. Examples are shown below:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">change</span><span class="p">,</span> <span class="n">addLJType</span><span class="p">,</span> <span class="n">changeRadii</span><span class="p">,</span> <span class="n">tiMerge</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">setBond</span><span class="p">,</span> <span class="n">deleteBond</span><span class="p">,</span> <span class="n">addDihedral</span><span class="p">,</span> <span class="n">addPDB</span>
@@ -106,10 +106,10 @@ above):</p>
 </div>
 <p>The informational message printed to the ParmEd output are available by casting
 the action to a string:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">))</span>
 
 <span class="c1"># Equivalent:</span>
-<span class="k">print</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">action</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

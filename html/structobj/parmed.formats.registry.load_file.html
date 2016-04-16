@@ -84,8 +84,14 @@ treated the same as <code class="docutils literal"><span class="pre">structure</
 </div></blockquote>
 <p><strong>hasbox</strong> : bool, optional</p>
 <blockquote>
-<div><p>Same as <code class="docutils literal"><span class="pre">natom</span></code>, but indicates whether the coordinate file has unit
-cell dimensions</p>
+<div><p>Same as <code class="docutils literal"><span class="pre">structure</span></code>, but indicates whether the coordinate file has
+unit cell dimensions</p>
+</div></blockquote>
+<p><strong>skip_bonds</strong> : bool, optional</p>
+<blockquote>
+<div><p>Same as <code class="docutils literal"><span class="pre">structure</span></code>, but indicates whether or not bond searching will
+be skipped if the topology file format does not contain bond information
+(like PDB, GRO, and PQR files).</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
 <blockquote>

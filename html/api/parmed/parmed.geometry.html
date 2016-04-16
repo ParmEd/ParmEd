@@ -182,6 +182,39 @@ be able to be reshaped to (len(masses), 3), or ValueError&#8217;s will ensue</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="parmed.geometry.distance2">
+<code class="descclassname">parmed.geometry.</code><code class="descname">distance2</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#distance2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.distance2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the cartesian distance between two atoms. Ignores periodic boundary
+conditions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a1, a2</strong> : Atom or collection of 3 coordinates</p>
+<blockquote>
+<div><p>The two atoms between whom the distance should be calculated</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>d2</strong> : float</p>
+<blockquote>
+<div><p>The square of the distance between the two atoms</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError if a1 or a2 are not Atom or iterable</strong></p>
+<p class="last"><strong>ValueError if a1 or a2 are iterable, but do not have exactly 3 items</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is done in pure Python, so it should not be used for large numbers of
+distance calculations. For that, use numpy-vectorized routines and the numpy
+coordinate arrays</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="parmed.geometry.reduce_box_vectors">
 <code class="descclassname">parmed.geometry.</code><code class="descname">reduce_box_vectors</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>c</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#reduce_box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.reduce_box_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function puts three unit cell vectors in a reduced form where a is

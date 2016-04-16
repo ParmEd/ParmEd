@@ -139,7 +139,7 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PQRFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.PQRFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="PQRFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.PQRFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read a PQR file and return a populated `Structure` class</span>
 
 <span class="sd">        Parameters</span>
@@ -149,6 +149,11 @@
 <span class="sd">            over the lines of a PQR. Compressed file names can be specified and</span>
 <span class="sd">            are determined by file-name extension (e.g., file.pqr.gz,</span>
 <span class="sd">            file.pqr.bz2)</span>
+<span class="sd">        skip_bonds : bool, optional</span>
+<span class="sd">            If True, skip trying to assign bonds. This can save substantial time</span>
+<span class="sd">            when parsing large files with non-standard residue names. However,</span>
+<span class="sd">            no bonds are assigned. This is OK if, for instance, the PQR file is</span>
+<span class="sd">            being parsed simply for its coordinates. Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -256,6 +261,8 @@
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="n">struct</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_bonds</span><span class="p">:</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">assign_bonds</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">coordinates</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">PDBError</span><span class="p">(</span><span class="s1">&#39;bad number of atoms in some PQR models&#39;</span><span class="p">)</span>

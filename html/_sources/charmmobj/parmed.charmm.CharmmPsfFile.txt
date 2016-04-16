@@ -16,6 +16,7 @@ parmed.charmm.CharmmPsfFile
       ~CharmmPsfFile.__init__
       ~CharmmPsfFile.add_atom
       ~CharmmPsfFile.add_atom_to_residue
+      ~CharmmPsfFile.assign_bonds
       ~CharmmPsfFile.clear_cmap
       ~CharmmPsfFile.copy
       ~CharmmPsfFile.createSystem

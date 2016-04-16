@@ -129,8 +129,14 @@ treated the same as <code class="docutils literal"><span class="pre">structure</
 </div></blockquote>
 <p><strong>hasbox</strong> : bool, optional</p>
 <blockquote>
-<div><p>Same as <code class="docutils literal"><span class="pre">natom</span></code>, but indicates whether the coordinate file has unit
-cell dimensions</p>
+<div><p>Same as <code class="docutils literal"><span class="pre">structure</span></code>, but indicates whether the coordinate file has
+unit cell dimensions</p>
+</div></blockquote>
+<p><strong>skip_bonds</strong> : bool, optional</p>
+<blockquote>
+<div><p>Same as <code class="docutils literal"><span class="pre">structure</span></code>, but indicates whether or not bond searching will
+be skipped if the topology file format does not contain bond information
+(like PDB, GRO, and PQR files).</p>
 </div></blockquote>
 <p><strong>*args</strong> : other positional arguments</p>
 <blockquote>
@@ -196,7 +202,7 @@ applies both to local and remote files. The following names are supported:</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.id_format" title="parmed.formats.PDBFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.parse" title="parmed.formats.PDBFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PDBFile.parse" title="parmed.formats.PDBFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
 <td>Read a PDB file and return a populated <cite>Structure</cite> class</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PDBFile.write" title="parmed.formats.PDBFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
@@ -276,7 +282,7 @@ somewhat-stripped version you would get by using
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PDBFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDB file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -288,6 +294,15 @@ somewhat-stripped version you would get by using
 over the lines of a PDB. Compressed file names can be specified and
 are determined by file-name extension (e.g., file.pdb.gz,
 file.pdb.bz2)</p>
+</div></blockquote>
+<p><strong>skip_bonds</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, skip trying to assign bonds. This can save substantial time
+when parsing large files with non-standard residue names. However,
+no bonds are assigned. This is OK if, for instance, the PDB file is
+being parsed simply for its coordinates. This may also reduce
+element assignment if element information is not present in the PDB
+file already. Default is False.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -395,7 +410,7 @@ will be converted into the PDB-standard values.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.id_format" title="parmed.formats.CIFFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDBx/mmCIF file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.parse" title="parmed.formats.CIFFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.CIFFile.parse" title="parmed.formats.CIFFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
 <td>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.CIFFile.write" title="parmed.formats.CIFFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
@@ -474,7 +489,7 @@ somewhat-stripped version you would get by using
 
 <dl class="staticmethod">
 <dt id="parmed.formats.CIFFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -486,6 +501,13 @@ somewhat-stripped version you would get by using
 over the lines of a PDB. Compressed file names can be specified and
 are determined by file-name extension (e.g., file.pdb.gz,
 file.pdb.bz2)</p>
+</div></blockquote>
+<p><strong>skip_bonds</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, skip trying to assign bonds. This can save substantial time
+when parsing large files with non-standard residue names. However,
+no bonds are assigned. This is OK if, for instance, the CIF file is
+being parsed simply for its coordinates. Default is False.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -827,7 +849,7 @@ closed</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.id_format" title="parmed.formats.PQRFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PQRFile.parse" title="parmed.formats.PQRFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.PQRFile.parse" title="parmed.formats.PQRFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
 <td>Read a PQR file and return a populated <cite>Structure</cite> class</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.PQRFile.write" title="parmed.formats.PQRFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
@@ -861,7 +883,7 @@ closed</p>
 
 <dl class="staticmethod">
 <dt id="parmed.formats.PQRFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PQR file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -873,6 +895,13 @@ closed</p>
 over the lines of a PQR. Compressed file names can be specified and
 are determined by file-name extension (e.g., file.pqr.gz,
 file.pqr.bz2)</p>
+</div></blockquote>
+<p><strong>skip_bonds</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, skip trying to assign bonds. This can save substantial time
+when parsing large files with non-standard residue names. However,
+no bonds are assigned. This is OK if, for instance, the PQR file is
+being parsed simply for its coordinates. Default is False.</p>
 </div></blockquote>
 </td>
 </tr>

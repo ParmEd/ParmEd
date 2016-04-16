@@ -371,25 +371,25 @@
                 <span class="n">parameterset</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">1</span><span class="p">:</span><span class="mi">78</span><span class="p">]</span>
                 <span class="k">continue</span>
             <span class="c1"># Set section if this is a section header</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;ATOMS&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;BOND&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;BOND&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;BONDS&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ANGLE&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;THETA&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ANGLE&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;THETA&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;ANGLES&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;DIHE&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PHI&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;DIHE&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PHI&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;DIHEDRALS&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;IMPROPER&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;IMPHI&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;IMPROPER&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;IMPHI&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;IMPROPER&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;CMAP&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;CMAP&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;CMAP&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;NONBONDED&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;NONBONDED&#39;</span><span class="p">):</span>
                 <span class="n">read_first_nonbonded</span> <span class="o">=</span> <span class="n">declared_geometric</span> <span class="o">=</span> <span class="bp">False</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;NONBONDED&#39;</span>
                 <span class="c1"># Get nonbonded keywords</span>
@@ -426,14 +426,14 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">=</span> <span class="s1">&#39;geometric&#39;</span>
                         <span class="n">declared_geometric</span> <span class="o">=</span> <span class="bp">True</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;NBFIX&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;NBFIX&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;NBFIX&#39;</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;HBOND&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;HBOND&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="k">continue</span>
             <span class="c1"># It seems like files? sections? can be terminated with &#39;END&#39;</span>
-            <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span> <span class="c1"># should this be case-insensitive?</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="k">continue</span>
             <span class="c1"># If we have no section, skip</span>
@@ -445,8 +445,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">penalty</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="c1"># Now handle each section specifically</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;ATOMS&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MASS&#39;</span><span class="p">):</span> <span class="k">continue</span> <span class="c1"># Should this happen?</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ATOMS&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MASS&#39;</span><span class="p">):</span> <span class="k">continue</span> <span class="c1"># Should this happen?</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -471,7 +471,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">[(</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atype</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;BONDS&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;BONDS&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -497,7 +497,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">[(</span><span class="n">type2</span><span class="p">,</span> <span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">bond_type</span>
                 <span class="n">bond_type</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;ANGLES&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ANGLES&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -537,7 +537,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">[(</span><span class="n">type3</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">ubtype</span>
                 <span class="n">angle_type</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;DIHEDRALS&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;DIHEDRALS&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -577,7 +577,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[(</span><span class="n">type1</span><span class="p">,</span><span class="n">type2</span><span class="p">,</span><span class="n">type3</span><span class="p">,</span><span class="n">type4</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dtl</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[(</span><span class="n">type4</span><span class="p">,</span><span class="n">type3</span><span class="p">,</span><span class="n">type2</span><span class="p">,</span><span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dtl</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;IMPROPER&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;IMPROPER&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -615,7 +615,7 @@
                     <span class="n">improp</span><span class="o">.</span><span class="n">improper</span> <span class="o">=</span> <span class="bp">True</span>
                 <span class="n">improp</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;CMAP&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;CMAP&#39;</span><span class="p">:</span>
                 <span class="c1"># This is the most complicated part, since cmap parameters span</span>
                 <span class="c1"># many lines. We won&#39;t do much error catching here.</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -652,7 +652,7 @@
                     <span class="n">current_cmap_res</span> <span class="o">=</span> <span class="n">res</span>
                     <span class="n">current_cmap_data</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;NONBONDED&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;NONBONDED&#39;</span><span class="p">:</span>
                 <span class="c1"># Now get the nonbonded values</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
@@ -721,7 +721,7 @@
                     <span class="n">eps14</span> <span class="o">=</span> <span class="n">rmin14</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="n">nonbonded_types</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">eps14</span><span class="p">,</span> <span class="n">rmin14</span><span class="p">]</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;NBFIX&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;NBFIX&#39;</span><span class="p">:</span>
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -789,14 +789,13 @@
             <span class="n">f</span> <span class="o">=</span> <span class="n">tfile</span>
         <span class="n">hpatch</span> <span class="o">=</span> <span class="n">tpatch</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># default Head and Tail patches</span>
         <span class="n">residues</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">patches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">hpatches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">tpatches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;MASS&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;MASS&#39;</span><span class="p">:</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;atom type&#39;</span><span class="p">)</span>
@@ -819,9 +818,9 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_str</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_int</span><span class="p">[</span><span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">atype</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">atom_types_tuple</span><span class="p">[(</span><span class="n">atype</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atype</span><span class="o">.</span><span class="n">number</span><span class="p">)]</span> <span class="o">=</span> <span class="n">atype</span>
-                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DECL&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;DECL&#39;</span><span class="p">:</span>
                     <span class="k">pass</span> <span class="c1"># Not really sure what this means</span>
-                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DEFA&#39;</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;DEFA&#39;</span><span class="p">:</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;DEFA line has </span><span class="si">%d</span><span class="s1"> tokens; expected 5&#39;</span> <span class="o">%</span>
@@ -842,6 +841,9 @@
                     <span class="c1"># Get the residue definition</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="n">resname</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">resname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Replacing residue </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                              <span class="n">resname</span><span class="p">,</span> <span class="n">ParameterWarning</span><span class="p">)</span>
                     <span class="c1"># Assign default patches</span>
                     <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">hpatch</span>
                     <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">tpatch</span>
@@ -872,7 +874,7 @@
                             <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">)</span>
                             <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
                             <span class="n">res</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
-                        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> \
+                        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> \
                                 <span class="p">(</span><span class="s1">&#39;BOND&#39;</span><span class="p">,</span> <span class="s1">&#39;DOUBLE&#39;</span><span class="p">):</span>
                             <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]])</span>
                             <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
@@ -931,7 +933,7 @@
                     <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;RESI&#39;</span><span class="p">:</span>
                         <span class="n">residues</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
                     <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;PRES&#39;</span><span class="p">:</span>
-                        <span class="n">patches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;restype != RESI or PRES&#39;</span>
                     <span class="c1"># We parsed a line we need to look at. So don&#39;t update the</span>
@@ -946,17 +948,16 @@
         <span class="k">for</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">res</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Patch </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">res</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Patch </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">])</span>
         <span class="c1"># Now update the residues and patches with the ones we parsed here</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 

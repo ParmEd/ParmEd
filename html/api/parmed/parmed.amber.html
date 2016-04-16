@@ -438,17 +438,17 @@ replaced by any number) are optimized:</p>
 </table>
 <dl class="attribute">
 <dt id="parmed.amber.FortranFormat.floatre">
-<code class="descname">floatre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">floatre</code><em class="property"> = re.compile('(\\d+)?[edf](\\d+)\\.(\\d+)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.amber.FortranFormat.floatre2">
-<code class="descname">floatre2</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">floatre2</code><em class="property"> = re.compile('(\\d+)?\\([edf](\\d+)\\.(\\d+)\\)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.amber.FortranFormat.intre">
-<code class="descname">intre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">intre</code><em class="property"> = re.compile('(\\d+)?i(\\d+)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -459,7 +459,7 @@ replaced by any number) are optimized:</p>
 
 <dl class="attribute">
 <dt id="parmed.amber.FortranFormat.strre">
-<code class="descname">strre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">strre</code><em class="property"> = re.compile('(\\d+)?a(\\d+)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2097,175 +2097,178 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_flag" title="parmed.amber.AmberParm.add_flag"><code class="xref py py-obj docutils literal"><span class="pre">add_flag</span></code></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
 <td>Adds a new flag with the given flag name and Fortran format string and</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.copy" title="parmed.amber.AmberParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.assign_bonds" title="parmed.amber.AmberParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.copy" title="parmed.amber.AmberParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.createSystem" title="parmed.amber.AmberParm.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.createSystem" title="parmed.amber.AmberParm.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.delete_flag" title="parmed.amber.AmberParm.delete_flag"><code class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></code></a>(flag_name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.delete_flag" title="parmed.amber.AmberParm.delete_flag"><code class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></code></a>(flag_name)</td>
 <td>Removes a flag from the topology file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.fill_LJ" title="parmed.amber.AmberParm.fill_LJ"><code class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.fill_LJ" title="parmed.amber.AmberParm.fill_LJ"><code class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></code></a>()</td>
 <td>Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each atom type by computing their values from the A and B coefficients of each atom interacting with itself.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_rawdata" title="parmed.amber.AmberParm.from_rawdata"><code class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></code></a>(rawdata)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_rawdata" title="parmed.amber.AmberParm.from_rawdata"><code class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></code></a>(rawdata)</td>
 <td>Take the raw data from a AmberFormat object and initialize an AmberParm from that data.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_structure" title="parmed.amber.AmberParm.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.from_structure" title="parmed.amber.AmberParm.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
 <td>Take a Structure instance and initialize an AmberParm instance from that data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.get_box" title="parmed.amber.AmberParm.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.get_box" title="parmed.amber.AmberParm.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.get_coordinates" title="parmed.amber.AmberParm.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.get_coordinates" title="parmed.amber.AmberParm.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_1012" title="parmed.amber.AmberParm.has_1012"><code class="xref py py-obj docutils literal"><span class="pre">has_1012</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_1012" title="parmed.amber.AmberParm.has_1012"><code class="xref py py-obj docutils literal"><span class="pre">has_1012</span></code></a>()</td>
 <td>This routine determines whether there are any defined 10-12</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_NBFIX" title="parmed.amber.AmberParm.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.has_NBFIX" title="parmed.amber.AmberParm.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
 <td>This routine determines whether there are any off-diagonal Lennard-Jones modifications (i.e., if any two atoms have a L-J pair interaction that does not match the combined L-J parameters for that pair).</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.id_format" title="parmed.amber.AmberParm.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.id_format" title="parmed.amber.AmberParm.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.initialize_topology" title="parmed.amber.AmberParm.initialize_topology"><code class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></code></a>([xyz,&nbsp;box])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.initialize_topology" title="parmed.amber.AmberParm.initialize_topology"><code class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></code></a>([xyz,&nbsp;box])</td>
 <td>Initializes topology data structures, like the list of atoms, bonds, etc., after the topology file has been read.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.is_changed" title="parmed.amber.AmberParm.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.is_changed" title="parmed.amber.AmberParm.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
 <td>Determines if any of the topological arrays have changed since the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.join_dihedrals" title="parmed.amber.AmberParm.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.join_dihedrals" title="parmed.amber.AmberParm.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
 <td>Joins multi-term torsions into a single term and makes all of the parameters DihedralTypeList instances.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_atom_info" title="parmed.amber.AmberParm.load_atom_info"><code class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_atom_info" title="parmed.amber.AmberParm.load_atom_info"><code class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></code></a>()</td>
 <td>Loads atom properties into the atoms that have been loaded.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_dataframe" title="parmed.amber.AmberParm.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_dataframe" title="parmed.amber.AmberParm.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
 <td>Loads atomic properties from an input DataFrame</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_pointers" title="parmed.amber.AmberParm.load_pointers"><code class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_pointers" title="parmed.amber.AmberParm.load_pointers"><code class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></code></a>()</td>
 <td>Loads the data in POINTERS section into a pointers dictionary with each</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_rst7" title="parmed.amber.AmberParm.load_rst7"><code class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></code></a>(rst7)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_rst7" title="parmed.amber.AmberParm.load_rst7"><code class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></code></a>(rst7)</td>
 <td>Loads coordinates into the AmberParm class</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_structure" title="parmed.amber.AmberParm.load_structure"><code class="xref py py-obj docutils literal"><span class="pre">load_structure</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.load_structure" title="parmed.amber.AmberParm.load_structure"><code class="xref py py-obj docutils literal"><span class="pre">load_structure</span></code></a>()</td>
 <td>Loads all of the topology instance variables.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_add_constraints" title="parmed.amber.AmberParm.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_add_constraints" title="parmed.amber.AmberParm.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(system,&nbsp;constraints,&nbsp;...)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_angle_force" title="parmed.amber.AmberParm.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_angle_force" title="parmed.amber.AmberParm.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>([constraints,&nbsp;...])</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_bond_force" title="parmed.amber.AmberParm.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_bond_force" title="parmed.amber.AmberParm.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>([constraints,&nbsp;rigidWater,&nbsp;...])</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_cmap_force" title="parmed.amber.AmberParm.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_cmap_force" title="parmed.amber.AmberParm.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>()</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_dihedral_force" title="parmed.amber.AmberParm.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_dihedral_force" title="parmed.amber.AmberParm.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>([split])</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_gbsa_force" title="parmed.amber.AmberParm.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_gbsa_force" title="parmed.amber.AmberParm.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(implicitSolvent[,&nbsp;...])</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_improper_force" title="parmed.amber.AmberParm.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_improper_force" title="parmed.amber.AmberParm.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>()</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="parmed.amber.AmberParm.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="parmed.amber.AmberParm.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if necessary) to define the nonbonded interatomic potential for this system.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="parmed.amber.AmberParm.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="parmed.amber.AmberParm.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>()</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="parmed.amber.AmberParm.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="parmed.amber.AmberParm.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>()</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="parmed.amber.AmberParm.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="parmed.amber.AmberParm.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>()</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="parmed.amber.AmberParm.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="parmed.amber.AmberParm.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(system)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="parmed.amber.AmberParm.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="parmed.amber.AmberParm.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="parmed.amber.AmberParm.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="parmed.amber.AmberParm.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="parmed.amber.AmberParm.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="parmed.amber.AmberParm.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>()</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="parmed.amber.AmberParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="parmed.amber.AmberParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.parse" title="parmed.amber.AmberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.parse" title="parmed.amber.AmberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.prune_empty_terms" title="parmed.amber.AmberParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.prune_empty_terms" title="parmed.amber.AmberParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.ptr" title="parmed.amber.AmberParm.ptr"><code class="xref py py-obj docutils literal"><span class="pre">ptr</span></code></a>(pointer)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.ptr" title="parmed.amber.AmberParm.ptr"><code class="xref py py-obj docutils literal"><span class="pre">ptr</span></code></a>(pointer)</td>
 <td>Returns the value of the given pointer, and converts to upper-case so it&#8217;s case-insensitive.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm" title="parmed.amber.AmberParm.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm" title="parmed.amber.AmberParm.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
 <td>Parses the Amber format file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_old" title="parmed.amber.AmberParm.rdparm_old"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></code></a>(prmtop_lines[,&nbsp;check])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_old" title="parmed.amber.AmberParm.rdparm_old"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></code></a>(prmtop_lines[,&nbsp;check])</td>
 <td>This reads an old-style topology file and stores the results in the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_slow" title="parmed.amber.AmberParm.rdparm_slow"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></code></a>(fname)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rdparm_slow" title="parmed.amber.AmberParm.rdparm_slow"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></code></a>(fname)</td>
 <td>Parses the Amber format file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.recalculate_LJ" title="parmed.amber.AmberParm.recalculate_LJ"><code class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.recalculate_LJ" title="parmed.amber.AmberParm.recalculate_LJ"><code class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></code></a>()</td>
 <td>Fills the <code class="docutils literal"><span class="pre">LENNARD_JONES_ACOEF</span></code> and <code class="docutils literal"><span class="pre">LENNARD_JONES_BCOEF</span></code> arrays in the <code class="xref py py-attr docutils literal"><span class="pre">parm_data</span></code> raw data dictionary by applying the canonical Lorentz-Berthelot combining rules to the values in <code class="xref py py-attr docutils literal"><span class="pre">LJ_radius</span></code> and <code class="xref py py-attr docutils literal"><span class="pre">LJ_depth</span></code>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.rediscover_molecules" title="parmed.amber.AmberParm.rediscover_molecules"><code class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></code></a>([solute_ions,&nbsp;fix_broken])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.rediscover_molecules" title="parmed.amber.AmberParm.rediscover_molecules"><code class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></code></a>([solute_ions,&nbsp;fix_broken])</td>
 <td>This determines the molecularity and sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the prmtops.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.remake_parm" title="parmed.amber.AmberParm.remake_parm"><code class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.remake_parm" title="parmed.amber.AmberParm.remake_parm"><code class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></code></a>()</td>
 <td>Fills <code class="xref py py-attr docutils literal"><span class="pre">parm_data</span></code> from the data in the parameter and topology</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.save" title="parmed.amber.AmberParm.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.save" title="parmed.amber.AmberParm.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
 <td>Saves the current Structure in the requested file format.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.set_version" title="parmed.amber.AmberParm.set_version"><code class="xref py py-obj docutils literal"><span class="pre">set_version</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.set_version" title="parmed.amber.AmberParm.set_version"><code class="xref py py-obj docutils literal"><span class="pre">set_version</span></code></a>()</td>
 <td>Sets the version string</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.split" title="parmed.amber.AmberParm.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.split" title="parmed.amber.AmberParm.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
 <td>Split the current Structure into separate Structure instances for each unique molecule.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.strip" title="parmed.amber.AmberParm.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.strip" title="parmed.amber.AmberParm.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.to_dataframe" title="parmed.amber.AmberParm.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.to_dataframe" title="parmed.amber.AmberParm.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
 <td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.unchange" title="parmed.amber.AmberParm.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.unchange" title="parmed.amber.AmberParm.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.update_dihedral_exclusions" title="parmed.amber.AmberParm.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.update_dihedral_exclusions" title="parmed.amber.AmberParm.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.view_as" title="parmed.amber.AmberParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.view_as" title="parmed.amber.AmberParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_cif" title="parmed.amber.AmberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_cif" title="parmed.amber.AmberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_parm" title="parmed.amber.AmberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_parm" title="parmed.amber.AmberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_pdb" title="parmed.amber.AmberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_pdb" title="parmed.amber.AmberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_psf" title="parmed.amber.AmberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_psf" title="parmed.amber.AmberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_rst7" title="parmed.amber.AmberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_rst7" title="parmed.amber.AmberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -2473,6 +2476,28 @@ be raised</p>
 <dd><p>All angles including hydrogen</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.amber.AmberParm.assign_bonds">
+<code class="descname">assign_bonds</code><span class="sig-paren">(</span><em>*reslibs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.assign_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns bonds to all atoms based on the provided residue template
+libraries. Atoms whose names are <em>not</em> in the templates, as well as
+those residues for whom no template is found, is assigned to bonds based
+on distances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>reslibs</strong> : dict{str: ResidueTemplate}</p>
+<blockquote class="last">
+<div><p>Any number of residue template libraries. By default, assign_bonds
+knows about the standard amino acid, RNA, and DNA residues.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.amber.AmberParm.bonds_inc_h">
 <code class="descname">bonds_inc_h</code><a class="headerlink" href="#parmed.amber.AmberParm.bonds_inc_h" title="Permalink to this definition">¶</a></dt>
@@ -2547,7 +2572,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.createSystem">
-<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.createSystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8.0</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0.0</em>, <em>unit=angstrom)</em>, <em>constraints=None</em>, <em>rigidWater=True</em>, <em>implicitSolvent=None</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>useSASA=False</em>, <em>removeCMMotion=True</em>, <em>hydrogenMass=None</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>flexibleConstraints=True</em>, <em>verbose=False</em>, <em>splitDihedrals=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an OpenMM System representing the topology described by the
 prmtop file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2763,16 +2788,16 @@ This function retrieves a particular frame&#8217;s unit cell (box) dimensions</p
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
 <blockquote>
-<div><p>The frame number whose coordinates should be retrieved. Default is
+<div><p>The frame number whose unit cell should be retrieved. Default is
 &#8216;all&#8217;</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] 6) or None</p>
 <blockquote>
-<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
-(#, natom, 3). Otherwise the requested frame is returned with shape
-(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+<div><p>If frame is &#8216;all&#8217;, all unit cells are returned with shape
+(#, 6). Otherwise the requested frame is returned with shape
+(6,). If no unit cell exist and &#8216;all&#8217; is requested, None is
 returned</p>
 </div></blockquote>
 </td>
@@ -2976,7 +3001,7 @@ actually want to modify the topological layout of our system
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_add_constraints">
-<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>system</em>, <em>constraints</em>, <em>rigidWater</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3003,7 +3028,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_angle_force">
-<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3036,7 +3061,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_bond_force">
-<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>rigidWater=True</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3073,7 +3098,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_cmap_force">
-<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3091,7 +3116,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_dihedral_force">
-<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>split=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3118,7 +3143,7 @@ returned.</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_gbsa_force">
-<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>implicitSolvent</em>, <em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=30.0</em>, <em>unit=angstrom)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>useSASA=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3173,7 +3198,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_improper_force">
-<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3191,7 +3216,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_nonbonded_force">
-<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/_amberparm.html#AmberParm.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0</em>, <em>unit=angstrom)</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>reactionFieldDielectric=78.5</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/_amberparm.html#AmberParm.omm_nonbonded_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if
 necessary) to define the nonbonded interatomic potential for this
 system. A CustomNonbondedForce is used for the r^-4 part of the 12-6-4
@@ -3248,7 +3273,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_out_of_plane_bend_force">
-<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3266,7 +3291,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_pi_torsion_force">
-<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3284,7 +3309,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_rb_torsion_force">
-<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3302,7 +3327,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_set_virtual_sites">
-<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3323,7 +3348,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_stretch_bend_force">
-<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3341,7 +3366,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_torsion_torsion_force">
-<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3360,7 +3385,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_trigonal_angle_force">
-<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3378,7 +3403,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmberParm.omm_urey_bradley_force">
-<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3985,6 +4010,23 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <p class="last"><code class="xref py py-obj docutils literal"><span class="pre">instances</span></code></p>
 </div>
 <p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.chamber" title="parmed.amber.ChamberParm.chamber"><code class="xref py py-obj docutils literal"><span class="pre">chamber</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.amoeba" title="parmed.amber.ChamberParm.amoeba"><code class="xref py py-obj docutils literal"><span class="pre">amoeba</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.has_cmap" title="parmed.amber.ChamberParm.has_cmap"><code class="xref py py-obj docutils literal"><span class="pre">has_cmap</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="13%" />
@@ -4015,15 +4057,6 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-even"><td>cmap_types</td>
 <td>(TrackedList(CmapType)) List of parameters defining the CMAP terms</td>
 </tr>
-<tr class="row-odd"><td>chamber</td>
-<td>(bool=True) On ChamberParm instances, this is always True to indicate that it is a CHAMBER-style topology file</td>
-</tr>
-<tr class="row-even"><td>amoeba</td>
-<td>(bool=False) On ChamberParm instances, this is always False to indicate that it is not an AMOEBA-style topology file</td>
-</tr>
-<tr class="row-odd"><td>has_cmap</td>
-<td>(bool) True if CMAP parameters are present in this system; False otherwise</td>
-</tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
@@ -4042,175 +4075,178 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.add_flag" title="parmed.amber.ChamberParm.add_flag"><code class="xref py py-obj docutils literal"><span class="pre">add_flag</span></code></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
 <td>Adds a new flag with the given flag name and Fortran format string and</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.copy" title="parmed.amber.ChamberParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.assign_bonds" title="parmed.amber.ChamberParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.copy" title="parmed.amber.ChamberParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.createSystem" title="parmed.amber.ChamberParm.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.createSystem" title="parmed.amber.ChamberParm.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.delete_flag" title="parmed.amber.ChamberParm.delete_flag"><code class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></code></a>(flag_name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.delete_flag" title="parmed.amber.ChamberParm.delete_flag"><code class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></code></a>(flag_name)</td>
 <td>Removes a flag from the topology file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.fill_LJ" title="parmed.amber.ChamberParm.fill_LJ"><code class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.fill_LJ" title="parmed.amber.ChamberParm.fill_LJ"><code class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></code></a>()</td>
 <td>Fills the LJ_radius, LJ_depth arrays and LJ_types dictionary with data from LENNARD_JONES_ACOEF and LENNARD_JONES_BCOEF sections of the prmtop files, by undoing the canonical combining rules.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.from_rawdata" title="parmed.amber.ChamberParm.from_rawdata"><code class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></code></a>(rawdata)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.from_rawdata" title="parmed.amber.ChamberParm.from_rawdata"><code class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></code></a>(rawdata)</td>
 <td>Take the raw data from a AmberFormat object and initialize an AmberParm from that data.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.from_structure" title="parmed.amber.ChamberParm.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.from_structure" title="parmed.amber.ChamberParm.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
 <td>Take a Structure instance and initialize a ChamberParm instance from that data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.get_box" title="parmed.amber.ChamberParm.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.get_box" title="parmed.amber.ChamberParm.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.get_coordinates" title="parmed.amber.ChamberParm.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.get_coordinates" title="parmed.amber.ChamberParm.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.has_1012" title="parmed.amber.ChamberParm.has_1012"><code class="xref py py-obj docutils literal"><span class="pre">has_1012</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.has_1012" title="parmed.amber.ChamberParm.has_1012"><code class="xref py py-obj docutils literal"><span class="pre">has_1012</span></code></a>()</td>
 <td>This routine determines whether there are any defined 10-12</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.has_NBFIX" title="parmed.amber.ChamberParm.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.has_NBFIX" title="parmed.amber.ChamberParm.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
 <td>This routine determines whether there are any off-diagonal Lennard-Jones modifications (i.e., if any two atoms have a L-J pair interaction that does not match the combined L-J parameters for that pair).</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.id_format" title="parmed.amber.ChamberParm.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.id_format" title="parmed.amber.ChamberParm.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.initialize_topology" title="parmed.amber.ChamberParm.initialize_topology"><code class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></code></a>([xyz,&nbsp;box])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.initialize_topology" title="parmed.amber.ChamberParm.initialize_topology"><code class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></code></a>([xyz,&nbsp;box])</td>
 <td>Initializes topology data structures, like the list of atoms, bonds, etc., after the topology file has been read.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.is_changed" title="parmed.amber.ChamberParm.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.is_changed" title="parmed.amber.ChamberParm.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
 <td>Determines if any of the topological arrays have changed since the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.join_dihedrals" title="parmed.amber.ChamberParm.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.join_dihedrals" title="parmed.amber.ChamberParm.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
 <td>Joins multi-term torsions into a single term and makes all of the parameters DihedralTypeList instances.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_atom_info" title="parmed.amber.ChamberParm.load_atom_info"><code class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_atom_info" title="parmed.amber.ChamberParm.load_atom_info"><code class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></code></a>()</td>
 <td>Loads atom properties into the atoms that have been loaded.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_dataframe" title="parmed.amber.ChamberParm.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_dataframe" title="parmed.amber.ChamberParm.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
 <td>Loads atomic properties from an input DataFrame</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_pointers" title="parmed.amber.ChamberParm.load_pointers"><code class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_pointers" title="parmed.amber.ChamberParm.load_pointers"><code class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></code></a>()</td>
 <td>Loads the data in POINTERS section into a pointers dictionary with each</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_rst7" title="parmed.amber.ChamberParm.load_rst7"><code class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></code></a>(rst7)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_rst7" title="parmed.amber.ChamberParm.load_rst7"><code class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></code></a>(rst7)</td>
 <td>Loads coordinates into the AmberParm class</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_structure" title="parmed.amber.ChamberParm.load_structure"><code class="xref py py-obj docutils literal"><span class="pre">load_structure</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.load_structure" title="parmed.amber.ChamberParm.load_structure"><code class="xref py py-obj docutils literal"><span class="pre">load_structure</span></code></a>()</td>
 <td>Loads all of the topology instance variables.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_add_constraints" title="parmed.amber.ChamberParm.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_add_constraints" title="parmed.amber.ChamberParm.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(system,&nbsp;constraints,&nbsp;...)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_angle_force" title="parmed.amber.ChamberParm.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_angle_force" title="parmed.amber.ChamberParm.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>([constraints,&nbsp;...])</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_bond_force" title="parmed.amber.ChamberParm.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_bond_force" title="parmed.amber.ChamberParm.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>([constraints,&nbsp;rigidWater,&nbsp;...])</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_cmap_force" title="parmed.amber.ChamberParm.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_cmap_force" title="parmed.amber.ChamberParm.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>()</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_dihedral_force" title="parmed.amber.ChamberParm.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_dihedral_force" title="parmed.amber.ChamberParm.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>([split])</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_gbsa_force" title="parmed.amber.ChamberParm.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_gbsa_force" title="parmed.amber.ChamberParm.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(implicitSolvent[,&nbsp;...])</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_improper_force" title="parmed.amber.ChamberParm.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_improper_force" title="parmed.amber.ChamberParm.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>()</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_nonbonded_force" title="parmed.amber.ChamberParm.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_nonbonded_force" title="parmed.amber.ChamberParm.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if necessary) to define the nonbonded interatomic potential for this system.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_out_of_plane_bend_force" title="parmed.amber.ChamberParm.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_out_of_plane_bend_force" title="parmed.amber.ChamberParm.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>()</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_pi_torsion_force" title="parmed.amber.ChamberParm.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_pi_torsion_force" title="parmed.amber.ChamberParm.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>()</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_rb_torsion_force" title="parmed.amber.ChamberParm.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_rb_torsion_force" title="parmed.amber.ChamberParm.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>()</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_set_virtual_sites" title="parmed.amber.ChamberParm.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_set_virtual_sites" title="parmed.amber.ChamberParm.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(system)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_stretch_bend_force" title="parmed.amber.ChamberParm.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_stretch_bend_force" title="parmed.amber.ChamberParm.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_torsion_torsion_force" title="parmed.amber.ChamberParm.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_torsion_torsion_force" title="parmed.amber.ChamberParm.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_trigonal_angle_force" title="parmed.amber.ChamberParm.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_trigonal_angle_force" title="parmed.amber.ChamberParm.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>()</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_urey_bradley_force" title="parmed.amber.ChamberParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_urey_bradley_force" title="parmed.amber.ChamberParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.parse" title="parmed.amber.ChamberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.parse" title="parmed.amber.ChamberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.prune_empty_terms" title="parmed.amber.ChamberParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.prune_empty_terms" title="parmed.amber.ChamberParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.ptr" title="parmed.amber.ChamberParm.ptr"><code class="xref py py-obj docutils literal"><span class="pre">ptr</span></code></a>(pointer)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.ptr" title="parmed.amber.ChamberParm.ptr"><code class="xref py py-obj docutils literal"><span class="pre">ptr</span></code></a>(pointer)</td>
 <td>Returns the value of the given pointer, and converts to upper-case so it&#8217;s case-insensitive.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rdparm" title="parmed.amber.ChamberParm.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rdparm" title="parmed.amber.ChamberParm.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
 <td>Parses the Amber format file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rdparm_old" title="parmed.amber.ChamberParm.rdparm_old"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></code></a>(prmtop_lines[,&nbsp;check])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rdparm_old" title="parmed.amber.ChamberParm.rdparm_old"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></code></a>(prmtop_lines[,&nbsp;check])</td>
 <td>This reads an old-style topology file and stores the results in the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rdparm_slow" title="parmed.amber.ChamberParm.rdparm_slow"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></code></a>(fname)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rdparm_slow" title="parmed.amber.ChamberParm.rdparm_slow"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></code></a>(fname)</td>
 <td>Parses the Amber format file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.recalculate_LJ" title="parmed.amber.ChamberParm.recalculate_LJ"><code class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.recalculate_LJ" title="parmed.amber.ChamberParm.recalculate_LJ"><code class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></code></a>()</td>
 <td>Takes the values of the LJ_radius and LJ_depth arrays and recalculates the LENNARD_JONES_A/BCOEF topology sections from the canonical combining rules.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rediscover_molecules" title="parmed.amber.ChamberParm.rediscover_molecules"><code class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></code></a>([solute_ions,&nbsp;fix_broken])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.rediscover_molecules" title="parmed.amber.ChamberParm.rediscover_molecules"><code class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></code></a>([solute_ions,&nbsp;fix_broken])</td>
 <td>This determines the molecularity and sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the prmtops.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.remake_parm" title="parmed.amber.ChamberParm.remake_parm"><code class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.remake_parm" title="parmed.amber.ChamberParm.remake_parm"><code class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></code></a>()</td>
 <td>Fills <code class="xref py py-attr docutils literal"><span class="pre">parm_data</span></code> from the data in the parameter and topology</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.save" title="parmed.amber.ChamberParm.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.save" title="parmed.amber.ChamberParm.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
 <td>Saves the current Structure in the requested file format.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.set_version" title="parmed.amber.ChamberParm.set_version"><code class="xref py py-obj docutils literal"><span class="pre">set_version</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.set_version" title="parmed.amber.ChamberParm.set_version"><code class="xref py py-obj docutils literal"><span class="pre">set_version</span></code></a>()</td>
 <td>Sets the version string</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.split" title="parmed.amber.ChamberParm.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.split" title="parmed.amber.ChamberParm.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
 <td>Split the current Structure into separate Structure instances for each unique molecule.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.strip" title="parmed.amber.ChamberParm.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.strip" title="parmed.amber.ChamberParm.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.to_dataframe" title="parmed.amber.ChamberParm.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.to_dataframe" title="parmed.amber.ChamberParm.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
 <td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.unchange" title="parmed.amber.ChamberParm.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.unchange" title="parmed.amber.ChamberParm.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.update_dihedral_exclusions" title="parmed.amber.ChamberParm.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.update_dihedral_exclusions" title="parmed.amber.ChamberParm.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.view_as" title="parmed.amber.ChamberParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.view_as" title="parmed.amber.ChamberParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_cif" title="parmed.amber.ChamberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_cif" title="parmed.amber.ChamberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_parm" title="parmed.amber.ChamberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_parm" title="parmed.amber.ChamberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_pdb" title="parmed.amber.ChamberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_pdb" title="parmed.amber.ChamberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_psf" title="parmed.amber.ChamberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_psf" title="parmed.amber.ChamberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_rst7" title="parmed.amber.ChamberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_rst7" title="parmed.amber.ChamberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -4417,6 +4453,28 @@ be raised</p>
 <dd><p>All angles including hydrogen</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.amber.ChamberParm.assign_bonds">
+<code class="descname">assign_bonds</code><span class="sig-paren">(</span><em>*reslibs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.assign_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns bonds to all atoms based on the provided residue template
+libraries. Atoms whose names are <em>not</em> in the templates, as well as
+those residues for whom no template is found, is assigned to bonds based
+on distances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>reslibs</strong> : dict{str: ResidueTemplate}</p>
+<blockquote class="last">
+<div><p>Any number of residue template libraries. By default, assign_bonds
+knows about the standard amino acid, RNA, and DNA residues.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.amber.ChamberParm.bonds_inc_h">
 <code class="descname">bonds_inc_h</code><a class="headerlink" href="#parmed.amber.ChamberParm.bonds_inc_h" title="Permalink to this definition">¶</a></dt>
@@ -4490,7 +4548,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.createSystem">
-<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.createSystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8.0</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0.0</em>, <em>unit=angstrom)</em>, <em>constraints=None</em>, <em>rigidWater=True</em>, <em>implicitSolvent=None</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>useSASA=False</em>, <em>removeCMMotion=True</em>, <em>hydrogenMass=None</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>flexibleConstraints=True</em>, <em>verbose=False</em>, <em>splitDihedrals=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an OpenMM System representing the topology described by the
 prmtop file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -4697,16 +4755,16 @@ This function retrieves a particular frame&#8217;s unit cell (box) dimensions</p
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
 <blockquote>
-<div><p>The frame number whose coordinates should be retrieved. Default is
+<div><p>The frame number whose unit cell should be retrieved. Default is
 &#8216;all&#8217;</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] 6) or None</p>
 <blockquote>
-<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
-(#, natom, 3). Otherwise the requested frame is returned with shape
-(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+<div><p>If frame is &#8216;all&#8217;, all unit cells are returned with shape
+(#, 6). Otherwise the requested frame is returned with shape
+(6,). If no unit cell exist and &#8216;all&#8217; is requested, None is
 returned</p>
 </div></blockquote>
 </td>
@@ -4910,7 +4968,7 @@ actually want to modify the topological layout of our system
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_add_constraints">
-<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>system</em>, <em>constraints</em>, <em>rigidWater</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -4937,7 +4995,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_angle_force">
-<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -4970,7 +5028,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_bond_force">
-<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>rigidWater=True</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -5007,7 +5065,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_cmap_force">
-<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5025,7 +5083,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_dihedral_force">
-<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>split=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5052,7 +5110,7 @@ returned.</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_gbsa_force">
-<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>implicitSolvent</em>, <em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=30.0</em>, <em>unit=angstrom)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>useSASA=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -5107,7 +5165,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_improper_force">
-<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5125,7 +5183,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_nonbonded_force">
-<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0</em>, <em>unit=angstrom)</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>reactionFieldDielectric=78.5</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if
 necessary) to define the nonbonded interatomic potential for this
 system. A CustomNonbondedForce is used for the r^-4 part of the 12-6-4
@@ -5182,7 +5240,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_out_of_plane_bend_force">
-<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5200,7 +5258,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_pi_torsion_force">
-<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5218,7 +5276,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_rb_torsion_force">
-<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5236,7 +5294,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_set_virtual_sites">
-<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -5257,7 +5315,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_stretch_bend_force">
-<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5275,7 +5333,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_torsion_torsion_force">
-<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5294,7 +5352,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_trigonal_angle_force">
-<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5312,7 +5370,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.amber.ChamberParm.omm_urey_bradley_force">
-<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -5927,6 +5985,12 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.dihedrals_without_h" title="parmed.amber.AmoebaParm.dihedrals_without_h"><code class="xref py py-obj docutils literal"><span class="pre">dihedrals_without_h</span></code></a></td>
 <td>All dihedrals including hydrogen</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.chamber" title="parmed.amber.AmoebaParm.chamber"><code class="xref py py-obj docutils literal"><span class="pre">chamber</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.amoeba" title="parmed.amber.AmoebaParm.amoeba"><code class="xref py py-obj docutils literal"><span class="pre">amoeba</span></code></a></td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.has_cmap" title="parmed.amber.AmoebaParm.has_cmap"><code class="xref py py-obj docutils literal"><span class="pre">has_cmap</span></code></a></td>
 <td>Whether this instance has correction map terms or not</td>
 </tr>
@@ -6031,12 +6095,6 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-odd"><td>adjust_types</td>
 <td>(TrackedList(NonbondedExceptionType)) The nonbonded exception scaling factors for pairs of particles</td>
 </tr>
-<tr class="row-even"><td>chamber</td>
-<td>(bool=False) On AmberParm instances, this is always False to indicate that it is not a CHAMBER-style topology file</td>
-</tr>
-<tr class="row-odd"><td>amoeba</td>
-<td>(bool=False) On AmberParm instances, this is always False to indicate that it is not an AMOEBA-style topology file</td>
-</tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
@@ -6055,178 +6113,181 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.add_flag" title="parmed.amber.AmoebaParm.add_flag"><code class="xref py py-obj docutils literal"><span class="pre">add_flag</span></code></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
 <td>Adds a new flag with the given flag name and Fortran format string and</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.copy" title="parmed.amber.AmoebaParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.assign_bonds" title="parmed.amber.AmoebaParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.copy" title="parmed.amber.AmoebaParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.createSystem" title="parmed.amber.AmoebaParm.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.createSystem" title="parmed.amber.AmoebaParm.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.delete_flag" title="parmed.amber.AmoebaParm.delete_flag"><code class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></code></a>(flag_name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.delete_flag" title="parmed.amber.AmoebaParm.delete_flag"><code class="xref py py-obj docutils literal"><span class="pre">delete_flag</span></code></a>(flag_name)</td>
 <td>Removes a flag from the topology file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.fill_LJ" title="parmed.amber.AmoebaParm.fill_LJ"><code class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.fill_LJ" title="parmed.amber.AmoebaParm.fill_LJ"><code class="xref py py-obj docutils literal"><span class="pre">fill_LJ</span></code></a>()</td>
 <td>Calculates the Lennard-Jones parameters (Rmin/2 and epsilon) for each atom type by computing their values from the A and B coefficients of each atom interacting with itself.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.from_rawdata" title="parmed.amber.AmoebaParm.from_rawdata"><code class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></code></a>(rawdata)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.from_rawdata" title="parmed.amber.AmoebaParm.from_rawdata"><code class="xref py py-obj docutils literal"><span class="pre">from_rawdata</span></code></a>(rawdata)</td>
 <td>Take the raw data from a AmberFormat object and initialize an AmberParm from that data.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.from_structure" title="parmed.amber.AmoebaParm.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.from_structure" title="parmed.amber.AmoebaParm.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;copy])</td>
 <td>Take a Structure instance and initialize an AmberParm instance from that data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.get_box" title="parmed.amber.AmoebaParm.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.get_box" title="parmed.amber.AmoebaParm.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.get_coordinates" title="parmed.amber.AmoebaParm.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.get_coordinates" title="parmed.amber.AmoebaParm.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.has_1012" title="parmed.amber.AmoebaParm.has_1012"><code class="xref py py-obj docutils literal"><span class="pre">has_1012</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.has_1012" title="parmed.amber.AmoebaParm.has_1012"><code class="xref py py-obj docutils literal"><span class="pre">has_1012</span></code></a>()</td>
 <td>This routine determines whether there are any defined 10-12</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.has_NBFIX" title="parmed.amber.AmoebaParm.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.has_NBFIX" title="parmed.amber.AmoebaParm.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
 <td>This routine determines whether there are any off-diagonal Lennard-Jones modifications (i.e., if any two atoms have a L-J pair interaction that does not match the combined L-J parameters for that pair).</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.id_format" title="parmed.amber.AmoebaParm.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.id_format" title="parmed.amber.AmoebaParm.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.initialize_topology" title="parmed.amber.AmoebaParm.initialize_topology"><code class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></code></a>([xyz,&nbsp;box])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.initialize_topology" title="parmed.amber.AmoebaParm.initialize_topology"><code class="xref py py-obj docutils literal"><span class="pre">initialize_topology</span></code></a>([xyz,&nbsp;box])</td>
 <td>Initializes topology data structures, like the list of atoms, bonds, etc., after the topology file has been read.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.is_changed" title="parmed.amber.AmoebaParm.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.is_changed" title="parmed.amber.AmoebaParm.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
 <td>Determines if any of the topological arrays have changed since the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.join_dihedrals" title="parmed.amber.AmoebaParm.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.join_dihedrals" title="parmed.amber.AmoebaParm.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
 <td>Joins multi-term torsions into a single term and makes all of the parameters DihedralTypeList instances.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_atom_info" title="parmed.amber.AmoebaParm.load_atom_info"><code class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_atom_info" title="parmed.amber.AmoebaParm.load_atom_info"><code class="xref py py-obj docutils literal"><span class="pre">load_atom_info</span></code></a>()</td>
 <td>Loads atom properties into the atoms that have been loaded.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_dataframe" title="parmed.amber.AmoebaParm.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_dataframe" title="parmed.amber.AmoebaParm.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
 <td>Loads atomic properties from an input DataFrame</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_pointers" title="parmed.amber.AmoebaParm.load_pointers"><code class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_pointers" title="parmed.amber.AmoebaParm.load_pointers"><code class="xref py py-obj docutils literal"><span class="pre">load_pointers</span></code></a>()</td>
 <td>Loads the data in POINTERS section into a pointers dictionary with each</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_rst7" title="parmed.amber.AmoebaParm.load_rst7"><code class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></code></a>(rst7)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_rst7" title="parmed.amber.AmoebaParm.load_rst7"><code class="xref py py-obj docutils literal"><span class="pre">load_rst7</span></code></a>(rst7)</td>
 <td>Loads coordinates into the AmberParm class</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_structure" title="parmed.amber.AmoebaParm.load_structure"><code class="xref py py-obj docutils literal"><span class="pre">load_structure</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.load_structure" title="parmed.amber.AmoebaParm.load_structure"><code class="xref py py-obj docutils literal"><span class="pre">load_structure</span></code></a>()</td>
 <td>Loads all of the topology instance variables.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.mdin_skeleton" title="parmed.amber.AmoebaParm.mdin_skeleton"><code class="xref py py-obj docutils literal"><span class="pre">mdin_skeleton</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.mdin_skeleton" title="parmed.amber.AmoebaParm.mdin_skeleton"><code class="xref py py-obj docutils literal"><span class="pre">mdin_skeleton</span></code></a>()</td>
 <td>Returns the skeleton of an mdin file with the &amp;amoeba namelist set up correctly for the potential terms that are present in this topology file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_add_constraints" title="parmed.amber.AmoebaParm.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_add_constraints" title="parmed.amber.AmoebaParm.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(system,&nbsp;constraints,&nbsp;...)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_angle_force" title="parmed.amber.AmoebaParm.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_angle_force" title="parmed.amber.AmoebaParm.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>([constraints,&nbsp;...])</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_bond_force" title="parmed.amber.AmoebaParm.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_bond_force" title="parmed.amber.AmoebaParm.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>([constraints,&nbsp;rigidWater,&nbsp;...])</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_cmap_force" title="parmed.amber.AmoebaParm.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_cmap_force" title="parmed.amber.AmoebaParm.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>()</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_dihedral_force" title="parmed.amber.AmoebaParm.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_dihedral_force" title="parmed.amber.AmoebaParm.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>([split])</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_gbsa_force" title="parmed.amber.AmoebaParm.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_gbsa_force" title="parmed.amber.AmoebaParm.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(implicitSolvent[,&nbsp;...])</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_improper_force" title="parmed.amber.AmoebaParm.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_improper_force" title="parmed.amber.AmoebaParm.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>()</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_nonbonded_force" title="parmed.amber.AmoebaParm.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_nonbonded_force" title="parmed.amber.AmoebaParm.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if necessary) to define the nonbonded interatomic potential for this system.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_out_of_plane_bend_force" title="parmed.amber.AmoebaParm.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_out_of_plane_bend_force" title="parmed.amber.AmoebaParm.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>()</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_pi_torsion_force" title="parmed.amber.AmoebaParm.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_pi_torsion_force" title="parmed.amber.AmoebaParm.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>()</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_rb_torsion_force" title="parmed.amber.AmoebaParm.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_rb_torsion_force" title="parmed.amber.AmoebaParm.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>()</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_set_virtual_sites" title="parmed.amber.AmoebaParm.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_set_virtual_sites" title="parmed.amber.AmoebaParm.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(system)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_stretch_bend_force" title="parmed.amber.AmoebaParm.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_stretch_bend_force" title="parmed.amber.AmoebaParm.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_torsion_torsion_force" title="parmed.amber.AmoebaParm.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_torsion_torsion_force" title="parmed.amber.AmoebaParm.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_trigonal_angle_force" title="parmed.amber.AmoebaParm.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_trigonal_angle_force" title="parmed.amber.AmoebaParm.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>()</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_urey_bradley_force" title="parmed.amber.AmoebaParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_urey_bradley_force" title="parmed.amber.AmoebaParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.parse" title="parmed.amber.AmoebaParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.parse" title="parmed.amber.AmoebaParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.prune_empty_terms" title="parmed.amber.AmoebaParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.prune_empty_terms" title="parmed.amber.AmoebaParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.ptr" title="parmed.amber.AmoebaParm.ptr"><code class="xref py py-obj docutils literal"><span class="pre">ptr</span></code></a>(pointer)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.ptr" title="parmed.amber.AmoebaParm.ptr"><code class="xref py py-obj docutils literal"><span class="pre">ptr</span></code></a>(pointer)</td>
 <td>Returns the value of the given pointer, and converts to upper-case so it&#8217;s case-insensitive.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rdparm" title="parmed.amber.AmoebaParm.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rdparm" title="parmed.amber.AmoebaParm.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
 <td>Parses the Amber format file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rdparm_old" title="parmed.amber.AmoebaParm.rdparm_old"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></code></a>(prmtop_lines[,&nbsp;check])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rdparm_old" title="parmed.amber.AmoebaParm.rdparm_old"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_old</span></code></a>(prmtop_lines[,&nbsp;check])</td>
 <td>This reads an old-style topology file and stores the results in the</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rdparm_slow" title="parmed.amber.AmoebaParm.rdparm_slow"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></code></a>(fname)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rdparm_slow" title="parmed.amber.AmoebaParm.rdparm_slow"><code class="xref py py-obj docutils literal"><span class="pre">rdparm_slow</span></code></a>(fname)</td>
 <td>Parses the Amber format file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.recalculate_LJ" title="parmed.amber.AmoebaParm.recalculate_LJ"><code class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.recalculate_LJ" title="parmed.amber.AmoebaParm.recalculate_LJ"><code class="xref py py-obj docutils literal"><span class="pre">recalculate_LJ</span></code></a>()</td>
 <td>Fills the <code class="docutils literal"><span class="pre">LENNARD_JONES_ACOEF</span></code> and <code class="docutils literal"><span class="pre">LENNARD_JONES_BCOEF</span></code> arrays in the <code class="xref py py-attr docutils literal"><span class="pre">parm_data</span></code> raw data dictionary by applying the canonical Lorentz-Berthelot combining rules to the values in <code class="xref py py-attr docutils literal"><span class="pre">LJ_radius</span></code> and <code class="xref py py-attr docutils literal"><span class="pre">LJ_depth</span></code>.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rediscover_molecules" title="parmed.amber.AmoebaParm.rediscover_molecules"><code class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></code></a>([solute_ions,&nbsp;fix_broken])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.rediscover_molecules" title="parmed.amber.AmoebaParm.rediscover_molecules"><code class="xref py py-obj docutils literal"><span class="pre">rediscover_molecules</span></code></a>([solute_ions,&nbsp;fix_broken])</td>
 <td>This determines the molecularity and sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the prmtops.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.remake_parm" title="parmed.amber.AmoebaParm.remake_parm"><code class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.remake_parm" title="parmed.amber.AmoebaParm.remake_parm"><code class="xref py py-obj docutils literal"><span class="pre">remake_parm</span></code></a>()</td>
 <td>Recomputes the topology file parameters and fills parm_data</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.save" title="parmed.amber.AmoebaParm.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.save" title="parmed.amber.AmoebaParm.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
 <td>Saves the current Structure in the requested file format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.set_version" title="parmed.amber.AmoebaParm.set_version"><code class="xref py py-obj docutils literal"><span class="pre">set_version</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.set_version" title="parmed.amber.AmoebaParm.set_version"><code class="xref py py-obj docutils literal"><span class="pre">set_version</span></code></a>()</td>
 <td>Sets the version string</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.split" title="parmed.amber.AmoebaParm.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.split" title="parmed.amber.AmoebaParm.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
 <td>Split the current Structure into separate Structure instances for each unique molecule.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.strip" title="parmed.amber.AmoebaParm.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.strip" title="parmed.amber.AmoebaParm.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.to_dataframe" title="parmed.amber.AmoebaParm.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.to_dataframe" title="parmed.amber.AmoebaParm.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
 <td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.unchange" title="parmed.amber.AmoebaParm.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.unchange" title="parmed.amber.AmoebaParm.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.update_dihedral_exclusions" title="parmed.amber.AmoebaParm.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.update_dihedral_exclusions" title="parmed.amber.AmoebaParm.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.view_as" title="parmed.amber.AmoebaParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.view_as" title="parmed.amber.AmoebaParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_cif" title="parmed.amber.AmoebaParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_cif" title="parmed.amber.AmoebaParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_parm" title="parmed.amber.AmoebaParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_parm" title="parmed.amber.AmoebaParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_pdb" title="parmed.amber.AmoebaParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_pdb" title="parmed.amber.AmoebaParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_psf" title="parmed.amber.AmoebaParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_psf" title="parmed.amber.AmoebaParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_rst7" title="parmed.amber.AmoebaParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_rst7" title="parmed.amber.AmoebaParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -6433,6 +6494,28 @@ be raised</p>
 <dd><p>All angles including hydrogen</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.amber.AmoebaParm.assign_bonds">
+<code class="descname">assign_bonds</code><span class="sig-paren">(</span><em>*reslibs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.assign_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns bonds to all atoms based on the provided residue template
+libraries. Atoms whose names are <em>not</em> in the templates, as well as
+those residues for whom no template is found, is assigned to bonds based
+on distances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>reslibs</strong> : dict{str: ResidueTemplate}</p>
+<blockquote class="last">
+<div><p>Any number of residue template libraries. By default, assign_bonds
+knows about the standard amino acid, RNA, and DNA residues.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.amber.AmoebaParm.bonds_inc_h">
 <code class="descname">bonds_inc_h</code><a class="headerlink" href="#parmed.amber.AmoebaParm.bonds_inc_h" title="Permalink to this definition">¶</a></dt>
@@ -6506,7 +6589,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.createSystem">
-<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.createSystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8.0</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0.0</em>, <em>unit=angstrom)</em>, <em>constraints=None</em>, <em>rigidWater=True</em>, <em>implicitSolvent=None</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>useSASA=False</em>, <em>removeCMMotion=True</em>, <em>hydrogenMass=None</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>flexibleConstraints=True</em>, <em>verbose=False</em>, <em>splitDihedrals=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an OpenMM System representing the topology described by the
 prmtop file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -6722,16 +6805,16 @@ This function retrieves a particular frame&#8217;s unit cell (box) dimensions</p
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
 <blockquote>
-<div><p>The frame number whose coordinates should be retrieved. Default is
+<div><p>The frame number whose unit cell should be retrieved. Default is
 &#8216;all&#8217;</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] 6) or None</p>
 <blockquote>
-<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
-(#, natom, 3). Otherwise the requested frame is returned with shape
-(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+<div><p>If frame is &#8216;all&#8217;, all unit cells are returned with shape
+(#, 6). Otherwise the requested frame is returned with shape
+(6,). If no unit cell exist and &#8216;all&#8217; is requested, None is
 returned</p>
 </div></blockquote>
 </td>
@@ -6963,7 +7046,7 @@ section set correctly. It is commented for easy editing</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_add_constraints">
-<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>system</em>, <em>constraints</em>, <em>rigidWater</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -6990,7 +7073,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_angle_force">
-<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -7023,7 +7106,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_bond_force">
-<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>rigidWater=True</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -7060,7 +7143,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_cmap_force">
-<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7078,7 +7161,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_dihedral_force">
-<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>split=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7105,7 +7188,7 @@ returned.</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_gbsa_force">
-<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>implicitSolvent</em>, <em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=30.0</em>, <em>unit=angstrom)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>useSASA=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -7160,7 +7243,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_improper_force">
-<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7178,7 +7261,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_nonbonded_force">
-<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0</em>, <em>unit=angstrom)</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>reactionFieldDielectric=78.5</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce (and CustomNonbondedForce if
 necessary) to define the nonbonded interatomic potential for this
 system. A CustomNonbondedForce is used for the r^-4 part of the 12-6-4
@@ -7235,7 +7318,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_out_of_plane_bend_force">
-<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7253,7 +7336,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_pi_torsion_force">
-<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7271,7 +7354,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_rb_torsion_force">
-<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7289,7 +7372,7 @@ NonbondedForce is necessary, that is the return value</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_set_virtual_sites">
-<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -7310,7 +7393,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_stretch_bend_force">
-<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7328,7 +7411,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_torsion_torsion_force">
-<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7347,7 +7430,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_trigonal_angle_force">
-<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -7365,7 +7448,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.amber.AmoebaParm.omm_urey_bradley_force">
-<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

@@ -55,7 +55,7 @@
 <h1>parmed.unit.Unit<a class="headerlink" href="#parmed-unit-unit" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.unit.Unit">
-<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">Unit</code><span class="sig-paren">(</span><em>base_or_scaled_units</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">Unit</code><span class="sig-paren">(</span><em>base_or_scaled_units</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Physical unit such as meter or ampere.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -110,16 +110,24 @@
 </table>
 <dl class="method">
 <dt id="parmed.unit.Unit.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>base_or_scaled_units</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>base_or_scaled_units</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new Unit.</p>
-<dl class="docutils">
-<dt>Parameters:</dt>
-<dd><ul class="first last simple">
-<li>self (Unit) The newly created Unit.</li>
-<li>base_or_scaled_units (dict) Keys are BaseUnits or ScaledUnits.  Values are exponents (numbers).</li>
-</ul>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>self</strong> : Unit</p>
+<blockquote>
+<div><p>The newly created Unit.</p>
+</div></blockquote>
+<p><strong>base_or_scaled_units</strong> : dict</p>
+<blockquote class="last">
+<div><p>Keys are BaseUnits or ScaledUnits.  Values are exponents (numbers).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -178,7 +186,7 @@
 </table>
 <dl class="method">
 <dt id="parmed.unit.Unit.conversion_factor_to">
-<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns conversion factor for computing all of the common dimensions
 between self and other from self base units to other base units.</p>
 <p>The two units need not share all of the same dimensions.  In case they
@@ -189,14 +197,14 @@ that correspond to different BaseUnits in other.</p>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.create_unit">
-<code class="descname">create_unit</code><span class="sig-paren">(</span><em>scale</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.create_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.create_unit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_unit</code><span class="sig-paren">(</span><em>scale</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.create_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.create_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience method for creating a new simple unit from another simple unit.
 Both units must consist of a single BaseUnit.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.get_conversion_factor_to_base_units">
-<code class="descname">get_conversion_factor_to_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.get_conversion_factor_to_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_conversion_factor_to_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.get_conversion_factor_to_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>There may be ScaleUnit components to this Unit.
 Returns conversion factor to the set of BaseUnits returned by iter_all_base_units().</p>
 <p>Units comprised of only BaseUnits return 1.0</p>
@@ -204,49 +212,50 @@ Returns conversion factor to the set of BaseUnits returned by iter_all_base_unit
 
 <dl class="method">
 <dt id="parmed.unit.Unit.get_name">
-<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.get_name" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.get_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a unit name (string) for this Unit, composed of its various
 BaseUnit symbols.  e.g. &#8216;kilogram meter**2 secon**-1&#8217;.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.get_symbol">
-<code class="descname">get_symbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.get_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.get_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_symbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.get_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.get_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a unit symbol (string) for this Unit, composed of its various
 BaseUnit symbols.  e.g. &#8216;kg m**2 s**-1&#8217;</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.in_unit_system">
-<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</p>
 <p>Strips off any ScaledUnits in the Unit, leaving only BaseUnits.</p>
-<dl class="docutils">
-<dt>Parameters</dt>
-<dd><ul class="first last simple">
-<li>system: a dictionary of (BaseDimension, BaseUnit) pairs</li>
-</ul>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>system</strong> : a dictionary of (BaseDimension, BaseUnit) pairs</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.is_compatible">
-<code class="descname">is_compatible</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.is_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.is_compatible" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_compatible</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.is_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.is_compatible" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if two Units share the same dimension.
 Returns False otherwise.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.is_dimensionless">
-<code class="descname">is_dimensionless</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.is_dimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.is_dimensionless" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_dimensionless</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.is_dimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.is_dimensionless" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if this Unit has no dimensions.
 Returns False otherwise.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.iter_all_base_units">
-<code class="descname">iter_all_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.iter_all_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.iter_all_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iter_all_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.iter_all_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.iter_all_base_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits
 found within ScaledUnits.</p>
 <p>There might be multiple BaseUnits with the same dimension.</p>
@@ -254,19 +263,19 @@ found within ScaledUnits.</p>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.iter_base_dimensions">
-<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields (BaseDimension, exponent) tuples comprising this unit.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.iter_top_base_units">
-<code class="descname">iter_top_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.iter_top_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.iter_top_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iter_top_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.iter_top_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.iter_top_base_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Unit.sqrt">
-<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/unit.html#Unit.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.sqrt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/unit.html#Unit.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Unit.sqrt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns square root of a unit.</p>
 <p>Raises ArithmeticError if component exponents are not even.
 This behavior can be changed if you present a reasonable real life case to me.</p>

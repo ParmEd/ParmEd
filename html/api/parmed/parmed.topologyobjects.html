@@ -678,6 +678,12 @@ it belongs to.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.claim" title="parmed.topologyobjects.AtomList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.clear" title="parmed.topologyobjects.AtomList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.copy" title="parmed.topologyobjects.AtomList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.count" title="parmed.topologyobjects.AtomList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -708,8 +714,8 @@ it belongs to.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.reverse" title="parmed.topologyobjects.AtomList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.sort" title="parmed.topologyobjects.AtomList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.sort" title="parmed.topologyobjects.AtomList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList.unmark" title="parmed.topologyobjects.AtomList.unmark"><code class="xref py py-obj docutils literal"><span class="pre">unmark</span></code></a>()</td>
 <td>Unmark all atoms in this list</td>
@@ -749,6 +755,16 @@ alterations are defined for the type with that given that index
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.AtomList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.AtomList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.AtomList.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.AtomList.count">
@@ -835,10 +851,8 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.AtomList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.AtomList.unmark">
@@ -1516,11 +1530,17 @@ keyword-only argument. Default is <code class="docutils literal"><span class="pr
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.append" title="parmed.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(other[,&nbsp;override])</td>
 <td>Adds a DihedralType to the DihedralTypeList</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.clear" title="parmed.topologyobjects.DihedralTypeList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.copy" title="parmed.topologyobjects.DihedralTypeList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.count" title="parmed.topologyobjects.DihedralTypeList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(...)</td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.index" title="parmed.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
@@ -1531,14 +1551,14 @@ keyword-only argument. Default is <code class="docutils literal"><span class="pr
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.pop" title="parmed.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.reverse" title="parmed.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1574,15 +1594,24 @@ warning if it does so</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.topologyobjects.DihedralTypeList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.DihedralTypeList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.count">
 <code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
+<code class="descname">extend</code><span class="sig-paren">(</span><em>iterable</em><span class="sig-paren">)</span> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.topologyobjects.DihedralTypeList.idx">
@@ -1614,9 +1643,8 @@ warning if it does so</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1627,10 +1655,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.DihedralTypeList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -2145,6 +2171,12 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.claim" title="parmed.topologyobjects.ResidueList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.clear" title="parmed.topologyobjects.ResidueList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.copy" title="parmed.topologyobjects.ResidueList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.count" title="parmed.topologyobjects.ResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -2175,8 +2207,8 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.reverse" title="parmed.topologyobjects.ResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList.sort" title="parmed.topologyobjects.ResidueList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -2233,6 +2265,16 @@ list, a new residue is added and the atom is added to that residue</p>
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.ResidueList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.ResidueList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.ResidueList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.ResidueList.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.count">
@@ -2296,10 +2338,8 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.ResidueList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.ResidueList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.ResidueList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -2764,6 +2804,12 @@ the one shown below</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.claim" title="parmed.topologyobjects.TrackedList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
 <td>This method causes this list to &#8220;claim&#8221; all of the items it contains and subsequently indexes all of its items.</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.clear" title="parmed.topologyobjects.TrackedList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.copy" title="parmed.topologyobjects.TrackedList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.count" title="parmed.topologyobjects.TrackedList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -2791,8 +2837,8 @@ the one shown below</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.reverse" title="parmed.topologyobjects.TrackedList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.sort" title="parmed.topologyobjects.TrackedList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.TrackedList.sort" title="parmed.topologyobjects.TrackedList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -2807,6 +2853,16 @@ the one shown below</p>
 <dd><p>This method causes this list to &#8220;claim&#8221; all of the items it contains and
 subsequently indexes all of its items.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.TrackedList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.TrackedList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.TrackedList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.TrackedList.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.TrackedList.count">
@@ -2861,10 +2917,8 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.TrackedList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.TrackedList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.TrackedList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

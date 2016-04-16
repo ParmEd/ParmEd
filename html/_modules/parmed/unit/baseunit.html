@@ -88,7 +88,7 @@
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Christopher M. Bruns&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.6&quot;</span>
 
-<div class="viewcode-block" id="BaseUnit"><a class="viewcode-back" href="../../../unitobj/parmed.unit.BaseUnit.html#parmed.unit.baseunit.BaseUnit">[docs]</a><span class="k">class</span> <span class="nc">BaseUnit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseUnit"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.baseunit.html#parmed.unit.baseunit.BaseUnit">[docs]</a><span class="k">class</span> <span class="nc">BaseUnit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Physical unit expressed in exactly one BaseDimension.</span>
 
@@ -97,7 +97,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">100</span>
 
-<div class="viewcode-block" id="BaseUnit.__init__"><a class="viewcode-back" href="../../../unitobj/parmed.unit.BaseUnit.html#parmed.unit.baseunit.BaseUnit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_dim</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_dim</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates a new BaseUnit.</span>
 
 <span class="sd">        Parameters</span>
@@ -113,7 +113,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_conversion_factor_to</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conversion_factor_to</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conversion_factor_to_by_name</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_conversion_factor_to_by_name</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conversion_factor_to_by_name</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
 
     <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -125,7 +125,7 @@
         <span class="c1"># Second on conversion factor</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0</span>
 
-<div class="viewcode-block" id="BaseUnit.iter_base_dimensions"><a class="viewcode-back" href="../../../unitobj/parmed.unit.BaseUnit.html#parmed.unit.baseunit.BaseUnit.iter_base_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">iter_base_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseUnit.iter_base_dimensions"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.baseunit.html#parmed.unit.baseunit.BaseUnit.iter_base_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">iter_base_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -134,7 +134,7 @@
 <div class="viewcode-block" id="BaseUnit.iter_base_units"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.baseunit.html#parmed.unit.baseunit.BaseUnit.iter_base_units">[docs]</a>    <span class="k">def</span> <span class="nf">iter_base_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">yield</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseUnit.get_dimension_tuple"><a class="viewcode-back" href="../../../unitobj/parmed.unit.BaseUnit.html#parmed.unit.baseunit.BaseUnit.get_dimension_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">get_dimension_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseUnit.get_dimension_tuple"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.baseunit.html#parmed.unit.baseunit.BaseUnit.get_dimension_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">get_dimension_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -150,7 +150,7 @@
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;BaseUnit(base_dim=</span><span class="si">%s</span><span class="s1">, name=&quot;</span><span class="si">%s</span><span class="s1">&quot;, symbol=&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseUnit.define_conversion_factor_to"><a class="viewcode-back" href="../../../unitobj/parmed.unit.BaseUnit.html#parmed.unit.baseunit.BaseUnit.define_conversion_factor_to">[docs]</a>    <span class="k">def</span> <span class="nf">define_conversion_factor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseUnit.define_conversion_factor_to"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.baseunit.html#parmed.unit.baseunit.BaseUnit.define_conversion_factor_to">[docs]</a>    <span class="k">def</span> <span class="nf">define_conversion_factor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines a conversion factor between two BaseUnits.</span>
 
@@ -196,7 +196,7 @@
             <span class="n">other</span><span class="o">.</span><span class="n">_conversion_factor_to_by_name</span><span class="p">[</span><span class="n">unit</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">invFac</span> <span class="o">*</span> <span class="n">cfac</span>
             <span class="n">unit</span><span class="o">.</span><span class="n">_conversion_factor_to_by_name</span><span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">invFac</span> <span class="o">*</span> <span class="n">cfac</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseUnit.conversion_factor_to"><a class="viewcode-back" href="../../../unitobj/parmed.unit.BaseUnit.html#parmed.unit.baseunit.BaseUnit.conversion_factor_to">[docs]</a>    <span class="k">def</span> <span class="nf">conversion_factor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseUnit.conversion_factor_to"><a class="viewcode-back" href="../../../api/parmed/parmed.unit.baseunit.html#parmed.unit.baseunit.BaseUnit.conversion_factor_to">[docs]</a>    <span class="k">def</span> <span class="nf">conversion_factor_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a conversion factor from this BaseUnit to another BaseUnit.</span>
 
 <span class="sd">        It does not matter which existing BaseUnit you define the conversion factor to.</span>

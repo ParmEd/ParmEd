@@ -108,11 +108,6 @@ given the extensions .coor and .vel (coordinates and velocities, respectively).<
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="parmed.namd.NamdBinCoor.SCALE_FACTOR">
-<code class="descname">SCALE_FACTOR</code><em class="property"> = 1.0</em><a class="headerlink" href="#parmed.namd.NamdBinCoor.SCALE_FACTOR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="parmed.namd.NamdBinCoor.coordinates">
 <code class="descname">coordinates</code><a class="headerlink" href="#parmed.namd.NamdBinCoor.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -133,7 +128,7 @@ be the same as the previous natoms&#8217; values (i.e. make a copy of them).</p>
 <dl class="method">
 <dt id="parmed.namd.NamdBinCoor.insertatoms">
 <code class="descname">insertatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em>, <em>values=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.NamdBinCoor.insertatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert space for natom entries beginning at start_index. If 
+<dd><p>Insert space for natom entries beginning at start_index. If
 specified, give them the provided values, otherwise set them to zero.</p>
 </dd></dl>
 
@@ -162,8 +157,6 @@ specified, give them the provided values, otherwise set them to zero.</p>
 <em class="property">class </em><code class="descclassname">parmed.namd.</code><code class="descname">NamdBinVel</code><span class="sig-paren">(</span><em>values=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.NamdBinVel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="parmed.namd.namdbinfiles.html#parmed.namd.namdbinfiles.NamdBinFile" title="parmed.namd.namdbinfiles.NamdBinFile"><code class="xref py py-class docutils literal"><span class="pre">parmed.namd.namdbinfiles.NamdBinFile</span></code></a></p>
 <p>Class to read or write NAMD &#8220;binvelocities&#8221; files.</p>
-<p>NAMD internal units are assumed. These can be converted to 
-Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -203,11 +196,6 @@ Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.</p>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="parmed.namd.NamdBinVel.SCALE_FACTOR">
-<code class="descname">SCALE_FACTOR</code><em class="property"> = 20.45482706</em><a class="headerlink" href="#parmed.namd.NamdBinVel.SCALE_FACTOR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="method">
 <dt id="parmed.namd.NamdBinVel.copyatoms">
 <code class="descname">copyatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.NamdBinVel.copyatoms" title="Permalink to this definition">¶</a></dt>
@@ -224,7 +212,7 @@ be the same as the previous natoms&#8217; values (i.e. make a copy of them).</p>
 <dl class="method">
 <dt id="parmed.namd.NamdBinVel.insertatoms">
 <code class="descname">insertatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em>, <em>values=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.NamdBinVel.insertatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert space for natom entries beginning at start_index. If 
+<dd><p>Insert space for natom entries beginning at start_index. If
 specified, give them the provided values, otherwise set them to zero.</p>
 </dd></dl>
 

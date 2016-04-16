@@ -81,16 +81,16 @@
 <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">DEG_TO_RAD</span><span class="p">,</span> <span class="n">SMALL</span>
 <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParameterError</span>
 <span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="kn">import</span> <span class="p">(</span><span class="n">box_lengths_and_angles_to_vectors</span><span class="p">,</span>
-        <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">SOLVENT_NAMES</span>
+        <span class="n">box_vectors_to_lengths_and_angles</span><span class="p">,</span> <span class="n">STANDARD_BOND_LENGTHS_SQUARED</span><span class="p">,</span>
+        <span class="n">distance2</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AtomList</span><span class="p">,</span> <span class="n">ResidueList</span><span class="p">,</span> <span class="n">TrackedList</span><span class="p">,</span>
         <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span>
         <span class="n">TrigonalAngle</span><span class="p">,</span> <span class="n">OutOfPlaneBend</span><span class="p">,</span> <span class="n">PiTorsion</span><span class="p">,</span> <span class="n">StretchBend</span><span class="p">,</span> <span class="n">TorsionTorsion</span><span class="p">,</span>
         <span class="n">NonbondedException</span><span class="p">,</span> <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">ChiralFrame</span><span class="p">,</span>
         <span class="n">TwoParticleExtraPointFrame</span><span class="p">,</span> <span class="n">MultipoleFrame</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span>
         <span class="n">ThreeParticleExtraPointFrame</span><span class="p">,</span> <span class="n">OutOfPlaneExtraPointFrame</span><span class="p">,</span> <span class="n">UnassignedAtomType</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">parmed.utils</span> <span class="kn">import</span> <span class="n">tag_molecules</span><span class="p">,</span> <span class="n">PYPY</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span><span class="p">,</span> <span class="n">residue</span>
+<span class="kn">from</span> <span class="nn">parmed.utils</span> <span class="kn">import</span> <span class="n">tag_molecules</span><span class="p">,</span> <span class="n">PYPY</span><span class="p">,</span> <span class="n">find_atom_pairs</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">iteritems</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
@@ -470,7 +470,8 @@
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
             <span class="n">a</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
-            <span class="n">c</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">)</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">,</span>
+                       <span class="n">res</span><span class="o">.</span><span class="n">segid</span><span class="p">)</span>
         <span class="c1"># Now copy all of the types</span>
         <span class="k">for</span> <span class="n">bt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">:</span>
             <span class="n">c</span><span class="o">.</span><span class="n">bond_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">bt</span><span class="p">))</span>
@@ -875,6 +876,170 @@
 
     <span class="c1">#===================================================</span>
 
+<div class="viewcode-block" id="Structure.assign_bonds"><a class="viewcode-back" href="../../structobj/parmed.structure.Structure.html#parmed.amber.Structure.assign_bonds">[docs]</a>    <span class="k">def</span> <span class="nf">assign_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">reslibs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns bonds to all atoms based on the provided residue template</span>
+<span class="sd">        libraries. Atoms whose names are *not* in the templates, as well as</span>
+<span class="sd">        those residues for whom no template is found, is assigned to bonds based</span>
+<span class="sd">        on distances.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reslibs : dict{str: ResidueTemplate}</span>
+<span class="sd">            Any number of residue template libraries. By default, assign_bonds</span>
+<span class="sd">            knows about the standard amino acid, RNA, and DNA residues.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Import here to avoid circular references</span>
+        <span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">StandardBiomolecularResidues</span>
+        <span class="c1"># Build a composite dict of all residue templates</span>
+        <span class="n">all_residues</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">StandardBiomolecularResidues</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="n">reslibs</span><span class="p">:</span>
+            <span class="n">all_residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
+        <span class="c1"># Walk through every residue and assign bonds from the templates</span>
+        <span class="n">unassigned_residues</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">unassigned_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">cysteine_sg</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+            <span class="n">templ</span> <span class="o">=</span> <span class="n">_res_in_templlib</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">all_residues</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">templ</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c1"># Don&#39;t have a template for this residue. Keep a note and go on</span>
+                <span class="n">unassigned_atoms</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+                <span class="n">unassigned_residues</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">resatoms</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">templ</span><span class="o">.</span><span class="n">map</span><span class="p">:</span>
+                    <span class="n">unassigned_atoms</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="c1"># We matched our template atom. Transfer the element</span>
+                <span class="c1"># information, as it is more reliable</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">=</span> <span class="n">templ</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span>
+                <span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">templ</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">resatoms</span> <span class="ow">and</span>
+                            <span class="n">resatoms</span><span class="p">[</span><span class="n">bp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">resatoms</span><span class="p">[</span><span class="n">bp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">resatoms</span><span class="p">[</span><span class="n">bp</span><span class="o">.</span><span class="n">name</span><span class="p">]))</span>
+        <span class="c1"># Now go through each residue and assign heads and tails. This walks</span>
+        <span class="c1"># through the residues and bonds residue i&#39;s tail with residue j&#39;s head.</span>
+        <span class="c1"># So there is nothing to do for the last residue. Omit it from the loop</span>
+        <span class="c1"># so self.residues[i+1] never raises an IndexError</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">templ</span> <span class="o">=</span> <span class="n">_res_in_templlib</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">all_residues</span><span class="p">)</span>
+            <span class="c1"># TER cards and changing chains prevents bonding to the next residue</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">ter</span> <span class="ow">or</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">chain</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="n">ntempl</span> <span class="o">=</span> <span class="n">_res_in_templlib</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">all_residues</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">templ</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">ntempl</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c1"># Any cross-link here picked up later</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">templ</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ntempl</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">continue</span> <span class="c1"># Next residue doesn&#39;t bond to the previous one</span>
+                <span class="c1"># See if any atom in templ is close enough to bond to the head</span>
+                <span class="c1"># atom of the next residue&#39;s template</span>
+                <span class="k">for</span> <span class="n">head</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">head</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">ntempl</span><span class="o">.</span><span class="n">head</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span> <span class="c1"># head atom not found!</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                    <span class="n">maxdist</span> <span class="o">=</span> <span class="n">STANDARD_BOND_LENGTHS_SQUARED</span><span class="p">[(</span><span class="n">a</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
+                                                             <span class="n">head</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)]</span>
+                    <span class="k">if</span> <span class="n">distance2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">head</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">maxdist</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">head</span><span class="p">))</span>
+                        <span class="k">break</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">templ</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span> <span class="c1"># This residue does not bond with the next one</span>
+            <span class="k">if</span> <span class="n">ntempl</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c1"># See if any atom in the next residue is bonding distance away</span>
+                <span class="c1"># from my tail</span>
+                <span class="k">for</span> <span class="n">tail</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">tail</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">templ</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span> <span class="c1"># tail not found</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                    <span class="n">maxdist</span> <span class="o">=</span> <span class="n">STANDARD_BOND_LENGTHS_SQUARED</span><span class="p">[(</span><span class="n">a</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
+                                                             <span class="n">tail</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)]</span>
+                    <span class="k">if</span> <span class="n">distance2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">maxdist</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tail</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">tail</span><span class="p">))</span>
+                        <span class="k">break</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">ntempl</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span> <span class="c1"># Next residue does not bond with this one</span>
+            <span class="c1"># We have templates for both atoms, and both have a head and a tail</span>
+            <span class="k">for</span> <span class="n">tail</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tail</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">templ</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span> <span class="c1"># head could not be found</span>
+            <span class="k">for</span> <span class="n">head</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">head</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">ntempl</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span> <span class="c1"># tail could not be found</span>
+            <span class="k">if</span> <span class="n">head</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tail</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">))</span>
+        <span class="c1"># Now time to find bonds based on distance. First thing to do is to find</span>
+        <span class="c1"># all CYS residues and pull out those that have an SG atom with only 1</span>
+        <span class="c1"># bond partner, since those are *very* commonly bonded by</span>
+        <span class="c1"># post-translational modifications.</span>
+        <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">residue</span><span class="o">.</span><span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span> <span class="o">!=</span> <span class="s1">&#39;CYS&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># Cysteine! Find the SG and add it to unassigned atoms if it only</span>
+            <span class="c1"># has 1 atom bonded to it</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;SG&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">unassigned_atoms</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                    <span class="n">cysteine_sg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="c1"># Can&#39;t do distance-based bond determination without coordinates</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># OK, now go through all atoms that have not been assigned. If an atom</span>
+        <span class="c1"># has not been assigned, but its residue HAS been assigned, then that</span>
+        <span class="c1"># means the name is wrong. A likely culprit is bad nomenclature for</span>
+        <span class="c1"># atoms. So in this case (and this case only), look for bond partners in</span>
+        <span class="c1"># an &#39;assigned&#39; residue (but only the same residue we are part of). One</span>
+        <span class="c1"># thing this misses is when the head or tail atom is misnamed.</span>
+        <span class="n">mindist</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">STANDARD_BOND_LENGTHS_SQUARED</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="n">find_atom_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mindist</span><span class="p">,</span> <span class="n">unassigned_atoms</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">unassigned_atoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">partner</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="n">maxdist</span> <span class="o">=</span> <span class="n">STANDARD_BOND_LENGTHS_SQUARED</span><span class="p">[(</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
+                                                         <span class="n">partner</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">distance2</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">partner</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">maxdist</span> <span class="ow">and</span>
+                        <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">partner</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">partner</span><span class="p">))</span>
+            <span class="c1"># Now look through all atoms in this template if it&#39;s a template</span>
+            <span class="c1"># that&#39;s already been assigned. If it&#39;s already in an unassigned</span>
+            <span class="c1"># residue, then all that residue&#39;s atoms were in unassigned_atoms,</span>
+            <span class="c1"># so there&#39;s no need to look through the residue again. Also, we</span>
+            <span class="c1"># added cysteine SG atoms to the unassigned atoms list to see if it</span>
+            <span class="c1"># is involved in post-translational bonds. But there *was* a</span>
+            <span class="c1"># template match for cysteine and SG was paired correctly. So don&#39;t</span>
+            <span class="c1"># try to assign it to bonds with other atoms in the cysteine here.</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">in</span> <span class="n">unassigned_residues</span> <span class="ow">or</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">cysteine_sg</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">partner</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="n">atom</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">maxdist</span> <span class="o">=</span> <span class="n">STANDARD_BOND_LENGTHS_SQUARED</span><span class="p">[(</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
+                                                         <span class="n">partner</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">distance2</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">partner</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">maxdist</span> <span class="ow">and</span>
+                        <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">partner</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">partner</span><span class="p">))</span></div>
+        <span class="c1"># All reasonable bonds have now been added</span>
+
+    <span class="c1">#===================================================</span>
+
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allows extracting a single atom from the structure or a slice of atoms</span>
@@ -952,7 +1117,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">num</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">number</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span>
-                            <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">)</span>
+                            <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">segid</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">copy_valence_terms</span><span class="p">(</span><span class="n">oval</span><span class="p">,</span> <span class="n">otyp</span><span class="p">,</span> <span class="n">sval</span><span class="p">,</span> <span class="n">styp</span><span class="p">,</span> <span class="n">attrlist</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot; Copies the valence terms from one list to another;</span>
 <span class="sd">            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;</span>
@@ -1655,15 +1820,15 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        frame : int or &#39;all&#39;, optional</span>
-<span class="sd">            The frame number whose coordinates should be retrieved. Default is</span>
+<span class="sd">            The frame number whose unit cell should be retrieved. Default is</span>
 <span class="sd">            &#39;all&#39;</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        box : np.ndarray, shape([#,] natom, 3) or None</span>
-<span class="sd">            If frame is &#39;all&#39;, all coordinates are returned with shape</span>
-<span class="sd">            (#, natom, 3). Otherwise the requested frame is returned with shape</span>
-<span class="sd">            (natom, 3). If no coordinates exist and &#39;all&#39; is requested, None is</span>
+<span class="sd">        box : np.ndarray, shape([#,] 6) or None</span>
+<span class="sd">            If frame is &#39;all&#39;, all unit cells are returned with shape</span>
+<span class="sd">            (#, 6). Otherwise the requested frame is returned with shape</span>
+<span class="sd">            (6,). If no unit cell exist and &#39;all&#39; is requested, None is</span>
 <span class="sd">            returned</span>
 
 <span class="sd">        Raises</span>
@@ -1968,12 +2133,12 @@
         <span class="n">length_conv</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nanometer</span><span class="p">)</span>
         <span class="c1"># Rigid water only</span>
         <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">is_water</span> <span class="o">=</span> <span class="n">_settler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
                 <span class="c1"># Skip all extra points... don&#39;t constrain those</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">):</span> <span class="k">continue</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">):</span> <span class="k">continue</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">SOLVENT_NAMES</span> <span class="ow">or</span>
-                        <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">SOLVENT_NAMES</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_water</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">]:</span>
                     <span class="n">system</span><span class="o">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span>
                                          <span class="n">bond</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">req</span><span class="o">*</span><span class="n">length_conv</span><span class="p">)</span>
             <span class="k">return</span>
@@ -2087,9 +2252,18 @@
             <span class="n">force</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">()</span>
         <span class="n">force</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BOND_FORCE_GROUP</span><span class="p">)</span>
         <span class="c1"># Add the bonds</span>
+        <span class="k">if</span> <span class="n">rigidWater</span><span class="p">:</span>
+            <span class="n">is_water</span> <span class="o">=</span> <span class="n">_settler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">is_water</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
                     <span class="ow">not</span> <span class="n">flexibleConstraints</span> <span class="ow">and</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">HBonds</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">flexibleConstraints</span> <span class="ow">and</span> <span class="n">is_water</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="c1"># is_water is False even for waters if rigidWater is False, so</span>
+                <span class="c1"># we can rely on is_water to be correct for our needs</span>
+                <span class="c1"># regardless</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Cannot find necessary parameters&#39;</span><span class="p">)</span>
@@ -3270,7 +3444,7 @@
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="n">roffset</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span>
-                          <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">)</span>
+                          <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">segid</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">copy_valence_terms</span><span class="p">(</span><span class="n">oval</span><span class="p">,</span> <span class="n">otyp</span><span class="p">,</span> <span class="n">sval</span><span class="p">,</span> <span class="n">styp</span><span class="p">,</span> <span class="n">attrlist</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot; Copies the valence terms from one list to another;</span>
 <span class="sd">            oval=Other VALence; otyp=Other TYPe; sval=Self VALence;</span>
@@ -3395,7 +3569,7 @@
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="n">roffset</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span>
-                              <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">)</span>
+                              <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">segid</span><span class="p">)</span>
             <span class="n">copy_valence_terms</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">bonds</span><span class="p">,</span> <span class="n">aoffset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">bond_types</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;atom1&#39;</span><span class="p">,</span> <span class="s1">&#39;atom2&#39;</span><span class="p">])</span>
             <span class="n">copy_valence_terms</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span> <span class="n">aoffset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">,</span>
@@ -3942,6 +4116,47 @@
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span></div>
 
 <span class="c1">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="k">def</span> <span class="nf">_settler</span><span class="p">(</span><span class="n">parm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Identifies residues that can have SETTLE applied to it &quot;&quot;&quot;</span>
+    <span class="n">is_water</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+        <span class="n">na</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">r</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">na</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">is_water</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="c1"># Make sure we are not bonded to any other residues</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a2</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="n">is_water</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># this atom is OK</span>
+                <span class="k">continue</span>
+            <span class="c1"># We only hit here if we hit the break above. So break here</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Don&#39;t check elements, since they may not *always* be accurate.</span>
+            <span class="c1"># It&#39;s more likely that a 3-atom residue not bonded to any other</span>
+            <span class="c1"># residue is water.</span>
+            <span class="n">is_water</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">is_water</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">),</span> <span class="s1">&#39;Incorrect length&#39;</span>
+    <span class="k">return</span> <span class="n">is_water</span>
+
+<span class="k">def</span> <span class="nf">_res_in_templlib</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">lib</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the residue template inside lib that matches res &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">lib</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">residue</span><span class="o">.</span><span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="p">[</span><span class="n">residue</span><span class="o">.</span><span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="p">[</span><span class="n">residue</span><span class="o">.</span><span class="n">DNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">residue</span><span class="o">.</span><span class="n">RNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span> <span class="o">!=</span> <span class="s1">&#39;T&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="p">[</span><span class="n">residue</span><span class="o">.</span><span class="n">RNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">]</span>
+    <span class="c1"># Not present</span>
+    <span class="k">return</span> <span class="bp">None</span>
 </pre></div>
 
           </div>

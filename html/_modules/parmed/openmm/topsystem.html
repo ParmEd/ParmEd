@@ -152,7 +152,7 @@
 
     <span class="k">if</span> <span class="n">xyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">xyz</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+            <span class="n">xyz</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">coordinates</span>
             <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">xyz</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>

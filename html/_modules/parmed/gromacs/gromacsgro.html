@@ -171,13 +171,20 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="GromacsGroFile.parse"><a class="viewcode-back" href="../../../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="GromacsGroFile.parse"><a class="viewcode-back" href="../../../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parses a Gromacs GRO file</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename : str or file-like</span>
 <span class="sd">            Name of the file or the GRO file object</span>
+<span class="sd">        skip_bonds : bool, optional</span>
+<span class="sd">            If True, skip trying to assign bonds. This can save substantial time</span>
+<span class="sd">            when parsing large files with non-standard residue names. However,</span>
+<span class="sd">            no bonds are assigned. This is OK if, for instance, the GRO file is</span>
+<span class="sd">            being parsed simply for its coordinates. This will also reduce the</span>
+<span class="sd">            accuracy of assigned atomic numbers for typical ions. Default is</span>
+<span class="sd">            False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -238,6 +245,10 @@
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
                 <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Assign bonds (and improved element guesses)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_bonds</span><span class="p">:</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">assign_bonds</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">struct</span></div>
 

@@ -685,8 +685,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cell_lengths_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_lengths&#39;</span><span class="p">][:],</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_angles&#39;</span><span class="p">][:]))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_lengths&#39;</span><span class="p">][:],</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_angles&#39;</span><span class="p">][:]))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
 
     <span class="n">box</span> <span class="o">=</span> <span class="n">cell_lengths_angles</span>
 

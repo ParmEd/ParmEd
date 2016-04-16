@@ -51,7 +51,7 @@
 <h1>parmed.openmm.ProgressReporter<a class="headerlink" href="#parmed-openmm-progressreporter" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.openmm.ProgressReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">ProgressReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">ProgressReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>totalSteps</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=False</em>, <em>volume=False</em>, <em>density=False</em>, <em>systemMass=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class that prints out a progress report of how much MD (or minimization)
 has been done, how fast the simulation is running, and how much time is left
 (similar to the mdinfo file in Amber)</p>
@@ -129,7 +129,7 @@ where masses are set to 0 to constrain their positions)</p>
 </table>
 <dl class="method">
 <dt id="parmed.openmm.ProgressReporter.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>totalSteps</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=False</em>, <em>volume=False</em>, <em>density=False</em>, <em>systemMass=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -139,7 +139,7 @@ where masses are set to 0 to constrain their positions)</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.__init__" title="parmed.openmm.ProgressReporter.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.__init__" title="parmed.openmm.ProgressReporter.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(f,&nbsp;reportInterval,&nbsp;totalSteps[,&nbsp;...])</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.describeNextReport" title="parmed.openmm.ProgressReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(simulation)</td>

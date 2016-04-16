@@ -68,12 +68,12 @@ TINKER-based parameter file.</p>
 </table>
 <dl class="attribute">
 <dt id="parmed.tinker.parameterfile.AmoebaParameterSet.anglere">
-<code class="descname">anglere</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.anglere" title="Permalink to this definition">¶</a></dt>
+<code class="descname">anglere</code><em class="property"> = re.compile('angle([ 345fF])')</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.anglere" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.parameterfile.AmoebaParameterSet.atomre">
-<code class="descname">atomre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.atomre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atomre</code><em class="property"> = re.compile('atom *(\\d+) *(\\d+) *([A-Za-z\\-\\+\\*0-9]+) *&quot;(.+)&quot; *(\\d+) *(\\d+\\.\\d+) *(\\d+)', re.IGNORECASE)</em><a class="headerlink" href="#parmed.tinker.parameterfile.AmoebaParameterSet.atomre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

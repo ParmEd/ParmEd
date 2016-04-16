@@ -51,7 +51,7 @@
 <h1>parmed.openmm.RestartReporter<a class="headerlink" href="#parmed-openmm-restartreporter" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.openmm.RestartReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">RestartReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.RestartReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">RestartReporter</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>write_multiple=False</em>, <em>netcdf=False</em>, <em>write_velocities=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.RestartReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use a reporter to handle writing restarts at specified intervals.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -104,7 +104,7 @@ in, for instance, a minimized structure.</p>
 </table>
 <dl class="method">
 <dt id="parmed.openmm.RestartReporter.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#RestartReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.RestartReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>write_multiple=False</em>, <em>netcdf=False</em>, <em>write_velocities=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#RestartReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.RestartReporter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -114,7 +114,7 @@ in, for instance, a minimized structure.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.RestartReporter.__init__" title="parmed.openmm.RestartReporter.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.RestartReporter.__init__" title="parmed.openmm.RestartReporter.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(file,&nbsp;reportInterval[,&nbsp;...])</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.RestartReporter.describeNextReport" title="parmed.openmm.RestartReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(simulation)</td>

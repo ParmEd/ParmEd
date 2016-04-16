@@ -55,7 +55,7 @@
 <h1>parmed.unit.Quantity<a class="headerlink" href="#parmed-unit-quantity" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.unit.Quantity">
-<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">Quantity</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">Quantity</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Physical quantity, such as 1.3 meters per second.</p>
 <p>Quantities contain both a value, such as 1.3; and a unit,
 such as &#8216;meters per second&#8217;.</p>
@@ -141,7 +141,7 @@ such as &#8216;meters per second&#8217;.</p>
 </table>
 <dl class="method">
 <dt id="parmed.unit.Quantity.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new Quantity from a value and a unit.</p>
 <dl class="docutils">
 <dt>Parameters</dt>
@@ -227,13 +227,13 @@ such as &#8216;meters per second&#8217;.</p>
 </table>
 <dl class="method">
 <dt id="parmed.unit.Quantity.in_unit_system">
-<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new Quantity equal to this one, expressed in a particular unit system.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.in_units_of">
-<code class="descname">in_units_of</code><span class="sig-paren">(</span><em>other_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.in_units_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.in_units_of" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_units_of</code><span class="sig-paren">(</span><em>other_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.in_units_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.in_units_of" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an equal Quantity expressed in different units.</p>
 <p>If the units are the same as those in self, a reference to self is returned.
 Raises a TypeError if the new unit is not compatible with the original unit.</p>
@@ -246,7 +246,7 @@ and  result = value * factor when post_multiply is True</dd>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.max">
-<code class="descname">max</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.max" title="Permalink to this definition">¶</a></dt>
+<code class="descname">max</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the maximum value of the sequence, with the result having the
 same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -257,7 +257,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.mean">
-<code class="descname">mean</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.mean" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mean</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the mean of a sequence, with the result having the same unit as
 the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -268,7 +268,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.min">
-<code class="descname">min</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.min" title="Permalink to this definition">¶</a></dt>
+<code class="descname">min</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the minimum value of the sequence, with the result having the
 same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -279,7 +279,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.reduce_unit">
-<code class="descname">reduce_unit</code><span class="sig-paren">(</span><em>guide_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.reduce_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.reduce_unit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reduce_unit</code><span class="sig-paren">(</span><em>guide_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.reduce_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.reduce_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine similar component units and scale, to form an
 equal Quantity in simpler units.</p>
 <p>Returns underlying value type if unit is dimensionless.</p>
@@ -287,14 +287,14 @@ equal Quantity in simpler units.</p>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.reshape">
-<code class="descname">reshape</code><span class="sig-paren">(</span><em>shape</em>, <em>order='C'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.reshape" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reshape</code><span class="sig-paren">(</span><em>shape</em>, <em>order='C'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.reshape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as numpy.ndarray.reshape, except the result is a Quantity with the
 same units as the current object rather than a plain numpy.ndarray</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.sqrt">
-<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.sqrt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.sqrt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns square root of a Quantity.</p>
 <p>Raises ArithmeticError if component exponents are not even.
 This behavior can be changed if you present a reasonable real life case to me.</p>
@@ -302,7 +302,7 @@ This behavior can be changed if you present a reasonable real life case to me.</
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.std">
-<code class="descname">std</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.std" title="Permalink to this definition">¶</a></dt>
+<code class="descname">std</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.std" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the square root of the variance of a sequence, with the result
 having the same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -313,7 +313,7 @@ is raised</p>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.sum">
-<code class="descname">sum</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.sum" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sum</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.sum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the sum of a sequence, with the result having the same unit as
 the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError (same behavior as if
@@ -325,13 +325,13 @@ is raised</p>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.value_in_unit">
-<code class="descname">value_in_unit</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.value_in_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.value_in_unit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">value_in_unit</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.value_in_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.value_in_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns underlying value, in the specified units.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.Quantity.value_in_unit_system">
-<code class="descname">value_in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/quantity.html#Quantity.value_in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.value_in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="descname">value_in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/quantity.html#Quantity.value_in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.Quantity.value_in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the underlying value type, after conversion to a particular unit system.</p>
 </dd></dl>
 

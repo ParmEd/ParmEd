@@ -1,0 +1,17 @@
+parmed.rdkit package
+====================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.rdkit.rdkit
+
+Module contents
+---------------
+
+.. automodule:: parmed.rdkit
+    :members:
+    :undoc-members:
+    :show-inheritance:

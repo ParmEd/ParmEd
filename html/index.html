@@ -148,6 +148,7 @@ developments!</p>
 the hopes that they may be helpful or informative.</p>
 <ul class="simple">
 <li><a class="reference external" href="http://parmed.github.io/ParmEd/ParmEd_Slides_08Apr2015.pdf">April 10, 2015 at MSKCC</a></li>
+<li><a class="reference external" href="http://parmed.github.io/ParmEd/ParmEd_Amber_Meeting2016.pdf">March 19, 2016 at the Amber developer meeting at UCSD</a></li>
 </ul>
 </div>
 <div class="section" id="getting-started">
@@ -178,7 +179,7 @@ find out numerous attributes about a structure defined by a PDB file, like the
 number of atoms, residues, and even various citation information. For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span>
-<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lysozyme</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lysozyme</span><span class="o">.</span><span class="n">authors</span>
 <span class="go">&#39;M.A.WALSH,T.SCHNEIDER,L.C.SIEKER,Z.DAUTER,V.LAMZIN,K.S.WILSON&#39;</span>
@@ -190,7 +191,7 @@ number of atoms, residues, and even various citation information. For example:</
 <span class="go">274</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get all backbone atoms</span>
 <span class="gp">... </span><span class="n">lysozyme</span><span class="p">[</span><span class="s1">&#39;@CA,C,N&#39;</span><span class="p">]</span>
-<span class="go">&lt;Structure 393 atoms; 135 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 393 atoms; 135 residues; 386 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>A simple example demonstrating the file conversion capabilities is to convert a
@@ -199,7 +200,7 @@ PDBx/mmCIF file into the more commonly supported PDB format:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pmd</span><span class="o">.</span><span class="n">download_CIF</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now read in the PDB file we just created</span>
 <span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
-<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 </div>

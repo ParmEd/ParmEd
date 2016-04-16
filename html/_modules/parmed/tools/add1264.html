@@ -211,16 +211,17 @@
 
 <span class="k">def</span> <span class="nf">_get_params</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
     <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">atomtype</span><span class="p">,</span> <span class="n">param</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">param</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">atomtype</span> <span class="ow">in</span> <span class="n">params</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param</span> <span class="o">-</span> <span class="n">params</span><span class="p">[</span><span class="n">atomtype</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">0.0001</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Atom type </span><span class="si">%s</span><span class="s1"> has multiple parameters in </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
-                          <span class="p">(</span><span class="n">atomtype</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="n">DuplicateParamWarning</span><span class="p">)</span>
-        <span class="n">params</span><span class="p">[</span><span class="n">atomtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
 
-    <span class="k">return</span> <span class="n">params</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">atomtype</span><span class="p">,</span> <span class="n">param</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">atomtype</span> <span class="ow">in</span> <span class="n">params</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param</span> <span class="o">-</span> <span class="n">params</span><span class="p">[</span><span class="n">atomtype</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">0.0001</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Atom type </span><span class="si">%s</span><span class="s1"> has multiple parameters in </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span>
+                              <span class="p">(</span><span class="n">atomtype</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="n">DuplicateParamWarning</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">atomtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+
+        <span class="k">return</span> <span class="n">params</span>
 </pre></div>
 
           </div>

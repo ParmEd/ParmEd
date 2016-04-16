@@ -63,7 +63,7 @@
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.id_format" title="parmed.formats.pqr.PQRFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as a PDB file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.parse" title="parmed.formats.pqr.PQRFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.parse" title="parmed.formats.pqr.PQRFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
 <td>Read a PQR file and return a populated <cite>Structure</cite> class</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pqr.PQRFile.write" title="parmed.formats.pqr.PQRFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
@@ -97,7 +97,7 @@
 
 <dl class="staticmethod">
 <dt id="parmed.formats.pqr.PQRFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pqr.html#PQRFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pqr.PQRFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PQR file and return a populated <cite>Structure</cite> class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -109,6 +109,13 @@
 over the lines of a PQR. Compressed file names can be specified and
 are determined by file-name extension (e.g., file.pqr.gz,
 file.pqr.bz2)</p>
+</div></blockquote>
+<p><strong>skip_bonds</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, skip trying to assign bonds. This can save substantial time
+when parsing large files with non-standard residue names. However,
+no bonds are assigned. This is OK if, for instance, the PQR file is
+being parsed simply for its coordinates. Default is False.</p>
 </div></blockquote>
 </td>
 </tr>

@@ -51,7 +51,7 @@
 <h1>parmed.unit.BaseUnit<a class="headerlink" href="#parmed-unit-baseunit" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.unit.BaseUnit">
-<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">BaseUnit</code><span class="sig-paren">(</span><em>base_dim</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">BaseUnit</code><span class="sig-paren">(</span><em>base_dim</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Physical unit expressed in exactly one BaseDimension.</p>
 <p>For example, meter_base_unit could be a BaseUnit for the length dimension.
 The BaseUnit class is used internally in the more general Unit class.</p>
@@ -81,7 +81,7 @@ The BaseUnit class is used internally in the more general Unit class.</p>
 </table>
 <dl class="method">
 <dt id="parmed.unit.BaseUnit.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>base_dim</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>base_dim</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new BaseUnit.</p>
 <dl class="docutils">
 <dt>Parameters</dt>
@@ -132,7 +132,7 @@ The BaseUnit class is used internally in the more general Unit class.</p>
 </table>
 <dl class="method">
 <dt id="parmed.unit.BaseUnit.conversion_factor_to">
-<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a conversion factor from this BaseUnit to another BaseUnit.</p>
 <p>It does not matter which existing BaseUnit you define the conversion factor to.
 Conversions for all other known BaseUnits will be computed at the same time.</p>
@@ -142,7 +142,7 @@ Raises LookupError if no conversion has been defined. (see define_conversion_fac
 
 <dl class="method">
 <dt id="parmed.unit.BaseUnit.define_conversion_factor_to">
-<code class="descname">define_conversion_factor_to</code><span class="sig-paren">(</span><em>other</em>, <em>factor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit.define_conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.define_conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<code class="descname">define_conversion_factor_to</code><span class="sig-paren">(</span><em>other</em>, <em>factor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.define_conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.define_conversion_factor_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines a conversion factor between two BaseUnits.</p>
 <p>self * factor = other</p>
 <dl class="docutils">
@@ -164,13 +164,13 @@ will be raised.</p>
 
 <dl class="method">
 <dt id="parmed.unit.BaseUnit.get_dimension_tuple">
-<code class="descname">get_dimension_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit.get_dimension_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_dimension_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.get_dimension_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="parmed.unit.BaseUnit.iter_base_dimensions">
-<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</p>
 </dd></dl>
 

@@ -77,10 +77,9 @@
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.netcdf.html">parmed.utils.netcdf module</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.utils.pairlist.html">parmed.utils.pairlist module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.pandautils.html">parmed.utils.pandautils module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parmed.utils.six.html">parmed.utils.six module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.utils.six.html">parmed.utils.six module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.timer.html">parmed.utils.timer module</a><ul class="simple">
 </ul>
 </li>
@@ -138,11 +137,11 @@ it is a part of. If no bonds are present, every atom is its own molecule.</p>
 <code class="descclassname">parmed.utils.</code><code class="descname">canonical_improper_order</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>center=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#canonical_improper_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.canonical_improper_order" title="Permalink to this definition">¶</a></dt>
 <dd><p>Controls how improper torsion keys are generated from Structures.
 Different programs have different conventions as far as where the
-&#8220;central&#8221; atom is placed. This function should be overridden for each
-subclass</p>
-<p>The default is to <em>always</em> put the central atom first, and assume it
-comes first already if no central atom is detected. A central atom is
-defined as one that is bonded to the other 3</p>
+&#8220;central&#8221; atom is placed.</p>
+<p>Note, different programs use different conventions for where the &#8220;central&#8221;
+atom comes in the overall torsion ordering. CHARMM puts the central atom
+first, whereas AMBER puts the central atom third. A central atom is defined
+as the one that is bonded to the other 3.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -178,6 +177,45 @@ location).</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="parmed.utils.find_atom_pairs">
+<code class="descclassname">parmed.utils.</code><code class="descname">find_atom_pairs</code><span class="sig-paren">(</span><em>struct</em>, <em>dist</em>, <em>subset=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pairlist.html#find_atom_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.find_atom_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds all pairs of atoms in a structure within a requested distance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
+<blockquote>
+<div><p>The structure for which to find all atom pairs</p>
+</div></blockquote>
+<p><strong>dist</strong> : float</p>
+<blockquote>
+<div><p>The maximum distance between identified pairs. No pairs separated by
+less than dist will be omitted, although some pairs greater than dist
+will be identified.</p>
+</div></blockquote>
+<p><strong>subset</strong> : set of Atom, optional</p>
+<blockquote>
+<div><p>If specified, the pairlist will be built <em>only</em> considering these atoms</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pairs</strong> : list of set of Atom</p>
+<blockquote>
+<div><p>The list of set of atoms that may be pairs</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if ``struct`` does not have any coordinates.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function does not do anything with periodic boundary conditions.</p>
 </dd></dl>
 
 </div>

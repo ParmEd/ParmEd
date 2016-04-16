@@ -90,12 +90,9 @@
 <span class="sd">`self.undoc_header&#39; set the headers used for the help function&#39;s</span>
 <span class="sd">listings of documented functions, miscellaneous topics, and undocumented</span>
 <span class="sd">functions respectively.</span>
-
-<span class="sd">These interpreters use raw_input; thus, if the readline module is loaded,</span>
-<span class="sd">they automatically support Emacs-like command history and editing features.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">string</span><span class="o">,</span> <span class="nn">sys</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Cmd&quot;</span><span class="p">]</span>
 
@@ -137,7 +134,6 @@
 <span class="sd">        sys.stdin and sys.stdout are used.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">sys</span>
         <span class="k">if</span> <span class="n">stdin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span> <span class="o">=</span> <span class="n">stdin</span>
         <span class="k">else</span><span class="p">:</span>
@@ -177,7 +173,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_rawinput</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
-                            <span class="n">line</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
+                            <span class="n">line</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">EOFError</span><span class="p">:</span>
                             <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;EOF&#39;</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -386,7 +382,7 @@
                         <span class="n">cmds_undoc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_leader</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc_header</span><span class="p">,</span>   <span class="n">cmds_doc</span><span class="p">,</span>   <span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">misc_header</span><span class="p">,</span>  <span class="n">help</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">misc_header</span><span class="p">,</span>  <span class="nb">list</span><span class="p">(</span><span class="n">help</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span><span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">undoc_header</span><span class="p">,</span> <span class="n">cmds_undoc</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span><span class="mi">80</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">print_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">cmds</span><span class="p">,</span> <span class="n">cmdlen</span><span class="p">,</span> <span class="n">maxcol</span><span class="p">):</span>
@@ -406,11 +402,12 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;empty&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span>
+
         <span class="n">nonstrings</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">))</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">str</span><span class="p">)]</span>
         <span class="k">if</span> <span class="n">nonstrings</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;list[i] not a string for i in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">nonstrings</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;list[i] not a string for i in </span><span class="si">%s</span><span class="s2">&quot;</span>
+                            <span class="o">%</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">nonstrings</span><span class="p">)))</span>
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>

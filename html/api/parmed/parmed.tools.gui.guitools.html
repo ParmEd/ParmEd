@@ -51,7 +51,7 @@
 <dl class="class">
 <dt id="parmed.tools.gui.guitools.ActionButton">
 <em class="property">class </em><code class="descclassname">parmed.tools.gui.guitools.</code><code class="descname">ActionButton</code><span class="sig-paren">(</span><em>root</em>, <em>amber_prmtop</em>, <em>messages</em>, <em>action_desc</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/gui/guitools.html#ActionButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Tkinter.Button</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tkinter.Button</span></code></p>
 <p>A button to dispatch the command to a particular function in guiactions</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -69,38 +69,38 @@
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.after_idle" title="parmed.tools.gui.guitools.ActionButton.after_idle"><code class="xref py py-obj docutils literal"><span class="pre">after_idle</span></code></a>(func,&nbsp;*args)</td>
 <td>Call FUNC once if the Tcl main loop has no event to process.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bbox" title="parmed.tools.gui.guitools.ActionButton.bbox"><code class="xref py py-obj docutils literal"><span class="pre">bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.anchor" title="parmed.tools.gui.guitools.ActionButton.anchor"><code class="xref py py-obj docutils literal"><span class="pre">anchor</span></code></a>([anchor])</td>
+<td>The anchor value controls how to place the grid within the master when no row/column has any weight.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bbox" title="parmed.tools.gui.guitools.ActionButton.bbox"><code class="xref py py-obj docutils literal"><span class="pre">bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
 <td>Return a tuple of integer coordinates for the bounding box of this widget controlled by the geometry manager grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bell" title="parmed.tools.gui.guitools.ActionButton.bell"><code class="xref py py-obj docutils literal"><span class="pre">bell</span></code></a>([displayof])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bell" title="parmed.tools.gui.guitools.ActionButton.bell"><code class="xref py py-obj docutils literal"><span class="pre">bell</span></code></a>([displayof])</td>
 <td>Ring a display&#8217;s bell.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bind" title="parmed.tools.gui.guitools.ActionButton.bind"><code class="xref py py-obj docutils literal"><span class="pre">bind</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bind" title="parmed.tools.gui.guitools.ActionButton.bind"><code class="xref py py-obj docutils literal"><span class="pre">bind</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to this widget at event SEQUENCE a call to function FUNC.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bind_all" title="parmed.tools.gui.guitools.ActionButton.bind_all"><code class="xref py py-obj docutils literal"><span class="pre">bind_all</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bind_all" title="parmed.tools.gui.guitools.ActionButton.bind_all"><code class="xref py py-obj docutils literal"><span class="pre">bind_all</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to all widgets at an event SEQUENCE a call to function FUNC.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bind_class" title="parmed.tools.gui.guitools.ActionButton.bind_class"><code class="xref py py-obj docutils literal"><span class="pre">bind_class</span></code></a>(className[,&nbsp;sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bind_class" title="parmed.tools.gui.guitools.ActionButton.bind_class"><code class="xref py py-obj docutils literal"><span class="pre">bind_class</span></code></a>(className[,&nbsp;sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to widgets with bindtag CLASSNAME at event SEQUENCE a call of function FUNC.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bindtags" title="parmed.tools.gui.guitools.ActionButton.bindtags"><code class="xref py py-obj docutils literal"><span class="pre">bindtags</span></code></a>([tagList])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.bindtags" title="parmed.tools.gui.guitools.ActionButton.bindtags"><code class="xref py py-obj docutils literal"><span class="pre">bindtags</span></code></a>([tagList])</td>
 <td>Set or get the list of bindtags for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.cget" title="parmed.tools.gui.guitools.ActionButton.cget"><code class="xref py py-obj docutils literal"><span class="pre">cget</span></code></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.cget" title="parmed.tools.gui.guitools.ActionButton.cget"><code class="xref py py-obj docutils literal"><span class="pre">cget</span></code></a>(key)</td>
 <td>Return the resource value for a KEY given as string.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.clipboard_append" title="parmed.tools.gui.guitools.ActionButton.clipboard_append"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_append</span></code></a>(string,&nbsp;**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.clipboard_append" title="parmed.tools.gui.guitools.ActionButton.clipboard_append"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_append</span></code></a>(string,&nbsp;**kw)</td>
 <td>Append STRING to the Tk clipboard.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.clipboard_clear" title="parmed.tools.gui.guitools.ActionButton.clipboard_clear"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_clear</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.clipboard_clear" title="parmed.tools.gui.guitools.ActionButton.clipboard_clear"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_clear</span></code></a>(**kw)</td>
 <td>Clear the data in the Tk clipboard.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.clipboard_get" title="parmed.tools.gui.guitools.ActionButton.clipboard_get"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_get</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.clipboard_get" title="parmed.tools.gui.guitools.ActionButton.clipboard_get"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_get</span></code></a>(**kw)</td>
 <td>Retrieve data from the clipboard on window&#8217;s display.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.colormodel" title="parmed.tools.gui.guitools.ActionButton.colormodel"><code class="xref py py-obj docutils literal"><span class="pre">colormodel</span></code></a>([value])</td>
-<td>Useless.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.columnconfigure" title="parmed.tools.gui.guitools.ActionButton.columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure column INDEX of a grid.</td>
@@ -159,11 +159,11 @@
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.getboolean" title="parmed.tools.gui.guitools.ActionButton.getboolean"><code class="xref py py-obj docutils literal"><span class="pre">getboolean</span></code></a>(s)</td>
 <td>Return a boolean value for Tcl boolean values true and false given as parameter.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.getdouble" title="parmed.tools.gui.guitools.ActionButton.getdouble"><code class="xref py py-obj docutils literal"><span class="pre">getdouble</span></code></a></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.getdouble" title="parmed.tools.gui.guitools.ActionButton.getdouble"><code class="xref py py-obj docutils literal"><span class="pre">getdouble</span></code></a>(s)</td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.getint" title="parmed.tools.gui.guitools.ActionButton.getint"><code class="xref py py-obj docutils literal"><span class="pre">getint</span></code></a></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.getint" title="parmed.tools.gui.guitools.ActionButton.getint"><code class="xref py py-obj docutils literal"><span class="pre">getint</span></code></a>(s)</td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.getvar" title="parmed.tools.gui.guitools.ActionButton.getvar"><code class="xref py py-obj docutils literal"><span class="pre">getvar</span></code></a>([name])</td>
 <td>Return value of Tcl variable NAME.</td>
@@ -186,167 +186,155 @@
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid" title="parmed.tools.gui.guitools.ActionButton.grid"><code class="xref py py-obj docutils literal"><span class="pre">grid</span></code></a>([cnf])</td>
 <td>Position a widget in the parent widget in a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_bbox" title="parmed.tools.gui.guitools.ActionButton.grid_bbox"><code class="xref py py-obj docutils literal"><span class="pre">grid_bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_anchor" title="parmed.tools.gui.guitools.ActionButton.grid_anchor"><code class="xref py py-obj docutils literal"><span class="pre">grid_anchor</span></code></a>([anchor])</td>
+<td>The anchor value controls how to place the grid within the master when no row/column has any weight.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_bbox" title="parmed.tools.gui.guitools.ActionButton.grid_bbox"><code class="xref py py-obj docutils literal"><span class="pre">grid_bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
 <td>Return a tuple of integer coordinates for the bounding box of this widget controlled by the geometry manager grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_columnconfigure" title="parmed.tools.gui.guitools.ActionButton.grid_columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_columnconfigure" title="parmed.tools.gui.guitools.ActionButton.grid_columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure column INDEX of a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_configure" title="parmed.tools.gui.guitools.ActionButton.grid_configure"><code class="xref py py-obj docutils literal"><span class="pre">grid_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_configure" title="parmed.tools.gui.guitools.ActionButton.grid_configure"><code class="xref py py-obj docutils literal"><span class="pre">grid_configure</span></code></a>([cnf])</td>
 <td>Position a widget in the parent widget in a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_forget" title="parmed.tools.gui.guitools.ActionButton.grid_forget"><code class="xref py py-obj docutils literal"><span class="pre">grid_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_forget" title="parmed.tools.gui.guitools.ActionButton.grid_forget"><code class="xref py py-obj docutils literal"><span class="pre">grid_forget</span></code></a>()</td>
 <td>Unmap this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_info" title="parmed.tools.gui.guitools.ActionButton.grid_info"><code class="xref py py-obj docutils literal"><span class="pre">grid_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_info" title="parmed.tools.gui.guitools.ActionButton.grid_info"><code class="xref py py-obj docutils literal"><span class="pre">grid_info</span></code></a>()</td>
 <td>Return information about the options for positioning this widget in a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_location" title="parmed.tools.gui.guitools.ActionButton.grid_location"><code class="xref py py-obj docutils literal"><span class="pre">grid_location</span></code></a>(x,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_location" title="parmed.tools.gui.guitools.ActionButton.grid_location"><code class="xref py py-obj docutils literal"><span class="pre">grid_location</span></code></a>(x,&nbsp;y)</td>
 <td>Return a tuple of column and row which identify the cell at which the pixel at position X and Y inside the master widget is located.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_propagate" title="parmed.tools.gui.guitools.ActionButton.grid_propagate"><code class="xref py py-obj docutils literal"><span class="pre">grid_propagate</span></code></a>([flag])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_propagate" title="parmed.tools.gui.guitools.ActionButton.grid_propagate"><code class="xref py py-obj docutils literal"><span class="pre">grid_propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_remove" title="parmed.tools.gui.guitools.ActionButton.grid_remove"><code class="xref py py-obj docutils literal"><span class="pre">grid_remove</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_remove" title="parmed.tools.gui.guitools.ActionButton.grid_remove"><code class="xref py py-obj docutils literal"><span class="pre">grid_remove</span></code></a>()</td>
 <td>Unmap this widget but remember the grid options.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_rowconfigure" title="parmed.tools.gui.guitools.ActionButton.grid_rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_rowconfigure" title="parmed.tools.gui.guitools.ActionButton.grid_rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure row INDEX of a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_size" title="parmed.tools.gui.guitools.ActionButton.grid_size"><code class="xref py py-obj docutils literal"><span class="pre">grid_size</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_size" title="parmed.tools.gui.guitools.ActionButton.grid_size"><code class="xref py py-obj docutils literal"><span class="pre">grid_size</span></code></a>()</td>
 <td>Return a tuple of the number of column and rows in the grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_slaves" title="parmed.tools.gui.guitools.ActionButton.grid_slaves"><code class="xref py py-obj docutils literal"><span class="pre">grid_slaves</span></code></a>([row,&nbsp;column])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.grid_slaves" title="parmed.tools.gui.guitools.ActionButton.grid_slaves"><code class="xref py py-obj docutils literal"><span class="pre">grid_slaves</span></code></a>([row,&nbsp;column])</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.image_names" title="parmed.tools.gui.guitools.ActionButton.image_names"><code class="xref py py-obj docutils literal"><span class="pre">image_names</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.image_names" title="parmed.tools.gui.guitools.ActionButton.image_names"><code class="xref py py-obj docutils literal"><span class="pre">image_names</span></code></a>()</td>
 <td>Return a list of all existing image names.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.image_types" title="parmed.tools.gui.guitools.ActionButton.image_types"><code class="xref py py-obj docutils literal"><span class="pre">image_types</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.image_types" title="parmed.tools.gui.guitools.ActionButton.image_types"><code class="xref py py-obj docutils literal"><span class="pre">image_types</span></code></a>()</td>
 <td>Return a list of all available image types (e.g.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.info" title="parmed.tools.gui.guitools.ActionButton.info"><code class="xref py py-obj docutils literal"><span class="pre">info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.info" title="parmed.tools.gui.guitools.ActionButton.info"><code class="xref py py-obj docutils literal"><span class="pre">info</span></code></a>()</td>
 <td>Return information about the packing options for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.invoke" title="parmed.tools.gui.guitools.ActionButton.invoke"><code class="xref py py-obj docutils literal"><span class="pre">invoke</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.invoke" title="parmed.tools.gui.guitools.ActionButton.invoke"><code class="xref py py-obj docutils literal"><span class="pre">invoke</span></code></a>()</td>
 <td>Invoke the command associated with the button.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.keys" title="parmed.tools.gui.guitools.ActionButton.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.keys" title="parmed.tools.gui.guitools.ActionButton.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>()</td>
 <td>Return a list of all resource names of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.lift" title="parmed.tools.gui.guitools.ActionButton.lift"><code class="xref py py-obj docutils literal"><span class="pre">lift</span></code></a>([aboveThis])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.lift" title="parmed.tools.gui.guitools.ActionButton.lift"><code class="xref py py-obj docutils literal"><span class="pre">lift</span></code></a>([aboveThis])</td>
 <td>Raise this widget in the stacking order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.location" title="parmed.tools.gui.guitools.ActionButton.location"><code class="xref py py-obj docutils literal"><span class="pre">location</span></code></a>(x,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.location" title="parmed.tools.gui.guitools.ActionButton.location"><code class="xref py py-obj docutils literal"><span class="pre">location</span></code></a>(x,&nbsp;y)</td>
 <td>Return a tuple of column and row which identify the cell at which the pixel at position X and Y inside the master widget is located.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.lower" title="parmed.tools.gui.guitools.ActionButton.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>([belowThis])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.lower" title="parmed.tools.gui.guitools.ActionButton.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>([belowThis])</td>
 <td>Lower this widget in the stacking order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.mainloop" title="parmed.tools.gui.guitools.ActionButton.mainloop"><code class="xref py py-obj docutils literal"><span class="pre">mainloop</span></code></a>([n])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.mainloop" title="parmed.tools.gui.guitools.ActionButton.mainloop"><code class="xref py py-obj docutils literal"><span class="pre">mainloop</span></code></a>([n])</td>
 <td>Call the mainloop of Tk.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.nametowidget" title="parmed.tools.gui.guitools.ActionButton.nametowidget"><code class="xref py py-obj docutils literal"><span class="pre">nametowidget</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.nametowidget" title="parmed.tools.gui.guitools.ActionButton.nametowidget"><code class="xref py py-obj docutils literal"><span class="pre">nametowidget</span></code></a>(name)</td>
 <td>Return the Tkinter instance of a widget identified by its Tcl name NAME.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_add" title="parmed.tools.gui.guitools.ActionButton.option_add"><code class="xref py py-obj docutils literal"><span class="pre">option_add</span></code></a>(pattern,&nbsp;value[,&nbsp;priority])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_add" title="parmed.tools.gui.guitools.ActionButton.option_add"><code class="xref py py-obj docutils literal"><span class="pre">option_add</span></code></a>(pattern,&nbsp;value[,&nbsp;priority])</td>
 <td>Set a VALUE (second parameter) for an option PATTERN (first parameter).</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_clear" title="parmed.tools.gui.guitools.ActionButton.option_clear"><code class="xref py py-obj docutils literal"><span class="pre">option_clear</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_clear" title="parmed.tools.gui.guitools.ActionButton.option_clear"><code class="xref py py-obj docutils literal"><span class="pre">option_clear</span></code></a>()</td>
 <td>Clear the option database.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_get" title="parmed.tools.gui.guitools.ActionButton.option_get"><code class="xref py py-obj docutils literal"><span class="pre">option_get</span></code></a>(name,&nbsp;className)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_get" title="parmed.tools.gui.guitools.ActionButton.option_get"><code class="xref py py-obj docutils literal"><span class="pre">option_get</span></code></a>(name,&nbsp;className)</td>
 <td>Return the value for an option NAME for this widget with CLASSNAME.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_readfile" title="parmed.tools.gui.guitools.ActionButton.option_readfile"><code class="xref py py-obj docutils literal"><span class="pre">option_readfile</span></code></a>(fileName[,&nbsp;priority])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.option_readfile" title="parmed.tools.gui.guitools.ActionButton.option_readfile"><code class="xref py py-obj docutils literal"><span class="pre">option_readfile</span></code></a>(fileName[,&nbsp;priority])</td>
 <td>Read file FILENAME into the option database.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack" title="parmed.tools.gui.guitools.ActionButton.pack"><code class="xref py py-obj docutils literal"><span class="pre">pack</span></code></a>([cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack" title="parmed.tools.gui.guitools.ActionButton.pack"><code class="xref py py-obj docutils literal"><span class="pre">pack</span></code></a>([cnf])</td>
 <td>Pack a widget in the parent widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_configure" title="parmed.tools.gui.guitools.ActionButton.pack_configure"><code class="xref py py-obj docutils literal"><span class="pre">pack_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_configure" title="parmed.tools.gui.guitools.ActionButton.pack_configure"><code class="xref py py-obj docutils literal"><span class="pre">pack_configure</span></code></a>([cnf])</td>
 <td>Pack a widget in the parent widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_forget" title="parmed.tools.gui.guitools.ActionButton.pack_forget"><code class="xref py py-obj docutils literal"><span class="pre">pack_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_forget" title="parmed.tools.gui.guitools.ActionButton.pack_forget"><code class="xref py py-obj docutils literal"><span class="pre">pack_forget</span></code></a>()</td>
 <td>Unmap this widget and do not use it for the packing order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_info" title="parmed.tools.gui.guitools.ActionButton.pack_info"><code class="xref py py-obj docutils literal"><span class="pre">pack_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_info" title="parmed.tools.gui.guitools.ActionButton.pack_info"><code class="xref py py-obj docutils literal"><span class="pre">pack_info</span></code></a>()</td>
 <td>Return information about the packing options for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_propagate" title="parmed.tools.gui.guitools.ActionButton.pack_propagate"><code class="xref py py-obj docutils literal"><span class="pre">pack_propagate</span></code></a>([flag])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_propagate" title="parmed.tools.gui.guitools.ActionButton.pack_propagate"><code class="xref py py-obj docutils literal"><span class="pre">pack_propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_slaves" title="parmed.tools.gui.guitools.ActionButton.pack_slaves"><code class="xref py py-obj docutils literal"><span class="pre">pack_slaves</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.pack_slaves" title="parmed.tools.gui.guitools.ActionButton.pack_slaves"><code class="xref py py-obj docutils literal"><span class="pre">pack_slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place" title="parmed.tools.gui.guitools.ActionButton.place"><code class="xref py py-obj docutils literal"><span class="pre">place</span></code></a>([cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place" title="parmed.tools.gui.guitools.ActionButton.place"><code class="xref py py-obj docutils literal"><span class="pre">place</span></code></a>([cnf])</td>
 <td>Place a widget in the parent widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_configure" title="parmed.tools.gui.guitools.ActionButton.place_configure"><code class="xref py py-obj docutils literal"><span class="pre">place_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_configure" title="parmed.tools.gui.guitools.ActionButton.place_configure"><code class="xref py py-obj docutils literal"><span class="pre">place_configure</span></code></a>([cnf])</td>
 <td>Place a widget in the parent widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_forget" title="parmed.tools.gui.guitools.ActionButton.place_forget"><code class="xref py py-obj docutils literal"><span class="pre">place_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_forget" title="parmed.tools.gui.guitools.ActionButton.place_forget"><code class="xref py py-obj docutils literal"><span class="pre">place_forget</span></code></a>()</td>
 <td>Unmap this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_info" title="parmed.tools.gui.guitools.ActionButton.place_info"><code class="xref py py-obj docutils literal"><span class="pre">place_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_info" title="parmed.tools.gui.guitools.ActionButton.place_info"><code class="xref py py-obj docutils literal"><span class="pre">place_info</span></code></a>()</td>
 <td>Return information about the placing options for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_slaves" title="parmed.tools.gui.guitools.ActionButton.place_slaves"><code class="xref py py-obj docutils literal"><span class="pre">place_slaves</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.place_slaves" title="parmed.tools.gui.guitools.ActionButton.place_slaves"><code class="xref py py-obj docutils literal"><span class="pre">place_slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.propagate" title="parmed.tools.gui.guitools.ActionButton.propagate"><code class="xref py py-obj docutils literal"><span class="pre">propagate</span></code></a>([flag])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.propagate" title="parmed.tools.gui.guitools.ActionButton.propagate"><code class="xref py py-obj docutils literal"><span class="pre">propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.quit" title="parmed.tools.gui.guitools.ActionButton.quit"><code class="xref py py-obj docutils literal"><span class="pre">quit</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.quit" title="parmed.tools.gui.guitools.ActionButton.quit"><code class="xref py py-obj docutils literal"><span class="pre">quit</span></code></a>()</td>
 <td>Quit the Tcl interpreter.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.register" title="parmed.tools.gui.guitools.ActionButton.register"><code class="xref py py-obj docutils literal"><span class="pre">register</span></code></a>(func[,&nbsp;subst,&nbsp;needcleanup])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.register" title="parmed.tools.gui.guitools.ActionButton.register"><code class="xref py py-obj docutils literal"><span class="pre">register</span></code></a>(func[,&nbsp;subst,&nbsp;needcleanup])</td>
 <td>Return a newly created Tcl function.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.rowconfigure" title="parmed.tools.gui.guitools.ActionButton.rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.rowconfigure" title="parmed.tools.gui.guitools.ActionButton.rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure row INDEX of a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_clear" title="parmed.tools.gui.guitools.ActionButton.selection_clear"><code class="xref py py-obj docutils literal"><span class="pre">selection_clear</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_clear" title="parmed.tools.gui.guitools.ActionButton.selection_clear"><code class="xref py py-obj docutils literal"><span class="pre">selection_clear</span></code></a>(**kw)</td>
 <td>Clear the current X selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_get" title="parmed.tools.gui.guitools.ActionButton.selection_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_get</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_get" title="parmed.tools.gui.guitools.ActionButton.selection_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_get</span></code></a>(**kw)</td>
 <td>Return the contents of the current X selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_handle" title="parmed.tools.gui.guitools.ActionButton.selection_handle"><code class="xref py py-obj docutils literal"><span class="pre">selection_handle</span></code></a>(command,&nbsp;**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_handle" title="parmed.tools.gui.guitools.ActionButton.selection_handle"><code class="xref py py-obj docutils literal"><span class="pre">selection_handle</span></code></a>(command,&nbsp;**kw)</td>
 <td>Specify a function COMMAND to call if the X selection owned by this widget is queried by another application.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_own" title="parmed.tools.gui.guitools.ActionButton.selection_own"><code class="xref py py-obj docutils literal"><span class="pre">selection_own</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_own" title="parmed.tools.gui.guitools.ActionButton.selection_own"><code class="xref py py-obj docutils literal"><span class="pre">selection_own</span></code></a>(**kw)</td>
 <td>Become owner of X selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_own_get" title="parmed.tools.gui.guitools.ActionButton.selection_own_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_own_get</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.selection_own_get" title="parmed.tools.gui.guitools.ActionButton.selection_own_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_own_get</span></code></a>(**kw)</td>
 <td>Return owner of X selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.send" title="parmed.tools.gui.guitools.ActionButton.send"><code class="xref py py-obj docutils literal"><span class="pre">send</span></code></a>(interp,&nbsp;cmd,&nbsp;*args)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.send" title="parmed.tools.gui.guitools.ActionButton.send"><code class="xref py py-obj docutils literal"><span class="pre">send</span></code></a>(interp,&nbsp;cmd,&nbsp;*args)</td>
 <td>Send Tcl command CMD to different interpreter INTERP to be executed.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.setvar" title="parmed.tools.gui.guitools.ActionButton.setvar"><code class="xref py py-obj docutils literal"><span class="pre">setvar</span></code></a>([name,&nbsp;value])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.setvar" title="parmed.tools.gui.guitools.ActionButton.setvar"><code class="xref py py-obj docutils literal"><span class="pre">setvar</span></code></a>([name,&nbsp;value])</td>
 <td>Set Tcl variable NAME to VALUE.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.size" title="parmed.tools.gui.guitools.ActionButton.size"><code class="xref py py-obj docutils literal"><span class="pre">size</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.size" title="parmed.tools.gui.guitools.ActionButton.size"><code class="xref py py-obj docutils literal"><span class="pre">size</span></code></a>()</td>
 <td>Return a tuple of the number of column and rows in the grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.slaves" title="parmed.tools.gui.guitools.ActionButton.slaves"><code class="xref py py-obj docutils literal"><span class="pre">slaves</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.slaves" title="parmed.tools.gui.guitools.ActionButton.slaves"><code class="xref py py-obj docutils literal"><span class="pre">slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.tkButtonDown" title="parmed.tools.gui.guitools.ActionButton.tkButtonDown"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonDown</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.tkButtonEnter" title="parmed.tools.gui.guitools.ActionButton.tkButtonEnter"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonEnter</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.tkButtonInvoke" title="parmed.tools.gui.guitools.ActionButton.tkButtonInvoke"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonInvoke</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.tkButtonLeave" title="parmed.tools.gui.guitools.ActionButton.tkButtonLeave"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonLeave</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.tkButtonUp" title="parmed.tools.gui.guitools.ActionButton.tkButtonUp"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonUp</span></code></a>(*dummy)</td>
-<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ActionButton.tk_bisque" title="parmed.tools.gui.guitools.ActionButton.tk_bisque"><code class="xref py py-obj docutils literal"><span class="pre">tk_bisque</span></code></a>()</td>
 <td>Change the color scheme to light brown as used in Tk 3.6 and before.</td>
@@ -576,6 +564,14 @@ after_cancel.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.tools.gui.guitools.ActionButton.anchor">
+<code class="descname">anchor</code><span class="sig-paren">(</span><em>anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The anchor value controls how to place the grid within the
+master when no row/column has any weight.</p>
+<p>The default anchor is nw.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.ActionButton.bbox">
 <code class="descname">bbox</code><span class="sig-paren">(</span><em>column=None</em>, <em>row=None</em>, <em>col2=None</em>, <em>row2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.bbox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a tuple of integer coordinates for the bounding
@@ -696,12 +692,6 @@ or FILE_NAME.  Type defaults to STRING, except on X11, where the default
 is to try UTF8_STRING and fall back to STRING.</p>
 <p>This command is equivalent to:</p>
 <p>selection_get(CLIPBOARD)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ActionButton.colormodel">
-<code class="descname">colormodel</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.colormodel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Useless. Not implemented in Tk.</p>
 </dd></dl>
 
 <dl class="method">
@@ -854,17 +844,15 @@ the focus through the window manager.</p>
 <dd><p>Return a boolean value for Tcl boolean values true and false given as parameter.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.ActionButton.getdouble">
-<code class="descname">getdouble</code><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.getdouble" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
-</dd></dl>
+<code class="descname">getdouble</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.getdouble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.ActionButton.getint">
-<code class="descname">getint</code><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.getint" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></p>
-</dd></dl>
+<code class="descname">getint</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.getint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.gui.guitools.ActionButton.getvar">
@@ -926,6 +914,14 @@ rowspan=number - this widget will span several rows
 sticky=NSEW - if cell is larger on which sides will this</p>
 <blockquote>
 <div>widget stick to the cell boundary</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tools.gui.guitools.ActionButton.grid_anchor">
+<code class="descname">grid_anchor</code><span class="sig-paren">(</span><em>anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.grid_anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The anchor value controls how to place the grid within the
+master when no row/column has any weight.</p>
+<p>The default anchor is nw.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1386,31 +1382,6 @@ type - type of the selection (e.g. STRING, FILE_NAME).</p>
 <dd><p>Return a list of all slaves of this widget
 in its packing order.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ActionButton.tkButtonDown">
-<code class="descname">tkButtonDown</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.tkButtonDown" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ActionButton.tkButtonEnter">
-<code class="descname">tkButtonEnter</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.tkButtonEnter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ActionButton.tkButtonInvoke">
-<code class="descname">tkButtonInvoke</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.tkButtonInvoke" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ActionButton.tkButtonLeave">
-<code class="descname">tkButtonLeave</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.tkButtonLeave" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ActionButton.tkButtonUp">
-<code class="descname">tkButtonUp</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ActionButton.tkButtonUp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.gui.guitools.ActionButton.tk_bisque">
@@ -1887,38 +1858,38 @@ in the parent.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.after_idle" title="parmed.tools.gui.guitools.OutparmButton.after_idle"><code class="xref py py-obj docutils literal"><span class="pre">after_idle</span></code></a>(func,&nbsp;*args)</td>
 <td>Call FUNC once if the Tcl main loop has no event to process.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bbox" title="parmed.tools.gui.guitools.OutparmButton.bbox"><code class="xref py py-obj docutils literal"><span class="pre">bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.anchor" title="parmed.tools.gui.guitools.OutparmButton.anchor"><code class="xref py py-obj docutils literal"><span class="pre">anchor</span></code></a>([anchor])</td>
+<td>The anchor value controls how to place the grid within the master when no row/column has any weight.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bbox" title="parmed.tools.gui.guitools.OutparmButton.bbox"><code class="xref py py-obj docutils literal"><span class="pre">bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
 <td>Return a tuple of integer coordinates for the bounding box of this widget controlled by the geometry manager grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bell" title="parmed.tools.gui.guitools.OutparmButton.bell"><code class="xref py py-obj docutils literal"><span class="pre">bell</span></code></a>([displayof])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bell" title="parmed.tools.gui.guitools.OutparmButton.bell"><code class="xref py py-obj docutils literal"><span class="pre">bell</span></code></a>([displayof])</td>
 <td>Ring a display&#8217;s bell.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bind" title="parmed.tools.gui.guitools.OutparmButton.bind"><code class="xref py py-obj docutils literal"><span class="pre">bind</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bind" title="parmed.tools.gui.guitools.OutparmButton.bind"><code class="xref py py-obj docutils literal"><span class="pre">bind</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to this widget at event SEQUENCE a call to function FUNC.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bind_all" title="parmed.tools.gui.guitools.OutparmButton.bind_all"><code class="xref py py-obj docutils literal"><span class="pre">bind_all</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bind_all" title="parmed.tools.gui.guitools.OutparmButton.bind_all"><code class="xref py py-obj docutils literal"><span class="pre">bind_all</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to all widgets at an event SEQUENCE a call to function FUNC.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bind_class" title="parmed.tools.gui.guitools.OutparmButton.bind_class"><code class="xref py py-obj docutils literal"><span class="pre">bind_class</span></code></a>(className[,&nbsp;sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bind_class" title="parmed.tools.gui.guitools.OutparmButton.bind_class"><code class="xref py py-obj docutils literal"><span class="pre">bind_class</span></code></a>(className[,&nbsp;sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to widgets with bindtag CLASSNAME at event SEQUENCE a call of function FUNC.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bindtags" title="parmed.tools.gui.guitools.OutparmButton.bindtags"><code class="xref py py-obj docutils literal"><span class="pre">bindtags</span></code></a>([tagList])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.bindtags" title="parmed.tools.gui.guitools.OutparmButton.bindtags"><code class="xref py py-obj docutils literal"><span class="pre">bindtags</span></code></a>([tagList])</td>
 <td>Set or get the list of bindtags for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.cget" title="parmed.tools.gui.guitools.OutparmButton.cget"><code class="xref py py-obj docutils literal"><span class="pre">cget</span></code></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.cget" title="parmed.tools.gui.guitools.OutparmButton.cget"><code class="xref py py-obj docutils literal"><span class="pre">cget</span></code></a>(key)</td>
 <td>Return the resource value for a KEY given as string.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.clipboard_append" title="parmed.tools.gui.guitools.OutparmButton.clipboard_append"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_append</span></code></a>(string,&nbsp;**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.clipboard_append" title="parmed.tools.gui.guitools.OutparmButton.clipboard_append"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_append</span></code></a>(string,&nbsp;**kw)</td>
 <td>Append STRING to the Tk clipboard.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.clipboard_clear" title="parmed.tools.gui.guitools.OutparmButton.clipboard_clear"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_clear</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.clipboard_clear" title="parmed.tools.gui.guitools.OutparmButton.clipboard_clear"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_clear</span></code></a>(**kw)</td>
 <td>Clear the data in the Tk clipboard.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.clipboard_get" title="parmed.tools.gui.guitools.OutparmButton.clipboard_get"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_get</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.clipboard_get" title="parmed.tools.gui.guitools.OutparmButton.clipboard_get"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_get</span></code></a>(**kw)</td>
 <td>Retrieve data from the clipboard on window&#8217;s display.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.colormodel" title="parmed.tools.gui.guitools.OutparmButton.colormodel"><code class="xref py py-obj docutils literal"><span class="pre">colormodel</span></code></a>([value])</td>
-<td>Useless.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.columnconfigure" title="parmed.tools.gui.guitools.OutparmButton.columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure column INDEX of a grid.</td>
@@ -1977,11 +1948,11 @@ in the parent.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.getboolean" title="parmed.tools.gui.guitools.OutparmButton.getboolean"><code class="xref py py-obj docutils literal"><span class="pre">getboolean</span></code></a>(s)</td>
 <td>Return a boolean value for Tcl boolean values true and false given as parameter.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.getdouble" title="parmed.tools.gui.guitools.OutparmButton.getdouble"><code class="xref py py-obj docutils literal"><span class="pre">getdouble</span></code></a></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.getdouble" title="parmed.tools.gui.guitools.OutparmButton.getdouble"><code class="xref py py-obj docutils literal"><span class="pre">getdouble</span></code></a>(s)</td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.getint" title="parmed.tools.gui.guitools.OutparmButton.getint"><code class="xref py py-obj docutils literal"><span class="pre">getint</span></code></a></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.getint" title="parmed.tools.gui.guitools.OutparmButton.getint"><code class="xref py py-obj docutils literal"><span class="pre">getint</span></code></a>(s)</td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.getvar" title="parmed.tools.gui.guitools.OutparmButton.getvar"><code class="xref py py-obj docutils literal"><span class="pre">getvar</span></code></a>([name])</td>
 <td>Return value of Tcl variable NAME.</td>
@@ -2004,167 +1975,155 @@ in the parent.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid" title="parmed.tools.gui.guitools.OutparmButton.grid"><code class="xref py py-obj docutils literal"><span class="pre">grid</span></code></a>([cnf])</td>
 <td>Position a widget in the parent widget in a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_bbox" title="parmed.tools.gui.guitools.OutparmButton.grid_bbox"><code class="xref py py-obj docutils literal"><span class="pre">grid_bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_anchor" title="parmed.tools.gui.guitools.OutparmButton.grid_anchor"><code class="xref py py-obj docutils literal"><span class="pre">grid_anchor</span></code></a>([anchor])</td>
+<td>The anchor value controls how to place the grid within the master when no row/column has any weight.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_bbox" title="parmed.tools.gui.guitools.OutparmButton.grid_bbox"><code class="xref py py-obj docutils literal"><span class="pre">grid_bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
 <td>Return a tuple of integer coordinates for the bounding box of this widget controlled by the geometry manager grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_columnconfigure" title="parmed.tools.gui.guitools.OutparmButton.grid_columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_columnconfigure" title="parmed.tools.gui.guitools.OutparmButton.grid_columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure column INDEX of a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_configure" title="parmed.tools.gui.guitools.OutparmButton.grid_configure"><code class="xref py py-obj docutils literal"><span class="pre">grid_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_configure" title="parmed.tools.gui.guitools.OutparmButton.grid_configure"><code class="xref py py-obj docutils literal"><span class="pre">grid_configure</span></code></a>([cnf])</td>
 <td>Position a widget in the parent widget in a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_forget" title="parmed.tools.gui.guitools.OutparmButton.grid_forget"><code class="xref py py-obj docutils literal"><span class="pre">grid_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_forget" title="parmed.tools.gui.guitools.OutparmButton.grid_forget"><code class="xref py py-obj docutils literal"><span class="pre">grid_forget</span></code></a>()</td>
 <td>Unmap this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_info" title="parmed.tools.gui.guitools.OutparmButton.grid_info"><code class="xref py py-obj docutils literal"><span class="pre">grid_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_info" title="parmed.tools.gui.guitools.OutparmButton.grid_info"><code class="xref py py-obj docutils literal"><span class="pre">grid_info</span></code></a>()</td>
 <td>Return information about the options for positioning this widget in a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_location" title="parmed.tools.gui.guitools.OutparmButton.grid_location"><code class="xref py py-obj docutils literal"><span class="pre">grid_location</span></code></a>(x,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_location" title="parmed.tools.gui.guitools.OutparmButton.grid_location"><code class="xref py py-obj docutils literal"><span class="pre">grid_location</span></code></a>(x,&nbsp;y)</td>
 <td>Return a tuple of column and row which identify the cell at which the pixel at position X and Y inside the master widget is located.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_propagate" title="parmed.tools.gui.guitools.OutparmButton.grid_propagate"><code class="xref py py-obj docutils literal"><span class="pre">grid_propagate</span></code></a>([flag])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_propagate" title="parmed.tools.gui.guitools.OutparmButton.grid_propagate"><code class="xref py py-obj docutils literal"><span class="pre">grid_propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_remove" title="parmed.tools.gui.guitools.OutparmButton.grid_remove"><code class="xref py py-obj docutils literal"><span class="pre">grid_remove</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_remove" title="parmed.tools.gui.guitools.OutparmButton.grid_remove"><code class="xref py py-obj docutils literal"><span class="pre">grid_remove</span></code></a>()</td>
 <td>Unmap this widget but remember the grid options.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_rowconfigure" title="parmed.tools.gui.guitools.OutparmButton.grid_rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_rowconfigure" title="parmed.tools.gui.guitools.OutparmButton.grid_rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure row INDEX of a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_size" title="parmed.tools.gui.guitools.OutparmButton.grid_size"><code class="xref py py-obj docutils literal"><span class="pre">grid_size</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_size" title="parmed.tools.gui.guitools.OutparmButton.grid_size"><code class="xref py py-obj docutils literal"><span class="pre">grid_size</span></code></a>()</td>
 <td>Return a tuple of the number of column and rows in the grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_slaves" title="parmed.tools.gui.guitools.OutparmButton.grid_slaves"><code class="xref py py-obj docutils literal"><span class="pre">grid_slaves</span></code></a>([row,&nbsp;column])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.grid_slaves" title="parmed.tools.gui.guitools.OutparmButton.grid_slaves"><code class="xref py py-obj docutils literal"><span class="pre">grid_slaves</span></code></a>([row,&nbsp;column])</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.image_names" title="parmed.tools.gui.guitools.OutparmButton.image_names"><code class="xref py py-obj docutils literal"><span class="pre">image_names</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.image_names" title="parmed.tools.gui.guitools.OutparmButton.image_names"><code class="xref py py-obj docutils literal"><span class="pre">image_names</span></code></a>()</td>
 <td>Return a list of all existing image names.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.image_types" title="parmed.tools.gui.guitools.OutparmButton.image_types"><code class="xref py py-obj docutils literal"><span class="pre">image_types</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.image_types" title="parmed.tools.gui.guitools.OutparmButton.image_types"><code class="xref py py-obj docutils literal"><span class="pre">image_types</span></code></a>()</td>
 <td>Return a list of all available image types (e.g.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.info" title="parmed.tools.gui.guitools.OutparmButton.info"><code class="xref py py-obj docutils literal"><span class="pre">info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.info" title="parmed.tools.gui.guitools.OutparmButton.info"><code class="xref py py-obj docutils literal"><span class="pre">info</span></code></a>()</td>
 <td>Return information about the packing options for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.invoke" title="parmed.tools.gui.guitools.OutparmButton.invoke"><code class="xref py py-obj docutils literal"><span class="pre">invoke</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.invoke" title="parmed.tools.gui.guitools.OutparmButton.invoke"><code class="xref py py-obj docutils literal"><span class="pre">invoke</span></code></a>()</td>
 <td>Invoke the command associated with the button.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.keys" title="parmed.tools.gui.guitools.OutparmButton.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.keys" title="parmed.tools.gui.guitools.OutparmButton.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>()</td>
 <td>Return a list of all resource names of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.lift" title="parmed.tools.gui.guitools.OutparmButton.lift"><code class="xref py py-obj docutils literal"><span class="pre">lift</span></code></a>([aboveThis])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.lift" title="parmed.tools.gui.guitools.OutparmButton.lift"><code class="xref py py-obj docutils literal"><span class="pre">lift</span></code></a>([aboveThis])</td>
 <td>Raise this widget in the stacking order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.location" title="parmed.tools.gui.guitools.OutparmButton.location"><code class="xref py py-obj docutils literal"><span class="pre">location</span></code></a>(x,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.location" title="parmed.tools.gui.guitools.OutparmButton.location"><code class="xref py py-obj docutils literal"><span class="pre">location</span></code></a>(x,&nbsp;y)</td>
 <td>Return a tuple of column and row which identify the cell at which the pixel at position X and Y inside the master widget is located.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.lower" title="parmed.tools.gui.guitools.OutparmButton.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>([belowThis])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.lower" title="parmed.tools.gui.guitools.OutparmButton.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>([belowThis])</td>
 <td>Lower this widget in the stacking order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.mainloop" title="parmed.tools.gui.guitools.OutparmButton.mainloop"><code class="xref py py-obj docutils literal"><span class="pre">mainloop</span></code></a>([n])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.mainloop" title="parmed.tools.gui.guitools.OutparmButton.mainloop"><code class="xref py py-obj docutils literal"><span class="pre">mainloop</span></code></a>([n])</td>
 <td>Call the mainloop of Tk.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.nametowidget" title="parmed.tools.gui.guitools.OutparmButton.nametowidget"><code class="xref py py-obj docutils literal"><span class="pre">nametowidget</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.nametowidget" title="parmed.tools.gui.guitools.OutparmButton.nametowidget"><code class="xref py py-obj docutils literal"><span class="pre">nametowidget</span></code></a>(name)</td>
 <td>Return the Tkinter instance of a widget identified by its Tcl name NAME.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_add" title="parmed.tools.gui.guitools.OutparmButton.option_add"><code class="xref py py-obj docutils literal"><span class="pre">option_add</span></code></a>(pattern,&nbsp;value[,&nbsp;priority])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_add" title="parmed.tools.gui.guitools.OutparmButton.option_add"><code class="xref py py-obj docutils literal"><span class="pre">option_add</span></code></a>(pattern,&nbsp;value[,&nbsp;priority])</td>
 <td>Set a VALUE (second parameter) for an option PATTERN (first parameter).</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_clear" title="parmed.tools.gui.guitools.OutparmButton.option_clear"><code class="xref py py-obj docutils literal"><span class="pre">option_clear</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_clear" title="parmed.tools.gui.guitools.OutparmButton.option_clear"><code class="xref py py-obj docutils literal"><span class="pre">option_clear</span></code></a>()</td>
 <td>Clear the option database.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_get" title="parmed.tools.gui.guitools.OutparmButton.option_get"><code class="xref py py-obj docutils literal"><span class="pre">option_get</span></code></a>(name,&nbsp;className)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_get" title="parmed.tools.gui.guitools.OutparmButton.option_get"><code class="xref py py-obj docutils literal"><span class="pre">option_get</span></code></a>(name,&nbsp;className)</td>
 <td>Return the value for an option NAME for this widget with CLASSNAME.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_readfile" title="parmed.tools.gui.guitools.OutparmButton.option_readfile"><code class="xref py py-obj docutils literal"><span class="pre">option_readfile</span></code></a>(fileName[,&nbsp;priority])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.option_readfile" title="parmed.tools.gui.guitools.OutparmButton.option_readfile"><code class="xref py py-obj docutils literal"><span class="pre">option_readfile</span></code></a>(fileName[,&nbsp;priority])</td>
 <td>Read file FILENAME into the option database.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack" title="parmed.tools.gui.guitools.OutparmButton.pack"><code class="xref py py-obj docutils literal"><span class="pre">pack</span></code></a>([cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack" title="parmed.tools.gui.guitools.OutparmButton.pack"><code class="xref py py-obj docutils literal"><span class="pre">pack</span></code></a>([cnf])</td>
 <td>Pack a widget in the parent widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_configure" title="parmed.tools.gui.guitools.OutparmButton.pack_configure"><code class="xref py py-obj docutils literal"><span class="pre">pack_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_configure" title="parmed.tools.gui.guitools.OutparmButton.pack_configure"><code class="xref py py-obj docutils literal"><span class="pre">pack_configure</span></code></a>([cnf])</td>
 <td>Pack a widget in the parent widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_forget" title="parmed.tools.gui.guitools.OutparmButton.pack_forget"><code class="xref py py-obj docutils literal"><span class="pre">pack_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_forget" title="parmed.tools.gui.guitools.OutparmButton.pack_forget"><code class="xref py py-obj docutils literal"><span class="pre">pack_forget</span></code></a>()</td>
 <td>Unmap this widget and do not use it for the packing order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_info" title="parmed.tools.gui.guitools.OutparmButton.pack_info"><code class="xref py py-obj docutils literal"><span class="pre">pack_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_info" title="parmed.tools.gui.guitools.OutparmButton.pack_info"><code class="xref py py-obj docutils literal"><span class="pre">pack_info</span></code></a>()</td>
 <td>Return information about the packing options for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_propagate" title="parmed.tools.gui.guitools.OutparmButton.pack_propagate"><code class="xref py py-obj docutils literal"><span class="pre">pack_propagate</span></code></a>([flag])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_propagate" title="parmed.tools.gui.guitools.OutparmButton.pack_propagate"><code class="xref py py-obj docutils literal"><span class="pre">pack_propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_slaves" title="parmed.tools.gui.guitools.OutparmButton.pack_slaves"><code class="xref py py-obj docutils literal"><span class="pre">pack_slaves</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.pack_slaves" title="parmed.tools.gui.guitools.OutparmButton.pack_slaves"><code class="xref py py-obj docutils literal"><span class="pre">pack_slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place" title="parmed.tools.gui.guitools.OutparmButton.place"><code class="xref py py-obj docutils literal"><span class="pre">place</span></code></a>([cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place" title="parmed.tools.gui.guitools.OutparmButton.place"><code class="xref py py-obj docutils literal"><span class="pre">place</span></code></a>([cnf])</td>
 <td>Place a widget in the parent widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_configure" title="parmed.tools.gui.guitools.OutparmButton.place_configure"><code class="xref py py-obj docutils literal"><span class="pre">place_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_configure" title="parmed.tools.gui.guitools.OutparmButton.place_configure"><code class="xref py py-obj docutils literal"><span class="pre">place_configure</span></code></a>([cnf])</td>
 <td>Place a widget in the parent widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_forget" title="parmed.tools.gui.guitools.OutparmButton.place_forget"><code class="xref py py-obj docutils literal"><span class="pre">place_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_forget" title="parmed.tools.gui.guitools.OutparmButton.place_forget"><code class="xref py py-obj docutils literal"><span class="pre">place_forget</span></code></a>()</td>
 <td>Unmap this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_info" title="parmed.tools.gui.guitools.OutparmButton.place_info"><code class="xref py py-obj docutils literal"><span class="pre">place_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_info" title="parmed.tools.gui.guitools.OutparmButton.place_info"><code class="xref py py-obj docutils literal"><span class="pre">place_info</span></code></a>()</td>
 <td>Return information about the placing options for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_slaves" title="parmed.tools.gui.guitools.OutparmButton.place_slaves"><code class="xref py py-obj docutils literal"><span class="pre">place_slaves</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.place_slaves" title="parmed.tools.gui.guitools.OutparmButton.place_slaves"><code class="xref py py-obj docutils literal"><span class="pre">place_slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.propagate" title="parmed.tools.gui.guitools.OutparmButton.propagate"><code class="xref py py-obj docutils literal"><span class="pre">propagate</span></code></a>([flag])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.propagate" title="parmed.tools.gui.guitools.OutparmButton.propagate"><code class="xref py py-obj docutils literal"><span class="pre">propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.quit" title="parmed.tools.gui.guitools.OutparmButton.quit"><code class="xref py py-obj docutils literal"><span class="pre">quit</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.quit" title="parmed.tools.gui.guitools.OutparmButton.quit"><code class="xref py py-obj docutils literal"><span class="pre">quit</span></code></a>()</td>
 <td>Quit the Tcl interpreter.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.register" title="parmed.tools.gui.guitools.OutparmButton.register"><code class="xref py py-obj docutils literal"><span class="pre">register</span></code></a>(func[,&nbsp;subst,&nbsp;needcleanup])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.register" title="parmed.tools.gui.guitools.OutparmButton.register"><code class="xref py py-obj docutils literal"><span class="pre">register</span></code></a>(func[,&nbsp;subst,&nbsp;needcleanup])</td>
 <td>Return a newly created Tcl function.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.rowconfigure" title="parmed.tools.gui.guitools.OutparmButton.rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.rowconfigure" title="parmed.tools.gui.guitools.OutparmButton.rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure row INDEX of a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_clear" title="parmed.tools.gui.guitools.OutparmButton.selection_clear"><code class="xref py py-obj docutils literal"><span class="pre">selection_clear</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_clear" title="parmed.tools.gui.guitools.OutparmButton.selection_clear"><code class="xref py py-obj docutils literal"><span class="pre">selection_clear</span></code></a>(**kw)</td>
 <td>Clear the current X selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_get" title="parmed.tools.gui.guitools.OutparmButton.selection_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_get</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_get" title="parmed.tools.gui.guitools.OutparmButton.selection_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_get</span></code></a>(**kw)</td>
 <td>Return the contents of the current X selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_handle" title="parmed.tools.gui.guitools.OutparmButton.selection_handle"><code class="xref py py-obj docutils literal"><span class="pre">selection_handle</span></code></a>(command,&nbsp;**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_handle" title="parmed.tools.gui.guitools.OutparmButton.selection_handle"><code class="xref py py-obj docutils literal"><span class="pre">selection_handle</span></code></a>(command,&nbsp;**kw)</td>
 <td>Specify a function COMMAND to call if the X selection owned by this widget is queried by another application.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_own" title="parmed.tools.gui.guitools.OutparmButton.selection_own"><code class="xref py py-obj docutils literal"><span class="pre">selection_own</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_own" title="parmed.tools.gui.guitools.OutparmButton.selection_own"><code class="xref py py-obj docutils literal"><span class="pre">selection_own</span></code></a>(**kw)</td>
 <td>Become owner of X selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_own_get" title="parmed.tools.gui.guitools.OutparmButton.selection_own_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_own_get</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.selection_own_get" title="parmed.tools.gui.guitools.OutparmButton.selection_own_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_own_get</span></code></a>(**kw)</td>
 <td>Return owner of X selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.send" title="parmed.tools.gui.guitools.OutparmButton.send"><code class="xref py py-obj docutils literal"><span class="pre">send</span></code></a>(interp,&nbsp;cmd,&nbsp;*args)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.send" title="parmed.tools.gui.guitools.OutparmButton.send"><code class="xref py py-obj docutils literal"><span class="pre">send</span></code></a>(interp,&nbsp;cmd,&nbsp;*args)</td>
 <td>Send Tcl command CMD to different interpreter INTERP to be executed.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.setvar" title="parmed.tools.gui.guitools.OutparmButton.setvar"><code class="xref py py-obj docutils literal"><span class="pre">setvar</span></code></a>([name,&nbsp;value])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.setvar" title="parmed.tools.gui.guitools.OutparmButton.setvar"><code class="xref py py-obj docutils literal"><span class="pre">setvar</span></code></a>([name,&nbsp;value])</td>
 <td>Set Tcl variable NAME to VALUE.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.size" title="parmed.tools.gui.guitools.OutparmButton.size"><code class="xref py py-obj docutils literal"><span class="pre">size</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.size" title="parmed.tools.gui.guitools.OutparmButton.size"><code class="xref py py-obj docutils literal"><span class="pre">size</span></code></a>()</td>
 <td>Return a tuple of the number of column and rows in the grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.slaves" title="parmed.tools.gui.guitools.OutparmButton.slaves"><code class="xref py py-obj docutils literal"><span class="pre">slaves</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.slaves" title="parmed.tools.gui.guitools.OutparmButton.slaves"><code class="xref py py-obj docutils literal"><span class="pre">slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonDown" title="parmed.tools.gui.guitools.OutparmButton.tkButtonDown"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonDown</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonEnter" title="parmed.tools.gui.guitools.OutparmButton.tkButtonEnter"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonEnter</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonInvoke" title="parmed.tools.gui.guitools.OutparmButton.tkButtonInvoke"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonInvoke</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonLeave" title="parmed.tools.gui.guitools.OutparmButton.tkButtonLeave"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonLeave</span></code></a>(*dummy)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonUp" title="parmed.tools.gui.guitools.OutparmButton.tkButtonUp"><code class="xref py py-obj docutils literal"><span class="pre">tkButtonUp</span></code></a>(*dummy)</td>
-<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.OutparmButton.tk_bisque" title="parmed.tools.gui.guitools.OutparmButton.tk_bisque"><code class="xref py py-obj docutils literal"><span class="pre">tk_bisque</span></code></a>()</td>
 <td>Change the color scheme to light brown as used in Tk 3.6 and before.</td>
@@ -2394,6 +2353,14 @@ after_cancel.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.tools.gui.guitools.OutparmButton.anchor">
+<code class="descname">anchor</code><span class="sig-paren">(</span><em>anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The anchor value controls how to place the grid within the
+master when no row/column has any weight.</p>
+<p>The default anchor is nw.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.OutparmButton.bbox">
 <code class="descname">bbox</code><span class="sig-paren">(</span><em>column=None</em>, <em>row=None</em>, <em>col2=None</em>, <em>row2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.bbox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a tuple of integer coordinates for the bounding
@@ -2514,12 +2481,6 @@ or FILE_NAME.  Type defaults to STRING, except on X11, where the default
 is to try UTF8_STRING and fall back to STRING.</p>
 <p>This command is equivalent to:</p>
 <p>selection_get(CLIPBOARD)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.OutparmButton.colormodel">
-<code class="descname">colormodel</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.colormodel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Useless. Not implemented in Tk.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2672,17 +2633,15 @@ the focus through the window manager.</p>
 <dd><p>Return a boolean value for Tcl boolean values true and false given as parameter.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.OutparmButton.getdouble">
-<code class="descname">getdouble</code><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.getdouble" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
-</dd></dl>
+<code class="descname">getdouble</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.getdouble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.OutparmButton.getint">
-<code class="descname">getint</code><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.getint" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></p>
-</dd></dl>
+<code class="descname">getint</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.getint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.gui.guitools.OutparmButton.getvar">
@@ -2744,6 +2703,14 @@ rowspan=number - this widget will span several rows
 sticky=NSEW - if cell is larger on which sides will this</p>
 <blockquote>
 <div>widget stick to the cell boundary</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tools.gui.guitools.OutparmButton.grid_anchor">
+<code class="descname">grid_anchor</code><span class="sig-paren">(</span><em>anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.grid_anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The anchor value controls how to place the grid within the
+master when no row/column has any weight.</p>
+<p>The default anchor is nw.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3206,31 +3173,6 @@ in its packing order.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="parmed.tools.gui.guitools.OutparmButton.tkButtonDown">
-<code class="descname">tkButtonDown</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonDown" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.OutparmButton.tkButtonEnter">
-<code class="descname">tkButtonEnter</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonEnter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.OutparmButton.tkButtonInvoke">
-<code class="descname">tkButtonInvoke</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonInvoke" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.OutparmButton.tkButtonLeave">
-<code class="descname">tkButtonLeave</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonLeave" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.OutparmButton.tkButtonUp">
-<code class="descname">tkButtonUp</code><span class="sig-paren">(</span><em>*dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.tkButtonUp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="parmed.tools.gui.guitools.OutparmButton.tk_bisque">
 <code class="descname">tk_bisque</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.OutparmButton.tk_bisque" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the color scheme to light brown as used in Tk 3.6 and before.</p>
@@ -3687,7 +3629,7 @@ in the parent.</p>
 <dl class="class">
 <dt id="parmed.tools.gui.guitools.ParmedApp">
 <em class="property">class </em><code class="descclassname">parmed.tools.gui.guitools.</code><code class="descname">ParmedApp</code><span class="sig-paren">(</span><em>master</em>, <em>amber_prmtop</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/gui/guitools.html#ParmedApp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Tkinter.Frame</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tkinter.Frame</span></code></p>
 <p>Main Parmed App Window</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
@@ -3705,38 +3647,38 @@ in the parent.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.after_idle" title="parmed.tools.gui.guitools.ParmedApp.after_idle"><code class="xref py py-obj docutils literal"><span class="pre">after_idle</span></code></a>(func,&nbsp;*args)</td>
 <td>Call FUNC once if the Tcl main loop has no event to process.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bbox" title="parmed.tools.gui.guitools.ParmedApp.bbox"><code class="xref py py-obj docutils literal"><span class="pre">bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.anchor" title="parmed.tools.gui.guitools.ParmedApp.anchor"><code class="xref py py-obj docutils literal"><span class="pre">anchor</span></code></a>([anchor])</td>
+<td>The anchor value controls how to place the grid within the master when no row/column has any weight.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bbox" title="parmed.tools.gui.guitools.ParmedApp.bbox"><code class="xref py py-obj docutils literal"><span class="pre">bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
 <td>Return a tuple of integer coordinates for the bounding box of this widget controlled by the geometry manager grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bell" title="parmed.tools.gui.guitools.ParmedApp.bell"><code class="xref py py-obj docutils literal"><span class="pre">bell</span></code></a>([displayof])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bell" title="parmed.tools.gui.guitools.ParmedApp.bell"><code class="xref py py-obj docutils literal"><span class="pre">bell</span></code></a>([displayof])</td>
 <td>Ring a display&#8217;s bell.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bind" title="parmed.tools.gui.guitools.ParmedApp.bind"><code class="xref py py-obj docutils literal"><span class="pre">bind</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bind" title="parmed.tools.gui.guitools.ParmedApp.bind"><code class="xref py py-obj docutils literal"><span class="pre">bind</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to this widget at event SEQUENCE a call to function FUNC.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bind_all" title="parmed.tools.gui.guitools.ParmedApp.bind_all"><code class="xref py py-obj docutils literal"><span class="pre">bind_all</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bind_all" title="parmed.tools.gui.guitools.ParmedApp.bind_all"><code class="xref py py-obj docutils literal"><span class="pre">bind_all</span></code></a>([sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to all widgets at an event SEQUENCE a call to function FUNC.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bind_class" title="parmed.tools.gui.guitools.ParmedApp.bind_class"><code class="xref py py-obj docutils literal"><span class="pre">bind_class</span></code></a>(className[,&nbsp;sequence,&nbsp;func,&nbsp;add])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bind_class" title="parmed.tools.gui.guitools.ParmedApp.bind_class"><code class="xref py py-obj docutils literal"><span class="pre">bind_class</span></code></a>(className[,&nbsp;sequence,&nbsp;func,&nbsp;add])</td>
 <td>Bind to widgets with bindtag CLASSNAME at event SEQUENCE a call of function FUNC.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bindtags" title="parmed.tools.gui.guitools.ParmedApp.bindtags"><code class="xref py py-obj docutils literal"><span class="pre">bindtags</span></code></a>([tagList])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.bindtags" title="parmed.tools.gui.guitools.ParmedApp.bindtags"><code class="xref py py-obj docutils literal"><span class="pre">bindtags</span></code></a>([tagList])</td>
 <td>Set or get the list of bindtags for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.cget" title="parmed.tools.gui.guitools.ParmedApp.cget"><code class="xref py py-obj docutils literal"><span class="pre">cget</span></code></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.cget" title="parmed.tools.gui.guitools.ParmedApp.cget"><code class="xref py py-obj docutils literal"><span class="pre">cget</span></code></a>(key)</td>
 <td>Return the resource value for a KEY given as string.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.clipboard_append" title="parmed.tools.gui.guitools.ParmedApp.clipboard_append"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_append</span></code></a>(string,&nbsp;**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.clipboard_append" title="parmed.tools.gui.guitools.ParmedApp.clipboard_append"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_append</span></code></a>(string,&nbsp;**kw)</td>
 <td>Append STRING to the Tk clipboard.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.clipboard_clear" title="parmed.tools.gui.guitools.ParmedApp.clipboard_clear"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_clear</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.clipboard_clear" title="parmed.tools.gui.guitools.ParmedApp.clipboard_clear"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_clear</span></code></a>(**kw)</td>
 <td>Clear the data in the Tk clipboard.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.clipboard_get" title="parmed.tools.gui.guitools.ParmedApp.clipboard_get"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_get</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.clipboard_get" title="parmed.tools.gui.guitools.ParmedApp.clipboard_get"><code class="xref py py-obj docutils literal"><span class="pre">clipboard_get</span></code></a>(**kw)</td>
 <td>Retrieve data from the clipboard on window&#8217;s display.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.colormodel" title="parmed.tools.gui.guitools.ParmedApp.colormodel"><code class="xref py py-obj docutils literal"><span class="pre">colormodel</span></code></a>([value])</td>
-<td>Useless.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.columnconfigure" title="parmed.tools.gui.guitools.ParmedApp.columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure column INDEX of a grid.</td>
@@ -3789,11 +3731,11 @@ in the parent.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.getboolean" title="parmed.tools.gui.guitools.ParmedApp.getboolean"><code class="xref py py-obj docutils literal"><span class="pre">getboolean</span></code></a>(s)</td>
 <td>Return a boolean value for Tcl boolean values true and false given as parameter.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.getdouble" title="parmed.tools.gui.guitools.ParmedApp.getdouble"><code class="xref py py-obj docutils literal"><span class="pre">getdouble</span></code></a></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.getdouble" title="parmed.tools.gui.guitools.ParmedApp.getdouble"><code class="xref py py-obj docutils literal"><span class="pre">getdouble</span></code></a>(s)</td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.getint" title="parmed.tools.gui.guitools.ParmedApp.getint"><code class="xref py py-obj docutils literal"><span class="pre">getint</span></code></a></td>
-<td>alias of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.getint" title="parmed.tools.gui.guitools.ParmedApp.getint"><code class="xref py py-obj docutils literal"><span class="pre">getint</span></code></a>(s)</td>
+<td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.getvar" title="parmed.tools.gui.guitools.ParmedApp.getvar"><code class="xref py py-obj docutils literal"><span class="pre">getvar</span></code></a>([name])</td>
 <td>Return value of Tcl variable NAME.</td>
@@ -3816,346 +3758,349 @@ in the parent.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid" title="parmed.tools.gui.guitools.ParmedApp.grid"><code class="xref py py-obj docutils literal"><span class="pre">grid</span></code></a>([cnf])</td>
 <td>Position a widget in the parent widget in a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_bbox" title="parmed.tools.gui.guitools.ParmedApp.grid_bbox"><code class="xref py py-obj docutils literal"><span class="pre">grid_bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_anchor" title="parmed.tools.gui.guitools.ParmedApp.grid_anchor"><code class="xref py py-obj docutils literal"><span class="pre">grid_anchor</span></code></a>([anchor])</td>
+<td>The anchor value controls how to place the grid within the master when no row/column has any weight.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_bbox" title="parmed.tools.gui.guitools.ParmedApp.grid_bbox"><code class="xref py py-obj docutils literal"><span class="pre">grid_bbox</span></code></a>([column,&nbsp;row,&nbsp;col2,&nbsp;row2])</td>
 <td>Return a tuple of integer coordinates for the bounding box of this widget controlled by the geometry manager grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_columnconfigure" title="parmed.tools.gui.guitools.ParmedApp.grid_columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_columnconfigure" title="parmed.tools.gui.guitools.ParmedApp.grid_columnconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_columnconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure column INDEX of a grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_configure" title="parmed.tools.gui.guitools.ParmedApp.grid_configure"><code class="xref py py-obj docutils literal"><span class="pre">grid_configure</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_configure" title="parmed.tools.gui.guitools.ParmedApp.grid_configure"><code class="xref py py-obj docutils literal"><span class="pre">grid_configure</span></code></a>([cnf])</td>
 <td>Position a widget in the parent widget in a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_forget" title="parmed.tools.gui.guitools.ParmedApp.grid_forget"><code class="xref py py-obj docutils literal"><span class="pre">grid_forget</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_forget" title="parmed.tools.gui.guitools.ParmedApp.grid_forget"><code class="xref py py-obj docutils literal"><span class="pre">grid_forget</span></code></a>()</td>
 <td>Unmap this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_info" title="parmed.tools.gui.guitools.ParmedApp.grid_info"><code class="xref py py-obj docutils literal"><span class="pre">grid_info</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_info" title="parmed.tools.gui.guitools.ParmedApp.grid_info"><code class="xref py py-obj docutils literal"><span class="pre">grid_info</span></code></a>()</td>
 <td>Return information about the options for positioning this widget in a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_location" title="parmed.tools.gui.guitools.ParmedApp.grid_location"><code class="xref py py-obj docutils literal"><span class="pre">grid_location</span></code></a>(x,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_location" title="parmed.tools.gui.guitools.ParmedApp.grid_location"><code class="xref py py-obj docutils literal"><span class="pre">grid_location</span></code></a>(x,&nbsp;y)</td>
 <td>Return a tuple of column and row which identify the cell at which the pixel at position X and Y inside the master widget is located.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_propagate" title="parmed.tools.gui.guitools.ParmedApp.grid_propagate"><code class="xref py py-obj docutils literal"><span class="pre">grid_propagate</span></code></a>([flag])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_propagate" title="parmed.tools.gui.guitools.ParmedApp.grid_propagate"><code class="xref py py-obj docutils literal"><span class="pre">grid_propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_remove" title="parmed.tools.gui.guitools.ParmedApp.grid_remove"><code class="xref py py-obj docutils literal"><span class="pre">grid_remove</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_remove" title="parmed.tools.gui.guitools.ParmedApp.grid_remove"><code class="xref py py-obj docutils literal"><span class="pre">grid_remove</span></code></a>()</td>
 <td>Unmap this widget but remember the grid options.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_rowconfigure" title="parmed.tools.gui.guitools.ParmedApp.grid_rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_rowconfigure" title="parmed.tools.gui.guitools.ParmedApp.grid_rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">grid_rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure row INDEX of a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_size" title="parmed.tools.gui.guitools.ParmedApp.grid_size"><code class="xref py py-obj docutils literal"><span class="pre">grid_size</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_size" title="parmed.tools.gui.guitools.ParmedApp.grid_size"><code class="xref py py-obj docutils literal"><span class="pre">grid_size</span></code></a>()</td>
 <td>Return a tuple of the number of column and rows in the grid.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_slaves" title="parmed.tools.gui.guitools.ParmedApp.grid_slaves"><code class="xref py py-obj docutils literal"><span class="pre">grid_slaves</span></code></a>([row,&nbsp;column])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.grid_slaves" title="parmed.tools.gui.guitools.ParmedApp.grid_slaves"><code class="xref py py-obj docutils literal"><span class="pre">grid_slaves</span></code></a>([row,&nbsp;column])</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.image_names" title="parmed.tools.gui.guitools.ParmedApp.image_names"><code class="xref py py-obj docutils literal"><span class="pre">image_names</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.image_names" title="parmed.tools.gui.guitools.ParmedApp.image_names"><code class="xref py py-obj docutils literal"><span class="pre">image_names</span></code></a>()</td>
 <td>Return a list of all existing image names.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.image_types" title="parmed.tools.gui.guitools.ParmedApp.image_types"><code class="xref py py-obj docutils literal"><span class="pre">image_types</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.image_types" title="parmed.tools.gui.guitools.ParmedApp.image_types"><code class="xref py py-obj docutils literal"><span class="pre">image_types</span></code></a>()</td>
 <td>Return a list of all available image types (e.g.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.info" title="parmed.tools.gui.guitools.ParmedApp.info"><code class="xref py py-obj docutils literal"><span class="pre">info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.info" title="parmed.tools.gui.guitools.ParmedApp.info"><code class="xref py py-obj docutils literal"><span class="pre">info</span></code></a>()</td>
 <td>Return information about the packing options for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.keys" title="parmed.tools.gui.guitools.ParmedApp.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.keys" title="parmed.tools.gui.guitools.ParmedApp.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>()</td>
 <td>Return a list of all resource names of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.lift" title="parmed.tools.gui.guitools.ParmedApp.lift"><code class="xref py py-obj docutils literal"><span class="pre">lift</span></code></a>([aboveThis])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.lift" title="parmed.tools.gui.guitools.ParmedApp.lift"><code class="xref py py-obj docutils literal"><span class="pre">lift</span></code></a>([aboveThis])</td>
 <td>Raise this widget in the stacking order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.location" title="parmed.tools.gui.guitools.ParmedApp.location"><code class="xref py py-obj docutils literal"><span class="pre">location</span></code></a>(x,&nbsp;y)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.location" title="parmed.tools.gui.guitools.ParmedApp.location"><code class="xref py py-obj docutils literal"><span class="pre">location</span></code></a>(x,&nbsp;y)</td>
 <td>Return a tuple of column and row which identify the cell at which the pixel at position X and Y inside the master widget is located.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.lower" title="parmed.tools.gui.guitools.ParmedApp.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>([belowThis])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.lower" title="parmed.tools.gui.guitools.ParmedApp.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>([belowThis])</td>
 <td>Lower this widget in the stacking order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.mainloop" title="parmed.tools.gui.guitools.ParmedApp.mainloop"><code class="xref py py-obj docutils literal"><span class="pre">mainloop</span></code></a>([n])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.mainloop" title="parmed.tools.gui.guitools.ParmedApp.mainloop"><code class="xref py py-obj docutils literal"><span class="pre">mainloop</span></code></a>([n])</td>
 <td>Call the mainloop of Tk.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.nametowidget" title="parmed.tools.gui.guitools.ParmedApp.nametowidget"><code class="xref py py-obj docutils literal"><span class="pre">nametowidget</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.nametowidget" title="parmed.tools.gui.guitools.ParmedApp.nametowidget"><code class="xref py py-obj docutils literal"><span class="pre">nametowidget</span></code></a>(name)</td>
 <td>Return the Tkinter instance of a widget identified by its Tcl name NAME.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_add" title="parmed.tools.gui.guitools.ParmedApp.option_add"><code class="xref py py-obj docutils literal"><span class="pre">option_add</span></code></a>(pattern,&nbsp;value[,&nbsp;priority])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_add" title="parmed.tools.gui.guitools.ParmedApp.option_add"><code class="xref py py-obj docutils literal"><span class="pre">option_add</span></code></a>(pattern,&nbsp;value[,&nbsp;priority])</td>
 <td>Set a VALUE (second parameter) for an option PATTERN (first parameter).</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_clear" title="parmed.tools.gui.guitools.ParmedApp.option_clear"><code class="xref py py-obj docutils literal"><span class="pre">option_clear</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_clear" title="parmed.tools.gui.guitools.ParmedApp.option_clear"><code class="xref py py-obj docutils literal"><span class="pre">option_clear</span></code></a>()</td>
 <td>Clear the option database.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_get" title="parmed.tools.gui.guitools.ParmedApp.option_get"><code class="xref py py-obj docutils literal"><span class="pre">option_get</span></code></a>(name,&nbsp;className)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_get" title="parmed.tools.gui.guitools.ParmedApp.option_get"><code class="xref py py-obj docutils literal"><span class="pre">option_get</span></code></a>(name,&nbsp;className)</td>
 <td>Return the value for an option NAME for this widget with CLASSNAME.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_readfile" title="parmed.tools.gui.guitools.ParmedApp.option_readfile"><code class="xref py py-obj docutils literal"><span class="pre">option_readfile</span></code></a>(fileName[,&nbsp;priority])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.option_readfile" title="parmed.tools.gui.guitools.ParmedApp.option_readfile"><code class="xref py py-obj docutils literal"><span class="pre">option_readfile</span></code></a>(fileName[,&nbsp;priority])</td>
 <td>Read file FILENAME into the option database.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack" title="parmed.tools.gui.guitools.ParmedApp.pack"><code class="xref py py-obj docutils literal"><span class="pre">pack</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack" title="parmed.tools.gui.guitools.ParmedApp.pack"><code class="xref py py-obj docutils literal"><span class="pre">pack</span></code></a>([cnf])</td>
 <td>Pack a widget in the parent widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_configure" title="parmed.tools.gui.guitools.ParmedApp.pack_configure"><code class="xref py py-obj docutils literal"><span class="pre">pack_configure</span></code></a>([cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_configure" title="parmed.tools.gui.guitools.ParmedApp.pack_configure"><code class="xref py py-obj docutils literal"><span class="pre">pack_configure</span></code></a>([cnf])</td>
 <td>Pack a widget in the parent widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_forget" title="parmed.tools.gui.guitools.ParmedApp.pack_forget"><code class="xref py py-obj docutils literal"><span class="pre">pack_forget</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_forget" title="parmed.tools.gui.guitools.ParmedApp.pack_forget"><code class="xref py py-obj docutils literal"><span class="pre">pack_forget</span></code></a>()</td>
 <td>Unmap this widget and do not use it for the packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_info" title="parmed.tools.gui.guitools.ParmedApp.pack_info"><code class="xref py py-obj docutils literal"><span class="pre">pack_info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_info" title="parmed.tools.gui.guitools.ParmedApp.pack_info"><code class="xref py py-obj docutils literal"><span class="pre">pack_info</span></code></a>()</td>
 <td>Return information about the packing options for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_propagate" title="parmed.tools.gui.guitools.ParmedApp.pack_propagate"><code class="xref py py-obj docutils literal"><span class="pre">pack_propagate</span></code></a>([flag])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_propagate" title="parmed.tools.gui.guitools.ParmedApp.pack_propagate"><code class="xref py py-obj docutils literal"><span class="pre">pack_propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_slaves" title="parmed.tools.gui.guitools.ParmedApp.pack_slaves"><code class="xref py py-obj docutils literal"><span class="pre">pack_slaves</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.pack_slaves" title="parmed.tools.gui.guitools.ParmedApp.pack_slaves"><code class="xref py py-obj docutils literal"><span class="pre">pack_slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place" title="parmed.tools.gui.guitools.ParmedApp.place"><code class="xref py py-obj docutils literal"><span class="pre">place</span></code></a>([cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place" title="parmed.tools.gui.guitools.ParmedApp.place"><code class="xref py py-obj docutils literal"><span class="pre">place</span></code></a>([cnf])</td>
 <td>Place a widget in the parent widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_configure" title="parmed.tools.gui.guitools.ParmedApp.place_configure"><code class="xref py py-obj docutils literal"><span class="pre">place_configure</span></code></a>([cnf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_configure" title="parmed.tools.gui.guitools.ParmedApp.place_configure"><code class="xref py py-obj docutils literal"><span class="pre">place_configure</span></code></a>([cnf])</td>
 <td>Place a widget in the parent widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_forget" title="parmed.tools.gui.guitools.ParmedApp.place_forget"><code class="xref py py-obj docutils literal"><span class="pre">place_forget</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_forget" title="parmed.tools.gui.guitools.ParmedApp.place_forget"><code class="xref py py-obj docutils literal"><span class="pre">place_forget</span></code></a>()</td>
 <td>Unmap this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_info" title="parmed.tools.gui.guitools.ParmedApp.place_info"><code class="xref py py-obj docutils literal"><span class="pre">place_info</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_info" title="parmed.tools.gui.guitools.ParmedApp.place_info"><code class="xref py py-obj docutils literal"><span class="pre">place_info</span></code></a>()</td>
 <td>Return information about the placing options for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_slaves" title="parmed.tools.gui.guitools.ParmedApp.place_slaves"><code class="xref py py-obj docutils literal"><span class="pre">place_slaves</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.place_slaves" title="parmed.tools.gui.guitools.ParmedApp.place_slaves"><code class="xref py py-obj docutils literal"><span class="pre">place_slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.propagate" title="parmed.tools.gui.guitools.ParmedApp.propagate"><code class="xref py py-obj docutils literal"><span class="pre">propagate</span></code></a>([flag])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.propagate" title="parmed.tools.gui.guitools.ParmedApp.propagate"><code class="xref py py-obj docutils literal"><span class="pre">propagate</span></code></a>([flag])</td>
 <td>Set or get the status for propagation of geometry information.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.quit" title="parmed.tools.gui.guitools.ParmedApp.quit"><code class="xref py py-obj docutils literal"><span class="pre">quit</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.quit" title="parmed.tools.gui.guitools.ParmedApp.quit"><code class="xref py py-obj docutils literal"><span class="pre">quit</span></code></a>()</td>
 <td>Quit the Tcl interpreter.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.register" title="parmed.tools.gui.guitools.ParmedApp.register"><code class="xref py py-obj docutils literal"><span class="pre">register</span></code></a>(func[,&nbsp;subst,&nbsp;needcleanup])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.register" title="parmed.tools.gui.guitools.ParmedApp.register"><code class="xref py py-obj docutils literal"><span class="pre">register</span></code></a>(func[,&nbsp;subst,&nbsp;needcleanup])</td>
 <td>Return a newly created Tcl function.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.rowconfigure" title="parmed.tools.gui.guitools.ParmedApp.rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.rowconfigure" title="parmed.tools.gui.guitools.ParmedApp.rowconfigure"><code class="xref py py-obj docutils literal"><span class="pre">rowconfigure</span></code></a>(index[,&nbsp;cnf])</td>
 <td>Configure row INDEX of a grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_clear" title="parmed.tools.gui.guitools.ParmedApp.selection_clear"><code class="xref py py-obj docutils literal"><span class="pre">selection_clear</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_clear" title="parmed.tools.gui.guitools.ParmedApp.selection_clear"><code class="xref py py-obj docutils literal"><span class="pre">selection_clear</span></code></a>(**kw)</td>
 <td>Clear the current X selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_get" title="parmed.tools.gui.guitools.ParmedApp.selection_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_get</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_get" title="parmed.tools.gui.guitools.ParmedApp.selection_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_get</span></code></a>(**kw)</td>
 <td>Return the contents of the current X selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_handle" title="parmed.tools.gui.guitools.ParmedApp.selection_handle"><code class="xref py py-obj docutils literal"><span class="pre">selection_handle</span></code></a>(command,&nbsp;**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_handle" title="parmed.tools.gui.guitools.ParmedApp.selection_handle"><code class="xref py py-obj docutils literal"><span class="pre">selection_handle</span></code></a>(command,&nbsp;**kw)</td>
 <td>Specify a function COMMAND to call if the X selection owned by this widget is queried by another application.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_own" title="parmed.tools.gui.guitools.ParmedApp.selection_own"><code class="xref py py-obj docutils literal"><span class="pre">selection_own</span></code></a>(**kw)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_own" title="parmed.tools.gui.guitools.ParmedApp.selection_own"><code class="xref py py-obj docutils literal"><span class="pre">selection_own</span></code></a>(**kw)</td>
 <td>Become owner of X selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_own_get" title="parmed.tools.gui.guitools.ParmedApp.selection_own_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_own_get</span></code></a>(**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.selection_own_get" title="parmed.tools.gui.guitools.ParmedApp.selection_own_get"><code class="xref py py-obj docutils literal"><span class="pre">selection_own_get</span></code></a>(**kw)</td>
 <td>Return owner of X selection.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.send" title="parmed.tools.gui.guitools.ParmedApp.send"><code class="xref py py-obj docutils literal"><span class="pre">send</span></code></a>(interp,&nbsp;cmd,&nbsp;*args)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.send" title="parmed.tools.gui.guitools.ParmedApp.send"><code class="xref py py-obj docutils literal"><span class="pre">send</span></code></a>(interp,&nbsp;cmd,&nbsp;*args)</td>
 <td>Send Tcl command CMD to different interpreter INTERP to be executed.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.setvar" title="parmed.tools.gui.guitools.ParmedApp.setvar"><code class="xref py py-obj docutils literal"><span class="pre">setvar</span></code></a>([name,&nbsp;value])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.setvar" title="parmed.tools.gui.guitools.ParmedApp.setvar"><code class="xref py py-obj docutils literal"><span class="pre">setvar</span></code></a>([name,&nbsp;value])</td>
 <td>Set Tcl variable NAME to VALUE.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.size" title="parmed.tools.gui.guitools.ParmedApp.size"><code class="xref py py-obj docutils literal"><span class="pre">size</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.size" title="parmed.tools.gui.guitools.ParmedApp.size"><code class="xref py py-obj docutils literal"><span class="pre">size</span></code></a>()</td>
 <td>Return a tuple of the number of column and rows in the grid.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.slaves" title="parmed.tools.gui.guitools.ParmedApp.slaves"><code class="xref py py-obj docutils literal"><span class="pre">slaves</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.slaves" title="parmed.tools.gui.guitools.ParmedApp.slaves"><code class="xref py py-obj docutils literal"><span class="pre">slaves</span></code></a>()</td>
 <td>Return a list of all slaves of this widget in its packing order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_bisque" title="parmed.tools.gui.guitools.ParmedApp.tk_bisque"><code class="xref py py-obj docutils literal"><span class="pre">tk_bisque</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_bisque" title="parmed.tools.gui.guitools.ParmedApp.tk_bisque"><code class="xref py py-obj docutils literal"><span class="pre">tk_bisque</span></code></a>()</td>
 <td>Change the color scheme to light brown as used in Tk 3.6 and before.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_focusFollowsMouse" title="parmed.tools.gui.guitools.ParmedApp.tk_focusFollowsMouse"><code class="xref py py-obj docutils literal"><span class="pre">tk_focusFollowsMouse</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_focusFollowsMouse" title="parmed.tools.gui.guitools.ParmedApp.tk_focusFollowsMouse"><code class="xref py py-obj docutils literal"><span class="pre">tk_focusFollowsMouse</span></code></a>()</td>
 <td>The widget under mouse will get automatically focus.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_focusNext" title="parmed.tools.gui.guitools.ParmedApp.tk_focusNext"><code class="xref py py-obj docutils literal"><span class="pre">tk_focusNext</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_focusNext" title="parmed.tools.gui.guitools.ParmedApp.tk_focusNext"><code class="xref py py-obj docutils literal"><span class="pre">tk_focusNext</span></code></a>()</td>
 <td>Return the next widget in the focus order which follows widget which has currently the focus.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_focusPrev" title="parmed.tools.gui.guitools.ParmedApp.tk_focusPrev"><code class="xref py py-obj docutils literal"><span class="pre">tk_focusPrev</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_focusPrev" title="parmed.tools.gui.guitools.ParmedApp.tk_focusPrev"><code class="xref py py-obj docutils literal"><span class="pre">tk_focusPrev</span></code></a>()</td>
 <td>Return previous widget in the focus order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_menuBar" title="parmed.tools.gui.guitools.ParmedApp.tk_menuBar"><code class="xref py py-obj docutils literal"><span class="pre">tk_menuBar</span></code></a>(*args)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_menuBar" title="parmed.tools.gui.guitools.ParmedApp.tk_menuBar"><code class="xref py py-obj docutils literal"><span class="pre">tk_menuBar</span></code></a>(*args)</td>
 <td>Do not use.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_setPalette" title="parmed.tools.gui.guitools.ParmedApp.tk_setPalette"><code class="xref py py-obj docutils literal"><span class="pre">tk_setPalette</span></code></a>(*args,&nbsp;**kw)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_setPalette" title="parmed.tools.gui.guitools.ParmedApp.tk_setPalette"><code class="xref py py-obj docutils literal"><span class="pre">tk_setPalette</span></code></a>(*args,&nbsp;**kw)</td>
 <td>Set a new color scheme for all widget elements.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_strictMotif" title="parmed.tools.gui.guitools.ParmedApp.tk_strictMotif"><code class="xref py py-obj docutils literal"><span class="pre">tk_strictMotif</span></code></a>([boolean])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tk_strictMotif" title="parmed.tools.gui.guitools.ParmedApp.tk_strictMotif"><code class="xref py py-obj docutils literal"><span class="pre">tk_strictMotif</span></code></a>([boolean])</td>
 <td>Set Tcl internal variable, whether the look and feel should adhere to Motif.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tkraise" title="parmed.tools.gui.guitools.ParmedApp.tkraise"><code class="xref py py-obj docutils literal"><span class="pre">tkraise</span></code></a>([aboveThis])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.tkraise" title="parmed.tools.gui.guitools.ParmedApp.tkraise"><code class="xref py py-obj docutils literal"><span class="pre">tkraise</span></code></a>([aboveThis])</td>
 <td>Raise this widget in the stacking order.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.unbind" title="parmed.tools.gui.guitools.ParmedApp.unbind"><code class="xref py py-obj docutils literal"><span class="pre">unbind</span></code></a>(sequence[,&nbsp;funcid])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.unbind" title="parmed.tools.gui.guitools.ParmedApp.unbind"><code class="xref py py-obj docutils literal"><span class="pre">unbind</span></code></a>(sequence[,&nbsp;funcid])</td>
 <td>Unbind for this widget for event SEQUENCE  the function identified with FUNCID.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.unbind_all" title="parmed.tools.gui.guitools.ParmedApp.unbind_all"><code class="xref py py-obj docutils literal"><span class="pre">unbind_all</span></code></a>(sequence)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.unbind_all" title="parmed.tools.gui.guitools.ParmedApp.unbind_all"><code class="xref py py-obj docutils literal"><span class="pre">unbind_all</span></code></a>(sequence)</td>
 <td>Unbind for all widgets for event SEQUENCE all functions.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.unbind_class" title="parmed.tools.gui.guitools.ParmedApp.unbind_class"><code class="xref py py-obj docutils literal"><span class="pre">unbind_class</span></code></a>(className,&nbsp;sequence)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.unbind_class" title="parmed.tools.gui.guitools.ParmedApp.unbind_class"><code class="xref py py-obj docutils literal"><span class="pre">unbind_class</span></code></a>(className,&nbsp;sequence)</td>
 <td>Unbind for all widgets with bindtag CLASSNAME for event SEQUENCE all functions.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.update" title="parmed.tools.gui.guitools.ParmedApp.update"><code class="xref py py-obj docutils literal"><span class="pre">update</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.update" title="parmed.tools.gui.guitools.ParmedApp.update"><code class="xref py py-obj docutils literal"><span class="pre">update</span></code></a>()</td>
 <td>Enter event loop until all pending events have been processed by Tcl.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.update_idletasks" title="parmed.tools.gui.guitools.ParmedApp.update_idletasks"><code class="xref py py-obj docutils literal"><span class="pre">update_idletasks</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.update_idletasks" title="parmed.tools.gui.guitools.ParmedApp.update_idletasks"><code class="xref py py-obj docutils literal"><span class="pre">update_idletasks</span></code></a>()</td>
 <td>Enter event loop until all idle callbacks have been called.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.wait_variable" title="parmed.tools.gui.guitools.ParmedApp.wait_variable"><code class="xref py py-obj docutils literal"><span class="pre">wait_variable</span></code></a>([name])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.wait_variable" title="parmed.tools.gui.guitools.ParmedApp.wait_variable"><code class="xref py py-obj docutils literal"><span class="pre">wait_variable</span></code></a>([name])</td>
 <td>Wait until the variable is modified.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.wait_visibility" title="parmed.tools.gui.guitools.ParmedApp.wait_visibility"><code class="xref py py-obj docutils literal"><span class="pre">wait_visibility</span></code></a>([window])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.wait_visibility" title="parmed.tools.gui.guitools.ParmedApp.wait_visibility"><code class="xref py py-obj docutils literal"><span class="pre">wait_visibility</span></code></a>([window])</td>
 <td>Wait until the visibility of a WIDGET changes (e.g.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.wait_window" title="parmed.tools.gui.guitools.ParmedApp.wait_window"><code class="xref py py-obj docutils literal"><span class="pre">wait_window</span></code></a>([window])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.wait_window" title="parmed.tools.gui.guitools.ParmedApp.wait_window"><code class="xref py py-obj docutils literal"><span class="pre">wait_window</span></code></a>([window])</td>
 <td>Wait until a WIDGET is destroyed.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.waitvar" title="parmed.tools.gui.guitools.ParmedApp.waitvar"><code class="xref py py-obj docutils literal"><span class="pre">waitvar</span></code></a>([name])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.waitvar" title="parmed.tools.gui.guitools.ParmedApp.waitvar"><code class="xref py py-obj docutils literal"><span class="pre">waitvar</span></code></a>([name])</td>
 <td>Wait until the variable is modified.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_atom" title="parmed.tools.gui.guitools.ParmedApp.winfo_atom"><code class="xref py py-obj docutils literal"><span class="pre">winfo_atom</span></code></a>(name[,&nbsp;displayof])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_atom" title="parmed.tools.gui.guitools.ParmedApp.winfo_atom"><code class="xref py py-obj docutils literal"><span class="pre">winfo_atom</span></code></a>(name[,&nbsp;displayof])</td>
 <td>Return integer which represents atom NAME.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_atomname" title="parmed.tools.gui.guitools.ParmedApp.winfo_atomname"><code class="xref py py-obj docutils literal"><span class="pre">winfo_atomname</span></code></a>(id[,&nbsp;displayof])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_atomname" title="parmed.tools.gui.guitools.ParmedApp.winfo_atomname"><code class="xref py py-obj docutils literal"><span class="pre">winfo_atomname</span></code></a>(id[,&nbsp;displayof])</td>
 <td>Return name of atom with identifier ID.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_cells" title="parmed.tools.gui.guitools.ParmedApp.winfo_cells"><code class="xref py py-obj docutils literal"><span class="pre">winfo_cells</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_cells" title="parmed.tools.gui.guitools.ParmedApp.winfo_cells"><code class="xref py py-obj docutils literal"><span class="pre">winfo_cells</span></code></a>()</td>
 <td>Return number of cells in the colormap for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_children" title="parmed.tools.gui.guitools.ParmedApp.winfo_children"><code class="xref py py-obj docutils literal"><span class="pre">winfo_children</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_children" title="parmed.tools.gui.guitools.ParmedApp.winfo_children"><code class="xref py py-obj docutils literal"><span class="pre">winfo_children</span></code></a>()</td>
 <td>Return a list of all widgets which are children of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_class" title="parmed.tools.gui.guitools.ParmedApp.winfo_class"><code class="xref py py-obj docutils literal"><span class="pre">winfo_class</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_class" title="parmed.tools.gui.guitools.ParmedApp.winfo_class"><code class="xref py py-obj docutils literal"><span class="pre">winfo_class</span></code></a>()</td>
 <td>Return window class name of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_colormapfull" title="parmed.tools.gui.guitools.ParmedApp.winfo_colormapfull"><code class="xref py py-obj docutils literal"><span class="pre">winfo_colormapfull</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_colormapfull" title="parmed.tools.gui.guitools.ParmedApp.winfo_colormapfull"><code class="xref py py-obj docutils literal"><span class="pre">winfo_colormapfull</span></code></a>()</td>
 <td>Return true if at the last color request the colormap was full.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_containing" title="parmed.tools.gui.guitools.ParmedApp.winfo_containing"><code class="xref py py-obj docutils literal"><span class="pre">winfo_containing</span></code></a>(rootX,&nbsp;rootY[,&nbsp;displayof])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_containing" title="parmed.tools.gui.guitools.ParmedApp.winfo_containing"><code class="xref py py-obj docutils literal"><span class="pre">winfo_containing</span></code></a>(rootX,&nbsp;rootY[,&nbsp;displayof])</td>
 <td>Return the widget which is at the root coordinates ROOTX, ROOTY.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_depth" title="parmed.tools.gui.guitools.ParmedApp.winfo_depth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_depth</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_depth" title="parmed.tools.gui.guitools.ParmedApp.winfo_depth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_depth</span></code></a>()</td>
 <td>Return the number of bits per pixel.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_exists" title="parmed.tools.gui.guitools.ParmedApp.winfo_exists"><code class="xref py py-obj docutils literal"><span class="pre">winfo_exists</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_exists" title="parmed.tools.gui.guitools.ParmedApp.winfo_exists"><code class="xref py py-obj docutils literal"><span class="pre">winfo_exists</span></code></a>()</td>
 <td>Return true if this widget exists.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_fpixels" title="parmed.tools.gui.guitools.ParmedApp.winfo_fpixels"><code class="xref py py-obj docutils literal"><span class="pre">winfo_fpixels</span></code></a>(number)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_fpixels" title="parmed.tools.gui.guitools.ParmedApp.winfo_fpixels"><code class="xref py py-obj docutils literal"><span class="pre">winfo_fpixels</span></code></a>(number)</td>
 <td>Return the number of pixels for the given distance NUMBER (e.g.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_geometry" title="parmed.tools.gui.guitools.ParmedApp.winfo_geometry"><code class="xref py py-obj docutils literal"><span class="pre">winfo_geometry</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_geometry" title="parmed.tools.gui.guitools.ParmedApp.winfo_geometry"><code class="xref py py-obj docutils literal"><span class="pre">winfo_geometry</span></code></a>()</td>
 <td>Return geometry string for this widget in the form &#8220;widthxheight+X+Y&#8221;.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_height" title="parmed.tools.gui.guitools.ParmedApp.winfo_height"><code class="xref py py-obj docutils literal"><span class="pre">winfo_height</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_height" title="parmed.tools.gui.guitools.ParmedApp.winfo_height"><code class="xref py py-obj docutils literal"><span class="pre">winfo_height</span></code></a>()</td>
 <td>Return height of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_id" title="parmed.tools.gui.guitools.ParmedApp.winfo_id"><code class="xref py py-obj docutils literal"><span class="pre">winfo_id</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_id" title="parmed.tools.gui.guitools.ParmedApp.winfo_id"><code class="xref py py-obj docutils literal"><span class="pre">winfo_id</span></code></a>()</td>
 <td>Return identifier ID for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_interps" title="parmed.tools.gui.guitools.ParmedApp.winfo_interps"><code class="xref py py-obj docutils literal"><span class="pre">winfo_interps</span></code></a>([displayof])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_interps" title="parmed.tools.gui.guitools.ParmedApp.winfo_interps"><code class="xref py py-obj docutils literal"><span class="pre">winfo_interps</span></code></a>([displayof])</td>
 <td>Return the name of all Tcl interpreters for this display.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_ismapped" title="parmed.tools.gui.guitools.ParmedApp.winfo_ismapped"><code class="xref py py-obj docutils literal"><span class="pre">winfo_ismapped</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_ismapped" title="parmed.tools.gui.guitools.ParmedApp.winfo_ismapped"><code class="xref py py-obj docutils literal"><span class="pre">winfo_ismapped</span></code></a>()</td>
 <td>Return true if this widget is mapped.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_manager" title="parmed.tools.gui.guitools.ParmedApp.winfo_manager"><code class="xref py py-obj docutils literal"><span class="pre">winfo_manager</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_manager" title="parmed.tools.gui.guitools.ParmedApp.winfo_manager"><code class="xref py py-obj docutils literal"><span class="pre">winfo_manager</span></code></a>()</td>
 <td>Return the window mananger name for this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_name" title="parmed.tools.gui.guitools.ParmedApp.winfo_name"><code class="xref py py-obj docutils literal"><span class="pre">winfo_name</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_name" title="parmed.tools.gui.guitools.ParmedApp.winfo_name"><code class="xref py py-obj docutils literal"><span class="pre">winfo_name</span></code></a>()</td>
 <td>Return the name of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_parent" title="parmed.tools.gui.guitools.ParmedApp.winfo_parent"><code class="xref py py-obj docutils literal"><span class="pre">winfo_parent</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_parent" title="parmed.tools.gui.guitools.ParmedApp.winfo_parent"><code class="xref py py-obj docutils literal"><span class="pre">winfo_parent</span></code></a>()</td>
 <td>Return the name of the parent of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pathname" title="parmed.tools.gui.guitools.ParmedApp.winfo_pathname"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pathname</span></code></a>(id[,&nbsp;displayof])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pathname" title="parmed.tools.gui.guitools.ParmedApp.winfo_pathname"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pathname</span></code></a>(id[,&nbsp;displayof])</td>
 <td>Return the pathname of the widget given by ID.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pixels" title="parmed.tools.gui.guitools.ParmedApp.winfo_pixels"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pixels</span></code></a>(number)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pixels" title="parmed.tools.gui.guitools.ParmedApp.winfo_pixels"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pixels</span></code></a>(number)</td>
 <td>Rounded integer value of winfo_fpixels.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pointerx" title="parmed.tools.gui.guitools.ParmedApp.winfo_pointerx"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pointerx</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pointerx" title="parmed.tools.gui.guitools.ParmedApp.winfo_pointerx"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pointerx</span></code></a>()</td>
 <td>Return the x coordinate of the pointer on the root window.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pointerxy" title="parmed.tools.gui.guitools.ParmedApp.winfo_pointerxy"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pointerxy</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pointerxy" title="parmed.tools.gui.guitools.ParmedApp.winfo_pointerxy"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pointerxy</span></code></a>()</td>
 <td>Return a tuple of x and y coordinates of the pointer on the root window.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pointery" title="parmed.tools.gui.guitools.ParmedApp.winfo_pointery"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pointery</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_pointery" title="parmed.tools.gui.guitools.ParmedApp.winfo_pointery"><code class="xref py py-obj docutils literal"><span class="pre">winfo_pointery</span></code></a>()</td>
 <td>Return the y coordinate of the pointer on the root window.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_reqheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_reqheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_reqheight</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_reqheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_reqheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_reqheight</span></code></a>()</td>
 <td>Return requested height of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_reqwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_reqwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_reqwidth</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_reqwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_reqwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_reqwidth</span></code></a>()</td>
 <td>Return requested width of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_rgb" title="parmed.tools.gui.guitools.ParmedApp.winfo_rgb"><code class="xref py py-obj docutils literal"><span class="pre">winfo_rgb</span></code></a>(color)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_rgb" title="parmed.tools.gui.guitools.ParmedApp.winfo_rgb"><code class="xref py py-obj docutils literal"><span class="pre">winfo_rgb</span></code></a>(color)</td>
 <td>Return tuple of decimal values for red, green, blue for COLOR in this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_rootx" title="parmed.tools.gui.guitools.ParmedApp.winfo_rootx"><code class="xref py py-obj docutils literal"><span class="pre">winfo_rootx</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_rootx" title="parmed.tools.gui.guitools.ParmedApp.winfo_rootx"><code class="xref py py-obj docutils literal"><span class="pre">winfo_rootx</span></code></a>()</td>
 <td>Return x coordinate of upper left corner of this widget on the root window.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_rooty" title="parmed.tools.gui.guitools.ParmedApp.winfo_rooty"><code class="xref py py-obj docutils literal"><span class="pre">winfo_rooty</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_rooty" title="parmed.tools.gui.guitools.ParmedApp.winfo_rooty"><code class="xref py py-obj docutils literal"><span class="pre">winfo_rooty</span></code></a>()</td>
 <td>Return y coordinate of upper left corner of this widget on the root window.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screen" title="parmed.tools.gui.guitools.ParmedApp.winfo_screen"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screen</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screen" title="parmed.tools.gui.guitools.ParmedApp.winfo_screen"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screen</span></code></a>()</td>
 <td>Return the screen name of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screencells" title="parmed.tools.gui.guitools.ParmedApp.winfo_screencells"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screencells</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screencells" title="parmed.tools.gui.guitools.ParmedApp.winfo_screencells"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screencells</span></code></a>()</td>
 <td>Return the number of the cells in the colormap of the screen of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screendepth" title="parmed.tools.gui.guitools.ParmedApp.winfo_screendepth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screendepth</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screendepth" title="parmed.tools.gui.guitools.ParmedApp.winfo_screendepth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screendepth</span></code></a>()</td>
 <td>Return the number of bits per pixel of the root window of the screen of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenheight</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenheight</span></code></a>()</td>
 <td>Return the number of pixels of the height of the screen of this widget in pixel.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenmmheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenmmheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenmmheight</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenmmheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenmmheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenmmheight</span></code></a>()</td>
 <td>Return the number of pixels of the height of the screen of this widget in mm.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenmmwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenmmwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenmmwidth</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenmmwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenmmwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenmmwidth</span></code></a>()</td>
 <td>Return the number of pixels of the width of the screen of this widget in mm.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenvisual" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenvisual"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenvisual</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenvisual" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenvisual"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenvisual</span></code></a>()</td>
 <td>Return one of the strings directcolor, grayscale, pseudocolor, staticcolor, staticgray, or truecolor for the default colormodel of this screen.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenwidth</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_screenwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_screenwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_screenwidth</span></code></a>()</td>
 <td>Return the number of pixels of the width of the screen of this widget in pixel.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_server" title="parmed.tools.gui.guitools.ParmedApp.winfo_server"><code class="xref py py-obj docutils literal"><span class="pre">winfo_server</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_server" title="parmed.tools.gui.guitools.ParmedApp.winfo_server"><code class="xref py py-obj docutils literal"><span class="pre">winfo_server</span></code></a>()</td>
 <td>Return information of the X-Server of the screen of this widget in the form &#8220;XmajorRminor vendor vendorVersion&#8221;.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_toplevel" title="parmed.tools.gui.guitools.ParmedApp.winfo_toplevel"><code class="xref py py-obj docutils literal"><span class="pre">winfo_toplevel</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_toplevel" title="parmed.tools.gui.guitools.ParmedApp.winfo_toplevel"><code class="xref py py-obj docutils literal"><span class="pre">winfo_toplevel</span></code></a>()</td>
 <td>Return the toplevel widget of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_viewable" title="parmed.tools.gui.guitools.ParmedApp.winfo_viewable"><code class="xref py py-obj docutils literal"><span class="pre">winfo_viewable</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_viewable" title="parmed.tools.gui.guitools.ParmedApp.winfo_viewable"><code class="xref py py-obj docutils literal"><span class="pre">winfo_viewable</span></code></a>()</td>
 <td>Return true if the widget and all its higher ancestors are mapped.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_visual" title="parmed.tools.gui.guitools.ParmedApp.winfo_visual"><code class="xref py py-obj docutils literal"><span class="pre">winfo_visual</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_visual" title="parmed.tools.gui.guitools.ParmedApp.winfo_visual"><code class="xref py py-obj docutils literal"><span class="pre">winfo_visual</span></code></a>()</td>
 <td>Return one of the strings directcolor, grayscale, pseudocolor, staticcolor, staticgray, or truecolor for the colormodel of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_visualid" title="parmed.tools.gui.guitools.ParmedApp.winfo_visualid"><code class="xref py py-obj docutils literal"><span class="pre">winfo_visualid</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_visualid" title="parmed.tools.gui.guitools.ParmedApp.winfo_visualid"><code class="xref py py-obj docutils literal"><span class="pre">winfo_visualid</span></code></a>()</td>
 <td>Return the X identifier for the visual for this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_visualsavailable" title="parmed.tools.gui.guitools.ParmedApp.winfo_visualsavailable"><code class="xref py py-obj docutils literal"><span class="pre">winfo_visualsavailable</span></code></a>([includeids])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_visualsavailable" title="parmed.tools.gui.guitools.ParmedApp.winfo_visualsavailable"><code class="xref py py-obj docutils literal"><span class="pre">winfo_visualsavailable</span></code></a>([includeids])</td>
 <td>Return a list of all visuals available for the screen of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrootheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrootheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrootheight</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrootheight" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrootheight"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrootheight</span></code></a>()</td>
 <td>Return the height of the virtual root window associated with this widget in pixels.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrootwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrootwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrootwidth</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrootwidth" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrootwidth"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrootwidth</span></code></a>()</td>
 <td>Return the width of the virtual root window associated with this widget in pixel.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrootx" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrootx"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrootx</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrootx" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrootx"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrootx</span></code></a>()</td>
 <td>Return the x offset of the virtual root relative to the root window of the screen of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrooty" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrooty"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrooty</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_vrooty" title="parmed.tools.gui.guitools.ParmedApp.winfo_vrooty"><code class="xref py py-obj docutils literal"><span class="pre">winfo_vrooty</span></code></a>()</td>
 <td>Return the y offset of the virtual root relative to the root window of the screen of this widget.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_width" title="parmed.tools.gui.guitools.ParmedApp.winfo_width"><code class="xref py py-obj docutils literal"><span class="pre">winfo_width</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_width" title="parmed.tools.gui.guitools.ParmedApp.winfo_width"><code class="xref py py-obj docutils literal"><span class="pre">winfo_width</span></code></a>()</td>
 <td>Return the width of this widget.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_x" title="parmed.tools.gui.guitools.ParmedApp.winfo_x"><code class="xref py py-obj docutils literal"><span class="pre">winfo_x</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_x" title="parmed.tools.gui.guitools.ParmedApp.winfo_x"><code class="xref py py-obj docutils literal"><span class="pre">winfo_x</span></code></a>()</td>
 <td>Return the x coordinate of the upper left corner of this widget in the parent.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_y" title="parmed.tools.gui.guitools.ParmedApp.winfo_y"><code class="xref py py-obj docutils literal"><span class="pre">winfo_y</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.gui.guitools.ParmedApp.winfo_y" title="parmed.tools.gui.guitools.ParmedApp.winfo_y"><code class="xref py py-obj docutils literal"><span class="pre">winfo_y</span></code></a>()</td>
 <td>Return the y coordinate of the upper left corner of this widget in the parent.</td>
 </tr>
 </tbody>
@@ -4185,6 +4130,14 @@ given as first parameter.</p>
 process.</p>
 <p>Return an identifier to cancel the scheduling with
 after_cancel.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tools.gui.guitools.ParmedApp.anchor">
+<code class="descname">anchor</code><span class="sig-paren">(</span><em>anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The anchor value controls how to place the grid within the
+master when no row/column has any weight.</p>
+<p>The default anchor is nw.</p>
 </dd></dl>
 
 <dl class="method">
@@ -4308,12 +4261,6 @@ or FILE_NAME.  Type defaults to STRING, except on X11, where the default
 is to try UTF8_STRING and fall back to STRING.</p>
 <p>This command is equivalent to:</p>
 <p>selection_get(CLIPBOARD)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.tools.gui.guitools.ParmedApp.colormodel">
-<code class="descname">colormodel</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.colormodel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Useless. Not implemented in Tk.</p>
 </dd></dl>
 
 <dl class="method">
@@ -4448,17 +4395,15 @@ the focus through the window manager.</p>
 <dd><p>Return a boolean value for Tcl boolean values true and false given as parameter.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.ParmedApp.getdouble">
-<code class="descname">getdouble</code><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.getdouble" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
-</dd></dl>
+<code class="descname">getdouble</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.getdouble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="parmed.tools.gui.guitools.ParmedApp.getint">
-<code class="descname">getint</code><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.getint" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">int</span></code></p>
-</dd></dl>
+<code class="descname">getint</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.getint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tools.gui.guitools.ParmedApp.getvar">
@@ -4520,6 +4465,14 @@ rowspan=number - this widget will span several rows
 sticky=NSEW - if cell is larger on which sides will this</p>
 <blockquote>
 <div>widget stick to the cell boundary</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.tools.gui.guitools.ParmedApp.grid_anchor">
+<code class="descname">grid_anchor</code><span class="sig-paren">(</span><em>anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tools.gui.guitools.ParmedApp.grid_anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The anchor value controls how to place the grid within the
+master when no row/column has any weight.</p>
+<p>The default anchor is nw.</p>
 </dd></dl>
 
 <dl class="method">

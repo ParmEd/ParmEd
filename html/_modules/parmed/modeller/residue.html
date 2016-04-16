@@ -120,6 +120,11 @@
 <span class="sd">        atom of this residue when this residue is the last in a chain</span>
 <span class="sd">    groups : list of list(:class:`Atom`)</span>
 <span class="sd">        If set, each group is a list of Atom instances making up each group</span>
+<span class="sd">    overload_level : integer</span>
+<span class="sd">        For use with OpenMM ResidueTemplates. If OpenMM ForceField is given multiple</span>
+<span class="sd">        identically-matching residue templates with the same names it choses</span>
+<span class="sd">        (overloads with) the one with the highest overload_level</span>
+<span class="sd">        (overloadLevel in OpenMM). Default is 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
@@ -129,11 +134,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">UNKNOWN</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overload_level</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -148,6 +154,10 @@
                     <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span>
                     <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">),</span> <span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span>
+
 <div class="viewcode-block" id="ResidueTemplate.add_atom"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.add_atom">[docs]</a>    <span class="k">def</span> <span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds an atom to this residue template</span>
 
@@ -161,11 +171,11 @@
 <span class="sd">        ValueError if ``atom`` has the same name as another atom in this</span>
 <span class="sd">        residue already</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Residue already has atom named </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_atomnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span></div>
 
 <div class="viewcode-block" id="ResidueTemplate.add_bond"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.add_bond">[docs]</a>    <span class="k">def</span> <span class="nf">add_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds a bond between the two provided atoms in the residue</span>
@@ -267,10 +277,8 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">atom</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;Should not be here!&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">other</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -789,7 +797,6 @@
             <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_library</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized format for ResidueTemplate save&#39;</span><span class="p">)</span></div></div>
-
 </pre></div>
 
           </div>

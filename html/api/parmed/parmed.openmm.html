@@ -70,7 +70,7 @@
 <p>This is a collection of all of the OpenMM functionality supported in ParmEd</p>
 <dl class="class">
 <dt id="parmed.openmm.StateDataReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>This class acts as a state data reporter for OpenMM simulations, but it is a
 little more generalized. Notable differences are:</p>
@@ -238,7 +238,7 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.NetCDFReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">NetCDFReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.NetCDFReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">NetCDFReporter</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#NetCDFReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.NetCDFReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>NetCDFReporter prints a trajectory in NetCDF format</p>
 <p class="rubric">Methods</p>
@@ -317,7 +317,7 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.MdcrdReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">MdcrdReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">MdcrdReporter</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will
 be significantly slower than binary file reporters (like DCDReporter or
@@ -421,7 +421,7 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.RestartReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">RestartReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.RestartReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">RestartReporter</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>write_multiple=False</em>, <em>netcdf=False</em>, <em>write_velocities=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#RestartReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.RestartReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Use a reporter to handle writing restarts at specified intervals.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -531,7 +531,7 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.ProgressReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">ProgressReporter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">ProgressReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>totalSteps</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=False</em>, <em>volume=False</em>, <em>density=False</em>, <em>systemMass=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="parmed.openmm.reporters.html#parmed.openmm.reporters.StateDataReporter" title="parmed.openmm.reporters.StateDataReporter"><code class="xref py py-class docutils literal"><span class="pre">parmed.openmm.reporters.StateDataReporter</span></code></a></p>
 <p>A class that prints out a progress report of how much MD (or minimization)
 has been done, how fast the simulation is running, and how much time is left
@@ -713,7 +713,7 @@ single-point energies.</p>
 
 <dl class="function">
 <dt id="parmed.openmm.load_topology">
-<code class="descclassname">parmed.openmm.</code><code class="descname">load_topology</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/topsystem.html#load_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.load_topology" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">load_topology</code><span class="sig-paren">(</span><em>topology</em>, <em>system=None</em>, <em>xyz=None</em>, <em>box=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/topsystem.html#load_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.load_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a> instance from an OpenMM
 Topology, optionally filling in parameters from a System</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -785,7 +785,7 @@ System, Integrator, and ForceField objects.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile.id_format" title="parmed.openmm.XmlFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an XML file</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile.parse" title="parmed.openmm.XmlFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../openmmobj/parmed.openmm.XmlFile.html#parmed.openmm.XmlFile.parse" title="parmed.openmm.XmlFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename)</td>
 <td>Parses XML file and returns deserialized object.</td>
 </tr>
 </tbody>
@@ -816,7 +816,7 @@ System, Integrator, and ForceField objects.</p>
 
 <dl class="staticmethod">
 <dt id="parmed.openmm.XmlFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.XmlFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/xmlfile.html#XmlFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.XmlFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses XML file and returns deserialized object. The return value
 depends on the serialized object, summarized below</p>
 <blockquote>
@@ -854,7 +854,7 @@ result, this function may require a significant amount of memory.</p>
 
 <dl class="function">
 <dt id="parmed.openmm.energy_decomposition">
-<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition</code><span class="sig-paren">(</span><em>structure</em>, <em>context</em>, <em>nrg=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition</code><span class="sig-paren">(</span><em>structure</em>, <em>context</em>, <em>nrg=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>This computes the energy of every force group in the given structure and
 computes the energy for each force group for the given Context.  Note, the
 context must have positions already assigned.</p>
@@ -891,7 +891,7 @@ with the energy of that group in</p>
 
 <dl class="function">
 <dt id="parmed.openmm.energy_decomposition_system">
-<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition_system</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition_system" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition_system</code><span class="sig-paren">(</span><em>structure</em>, <em>system</em>, <em>platform=None</em>, <em>nrg=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function computes the energy contribution for all of the different
 force groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1188,8 +1188,11 @@ provenance = {&#8216;Reference&#8217; : [&#8216;Nature&#8217;, &#8216;Cell&#8217
 </div></blockquote>
 <p><strong>write_unused</strong> : bool</p>
 <blockquote class="last">
-<div><p>If False, atom types that are not used in any of the residue templates
-and parameters including those atom types will not be written</p>
+<div><p>If False: a) residue templates using unavailable atom types will not
+be written, b) atom types that are not used in any of the residue
+templates remaining and parameters including those atom types will
+not be written. A ParameterWarning is issued if any such residues are
+found in a).</p>
 </div></blockquote>
 </td>
 </tr>

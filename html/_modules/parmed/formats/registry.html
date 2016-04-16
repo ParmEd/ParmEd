@@ -126,8 +126,12 @@
 <span class="sd">        This is needed for some coordinate file classes, but not others. This is</span>
 <span class="sd">        treated the same as ``structure``, above. It is the # of atoms expected</span>
 <span class="sd">    hasbox : bool, optional</span>
-<span class="sd">        Same as ``natom``, but indicates whether the coordinate file has unit</span>
-<span class="sd">        cell dimensions</span>
+<span class="sd">        Same as ``structure``, but indicates whether the coordinate file has</span>
+<span class="sd">        unit cell dimensions</span>
+<span class="sd">    skip_bonds : bool, optional</span>
+<span class="sd">        Same as ``structure``, but indicates whether or not bond searching will</span>
+<span class="sd">        be skipped if the topology file format does not contain bond information</span>
+<span class="sd">        (like PDB, GRO, and PQR files).</span>
 <span class="sd">    *args : other positional arguments</span>
 <span class="sd">        Some formats accept positional arguments. These will be passed along</span>
 <span class="sd">    **kwargs : other options</span>
@@ -191,26 +195,30 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> constructor expects </span><span class="si">%s</span><span class="s1"> keyword argument&#39;</span> <span class="o">%</span>
                             <span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
-    <span class="c1"># Pass on the &quot;structure&quot; keyword IFF the target function accepts a target</span>
-    <span class="c1"># keyword. Otherwise, get rid of it.</span>
+    <span class="c1"># Pass on the following keywords IFF the target function accepts a target</span>
+    <span class="c1"># keyword. Otherwise, get rid of it: structure, natom, hasbox, skip_bonds</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;parse&#39;</span><span class="p">):</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;skip_bonds&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;open_old&#39;</span><span class="p">):</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;skip_bonds&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">open_old</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s1">&#39;open&#39;</span><span class="p">):</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
         <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
+        <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;skip_bonds&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
     <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;natom&#39;</span><span class="p">)</span>
     <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;hasbox&#39;</span><span class="p">)</span>
+    <span class="n">_prune_argument</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s1">&#39;skip_bonds&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <span class="k">def</span> <span class="nf">_prune_argument</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>

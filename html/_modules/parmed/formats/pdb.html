@@ -64,7 +64,7 @@
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
 <span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">Bond</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
@@ -265,7 +265,7 @@
     <span class="n">_relatere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;RELATED ID: *(\w+) *RELATED DB: *(\w+)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PDBFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="PDBFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read a PDB file and return a populated `Structure` class</span>
 
 <span class="sd">        Parameters</span>
@@ -275,12 +275,19 @@
 <span class="sd">            over the lines of a PDB. Compressed file names can be specified and</span>
 <span class="sd">            are determined by file-name extension (e.g., file.pdb.gz,</span>
 <span class="sd">            file.pdb.bz2)</span>
+<span class="sd">        skip_bonds : bool, optional</span>
+<span class="sd">            If True, skip trying to assign bonds. This can save substantial time</span>
+<span class="sd">            when parsing large files with non-standard residue names. However,</span>
+<span class="sd">            no bonds are assigned. This is OK if, for instance, the PDB file is</span>
+<span class="sd">            being parsed simply for its coordinates. This may also reduce</span>
+<span class="sd">            element assignment if element information is not present in the PDB</span>
+<span class="sd">            file already. Default is False.</span>
 
 <span class="sd">        Metadata</span>
 <span class="sd">        --------</span>
 <span class="sd">        The PDB parser also adds metadata to the returned Structure object that</span>
 <span class="sd">        may be present in the PDB file</span>
-<span class="sd">    </span>
+
 <span class="sd">        experimental : ``str``</span>
 <span class="sd">            EXPDTA record</span>
 <span class="sd">        journal : ``str``</span>
@@ -307,7 +314,7 @@
 <span class="sd">            The X-RAY resolution in Angstroms, or None if not found</span>
 <span class="sd">        related_entries : ``list of (str, str)``</span>
 <span class="sd">            List of entries in other databases</span>
-<span class="sd">    </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        structure : :class:`Structure`</span>
@@ -343,6 +350,7 @@
         <span class="n">atom_hex</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">atom_overflow</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">ZEROSET</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+        <span class="n">altloc_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="p">:</span>
@@ -475,6 +483,7 @@
                                        <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">segid</span><span class="p">)</span> <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
                         <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span>
                         <span class="n">last_atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">[</span><span class="n">altloc</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
+                        <span class="n">altloc_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
                         <span class="n">last_atom_added</span> <span class="o">=</span> <span class="n">atom</span>
                         <span class="k">continue</span>
                     <span class="n">last_atom</span> <span class="o">=</span> <span class="n">last_atom_added</span> <span class="o">=</span> <span class="n">atom</span>
@@ -626,9 +635,51 @@
                         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Trouble converting resolution (</span><span class="si">%s</span><span class="s1">) &#39;</span>
                                           <span class="s1">&#39;to float&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">[</span><span class="mi">23</span><span class="p">:</span><span class="mi">30</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">rec</span> <span class="o">==</span> <span class="s1">&#39;CONECT&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">skip_bonds</span><span class="p">:</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">11</span><span class="p">])</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Corrupt CONECT record&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="c1"># last 3 integers are optional and may not exist</span>
+                    <span class="n">j</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="mi">21</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">:</span><span class="mi">26</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">26</span><span class="p">:</span><span class="mi">31</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">altloc_ids</span><span class="p">:</span>
+                        <span class="k">continue</span> <span class="c1"># Do not handle altloc bonds yet.</span>
+                    <span class="n">origin</span> <span class="o">=</span> <span class="n">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;CONECT record references non-existent &#39;</span>
+                                      <span class="s1">&#39;origin atom </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">b</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
+                        <span class="k">continue</span> <span class="c1"># pragma: no cover</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">altloc_ids</span><span class="p">:</span>
+                        <span class="n">partner</span> <span class="o">=</span> <span class="n">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;CONECT record references non-existent &#39;</span>
+                                          <span class="s1">&#39;destination atom </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">partner</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">origin</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                            <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">partner</span><span class="p">))</span>
+                    <span class="c1"># Other atoms are optional, so loop through the</span>
+                    <span class="c1"># possibilities and bond them if they&#39;re set</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span><span class="p">:</span> <span class="k">continue</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">altloc_ids</span><span class="p">:</span> <span class="k">continue</span>
+                        <span class="n">partner</span> <span class="o">=</span> <span class="n">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;CONECT record references non-&#39;</span>
+                                          <span class="s1">&#39;existent destination atom </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+                                          <span class="n">PDBWarning</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">partner</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">origin</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
+                            <span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">partner</span><span class="p">))</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="c1"># Make sure our file is closed if we opened it</span>
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Assign bonds based on standard templates and simple distances</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_bonds</span><span class="p">:</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">assign_bonds</span><span class="p">()</span>
 
         <span class="c1"># Post-process some of the metadata to make it more reader-friendly</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
@@ -945,7 +996,7 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="CIFFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="CIFFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read a PDBx or mmCIF file and return a populated `Structure` class</span>
 
@@ -956,6 +1007,11 @@
 <span class="sd">            over the lines of a PDB. Compressed file names can be specified and</span>
 <span class="sd">            are determined by file-name extension (e.g., file.pdb.gz,</span>
 <span class="sd">            file.pdb.bz2)</span>
+<span class="sd">        skip_bonds : bool, optional</span>
+<span class="sd">            If True, skip trying to assign bonds. This can save substantial time</span>
+<span class="sd">            when parsing large files with non-standard residue names. However,</span>
+<span class="sd">            no bonds are assigned. This is OK if, for instance, the CIF file is</span>
+<span class="sd">            being parsed simply for its coordinates. Default is False.</span>
 
 <span class="sd">        Metadata</span>
 <span class="sd">        --------</span>
@@ -1270,6 +1326,10 @@
                 <span class="n">struct</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_coords</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                             <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
 
+        <span class="c1"># Make sure we assign bonds for all of the structures we parsed</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_bonds</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">struct</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">:</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">assign_bonds</span><span class="p">()</span>
         <span class="c1"># Build the return value</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">structures</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">structures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1480,6 +1540,33 @@
             <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
 <span class="c1">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
+
+<span class="k">def</span> <span class="nf">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the atom with the given index in the structure. This is required</span>
+<span class="sd">    because atom indices may not start from 1 and may contain gaps in a PDB</span>
+<span class="sd">    file. This tries to find atoms quickly, assuming that indices *do* start</span>
+<span class="sd">    from 1 and have no gaps. It then looks up or down, depending on whether we</span>
+<span class="sd">    hit an index too high or too low. So it *assumes* that the sequence is</span>
+<span class="sd">    monotonically increasing. If the atom can&#39;t be found, None is returned</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idx0</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span> <span class="o">&lt;</span> <span class="n">idx</span><span class="p">:</span>
+        <span class="n">idx0</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">idx0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
+            <span class="n">idx0</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">None</span> <span class="c1"># not found</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">idx0</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">idx0</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
+            <span class="n">idx0</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">None</span> <span class="c1"># not found</span>
 </pre></div>
 
           </div>

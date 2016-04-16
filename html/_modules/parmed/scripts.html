@@ -62,7 +62,7 @@
     <span class="kn">import</span> <span class="nn">signal</span>
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="kn">import</span> <span class="nn">warnings</span>
-    
+
     <span class="c1"># Load custom modules</span>
     <span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">ParmedError</span>
 
@@ -72,15 +72,15 @@
     <span class="kn">from</span> <span class="nn">parmed.tools.actions</span> <span class="kn">import</span> <span class="n">Action</span>
     <span class="kn">from</span> <span class="nn">parmed.tools.parmlist</span> <span class="kn">import</span> <span class="n">ParmList</span>
     <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">__version__</span>
-    
+
     <span class="c1"># Set up new excepthook to clean up fatal exception printouts</span>
     <span class="k">def</span> <span class="nf">interrupted</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Handle interruptions gracefully &quot;&quot;&quot;</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Interrupted</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">interrupted</span><span class="p">)</span>
-    
+
     <span class="c1"># Define our own custom warning printer</span>
     <span class="k">def</span> <span class="nf">_print_warnings</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">lineno</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Override the default showwarning method &quot;&quot;&quot;</span>
@@ -89,15 +89,15 @@
             <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">category</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
             <span class="k">pass</span>
-    
+
     <span class="n">warnings</span><span class="o">.</span><span class="n">showwarning</span> <span class="o">=</span> <span class="n">_print_warnings</span>
-    
+
     <span class="c1"># Set up parser</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
              <span class="n">version</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%%</span><span class="s1">(prog)s: Version </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">__version__</span><span class="p">)</span>
     <span class="n">group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;Input Files&#39;</span><span class="p">)</span>
-    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--input&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> 
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--input&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
              <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;&#39;&#39;Script with ParmEd commands to execute. Default</span>
 <span class="s1">             reads from stdin. Can be specified multiple times to process multiple</span>
 <span class="s1">             input files.&#39;&#39;&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">)</span>
@@ -144,29 +144,29 @@
              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Topology file to analyze.&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;script_cl&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;&lt;script&gt;&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;File with a series of ParmEd commands to execute.&#39;</span><span class="p">)</span>
-    
+
     <span class="n">opt</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    
+
     <span class="c1"># If the user specified a prmtop and script in the &#39;old&#39; way, append them to the</span>
     <span class="c1"># list constructed via the --parm and -i flags -- they come at the end</span>
     <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">script_cl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">opt</span><span class="o">.</span><span class="n">script</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">script_cl</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">prmtop_cl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">opt</span><span class="o">.</span><span class="n">prmtop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">prmtop_cl</span><span class="p">)</span>
-    
+
     <span class="c1"># Load the splash screen</span>
     <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">printlogo</span><span class="p">:</span>
         <span class="n">splash</span> <span class="o">=</span> <span class="n">Logo</span><span class="p">()</span>
         <span class="k">print</span><span class="p">(</span><span class="n">splash</span><span class="p">)</span>
-    
+
     <span class="c1"># Set our warning filter</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;always&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">SeriousParmWarning</span><span class="p">)</span>
-    
+
     <span class="c1"># Set our overwrite preferences</span>
     <span class="n">Action</span><span class="o">.</span><span class="n">overwrite</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">overwrite</span>
-    
+
     <span class="n">amber_prmtop</span> <span class="o">=</span> <span class="n">ParmList</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">parm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">prmtop</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">inpcrd</span><span class="p">):</span>
@@ -177,7 +177,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">amber_prmtop</span><span class="o">.</span><span class="n">add_parm</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
             <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Loaded Amber topology file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">parm</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">script</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Read from the list of scripts</span>
         <span class="k">print</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">script</span><span class="p">)</span>
@@ -187,7 +187,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">script</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Script file </span><span class="si">%s</span><span class="s1"> cannot be found.&#39;</span> <span class="o">%</span> <span class="n">script</span><span class="p">,</span>
                               <span class="n">SeriousParmWarning</span><span class="p">)</span>
-    
+
         <span class="c1"># We have already pre-screened the scripts.</span>
         <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">script</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">script</span><span class="p">):</span> <span class="k">continue</span>
@@ -205,7 +205,7 @@
                 <span class="c1"># This has already been caught and printed. If it was re-raised,</span>
                 <span class="c1"># then that means we wanted to exit</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="k">else</span><span class="p">:</span>
         <span class="n">close_log_file</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">parmed_commands</span> <span class="o">=</span> <span class="n">ParmedCmd</span><span class="p">(</span><span class="n">amber_prmtop</span><span class="p">)</span>
@@ -236,6 +236,12 @@
                 <span class="n">logfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# Log started on </span><span class="si">%02d</span><span class="s1">/</span><span class="si">%02d</span><span class="s1">/</span><span class="si">%d</span><span class="s1"> [mm/dd/yyyy] at &#39;</span>
                               <span class="s1">&#39;</span><span class="si">%02d</span><span class="s1">:</span><span class="si">%02d</span><span class="s1">:</span><span class="si">%02d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
                                                 <span class="n">now</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">second</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# Command line arguments: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                            <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">amber_prmtop</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# Loaded topologies: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">amber_prmtop</span><span class="o">.</span><span class="n">_parm_names</span><span class="p">))</span>
                 <span class="n">parmed_commands</span><span class="o">.</span><span class="n">setlog</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
                 <span class="n">close_log_file</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="c1"># Loop through all of the commands</span>
@@ -251,7 +257,7 @@
         <span class="k">finally</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">close_log_file</span><span class="p">:</span>
                 <span class="n">logfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    
+
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="guiapp"><a class="viewcode-back" href="../../api/parmed/parmed.scripts.html#parmed.scripts.guiapp">[docs]</a><span class="k">def</span> <span class="nf">guiapp</span><span class="p">():</span>
@@ -267,17 +273,17 @@
     <span class="kn">from</span> <span class="nn">parmed.tools.actions</span> <span class="kn">import</span> <span class="n">Action</span>
     <span class="kn">from</span> <span class="nn">parmed.tools.parmlist</span> <span class="kn">import</span> <span class="n">ParmList</span>
     <span class="kn">import</span> <span class="nn">sys</span>
-    
+
     <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-    
-    <span class="k">def</span> <span class="nf">excepthook</span><span class="p">(</span><span class="n">exception_type</span><span class="p">,</span> <span class="n">exception_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">excepthook</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Default exception handler &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">traceback</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
-        <span class="n">showerror</span><span class="p">(</span><span class="s1">&#39;Fatal Error&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exception_type</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
-                                            <span class="n">exception_value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+        <span class="n">showerror</span><span class="p">(</span><span class="s1">&#39;Fatal Error&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="c1"># Launch the root window</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
     <span class="n">root</span><span class="o">.</span><span class="n">resizable</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
@@ -287,7 +293,7 @@
 
     <span class="c1"># See if we were provided a topology file on the command-line</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span><span class="n">usage</span> <span class="o">=</span> <span class="s1">&#39;%prog [&lt;prmtop&gt;]&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                       <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Show detailed tracebacks &#39;</span> <span class="o">+</span>
                       <span class="s1">&#39;when an error is detected.&#39;</span><span class="p">)</span>
     <span class="n">opt</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
@@ -304,8 +310,9 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Unknown command-line options. Ignoring</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">prmtop_name</span> <span class="o">=</span> <span class="n">file_chooser</span><span class="p">(</span><span class="s1">&#39;Topology&#39;</span><span class="p">)</span>
 
-    <span class="c1"># If we chose no prmtop file, </span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">prmtop_name</span><span class="p">:</span> <span class="k">raise</span> <span class="n">ParmError</span><span class="p">(</span><span class="s1">&#39;No prmtop chosen!&#39;</span><span class="p">)</span>
+    <span class="c1"># If we chose no prmtop file, throw an error</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prmtop_name</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParmError</span><span class="p">(</span><span class="s1">&#39;No prmtop chosen!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Load the amber prmtop and check for errors</span>
     <span class="n">amber_prmtop</span> <span class="o">=</span> <span class="n">ParmList</span><span class="p">()</span>

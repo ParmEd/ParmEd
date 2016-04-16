@@ -145,14 +145,20 @@ the Constant pH MD method implemented in sander</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.add_residue" title="parmed.amber.titratable_residues.TitratableResidueList.add_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_residue</span></code></a>(residue,&nbsp;resnum,&nbsp;first_atom[,&nbsp;state])</td>
 <td>Adds a residue to the list</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.append" title="parmed.amber.titratable_residues.TitratableResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a></td>
-<td>L.append(object) &#8211; append object to end</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.append" title="parmed.amber.titratable_residues.TitratableResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>((object)&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;append&nbsp;object&nbsp;to&nbsp;end)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.clear" title="parmed.amber.titratable_residues.TitratableResidueList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.copy" title="parmed.amber.titratable_residues.TitratableResidueList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.count" title="parmed.amber.titratable_residues.TitratableResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.extend" title="parmed.amber.titratable_residues.TitratableResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a></td>
-<td>L.extend(iterable) &#8211; extend list by appending elements from the iterable</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.extend" title="parmed.amber.titratable_residues.TitratableResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(...)</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.index" title="parmed.amber.titratable_residues.TitratableResidueList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
@@ -163,8 +169,8 @@ the Constant pH MD method implemented in sander</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.pop" title="parmed.amber.titratable_residues.TitratableResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.remove" title="parmed.amber.titratable_residues.TitratableResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.remove" title="parmed.amber.titratable_residues.TitratableResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.reverse" title="parmed.amber.titratable_residues.TitratableResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
@@ -188,9 +194,18 @@ the Constant pH MD method implemented in sander</p>
 
 <dl class="method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.append">
-<code class="descname">append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.append(object) &#8211; append object to end</p>
-</dd></dl>
+<code class="descname">append</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span> &rarr; None -- append object to end<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.titratable_residues.TitratableResidueList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.amber.titratable_residues.TitratableResidueList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.count">
@@ -199,9 +214,8 @@ the Constant pH MD method implemented in sander</p>
 
 <dl class="method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.extend" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.extend(iterable) &#8211; extend list by appending elements from the iterable</p>
-</dd></dl>
+<code class="descname">extend</code><span class="sig-paren">(</span><em>iterable</em><span class="sig-paren">)</span> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.index">
@@ -223,9 +237,8 @@ the Constant pH MD method implemented in sander</p>
 
 <dl class="method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">

@@ -138,109 +138,112 @@ None (so every atom will be part of the same residue)</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.add_atom_to_residue" title="parmed.tinker.XyzFile.add_atom_to_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></code></a>(atom,&nbsp;residue)</td>
 <td>Adds a new atom to the Structure at the end if the given residue</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.copy" title="parmed.tinker.XyzFile.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.assign_bonds" title="parmed.tinker.XyzFile.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.copy" title="parmed.tinker.XyzFile.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
 <td>Makes a copy of the current structure as an instance of a specified</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.createSystem" title="parmed.tinker.XyzFile.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.createSystem" title="parmed.tinker.XyzFile.createSystem"><code class="xref py py-obj docutils literal"><span class="pre">createSystem</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Construct an OpenMM System representing the topology described by the prmtop file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.get_box" title="parmed.tinker.XyzFile.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.get_box" title="parmed.tinker.XyzFile.get_box"><code class="xref py py-obj docutils literal"><span class="pre">get_box</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.get_coordinates" title="parmed.tinker.XyzFile.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.get_coordinates" title="parmed.tinker.XyzFile.get_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">get_coordinates</span></code></a>([frame])</td>
 <td>In some cases, multiple conformations may be stored in the Structure.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.has_NBFIX" title="parmed.tinker.XyzFile.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.has_NBFIX" title="parmed.tinker.XyzFile.has_NBFIX"><code class="xref py py-obj docutils literal"><span class="pre">has_NBFIX</span></code></a>()</td>
 <td>Returns whether or not any pairs of atom types have their LJ</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.id_format" title="parmed.tinker.XyzFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.id_format" title="parmed.tinker.XyzFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identify the file as a Tinker XYZ file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.is_changed" title="parmed.tinker.XyzFile.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.is_changed" title="parmed.tinker.XyzFile.is_changed"><code class="xref py py-obj docutils literal"><span class="pre">is_changed</span></code></a>()</td>
 <td>Determines if any of the topology has changed for this structure</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.join_dihedrals" title="parmed.tinker.XyzFile.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.join_dihedrals" title="parmed.tinker.XyzFile.join_dihedrals"><code class="xref py py-obj docutils literal"><span class="pre">join_dihedrals</span></code></a>()</td>
 <td>Joins multi-term torsions into a single term and makes all of the parameters DihedralTypeList instances.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.load_dataframe" title="parmed.tinker.XyzFile.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.load_dataframe" title="parmed.tinker.XyzFile.load_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">load_dataframe</span></code></a>(df)</td>
 <td>Loads atomic properties from an input DataFrame</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_add_constraints" title="parmed.tinker.XyzFile.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_add_constraints" title="parmed.tinker.XyzFile.omm_add_constraints"><code class="xref py py-obj docutils literal"><span class="pre">omm_add_constraints</span></code></a>(system,&nbsp;constraints,&nbsp;...)</td>
 <td>Adds constraints to a given system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_angle_force" title="parmed.tinker.XyzFile.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_angle_force" title="parmed.tinker.XyzFile.omm_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_angle_force</span></code></a>([constraints,&nbsp;...])</td>
 <td>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_bond_force" title="parmed.tinker.XyzFile.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_bond_force" title="parmed.tinker.XyzFile.omm_bond_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_bond_force</span></code></a>([constraints,&nbsp;rigidWater,&nbsp;...])</td>
 <td>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_cmap_force" title="parmed.tinker.XyzFile.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_cmap_force" title="parmed.tinker.XyzFile.omm_cmap_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_cmap_force</span></code></a>()</td>
 <td>Creates the OpenMM CMAP torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_dihedral_force" title="parmed.tinker.XyzFile.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_dihedral_force" title="parmed.tinker.XyzFile.omm_dihedral_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_dihedral_force</span></code></a>([split])</td>
 <td>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_gbsa_force" title="parmed.tinker.XyzFile.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_gbsa_force" title="parmed.tinker.XyzFile.omm_gbsa_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_gbsa_force</span></code></a>(implicitSolvent[,&nbsp;...])</td>
 <td>Creates a Generalized Born force for running implicit solvent</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_improper_force" title="parmed.tinker.XyzFile.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_improper_force" title="parmed.tinker.XyzFile.omm_improper_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_improper_force</span></code></a>()</td>
 <td>Creates the OpenMM improper torsion force (quadratic bias)</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_nonbonded_force" title="parmed.tinker.XyzFile.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_nonbonded_force" title="parmed.tinker.XyzFile.omm_nonbonded_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_nonbonded_force</span></code></a>([nonbondedMethod,&nbsp;...])</td>
 <td>Creates the OpenMM NonbondedForce instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_out_of_plane_bend_force" title="parmed.tinker.XyzFile.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_out_of_plane_bend_force" title="parmed.tinker.XyzFile.omm_out_of_plane_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_out_of_plane_bend_force</span></code></a>()</td>
 <td>Creates the Amoeba out-of-plane bend force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_pi_torsion_force" title="parmed.tinker.XyzFile.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_pi_torsion_force" title="parmed.tinker.XyzFile.omm_pi_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_pi_torsion_force</span></code></a>()</td>
 <td>Creates the Amoeba pi-torsion force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_rb_torsion_force" title="parmed.tinker.XyzFile.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_rb_torsion_force" title="parmed.tinker.XyzFile.omm_rb_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_rb_torsion_force</span></code></a>()</td>
 <td>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_set_virtual_sites" title="parmed.tinker.XyzFile.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_set_virtual_sites" title="parmed.tinker.XyzFile.omm_set_virtual_sites"><code class="xref py py-obj docutils literal"><span class="pre">omm_set_virtual_sites</span></code></a>(system)</td>
 <td>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_stretch_bend_force" title="parmed.tinker.XyzFile.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_stretch_bend_force" title="parmed.tinker.XyzFile.omm_stretch_bend_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_stretch_bend_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba stretch-bend force for this system</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_torsion_torsion_force" title="parmed.tinker.XyzFile.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_torsion_torsion_force" title="parmed.tinker.XyzFile.omm_torsion_torsion_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_torsion_torsion_force</span></code></a>()</td>
 <td>Create the OpenMM Amoeba coupled-torsion (CMAP) force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_trigonal_angle_force" title="parmed.tinker.XyzFile.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_trigonal_angle_force" title="parmed.tinker.XyzFile.omm_trigonal_angle_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_trigonal_angle_force</span></code></a>()</td>
 <td>Creates the Amoeba trigonal-angle force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_urey_bradley_force" title="parmed.tinker.XyzFile.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.omm_urey_bradley_force" title="parmed.tinker.XyzFile.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.prune_empty_terms" title="parmed.tinker.XyzFile.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.prune_empty_terms" title="parmed.tinker.XyzFile.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
 <td>Looks through all of the topological lists and gets rid of terms</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.save" title="parmed.tinker.XyzFile.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.save" title="parmed.tinker.XyzFile.save"><code class="xref py py-obj docutils literal"><span class="pre">save</span></code></a>(fname[,&nbsp;format,&nbsp;overwrite])</td>
 <td>Saves the current Structure in the requested file format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.split" title="parmed.tinker.XyzFile.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.split" title="parmed.tinker.XyzFile.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>()</td>
 <td>Split the current Structure into separate Structure instances for each unique molecule.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.strip" title="parmed.tinker.XyzFile.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.strip" title="parmed.tinker.XyzFile.strip"><code class="xref py py-obj docutils literal"><span class="pre">strip</span></code></a>(selection)</td>
 <td>Deletes a subset of the atoms corresponding to an atom-based selection.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.to_dataframe" title="parmed.tinker.XyzFile.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.to_dataframe" title="parmed.tinker.XyzFile.to_dataframe"><code class="xref py py-obj docutils literal"><span class="pre">to_dataframe</span></code></a>()</td>
 <td>Generates a DataFrame from the current Structure&#8217;s atomic properties</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.unchange" title="parmed.tinker.XyzFile.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.unchange" title="parmed.tinker.XyzFile.unchange"><code class="xref py py-obj docutils literal"><span class="pre">unchange</span></code></a>()</td>
 <td>Toggles all lists so that they do not indicate any changes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.update_dihedral_exclusions" title="parmed.tinker.XyzFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.update_dihedral_exclusions" title="parmed.tinker.XyzFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.write_cif" title="parmed.tinker.XyzFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.write_cif" title="parmed.tinker.XyzFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.write_pdb" title="parmed.tinker.XyzFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.write_pdb" title="parmed.tinker.XyzFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.XyzFile.write_psf" title="parmed.tinker.XyzFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.XyzFile.write_psf" title="parmed.tinker.XyzFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -381,6 +384,28 @@ contiguous in the atoms list. For large systems, this may be a
 relatively expensive operation</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.tinker.XyzFile.assign_bonds">
+<code class="descname">assign_bonds</code><span class="sig-paren">(</span><em>*reslibs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.assign_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns bonds to all atoms based on the provided residue template
+libraries. Atoms whose names are <em>not</em> in the templates, as well as
+those residues for whom no template is found, is assigned to bonds based
+on distances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>reslibs</strong> : dict{str: ResidueTemplate}</p>
+<blockquote class="last">
+<div><p>Any number of residue template libraries. By default, assign_bonds
+knows about the standard amino acid, RNA, and DNA residues.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.tinker.XyzFile.box">
 <code class="descname">box</code><a class="headerlink" href="#parmed.tinker.XyzFile.box" title="Permalink to this definition">¶</a></dt>
@@ -437,7 +462,7 @@ current Structure&#8217;s topology information</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.createSystem">
-<code class="descname">createSystem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.createSystem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">createSystem</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8.0</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0.0</em>, <em>unit=angstrom)</em>, <em>constraints=None</em>, <em>rigidWater=True</em>, <em>implicitSolvent=None</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>useSASA=False</em>, <em>removeCMMotion=True</em>, <em>hydrogenMass=None</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>flexibleConstraints=True</em>, <em>verbose=False</em>, <em>splitDihedrals=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.createSystem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an OpenMM System representing the topology described by the
 prmtop file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -558,16 +583,16 @@ This function retrieves a particular frame&#8217;s unit cell (box) dimensions</p
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int or &#8216;all&#8217;, optional</p>
 <blockquote>
-<div><p>The frame number whose coordinates should be retrieved. Default is
+<div><p>The frame number whose unit cell should be retrieved. Default is
 &#8216;all&#8217;</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] natom, 3) or None</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>box</strong> : np.ndarray, shape([#,] 6) or None</p>
 <blockquote>
-<div><p>If frame is &#8216;all&#8217;, all coordinates are returned with shape
-(#, natom, 3). Otherwise the requested frame is returned with shape
-(natom, 3). If no coordinates exist and &#8216;all&#8217; is requested, None is
+<div><p>If frame is &#8216;all&#8217;, all unit cells are returned with shape
+(#, 6). Otherwise the requested frame is returned with shape
+(6,). If no unit cell exist and &#8216;all&#8217; is requested, None is
 returned</p>
 </div></blockquote>
 </td>
@@ -694,7 +719,7 @@ the properties on the current list of atoms</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_add_constraints">
-<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_add_constraints</code><span class="sig-paren">(</span><em>system</em>, <em>constraints</em>, <em>rigidWater</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_add_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds constraints to a given system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -721,7 +746,7 @@ constrains is None</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_angle_force">
-<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_angle_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM HarmonicAngleForce object (or AmoebaAngleForce if the
 angles are for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -754,7 +779,7 @@ system), or None if there are no angles to add</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_bond_force">
-<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_bond_force</code><span class="sig-paren">(</span><em>constraints=None</em>, <em>rigidWater=True</em>, <em>flexibleConstraints=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_bond_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an OpenMM Bond Force object (or AmoebaBondForce if the bonds are
 for an Amoeba-parametrized system)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -791,7 +816,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_cmap_force">
-<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_cmap_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_cmap_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM CMAP torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -809,7 +834,7 @@ or None if there are no bonds to add</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_dihedral_force">
-<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_dihedral_force</code><span class="sig-paren">(</span><em>split=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_dihedral_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM PeriodicTorsionForce modeling dihedrals</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -836,7 +861,7 @@ returned.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_gbsa_force">
-<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_gbsa_force</code><span class="sig-paren">(</span><em>implicitSolvent</em>, <em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=30.0</em>, <em>unit=angstrom)</em>, <em>soluteDielectric=1.0</em>, <em>solventDielectric=78.5</em>, <em>implicitSolventKappa=None</em>, <em>implicitSolventSaltConc=Quantity(value=0.0</em>, <em>unit=mole/liter)</em>, <em>temperature=Quantity(value=298.15</em>, <em>unit=kelvin)</em>, <em>useSASA=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_gbsa_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Generalized Born force for running implicit solvent
 calculations</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -891,7 +916,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_improper_force">
-<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_improper_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_improper_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM improper torsion force (quadratic bias)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -909,7 +934,7 @@ salt concentration. It should have units compatible with mol/L</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_nonbonded_force">
-<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_nonbonded_force</code><span class="sig-paren">(</span><em>nonbondedMethod=None</em>, <em>nonbondedCutoff=Quantity(value=8</em>, <em>unit=angstrom)</em>, <em>switchDistance=Quantity(value=0</em>, <em>unit=angstrom)</em>, <em>ewaldErrorTolerance=0.0005</em>, <em>reactionFieldDielectric=78.5</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_nonbonded_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM NonbondedForce instance</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -973,7 +998,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_out_of_plane_bend_force">
-<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_out_of_plane_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_out_of_plane_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba out-of-plane bend force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -991,7 +1016,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_pi_torsion_force">
-<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_pi_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_pi_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba pi-torsion force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1009,7 +1034,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_rb_torsion_force">
-<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_rb_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_rb_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM RBTorsionForce for Ryckaert-Bellemans torsions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1027,7 +1052,7 @@ dihedrals</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_set_virtual_sites">
-<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_set_virtual_sites</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_set_virtual_sites" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the virtual sites in a given OpenMM <cite>System</cite> object from the extra
 points defined in this system</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1048,7 +1073,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_stretch_bend_force">
-<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_stretch_bend_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_stretch_bend_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba stretch-bend force for this system</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1066,7 +1091,7 @@ method</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_torsion_torsion_force">
-<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_torsion_torsion_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_torsion_torsion_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the OpenMM Amoeba coupled-torsion (CMAP) force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1085,7 +1110,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_trigonal_angle_force">
-<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_trigonal_angle_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_trigonal_angle_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the Amoeba trigonal-angle force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1103,7 +1128,7 @@ for this system</p>
 
 <dl class="method">
 <dt id="parmed.tinker.XyzFile.omm_urey_bradley_force">
-<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
+<code class="descname">omm_urey_bradley_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.XyzFile.omm_urey_bradley_force" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the OpenMM Urey-Bradley force</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

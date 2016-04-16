@@ -309,8 +309,11 @@ provenance = {&#8216;Reference&#8217; : [&#8216;Nature&#8217;, &#8216;Cell&#8217
 </div></blockquote>
 <p><strong>write_unused</strong> : bool</p>
 <blockquote class="last">
-<div><p>If False, atom types that are not used in any of the residue templates
-and parameters including those atom types will not be written</p>
+<div><p>If False: a) residue templates using unavailable atom types will not
+be written, b) atom types that are not used in any of the residue
+templates remaining and parameters including those atom types will
+not be written. A ParameterWarning is issued if any such residues are
+found in a).</p>
 </div></blockquote>
 </td>
 </tr>

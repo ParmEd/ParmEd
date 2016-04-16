@@ -383,17 +383,17 @@ replaced by any number) are optimized:</p>
 </table>
 <dl class="attribute">
 <dt id="parmed.amber.amberformat.FortranFormat.floatre">
-<code class="descname">floatre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">floatre</code><em class="property"> = re.compile('(\\d+)?[edf](\\d+)\\.(\\d+)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.floatre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.amber.amberformat.FortranFormat.floatre2">
-<code class="descname">floatre2</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">floatre2</code><em class="property"> = re.compile('(\\d+)?\\([edf](\\d+)\\.(\\d+)\\)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.floatre2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.amber.amberformat.FortranFormat.intre">
-<code class="descname">intre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">intre</code><em class="property"> = re.compile('(\\d+)?i(\\d+)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.intre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -404,7 +404,7 @@ replaced by any number) are optimized:</p>
 
 <dl class="attribute">
 <dt id="parmed.amber.amberformat.FortranFormat.strre">
-<code class="descname">strre</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
+<code class="descname">strre</code><em class="property"> = re.compile('(\\d+)?a(\\d+)$', re.IGNORECASE)</em><a class="headerlink" href="#parmed.amber.amberformat.FortranFormat.strre" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

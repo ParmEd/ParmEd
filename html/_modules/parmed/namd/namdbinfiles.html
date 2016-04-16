@@ -64,9 +64,9 @@
 <div class="viewcode-block" id="NamdBinFile"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.NamdBinFile">[docs]</a><span class="k">class</span> <span class="nc">NamdBinFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;From the NAMD manual:</span>
 
-<span class="sd">        NAMD uses a trivial double-precision binary file format for </span>
-<span class="sd">        coordinates, velocities, and forces ... The file consists of the atom </span>
-<span class="sd">        count as a 32-bit integer followed by all three position or velocity </span>
+<span class="sd">        NAMD uses a trivial double-precision binary file format for</span>
+<span class="sd">        coordinates, velocities, and forces ... The file consists of the atom</span>
+<span class="sd">        count as a 32-bit integer followed by all three position or velocity</span>
 <span class="sd">        components for each atom as 64-bit double-precision floating point ...</span>
 
 <span class="sd">    The main attributes are the number of atom entries (natom) and a (flat)</span>
@@ -74,11 +74,13 @@
 <span class="sd">    effectively arbitrary, but for convenience derived classes are provided</span>
 <span class="sd">    which alias the values to more descriptive names (e.g. &quot;coordinates&quot;).</span>
 
-<span class="sd">    See NamdBinCoor and NamdBinVel.</span>
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    :class:`NamdBinCoor` and :class:`NamdBinVel`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">_SCALE_FACTOR</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[]):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SCALE_FACTOR</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">natom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -98,7 +100,7 @@
         <span class="sd">&quot;&quot;&quot;Write the current attributes to a file.&quot;&quot;&quot;</span>
         <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span>
         <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SCALE_FACTOR</span><span class="p">:</span>
             <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
         <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
@@ -112,7 +114,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">newvalues</span></div>
 
 <div class="viewcode-block" id="NamdBinFile.insertatoms"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.NamdBinFile.insertatoms">[docs]</a>    <span class="k">def</span> <span class="nf">insertatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_index</span><span class="p">,</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Insert space for natom entries beginning at start_index. If </span>
+        <span class="sd">&quot;&quot;&quot;Insert space for natom entries beginning at start_index. If</span>
 <span class="sd">        specified, give them the provided values, otherwise set them to zero.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -135,7 +137,7 @@
 
 
 <div class="viewcode-block" id="NamdBinCoor"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.NamdBinCoor">[docs]</a><span class="k">class</span> <span class="nc">NamdBinCoor</span><span class="p">(</span><span class="n">NamdBinFile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class to read or write NAMD &quot;bincoordinates&quot; files.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Class to read or write NAMD &quot;bincoordinates&quot; files. &quot;&quot;&quot;</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -147,12 +149,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="NamdBinVel"><a class="viewcode-back" href="../../../api/parmed/parmed.namd.namdbinfiles.html#parmed.namd.NamdBinVel">[docs]</a><span class="k">class</span> <span class="nc">NamdBinVel</span><span class="p">(</span><span class="n">NamdBinFile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class to read or write NAMD &quot;binvelocities&quot; files.</span>
+    <span class="sd">&quot;&quot;&quot; Class to read or write NAMD &quot;binvelocities&quot; files. &quot;&quot;&quot;</span>
 
-<span class="sd">    NAMD internal units are assumed. These can be converted to </span>
-<span class="sd">    Angstrom / picosecond by multiplying by NamdBinVel.PDBVELFACTOR.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">SCALE_FACTOR</span> <span class="o">=</span> <span class="mf">20.45482706</span>
+    <span class="n">_SCALE_FACTOR</span> <span class="o">=</span> <span class="mf">20.45482706</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

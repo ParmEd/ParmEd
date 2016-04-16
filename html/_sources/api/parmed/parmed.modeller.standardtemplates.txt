@@ -1,0 +1,7 @@
+parmed.modeller.standardtemplates module
+========================================
+
+.. automodule:: parmed.modeller.standardtemplates
+    :members:
+    :undoc-members:
+    :show-inheritance:

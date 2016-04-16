@@ -13,6 +13,7 @@ Subpackages
     parmed.modeller
     parmed.namd
     parmed.openmm
+    parmed.rdkit
     parmed.rosetta
     parmed.tinker
     parmed.tools

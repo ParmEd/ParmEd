@@ -72,6 +72,12 @@
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.append" title="parmed.tinker.topologyobjects.AngleList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.clear" title="parmed.tinker.topologyobjects.AngleList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.copy" title="parmed.tinker.topologyobjects.AngleList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.count" title="parmed.tinker.topologyobjects.AngleList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -87,14 +93,14 @@
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.pop" title="parmed.tinker.topologyobjects.AngleList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.remove" title="parmed.tinker.topologyobjects.AngleList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.remove" title="parmed.tinker.topologyobjects.AngleList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.reverse" title="parmed.tinker.topologyobjects.AngleList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.sort" title="parmed.tinker.topologyobjects.AngleList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.sort" title="parmed.tinker.topologyobjects.AngleList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AngleList.typeclass" title="parmed.tinker.topologyobjects.AngleList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.AngleBend" title="parmed.tinker.topologyobjects.AngleBend"><code class="xref py py-class docutils literal"><span class="pre">AngleBend</span></code></a></td>
@@ -109,6 +115,16 @@
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AngleList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.AngleList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.AngleList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -141,9 +157,8 @@
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AngleList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -154,10 +169,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AngleList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.AngleList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.AngleList.typeclass">
@@ -210,6 +223,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.append" title="parmed.tinker.topologyobjects.AtomList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.clear" title="parmed.tinker.topologyobjects.AtomList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.copy" title="parmed.tinker.topologyobjects.AtomList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.count" title="parmed.tinker.topologyobjects.AtomList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -225,14 +244,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.pop" title="parmed.tinker.topologyobjects.AtomList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.remove" title="parmed.tinker.topologyobjects.AtomList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.remove" title="parmed.tinker.topologyobjects.AtomList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.reverse" title="parmed.tinker.topologyobjects.AtomList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.sort" title="parmed.tinker.topologyobjects.AtomList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.sort" title="parmed.tinker.topologyobjects.AtomList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomList.typeclass" title="parmed.tinker.topologyobjects.AtomList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.Atom" title="parmed.tinker.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a></td>
@@ -247,6 +266,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AtomList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.AtomList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.AtomList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -279,9 +308,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AtomList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -292,10 +320,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AtomList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.AtomList.typeclass">
@@ -329,6 +355,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.append" title="parmed.tinker.topologyobjects.AtomicMultipoleList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.clear" title="parmed.tinker.topologyobjects.AtomicMultipoleList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.copy" title="parmed.tinker.topologyobjects.AtomicMultipoleList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.count" title="parmed.tinker.topologyobjects.AtomicMultipoleList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -344,14 +376,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.pop" title="parmed.tinker.topologyobjects.AtomicMultipoleList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.remove" title="parmed.tinker.topologyobjects.AtomicMultipoleList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.remove" title="parmed.tinker.topologyobjects.AtomicMultipoleList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.reverse" title="parmed.tinker.topologyobjects.AtomicMultipoleList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.sort" title="parmed.tinker.topologyobjects.AtomicMultipoleList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.sort" title="parmed.tinker.topologyobjects.AtomicMultipoleList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.typeclass" title="parmed.tinker.topologyobjects.AtomicMultipoleList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.AtomicMultipole" title="parmed.tinker.topologyobjects.AtomicMultipole"><code class="xref py py-class docutils literal"><span class="pre">AtomicMultipole</span></code></a></td>
@@ -366,6 +398,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AtomicMultipoleList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.AtomicMultipoleList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.AtomicMultipoleList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -398,9 +440,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AtomicMultipoleList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -411,10 +452,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.AtomicMultipoleList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.AtomicMultipoleList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.AtomicMultipoleList.typeclass">
@@ -441,6 +480,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.append" title="parmed.tinker.topologyobjects.BondList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.clear" title="parmed.tinker.topologyobjects.BondList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.copy" title="parmed.tinker.topologyobjects.BondList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.count" title="parmed.tinker.topologyobjects.BondList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -456,14 +501,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.pop" title="parmed.tinker.topologyobjects.BondList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.remove" title="parmed.tinker.topologyobjects.BondList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.remove" title="parmed.tinker.topologyobjects.BondList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.reverse" title="parmed.tinker.topologyobjects.BondList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.sort" title="parmed.tinker.topologyobjects.BondList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.sort" title="parmed.tinker.topologyobjects.BondList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.BondList.typeclass" title="parmed.tinker.topologyobjects.BondList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.BondStretch" title="parmed.tinker.topologyobjects.BondStretch"><code class="xref py py-class docutils literal"><span class="pre">BondStretch</span></code></a></td>
@@ -478,6 +523,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.BondList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.BondList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.BondList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -510,9 +565,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.BondList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -523,10 +577,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.BondList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.BondList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.BondList.typeclass">
@@ -567,6 +619,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.append" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.clear" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.copy" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.count" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -582,14 +640,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.pop" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.remove" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.remove" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.reverse" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.sort" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.sort" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.typeclass" title="parmed.tinker.topologyobjects.DipolePolarizabilityList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.DipolePolarizability" title="parmed.tinker.topologyobjects.DipolePolarizability"><code class="xref py py-class docutils literal"><span class="pre">DipolePolarizability</span></code></a></td>
@@ -604,6 +662,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.DipolePolarizabilityList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.DipolePolarizabilityList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.DipolePolarizabilityList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -636,9 +704,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.DipolePolarizabilityList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -649,10 +716,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.DipolePolarizabilityList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.DipolePolarizabilityList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.DipolePolarizabilityList.typeclass">
@@ -686,6 +751,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.append" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.clear" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.copy" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.count" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -701,14 +772,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.pop" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.remove" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.remove" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.reverse" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.sort" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.sort" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.typeclass" title="parmed.tinker.topologyobjects.OutOfPlaneBendList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneBend" title="parmed.tinker.topologyobjects.OutOfPlaneBend"><code class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBend</span></code></a></td>
@@ -723,6 +794,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneBendList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.OutOfPlaneBendList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.OutOfPlaneBendList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -755,9 +836,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneBendList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -768,10 +848,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneBendList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneBendList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneBendList.typeclass">
@@ -805,6 +883,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.append" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.clear" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.copy" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.count" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -820,14 +904,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.pop" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.remove" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.remove" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.reverse" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.sort" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.sort" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.typeclass" title="parmed.tinker.topologyobjects.OutOfPlaneDistList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.OutOfPlaneDist" title="parmed.tinker.topologyobjects.OutOfPlaneDist"><code class="xref py py-class docutils literal"><span class="pre">OutOfPlaneDist</span></code></a></td>
@@ -842,6 +926,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneDistList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.OutOfPlaneDistList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.OutOfPlaneDistList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -874,9 +968,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneDistList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -887,10 +980,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneDistList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.OutOfPlaneDistList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.OutOfPlaneDistList.typeclass">
@@ -924,6 +1015,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.append" title="parmed.tinker.topologyobjects.PiTorsionList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.clear" title="parmed.tinker.topologyobjects.PiTorsionList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.copy" title="parmed.tinker.topologyobjects.PiTorsionList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.count" title="parmed.tinker.topologyobjects.PiTorsionList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -939,14 +1036,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.pop" title="parmed.tinker.topologyobjects.PiTorsionList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.remove" title="parmed.tinker.topologyobjects.PiTorsionList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.remove" title="parmed.tinker.topologyobjects.PiTorsionList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.reverse" title="parmed.tinker.topologyobjects.PiTorsionList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.sort" title="parmed.tinker.topologyobjects.PiTorsionList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.sort" title="parmed.tinker.topologyobjects.PiTorsionList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsionList.typeclass" title="parmed.tinker.topologyobjects.PiTorsionList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.PiTorsion" title="parmed.tinker.topologyobjects.PiTorsion"><code class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></code></a></td>
@@ -961,6 +1058,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.PiTorsionList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.PiTorsionList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.PiTorsionList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -993,9 +1100,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.PiTorsionList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1006,10 +1112,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.PiTorsionList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.PiTorsionList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.PiTorsionList.typeclass">
@@ -1043,6 +1147,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.append" title="parmed.tinker.topologyobjects.StretchBendList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.clear" title="parmed.tinker.topologyobjects.StretchBendList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.copy" title="parmed.tinker.topologyobjects.StretchBendList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.count" title="parmed.tinker.topologyobjects.StretchBendList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -1058,14 +1168,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.pop" title="parmed.tinker.topologyobjects.StretchBendList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.remove" title="parmed.tinker.topologyobjects.StretchBendList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.remove" title="parmed.tinker.topologyobjects.StretchBendList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.reverse" title="parmed.tinker.topologyobjects.StretchBendList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.sort" title="parmed.tinker.topologyobjects.StretchBendList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.sort" title="parmed.tinker.topologyobjects.StretchBendList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBendList.typeclass" title="parmed.tinker.topologyobjects.StretchBendList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.StretchBend" title="parmed.tinker.topologyobjects.StretchBend"><code class="xref py py-class docutils literal"><span class="pre">StretchBend</span></code></a></td>
@@ -1080,6 +1190,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.StretchBendList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.StretchBendList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.StretchBendList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1112,9 +1232,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.StretchBendList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1125,10 +1244,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.StretchBendList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.StretchBendList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.StretchBendList.typeclass">
@@ -1162,6 +1279,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.append" title="parmed.tinker.topologyobjects.TorsionAngleList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.clear" title="parmed.tinker.topologyobjects.TorsionAngleList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.copy" title="parmed.tinker.topologyobjects.TorsionAngleList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.count" title="parmed.tinker.topologyobjects.TorsionAngleList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -1177,14 +1300,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.pop" title="parmed.tinker.topologyobjects.TorsionAngleList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.remove" title="parmed.tinker.topologyobjects.TorsionAngleList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.remove" title="parmed.tinker.topologyobjects.TorsionAngleList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.reverse" title="parmed.tinker.topologyobjects.TorsionAngleList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.sort" title="parmed.tinker.topologyobjects.TorsionAngleList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.sort" title="parmed.tinker.topologyobjects.TorsionAngleList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngleList.typeclass" title="parmed.tinker.topologyobjects.TorsionAngleList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionAngle" title="parmed.tinker.topologyobjects.TorsionAngle"><code class="xref py py-class docutils literal"><span class="pre">TorsionAngle</span></code></a></td>
@@ -1199,6 +1322,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionAngleList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.TorsionAngleList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.TorsionAngleList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1231,9 +1364,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionAngleList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1244,10 +1376,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionAngleList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionAngleList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.TorsionAngleList.typeclass">
@@ -1266,7 +1396,7 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="class">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid">
-<em class="property">class </em><code class="descclassname">parmed.tinker.topologyobjects.</code><code class="descname">TorsionTorsionGrid</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tinker/topologyobjects.html#TorsionTorsionGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.tinker.topologyobjects.</code><code class="descname">TorsionTorsionGrid</code><a class="reference internal" href="../../_modules/parmed/tinker/topologyobjects.html#TorsionTorsionGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></code></p>
 <p>The interpolation grid of a coupled-torsion correction map. Every unique
 grid is cached and if a duplicate grid is instantiated, a reference to the
@@ -1291,49 +1421,31 @@ instances are singletons and should be compared for equality with &#8220;is&#822
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.get" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;D[k]&nbsp;if&nbsp;k&nbsp;in&nbsp;D,&nbsp;...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.has_key" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.has_key"><code class="xref py py-obj docutils literal"><span class="pre">has_key</span></code></a>((k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.items" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.items"><code class="xref py py-obj docutils literal"><span class="pre">items</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.items" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.items"><code class="xref py py-obj docutils literal"><span class="pre">items</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;(key,&nbsp;value)&nbsp;pairs&nbsp;in&nbsp;od)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.keys" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.iteritems" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.iteritems"><code class="xref py py-obj docutils literal"><span class="pre">iteritems</span></code></a>()</td>
-<td>od.iteritems -&gt; an iterator over the (key, value) pairs in od</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.move_to_end" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.move_to_end"><code class="xref py py-obj docutils literal"><span class="pre">move_to_end</span></code></a></td>
+<td>Move an existing element to the end (or beginning if last==False).</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.iterkeys" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.iterkeys"><code class="xref py py-obj docutils literal"><span class="pre">iterkeys</span></code></a>(()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;keys&nbsp;in&nbsp;od)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.new" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.new"><code class="xref py py-obj docutils literal"><span class="pre">new</span></code></a>(data)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.itervalues" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.itervalues"><code class="xref py py-obj docutils literal"><span class="pre">itervalues</span></code></a>()</td>
-<td>od.itervalues -&gt; an iterator over the values in od</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.keys" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.keys"><code class="xref py py-obj docutils literal"><span class="pre">keys</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;keys&nbsp;in&nbsp;od)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.new" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.new"><code class="xref py py-obj docutils literal"><span class="pre">new</span></code></a>(data)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.pop" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.pop" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;...)</td>
 <td>value.  If key is not found, d is returned if given, otherwise KeyError</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.popitem" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.popitem"><code class="xref py py-obj docutils literal"><span class="pre">popitem</span></code></a>(()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.popitem" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.popitem"><code class="xref py py-obj docutils literal"><span class="pre">popitem</span></code></a>(()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;...)</td>
 <td>Pairs are returned in LIFO order if last is true or FIFO order if false.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.setdefault" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.setdefault"><code class="xref py py-obj docutils literal"><span class="pre">setdefault</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;od.get(k,d),&nbsp;...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.setdefault" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.setdefault"><code class="xref py py-obj docutils literal"><span class="pre">setdefault</span></code></a>((k[,d])&nbsp;-&gt;&nbsp;od.get(k,d),&nbsp;...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.update" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.update"><code class="xref py py-obj docutils literal"><span class="pre">update</span></code></a>(([E,&nbsp;...)</td>
-<td>If E present and has a .keys() method, does:     for k in E: D[k] = E[k]</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.values" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.values"><code class="xref py py-obj docutils literal"><span class="pre">values</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;values&nbsp;in&nbsp;od)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.update" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.update"><code class="xref py py-obj docutils literal"><span class="pre">update</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.viewitems" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.viewitems"><code class="xref py py-obj docutils literal"><span class="pre">viewitems</span></code></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.viewkeys" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.viewkeys"><code class="xref py py-obj docutils literal"><span class="pre">viewkeys</span></code></a>(...)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.viewvalues" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.viewvalues"><code class="xref py py-obj docutils literal"><span class="pre">viewvalues</span></code></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.values" title="parmed.tinker.topologyobjects.TorsionTorsionGrid.values"><code class="xref py py-obj docutils literal"><span class="pre">values</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -1360,36 +1472,22 @@ instances are singletons and should be compared for equality with &#8220;is&#822
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.has_key">
-<code class="descname">has_key</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span> &rarr; True if D has a key k, else False<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.has_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.items">
-<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list of (key, value) pairs in od<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.items" title="Permalink to this definition">¶</a></dt>
+<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.items" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.iteritems">
-<code class="descname">iteritems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.iteritems" title="Permalink to this definition">¶</a></dt>
-<dd><p>od.iteritems -&gt; an iterator over the (key, value) pairs in od</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.iterkeys">
-<code class="descname">iterkeys</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; an iterator over the keys in od<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.iterkeys" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.itervalues">
-<code class="descname">itervalues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.itervalues" title="Permalink to this definition">¶</a></dt>
-<dd><p>od.itervalues -&gt; an iterator over the values in od</p>
-</dd></dl>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.keys">
-<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list of keys in od<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.keys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.move_to_end">
+<code class="descname">move_to_end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.move_to_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move an existing element to the end (or beginning if last==False).</p>
+<p>Raises KeyError if the element does not exist.
+When last=True, acts like a fast version of self[key]=self.pop(key).</p>
+</dd></dl>
 
 <dl class="classmethod">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.new">
@@ -1416,30 +1514,12 @@ is raised.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.update">
-<code class="descname">update</code><span class="sig-paren">(</span><span class="optional">[</span><em>E</em>, <span class="optional">]</span><em>**F</em><span class="sig-paren">)</span> &rarr; None.  Update D from mapping/iterable E and F.<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>If E present and has a .keys() method, does:     for k in E: D[k] = E[k]
-If E present and lacks .keys() method, does:     for (k, v) in E: D[k] = v
-In either case, this is followed by: for k, v in F.items(): D[k] = v</p>
-</dd></dl>
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.values">
-<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list of values in od<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.viewitems">
-<code class="descname">viewitems</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; a set-like object providing a view on od's items<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.viewitems" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.viewkeys">
-<code class="descname">viewkeys</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; a set-like object providing a view on od's keys<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.viewkeys" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.tinker.topologyobjects.TorsionTorsionGrid.viewvalues">
-<code class="descname">viewvalues</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; an object providing a view on od's values<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.viewvalues" title="Permalink to this definition">¶</a></dt>
+<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionGrid.values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1461,6 +1541,12 @@ In either case, this is followed by: for k, v in F.items(): D[k] = v</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.append" title="parmed.tinker.topologyobjects.TorsionTorsionList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.clear" title="parmed.tinker.topologyobjects.TorsionTorsionList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.copy" title="parmed.tinker.topologyobjects.TorsionTorsionList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.count" title="parmed.tinker.topologyobjects.TorsionTorsionList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -1476,14 +1562,14 @@ In either case, this is followed by: for k, v in F.items(): D[k] = v</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.pop" title="parmed.tinker.topologyobjects.TorsionTorsionList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.remove" title="parmed.tinker.topologyobjects.TorsionTorsionList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.remove" title="parmed.tinker.topologyobjects.TorsionTorsionList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.reverse" title="parmed.tinker.topologyobjects.TorsionTorsionList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.sort" title="parmed.tinker.topologyobjects.TorsionTorsionList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.sort" title="parmed.tinker.topologyobjects.TorsionTorsionList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsionList.typeclass" title="parmed.tinker.topologyobjects.TorsionTorsionList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.TorsionTorsion" title="parmed.tinker.topologyobjects.TorsionTorsion"><code class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></code></a></td>
@@ -1498,6 +1584,16 @@ In either case, this is followed by: for k, v in F.items(): D[k] = v</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.TorsionTorsionList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.TorsionTorsionList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1530,9 +1626,8 @@ In either case, this is followed by: for k, v in F.items(): D[k] = v</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1543,10 +1638,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.TorsionTorsionList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.TorsionTorsionList.typeclass">
@@ -1580,6 +1673,12 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.append" title="parmed.tinker.topologyobjects.UreyBradleyList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(thing)</td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.clear" title="parmed.tinker.topologyobjects.UreyBradleyList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.copy" title="parmed.tinker.topologyobjects.UreyBradleyList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.count" title="parmed.tinker.topologyobjects.UreyBradleyList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
@@ -1595,14 +1694,14 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.pop" title="parmed.tinker.topologyobjects.UreyBradleyList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.remove" title="parmed.tinker.topologyobjects.UreyBradleyList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a></td>
-<td>L.remove(value) &#8211; remove first occurrence of value.</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.remove" title="parmed.tinker.topologyobjects.UreyBradleyList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<td>Raises ValueError if the value is not present.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.reverse" title="parmed.tinker.topologyobjects.UreyBradleyList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.sort" title="parmed.tinker.topologyobjects.UreyBradleyList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a></td>
-<td>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.sort" title="parmed.tinker.topologyobjects.UreyBradleyList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradleyList.typeclass" title="parmed.tinker.topologyobjects.UreyBradleyList.typeclass"><code class="xref py py-obj docutils literal"><span class="pre">typeclass</span></code></a></td>
 <td>alias of <a class="reference internal" href="#parmed.tinker.topologyobjects.UreyBradley" title="parmed.tinker.topologyobjects.UreyBradley"><code class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></code></a></td>
@@ -1617,6 +1716,16 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.UreyBradleyList.append">
 <code class="descname">append</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.UreyBradleyList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.tinker.topologyobjects.UreyBradleyList.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1649,9 +1758,8 @@ cmp(x, y) -&gt; -1, 0, 1</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.UreyBradleyList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.remove(value) &#8211; remove first occurrence of value.
-Raises ValueError if the value is not present.</p>
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises ValueError if the value is not present.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1662,10 +1770,8 @@ Raises ValueError if the value is not present.</p>
 
 <dl class="method">
 <dt id="parmed.tinker.topologyobjects.UreyBradleyList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.sort(cmp=None, key=None, reverse=False) &#8211; stable sort <em>IN PLACE</em>;
-cmp(x, y) -&gt; -1, 0, 1</p>
-</dd></dl>
+<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.tinker.topologyobjects.UreyBradleyList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.tinker.topologyobjects.UreyBradleyList.typeclass">

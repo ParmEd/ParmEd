@@ -108,7 +108,7 @@ below (the filename argument is omitted):</p>
 <td>list of filenames</td>
 </tr>
 <tr class="row-even"><td>PDBx/mmCIF file</td>
-<td>None</td>
+<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
 </tr>
 <tr class="row-odd"><td>CHARMM coordinate file</td>
 <td>None</td>
@@ -117,7 +117,7 @@ below (the filename argument is omitted):</p>
 <td>None</td>
 </tr>
 <tr class="row-odd"><td>Gromacs GRO file</td>
-<td>None</td>
+<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
 </tr>
 <tr class="row-even"><td>Gromacs topology file</td>
 <td><code class="docutils literal"><span class="pre">defines</span></code>, <code class="docutils literal"><span class="pre">parametrize</span></code>
@@ -133,10 +133,10 @@ below (the filename argument is omitted):</p>
 <td>None</td>
 </tr>
 <tr class="row-even"><td>PDB file</td>
-<td>None</td>
+<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
 </tr>
 <tr class="row-odd"><td>PQR file</td>
-<td>None</td>
+<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
 </tr>
 <tr class="row-even"><td>PSF file</td>
 <td>None</td>
@@ -171,6 +171,15 @@ via an <code class="docutils literal"><span class="pre">OrderedDict</span></code
 <li><code class="docutils literal"><span class="pre">parametrize</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, parameters are assigned from the parameter
 database.  If <code class="docutils literal"><span class="pre">False</span></code>, they are not (default is <code class="docutils literal"><span class="pre">True</span></code>).</li>
 <li><code class="docutils literal"><span class="pre">structure</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, return the Mol2/Mol3 file as a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance. Default is <code class="docutils literal"><span class="pre">False</span></code></li>
+<li><code class="docutils literal"><span class="pre">skip_bonds</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, no attempt is made to identify covalent bonds
+between any atoms for these formats. If <code class="docutils literal"><span class="pre">False</span></code> (default), bonds are first
+assigned by comparing to standard residue templates, then based on distance
+criteria for any atom not specified within the templates. This has a
+side-effect of improving element identification for PDB files that have no
+element columns specified as well as substantially improving element
+identification for ions in GRO files. You are suggested to keep the default
+(<code class="docutils literal"><span class="pre">False</span></code>) unless you are <em>only</em> using the coordinates, in which case setting
+<code class="docutils literal"><span class="pre">skip_bonds</span></code> to <code class="docutils literal"><span class="pre">True</span></code> will result in significantly improved performance.</li>
 </ul>
 <p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file()</span></code></a> automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
@@ -186,8 +195,7 @@ downloaded and processed (again, in-memory).</p>
 <p>Finally, to make it so that you can always retrieve a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance from file types that support returning
 one by passing the <code class="docutils literal"><span class="pre">structure=True</span></code> keyword to <code class="docutils literal"><span class="pre">load_file</span></code>. If this argument
 is not supported by the resulting file type, it is simply ignored, as is the
-<code class="docutils literal"><span class="pre">natom</span></code> and <code class="docutils literal"><span class="pre">hasbox</span></code> keywords (which are required arguments for the Amber
-ASCII trajectory file).</p>
+<code class="docutils literal"><span class="pre">natom</span></code>, <code class="docutils literal"><span class="pre">hasbox</span></code>, and <code class="docutils literal"><span class="pre">skip_bonds</span></code> keywords.</p>
 </div>
 <div class="section" id="writing-files-with-structure-save">
 <h2>Writing files with <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><code class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></code></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
@@ -365,9 +373,9 @@ be found in the <code class="docutils literal"><span class="pre">test/files/</sp
 <span class="gp">... </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cif</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span>
-<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cif</span>
-<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load a Gromacs topology file -- only works with Gromacs installed</span>
 <span class="gp">... </span><span class="n">top</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">top</span>
@@ -387,11 +395,11 @@ supported:</p>
 <span class="gp">... </span><span class="n">pdb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;test_pdb.cif&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Check the resulting saved files</span>
 <span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test_parm.pdb&#39;</span><span class="p">)</span>
-<span class="go">&lt;Structure 1654 atoms; 108 residues; 0 bonds; NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1654 atoms; 108 residues; 1670 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test_cif.pdb&#39;</span><span class="p">)</span>
-<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test_pdb.cif&#39;</span><span class="p">)</span>
-<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 </pre></div>
 </div>
 </div>

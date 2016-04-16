@@ -196,8 +196,11 @@
 <span class="sd">                          &#39;AmberTools&#39;, sourcePackageVersion : &#39;15&#39;},</span>
 <span class="sd">                          &#39;User&#39; : &#39;Mark&#39;}</span>
 <span class="sd">        write_unused : bool</span>
-<span class="sd">            If False, atom types that are not used in any of the residue templates</span>
-<span class="sd">            and parameters including those atom types will not be written</span>
+<span class="sd">            If False: a) residue templates using unavailable atom types will not</span>
+<span class="sd">            be written, b) atom types that are not used in any of the residue</span>
+<span class="sd">            templates remaining and parameters including those atom types will</span>
+<span class="sd">            not be written. A ParameterWarning is issued if any such residues are</span>
+<span class="sd">            found in a).</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -211,27 +214,27 @@
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">typeified</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">write_unused</span><span class="p">:</span>
+            <span class="n">skip_residues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unused_residues</span><span class="p">()</span>
+            <span class="n">skip_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unused_types</span><span class="p">(</span><span class="n">skip_residues</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">skip_residues</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Some residue templates using unavailable AtomTypes &#39;</span>
+                              <span class="s1">&#39;were found. They will not be written to the ffxml &#39;</span>
+                              <span class="s1">&#39;as write_unused is set to False&#39;</span><span class="p">,</span> <span class="n">ParameterWarning</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">skip_residues</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">skip_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">typeify_templates</span><span class="p">()</span>
-                <span class="n">typeified</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Some residue templates are using unavailable &#39;</span>
                               <span class="s1">&#39;AtomTypes&#39;</span><span class="p">,</span> <span class="n">ParameterWarning</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">write_unused</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">typeified</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Typification of the templates was not successful. &#39;</span>
-                              <span class="s1">&#39;Proceeding with write_unused=False is not advised&#39;</span><span class="p">,</span>
-                               <span class="n">ParameterWarning</span><span class="p">)</span>
-            <span class="n">skip_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_unused_types</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">skip_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;ForceField&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_provenance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">provenance</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_atom_types</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_residues</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_residues</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_residues</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_bonds</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_angles</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_urey_bradley</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
@@ -246,12 +249,28 @@
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_find_unused_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_find_unused_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">skip_residues</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">((</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+                <span class="n">skip_residues</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">skip_residues</span>
+
+    <span class="k">def</span> <span class="nf">_find_unused_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_residues</span><span class="p">):</span>
         <span class="n">keep_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
-                <span class="n">keep_types</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">skip_residues</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                    <span class="n">keep_types</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">typ</span> <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="k">if</span> <span class="n">typ</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_types</span><span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_templhasher</span><span class="p">(</span><span class="n">residue</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">))</span>
+        <span class="c1"># TODO implement hash for polyatomic residues</span>
+        <span class="k">return</span> <span class="nb">id</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_write_omm_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">provenance</span><span class="p">):</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;Info&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -286,21 +305,30 @@
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">skip_types</span><span class="p">:</span> <span class="k">continue</span>
             <span class="k">assert</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Atomic number not set!&#39;</span>
             <span class="k">if</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">element</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Type name=&quot;</span><span class="si">%s</span><span class="s1">&quot; class=&quot;</span><span class="si">%s</span><span class="s1">&quot; mass=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+                           <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">element</span> <span class="o">=</span> <span class="n">Element</span><span class="p">[</span><span class="n">atom_type</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Type name=&quot;</span><span class="si">%s</span><span class="s1">&quot; class=&quot;</span><span class="si">%s</span><span class="s1">&quot; element=&quot;</span><span class="si">%s</span><span class="s1">&quot; mass=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
-                       <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
-                       <span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Type name=&quot;</span><span class="si">%s</span><span class="s1">&quot; class=&quot;</span><span class="si">%s</span><span class="s1">&quot; element=&quot;</span><span class="si">%s</span><span class="s1">&quot; mass=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+                          <span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;/AtomTypes&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write_omm_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_omm_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">skip_residues</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span> <span class="k">return</span>
+        <span class="n">written_residues</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;Residues&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">residue</span><span class="p">,</span> <span class="n">ResidueTemplate</span><span class="p">):</span>
-                <span class="k">continue</span>
-            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Residue name=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">skip_residues</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">templhash</span> <span class="o">=</span> <span class="n">OpenMMParameterSet</span><span class="o">.</span><span class="n">_templhasher</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">templhash</span> <span class="ow">in</span> <span class="n">written_residues</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">written_residues</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">templhash</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">overload_level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Residue name=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Residue name=&quot;</span><span class="si">%s</span><span class="s1">&quot; overload=&quot;</span><span class="si">%d</span><span class="s1">&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                           <span class="n">residue</span><span class="o">.</span><span class="n">overload_level</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;   &lt;Atom name=&quot;</span><span class="si">%s</span><span class="s1">&quot; type=&quot;</span><span class="si">%s</span><span class="s1">&quot; charge=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                            <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">))</span>
