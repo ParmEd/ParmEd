@@ -102,6 +102,41 @@ def load_file(filename, *args, **kwargs):
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
 
+    Examples
+    --------
+
+    Load a Mol2 file
+
+    >>> load_file('tripos1.mol2')
+    <ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None>
+
+    Load a Mol2 file as a Structure
+
+    >>> load_file('tripos1.mol2', structure=True)
+    <Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized>
+
+    Load an Amber topology file
+
+    >>> load_file('trx.prmtop', xyz='trx.inpcrd')
+    <AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized>
+
+    Load a CHARMM PSF file
+
+    >>> load_file('ala_ala_ala.psf')
+    <CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized>
+
+    Load a PDB and CIF file
+
+    >>> load_file('4lzt.pdb')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    >>> load_file('4LZT.cif')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+
+    Load a Gromacs topology file -- only works with Gromacs installed
+
+    >>> load_file('1aki.ff99sbildn.top')
+    <GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized>
+
     Raises
     ------
     IOError
