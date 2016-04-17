@@ -197,6 +197,12 @@ class XyzFile(Structure):
             for idx in bonds:
                 if idx > i:
                     self.bonds.append(Bond(atom, self.atoms[idx-1]))
+        if seq is None:
+            # Try to improve atomic number prediction for monoatomic species
+            # (like ions) if no sequence as loaded
+            for atom in self.atoms:
+                if len(atom.bonds) == 0: # not bonded to anybody else
+                    atom.atomic_number = _guess_atomic_number(atom.name)
         if own_handle_xyz:
             fxyz.close()
 
@@ -292,11 +298,11 @@ def is_float(thing):
     except ValueError:
         return False
 
-def _guess_atomic_number(name, residue):
+def _guess_atomic_number(name, residue=None):
     """ Guesses the atomic number """
     # Special-case single-atom residues, which are almost always ions
     name = ''.join(c for c in name if c.isalpha())
-    if len(residue.atoms) == 1:
+    if residue is None or len(residue.atoms) == 1:
         if len(name) > 1:
             try:
                 return AtomicNum[name[0].upper() + name[1].lower()]

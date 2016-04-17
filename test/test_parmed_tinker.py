@@ -112,6 +112,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(xyz.atoms[-1].type, '248')
         xyz = pmd.load_file(get_fn('2igd_924wat.xyz'), get_fn('2igd_924wat.pdb'))
         pdb = pmd.load_file(get_fn('2igd_924wat.pdb'))
+        xyz2 = pmd.load_file(get_fn('2igd_924wat.xyz'))
         self.assertEqual(len(pdb.atoms), len(xyz.atoms))
         self.assertEqual(len(pdb.residues), len(xyz.residues))
         for r1, r2 in zip(pdb.residues, xyz.residues):
@@ -121,6 +122,10 @@ class TestTinkerFiles(unittest.TestCase):
             self.assertEqual(r1.insertion_code, r2.insertion_code)
         # Make sure NA ions are atomic number of sodium
         for atom in xyz.view['NA',:].atoms:
+            self.assertEqual(atom.atomic_number, pmd.periodic_table.AtomicNum['Na'])
+        # Now make sure that NA ions are atomic number of sodium even if we
+        # don't load a PDB file
+        for atom in xyz2.view[:,'Na+']:
             self.assertEqual(atom.atomic_number, pmd.periodic_table.AtomicNum['Na'])
 
     def test_dyn(self):
