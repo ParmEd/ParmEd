@@ -13,6 +13,7 @@ from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from parmed.modeller import StandardBiomolecularResidues
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint, Bond
 from parmed.utils.io import genopen
@@ -60,15 +61,24 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
 def _standardize_resname(resname):
     """ Looks up a standardized residue name for the given resname """
     try:
-        return AminoAcidResidue.get(resname).abbr
+        return AminoAcidResidue.get(resname).abbr, False
     except KeyError:
         try:
-            return RNAResidue.get(resname).abbr
+            return RNAResidue.get(resname).abbr, False
         except KeyError:
             try:
-                return DNAResidue.get(resname).abbr
+                return DNAResidue.get(resname).abbr, False
             except KeyError:
-                return resname
+                return resname, True
+
+def _is_hetatm(resname):
+    """ Sees if residue name is "standard", otherwise, we need to use HETATM to
+    print atom records instead of ATOM
+    """
+    if len(resname) != 3:
+        return not (RNAResidue.has(resname) or DNAResidue.has(resname))
+    return not (AminoAcidResidue.has(resname) or RNAResidue.has(resname)
+            or DNAResidue.has(resname))
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -712,6 +722,7 @@ class PDBFile(object):
         if charmm:
             atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                        '%6.2f      %-4s%2s%-2s\n')
+            hetatomrec = atomrec.replace('ATOM  ', 'HETATM')
             anisourec = ('ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d'
                          '      %2s%-2s\n')
             terrec = ('TER   %5d      %-4s%1s%4d\n')
@@ -723,6 +734,7 @@ class PDBFile(object):
                          '      %2s%-2s\n')
             terrec = ('TER   %5d      %-3s %1s%4d\n')
             reslen = 3
+        hetatomrec = atomrec.replace('ATOM  ', 'HETATM')
         if struct.box is not None:
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
@@ -757,7 +769,7 @@ class PDBFile(object):
         if standard_resnames:
             standardize = lambda x: _standardize_resname(x)[:reslen]
         else:
-            standardize = lambda x: x[:reslen]
+            standardize = lambda x: (x[:reslen], _is_hetatm(x))
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
         last_rnumber = 0
@@ -791,15 +803,19 @@ class PDBFile(object):
                         aname = ' %-3s' % pa.name
                     else:
                         aname = pa.name[:4]
-                    dest.write(atomrec % (anum , aname, pa.altloc,
-                               standardize(res.name), res.chain[:1], rnum,
-                               res.insertion_code[:1], x, y, z, pa.occupancy,
-                               pa.bfactor, segid,
+                    resname, hetatom = standardize(res.name)
+                    if hetatom:
+                        rec = hetatomrec
+                    else:
+                        rec = atomrec
+                    dest.write(rec % (anum , aname, pa.altloc, resname,
+                               res.chain[:1], rnum, res.insertion_code[:1],
+                               x, y, z, pa.occupancy, pa.bfactor, segid,
                                Element[pa.atomic_number].upper(), ''))
                     if write_anisou and pa.anisou is not None:
                         anisou = [int(ani*1e4) for ani in pa.anisou]
                         dest.write(anisourec % (anum, aname, pa.altloc,
-                                   standardize(res.name), res.chain[:1], rnum,
+                                   resname, res.chain[:1], rnum,
                                    res.insertion_code[:1], anisou[0], anisou[1],
                                    anisou[2], anisou[3], anisou[4], anisou[5],
                                    Element[pa.atomic_number].upper(), ''))
@@ -818,22 +834,20 @@ class PDBFile(object):
                             aname = ' %-3s' % oatom.name
                         else:
                             aname = oatom.name[:4]
-                        dest.write(atomrec % (anum, aname, key,
-                                   standardize(res.name), res.chain[:1], rnum,
-                                   res.insertion_code[:1], x, y, z,
-                                   oatom.occupancy, oatom.bfactor, segid,
+                        dest.write(rec % (anum, aname, key, resname,
+                                   res.chain[:1], rnum, res.insertion_code[:1],
+                                   x, y, z, oatom.occupancy, oatom.bfactor, segid,
                                    Element[oatom.atomic_number].upper(), ''))
                         if write_anisou and oatom.anisou is not None:
                             anisou = [int(ani*1e4) for ani in oatom.anisou]
                             el = Element[oatom.atomic_number].upper()
                             dest.write(anisourec % (anum, aname,
-                                oatom.altloc[:1], standardize(res.name),
-                                res.chain[:1], rnum, res.insertion_code[:1],
-                                anisou[0], anisou[1], anisou[2], anisou[3],
+                                oatom.altloc[:1], resname, res.chain[:1],
+                                rnum, res.insertion_code[:1], anisou[0],
+                                anisou[1], anisou[2], anisou[3],
                                 anisou[4], anisou[5], el, ''))
-                if res.ter:
-                    dest.write(terrec % (anum+1, standardize(res.name),
-                                         res.chain, rnum))
+                if res.ter or (len(struct.bonds) > 0 and _needs_ter_card(res)):
+                    dest.write(terrec % (anum+1, resname, res.chain, rnum))
                     if renumber:
                         nmore += 1
                     else:
@@ -1388,7 +1402,7 @@ class CIFFile(object):
         if standard_resnames:
             standardize = lambda x: _standardize_resname(x)
         else:
-            standardize = lambda x: x
+            standardize = lambda x: (x, _is_hetatm(x))
         # Now add the atom section. Include all names that the CIF standard
         # usually includes, but put '?' in sections that contain data we don't
         # store in the Structure, Residue, or Atom classes
@@ -1428,7 +1442,11 @@ class CIFFile(object):
                     atoms = res.atoms
                 else:
                     atoms = sorted(res.atoms, key=lambda atom: atom.number)
-                resname = standardize(res.name)
+                resname, hetatom = standardize(res.name)
+                if hetatom:
+                    atomrec = 'HETATM'
+                else:
+                    atomrec = 'ATOM  '
                 for atom in atoms:
                     pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
@@ -1441,7 +1459,7 @@ class CIFFile(object):
                     last_number = anum
                     last_rnumber = rnum
                     cifatoms.append(
-                            ['ATOM', anum, Element[pa.atomic_number].upper(),
+                            [atomrec, anum, Element[pa.atomic_number].upper(),
                              pa.name, pa.altloc, resname, res.chain, '?', rnum,
                              res.insertion_code, x, y, z, pa.occupancy,
                              pa.bfactor, '?', '?', '?', '?', '?', '', rnum,
@@ -1467,7 +1485,7 @@ class CIFFile(object):
                         last_number = anum
                         el = Element[oatom.atomic_number].upper()
                         cifatoms.append(
-                                ['ATOM', anum, el, oatom.name, oatom.altloc,
+                                [atomrec, anum, el, oatom.name, oatom.altloc,
                                  resname, res.chain, '?', rnum,
                                  res.insertion_code, x, y, z, oatom.occupancy,
                                  oatom.bfactor, '?', '?', '?', '?', '?', '',
@@ -1517,3 +1535,30 @@ def _find_atom_index(struct, idx):
                 return struct[idx0]
             idx0 -= 1
         return None # not found
+
+def _needs_ter_card(res):
+    """ Determines if a TER card is needed by seeing if the residue is a
+    polymeric residue that is *not* bonded to the next residue
+    """
+    # First see if it's in the list of standard biomolecular residues. If so,
+    # and it has no tail, no TER is needed
+    std_resname = _standardize_resname(res.name)
+    if std_resname in StandardBiomolecularResidues:
+        is_std_res = True
+        if StandardBiomolecularResidues[std_resname].tail is None:
+            return False
+    else:
+        is_std_res = False
+    my_res_idx = res.idx
+    residxs = set()
+    for atom in res.atoms:
+        for bond in atom.bonds:
+            residxs |= {bond.atom1.residue.idx, bond.atom2.residue.idx}
+    if my_res_idx + 1 in residxs:
+        return False # It's connected to next residue
+    elif is_std_res:
+        return True
+    else:
+        # Heuristic -- add a TER if it's bonded to the previous residue, which
+        # indicates it's polymeric. Otherwise don't.
+        return my_res_idx - 1 in residxs
