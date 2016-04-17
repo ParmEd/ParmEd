@@ -160,7 +160,7 @@ class TestFileLoader(FileIOTestCase):
                 formats.mol2.Mol2File.parse(get_fn('error.mol2'))
         )
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_load_gromacs_topology(self):
         """ Tests automatic loading of Gromacs topology file """
         top = formats.load_file(get_fn('1aki.charmm27.top'))
@@ -798,6 +798,30 @@ class TestPDBStructure(FileIOTestCase):
                                    pdbfile.get_coordinates('all'))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
+    def test_ter_cards(self):
+        """ Tests that the addition of TER cards is correct in PDB writing """
+        pdbfile = read_PDB(get_fn('ala_ala_ala.pdb'))
+        pdbfile *= 5 # This should make us need 5 TER cards
+        fn = get_fn('test.pdb', written=True)
+        pdbfile.write_pdb(fn)
+        with open(fn, 'r') as f:
+            self.assertEqual(sum([l.startswith('TER') for l in f]), 5)
+        # Make sure TER cards *don't* get added for water
+        pdbfile = download_PDB('4lzt')
+        pdbfile.write_pdb(fn)
+        with open(fn, 'r') as f:
+            for line in f:
+                if line.startswith('TER'):
+                    break
+            else:
+                assert False, 'No TER card found!'
+            # Make sure the rest of the atoms after this are HETATM
+            has_hetatms = False
+            for line in f:
+                self.assertFalse(line.startswith('ATOM'))
+                has_hetatms = has_hetatms or line.startswith('HETATM')
+            self.assertTrue(has_hetatms)
+
     def test_pdb_big_coordinates(self):
         """ Test proper PDB coordinate parsing for large coordinates """
         pdbfile = read_PDB(get_fn('bigz.pdb'))
@@ -960,11 +984,11 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_private_functions(self):
         """ Tests the private helper functions in parmed/formats/pdb.py """
-        self.assertEqual(formats.pdb._standardize_resname('ASH'), 'ASP')
-        self.assertEqual(formats.pdb._standardize_resname('CYX'), 'CYS')
-        self.assertEqual(formats.pdb._standardize_resname('RA'), 'A')
-        self.assertEqual(formats.pdb._standardize_resname('DG'), 'DG')
-        self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
+        self.assertEqual(formats.pdb._standardize_resname('ASH'), ('ASP', False))
+        self.assertEqual(formats.pdb._standardize_resname('CYX'), ('CYS', False))
+        self.assertEqual(formats.pdb._standardize_resname('RA'), ('A', False))
+        self.assertEqual(formats.pdb._standardize_resname('DG'), ('DG', False))
+        self.assertEqual(formats.pdb._standardize_resname('BLA'), ('BLA', True))
 
     def test_deprecations(self):
         fn = get_fn('blah', written=True)
