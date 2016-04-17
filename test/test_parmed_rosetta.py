@@ -1,10 +1,8 @@
-import utils
 from parmed import read_PDB, load_rosetta
 from parmed.utils.six.moves import range
 from itertools import chain
 from utils import get_fn
 import unittest
-
 try:
     from simtk.openmm.app import PDBFile
 except:
@@ -13,11 +11,6 @@ try:
     from rosetta import init, pose_from_sequence
 except ImportError:
     init = pose_from_sequence = None
-
-
-def _unpackLen(obj):
-    return len(list(obj))
-
 
 @unittest.skipIf(init is None, "Cannot test load_rosetta module without PyRosetta.")
 class TestRosetta(unittest.TestCase):

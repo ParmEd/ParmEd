@@ -1,3 +1,5 @@
 graft examples
 graft src
 graft parmed
+include versioneer.py
+include parmed/_version.py
