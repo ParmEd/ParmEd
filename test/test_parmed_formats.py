@@ -984,11 +984,11 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_private_functions(self):
         """ Tests the private helper functions in parmed/formats/pdb.py """
-        self.assertEqual(formats.pdb._standardize_resname('ASH'), 'ASP')
-        self.assertEqual(formats.pdb._standardize_resname('CYX'), 'CYS')
-        self.assertEqual(formats.pdb._standardize_resname('RA'), 'A')
-        self.assertEqual(formats.pdb._standardize_resname('DG'), 'DG')
-        self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
+        self.assertEqual(formats.pdb._standardize_resname('ASH'), ('ASP', False))
+        self.assertEqual(formats.pdb._standardize_resname('CYX'), ('CYS', False))
+        self.assertEqual(formats.pdb._standardize_resname('RA'), ('A', False))
+        self.assertEqual(formats.pdb._standardize_resname('DG'), ('DG', False))
+        self.assertEqual(formats.pdb._standardize_resname('BLA'), ('BLA', True))
 
     def test_deprecations(self):
         fn = get_fn('blah', written=True)
