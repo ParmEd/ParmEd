@@ -1,5 +1,6 @@
 import os
 import sys
+import versioneer
 
 if sys.version_info < (2, 7):
     sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
@@ -82,7 +83,6 @@ extensions = [Extension('parmed.amber._rdparm',
 if __name__ == '__main__':
 
     import shutil
-    import parmed
 
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
@@ -140,8 +140,10 @@ if __name__ == '__main__':
         if os.path.exists(pmdc): delfile(pmdc)
         if os.path.exists(xpmdc): delfile(xpmdc)
 
+    cmdclass = dict(clean=CleanCommand)
+    cmdclass.update(versioneer.get_cmdclass())
     setup(name='ParmEd',
-          version=parmed.__version__,
+          version=versioneer.get_version(),
           description='Amber parameter file editor',
           author='Jason Swails',
           author_email='jason.swails -at- gmail.com',
@@ -149,7 +151,7 @@ if __name__ == '__main__':
           license='LGPL (or GPL if released with AmberTools)',
           packages=packages,
           ext_modules=extensions,
-          cmdclass={'clean': CleanCommand},
+          cmdclass=cmdclass,
           package_data={'parmed.modeller': ['data/*.lib']},
           **kws
     )

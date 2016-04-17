@@ -6,7 +6,7 @@ import unittest
 class InitTestCase(unittest.TestCase):
     """ Test various package __init__ code """
 
-    def testParmedVersion(self):
+    def test_parmed_version(self):
         """ Tests parmed.version class """
         version = type(pmd.version)
 

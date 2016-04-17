@@ -6,7 +6,6 @@ between standard and amber file formats, manipulate structures, etc.
 # Version format should be "major.minor.patch". For beta releases, attach
 # "-beta#" to the end. The beta number will be turned into another number in the
 # version tuple
-__version__ = '2.5.0'
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
@@ -14,6 +13,10 @@ __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
            'tinker', 'openmm', 'rosetta', 'rdkit', 'formats', 'Vec3', 'ParameterSet',
            'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF',
            'load_rosetta', 'load_rdkit', 'download_PDB', 'download_CIF', 'tools', 'version']
+
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
 
 from parmed import exceptions, periodic_table, residue
 from parmed import unit, utils
