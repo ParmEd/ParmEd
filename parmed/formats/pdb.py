@@ -1018,6 +1018,12 @@ class CIFFile(object):
             the PDBx/mmCIF file.  No bonds or other topological features are
             added by default. If multiple structures are defined in the CIF
             file, multiple Structure instances will be returned as a tuple.
+
+        Raises
+        ------
+        ValueError if the file severely violates the PDB format specification.
+        If this occurs, check the formatting on each line and make sure it
+        matches the others.
         """
         if isinstance(filename, string_types):
             own_handle = True
