@@ -403,6 +403,17 @@ class AmberParm(AmberFormat, Structure):
             other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
             other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
         other._add_standard_flags()
+        other.remake_parm()
+        other._set_nonbonded_tables()
+        # Add back the original L-J tables to restore any NBFIXes that may have
+        # been there
+        other.parm_data['LENNARD_JONES_ACOEF'] = \
+                self.parm_data['LENNARD_JONES_ACOEF'][:]
+        other.parm_data['LENNARD_JONES_BCOEF'] = \
+                self.parm_data['LENNARD_JONES_BCOEF'][:]
+        if 'LENNARD_JONES_CCOEF' in self.parm_data:
+            other.parm_data['LENNARD_JONES_CCOEF'] = \
+                    self.parm_data['LENNARD_JONES_CCOEF'][:]
         return other
 
     #===================================================
@@ -1513,7 +1524,7 @@ class AmberParm(AmberFormat, Structure):
             data['RESIDUE_CHAINID'] = [res.chain for res in self.residues]
         if 'RESIDUE_ICODE' in data:
             data['RESIDUE_ICODE'] = [r.insertion_code for r in self.residues]
-        nmxrs = max([len(res) for res in self.residues])
+        nmxrs = max([len(res) for res in self.residues]) if self.residues else 0
         data['POINTERS'][NMXRS] = nmxrs
         self.pointers['NMXRS'] = nmxrs
 
