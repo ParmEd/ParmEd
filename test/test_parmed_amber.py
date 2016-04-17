@@ -615,6 +615,17 @@ class TestReadParm(unittest.TestCase):
         self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm, has1012=True)
 
+    def test_getitem_nbtables(self):
+        """ Tests that nonbond tables are set correctly following slicing """
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        new = parm[list(range(len(parm.atoms)))]
+        self.assertEqual(len(parm.parm_data['NONBONDED_PARM_INDEX']),
+                         len(new.parm_data['NONBONDED_PARM_INDEX']))
+        self.assertEqual(len(parm.parm_data['LENNARD_JONES_ACOEF']),
+                         len(new.parm_data['LENNARD_JONES_ACOEF']))
+        self.assertEqual(len(parm.parm_data['LENNARD_JONES_BCOEF']),
+                         len(new.parm_data['LENNARD_JONES_BCOEF']))
+
     def test_bad_arguments(self):
         """ Test proper error handling for bad AmberParm arguments """
         self.assertRaises(TypeError, lambda:
