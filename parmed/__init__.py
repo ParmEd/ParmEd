@@ -78,7 +78,7 @@ _versionre = re.compile(r'(\d+)\.(\d+)\.(\d+)\+?(\d*)\.?g?([\dabcdefABCDEF]*)'
 if _versionre.match(__version__):
     versionlist = list(_versionre.match(__version__).groups())
     versionlist[3] = versionlist[3] or 0
-    version = version(*versionlist[:4])
+    version = version(*[int(v) for v in versionlist[:4]])
     version.git_hash = versionlist[4]
     version.dirty = bool(versionlist[5])
 else:
