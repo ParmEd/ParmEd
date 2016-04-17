@@ -49,85 +49,41 @@ __all__ += topologyobjects.__all__
 # Build a version tuple from __version__ for easy comparison
 import re
 from collections import namedtuple
-class version(namedtuple('version', ['major', 'minor', 'patchlevel'])):
-    # Make sure betas always compare *less* than non-betas, and beta levels
-    # compare greater than lower beta levels
-    def __lt__(self, other):
-        try:
-            other = tuple(other)
-        except TypeError:
-            return NotImplemented
-        other_is_beta = False
-        if len(other) >= 4:
-            other_is_beta = True
-        if other_is_beta and self.beta is None:
-            return tuple.__lt__(self, other[:3])
-        elif other_is_beta and self.beta is not None:
-            if tuple.__eq__(self, other[:3]):
-                return self.beta < other[3]
-            return tuple.__lt__(self, other)
-        elif not other_is_beta and self.beta is not None:
-            return tuple.__le__(self, other[:3])
-        else:
-            return tuple.__lt__(self, other)
-
-    def __gt__(self, other):
-        try:
-            other = tuple(other)
-        except TypeError:
-            return NotImplemented
-        other_is_beta = False
-        if len(other) >= 4:
-            other_is_beta = True
-        if other_is_beta and self.beta is None:
-            return tuple.__ge__(self, other[:3])
-        elif other_is_beta and self.beta is not None:
-            if tuple.__eq__(self, other[:3]):
-                return self.beta > other[3]
-            return tuple.__gt__(self, other)
-        elif not other_is_beta and self.beta is not None:
-            return tuple.__gt__(self, other)
-        else:
-            return tuple.__gt__(self, other)
-
+class version(namedtuple('version', ['major', 'minor',
+                                     'patchlevel', 'commits_ahead'])):
     def __eq__(self, other):
         try:
-            other = tuple(other)
+            if len(other) == 3:
+                return (other == self[:3] and self.commits_ahead == 0
+                        and not self.dirty)
         except TypeError:
             return NotImplemented
-        other_is_beta = False
-        if len(other) >= 4:
-            other_is_beta = True
-        if other_is_beta and self.beta is None:
+        if tuple(other) != tuple(self):
             return False
-        elif not other_is_beta and self.beta is not None:
-            return False
-        if other_is_beta:
-            return tuple.__eq__(self, other[:3]) and self.beta == other[3]
-        return tuple.__eq__(self, other)
+        elif not hasattr(other, 'git_hash') or not hasattr(other, 'dirty'):
+            return not self.dirty
+        return self.git_hash == other.git_hash and self.dirty is other.dirty
 
     def __ne__(self, other):
         return not self == other
 
-    def __ge__(self, other):
-        return self > other or self == other
     def __le__(self, other):
-        return self < other or self == other
-
-    def __repr__(self):
-        ret = super(type(self), self).__repr__()
-        if self.beta is None:
-            return ret
-        return ret[:-1] + ', beta=%d)' % self.beta
+        return self == other or self < other
+    def __ge__(self, other):
+        return self == other or self > other
 
 # Build the version
-_betare = re.compile(r'-beta*')
-versionlist = list(int(x) for x in _betare.sub('.', __version__).split('.'))
-version = version(*versionlist[:3])
-if len(versionlist) > 3:
-    version.beta = versionlist[3]
+_versionre = re.compile(r'(\d+)\.(\d+)\.(\d+)\+?(\d*)\.?g?([\dabcdefABCDEF]*)'
+                        r'\.*(dirty)?')
+if _versionre.match(__version__):
+    versionlist = list(_versionre.match(__version__).groups())
+    versionlist[3] = versionlist[3] or 0
+    version = version(*versionlist[:4])
+    version.git_hash = versionlist[4]
+    version.dirty = bool(versionlist[5])
 else:
-    version.beta = None
+    versionlist = None
+    version = version(0, 0, 0, 0)
 
 # Clean up
-del namedtuple, re, _betare, versionlist
+del namedtuple, re, versionlist
