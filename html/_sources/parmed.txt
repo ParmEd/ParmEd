@@ -933,7 +933,7 @@ A simple example is shown below (input follows the prompts ``>`` and ``py
 .. code-block:: none
 
     $ parmed -e
-    
+
                                       /^^^/           /]
                                      /   ]           / ]
                              _______/    ]___       /  ]
@@ -946,21 +946,21 @@ A simple example is shown below (input follows the prompts ``>`` and ``py
                           \_________\   \_____/
                                     \    \
                                      \____\
-    
+
     ParmEd: a Parameter file Editor
-    
-    
+
+
     Reading input from STDIN...
     > !!
     py >>> def print_hello_world():
     py >>>     print "Hello World"
-    py >>> 
+    py >>>
     py >>> print_hello_world()
     py >>> !!
     Hello World
     > !print "7 + 4 = %d" % (7 + 4)
     7 + 4 = 11
-    
+
 Notice that immediately after the closing ``!!`` in the first Python code block,
 the Python code is executed. The interpreter takes the entire code typed between
 the ``!!`` lines and interprets it as one string, preserving indentation, then
@@ -1001,7 +1001,7 @@ Let's have a look at how we might be able to use that:
     <BondType; k=500.000, Req=1.229>
     <Bond <Atom C [11]; In SER 0>--<Atom O [12]; In SER 0>; type=<BondType; k=500.000, Req=1.229>>
     > printBonds @12 @13
-    Atom 1               Atom 2               R eq       Frc Cnst  
+    Atom 1               Atom 2               R eq       Frc Cnst
          12    C (   C)      13    O (   O)     1.2290   500.0000
 
 Notice here how we changed our active prmtop by changing the bond force constant
@@ -1037,7 +1037,7 @@ above:
     > !!
     py >>> def print_hello_world():
     py >>>     print "Hello world!"
-    py >>> 
+    py >>>
     py >>> amber_prmtop.custom_func = print_hello_world
     py >>> !!
     > !amber_prmtop.custom_func()

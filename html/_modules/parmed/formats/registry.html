@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.registry &mdash; ParmEd 2.0 documentation</title>
+    <title>parmed.formats.registry &mdash; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.0',
+        VERSION:     '2.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -152,6 +152,41 @@
 <span class="sd">        - ``.gz`` : gzip compressed file</span>
 <span class="sd">        - ``.bz2`` : bzip2 compressed file</span>
 
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Load a Mol2 file</span>
+
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;tripos1.mol2&#39;)</span>
+<span class="sd">    &lt;ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None&gt;</span>
+
+<span class="sd">    Load a Mol2 file as a Structure</span>
+
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;tripos1.mol2&#39;, structure=True)</span>
+<span class="sd">    &lt;Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized&gt;</span>
+
+<span class="sd">    Load an Amber topology file</span>
+
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;trx.prmtop&#39;, xyz=&#39;trx.inpcrd&#39;)</span>
+<span class="sd">    &lt;AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized&gt;</span>
+
+<span class="sd">    Load a CHARMM PSF file</span>
+
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;ala_ala_ala.psf&#39;)</span>
+<span class="sd">    &lt;CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized&gt;</span>
+
+<span class="sd">    Load a PDB and CIF file</span>
+
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;4lzt.pdb&#39;)</span>
+<span class="sd">    &lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;4LZT.cif&#39;)</span>
+<span class="sd">    &lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+
+<span class="sd">    Load a Gromacs topology file -- only works with Gromacs installed</span>
+
+<span class="sd">    &gt;&gt;&gt; load_file(&#39;1aki.ff99sbildn.top&#39;)</span>
+<span class="sd">    &lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
+
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    IOError</span>
@@ -259,7 +294,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

@@ -15,8 +15,6 @@ parmed.topologyobjects.DihedralTypeList
    
       ~DihedralTypeList.__init__
       ~DihedralTypeList.append
-      ~DihedralTypeList.clear
-      ~DihedralTypeList.copy
       ~DihedralTypeList.count
       ~DihedralTypeList.extend
       ~DihedralTypeList.index

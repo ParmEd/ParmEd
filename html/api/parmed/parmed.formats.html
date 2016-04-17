@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats package &mdash; ParmEd 2.0 documentation</title>
+    <title>parmed.formats package &mdash; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0',
+        VERSION:     '2.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -182,6 +182,39 @@ applies both to local and remote files. The following names are supported:</p>
 <li><code class="docutils literal"><span class="pre">.bz2</span></code> : bzip2 compressed file</li>
 </ul>
 </div></blockquote>
+<p class="rubric">Examples</p>
+<p>Load a Mol2 file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
+<span class="go">&lt;ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None&gt;</span>
+</pre></div>
+</div>
+<p>Load a Mol2 file as a Structure</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">&lt;Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Load an Amber topology file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="s1">&#39;trx.inpcrd&#39;</span><span class="p">)</span>
+<span class="go">&lt;AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Load a CHARMM PSF file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;ala_ala_ala.psf&#39;</span><span class="p">)</span>
+<span class="go">&lt;CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Load a PDB and CIF file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span>
+<span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Load a Gromacs topology file &#8211; only works with Gromacs installed</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
+<span class="go">&lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="class">
@@ -1017,7 +1050,7 @@ will be converted into the PDB-standard values. Default is False</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

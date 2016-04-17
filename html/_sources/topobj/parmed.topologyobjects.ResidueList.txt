@@ -17,8 +17,6 @@ parmed.topologyobjects.ResidueList
       ~ResidueList.add_atom
       ~ResidueList.append
       ~ResidueList.claim
-      ~ResidueList.clear
-      ~ResidueList.copy
       ~ResidueList.count
       ~ResidueList.extend
       ~ResidueList.index

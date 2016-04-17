@@ -17,7 +17,6 @@ parmed.amber.ChamberParm
       ~ChamberParm.add_atom
       ~ChamberParm.add_atom_to_residue
       ~ChamberParm.add_flag
-      ~ChamberParm.assign_bonds
       ~ChamberParm.copy
       ~ChamberParm.createSystem
       ~ChamberParm.delete_flag

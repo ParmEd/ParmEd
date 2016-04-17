@@ -16,7 +16,6 @@ parmed.structure.Structure
       ~Structure.__init__
       ~Structure.add_atom
       ~Structure.add_atom_to_residue
-      ~Structure.assign_bonds
       ~Structure.copy
       ~Structure.createSystem
       ~Structure.get_box

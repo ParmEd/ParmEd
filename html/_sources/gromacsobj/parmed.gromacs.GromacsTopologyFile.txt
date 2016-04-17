@@ -16,7 +16,6 @@ parmed.gromacs.GromacsTopologyFile
       ~GromacsTopologyFile.__init__
       ~GromacsTopologyFile.add_atom
       ~GromacsTopologyFile.add_atom_to_residue
-      ~GromacsTopologyFile.assign_bonds
       ~GromacsTopologyFile.copy
       ~GromacsTopologyFile.createSystem
       ~GromacsTopologyFile.from_structure

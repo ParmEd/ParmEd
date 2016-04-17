@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.pdb &mdash; ParmEd 2.0 documentation</title>
+    <title>parmed.formats.pdb &mdash; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.0',
+        VERSION:     '2.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../../../index.html" />
+    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -63,6 +63,7 @@
 <span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
 <span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
 <span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
+<span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">StandardBiomolecularResidues</span>
 <span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">Bond</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
@@ -110,15 +111,24 @@
 <span class="k">def</span> <span class="nf">_standardize_resname</span><span class="p">(</span><span class="n">resname</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Looks up a standardized residue name for the given resname &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span>
+        <span class="k">return</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="bp">False</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span>
+            <span class="k">return</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="bp">False</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span>
+                <span class="k">return</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="bp">False</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">resname</span>
+                <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="bp">True</span>
+
+<span class="k">def</span> <span class="nf">_is_hetatm</span><span class="p">(</span><span class="n">resname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Sees if residue name is &quot;standard&quot;, otherwise, we need to use HETATM to</span>
+<span class="sd">    print atom records instead of ATOM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">resname</span><span class="p">))</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span> <span class="ow">or</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">resname</span><span class="p">))</span>
 
 <span class="c1">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -762,6 +772,7 @@
         <span class="k">if</span> <span class="n">charmm</span><span class="p">:</span>
             <span class="n">atomrec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ATOM  </span><span class="si">%5d</span><span class="s1"> </span><span class="si">%-4s%1s%-4s%1s%4d%1s</span><span class="s1">   </span><span class="si">%8.3f%8.3f%8.3f%6.2f</span><span class="s1">&#39;</span>
                        <span class="s1">&#39;</span><span class="si">%6.2f</span><span class="s1">      </span><span class="si">%-4s%2s%-2s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">hetatomrec</span> <span class="o">=</span> <span class="n">atomrec</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ATOM  &#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">)</span>
             <span class="n">anisourec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ANISOU</span><span class="si">%5d</span><span class="s1"> </span><span class="si">%-4s%1s%-4s%1s%4d%1s</span><span class="s1"> </span><span class="si">%7d%7d%7d%7d%7d%7d</span><span class="s1">&#39;</span>
                          <span class="s1">&#39;      </span><span class="si">%2s%-2s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">terrec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;TER   </span><span class="si">%5d</span><span class="s1">      </span><span class="si">%-4s%1s%4d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -773,6 +784,7 @@
                          <span class="s1">&#39;      </span><span class="si">%2s%-2s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">terrec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;TER   </span><span class="si">%5d</span><span class="s1">      </span><span class="si">%-3s</span><span class="s1"> </span><span class="si">%1s%4d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">reslen</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">hetatomrec</span> <span class="o">=</span> <span class="n">atomrec</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ATOM  &#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CRYST1</span><span class="si">%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f</span><span class="s1"> </span><span class="si">%-11s%4s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
@@ -807,7 +819,7 @@
         <span class="k">if</span> <span class="n">standard_resnames</span><span class="p">:</span>
             <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="n">reslen</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[:</span><span class="n">reslen</span><span class="p">]</span>
+            <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="n">reslen</span><span class="p">],</span> <span class="n">_is_hetatm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="n">nmore</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># how many *extra* atoms have been added?</span>
         <span class="n">last_number</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">last_rnumber</span> <span class="o">=</span> <span class="mi">0</span>
@@ -841,15 +853,19 @@
                         <span class="n">aname</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="si">%-3s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pa</span><span class="o">.</span><span class="n">name</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">aname</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span> <span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span>
-                               <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
-                               <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span>
-                               <span class="n">pa</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span>
+                    <span class="n">resname</span><span class="p">,</span> <span class="n">hetatom</span> <span class="o">=</span> <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hetatom</span><span class="p">:</span>
+                        <span class="n">rec</span> <span class="o">=</span> <span class="n">hetatomrec</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">rec</span> <span class="o">=</span> <span class="n">atomrec</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span> <span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
+                               <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span>
                                <span class="n">Element</span><span class="p">[</span><span class="n">pa</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                         <span class="n">anisou</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ani</span><span class="o">*</span><span class="mf">1e4</span><span class="p">)</span> <span class="k">for</span> <span class="n">ani</span> <span class="ow">in</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span><span class="p">]</span>
                         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anisourec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span>
-                                   <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
+                                   <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
                                    <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                    <span class="n">anisou</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
                                    <span class="n">Element</span><span class="p">[</span><span class="n">pa</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
@@ -868,22 +884,20 @@
                             <span class="n">aname</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="si">%-3s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">aname</span> <span class="o">=</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
-                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span>
-                                   <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
-                                   <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
-                                   <span class="n">oatom</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span>
+                        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
+                                   <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
+                                   <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span>
                                    <span class="n">Element</span><span class="p">[</span><span class="n">oatom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
                         <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                             <span class="n">anisou</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ani</span><span class="o">*</span><span class="mf">1e4</span><span class="p">)</span> <span class="k">for</span> <span class="n">ani</span> <span class="ow">in</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span><span class="p">]</span>
                             <span class="n">el</span> <span class="o">=</span> <span class="n">Element</span><span class="p">[</span><span class="n">oatom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anisourec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span>
-                                <span class="n">oatom</span><span class="o">.</span><span class="n">altloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
-                                <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
-                                <span class="n">anisou</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                <span class="n">oatom</span><span class="o">.</span><span class="n">altloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="n">rnum</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="n">anisou</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
                                 <span class="n">anisou</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">el</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">ter</span><span class="p">:</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">terrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
-                                         <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">rnum</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">ter</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">_needs_ter_card</span><span class="p">(</span><span class="n">res</span><span class="p">)):</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">terrec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">rnum</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">renumber</span><span class="p">:</span>
                         <span class="n">nmore</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -1438,7 +1452,7 @@
         <span class="k">if</span> <span class="n">standard_resnames</span><span class="p">:</span>
             <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+            <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_is_hetatm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="c1"># Now add the atom section. Include all names that the CIF standard</span>
         <span class="c1"># usually includes, but put &#39;?&#39; in sections that contain data we don&#39;t</span>
         <span class="c1"># store in the Structure, Residue, or Atom classes</span>
@@ -1478,7 +1492,11 @@
                     <span class="n">atoms</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">atoms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
-                <span class="n">resname</span> <span class="o">=</span> <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">resname</span><span class="p">,</span> <span class="n">hetatom</span> <span class="o">=</span> <span class="n">standardize</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hetatom</span><span class="p">:</span>
+                    <span class="n">atomrec</span> <span class="o">=</span> <span class="s1">&#39;HETATM&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">atomrec</span> <span class="o">=</span> <span class="s1">&#39;ATOM  &#39;</span>
                 <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
                     <span class="n">pa</span><span class="p">,</span> <span class="n">others</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">print_atoms</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">coord</span><span class="p">)</span>
                     <span class="c1"># Figure out the serial numbers we want to print</span>
@@ -1491,7 +1509,7 @@
                     <span class="n">last_number</span> <span class="o">=</span> <span class="n">anum</span>
                     <span class="n">last_rnumber</span> <span class="o">=</span> <span class="n">rnum</span>
                     <span class="n">cifatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="p">[</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span> <span class="n">anum</span><span class="p">,</span> <span class="n">Element</span><span class="p">[</span><span class="n">pa</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+                            <span class="p">[</span><span class="n">atomrec</span><span class="p">,</span> <span class="n">anum</span><span class="p">,</span> <span class="n">Element</span><span class="p">[</span><span class="n">pa</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
                              <span class="n">pa</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">rnum</span><span class="p">,</span>
                              <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span>
                              <span class="n">pa</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rnum</span><span class="p">,</span>
@@ -1517,7 +1535,7 @@
                         <span class="n">last_number</span> <span class="o">=</span> <span class="n">anum</span>
                         <span class="n">el</span> <span class="o">=</span> <span class="n">Element</span><span class="p">[</span><span class="n">oatom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                         <span class="n">cifatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="p">[</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span> <span class="n">anum</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span>
+                                <span class="p">[</span><span class="n">atomrec</span><span class="p">,</span> <span class="n">anum</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span>
                                  <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">rnum</span><span class="p">,</span>
                                  <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span>
                                  <span class="n">oatom</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
@@ -1567,6 +1585,33 @@
                 <span class="k">return</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
             <span class="n">idx0</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="bp">None</span> <span class="c1"># not found</span>
+
+<span class="k">def</span> <span class="nf">_needs_ter_card</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Determines if a TER card is needed by seeing if the residue is a</span>
+<span class="sd">    polymeric residue that is *not* bonded to the next residue</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First see if it&#39;s in the list of standard biomolecular residues. If so,</span>
+    <span class="c1"># and it has no tail, no TER is needed</span>
+    <span class="n">std_resname</span> <span class="o">=</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">std_resname</span> <span class="ow">in</span> <span class="n">StandardBiomolecularResidues</span><span class="p">:</span>
+        <span class="n">is_std_res</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">StandardBiomolecularResidues</span><span class="p">[</span><span class="n">std_resname</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_std_res</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">my_res_idx</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">idx</span>
+    <span class="n">residxs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="n">residxs</span> <span class="o">|=</span> <span class="p">{</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">my_res_idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">residxs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span> <span class="c1"># It&#39;s connected to next residue</span>
+    <span class="k">elif</span> <span class="n">is_std_res</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Heuristic -- add a TER if it&#39;s bonded to the previous residue, which</span>
+        <span class="c1"># indicates it&#39;s polymeric. Otherwise don&#39;t.</span>
+        <span class="k">return</span> <span class="n">my_res_idx</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">residxs</span>
 </pre></div>
 
           </div>
@@ -1600,7 +1645,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.0 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

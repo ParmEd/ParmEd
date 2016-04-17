@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm.reporters module &mdash; ParmEd 2.0 documentation</title>
+    <title>parmed.openmm.reporters module &mdash; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0',
+        VERSION:     '2.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="../../index.html" /> 
+    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -526,7 +526,7 @@ velocities, forces, and/or energies are needed from the Context</p>
 
 <dl class="class">
 <dt id="parmed.openmm.reporters.StateDataReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.reporters.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.reporters.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0</em>, <em>ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.reporters.StateDataReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>This class acts as a state data reporter for OpenMM simulations, but it is a
 little more generalized. Notable differences are:</p>
@@ -733,7 +733,7 @@ velocities, forces, and/or energies are needed from the Context</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

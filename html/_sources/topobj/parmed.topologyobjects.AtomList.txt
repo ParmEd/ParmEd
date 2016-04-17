@@ -17,8 +17,6 @@ parmed.topologyobjects.AtomList
       ~AtomList.append
       ~AtomList.assign_nbidx_from_types
       ~AtomList.claim
-      ~AtomList.clear
-      ~AtomList.copy
       ~AtomList.count
       ~AtomList.extend
       ~AtomList.find_original_index

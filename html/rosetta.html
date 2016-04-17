@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PyRosetta Integration &mdash; ParmEd 2.0 documentation</title>
+    <title>PyRosetta Integration &mdash; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.0',
+        VERSION:     '2.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="ParmEd 2.0 documentation" href="index.html" />
+    <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" /> 
   </head>
   <body role="document">
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -109,6 +109,26 @@ PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose
 <li class="toctree-l1"><a class="reference internal" href="omm_rosetta.html">Using PyRosetta and ParmEd to seed an OpenMM simulation</a></li>
 </ul>
 </div>
+<div class="section" id="warning">
+<h3>Warning<a class="headerlink" href="#warning" title="Permalink to this headline">¶</a></h3>
+<p>One minor complication with using PyRosetta to prepare a structure for
+simulating with OpenMM is that proline residues have virtual sites that prevent
+it from being recognized by OpenMM. If you get an error that looks like the
+following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Traceback (most recent call last):
+  File &quot;test.py&quot;, line 11, in &lt;module&gt;
+    positiveIon=&#39;Na+&#39;, negativeIon=&#39;Cl-&#39;, ionicStrength=0.1*molar)
+  File &quot;.../python2.7/site-packages/simtk/openmm/app/modeller.py&quot;, line 372, in addSolvent
+    system = forcefield.createSystem(self.topology)
+  File &quot;.../python2.7/site-packages/simtk/openmm/app/forcefield.py&quot;, line 785, in createSystem
+    raise ValueError(&#39;No template found for residue %d (%s).  %s&#39; % (res.index+1, res.name, _findMatchErrors(self, res)))
+ValueError: No template found for residue 2 (PRO).  This might mean your input topology is missing some atoms or bonds, or possibly that you are using the wrong force field.
+</pre></div>
+</div>
+<p>then you know that you have to strip all <code class="docutils literal"><span class="pre">NV</span></code> atoms (which are proline virtual
+sites) from the <code class="docutils literal"><span class="pre">Structure</span></code>. You can do this by calling <code class="docutils literal"><span class="pre">.strip('&#64;NV')</span></code> on
+your <code class="docutils literal"><span class="pre">Structure</span></code> prior to building the OpenMM <code class="docutils literal"><span class="pre">System</span></code> object.</p>
+</div>
 </div>
 </div>
 
@@ -123,7 +143,10 @@ PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose
 <li><a class="reference internal" href="#">PyRosetta Integration</a><ul>
 <li><a class="reference internal" href="#what-is-pyrosetta">What is PyRosetta</a></li>
 <li><a class="reference internal" href="#how-does-parmed-enhance-pyrosetta">How does ParmEd enhance PyRosetta?</a></li>
-<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#warning">Warning</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -164,7 +187,7 @@ PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
