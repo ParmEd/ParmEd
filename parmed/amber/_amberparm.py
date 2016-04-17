@@ -1524,7 +1524,7 @@ class AmberParm(AmberFormat, Structure):
             data['RESIDUE_CHAINID'] = [res.chain for res in self.residues]
         if 'RESIDUE_ICODE' in data:
             data['RESIDUE_ICODE'] = [r.insertion_code for r in self.residues]
-        nmxrs = max([len(res) for res in self.residues])
+        nmxrs = max([len(res) for res in self.residues]) if self.residues else 0
         data['POINTERS'][NMXRS] = nmxrs
         self.pointers['NMXRS'] = nmxrs
 
