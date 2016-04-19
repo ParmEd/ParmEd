@@ -1654,8 +1654,16 @@ class Bond(object):
         The first atom involved in the bond
     atom2 : :class:`Atom`
         The other atom involved in the bond
-    type : :class:`BondType`
-        The bond type that defines the parameters for this bond
+    type : :class:`BondType` or None, optional
+        The bond type that defines the parameters for this bond. Default is None
+    order : float, optional
+        The bond order of this bond. Bonds are classified as follows:
+            1.0 -- single bond
+            2.0 -- double bond
+            3.0 -- triple bond
+            1.5 -- aromatic bond
+            1.25 -- amide bond
+        Default is 1.0
 
     Notes
     -----
@@ -1673,7 +1681,7 @@ class Bond(object):
     True
     """
 
-    def __init__(self, atom1, atom2, type=None):
+    def __init__(self, atom1, atom2, type=None, order=1.0):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
@@ -1687,6 +1695,8 @@ class Bond(object):
         atom1.bond_to(atom2)
         self.type = type
         self.funct = 1
+        self._order = None
+        self.order = order
 
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom is in this Bond """
@@ -1704,6 +1714,19 @@ class Bond(object):
         _delete_from_list(self.atom2._bond_partners, self.atom1)
 
         self.atom1 = self.atom2 = self.type = None
+
+    @property
+    def order(self):
+        """ Bond order. See description in :class:`Bond` argument list """
+        return self._order
+
+    @order.setter
+    def order(self, value):
+        """
+        Order of the bond. Must be a float, or ValueError or TypeError will be
+        raised
+        """
+        self._order = float(value)
 
     def __repr__(self):
         return '<%s %r--%r; type=%r>' % (type(self).__name__,
