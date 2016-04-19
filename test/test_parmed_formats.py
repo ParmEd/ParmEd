@@ -1919,6 +1919,24 @@ class TestMol2File(FileIOTestCase):
         self.assertEqual(len(mol2.atoms), 89)
         self.assertEqual(len(mol2.bonds), 89)
 
+    def test_mol2_bond_order(self):
+        """ Tests that mol2 file parsing remembers bond order/type """
+        mol2 = formats.Mol2File.parse(get_fn('multimol.mol2'))[0]
+        fn = get_fn('test.mol2', written=True)
+        mol2.save(fn)
+        with open(fn, 'r') as f:
+            for line in f:
+                if line.startswith('@<TRIPOS>BOND'):
+                    break
+            # Collect all bond orders
+            bos = set()
+            for line in f:
+                if line.startswith('@<TRIPOS>'):
+                    break
+                bos.add(line.split()[3])
+        # This structure has bond orders 1, 2, am, and ar
+        self.assertEqual(bos, {'1', '2', 'am', 'ar'})
+
     @unittest.skipUnless(HAS_GROMACS, 'Cannot test without gromacs')
     def test_mol3_disulfide(self):
         """ Tests writing mol3 file w/ disulfide (for RESIDUECONNECT) """
