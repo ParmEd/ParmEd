@@ -1936,6 +1936,9 @@ class TestMol2File(FileIOTestCase):
                 bos.add(line.split()[3])
         # This structure has bond orders 1, 2, am, and ar
         self.assertEqual(bos, {'1', '2', 'am', 'ar'})
+        mol2_2 = formats.Mol2File.parse(fn)
+        for b1, b2 in zip(mol2.bonds, mol2_2.bonds):
+            self.assertEqual(b1.order, b2.order)
 
     @unittest.skipUnless(HAS_GROMACS, 'Cannot test without gromacs')
     def test_mol3_disulfide(self):

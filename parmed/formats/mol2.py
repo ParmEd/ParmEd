@@ -5,7 +5,7 @@ extension described at http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php
 from __future__ import print_function, division, absolute_import
 
 import copy
-from parmed.exceptions import Mol2Error
+from parmed.exceptions import Mol2Error, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
@@ -13,10 +13,14 @@ from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
+import warnings
 
 @add_metaclass(FileFormatType)
 class Mol2File(object):
     """ Class to read and write TRIPOS Mol2 files """
+
+    BOND_ORDER_MAP = dict(ar=1.5, am=1.25)
+    REVERSE_BOND_ORDER_MAP = {1.25 : 'am', 1.5 : 'ar'}
 
     #===================================================
 
@@ -193,15 +197,28 @@ class Mol2File(object):
                     #   bond_id -- serial number of bond (ignored)
                     #   origin_atom_id -- serial number of first atom in bond
                     #   target_atom_id -- serial number of other atom in bond
-                    #   bond_type -- string describing bond type (ignored)
+                    #   bond_type -- string describing bond type
                     #   status_bits -- ignored
                     words = line.split()
                     int(words[0]) # Bond serial number... redundant and ignored
                     a1 = int(words[1])
                     a2 = int(words[2])
+                    try:
+                        order = words[3]
+                    except IndexError:
+                        order = 1.0
+                    if order in Mol2File.BOND_ORDER_MAP:
+                        order = Mol2File.BOND_ORDER_MAP[order]
+                    else:
+                        try:
+                            order = float(order)
+                        except ValueError:
+                            warnings.warn('Mol2 bond order not recognized: %s' %
+                                          order, ParameterWarning)
+                            order = 1.0
                     atom1 = struct.atoms.find_original_index(a1)
                     atom2 = struct.atoms.find_original_index(a2)
-                    struct.bonds.append(Bond(atom1, atom2))
+                    struct.bonds.append(Bond(atom1, atom2, order=order))
                     # Now add it to our residue container
                     # See if it's a head/tail connection
                     if atom1.residue is not atom2.residue:
@@ -226,7 +243,7 @@ class Mol2File(object):
                             res2.tail = res2[idx2]
                     elif not multires_structure:
                         if not structure:
-                            restemp.add_bond(a1-1, a2-1)
+                            restemp.add_bond(a1-1, a2-1, order)
                     else:
                         # Same residue, add the bond
                         offset = atom1.residue[0].idx
@@ -234,7 +251,7 @@ class Mol2File(object):
                             res = restemp
                         else:
                             res = rescont[atom1.residue.idx]
-                        res.add_bond(atom1.idx-offset, atom2.idx-offset)
+                        res.add_bond(atom1.idx-offset, atom2.idx-offset, order)
                     continue
                 if section == 'CRYSIN':
                     # Section formatted as follows:
@@ -393,17 +410,20 @@ class Mol2File(object):
                 for i, res in enumerate(struct):
                     for bond in res.bonds:
                         bonds.append((bond.atom1.idx+bases[i],
-                                      bond.atom2.idx+bases[i]))
+                                      bond.atom2.idx+bases[i],
+                                      bond.order))
                     if i < len(struct)-1 and (res.tail is not None and
                             struct[i+1].head is not None):
                         bonds.append((res.tail.idx+bases[i],
-                                      struct[i+1].head.idx+bases[i+1]))
+                                      struct[i+1].head.idx+bases[i+1],
+                                      bond.order))
                     charges.extend([a.charge for a in res])
                 residues = struct
                 name = struct.name or struct[0].name
             else:
                 natom = len(struct.atoms)
-                bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
+                bonds = [(b.atom1.idx+1, b.atom2.idx+1, b.order)
+                            for b in struct.bonds]
                 if isinstance(struct, ResidueTemplate):
                     residues = [struct]
                     name = struct.name
@@ -466,7 +486,11 @@ class Mol2File(object):
                     j += 1
             dest.write('@<TRIPOS>BOND\n')
             for i, bond in enumerate(bonds):
-                dest.write('%8d %8d %8d 1\n' % (i+1, bond[0], bond[1]))
+                if bond[2] in Mol2File.REVERSE_BOND_ORDER_MAP:
+                    order = Mol2File.REVERSE_BOND_ORDER_MAP[bond[2]]
+                else:
+                    order = int(bond[2])
+                dest.write('%8d %8d %8d %s\n' % (i+1, bond[0], bond[1], order))
             dest.write('@<TRIPOS>SUBSTRUCTURE\n')
             first_atom = 0
             for i, res in enumerate(residues):
