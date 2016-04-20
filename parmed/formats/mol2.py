@@ -8,6 +8,7 @@ import copy
 from parmed.exceptions import Mol2Error, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from parmed.periodic_table import element_by_name, AtomicNum
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond
@@ -341,13 +342,23 @@ class Mol2File(object):
                             raise Mol2Error('Residue connection atom %s not '
                                             'found in residue %d' % (a, residx))
             if structure:
+                for atom in struct.atoms:
+                    atom.atomic_number = _guess_atomic_number(atom.name,
+                                                              atom.residue)
                 return struct
             elif len(rescont) > 0:
                 if not multires_structure and mol_info[0]:
                     restemp.name = mol_info[0]
                 rescont.append(restemp)
+                for res in rescont:
+                    for atom in res.atoms:
+                        atom.atomic_number = _guess_atomic_number(atom.name,
+                                                                  res)
                 return rescont
             else:
+                for atom in restemp.atoms:
+                    atom.atomic_number = _guess_atomic_number(atom.name,
+                                                              restemp)
                 return restemp
         except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)
@@ -569,3 +580,15 @@ class Mol2File(object):
                     dest.write('\n')
         finally:
             if own_handle: dest.close()
+
+def _guess_atomic_number(name, residue=None):
+    """ Guesses the atomic number """
+    # Special-case single-atom residues, which are almost always ions
+    name = ''.join(c for c in name if c.isalpha())
+    if residue is None or len(residue.atoms) == 1:
+        if len(name) > 1:
+            try:
+                return AtomicNum[name[0].upper() + name[1].lower()]
+            except KeyError:
+                return AtomicNum[element_by_name(name)]
+    return AtomicNum[element_by_name(name)]
