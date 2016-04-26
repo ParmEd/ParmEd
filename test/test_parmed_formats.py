@@ -11,7 +11,7 @@ from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
 from parmed.utils.six import iteritems, add_metaclass
-from parmed.utils.six.moves import zip, StringIO
+from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
 import unittest
@@ -1906,6 +1906,20 @@ class TestMol2File(FileIOTestCase):
         self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
                                    get_saved_fn('tripos9struct.mol3')))
 
+    def test_mol2_atomic_number_assignment(self):
+        """ Tests assignment of atomic numbers for mol2 files """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        templ = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        self.assertEqual(len(templ.atoms), len(mol2.atoms))
+        for a1, a2 in zip(mol2.atoms, templ.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+        # Now check that element assignment from GRO files (which has good
+        # element assignment routines) matches what the mol2 does
+        fn = get_fn('test.gro', written=True)
+        mol2.save(fn, overwrite=True)
+        for a1, a2 in zip(formats.load_file(fn).atoms, mol2.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+
     def test_mol2_box(self):
         """ Tests parsing Mol2 file with CRYSIN section """
         mol2 = formats.load_file(get_fn('tripos3.mol2'), structure=True)
@@ -1918,6 +1932,11 @@ class TestMol2File(FileIOTestCase):
         mol2 = formats.Mol2File.parse(get_fn('duplicate_names.mol2'), structure=True)
         self.assertEqual(len(mol2.atoms), 89)
         self.assertEqual(len(mol2.bonds), 89)
+        # Make sure that atom types are used to guess element if atom name is
+        # ambiguous
+        for atom in mol2.atoms:
+            if atom.name == '****':
+                self.assertEqual(atom.atomic_number, 1)
 
     def test_mol2_bond_order(self):
         """ Tests that mol2 file parsing remembers bond order/type """
