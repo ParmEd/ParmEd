@@ -1932,6 +1932,11 @@ class TestMol2File(FileIOTestCase):
         mol2 = formats.Mol2File.parse(get_fn('duplicate_names.mol2'), structure=True)
         self.assertEqual(len(mol2.atoms), 89)
         self.assertEqual(len(mol2.bonds), 89)
+        # Make sure that atom types are used to guess element if atom name is
+        # ambiguous
+        for atom in mol2.atoms:
+            if atom.name == '****':
+                self.assertEqual(atom.atomic_number, 1)
 
     def test_mol2_bond_order(self):
         """ Tests that mol2 file parsing remembers bond order/type """
