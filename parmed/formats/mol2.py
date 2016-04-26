@@ -343,8 +343,10 @@ class Mol2File(object):
                                             'found in residue %d' % (a, residx))
             if structure:
                 for atom in struct.atoms:
-                    atom.atomic_number = _guess_atomic_number(atom.name,
-                                                              atom.residue)
+                    anum = _guess_atomic_number(atom.name, restemp)
+                    if anum == 0:
+                        anum = _guess_atomic_number(atom.type, restemp)
+                    atom.atomic_number = anum
                 return struct
             elif len(rescont) > 0:
                 if not multires_structure and mol_info[0]:
@@ -352,13 +354,17 @@ class Mol2File(object):
                 rescont.append(restemp)
                 for res in rescont:
                     for atom in res.atoms:
-                        atom.atomic_number = _guess_atomic_number(atom.name,
-                                                                  res)
+                        anum = _guess_atomic_number(atom.name, restemp)
+                        if anum == 0:
+                            anum = _guess_atomic_number(atom.type, restemp)
+                        atom.atomic_number = anum
                 return rescont
             else:
                 for atom in restemp.atoms:
-                    atom.atomic_number = _guess_atomic_number(atom.name,
-                                                              restemp)
+                    anum = _guess_atomic_number(atom.name, restemp)
+                    if anum == 0:
+                        anum = _guess_atomic_number(atom.type, restemp)
+                    atom.atomic_number = anum
                 return restemp
         except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)

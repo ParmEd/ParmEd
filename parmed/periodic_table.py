@@ -287,7 +287,7 @@ def element_by_name(name):
     """
     name = name.strip()
     if len(name) == 0:
-        return 0
+        return Element[0]
     try:
         atomic_number = AtomicNum[name[0].upper()]
     except KeyError:
