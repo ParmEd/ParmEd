@@ -1785,10 +1785,16 @@ class TestMol2File(FileIOTestCase):
         formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
         formats.Mol2File.write(mol2, get_fn('test_multi_sep.mol2', written=True),
                                split=True)
+        formats.Mol2File.write(mol2, get_fn('test_multi_sep_squashed.mol2', written=True),
+                               split=True, compress_whitespace=True)
         self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
                                    get_fn('test_multi.mol2', written=True)))
         self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'),
                                    get_fn('test_multi_sep.mol2', written=True)))
+        # Make sure the squashed lines all fall below 80 characters
+        with open(get_fn('test_multi_sep_squashed.mol2', written=True)) as f:
+            for line in f:
+                self.assertLessEqual(len(line), 80)
         mol22 = formats.Mol2File.parse(get_fn('test_multi_sep.mol2', written=True))
         self.assertEqual(len(mol2), len(mol22))
         self.assertEqual([r.name for r in mol2], [r.name for r in mol22])
