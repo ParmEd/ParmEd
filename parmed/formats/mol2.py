@@ -407,14 +407,16 @@ class Mol2File(object):
             if isinstance(struct, ResidueTemplateContainer):
                 try:
                     for res in struct:
-                        Mol2File.write(res, dest, mol3)
+                        Mol2File.write(res, dest, mol3,
+                                       compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
             elif isinstance(struct, Structure) and len(struct.residues) > 1:
                 try:
                     for res in ResidueTemplateContainer.from_structure(struct):
-                        Mol2File.write(res, dest, mol3)
+                        Mol2File.write(res, dest, mol3,
+                                       compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
@@ -503,16 +505,16 @@ class Mol2File(object):
                     except AttributeError:
                         z = 0
                     if compress_whitespace:
-                        fmt = '%d %s %.4f %.4f %.4f %.4f %s %d %s'
+                        fmt = '%d %s %.4f %.4f %.4f %s %d %s'
                     else:
                         fmt = '%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s'
                     dest.write(fmt % (j, atom.name, x, y, z,
                                atom.type.strip() or atom.name, i+1, res.name))
                     if printchg:
                         if compress_whitespace:
-                            fmt = '%.6f\n'
+                            fmt = ' %.6f\n'
                         else:
-                            fmt = '%10.6f\n'
+                            fmt = ' %10.6f\n'
                         dest.write(fmt % atom.charge)
                     else:
                         dest.write('\n')

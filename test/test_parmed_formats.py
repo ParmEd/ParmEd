@@ -1783,19 +1783,19 @@ class TestMol2File(FileIOTestCase):
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
         formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
-        formats.Mol2File.write(mol2, get_fn('test_multi_sep.mol2', written=True),
-                               split=True)
-        formats.Mol2File.write(mol2, get_fn('test_multi_sep_squashed.mol2', written=True),
-                               split=True, compress_whitespace=True)
+        fn = get_fn('test_multi_sep.mol2', written=True)
+        formats.Mol2File.write(mol2, fn, split=True)
+        fnsq = get_fn('test_multi_sep_squashed.mol2', written=True)
+        formats.Mol2File.write(mol2, fnsq, split=True, compress_whitespace=True)
         self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
                                    get_fn('test_multi.mol2', written=True)))
-        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'),
-                                   get_fn('test_multi_sep.mol2', written=True)))
+        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'), fn))
         # Make sure the squashed lines all fall below 80 characters
-        with open(get_fn('test_multi_sep_squashed.mol2', written=True)) as f:
-            for line in f:
-                self.assertLessEqual(len(line), 80)
-        mol22 = formats.Mol2File.parse(get_fn('test_multi_sep.mol2', written=True))
+        with open(fnsq) as f, open(fn) as f2:
+            for line1, line2 in zip(f, f2):
+                self.assertLessEqual(len(line1), 80)
+                self.assertEqual(' '.join(line2.split()), line1.strip())
+        mol22 = formats.Mol2File.parse(fn)
         self.assertEqual(len(mol2), len(mol22))
         self.assertEqual([r.name for r in mol2], [r.name for r in mol22])
         for r1, r2 in zip(mol2, mol22):
