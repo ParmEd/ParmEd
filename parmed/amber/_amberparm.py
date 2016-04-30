@@ -549,7 +549,10 @@ class AmberParm(AmberFormat, Structure):
             atom.solvent_radius = radii[i]
             atom.screen = screen[i]
             if replace_atnum or atom.atomic_number == 0:
-                atom.atomic_number = atnum[i]
+                if atnum[i] == -1:
+                    atom.atomic_number = AtomicNum[element_by_mass(mass[i])]
+                else:
+                    atom.atomic_number = atnum[i]
             atom.atom_type = AtomType(atyp[i], None, mass[i], atnum[i])
             atom.occupancy = occu[i]
             atom.bfactor = bfac[i]
