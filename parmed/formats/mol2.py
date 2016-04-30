@@ -374,7 +374,7 @@ class Mol2File(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, mol3=False, split=False):
+    def write(struct, dest, mol3=False, split=False, compress_whitespace=False):
         """ Writes a mol2 file from a structure or residue template
 
         Parameters
@@ -391,6 +391,12 @@ class Mol2File(object):
             If True and ``struct`` is a ResidueTemplateContainer or a Structure
             with multiple residues, each residue is printed in a separate
             @<MOLECULE> section that appear sequentially in the output file
+        compress_whitespace : bool, optional
+            If True, seprate fields on one line with a single space instead of
+            aligning them with whitespace. This is useful for parsers that
+            truncate lines at 80 characters (e.g., some versions of OpenEye).
+            However, it will not look as "neat" upon visual inspection in a text
+            editor. Default is False.
         """
         own_handle = False
         if not hasattr(dest, 'write'):
@@ -401,14 +407,16 @@ class Mol2File(object):
             if isinstance(struct, ResidueTemplateContainer):
                 try:
                     for res in struct:
-                        Mol2File.write(res, dest, mol3)
+                        Mol2File.write(res, dest, mol3,
+                                       compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
             elif isinstance(struct, Structure) and len(struct.residues) > 1:
                 try:
                     for res in ResidueTemplateContainer.from_structure(struct):
-                        Mol2File.write(res, dest, mol3)
+                        Mol2File.write(res, dest, mol3,
+                                       compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
@@ -474,8 +482,11 @@ class Mol2File(object):
             if hasattr(struct, 'box') and struct.box is not None:
                 box = struct.box
                 dest.write('@<TRIPOS>CRYSIN\n')
-                dest.write('%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n' %
-                           (box[0], box[1], box[2], box[3], box[4], box[5]))
+                if compress_whitespace:
+                    fmt = '%.4f %.4f %.4f %.4f %.4f %.4f 1 1\n'
+                else:
+                    fmt = '%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n'
+                dest.write(fmt % tuple(box))
             # Now do ATOM section
             dest.write('@<TRIPOS>ATOM\n')
             j = 1
@@ -493,11 +504,18 @@ class Mol2File(object):
                         z = atom.xz
                     except AttributeError:
                         z = 0
-                    dest.write('%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s' % (
-                               j, atom.name, x, y, z,
+                    if compress_whitespace:
+                        fmt = '%d %s %.4f %.4f %.4f %s %d %s'
+                    else:
+                        fmt = '%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s'
+                    dest.write(fmt % (j, atom.name, x, y, z,
                                atom.type.strip() or atom.name, i+1, res.name))
                     if printchg:
-                        dest.write(' %10.6f\n' % atom.charge)
+                        if compress_whitespace:
+                            fmt = ' %.6f\n'
+                        else:
+                            fmt = ' %10.6f\n'
+                        dest.write(fmt % atom.charge)
                     else:
                         dest.write('\n')
                     j += 1
@@ -507,7 +525,11 @@ class Mol2File(object):
                     order = Mol2File.REVERSE_BOND_ORDER_MAP[bond[2]]
                 else:
                     order = int(bond[2])
-                dest.write('%8d %8d %8d %s\n' % (i+1, bond[0], bond[1], order))
+                if compress_whitespace:
+                    fmt = '%d %d %d %s\n'
+                else:
+                    fmt = '%8d %8d %8d %s\n'
+                dest.write(fmt % (i+1, bond[0], bond[1], order))
             dest.write('@<TRIPOS>SUBSTRUCTURE\n')
             first_atom = 0
             for i, res in enumerate(residues):
@@ -528,8 +550,12 @@ class Mol2File(object):
                         for a2 in atom.bond_partners:
                             if a2.residue is not res:
                                 intresbonds += 1
-                dest.write('%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n' % (i+1,
-                           res.name, first_atom+1, 0, chain[:4], intresbonds))
+                if compress_whitespace:
+                    fmt = '%d %s %d RESIDUE %d %s ROOT %d\n'
+                else:
+                    fmt = '%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n'
+                dest.write(fmt % (i+1, res.name, first_atom+1, 0, chain[:4],
+                           intresbonds))
                 first_atom += len(res)
             if mol3:
                 dest.write('@<TRIPOS>HEADTAIL\n')
