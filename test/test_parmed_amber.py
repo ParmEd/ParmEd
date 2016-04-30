@@ -16,6 +16,7 @@ from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError, ParameterWarning)
 from parmed import topologyobjects, load_file, Structure
+from parmed.tools import change
 import parmed.unit as u
 from parmed.utils import PYPY
 from parmed.utils.six import string_types, iteritems
@@ -24,16 +25,15 @@ import random
 import saved_outputs as saved
 import shutil
 import unittest
-from utils import (get_fn, FileIOTestCase, equal_atoms,
-                   create_random_structure, HAS_GROMACS,
-                   diff_files, get_saved_fn, has_openmm)
+from utils import (get_fn, FileIOTestCase, equal_atoms, create_random_structure,
+                   HAS_GROMACS, diff_files, get_saved_fn, has_openmm)
 import warnings
 try:
     from string import letters
 except ImportError:
     from string import ascii_letters as letters
 
-class TestReadParm(unittest.TestCase):
+class TestReadParm(FileIOTestCase):
     """ Tests the various Parm file classes """
 
     def test_fortran_format(self):
@@ -159,6 +159,19 @@ class TestReadParm(unittest.TestCase):
         """ Check that bzip2ed prmtop files can be parsed correctly """
         parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
         self.assertEqual(parm.ptr('natom'), 864)
+
+    def test_atomic_number_setting(self):
+        """ Make sure that if ATOMIC_NUMBER is -1, the mass sets the element """
+        fn = get_fn('test.parm7', written=True)
+        parm = readparm.LoadParm(get_fn('ash.parm7'))
+        # Turn off atomic numbers
+        change(parm, 'ATOMIC_NUMBER', ':*', -1).execute()
+        parm.write_parm(fn)
+        parm2 = readparm.LoadParm(fn)
+        parm = readparm.LoadParm(get_fn('ash.parm7'))
+        self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
 
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_change_detection(self):
