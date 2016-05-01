@@ -45,8 +45,7 @@ class CleanCommand(Clean):
         Clean.run(self)
         if os.path.exists('build'):
             shutil.rmtree('build')
-        self._clean('parmed')
-        self._clean('test')
+        self._clean('./')
 
 
 is_pypy = '__pypy__' in sys.builtin_module_names
