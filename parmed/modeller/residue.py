@@ -595,6 +595,7 @@ class ResidueTemplateContainer(list):
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
                     rt.name = '%s3' % rt.name
             inst.append(rt)
+        inst.box = struct.box
         return inst
 
     def __getitem__(self, value):
