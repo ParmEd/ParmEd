@@ -15,6 +15,7 @@ from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
                           FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError, ParameterWarning)
+from parmed.modeller import ResidueTemplateContainer
 from parmed import topologyobjects, load_file, Structure
 from parmed.tools import change
 import parmed.unit as u
@@ -1335,6 +1336,21 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(lib['ALA'].atoms[1].charge, 0.423221)
         self.assertEqual(lib['VAL'].atoms[8].name, 'HG12')
         self.assertEqual(lib['VAL'].atoms[8].charge, 0.062124)
+
+    def test_lib_with_box(self):
+        """ Tests handling of OFF files with multiple residues and a box """
+        solvents = AmberOFFLibrary.parse(get_fn('solvents.lib'))
+        for res in solvents['TIP3PBOX']:
+            self.assertEqual(len(res.bonds), 3)
+            for atom in res.atoms:
+                self.assertEqual(len(atom.bonds), 2)
+        self.assertIsNot(solvents['TIP3PBOX'].box, None)
+        # Now create one
+        struct = readparm.LoadParm(get_fn('cyclohexane.parm7'),
+                                   get_fn('cyclohexane.md.rst7'))
+        self.assertIsNot(struct.box, None)
+        reslib = ResidueTemplateContainer.from_structure(struct)
+        self.assertIsNot(reslib.box, None)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
