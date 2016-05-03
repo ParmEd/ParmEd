@@ -1350,7 +1350,16 @@ class TestParameterFiles(FileIOTestCase):
                                    get_fn('cyclohexane.md.rst7'))
         self.assertIsNot(struct.box, None)
         reslib = ResidueTemplateContainer.from_structure(struct)
+        reslib.name = 'CYCHBOX'
         self.assertIsNot(reslib.box, None)
+        np.testing.assert_equal(struct.box, reslib.box)
+        # Now write an OFF file
+        fn = get_fn('test.lib', written=True)
+        AmberOFFLibrary.write(dict(CYCHBOX=reslib), fn)
+        # Now read it and make sure I have the appropriate bonds
+        lib2 = AmberOFFLibrary.parse(fn)
+        # All residues should have exactly the same number of bonds
+        self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
