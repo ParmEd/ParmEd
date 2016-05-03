@@ -1360,6 +1360,8 @@ class TestParameterFiles(FileIOTestCase):
         lib2 = AmberOFFLibrary.parse(fn)
         # All residues should have exactly the same number of bonds
         self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
+        self.assertGreater(len(lib2['CYCHBOX'][0].bonds), 0)
+        np.testing.assert_allclose(lib2['CYCHBOX'].box, struct.box, atol=0.001)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
