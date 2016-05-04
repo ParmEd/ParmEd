@@ -470,8 +470,8 @@ class CharmmParameterSet(ParameterSet):
                         warnings.warn('Replacing angle %r, %r with %r' %
                                       (key, self.angle_types[key], angle_type),
                                       ParameterWarning)
-                        self.bond_types[(type1, type2, type3)] = angle_type
-                        self.bond_types[(type3, type2, type1)] = angle_type
+                        self.angle_types[(type1, type2, type3)] = angle_type
+                        self.angle_types[(type3, type2, type1)] = angle_type
                 else: # key not present
                     self.angle_types[(type1, type2, type3)] = angle_type
                     self.angle_types[(type3, type2, type1)] = angle_type
