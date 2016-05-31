@@ -12,7 +12,7 @@ from parmed.tools import addLJType
 import unittest
 from utils import (get_fn, get_saved_fn, diff_files, TestCaseRelative,
                    FileIOTestCase, HAS_GROMACS, CPU, has_openmm as HAS_OPENMM,
-                   mm, app, equal_atoms, Reference)
+                   mm, app, equal_atoms)
 import warnings
 
 class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
@@ -124,16 +124,14 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                         xyz=get_fn('1aki.charmm27.solv.gro'))
         gsystem1 = top.createSystem(nonbondedCutoff=8*u.angstroms,
                                     nonbondedMethod=app.PME)
-        gcon1 = mm.Context(gsystem1, mm.VerletIntegrator(1*u.femtosecond),
-                           Reference)
+        gcon1 = mm.Context(gsystem1, mm.VerletIntegrator(1*u.femtosecond), CPU)
         gcon1.setPositions(top.positions)
         top.adjust_types.append(to.NonbondedExceptionType(0, 0, 1))
         top.adjust_types.claim()
         top.adjusts[10].type = top.adjust_types[-1]
         gsystem2 = top.createSystem(nonbondedCutoff=8*u.angstroms,
                                     nonbondedMethod=app.PME)
-        gcon2 = mm.Context(gsystem2, mm.VerletIntegrator(1*u.femtosecond),
-                           Reference)
+        gcon2 = mm.Context(gsystem2, mm.VerletIntegrator(1*u.femtosecond), CPU)
         gcon2.setPositions(top.positions)
         e1 = gcon1.getState(getEnergy=True).getPotentialEnergy()
         e1 = e1.value_in_unit(u.kilocalories_per_mole)
@@ -144,8 +142,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         parm = amber.ChamberParm.from_structure(top)
         asystem = parm.createSystem(nonbondedCutoff=8*u.angstroms,
                                     nonbondedMethod=app.PME)
-        acon = mm.Context(asystem, mm.VerletIntegrator(1*u.femtosecond),
-                          Reference)
+        acon = mm.Context(asystem, mm.VerletIntegrator(1*u.femtosecond), CPU)
         acon.setPositions(top.positions)
         e3 = acon.getState(getEnergy=True).getPotentialEnergy()
         e3 = e3.value_in_unit(u.kilocalories_per_mole)
@@ -160,8 +157,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
                         xyz=get_fn('1aki.charmm27.solv.gro'))
         gsystem = top.createSystem(nonbondedCutoff=8*u.angstroms,
                                    nonbondedMethod=app.PME)
-        gcon = mm.Context(gsystem, mm.VerletIntegrator(1*u.femtosecond),
-                          Reference)
+        gcon = mm.Context(gsystem, mm.VerletIntegrator(1*u.femtosecond), CPU)
         gcon.setPositions(top.positions)
         eg = gcon.getState(getEnergy=True).getPotentialEnergy()
         eg = eg.value_in_unit(u.kilocalories_per_mole)
@@ -169,8 +165,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative):
         parm = amber.ChamberParm.from_structure(top)
         asystem = parm.createSystem(nonbondedCutoff=8*u.angstroms,
                                     nonbondedMethod=app.PME)
-        acon = mm.Context(asystem, mm.VerletIntegrator(1*u.femtosecond),
-                          Reference)
+        acon = mm.Context(asystem, mm.VerletIntegrator(1*u.femtosecond), CPU)
         acon.setPositions(top.positions)
         ea = acon.getState(getEnergy=True).getPotentialEnergy()
         ea = ea.value_in_unit(u.kilocalories_per_mole)

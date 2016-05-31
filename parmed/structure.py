@@ -31,15 +31,16 @@ import os
 from parmed.constants import DEG_TO_RAD, SMALL
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
-        box_vectors_to_lengths_and_angles)
+        box_vectors_to_lengths_and_angles, STANDARD_BOND_LENGTHS_SQUARED,
+        distance2)
 from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
         TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
         ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
-from parmed import unit as u
-from parmed.utils import tag_molecules, PYPY
+from parmed import unit as u, residue
+from parmed.utils import tag_molecules, PYPY, find_atom_pairs
 from parmed.utils.decorators import needs_openmm
 from parmed.utils.six import string_types, integer_types, iteritems
 from parmed.utils.six.moves import zip, range
@@ -419,7 +420,8 @@ class Structure(object):
         for atom in self.atoms:
             res = atom.residue
             a = copy(atom)
-            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code)
+            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code,
+                       res.segid)
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(copy(bt))
@@ -824,6 +826,170 @@ class Structure(object):
 
     #===================================================
 
+    def assign_bonds(self, *reslibs):
+        """
+        Assigns bonds to all atoms based on the provided residue template
+        libraries. Atoms whose names are *not* in the templates, as well as
+        those residues for whom no template is found, is assigned to bonds based
+        on distances.
+
+        Parameters
+        ----------
+        reslibs : dict{str: ResidueTemplate}
+            Any number of residue template libraries. By default, assign_bonds
+            knows about the standard amino acid, RNA, and DNA residues.
+        """
+        # Import here to avoid circular references
+        from parmed.modeller import StandardBiomolecularResidues
+        # Build a composite dict of all residue templates
+        all_residues = copy(StandardBiomolecularResidues)
+        for lib in reslibs:
+            all_residues.update(lib)
+        # Walk through every residue and assign bonds from the templates
+        unassigned_residues = set()
+        unassigned_atoms = set()
+        cysteine_sg = set()
+        for res in self.residues:
+            templ = _res_in_templlib(res, all_residues)
+            if templ is None:
+                # Don't have a template for this residue. Keep a note and go on
+                unassigned_atoms.update(res.atoms)
+                unassigned_residues.add(res)
+                continue
+            resatoms = {a.name: a for a in res.atoms}
+            for a in res.atoms:
+                if a.name not in templ.map:
+                    unassigned_atoms.add(a)
+                    continue
+                # We matched our template atom. Transfer the element
+                # information, as it is more reliable
+                a.atomic_number = templ.map[a.name].atomic_number
+                for bp in templ.map[a.name].bond_partners:
+                    if (bp.name in resatoms and
+                            resatoms[bp.name] not in a.bond_partners):
+                        if a not in resatoms[bp.name].bond_partners:
+                            self.bonds.append(Bond(a, resatoms[bp.name]))
+        # Now go through each residue and assign heads and tails. This walks
+        # through the residues and bonds residue i's tail with residue j's head.
+        # So there is nothing to do for the last residue. Omit it from the loop
+        # so self.residues[i+1] never raises an IndexError
+        for i, res in enumerate(self.residues[:-1]):
+            templ = _res_in_templlib(res, all_residues)
+            # TER cards and changing chains prevents bonding to the next residue
+            if res.ter or (res.chain and
+                    (res.chain != self.residues[i+1].chain)):
+                continue
+            ntempl = _res_in_templlib(self.residues[i+1], all_residues)
+            if templ is None and ntempl is None:
+                # Any cross-link here picked up later
+                continue
+            if templ is None:
+                if ntempl.head is None:
+                    continue # Next residue doesn't bond to the previous one
+                # See if any atom in templ is close enough to bond to the head
+                # atom of the next residue's template
+                for head in self.residues[i+1].atoms:
+                    if head.name == ntempl.head:
+                        break
+                else:
+                    continue # head atom not found!
+                for a in res.atoms:
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
+                                                             head.atomic_number)]
+                    if distance2(a, head) < maxdist:
+                        if a not in head.bond_partners:
+                            self.bonds.append(Bond(a, head))
+                        break
+                continue
+            if templ.tail is None:
+                continue # This residue does not bond with the next one
+            if ntempl is None:
+                # See if any atom in the next residue is bonding distance away
+                # from my tail
+                for tail in res.atoms:
+                    if tail.name == templ.tail.name:
+                        break
+                else:
+                    continue # tail not found
+                for a in self.residues[i+1].atoms:
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
+                                                             tail.atomic_number)]
+                    if distance2(a, tail) < maxdist:
+                        if a not in tail.bond_partners:
+                            self.bonds.append(Bond(a, tail))
+                        break
+                continue
+            if ntempl.head is None:
+                continue # Next residue does not bond with this one
+            # We have templates for both atoms, and both have a head and a tail
+            for tail in res.atoms:
+                if tail.name == templ.tail.name:
+                    break
+            else:
+                continue # head could not be found
+            for head in self.residues[i+1].atoms:
+                if head.name == ntempl.head.name:
+                    break
+            else:
+                continue # tail could not be found
+            if head not in tail.bond_partners:
+                self.bonds.append(Bond(head, tail))
+        # Now time to find bonds based on distance. First thing to do is to find
+        # all CYS residues and pull out those that have an SG atom with only 1
+        # bond partner, since those are *very* commonly bonded by
+        # post-translational modifications.
+        for res in self.residues:
+            if len(res.name) != 3 or not residue.AminoAcidResidue.has(res.name):
+                continue
+            if residue.AminoAcidResidue.get(res.name).abbr != 'CYS':
+                continue
+            # Cysteine! Find the SG and add it to unassigned atoms if it only
+            # has 1 atom bonded to it
+            for a in res.atoms:
+                if a.name == 'SG' and len(a.bond_partners) < 2:
+                    unassigned_atoms.add(a)
+                    cysteine_sg.add(a)
+                    break
+        # Can't do distance-based bond determination without coordinates
+        if self.coordinates is None:
+            return
+        # OK, now go through all atoms that have not been assigned. If an atom
+        # has not been assigned, but its residue HAS been assigned, then that
+        # means the name is wrong. A likely culprit is bad nomenclature for
+        # atoms. So in this case (and this case only), look for bond partners in
+        # an 'assigned' residue (but only the same residue we are part of). One
+        # thing this misses is when the head or tail atom is misnamed.
+        mindist = math.sqrt(max(STANDARD_BOND_LENGTHS_SQUARED.values()))
+        pairs = find_atom_pairs(self, mindist, unassigned_atoms)
+        for atom in unassigned_atoms:
+            for partner in pairs[atom.idx]:
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
+                                                         partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and
+                        atom not in partner.bond_partners):
+                    self.bonds.append(Bond(atom, partner))
+            # Now look through all atoms in this template if it's a template
+            # that's already been assigned. If it's already in an unassigned
+            # residue, then all that residue's atoms were in unassigned_atoms,
+            # so there's no need to look through the residue again. Also, we
+            # added cysteine SG atoms to the unassigned atoms list to see if it
+            # is involved in post-translational bonds. But there *was* a
+            # template match for cysteine and SG was paired correctly. So don't
+            # try to assign it to bonds with other atoms in the cysteine here.
+            if atom.residue in unassigned_residues or atom in cysteine_sg:
+                continue
+            for partner in atom.residue.atoms:
+                if partner is atom:
+                    continue
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
+                                                         partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and
+                        atom not in partner.bond_partners):
+                    self.bonds.append(Bond(atom, partner))
+        # All reasonable bonds have now been added
+
+    #===================================================
+
     def __getitem__(self, selection):
         """
         Allows extracting a single atom from the structure or a slice of atoms
@@ -901,7 +1067,7 @@ class Structure(object):
             else:
                 num = res.number
             struct.add_atom(copy(atom), res.name, num, res.chain,
-                            res.insertion_code)
+                            res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -1604,15 +1770,15 @@ class Structure(object):
         Parameters
         ----------
         frame : int or 'all', optional
-            The frame number whose coordinates should be retrieved. Default is
+            The frame number whose unit cell should be retrieved. Default is
             'all'
 
         Returns
         -------
-        box : np.ndarray, shape([#,] natom, 3) or None
-            If frame is 'all', all coordinates are returned with shape
-            (#, natom, 3). Otherwise the requested frame is returned with shape
-            (natom, 3). If no coordinates exist and 'all' is requested, None is
+        box : np.ndarray, shape([#,] 6) or None
+            If frame is 'all', all unit cells are returned with shape
+            (#, 6). Otherwise the requested frame is returned with shape
+            (6,). If no unit cell exist and 'all' is requested, None is
             returned
 
         Raises
@@ -3228,7 +3394,7 @@ class Structure(object):
         for atom in other.atoms:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                          res.insertion_code)
+                          res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -3353,7 +3519,7 @@ class Structure(object):
             for atom in other.atoms:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                              res.insertion_code)
+                              res.insertion_code, res.segid)
             copy_valence_terms(other.bonds, aoffset, self.bonds,
                                self.bond_types, ['atom1', 'atom2'])
             copy_valence_terms(other.angles, aoffset, self.angles,
@@ -3927,3 +4093,17 @@ def _settler(parm):
             is_water.append(True)
     assert len(is_water) == len(parm.residues), 'Incorrect length'
     return is_water
+
+def _res_in_templlib(res, lib):
+    """ Returns the residue template inside lib that matches res """
+    if res.name in lib:
+        return lib[res.name]
+    if len(res.name) == 3 and residue.AminoAcidResidue.has(res.name):
+        return lib[residue.AminoAcidResidue.get(res.name).abbr]
+    if residue.DNAResidue.has(res.name):
+        return lib[residue.DNAResidue.get(res.name).abbr]
+    if (residue.RNAResidue.has(res.name) and
+            residue.RNAResidue.get(res.name).abbr != 'T'):
+        return lib[residue.RNAResidue.get(res.name).abbr]
+    # Not present
+    return None

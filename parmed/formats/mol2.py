@@ -5,18 +5,23 @@ extension described at http://q4md-forcefieldtools.org/Tutorial/leap-mol3.php
 from __future__ import print_function, division, absolute_import
 
 import copy
-from parmed.exceptions import Mol2Error
+from parmed.exceptions import Mol2Error, ParameterWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from parmed.periodic_table import element_by_name, AtomicNum
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
+import warnings
 
 @add_metaclass(FileFormatType)
 class Mol2File(object):
     """ Class to read and write TRIPOS Mol2 files """
+
+    BOND_ORDER_MAP = dict(ar=1.5, am=1.25)
+    REVERSE_BOND_ORDER_MAP = {1.25 : 'am', 1.5 : 'ar'}
 
     #===================================================
 
@@ -193,15 +198,28 @@ class Mol2File(object):
                     #   bond_id -- serial number of bond (ignored)
                     #   origin_atom_id -- serial number of first atom in bond
                     #   target_atom_id -- serial number of other atom in bond
-                    #   bond_type -- string describing bond type (ignored)
+                    #   bond_type -- string describing bond type
                     #   status_bits -- ignored
                     words = line.split()
                     int(words[0]) # Bond serial number... redundant and ignored
                     a1 = int(words[1])
                     a2 = int(words[2])
+                    try:
+                        order = words[3]
+                    except IndexError:
+                        order = 1.0
+                    if order in Mol2File.BOND_ORDER_MAP:
+                        order = Mol2File.BOND_ORDER_MAP[order]
+                    else:
+                        try:
+                            order = float(order)
+                        except ValueError:
+                            warnings.warn('Mol2 bond order not recognized: %s' %
+                                          order, ParameterWarning)
+                            order = 1.0
                     atom1 = struct.atoms.find_original_index(a1)
                     atom2 = struct.atoms.find_original_index(a2)
-                    struct.bonds.append(Bond(atom1, atom2))
+                    struct.bonds.append(Bond(atom1, atom2, order=order))
                     # Now add it to our residue container
                     # See if it's a head/tail connection
                     if atom1.residue is not atom2.residue:
@@ -226,7 +244,7 @@ class Mol2File(object):
                             res2.tail = res2[idx2]
                     elif not multires_structure:
                         if not structure:
-                            restemp.add_bond(a1-1, a2-1)
+                            restemp.add_bond(a1-1, a2-1, order)
                     else:
                         # Same residue, add the bond
                         offset = atom1.residue[0].idx
@@ -234,7 +252,7 @@ class Mol2File(object):
                             res = restemp
                         else:
                             res = rescont[atom1.residue.idx]
-                        res.add_bond(atom1.idx-offset, atom2.idx-offset)
+                        res.add_bond(atom1.idx-offset, atom2.idx-offset, order)
                     continue
                 if section == 'CRYSIN':
                     # Section formatted as follows:
@@ -324,13 +342,29 @@ class Mol2File(object):
                             raise Mol2Error('Residue connection atom %s not '
                                             'found in residue %d' % (a, residx))
             if structure:
+                for atom in struct.atoms:
+                    anum = _guess_atomic_number(atom.name, restemp)
+                    if anum == 0:
+                        anum = _guess_atomic_number(atom.type, restemp)
+                    atom.atomic_number = anum
                 return struct
             elif len(rescont) > 0:
                 if not multires_structure and mol_info[0]:
                     restemp.name = mol_info[0]
                 rescont.append(restemp)
+                for res in rescont:
+                    for atom in res.atoms:
+                        anum = _guess_atomic_number(atom.name, restemp)
+                        if anum == 0:
+                            anum = _guess_atomic_number(atom.type, restemp)
+                        atom.atomic_number = anum
                 return rescont
             else:
+                for atom in restemp.atoms:
+                    anum = _guess_atomic_number(atom.name, restemp)
+                    if anum == 0:
+                        anum = _guess_atomic_number(atom.type, restemp)
+                    atom.atomic_number = anum
                 return restemp
         except ValueError as e:
             raise Mol2Error('String conversion trouble: %s' % e)
@@ -340,7 +374,7 @@ class Mol2File(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, mol3=False, split=False):
+    def write(struct, dest, mol3=False, split=False, compress_whitespace=False):
         """ Writes a mol2 file from a structure or residue template
 
         Parameters
@@ -357,6 +391,12 @@ class Mol2File(object):
             If True and ``struct`` is a ResidueTemplateContainer or a Structure
             with multiple residues, each residue is printed in a separate
             @<MOLECULE> section that appear sequentially in the output file
+        compress_whitespace : bool, optional
+            If True, seprate fields on one line with a single space instead of
+            aligning them with whitespace. This is useful for parsers that
+            truncate lines at 80 characters (e.g., some versions of OpenEye).
+            However, it will not look as "neat" upon visual inspection in a text
+            editor. Default is False.
         """
         own_handle = False
         if not hasattr(dest, 'write'):
@@ -367,14 +407,16 @@ class Mol2File(object):
             if isinstance(struct, ResidueTemplateContainer):
                 try:
                     for res in struct:
-                        Mol2File.write(res, dest, mol3)
+                        Mol2File.write(res, dest, mol3,
+                                       compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
             elif isinstance(struct, Structure) and len(struct.residues) > 1:
                 try:
                     for res in ResidueTemplateContainer.from_structure(struct):
-                        Mol2File.write(res, dest, mol3)
+                        Mol2File.write(res, dest, mol3,
+                                       compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
@@ -393,17 +435,20 @@ class Mol2File(object):
                 for i, res in enumerate(struct):
                     for bond in res.bonds:
                         bonds.append((bond.atom1.idx+bases[i],
-                                      bond.atom2.idx+bases[i]))
+                                      bond.atom2.idx+bases[i],
+                                      bond.order))
                     if i < len(struct)-1 and (res.tail is not None and
                             struct[i+1].head is not None):
                         bonds.append((res.tail.idx+bases[i],
-                                      struct[i+1].head.idx+bases[i+1]))
+                                      struct[i+1].head.idx+bases[i+1],
+                                      bond.order))
                     charges.extend([a.charge for a in res])
                 residues = struct
                 name = struct.name or struct[0].name
             else:
                 natom = len(struct.atoms)
-                bonds = [(b.atom1.idx+1, b.atom2.idx+1) for b in struct.bonds]
+                bonds = [(b.atom1.idx+1, b.atom2.idx+1, b.order)
+                            for b in struct.bonds]
                 if isinstance(struct, ResidueTemplate):
                     residues = [struct]
                     name = struct.name
@@ -437,8 +482,11 @@ class Mol2File(object):
             if hasattr(struct, 'box') and struct.box is not None:
                 box = struct.box
                 dest.write('@<TRIPOS>CRYSIN\n')
-                dest.write('%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n' %
-                           (box[0], box[1], box[2], box[3], box[4], box[5]))
+                if compress_whitespace:
+                    fmt = '%.4f %.4f %.4f %.4f %.4f %.4f 1 1\n'
+                else:
+                    fmt = '%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n'
+                dest.write(fmt % tuple(box))
             # Now do ATOM section
             dest.write('@<TRIPOS>ATOM\n')
             j = 1
@@ -456,17 +504,32 @@ class Mol2File(object):
                         z = atom.xz
                     except AttributeError:
                         z = 0
-                    dest.write('%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s' % (
-                               j, atom.name, x, y, z,
+                    if compress_whitespace:
+                        fmt = '%d %s %.4f %.4f %.4f %s %d %s'
+                    else:
+                        fmt = '%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s'
+                    dest.write(fmt % (j, atom.name, x, y, z,
                                atom.type.strip() or atom.name, i+1, res.name))
                     if printchg:
-                        dest.write(' %10.6f\n' % atom.charge)
+                        if compress_whitespace:
+                            fmt = ' %.6f\n'
+                        else:
+                            fmt = ' %10.6f\n'
+                        dest.write(fmt % atom.charge)
                     else:
                         dest.write('\n')
                     j += 1
             dest.write('@<TRIPOS>BOND\n')
             for i, bond in enumerate(bonds):
-                dest.write('%8d %8d %8d 1\n' % (i+1, bond[0], bond[1]))
+                if bond[2] in Mol2File.REVERSE_BOND_ORDER_MAP:
+                    order = Mol2File.REVERSE_BOND_ORDER_MAP[bond[2]]
+                else:
+                    order = int(bond[2])
+                if compress_whitespace:
+                    fmt = '%d %d %d %s\n'
+                else:
+                    fmt = '%8d %8d %8d %s\n'
+                dest.write(fmt % (i+1, bond[0], bond[1], order))
             dest.write('@<TRIPOS>SUBSTRUCTURE\n')
             first_atom = 0
             for i, res in enumerate(residues):
@@ -487,8 +550,12 @@ class Mol2File(object):
                         for a2 in atom.bond_partners:
                             if a2.residue is not res:
                                 intresbonds += 1
-                dest.write('%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n' % (i+1,
-                           res.name, first_atom+1, 0, chain[:4], intresbonds))
+                if compress_whitespace:
+                    fmt = '%d %s %d RESIDUE %d %s ROOT %d\n'
+                else:
+                    fmt = '%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n'
+                dest.write(fmt % (i+1, res.name, first_atom+1, 0, chain[:4],
+                           intresbonds))
                 first_atom += len(res)
             if mol3:
                 dest.write('@<TRIPOS>HEADTAIL\n')
@@ -545,3 +612,15 @@ class Mol2File(object):
                     dest.write('\n')
         finally:
             if own_handle: dest.close()
+
+def _guess_atomic_number(name, residue=None):
+    """ Guesses the atomic number """
+    # Special-case single-atom residues, which are almost always ions
+    name = ''.join(c for c in name if c.isalpha())
+    if residue is None or len(residue.atoms) == 1:
+        if len(name) > 1:
+            try:
+                return AtomicNum[name[0].upper() + name[1].lower()]
+            except KeyError:
+                return AtomicNum[element_by_name(name)]
+    return AtomicNum[element_by_name(name)]

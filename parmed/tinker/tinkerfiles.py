@@ -165,24 +165,29 @@ class XyzFile(Structure):
         if len(words) == 6 and not XyzFile._check_atom_record(words):
             self.box = [float(w) for w in words]
             words = fxyz.readline().split()
-        atom = Atom(atomic_number=AtomicNum[element_by_name(words[1])],
-                    name=words[1], type=words[5])
-        atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
         residue = Residue('SYS')
         residue.number = 1
         residue._idx = 0
         if seq is not None:
             residue = seqstruct.residues[0]
+            atomic_number = _guess_atomic_number(words[1], residue)
+        else:
+            atomic_number = AtomicNum[element_by_name(words[1])]
+        atom = Atom(atomic_number=atomic_number, name=words[1], type=words[5])
+        atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
         self.add_atom(atom, residue.name, residue.number, residue.chain,
                       residue.insertion_code, residue.segid)
         bond_ids = [[int(w) for w in words[6:]]]
         for i, line in enumerate(fxyz):
             words = line.split()
-            atom = Atom(atomic_number=AtomicNum[element_by_name(words[1])],
-                        name=words[1], type=words[5])
-            atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
             if seq is not None:
                 residue = seqstruct.atoms[i+1].residue
+                atomic_number = _guess_atomic_number(words[1], residue)
+            else:
+                atomic_number = AtomicNum[element_by_name(words[1])]
+            atom = Atom(atomic_number=atomic_number, name=words[1],
+                        type=words[5])
+            atom.xx, atom.xy, atom.xz = [float(w) for w in words[2:5]]
             self.add_atom(atom, residue.name, residue.number, residue.chain,
                           residue.insertion_code, residue.segid)
             bond_ids.append([int(w) for w in words[6:]])
@@ -192,9 +197,15 @@ class XyzFile(Structure):
             for idx in bonds:
                 if idx > i:
                     self.bonds.append(Bond(atom, self.atoms[idx-1]))
+        if seq is None:
+            # Try to improve atomic number prediction for monoatomic species
+            # (like ions) if no sequence as loaded
+            for atom in self.atoms:
+                if len(atom.bonds) == 0: # not bonded to anybody else
+                    atom.atomic_number = _guess_atomic_number(atom.name)
         if own_handle_xyz:
             fxyz.close()
-      
+
 class DynFile(object):
     """ Reads and processes a Tinker DYN file """
     def __init__(self, fname=None):
@@ -249,7 +260,7 @@ class DynFile(object):
                 self.velocities = [[0.0, 0.0, 0.0] for i in range(self.natom)]
                 DynFile._read_section(f, self.velocities, self.natom)
                 if f.readline().strip() != 'Current Atomic Accelerations :':
-                    raise TinkerError('Could not find accelerations in %s ' % 
+                    raise TinkerError('Could not find accelerations in %s ' %
                                       fname)
                 self.accelerations = [[0.0, 0.0, 0.0]
                                       for i in range(self.natom)]
@@ -257,7 +268,7 @@ class DynFile(object):
                 if f.readline().strip() != 'Alternate Atomic Accelerations :':
                     raise TinkerError('Could not find old accelerations in %s' %
                                       fname)
-                self.old_accelerations = [[0.0, 0.0, 0.0] 
+                self.old_accelerations = [[0.0, 0.0, 0.0]
                                           for i in range(self.natom)]
                 DynFile._read_section(f, self.old_accelerations, self.natom)
             else:
@@ -286,3 +297,15 @@ def is_float(thing):
         return True
     except ValueError:
         return False
+
+def _guess_atomic_number(name, residue=None):
+    """ Guesses the atomic number """
+    # Special-case single-atom residues, which are almost always ions
+    name = ''.join(c for c in name if c.isalpha())
+    if residue is None or len(residue.atoms) == 1:
+        if len(name) > 1:
+            try:
+                return AtomicNum[name[0].upper() + name[1].lower()]
+            except KeyError:
+                return AtomicNum[element_by_name(name)]
+    return AtomicNum[element_by_name(name)]

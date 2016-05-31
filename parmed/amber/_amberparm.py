@@ -213,7 +213,7 @@ class AmberParm(AmberFormat, Structure):
         self.load_structure()
 
         if isinstance(xyz, string_types):
-            f = load_file(xyz)
+            f = load_file(xyz, skip_bonds=True)
             if not hasattr(f, 'coordinates') or f.coordinates is None:
                 raise TypeError('%s does not have coordinates' % xyz)
             self.coordinates = f.coordinates
@@ -403,6 +403,17 @@ class AmberParm(AmberFormat, Structure):
             other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
             other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
         other._add_standard_flags()
+        other.remake_parm()
+        other._set_nonbonded_tables()
+        # Add back the original L-J tables to restore any NBFIXes that may have
+        # been there
+        other.parm_data['LENNARD_JONES_ACOEF'] = \
+                self.parm_data['LENNARD_JONES_ACOEF'][:]
+        other.parm_data['LENNARD_JONES_BCOEF'] = \
+                self.parm_data['LENNARD_JONES_BCOEF'][:]
+        if 'LENNARD_JONES_CCOEF' in self.parm_data:
+            other.parm_data['LENNARD_JONES_CCOEF'] = \
+                    self.parm_data['LENNARD_JONES_CCOEF'][:]
         return other
 
     #===================================================
@@ -538,7 +549,10 @@ class AmberParm(AmberFormat, Structure):
             atom.solvent_radius = radii[i]
             atom.screen = screen[i]
             if replace_atnum or atom.atomic_number == 0:
-                atom.atomic_number = atnum[i]
+                if atnum[i] == -1:
+                    atom.atomic_number = AtomicNum[element_by_mass(mass[i])]
+                else:
+                    atom.atomic_number = atnum[i]
             atom.atom_type = AtomType(atyp[i], None, mass[i], atnum[i])
             atom.occupancy = occu[i]
             atom.bfactor = bfac[i]
@@ -1513,7 +1527,7 @@ class AmberParm(AmberFormat, Structure):
             data['RESIDUE_CHAINID'] = [res.chain for res in self.residues]
         if 'RESIDUE_ICODE' in data:
             data['RESIDUE_ICODE'] = [r.insertion_code for r in self.residues]
-        nmxrs = max([len(res) for res in self.residues])
+        nmxrs = max([len(res) for res in self.residues]) if self.residues else 0
         data['POINTERS'][NMXRS] = nmxrs
         self.pointers['NMXRS'] = nmxrs
 
@@ -2022,8 +2036,7 @@ class AmberParm(AmberFormat, Structure):
                 if u.is_quantity(box[5]):
                     box[5] = box[5].value_in_unit(u.degrees)
             box = np.array(box, dtype=np.float64, copy=False, subok=True)
-            if box.shape != (6,):
-                raise ValueError('Box information must be 6 floats')
+
             if self._box is None:
                 self._box = box
                 # We need to add topology information

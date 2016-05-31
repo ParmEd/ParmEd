@@ -15,7 +15,9 @@ from parmed.amber import (readparm, asciicrd, mask, parameters, mdin,
                           FortranFormat, titratable_residues, AmberOFFLibrary)
 from parmed.exceptions import (AmberWarning, MoleculeError, AmberError,
                                MaskError, InputError, ParameterWarning)
+from parmed.modeller import ResidueTemplateContainer
 from parmed import topologyobjects, load_file, Structure
+from parmed.tools import change
 import parmed.unit as u
 from parmed.utils import PYPY
 from parmed.utils.six import string_types, iteritems
@@ -24,16 +26,15 @@ import random
 import saved_outputs as saved
 import shutil
 import unittest
-from utils import (get_fn, FileIOTestCase, equal_atoms,
-                   create_random_structure, HAS_GROMACS,
-                   diff_files, get_saved_fn, has_openmm)
+from utils import (get_fn, FileIOTestCase, equal_atoms, create_random_structure,
+                   HAS_GROMACS, diff_files, get_saved_fn, has_openmm)
 import warnings
 try:
     from string import letters
 except ImportError:
     from string import ascii_letters as letters
 
-class TestReadParm(unittest.TestCase):
+class TestReadParm(FileIOTestCase):
     """ Tests the various Parm file classes """
 
     def test_fortran_format(self):
@@ -159,6 +160,19 @@ class TestReadParm(unittest.TestCase):
         """ Check that bzip2ed prmtop files can be parsed correctly """
         parm = readparm.LoadParm(get_fn('small.parm7.bz2'))
         self.assertEqual(parm.ptr('natom'), 864)
+
+    def test_atomic_number_setting(self):
+        """ Make sure that if ATOMIC_NUMBER is -1, the mass sets the element """
+        fn = get_fn('test.parm7', written=True)
+        parm = readparm.LoadParm(get_fn('ash.parm7'))
+        # Turn off atomic numbers
+        change(parm, 'ATOMIC_NUMBER', ':*', -1).execute()
+        parm.write_parm(fn)
+        parm2 = readparm.LoadParm(fn)
+        parm = readparm.LoadParm(get_fn('ash.parm7'))
+        self.assertEqual(len(parm.atoms), len(parm2.atoms))
+        for a1, a2 in zip(parm.atoms, parm2.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
 
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_change_detection(self):
@@ -614,6 +628,17 @@ class TestReadParm(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('ff91.parm7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm, has1012=True)
+
+    def test_getitem_nbtables(self):
+        """ Tests that nonbond tables are set correctly following slicing """
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        new = parm[list(range(len(parm.atoms)))]
+        self.assertEqual(len(parm.parm_data['NONBONDED_PARM_INDEX']),
+                         len(new.parm_data['NONBONDED_PARM_INDEX']))
+        self.assertEqual(len(parm.parm_data['LENNARD_JONES_ACOEF']),
+                         len(new.parm_data['LENNARD_JONES_ACOEF']))
+        self.assertEqual(len(parm.parm_data['LENNARD_JONES_BCOEF']),
+                         len(new.parm_data['LENNARD_JONES_BCOEF']))
 
     def test_bad_arguments(self):
         """ Test proper error handling for bad AmberParm arguments """
@@ -1311,6 +1336,32 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(lib['ALA'].atoms[1].charge, 0.423221)
         self.assertEqual(lib['VAL'].atoms[8].name, 'HG12')
         self.assertEqual(lib['VAL'].atoms[8].charge, 0.062124)
+
+    def test_lib_with_box(self):
+        """ Tests handling of OFF files with multiple residues and a box """
+        solvents = AmberOFFLibrary.parse(get_fn('solvents.lib'))
+        for res in solvents['TIP3PBOX']:
+            self.assertEqual(len(res.bonds), 3)
+            for atom in res.atoms:
+                self.assertEqual(len(atom.bonds), 2)
+        self.assertIsNot(solvents['TIP3PBOX'].box, None)
+        # Now create one
+        struct = readparm.LoadParm(get_fn('cyclohexane.parm7'),
+                                   get_fn('cyclohexane.md.rst7'))
+        self.assertIsNot(struct.box, None)
+        reslib = ResidueTemplateContainer.from_structure(struct)
+        reslib.name = 'CYCHBOX'
+        self.assertIsNot(reslib.box, None)
+        np.testing.assert_equal(struct.box, reslib.box)
+        # Now write an OFF file
+        fn = get_fn('test.lib', written=True)
+        AmberOFFLibrary.write(dict(CYCHBOX=reslib), fn)
+        # Now read it and make sure I have the appropriate bonds
+        lib2 = AmberOFFLibrary.parse(fn)
+        # All residues should have exactly the same number of bonds
+        self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
+        self.assertGreater(len(lib2['CYCHBOX'][0].bonds), 0)
+        np.testing.assert_allclose(lib2['CYCHBOX'].box, struct.box, atol=0.001)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
@@ -2505,6 +2556,17 @@ class TestRst7Class(FileIOTestCase):
         self.assertRaises(RuntimeError, lambda:
                 readparm.Rst7().write(get_fn('test.nc', written=True), netcdf=True)
         )
+
+class TestNetCDFTrajectorywithBox(FileIOTestCase):
+    """ Test trajecotry with more than 1 frame and with box """
+
+    @unittest.skipIf(PYPY, 'Test does not yet run under pypy')
+    def test_netcdf_long_trajectory(self):
+        """ Test netcdf trajectory with box """
+        parmfile, ncfile = get_fn('tz2.parm7'), get_fn('tz2.nc')
+        parm = pmd.load_file(parmfile, xyz=ncfile, box=np.random.rand(101, 6))
+        boxes = parm.get_box('all')
+        self.assertEqual(boxes.shape, (101, 6))
 
 class TestAmberTitratableResidues(FileIOTestCase):
     """ Test Amber's titration module capabilities """

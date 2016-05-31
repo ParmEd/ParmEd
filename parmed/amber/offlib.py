@@ -8,7 +8,7 @@ from collections import OrderedDict
 from contextlib import closing
 import numpy as np
 from parmed import Atom
-from parmed.constants import RAD_TO_DEG
+from parmed.constants import RAD_TO_DEG, DEG_TO_RAD
 from parmed.exceptions import AmberWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
@@ -367,7 +367,6 @@ class AmberOFFLibrary(object):
                 container[i].type = SOLVENT
             elif typ != '?':
                 warnings.warn('Unknown residue type "%s"' % typ, AmberWarning)
-# TODO delete
             if nres > 1:
                 container[i].name = resname
         # Get the residues sequence table
@@ -477,7 +476,7 @@ class AmberOFFLibrary(object):
         else:
             dest.write(' 1.000000\n')
             if res.box[3] == res.box[4] == res.box[5]:
-                dest.write(' %f\n' % res.box[3])
+                dest.write(' %f\n' % (res.box[3] * DEG_TO_RAD))
             else:
                 raise RuntimeError('Cannot write boxes with different angles')
             dest.write(' %f\n' % res.box[0])
@@ -500,10 +499,12 @@ class AmberOFFLibrary(object):
         if any(len(r) > 1 for r in res):
             dest.write('!entry.%s.unit.connectivity table  int atom1x  '
                        'int atom2x  int flags\n' % res.name)
+            base = 1
             for r in res:
                 for bond in r.bonds:
-                    dest.write(' %d %d 1\n' % (bond.atom1.idx+1,
-                                               bond.atom2.idx+1))
+                    dest.write(' %d %d 1\n' % (bond.atom1.idx+base,
+                                               bond.atom2.idx+base))
+                base += len(r)
         dest.write('!entry.%s.unit.hierarchy table  str abovetype  int '
                    'abovex  str belowtype  int belowx\n' % res.name)
         c = 1

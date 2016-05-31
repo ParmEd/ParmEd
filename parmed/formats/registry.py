@@ -76,8 +76,12 @@ def load_file(filename, *args, **kwargs):
         This is needed for some coordinate file classes, but not others. This is
         treated the same as ``structure``, above. It is the # of atoms expected
     hasbox : bool, optional
-        Same as ``natom``, but indicates whether the coordinate file has unit
-        cell dimensions
+        Same as ``structure``, but indicates whether the coordinate file has
+        unit cell dimensions
+    skip_bonds : bool, optional
+        Same as ``structure``, but indicates whether or not bond searching will
+        be skipped if the topology file format does not contain bond information
+        (like PDB, GRO, and PQR files).
     *args : other positional arguments
         Some formats accept positional arguments. These will be passed along
     **kwargs : other options
@@ -97,6 +101,41 @@ def load_file(filename, *args, **kwargs):
 
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
+
+    Examples
+    --------
+
+    Load a Mol2 file
+
+    >>> load_file('tripos1.mol2')
+    <ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None>
+
+    Load a Mol2 file as a Structure
+
+    >>> load_file('tripos1.mol2', structure=True)
+    <Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized>
+
+    Load an Amber topology file
+
+    >>> load_file('trx.prmtop', xyz='trx.inpcrd')
+    <AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized>
+
+    Load a CHARMM PSF file
+
+    >>> load_file('ala_ala_ala.psf')
+    <CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized>
+
+    Load a PDB and CIF file
+
+    >>> load_file('4lzt.pdb')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    >>> load_file('4LZT.cif')
+    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+
+    Load a Gromacs topology file -- only works with Gromacs installed
+
+    >>> load_file('1aki.ff99sbildn.top')
+    <GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized>
 
     Raises
     ------
@@ -141,26 +180,30 @@ def load_file(filename, *args, **kwargs):
         if not arg in kwargs:
             raise TypeError('%s constructor expects %s keyword argument' %
                             name, arg)
-    # Pass on the "structure" keyword IFF the target function accepts a target
-    # keyword. Otherwise, get rid of it.
+    # Pass on the following keywords IFF the target function accepts a target
+    # keyword. Otherwise, get rid of it: structure, natom, hasbox, skip_bonds
     if hasattr(cls, 'parse'):
         _prune_argument(cls.parse, kwargs, 'structure')
         _prune_argument(cls.parse, kwargs, 'natom')
         _prune_argument(cls.parse, kwargs, 'hasbox')
+        _prune_argument(cls.parse, kwargs, 'skip_bonds')
         return cls.parse(filename, *args, **kwargs)
     elif hasattr(cls, 'open_old'):
         _prune_argument(cls.open_old, kwargs, 'structure')
         _prune_argument(cls.open_old, kwargs, 'natom')
         _prune_argument(cls.open_old, kwargs, 'hasbox')
+        _prune_argument(cls.open_old, kwargs, 'skip_bonds')
         return cls.open_old(filename, *args, **kwargs)
     elif hasattr(cls, 'open'):
         _prune_argument(cls.open, kwargs, 'structure')
         _prune_argument(cls.open, kwargs, 'natom')
         _prune_argument(cls.open, kwargs, 'hasbox')
+        _prune_argument(cls.open, kwargs, 'skip_bonds')
         return cls.open(filename, *args, **kwargs)
     _prune_argument(cls.__init__, kwargs, 'structure')
     _prune_argument(cls.__init__, kwargs, 'natom')
     _prune_argument(cls.__init__, kwargs, 'hasbox')
+    _prune_argument(cls.__init__, kwargs, 'skip_bonds')
     return cls(filename, *args, **kwargs)
 
 def _prune_argument(func, kwargs, keyword):
