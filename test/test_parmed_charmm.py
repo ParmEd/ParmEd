@@ -1181,3 +1181,11 @@ class TestFileWriting(utils.FileIOTestCase):
         finally:
             f.close()
         self.assertFalse(has_key)
+
+    def test_write_xplor(self):
+        """ Test that XPLOR-style CHARMM PSF files have XPLOR flag (#715) """
+        parm = pmd.load_file(get_fn('trx.prmtop'))
+        fn = get_fn('test.psf', written=True)
+        parm.save(fn, overwrite=True)
+        cpsf = pmd.load_file(fn)
+        self.assertIn('XPLOR', cpsf.flags)
