@@ -8,7 +8,7 @@ from collections import OrderedDict
 from contextlib import closing
 import numpy as np
 from parmed import Atom
-from parmed.constants import RAD_TO_DEG, DEG_TO_RAD
+from parmed.constants import RAD_TO_DEG
 from parmed.exceptions import AmberWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
