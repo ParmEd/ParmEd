@@ -222,7 +222,9 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Error processing boundbox table entries')
         else:
             if hasbox > 0:
-                angle *= RAD_TO_DEG
+                if angle < 3.15:
+                    # No box is this acute -- must be in radians
+                    angle *= RAD_TO_DEG
                 container.box = [a, b, c, angle, angle, angle]
         # Get the child sequence entry
         line = fileobj.readline()
