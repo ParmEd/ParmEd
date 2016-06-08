@@ -75,7 +75,7 @@ class PSFFile(object):
             attribute, it will be used to print the PSF file. Otherwise, it will
             be treated like a string and a file will be opened, printed, then
             closed
-        vmd : bool 
+        vmd : bool
             If True, it will write out a PSF in the format that VMD prints it in
             (i.e., no NUMLP/NUMLPH or MOLNT sections)
 
@@ -89,6 +89,16 @@ class PSFFile(object):
             ext = 'EXT' in struct.flags
         except AttributeError:
             ext = True
+        # See if this is an XPLOR format
+        try:
+            xplor = 'XPLOR' in struct.flags
+        except AttributeError:
+            for atom in struct.atoms:
+                if isinstance(atom.type, string_types):
+                    xplor = True
+                    break
+            else:
+                xplor = False
         own_handle = False
         # Index the atoms and residues TODO delete
         if isinstance(dest, string_types):
@@ -111,6 +121,8 @@ class PSFFile(object):
             dest.write(' '.join(f for f in struct.flags if f not in ('CHEQ',)))
         else:
             dest.write('EXT') # EXT is always active if no flags present
+            if xplor:
+                dest.write(' XPLOR')
         dest.write('\n\n')
         if isinstance(struct.title, string_types):
             dest.write(intfmt % 1 + ' !NTITLE\n')
