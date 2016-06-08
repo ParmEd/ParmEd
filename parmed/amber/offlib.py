@@ -8,7 +8,7 @@ from collections import OrderedDict
 from contextlib import closing
 import numpy as np
 from parmed import Atom
-from parmed.constants import RAD_TO_DEG, DEG_TO_RAD
+from parmed.constants import RAD_TO_DEG
 from parmed.exceptions import AmberWarning
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
@@ -222,7 +222,9 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Error processing boundbox table entries')
         else:
             if hasbox > 0:
-                angle *= RAD_TO_DEG
+                if angle < 3.15:
+                    # No box is this acute -- must be in radians
+                    angle *= RAD_TO_DEG
                 container.box = [a, b, c, angle, angle, angle]
         # Get the child sequence entry
         line = fileobj.readline()
@@ -476,7 +478,7 @@ class AmberOFFLibrary(object):
         else:
             dest.write(' 1.000000\n')
             if res.box[3] == res.box[4] == res.box[5]:
-                dest.write(' %f\n' % (res.box[3] * DEG_TO_RAD))
+                dest.write(' %f\n' % res.box[3])
             else:
                 raise RuntimeError('Cannot write boxes with different angles')
             dest.write(' %f\n' % res.box[0])
@@ -522,15 +524,17 @@ class AmberOFFLibrary(object):
                 dest.write(' %.6g %.6g %.6g\n' % (atom.xx, atom.xy, atom.xz))
         dest.write('!entry.%s.unit.residueconnect table  int c1x  int c2x  '
                    'int c3x  int c4x  int c5x  int c6x\n' % res.name)
+        c = 1
         for r in res:
-            # Make the CONECT1 and 0 default to 1 so that the TREE gets set
-            # correctly by tleap. Not used for anything else...
-            conn = [1, 1, 0, 0, 0, 0]
+            # Make the CONECT1 and 0 default to first and last atom so that the
+            # TREE gets set correctly by tleap. Not used for anything else...
+            conn = [c, c+len(r)-1, 0, 0, 0, 0]
             if r.head is not None: conn[0] = r.head.idx + 1
             if r.tail is not None: conn[1] = r.tail.idx + 1
             for i, at in enumerate(r.connections):
                 conn[i+2] = at.idx + 1
             dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
+            c += len(r)
         dest.write('!entry.%s.unit.residues table  str name  int seq  int '
                    'childseq  int startatomx  str restype  int imagingx\n' %
                    res.name)
@@ -549,7 +553,7 @@ class AmberOFFLibrary(object):
                               AmberWarning)
                 typ = '?'
             dest.write(' "%s" %d %d %d "%s" %d\n' % (r.name, i+1, 1+len(r), c,
-                       typ, _imaging_atom(r)))
+                       typ, _imaging_atom(r)+c))
             c += len(r)
         dest.write('!entry.%s.unit.residuesPdbSequenceNumber array int\n' %
                    res.name)
@@ -608,4 +612,4 @@ def _imaging_atom(res):
             masses[i] = atom.mass
     com = center_of_mass(coords, masses)
     diff = coords - com
-    return np.argmin((diff * diff).sum(axis=1)) + 1
+    return np.argmin((diff * diff).sum(axis=1))

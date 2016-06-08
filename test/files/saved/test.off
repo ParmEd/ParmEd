@@ -689,7 +689,7 @@
  -2.03486 -15.1048 15.1024
  -0.320386 -15.0783 13.7643
 !entry.CALA.unit.residueconnect table  int c1x  int c2x  int c3x  int c4x  int c5x  int c6x
- 1 1 0 0 0 0
+ 1 11 0 0 0 0
 !entry.CALA.unit.residues table  str name  int seq  int childseq  int startatomx  str restype  int imagingx
  "CALA" 1 12 1 "?" 9
 !entry.CALA.unit.residuesPdbSequenceNumber array int
