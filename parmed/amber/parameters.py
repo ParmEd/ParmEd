@@ -409,28 +409,6 @@ class AmberParameterSet(ParameterSet):
 
     #===================================================
 
-    @staticmethod
-    def _periodic_improper_key(atom1, atom2, atom3, atom4):
-        """ The central atom must always come third """
-        all_atoms = set([atom1, atom2, atom3, atom4])
-        for a in all_atoms:
-            for a2 in all_atoms:
-                if a2 is a: continue
-                if not a2 in a.bond_partners:
-                    break
-            else:
-                # We found our central atom
-                others = sorted(all_atoms - {a}, key=lambda x: x.type or x.name)
-                key = (others[0].type, others[1].type, a.type,
-                       others[2].type)
-                break
-        else:
-            # No atom identified as "central". Just assume that the third is
-            key = (atom1.type, atom2.type, atom3.type, atom4.type)
-        return key
-
-    #===================================================
-
     def _parse_frcmod(self, f, line):
         """ Parses an frcmod file from an open file object """
         def fiter():
