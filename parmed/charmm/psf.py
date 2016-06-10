@@ -612,11 +612,17 @@ class CharmmPsfFile(Structure):
             a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
             at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
             key = tuple(sorted([at1, at2, at3, at4]))
+            altkey1 = a1.type, a2.type, a3.type, a4.type
+            altkey2 = a4.type, a3.type, a2.type, a1.type
             # Check for exact harmonic or exact periodic
             if key in parmset.improper_types:
                 imp.type = parmset.improper_types[key]
             elif key in parmset.improper_periodic_types:
                 imp.type = parmset.improper_periodic_types[key]
+            elif altkey1 in parmset.improper_periodic_types:
+                imp.type = parmset.improper_periodic_types[altkey1]
+            elif altkey2 in parmset.improper_periodic_types:
+                imp.type = parmset.improper_periodic_types[altkey2]
             else:
                 # Check for wild-card harmonic
                 for anchor in (at2, at3, at4):
@@ -633,7 +639,7 @@ class CharmmPsfFile(Structure):
                             break
                     # Not found anywhere
                     if key not in parmset.improper_periodic_types:
-                        raise ParameterError('No improper parameters found for'
+                        raise ParameterError('No improper parameters found for '
                                              '%r' % imp)
             imp.type.used = False
         # prepare list of harmonic impropers present in system

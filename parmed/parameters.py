@@ -10,7 +10,6 @@ from __future__ import print_function, division
 from parmed.exceptions import ParameterError, ParameterWarning
 from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
                 AtomType, DihedralType, UnassignedAtomType)
-from parmed.utils import canonical_improper_order
 from parmed.utils.six.moves import range
 from parmed.utils.six import iteritems
 from collections import OrderedDict
@@ -248,10 +247,8 @@ class ParameterSet(object):
             key = (dihedral.atom1.type, dihedral.atom2.type,
                    dihedral.atom3.type, dihedral.atom4.type)
             if dihedral.improper:
-                key = cls._periodic_improper_key(
-                        dihedral.atom1, dihedral.atom2,
-                        dihedral.atom3, dihedral.atom4,
-                )
+                key = (dihedral.atom1.type, dihedral.atom2.type,
+                       dihedral.atom3.type, dihedral.atom4.type)
                 if key in params.improper_periodic_types:
                     if (not allow_unequal_duplicates and
                             params.improper_periodic_types[key] != dihedral.type):
@@ -447,11 +444,6 @@ class ParameterSet(object):
                 key2 = keylist[j]
                 if typedict[key1] == typedict[key2]:
                     typedict[key2] = typedict[key1]
-
-    @staticmethod
-    def _periodic_improper_key(atom1, atom2, atom3, atom4):
-        a1, a2, a3, a4 = canonical_improper_order(atom1, atom2, atom3, atom4)
-        return (a1.type, a2.type, a3.type, a4.type)
 
     @property
     def combining_rule(self):

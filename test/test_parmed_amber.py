@@ -1273,25 +1273,6 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_private_functions(self):
         """ Test some of the private utility functions in AmberParameterSet """
-        improper_key = parameters.AmberParameterSet._periodic_improper_key
-        # Construct an improper with 4 atoms
-        a1 = topologyobjects.Atom(name='CA', type='CA')
-        a2 = topologyobjects.Atom(name='CB', type='CB')
-        a3 = topologyobjects.Atom(name='CC', type='CD')
-        a4 = topologyobjects.Atom(name='CD', type='CC')
-        bonds = [topologyobjects.Bond(a1, a3), topologyobjects.Bond(a2, a3),
-                 topologyobjects.Bond(a3, a4)]
-        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a4, a3, a2, a1), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a1, a4, a2, a3), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a2, a4, a1, a3), ('CA', 'CB', 'CD', 'CC'))
-        # Now have no connectivity, check fallback
-        a1 = topologyobjects.Atom(name='CA', type='CA')
-        a2 = topologyobjects.Atom(name='CB', type='CB')
-        a3 = topologyobjects.Atom(name='CC', type='CD')
-        a4 = topologyobjects.Atom(name='CD', type='CC')
-        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a4, a3, a2, a1), ('CC', 'CD', 'CB', 'CA'))
         # Check on AmberParm._truncate_array
         parm = readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         parm._truncate_array('ATOM_NAME', 2)

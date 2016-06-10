@@ -373,28 +373,28 @@ CT     CT     N2     H           0.0000  3     0.00
 H1     CT     C      O2          0.0000  2     0.00
 
 IMPROPERS
-C      CT     O      N          10.5000  2   180.00
-C      CT     O2     O2         10.5000  2   180.00
-CC     CT     NA     CV          1.1000  2   180.00
-CA     CT     CA     CA          1.1000  2   180.00
-C      CT     O      OH         10.5000  2   180.00
-CSTR   CT     CW     CB          1.1000  2   180.00
-N      C      CT     CT          1.0000  2   180.00
-C      CA     OH     CA          1.1000  2   180.00
-CA     N2     N2     N2         10.5000  2   180.00
-N      C      H      CT          1.0000  2   180.00
-CV     CC     NB     H4          1.1000  2   180.00
-CR     NA     H5     NB          1.1000  2   180.00
-NA     CC     H      CR          1.0000  2   180.00
+CT     N      C      O          10.5000  2   180.00
+CT     O2     C      O2         10.5000  2   180.00
+NA     CV     CC     CT          1.1000  2   180.00
+CA     CA     CA     CT          1.1000  2   180.00
+CT     O      C      OH         10.5000  2   180.00
+CW     CB     CSTR   CT          1.1000  2   180.00
+C      CT     N      CT          1.0000  2   180.00
+CA     CA     C      OH          1.1000  2   180.00
+N2     N2     CA     N2         10.5000  2   180.00
+C      CT     N      H           1.0000  2   180.00
+CC     NB     CV     H4          1.1000  2   180.00
+NA     NB     CR     H5          1.1000  2   180.00
+CC     CR     NA     H           1.0000  2   180.00
 CA     CA     CA     HA          1.1000  2   180.00
-CA     CA     HA     CB          1.1000  2   180.00
-CA     CN     HA     CA          1.1000  2   180.00
-NA     CW     H      CN          1.0000  2   180.00
-CW     CSTR   H4     NA          1.1000  2   180.00
-CA     C      HA     CA          1.1000  2   180.00
-N      C      H      H           1.0000  2   180.00
-N2     CA     H      H           1.0000  2   180.00
-N2     CT     H      CA          1.0000  2   180.00
+CA     CB     CA     HA          1.1000  2   180.00
+CN     CA     CA     HA          1.1000  2   180.00
+CW     CN     NA     H           1.0000  2   180.00
+CSTR   NA     CW     H4          1.1000  2   180.00
+C      CA     CA     HA          1.1000  2   180.00
+C      H      N      H           1.0000  2   180.00
+CA     H      N2     H           1.0000  2   180.00
+CT     CA     N2     H           1.0000  2   180.00
 
 NONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
 cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 0.8333333333333334 wmin 1.5
