@@ -705,6 +705,13 @@ class PDBFile(object):
         standard_resnames : bool, optional, default False
             If True, common aliases for various amino and nucleic acid residues
             will be converted into the PDB-standard values.
+
+        Notes
+        -----
+        If multiple coordinate frames are present, these will be written as
+        separate models (but only the unit cell from the first model will be
+        written, as the PDB standard dictates that only one set of unit cells
+        shall be present).
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -1351,6 +1358,13 @@ class CIFFile(object):
         standard_resnames : bool, optional
             If True, common aliases for various amino and nucleic acid residues
             will be converted into the PDB-standard values. Default is False
+
+        Notes
+        -----
+        If multiple coordinate frames are present, these will be written as
+        separate models (but only the unit cell from the first model will be
+        written, as the PDBx standard dictates that only one set of unit cells
+        shall be present).
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
