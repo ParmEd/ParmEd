@@ -13,12 +13,20 @@ contained in this module.
 """
 from __future__ import division, print_function, absolute_import
 
+try:
+    # netCDF4 is *much* faster to write NetCDF files, and can make a huge
+    # difference when using it as an OpenMM reporter. So do what we can to use
+    # the faster library when available
+    import netCDF4 as nc
+except ImportError:
+    nc = None
 import numpy as np
 from parmed import __version__
 from parmed.formats.registry import FileFormatType
 from parmed import unit as u
 from parmed.utils.netcdf import netcdf_file as NetCDFFile
 from parmed.utils.six import add_metaclass
+import warnings
 
 @add_metaclass(FileFormatType)
 class NetCDFRestart(object):
@@ -68,8 +76,15 @@ class NetCDFRestart(object):
         respectively.
         """
         self.closed = False
-        self._ncfile = NetCDFFile(fname, mode, mmap=False)
-   
+        if mode.startswith('w') and nc is not None:
+            self._ncfile = nc.Dataset(fname, mode, format='NETCDF3_64BIT')
+        else:
+            if mode.startswith('w'):
+                warnings.warn('Could not find netCDF4 module. Falling back on '
+                              'scipy implementation, which can significantly '
+                              'slow down simulations if used as a reporter')
+            self._ncfile = NetCDFFile(fname, mode, mmap=False)
+
     @classmethod
     def open_new(cls, fname, natom, box, vels, title='',
                  remd=None, temp=None, remd_dimtypes=None):
@@ -179,6 +194,8 @@ class NetCDFRestart(object):
             v.units = 'angstrom/picosecond'
             v.scale_factor = np.float32(20.455)
             inst.velocity_scale = 20.455
+            if nc is not None:
+                v.set_auto_maskandscale(False)
 
         if remd_type == 'TEMPERATURE':
             v = ncfile.createVariable('temp0', 'd', ('time',))
@@ -257,7 +274,7 @@ class NetCDFRestart(object):
     @property
     def cell_lengths(self):
         return self._ncfile.variables['cell_lengths'][:]
-   
+
     @cell_lengths.setter
     def cell_lengths(self, stuff):
         self._ncfile.variables['cell_lengths'][:] = np.asarray(stuff)
@@ -266,7 +283,7 @@ class NetCDFRestart(object):
     @property
     def cell_angles(self):
         return self._ncfile.variables['cell_angles'][:]
-   
+
     @cell_angles.setter
     def cell_angles(self, stuff):
         self._ncfile.variables['cell_angles'][:] = np.asarray(stuff)
@@ -316,7 +333,9 @@ class NetCDFRestart(object):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
 
     def flush(self):
-        self._ncfile.flush()
+        if nc is None:
+            # netCDF4.Dataset does not have a flush method
+            self._ncfile.flush()
 
 @add_metaclass(FileFormatType)
 class NetCDFTraj(object):
@@ -376,8 +395,15 @@ class NetCDFTraj(object):
     def __init__(self, fname, mode='r'):
         """ Opens a NetCDF File """
         self.closed = False
-        self._ncfile = NetCDFFile(fname, mode, mmap=False)
-   
+        if mode.startswith('w') and nc is not None:
+            self._ncfile = nc.Dataset(fname, mode, format='NETCDF3_64BIT')
+        else:
+            if mode.startswith('w'):
+                warnings.warn('Could not find netCDF4 module. Falling back on '
+                              'scipy implementation, which can significantly '
+                              'slow down simulations if used as a reporter')
+            self._ncfile = NetCDFFile(fname, mode, mmap=False)
+
     @classmethod
     def open_new(cls, fname, natom, box, crds=True, vels=False, frcs=False,
                  remd=None, remd_dimension=None, title=''):
@@ -474,6 +500,8 @@ class NetCDFTraj(object):
             v.units = 'angstrom/picosecond'
             inst.velocity_scale = v.scale_factor = 20.455
             inst._last_vel_frame = 0
+            if nc is not None:
+                v.set_auto_maskandscale(False)
         if inst.hasfrcs:
             v = ncfile.createVariable('forces', 'f',
                                             ('frame', 'atom', 'spatial'))
@@ -497,7 +525,7 @@ class NetCDFTraj(object):
             ncfile.createVariable('remd_dimtype', 'i',
                                         ('remd_dimension',))
             inst._last_remd_frame = 0
-    
+
         inst._last_time_frame = 0
 
         return inst
@@ -750,4 +778,6 @@ class NetCDFTraj(object):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
 
     def flush(self):
-        self._ncfile.flush()
+        if nc is None:
+            # netCDF4.Dataset does not have a flush method
+            self._ncfile.flush()

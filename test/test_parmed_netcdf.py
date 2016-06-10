@@ -16,7 +16,7 @@ from utils import get_fn, FileIOTestCase, TestCaseRelative
 @skipIf(PYPY, 'NetCDF parsing does not yet work with pypy')
 class TestNetCDF(FileIOTestCase, TestCaseRelative):
     """ Test NetCDF Functionality """
-    
+
     def testNetCDF(self):
         """ Test scipy NetCDF parsing """
         traj = NetCDFTraj.open_old(get_fn('tz2.truncoct.nc'))
@@ -238,7 +238,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(rst.cell_angles[0], 109.471219)
         self.assertAlmostEqual(rst.cell_angles[1], 109.471219)
         self.assertAlmostEqual(rst.cell_angles[2], 109.471219)
-        self.assertTrue(all([round(x-y, 7) == 0 
+        self.assertTrue(all([round(x-y, 7) == 0
                              for x, y in zip(rst.cell_lengths, rst.box[:3])]))
-        self.assertTrue(all([round(x-y, 7) == 0 
+        self.assertTrue(all([round(x-y, 7) == 0
                              for x, y in zip(rst.cell_angles, rst.box[3:])]))
