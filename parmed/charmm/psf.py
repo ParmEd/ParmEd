@@ -613,7 +613,7 @@ class CharmmPsfFile(Structure):
             at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
             key = tuple(sorted([at1, at2, at3, at4]))
             altkey1 = a1.type, a2.type, a3.type, a4.type
-            altkey2 = a4.type, a2.type, a3.type, a4.type
+            altkey2 = a4.type, a3.type, a2.type, a1.type
             # Check for exact harmonic or exact periodic
             if key in parmset.improper_types:
                 imp.type = parmset.improper_types[key]
