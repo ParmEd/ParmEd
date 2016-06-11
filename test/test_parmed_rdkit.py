@@ -29,7 +29,7 @@ class TestRDKit(unittest.TestCase):
         self.assertEqual([atom.name for atom in parm.atoms], 
                          ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
         self.assertEqual(parm.residues[0].name, 'UNL')
-        np.testing.assert_allclose(parm.coordinates[0], [0, 0, 0])
+        np.testing.assertIs(parm.coordinates, None)
 
         # coordinates = True (default)
         parm = pmd.rdkit.from_smiles(smiles)

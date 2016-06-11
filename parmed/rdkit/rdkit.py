@@ -41,7 +41,6 @@ class RDKit(object):
         smiles : str, smiles
         coordinates : bool, default True
             if True, use `rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates
-            if False, coordinates for all atoms are all 0.0
         """
         from rdkit import Chem
         from rdkit.Chem import AllChem
@@ -50,4 +49,8 @@ class RDKit(object):
         if coordinates:
             AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True,
                     useBasicKnowledge=True)
-        return RDKit.load(mol)
+
+        parm = RDKit.load(mol)
+        if not coordinates:
+            parm.coordinates = None
+        return parm
