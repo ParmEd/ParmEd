@@ -53,4 +53,5 @@ class RDKit(object):
         parm = RDKit.load(mol)
         if not coordinates:
             parm.coordinates = None
+            parm._coordinates = None
         return parm

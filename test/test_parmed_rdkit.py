@@ -30,6 +30,7 @@ class TestRDKit(unittest.TestCase):
                          ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
         self.assertEqual(parm.residues[0].name, 'UNL')
         self.assertIs(parm.coordinates, None)
+        self.assertIs(parm.get_coordinates(), None)
 
         # coordinates = True (default)
         parm = pmd.rdkit.from_smiles(smiles)
