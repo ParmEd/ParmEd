@@ -364,6 +364,7 @@ class CharmmPsfFile(Structure):
         If copy is False, the original object may have its atom type names
         changed if any of them have lower-case letters
         """
+        from parmed.charmm.parameters import _typeconv as typeconv
         if (struct.rb_torsions or struct.trigonal_angles or
                 struct.out_of_plane_bends or struct.pi_torsions or
                 struct.stretch_bends or struct.torsion_torsions or
@@ -392,13 +393,6 @@ class CharmmPsfFile(Structure):
         psf.improper_types = struct.improper_types
         psf.cmap_types = struct.cmap_types
 
-        # Make all atom type names upper-case
-        def typeconv(name):
-            if name.upper() == name:
-                return name.replace('*', 'STR')
-            # Lowercase letters present -- decorate the type name with LTU --
-            # Lower To Upper
-            return ('%sLTU' % name.upper()).replace('*', 'STR')
         for atom in psf.atoms:
             atom.type = typeconv(atom.type)
             if atom.atom_type is not UnassignedAtomType:

@@ -577,6 +577,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(parameters._typeconv(randint), randint)
         self.assertEqual(parameters._typeconv('NOCHNG'), 'NOCHNG')
         self.assertEqual(parameters._typeconv('NoCh'), 'NOCHLTU')
+        self.assertEqual(parameters._typeconv('Na+'), 'NALTUPL')
+        self.assertEqual(parameters._typeconv('NA+'), 'NAPL')
 
     def test_e14_fac(self):
         """ Test reading CHARMM parameter files with 1-4 EEL scaling """
