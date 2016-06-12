@@ -318,8 +318,7 @@ class TestReadParm(FileIOTestCase):
 
     def test_amber_solv_parm(self):
         """ Test the AmberParm class with a periodic prmtop """
-        parm = readparm.AmberParm(get_fn('solv.prmtop'),
-                                  get_fn('solv.rst7'))
+        parm = readparm.AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         self._standard_parm_tests(parm)
         self._solv_pointer_tests(parm)
@@ -342,6 +341,13 @@ class TestReadParm(FileIOTestCase):
         self.assertNotIn('BOX_DIMENSIONS', parm.parm_data)
         self.assertNotIn('SOLVENT_POINTERS', parm.parm_data)
         self.assertNotIn('ATOMS_PER_MOLECULE', parm.parm_data)
+
+    def test_ifbox3(self):
+        """ Test that IFBOX is set to 3 for general triclinic cells """
+        parm = readparm.AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
+        parm.box[3:] = [60, 90, 60]
+        parm.remake_parm()
+        self.assertEqual(parm.ptr('IFBOX'), 3)
 
     def test_chamber_gas_parm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
