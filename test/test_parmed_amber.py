@@ -345,8 +345,7 @@ class TestReadParm(FileIOTestCase):
     def test_ifbox3(self):
         """ Test that IFBOX is set to 3 for general triclinic cells """
         parm = readparm.AmberParm(get_fn('solv.prmtop'), get_fn('solv.rst7'))
-        parm.box[3:] = [60, 90, 60]
-        parm.remake_parm()
+        parm.box = list(parm.box[:3]) + [60, 90, 60]
         self.assertEqual(parm.ptr('IFBOX'), 3)
 
     def test_chamber_gas_parm(self):
