@@ -2932,6 +2932,11 @@ class Structure(object):
                                  'should not be here')
         for atom, parms in zip(self.atoms, gb_parms):
             force.addParticle([atom.charge] + list(parms))
+        try:
+            force.finalize()
+        except AttributeError:
+            # only new versions of omm require calling finalize
+            pass
         # Set cutoff method
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomGBForce.NoCutoff)
