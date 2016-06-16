@@ -576,9 +576,9 @@ class TestCharmmParameters(utils.FileIOTestCase):
         randint = random.randint(0, 100000)
         self.assertEqual(parameters._typeconv(randint), randint)
         self.assertEqual(parameters._typeconv('NOCHNG'), 'NOCHNG')
-        self.assertEqual(parameters._typeconv('NoCh'), 'NOCHLTU')
-        self.assertEqual(parameters._typeconv('Na+'), 'NALTUPL')
-        self.assertEqual(parameters._typeconv('NA+'), 'NAPL')
+        self.assertEqual(parameters._typeconv('NoCh'), 'NOCHLT')
+        self.assertEqual(parameters._typeconv('Na+'), 'NAPLTU')
+        self.assertEqual(parameters._typeconv('NA+'), 'NAP')
 
     def test_e14_fac(self):
         """ Test reading CHARMM parameter files with 1-4 EEL scaling """
@@ -968,9 +968,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
             return ids1, ids2
         def typenames(key):
             if isinstance(key, string_types):
-                if key != key.upper():
-                    return ('%sLTU' % key.upper()).replace('*', 'STR')
-                return key.replace('*', 'STR')
+                return parameters._typeconv(key)
             return tuple(typenames(k) for k in key)
         # Bonds
         b1, b2 = get_typeset(set1.bond_types, set2.bond_types)
@@ -1029,7 +1027,13 @@ class TestCharmmParameters(utils.FileIOTestCase):
             self.assertEqual(set1.cmap_types[typenames(key)], item2)
         # Atom types
         a1, a2 = get_typeset(set1.atom_types, set2.atom_types)
-        self.assertEqual(len(a1), len(a2))
+        ndups = 0
+        recorded_types = set()
+        for typ in set2.atom_types:
+            if parameters._typeconv(typ) in recorded_types:
+                ndups += 1
+            recorded_types.add(parameters._typeconv(typ))
+        self.assertEqual(len(a1), len(a2)-ndups)
         if copy:
             self.assertFalse(a1 & a2)
         else:

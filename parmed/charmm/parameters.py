@@ -37,11 +37,11 @@ def _typeconv(name):
     if isinstance(name, integer_types):
         return name
     if name.upper() == name:
-        return name.replace('*', 'STR').replace('+', 'PL').replace('-', 'MI')[:8]
+        return name.replace('*', 'STR').replace('+', 'P').replace('-', 'M')[:6]
     # Lowercase letters present -- decorate the type name with LTU --
     # Lower To Upper
     return ('%sLTU' % name.upper()).replace('*', 'STR').replace(
-            '+', 'PL').replace('-', 'MI')[:8]
+            '+', 'P').replace('-', 'M')[:6]
 
 class CharmmParameterSet(ParameterSet):
     """
