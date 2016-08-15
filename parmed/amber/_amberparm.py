@@ -267,6 +267,7 @@ class AmberParm(AmberFormat, Structure):
             inst.box = _copy.copy(rawdata.box)
         inst.hasbox = inst.box is not None
         inst.hasvels = inst.velocities is not None
+        inst._label_alternates()
         return inst
 
     #===================================================
@@ -377,6 +378,7 @@ class AmberParm(AmberFormat, Structure):
                 dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
+        inst._label_alternates()
 
         return inst
 
@@ -1993,6 +1995,32 @@ class AmberParm(AmberFormat, Structure):
                      'most-used values scee=%f scnb=%f' % (scee, scnb),
                      AmberWarning)
         return n13, n14
+
+    #===================================================
+
+    def _get_atom_dict_for_alternate_labels(self):
+        from collections import defaultdict
+
+        atom_dict = defaultdict(list)
+    
+        for resid, residue in enumerate(self.residues):
+            atom_dict[resid] = defaultdict(list)
+    
+            for atom in residue.atoms:
+                atom_dict[resid][atom.name].append(atom)
+    
+        return atom_dict
+
+    def _label_alternates(self):
+      atom_with_residue_dict = self._get_atom_dict_for_alternate_labels()
+    
+      possible_labels = list('ABCDEF')
+    
+      for _, adict in atom_with_residue_dict.items():
+          for atom_name, atom_list in adict.items():
+              if len(atom_list) > 1:
+                  for atom, label in zip(atom_list, possible_labels):
+                      atom.altloc = label
 
     #===================================================
 
