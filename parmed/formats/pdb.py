@@ -16,6 +16,7 @@ from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.modeller import StandardBiomolecularResidues
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint, Bond
+from parmed.symmetry import Symmetry
 from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
@@ -312,8 +313,12 @@ class PDBFile(object):
         ZEROSET = set('0')
         altloc_ids = set()
 
+        _symm_lines = []
+
         try:
             for line in fileobj:
+                if 'REMARK 290   SMTRY' in line:
+                    _symm_lines.append(line)
                 rec = line[:6]
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
@@ -654,6 +659,9 @@ class PDBFile(object):
             all_coordinates.append(coordinates)
         struct._coordinates = np.array(all_coordinates).reshape(
                         (-1, len(struct.atoms), 3))
+        # process symmetry lines
+        if _symm_lines:
+            struct.symmetry = Symmetry(_symm_lines)
         return struct
 
     #===================================================
