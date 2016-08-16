@@ -39,4 +39,6 @@ else # Otherwise, CPython... go through conda
     fi
 
     source activate myenv
+    # uninstall parmed from ambermd
+    conda uninstall parmed --yes
 fi # CPython
