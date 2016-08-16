@@ -216,7 +216,7 @@ class Structure(object):
     coordinates : np.ndarray of shape (nframes, natom, 3)
         If no coordinates are set, this is set to None. The first frame will
         match the coordinates present on the atoms.
-    symmetry : np.ndarray of shape (n_symmetry, 4)
+    symmetry : :class:`Symmetry`
         if no symmetry is set, this is set to None.
 
     Notes
