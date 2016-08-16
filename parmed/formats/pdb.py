@@ -1294,6 +1294,9 @@ class CIFFile(object):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
                                       'B-factors. Skipping', PDBWarning)
+            symmetry_obj = cont.getObj('symmetry')
+            if symmetry_obj is not None:
+                struct.space_group = symmetry_obj.getRow(0)[1]
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
