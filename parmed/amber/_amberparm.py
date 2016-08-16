@@ -1998,27 +1998,23 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def _get_atom_dict_for_alternate_labels(self, residues):
-        from collections import defaultdict
+    def _get_atom_collection_for_alternate_labels(self):
+        atom_collection = [defaultdict(list) for r in self.residues] 
 
-        atom_dict = defaultdict(list)
-        for resid, residue in enumerate(residues):
-            atom_dict[resid] = defaultdict(list)
+        for adict, residue in zip(atom_collection, self.residues):
             for atom in residue.atoms:
-                atom_dict[resid][atom.name].append(atom)
-        return atom_dict
+                adict[atom.name].append(atom)
+        return atom_collection
 
-    def _label_alternates(self, residues=None):
-        # if we know which residue has alternative atoms, we do not need
-        # to iterate all residues
-        if residues is None:
-            residues = self.residues
-        atom_with_residue_dict = self._get_atom_dict_for_alternate_labels(residues=residues)
+    def _label_alternates(self):
+        atom_collection = self._get_atom_collection_for_alternate_labels()
         possible_labels = list('ABCDEF')
-        for _, residue_dict in atom_with_residue_dict.items():
-            for atom_name, atom_list in residue_dict.items():
+
+        for _, adict in enumerate(atom_collection):
+            for atom_name, atom_list in iteritems(adict):
                 if len(atom_list) > 1:
-                    for atom, label in zip(atom_list, possible_labels):
+                    for i, atom in enumerate(atom_list):
+                        label = possible_labels[i%len(possible_labels)]
                         atom.altloc = label
 
     #===================================================
