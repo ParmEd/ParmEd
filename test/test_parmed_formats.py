@@ -5,6 +5,7 @@ from __future__ import division
 import utils
 
 import numpy as np
+import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
                     topologyobjects, Atom, write_PDB, write_CIF)
@@ -961,6 +962,23 @@ class TestPDBStructure(FileIOTestCase):
         f = get_fn('pdb_format_test.pdb', written=True)
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
+
+    def test_pdb_write_symmetry_data(self):
+        def assert_remark_290(buffer, remark_290_lines):
+            for line in remark_290_lines.split():
+                self.assertTrue(line.strip() in buffer)
+        pdbfile = get_fn('4lzt.pdb')
+        parm = pmd.load_file(pdbfile)
+        output = StringIO()
+        parm.write_pdb(output)
+        output.seek(0)
+        buffer = output.read()
+        remark_290_lines = """
+        REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
+        REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
+        REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
+        """
+        assert_remark_290(buffer, remark_290_lines)
 
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """

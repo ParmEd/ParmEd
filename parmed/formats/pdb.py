@@ -661,7 +661,13 @@ class PDBFile(object):
                         (-1, len(struct.atoms), 3))
         # process symmetry lines
         if _symm_lines:
-            struct.symmetry = Symmetry(_symm_lines)
+            data = []
+            for line in _symm_lines:
+                if line.strip().startswith('REMARK 290   SMTRY'):
+                    data.append(line.split()[4:])
+
+            tensor = np.asarray(data, dtype='f8')
+            struct.symmetry = Symmetry(tensor)
         return struct
 
     #===================================================
@@ -754,6 +760,12 @@ class PDBFile(object):
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
                     struct.box[4], struct.box[5], struct.space_group, ''))
+        if struct.symmetry is not None:
+            fmt = '%d%4d%10.6f%10.6f%10.6f%15.5f\n'
+            for index, arr in enumerate(struct.symmetry.data):
+                arr_list = [1 + index % 3, 1 + int(index/3)] + arr.tolist()
+                symm_line = "REMARK 290   SMTRY" + fmt % tuple(arr_list)
+                dest.write(symm_line)
         if coordinates is not None:
             coords = np.array(coordinates, copy=False, subok=True)
             try:
