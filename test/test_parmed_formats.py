@@ -9,6 +9,7 @@ import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
                     topologyobjects, Atom, write_PDB, write_CIF)
+from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
 from parmed.utils.six import iteritems, add_metaclass
@@ -979,6 +980,8 @@ class TestPDBStructure(FileIOTestCase):
         REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
         """
         assert_remark_290(buffer, remark_290_lines)
+
+        self.assertRaises(ValueError, lambda: Symmetry(np.arange(100).reshape(10, 10)))
 
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
