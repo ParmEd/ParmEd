@@ -664,7 +664,6 @@ class PDBFile(object):
             for line in _symmetry_lines:
                 if line.strip().startswith('REMARK 290   SMTRY'):
                     data.append(line.split()[4:])
-
             tensor = np.asarray(data, dtype='f8')
             struct.symmetry = Symmetry(tensor)
         return struct
