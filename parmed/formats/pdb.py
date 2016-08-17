@@ -312,12 +312,12 @@ class PDBFile(object):
         atom_overflow = False
         ZEROSET = set('0')
         altloc_ids = set()
-        _symm_lines = []
+        _symmetry_lines = []
 
         try:
             for line in fileobj:
                 if 'REMARK 290   SMTRY' in line:
-                    _symm_lines.append(line)
+                    _symmetry_lines.append(line)
                 rec = line[:6]
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
@@ -659,9 +659,9 @@ class PDBFile(object):
         struct._coordinates = np.array(all_coordinates).reshape(
                         (-1, len(struct.atoms), 3))
         # process symmetry lines
-        if _symm_lines:
+        if _symmetry_lines:
             data = []
-            for line in _symm_lines:
+            for line in _symmetry_lines:
                 if line.strip().startswith('REMARK 290   SMTRY'):
                     data.append(line.split()[4:])
 
