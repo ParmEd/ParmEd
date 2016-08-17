@@ -267,6 +267,9 @@ class AmberParm(AmberFormat, Structure):
             inst.box = _copy.copy(rawdata.box)
         inst.hasbox = inst.box is not None
         inst.hasvels = inst.velocities is not None
+        n_copy = inst.pointers.get('NCOPY', 1)
+        if n_copy >= 2:
+            inst._label_alternates()
         return inst
 
     #===================================================
@@ -377,6 +380,9 @@ class AmberParm(AmberFormat, Structure):
                 dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
+        n_copy = inst.pointers.get('NCOPY', 1)
+        if n_copy >= 2:
+            inst._label_alternates()
 
         return inst
 
@@ -1993,6 +1999,27 @@ class AmberParm(AmberFormat, Structure):
                      'most-used values scee=%f scnb=%f' % (scee, scnb),
                      AmberWarning)
         return n13, n14
+
+    #===================================================
+
+    def _get_atom_collection_for_alternate_labels(self):
+        atom_collection = [defaultdict(list) for r in self.residues] 
+
+        for adict, residue in zip(atom_collection, self.residues):
+            for atom in residue.atoms:
+                adict[atom.name].append(atom)
+        return atom_collection
+
+    def _label_alternates(self):
+        atom_collection = self._get_atom_collection_for_alternate_labels()
+        possible_labels = list('ABCDEF')
+
+        for _, adict in enumerate(atom_collection):
+            for atom_name, atom_list in iteritems(adict):
+                if len(atom_list) > 1:
+                    for i, atom in enumerate(atom_list):
+                        label = possible_labels[i%len(possible_labels)]
+                        atom.altloc = label
 
     #===================================================
 

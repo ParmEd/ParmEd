@@ -1996,6 +1996,30 @@ class TestWriteFiles(FileIOTestCase):
         parm2 = readparm.AmberParm(get_fn('trx.prmtop', written=True))
         self.assertIn('NEW_FLAG', parm2.parm_data)
 
+    def test_write_pdb_with_LES_parm(self):
+        output = StringIO()
+        saved_pdb = get_fn('4lzt.les.pdb')
+        rst7_name = get_fn('4lzt.les.rst7')
+        parm_name = get_fn('4lzt.les.parm7')
+        parm = pmd.load_file(parm_name, rst7_name)
+        parm.write_pdb(output)
+        output.seek(0)
+        new_parm = pmd.read_PDB(output)
+        saved_parm = pmd.load_file(saved_pdb)
+
+        for new_atom, saved_atom  in zip(new_parm.atoms, saved_parm.atoms):
+            if saved_atom.other_locations:
+                self.assertTrue(new_atom.other_locations)
+
+        # make sure the labels are added, only pick two atoms since we already
+        # tested above
+        output.seek(0)
+        buffer = output.read()
+        self.assertIn('ATOM     18  HE2ALYS     1      -0.780   9.159  10.504',
+                buffer)
+        self.assertIn('ATOM     23  NZ BLYS     1      -0.618   8.282   8.901',
+                buffer)
+
     def test_amber_restart(self):
         """ Test writing an ASCII Amber restart file """
         Restart = asciicrd.AmberAsciiRestart
