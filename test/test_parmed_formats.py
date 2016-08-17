@@ -971,34 +971,34 @@ class TestPDBStructure(FileIOTestCase):
             output.seek(0)
             buffer = output.read()
             for line in remark_290_lines.split():
-                self.assertTrue(line.strip() in buffer)
+                self.assertTrue(line in buffer)
 
         # 4lzt
         pdbfile = get_fn('4lzt.pdb')
         parm = pmd.load_file(pdbfile)
         remark_290_lines = """
-        REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
-        REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
-        REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
-        """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
+"""
         assert_remark_290(parm, remark_290_lines)
 
         # 2idg
         parm = pmd.download_PDB('2igd')
         remark_290_lines = """
-        REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
-        REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
-        REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
-        REMARK 290   SMTRY1   2 -1.000000  0.000000  0.000000       17.52500            
-        REMARK 290   SMTRY2   2  0.000000 -1.000000  0.000000        0.00000            
-        REMARK 290   SMTRY3   2  0.000000  0.000000  1.000000       21.18500            
-        REMARK 290   SMTRY1   3 -1.000000  0.000000  0.000000        0.00000            
-        REMARK 290   SMTRY2   3  0.000000  1.000000  0.000000       20.25000            
-        REMARK 290   SMTRY3   3  0.000000  0.000000 -1.000000       21.18500            
-        REMARK 290   SMTRY1   4  1.000000  0.000000  0.000000       17.52500            
-        REMARK 290   SMTRY2   4  0.000000 -1.000000  0.000000       20.25000            
-        REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000    
-        """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
+REMARK 290   SMTRY1   2 -1.000000  0.000000  0.000000       17.52500            
+REMARK 290   SMTRY2   2  0.000000 -1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   2  0.000000  0.000000  1.000000       21.18500            
+REMARK 290   SMTRY1   3 -1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   3  0.000000  1.000000  0.000000       20.25000            
+REMARK 290   SMTRY3   3  0.000000  0.000000 -1.000000       21.18500            
+REMARK 290   SMTRY1   4  1.000000  0.000000  0.000000       17.52500            
+REMARK 290   SMTRY2   4  0.000000 -1.000000  0.000000       20.25000            
+REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000    
+"""
         assert_remark_290(parm, remark_290_lines)
 
         self.assertRaises(ValueError, lambda: Symmetry(np.arange(100).reshape(10, 10)))

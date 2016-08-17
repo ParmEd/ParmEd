@@ -312,7 +312,6 @@ class PDBFile(object):
         atom_overflow = False
         ZEROSET = set('0')
         altloc_ids = set()
-
         _symm_lines = []
 
         try:
@@ -763,7 +762,7 @@ class PDBFile(object):
         if struct.symmetry is not None:
             fmt = '%d%4d%10.6f%10.6f%10.6f%15.5f\n'
             for index, arr in enumerate(struct.symmetry.data):
-                arr_list = [1 + index % 3, 1 + int(index/3)] + arr.tolist()
+                arr_list = [1 + index % 3, 1 + index//3] + arr.tolist()
                 symm_line = "REMARK 290   SMTRY" + fmt % tuple(arr_list)
                 dest.write(symm_line)
         if coordinates is not None:
