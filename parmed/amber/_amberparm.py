@@ -267,7 +267,8 @@ class AmberParm(AmberFormat, Structure):
             inst.box = _copy.copy(rawdata.box)
         inst.hasbox = inst.box is not None
         inst.hasvels = inst.velocities is not None
-        inst._label_alternates()
+        if inst.pointers['NCOPY'] >= 2:
+            inst._label_alternates()
         return inst
 
     #===================================================
@@ -378,7 +379,8 @@ class AmberParm(AmberFormat, Structure):
                 dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
-        inst._label_alternates()
+        if inst.pointers['NCOPY'] >= 2:
+            inst._label_alternates()
 
         return inst
 
