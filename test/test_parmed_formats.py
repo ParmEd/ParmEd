@@ -5,9 +5,11 @@ from __future__ import division
 import utils
 
 import numpy as np
+import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
                     topologyobjects, Atom, write_PDB, write_CIF)
+from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
 from parmed.utils.six import iteritems, add_metaclass
@@ -961,6 +963,45 @@ class TestPDBStructure(FileIOTestCase):
         f = get_fn('pdb_format_test.pdb', written=True)
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
+
+    def test_pdb_write_symmetry_data(self):
+        def assert_remark_290(parm, remark_290_lines):
+            output = StringIO()
+            parm.write_pdb(output)
+            output.seek(0)
+            buffer = output.read()
+            for line in remark_290_lines.split():
+                self.assertTrue(line in buffer)
+
+        # 4lzt
+        pdbfile = get_fn('4lzt.pdb')
+        parm = pmd.load_file(pdbfile)
+        remark_290_lines = """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
+"""
+        assert_remark_290(parm, remark_290_lines)
+
+        # 2idg
+        parm = pmd.download_PDB('2igd')
+        remark_290_lines = """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
+REMARK 290   SMTRY1   2 -1.000000  0.000000  0.000000       17.52500            
+REMARK 290   SMTRY2   2  0.000000 -1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   2  0.000000  0.000000  1.000000       21.18500            
+REMARK 290   SMTRY1   3 -1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   3  0.000000  1.000000  0.000000       20.25000            
+REMARK 290   SMTRY3   3  0.000000  0.000000 -1.000000       21.18500            
+REMARK 290   SMTRY1   4  1.000000  0.000000  0.000000       17.52500            
+REMARK 290   SMTRY2   4  0.000000 -1.000000  0.000000       20.25000            
+REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000    
+"""
+        assert_remark_290(parm, remark_290_lines)
+
+        self.assertRaises(ValueError, lambda: Symmetry(np.arange(100).reshape(10, 10)))
 
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """

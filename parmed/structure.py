@@ -216,6 +216,8 @@ class Structure(object):
     coordinates : np.ndarray of shape (nframes, natom, 3)
         If no coordinates are set, this is set to None. The first frame will
         match the coordinates present on the atoms.
+    symmetry : :class:`Symmetry`
+        if no symmetry is set, this is set to None.
 
     Notes
     -----
@@ -297,6 +299,7 @@ class Structure(object):
         self.nrexcl = 3
         self.title = ''
         self._combining_rule = 'lorentz'
+        self.symmetry = None
 
     #===================================================
 
