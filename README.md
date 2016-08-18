@@ -63,7 +63,7 @@ Examples
 ```bash
 import parmed as pmd
 
-# converting GROMACS topology to AMBER format
+# convert GROMACS topology to AMBER format
 gmx_top = pmd.load_file('pmaawaterFE20mer2.top', xyz='pmaawaterFE20mer2.gro')
 gmx_top.save('pmaa.top', format='amber')
 gmx_top.save('pmaa.crd', format='rst7')
