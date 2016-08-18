@@ -574,7 +574,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml)
         ffxml.seek(0)
         output_lines = ffxml.readlines()
-        control_line1 = '  <Residue name="K" overload="1">\n'
+        control_line1 = '  <Residue name="K" override="1">\n'
         control_line2 = '  <Residue name="NA">\n'
         self.assertEqual(output_lines[5], control_line1)
         self.assertEqual(output_lines[8], control_line2)

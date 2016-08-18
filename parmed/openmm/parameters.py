@@ -277,7 +277,7 @@ class OpenMMParameterSet(ParameterSet):
             if residue.overload_level == 0:
                 dest.write('  <Residue name="%s">\n' % residue.name)
             else:
-                dest.write('  <Residue name="%s" overload="%d">\n' % (residue.name,
+                dest.write('  <Residue name="%s" override="%d">\n' % (residue.name,
                            residue.overload_level))
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
