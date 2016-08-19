@@ -240,7 +240,7 @@ class TestStructureSlicing(unittest.TestCase):
                 pdb2[list(range(len(pdb2.atoms)+1))])
         self.assertRaises(ValueError, lambda: pdb2[[0,len(pdb2.atoms)]])
         
-    def test_structure_box_space_group_and_symmetry(self):
+    def test_structure_box_and_space_group_and_symmetry(self):
         def assert_correctly_copy(parm):
             sliced_parm = parm['@1-3']
             np.testing.assert_equal(parm.box, sliced_parm.box)
@@ -249,9 +249,11 @@ class TestStructureSlicing(unittest.TestCase):
                 np.testing.assert_equal(parm.symmetry.data, sliced_parm.symmetry.data)
             else:
                 self.assertTrue(sliced_parm.symmetry is None)
-            print(parm, sliced_parm.box)
         # pdb
         parm = pmd.load_file(get_fn('4lzt.pdb'))
+        assert_correctly_copy(parm)
+        # pdb from rcsb
+        parm = pmd.download_PDB('2igd')
         assert_correctly_copy(parm)
         # cif
         parm = pmd.load_file(get_fn('sample.cif'))
@@ -273,6 +275,9 @@ class TestStructureSlicing(unittest.TestCase):
         assert_correctly_copy(parm)
         # mol2
         parm = pmd.load_file(get_fn('m2-c1_f3.mol2'), structure=True)
+        assert_correctly_copy(parm)
+        # pqr
+        parm = pmd.load_file(get_fn('adk_open.pqr'))
         assert_correctly_copy(parm)
 
 class TestStructureViewSlicing(unittest.TestCase):

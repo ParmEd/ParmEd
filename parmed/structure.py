@@ -1158,7 +1158,7 @@ class Structure(object):
             try:
                 struct.box = self.box
             except KeyError:
-                # will be updated in subclass?
+                # will be handled in subclass
                 pass
         struct.symmetry = self.symmetry
         struct.space_group = self.space_group
