@@ -10,11 +10,12 @@ from parmed.utils.six.moves import range, zip
 import random
 import unittest
 import utils
+from utils import get_fn
 
-parm = pmd.load_file(utils.get_fn('trx.prmtop'))
-pdb1 = pmd.load_file(utils.get_fn('4lzt.pdb'))
-pdb2 = pmd.load_file(utils.get_fn('1kip.cif'))
-parmep = pmd.load_file(utils.get_fn('tip4p.parm7'))
+parm = pmd.load_file(get_fn('trx.prmtop'))
+pdb1 = pmd.load_file(get_fn('4lzt.pdb'))
+pdb2 = pmd.load_file(get_fn('1kip.cif'))
+parmep = pmd.load_file(get_fn('tip4p.parm7'))
 
 class TestStructureSlicing(unittest.TestCase):
     """ Tests the fancy slicing/indexing of Structure """
@@ -238,6 +239,41 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertRaises(ValueError, lambda:
                 pdb2[list(range(len(pdb2.atoms)+1))])
         self.assertRaises(ValueError, lambda: pdb2[[0,len(pdb2.atoms)]])
+        
+    def test_structure_box_space_group_and_symmetry(self):
+        def assert_correctly_copy(parm):
+            sliced_parm = parm['@1-3']
+            np.testing.assert_equal(parm.box, sliced_parm.box)
+            self.assertEqual(parm.space_group, sliced_parm.space_group)
+            if parm.symmetry is not None:
+                np.testing.assert_equal(parm.symmetry.data, sliced_parm.symmetry.data)
+            else:
+                self.assertTrue(sliced_parm.symmetry is None)
+            print(parm, sliced_parm.box)
+        # pdb
+        parm = pmd.load_file(get_fn('4lzt.pdb'))
+        assert_correctly_copy(parm)
+        # cif
+        parm = pmd.load_file(get_fn('sample.cif'))
+        assert_correctly_copy(parm)
+        # LES parm7, no rst7
+        parm = pmd.load_file(get_fn('4lzt.les.parm7'))
+        assert_correctly_copy(parm)
+        # LES parm7, with rst7
+        parm = pmd.load_file(get_fn('4lzt.les.parm7'), xyz=get_fn('4lzt.les.rst7'))
+        assert_correctly_copy(parm)
+        # gro
+        parm = pmd.load_file(get_fn('1aki.charmm27.solv.gro'))
+        assert_correctly_copy(parm)
+        # amoeba: does slicing in original code works?
+        # parm = pmd.load_file(get_fn('amoeba.parm7'))
+        # assert_correctly_copy(parm)
+        # psf
+        parm = pmd.load_file(get_fn('4TVP-dmj_wat-ion.psf'))
+        assert_correctly_copy(parm)
+        # mol2
+        parm = pmd.load_file(get_fn('m2-c1_f3.mol2'), structure=True)
+        assert_correctly_copy(parm)
 
 class TestStructureViewSlicing(unittest.TestCase):
     """ Tests the fancy slicing/indexing of Structure """

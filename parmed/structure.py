@@ -1154,6 +1154,14 @@ class Structure(object):
                            ['atom1', 'atom2'])
         copy_valence_terms(struct.groups, [], self.groups, [],
                            ['atom', 'type', 'move'])
+        if self.box is not None:
+            try:
+                struct.box = self.box
+            except KeyError:
+                # will be updated in subclass?
+                pass
+        struct.symmetry = self.symmetry
+        struct.space_group = self.space_group
         return struct
 
     def _get_selection_array(self, selection):
