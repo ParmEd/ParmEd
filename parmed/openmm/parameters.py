@@ -272,11 +272,11 @@ class OpenMMParameterSet(ParameterSet):
             templhash = OpenMMParameterSet._templhasher(residue)
             if templhash in written_residues: continue
             written_residues.add(templhash)
-            if residue.overload_level == 0:
+            if residue.override_level == 0:
                 dest.write('  <Residue name="%s">\n' % residue.name)
             else:
                 dest.write('  <Residue name="%s" override="%d">\n' % (residue.name,
-                           residue.overload_level))
+                           residue.override_level))
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
