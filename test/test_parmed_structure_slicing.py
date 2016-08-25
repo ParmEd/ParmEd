@@ -241,14 +241,19 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertRaises(ValueError, lambda: pdb2[[0,len(pdb2.atoms)]])
         
     def test_structure_box_and_space_group_and_symmetry(self):
+        """ Test correctly copying box, space group and symmetry """
         def assert_correctly_copy(parm):
             sliced_parm = parm['@1-3']
-            np.testing.assert_equal(parm.box, sliced_parm.box)
-            self.assertEqual(parm.space_group, sliced_parm.space_group)
-            if parm.symmetry is not None:
-                np.testing.assert_equal(parm.symmetry.data, sliced_parm.symmetry.data)
+            if parm.box is None:
+                self.assertIs(sliced_parm.box, None)
             else:
-                self.assertTrue(sliced_parm.symmetry is None)
+                np.testing.assert_equal(parm.box, sliced_parm.box)
+            if parm.symmetry is None:
+                self.assertIs(sliced_parm.symmetry, None)
+            else:
+                np.testing.assert_equal(parm.symmetry.data, sliced_parm.symmetry.data)
+            self.assertEqual(parm.space_group, sliced_parm.space_group)
+
         # pdb
         parm = pmd.load_file(get_fn('4lzt.pdb'))
         assert_correctly_copy(parm)
@@ -263,6 +268,9 @@ class TestStructureSlicing(unittest.TestCase):
         assert_correctly_copy(parm)
         # LES parm7, with rst7
         parm = pmd.load_file(get_fn('4lzt.les.parm7'), xyz=get_fn('4lzt.les.rst7'))
+        assert_correctly_copy(parm)
+        # parm7, no box
+        parm = pmd.load_file(get_fn('ala_ala_ala.parm7'))
         assert_correctly_copy(parm)
         # gro
         parm = pmd.load_file(get_fn('1aki.charmm27.solv.gro'))
