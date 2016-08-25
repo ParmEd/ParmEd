@@ -239,7 +239,7 @@ class TestStructureSlicing(unittest.TestCase):
         self.assertRaises(ValueError, lambda:
                 pdb2[list(range(len(pdb2.atoms)+1))])
         self.assertRaises(ValueError, lambda: pdb2[[0,len(pdb2.atoms)]])
-        
+
     def test_structure_box_and_space_group_and_symmetry(self):
         """ Test correctly copying box, space group and symmetry """
         def assert_correctly_copy(parm):
@@ -275,9 +275,6 @@ class TestStructureSlicing(unittest.TestCase):
         # gro
         parm = pmd.load_file(get_fn('1aki.charmm27.solv.gro'))
         assert_correctly_copy(parm)
-        # amoeba: does slicing in original code works?
-        # parm = pmd.load_file(get_fn('amoeba.parm7'))
-        # assert_correctly_copy(parm)
         # psf
         parm = pmd.load_file(get_fn('4TVP-dmj_wat-ion.psf'))
         assert_correctly_copy(parm)
@@ -286,6 +283,9 @@ class TestStructureSlicing(unittest.TestCase):
         assert_correctly_copy(parm)
         # pqr
         parm = pmd.load_file(get_fn('adk_open.pqr'))
+        assert_correctly_copy(parm)
+        # chamber parm
+        parm = pmd.load_file(get_fn('ala_ala_ala.parm7'))
         assert_correctly_copy(parm)
 
 class TestStructureViewSlicing(unittest.TestCase):
