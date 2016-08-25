@@ -270,7 +270,7 @@ class TestStructureSlicing(unittest.TestCase):
         parm = pmd.load_file(get_fn('4lzt.les.parm7'), xyz=get_fn('4lzt.les.rst7'))
         assert_correctly_copy(parm)
         # parm7, no box
-        parm = pmd.load_file(get_fn('ala_ala_ala.parm7'))
+        parm = pmd.load_file(get_fn('ash.parm7'))
         assert_correctly_copy(parm)
         # gro
         parm = pmd.load_file(get_fn('1aki.charmm27.solv.gro'))
