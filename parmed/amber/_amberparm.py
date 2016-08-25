@@ -402,12 +402,7 @@ class AmberParm(AmberFormat, Structure):
         if isinstance(other, Atom):
             return other
         other.pointers = {}
-        other.LJ_types = self.LJ_types.copy()
-        other.LJ_radius = _copy.copy(self.LJ_radius)
-        other.LJ_depth = _copy.copy(self.LJ_depth)
-        for atom in other.atoms:
-            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        self._copy_lj_data(other)
         other._add_standard_flags()
         other.remake_parm()
         other._set_nonbonded_tables()
@@ -421,6 +416,15 @@ class AmberParm(AmberFormat, Structure):
             other.parm_data['LENNARD_JONES_CCOEF'] = \
                     self.parm_data['LENNARD_JONES_CCOEF'][:]
         return other
+
+    def _copy_lj_data(self, other):
+        """ Copies Lennard-Jones lists and dicts from myself to a copy """
+        other.LJ_types = self.LJ_types.copy()
+        other.LJ_radius = _copy.copy(self.LJ_radius)
+        other.LJ_depth = _copy.copy(self.LJ_depth)
+        for atom in other.atoms:
+            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
 
     #===================================================
 
@@ -2003,7 +2007,7 @@ class AmberParm(AmberFormat, Structure):
     #===================================================
 
     def _get_atom_collection_for_alternate_labels(self):
-        atom_collection = [defaultdict(list) for r in self.residues] 
+        atom_collection = [defaultdict(list) for r in self.residues]
 
         for adict, residue in zip(atom_collection, self.residues):
             for atom in residue.atoms:
