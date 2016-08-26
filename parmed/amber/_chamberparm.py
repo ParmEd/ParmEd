@@ -104,6 +104,17 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
+    def _copy_lj_data(self, other):
+        """ Copies Lennard-Jones lists and dicts from myself to a copy """
+        super(ChamberParm, self)._copy_lj_data(other)
+        other.LJ_14_radius = _copy.copy(self.LJ_14_radius)
+        other.LJ_14_depth = _copy.copy(self.LJ_14_depth)
+        for atom in other.atoms:
+            other.LJ_14_radius[atom.nb_idx-1] = atom.atom_type.rmin_14
+            other.LJ_14_depth[atom.nb_idx-1] = atom.atom_type.epsilon_14
+
+    #===================================================
+
     def load_pointers(self):
         """
         Loads the data in POINTERS section into a pointers dictionary with each
