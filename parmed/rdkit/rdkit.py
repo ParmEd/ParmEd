@@ -41,6 +41,10 @@ class RDKit(object):
         smiles : str, smiles
         coordinates : bool, default True
             if True, use `rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates
+
+        Returns
+        -------
+        parm : :class:`Structure`
         """
         from rdkit import Chem
         from rdkit.Chem import AllChem
@@ -55,3 +59,20 @@ class RDKit(object):
             parm.coordinates = None
             parm._coordinates = None
         return parm
+
+    @staticmethod
+    def from_sdf(filename):
+        """
+        Load SDF file to :class:`Structure`
+
+        Parameters
+        ----------
+        filename: str
+
+        Returns
+        -------
+        out : list of :class:`Structure`
+        """
+        from rdkit import Chem
+        sdf_collection = Chem.SDMolSupplier(filename, removeHs=False)
+        return [RDKit.load(mol) for mol in sdf_collection]
