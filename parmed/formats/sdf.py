@@ -1,6 +1,6 @@
 """
 This module contains parsers for sdf file format 
-extension described at [TODO] 
+extension described at https://www.cas.org/content/chemical-suppliers/example-sdf
 """
 from __future__ import print_function, division, absolute_import
 
