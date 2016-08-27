@@ -3,7 +3,6 @@ import sys
 import parmed as pmd
 import unittest
 import numpy as np
-from utils import get_fn
 
 try:
     import rdkit
