@@ -16,6 +16,7 @@ from parmed.utils.six import iteritems, add_metaclass
 from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
+import sys
 import unittest
 from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
                    HAS_GROMACS, FileIOTestCase)
@@ -26,6 +27,14 @@ def reset_stringio(io):
     io.seek(0)
     io.truncate()
     return io
+
+try:
+    import rdkit
+    has_rdkit = True
+except ImportError:
+    has_rdkit = False
+
+is_linux = sys.platform.startswith('linux')
 
 class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
@@ -232,6 +241,26 @@ class TestFileLoader(FileIOTestCase):
         crd = formats.load_file(get_fn('trx.prmtop'), natom=5827,
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberParm)
+
+    @unittest.skipUnless(has_rdkit and is_linux, "Only test load_rdkit module on Linux")
+    def test_load_sdf(self):
+        """ test load sdf format via rdkit """
+        sdffile = get_fn('test.sdf')
+        # structure = False
+        parmlist = pmd.load_file(sdffile)
+        self.assertIsInstance(parmlist, list)
+        self.assertEqual(len(parmlist[0].atoms), 34)
+        self.assertEqual(len(parmlist[1].atoms), 43)
+        np.testing.assert_almost_equal(parmlist[0].coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[0].coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[1].coordinates[0], [7.0468, -1.7307, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[1].coordinates[-1], [1.5269, 2.1331, 0.0000], decimal=3)
+        # structure = True
+        parm = pmd.load_file(sdffile, structure=True)
+        self.assertIsInstance(parm, Structure)
+        self.assertEqual(len(parm.atoms), 34)
+        np.testing.assert_almost_equal(parm.coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parm.coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
 
 class TestPDBStructure(FileIOTestCase):
 

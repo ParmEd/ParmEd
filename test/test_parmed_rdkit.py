@@ -41,14 +41,3 @@ class TestRDKit(unittest.TestCase):
         # coordinates = True (default)
         parm = pmd.rdkit.from_smiles(smiles)
         np.testing.assert_allclose(parm.coordinates[0], [-1.076,  0.83 ,  0.011])
-
-    def test_load_sdf(self):
-        """ test load rdkit from SDF format """
-        sdffile = get_fn('test.sdf')
-        parmlist = pmd.rdkit.from_sdf(sdffile)
-        self.assertEqual(len(parmlist[0].atoms), 34)
-        self.assertEqual(len(parmlist[1].atoms), 43)
-        np.testing.assert_almost_equal(parmlist[0].coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
-        np.testing.assert_almost_equal(parmlist[0].coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
-        np.testing.assert_almost_equal(parmlist[1].coordinates[0], [7.0468, -1.7307, 0.0000], decimal=3)
-        np.testing.assert_almost_equal(parmlist[1].coordinates[-1], [1.5269, 2.1331, 0.0000], decimal=3)

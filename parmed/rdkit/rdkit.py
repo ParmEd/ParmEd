@@ -61,18 +61,21 @@ class RDKit(object):
         return parm
 
     @staticmethod
-    def from_sdf(filename):
+    def from_sdf(filename, structure=False):
         """
         Load SDF file to :class:`Structure`
 
         Parameters
         ----------
         filename: str
-
-        Returns
-        -------
-        out : list of :class:`Structure`
+        structure : bool, default False
+            if True, return a :class:`Structure`
+            if False, return a list of :class:`Structure`
         """
         from rdkit import Chem
         sdf_collection = Chem.SDMolSupplier(filename, removeHs=False)
-        return [RDKit.load(mol) for mol in sdf_collection]
+        if structure:
+            mol = next(sdf_collection)
+            return RDKit.load(mol)
+        else:
+            return [RDKit.load(mol) for mol in sdf_collection]
