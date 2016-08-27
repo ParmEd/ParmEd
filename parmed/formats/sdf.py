@@ -31,7 +31,7 @@ class SDFFile(object):
         try:
             for line in f:
                 if not line.strip(): continue
-                if line.startswith('M  END') or  line.startswith('$$$$'):
+                if line.startswith('M  END') or line.startswith('$$$$'):
                     return True
                 else:
                     continue
