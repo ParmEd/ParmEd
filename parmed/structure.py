@@ -993,6 +993,24 @@ class Structure(object):
 
     #===================================================
 
+    def visualize(self, *args, **kwargs):
+        """Use nglview for visualization. This only works with Jupyter notebook
+
+        Examples
+        --------
+        >>> import parmed as pmd
+        >>> parm = pmd.download_PDB('1tsu')
+        >>> parm.visualize()
+
+        Parameters
+        ----------
+        args and kwargs : positional and keyword arguments given to nglview, optional
+        """
+        from nglview import show_parmed
+        return show_parmed(self, *args, **kwargs)
+
+    #===================================================
+
     def __getitem__(self, selection):
         """
         Allows extracting a single atom from the structure or a slice of atoms
