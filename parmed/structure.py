@@ -995,6 +995,7 @@ class Structure(object):
 
     def visualize(self, *args, **kwargs):
         """Use nglview for visualization. This only works with Jupyter notebook
+        and require to install `nglview`
 
         Examples
         --------
