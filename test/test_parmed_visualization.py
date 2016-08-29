@@ -50,3 +50,6 @@ class TestVisualization(unittest.TestCase):
         parm = pmd.load_file(get_fn('2koc.pdb'))
         view = parm.visualize()
         self.assertIsInstance(view, nglview.NGLWidget)
+        # test None
+        parm.coordinates = None
+        self.assertRaises(ValueError, parm.visualize)

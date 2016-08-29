@@ -1007,6 +1007,8 @@ class Structure(object):
         ----------
         args and kwargs : positional and keyword arguments given to nglview, optional
         """
+        if self.coordinates is None:
+            raise ValueError('coordinates must not be None')
         from nglview import show_parmed
         return show_parmed(self, *args, **kwargs)
 
