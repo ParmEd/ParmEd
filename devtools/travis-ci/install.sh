@@ -34,7 +34,7 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv boost==1.59.0 -c omnia
         # uninstall parmed from ambermd
         conda uninstall -y parmed -n myenv
-        conda install nglview -y -c bioconda
+        conda install -y -n myenv nglview -c bioconda
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes=1.0.0 \
