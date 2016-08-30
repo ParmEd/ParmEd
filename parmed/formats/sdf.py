@@ -3,6 +3,7 @@ This module contains parsers for sdf file format
 extension described at https://www.cas.org/content/chemical-suppliers/example-sdf
 """
 from __future__ import print_function, division, absolute_import
+import linecache
 
 from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
@@ -27,17 +28,11 @@ class SDFFile(object):
         is_fmt : bool
             True if it is a sdf file, False otherwise
         """
-        f = genopen(filename, 'r')
+        line = linecache.getline(filename, lineno=4)
         try:
-            for line in f:
-                if not line.strip(): continue
-                if line.startswith('M  END') or line.startswith('$$$$'):
-                    return True
-                else:
-                    continue
+            return line.split()[-1] in ['V2000', 'V3000']
+        except IndexError:
             return False
-        finally:
-            f.close()
 
     @staticmethod
     def parse(filename, structure=False):
