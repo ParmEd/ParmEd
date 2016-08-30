@@ -6,7 +6,6 @@ from __future__ import print_function, division, absolute_import
 import linecache
 
 from parmed.formats.registry import FileFormatType
-from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed import rdkit
 
