@@ -27,12 +27,8 @@ class SDFFile(object):
         is_fmt : bool
             True if it is a sdf file, False otherwise
         """
-        try:
-            words = linecache.getline(filename, lineno=4).split()
-            return len(words) >= 3 and words[-1] in ('V2000', 'V3000')
-        except IndexError:
-            # 4-th line is empty
-            return False
+        words = linecache.getline(filename, lineno=4).split()
+        return len(words) >= 3 and words[-1] in ('V2000', 'V3000')
 
     @staticmethod
     def parse(filename, structure=False):
