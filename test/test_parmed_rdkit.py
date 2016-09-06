@@ -17,6 +17,7 @@ class TestRDKit(unittest.TestCase):
     """ Tests loading of an rdkit Mol object """
 
     def test_load_rdkit_mol(self):
+        """ test load rdkit from Mol """
         from rdkit import Chem
         m1 = Chem.MolFromSmiles('C1=CC=CN=C1')
         parm = pmd.load_rdkit(m1)
@@ -25,6 +26,7 @@ class TestRDKit(unittest.TestCase):
         self.assertEqual(parm.residues[0].name, 'UNL')
 
     def test_load_smiles(self):
+        """ test load rdkit from smiles string """
         smiles = 'C1=CC=CN=C1'
 
         # coordinates = False

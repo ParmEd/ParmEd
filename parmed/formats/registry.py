@@ -102,6 +102,8 @@ def load_file(filename, *args, **kwargs):
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
 
+    SDF file is loaded via `rdkit` package. 
+
     Examples
     --------
 
@@ -136,6 +138,11 @@ def load_file(filename, *args, **kwargs):
 
     >>> load_file('1aki.ff99sbildn.top')
     <GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized>
+
+    Load a SDF file -- only works with rdkit installed
+
+    >>> load_file('mol.sdf', structure=True)
+    <Structure 34 atoms; 1 residues; 66 bonds; NOT parametrized>
 
     Raises
     ------
