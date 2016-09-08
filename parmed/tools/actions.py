@@ -2217,7 +2217,7 @@ class printLJMatrix(Action):
                 if bcoef == 0 or acoef == 0:
                     rij = eij = 0.0
                 else:
-                    rij = (2 * acoef / bcoef) ** (1 / 6)
+                    rij = (2 * acoef / bcoef) ** (1.0/6)
                     eij = (bcoef * bcoef / (4 * acoef))
                 if has_1264:
                     ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%15.6f %%10.6f %%10.6f\n' %
