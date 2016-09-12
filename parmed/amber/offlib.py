@@ -531,7 +531,7 @@ class AmberOFFLibrary(object):
             conn = [c, c+len(r)-1, 0, 0, 0, 0]
             if r.head is not None: conn[0] = r.head.idx + 1
             if r.tail is not None: conn[1] = r.tail.idx + 1
-            for i, at in enumerate(r.connections):
+            for i, at in enumerate(r.connections[:4]):
                 conn[i+2] = at.idx + 1
             dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
             c += len(r)
