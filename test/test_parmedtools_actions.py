@@ -346,6 +346,15 @@ class TestNonParmActions(FileIOTestCase):
         parm = a.parm
         for x, y in zip(parm.parm_data['BOX_DIMENSIONS'], [90] + [33]*3):
             self.assertEqual(x, y)
+        has_wat = False
+        for res in parm.residues:
+            self.assertNotEqual(res.name, 'TIP3')
+            if res.name == 'WAT':
+                has_wat = True
+                names = [a.name for a in res]
+                self.assertNotIn('OH2', names)
+                self.assertIn('O', names)
+        self.assertTrue(has_wat)
 
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromber(self):
