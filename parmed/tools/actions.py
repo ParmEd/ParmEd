@@ -3854,7 +3854,7 @@ class chamber(Action):
         elif self.box is not None:
             retstr += ' Box info %s.' % (self.box)
         retstr += ' GB Radius set %s.' % self.radii
-        if nosettle:
+        if self.nosettle:
             retstr += ' Not changing water names.'
         return retstr
 
