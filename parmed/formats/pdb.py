@@ -25,7 +25,7 @@ import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
+def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid, inscode):
     """
     Compares two atom instances, along with the residue name, number, and chain
     identifier, to determine if two atoms are actually the *same* atom, but
@@ -45,6 +45,8 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
         The chain identifier that the new atom would belong to
     segid : ``str``
         The segment identifier for the molecule
+    inscode : ``str``
+        The insertion code for the residue
 
     Returns
     -------
@@ -55,6 +57,7 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
     if old_atom.residue.number != resid: return False
     if old_atom.residue.chain != chain.strip(): return False
     if old_atom.residue.segid != segid.strip(): return False
+    if old_atom.residue.insertion_code != inscode.strip(): return False
     return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -443,8 +446,8 @@ class PDBFile(object):
                                 charge=chg, mass=mass, occupancy=occupancy,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
-                    if (_compare_atoms(last_atom, atom, resname,
-                                       resid, chain, segid) and altloc):
+                    if (_compare_atoms(last_atom, atom, resname, resid, chain,
+                                       segid, inscode) and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
                         altloc_ids.add(atom.number)
@@ -483,7 +486,7 @@ class PDBFile(object):
                         warnings.warn('Problem parsing residue number from '
                                       'ANISOU record', PDBWarning)
                         continue # Skip the rest of this record
-                    icode = line[27].strip()
+                    icode = line[26].strip()
                     try:
                         u11 = int(line[28:35])
                         u22 = int(line[35:42])
@@ -1221,7 +1224,7 @@ class CIFFile(object):
                                 altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
                 if (_compare_atoms(last_atom, atom, resname, resnum,
-                                   chain, '')
+                                   chain, '', inscode)
                         and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
