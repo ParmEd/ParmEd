@@ -1818,12 +1818,17 @@ Basic MD simulation
         parm7 = get_fn('ala_ala_ala.parm7')
         rst7 = get_fn('ala_ala_ala.rst7')
         parm = pmd.load_file(parm7, rst7)
-
         original_coordinates = parm.coordinates
+
         for igb in (0, 1, 2, 5, 6, 7, 8):
             arg_list = 'igb {} maxcyc 10'.format(igb)
             parm.coordinates = original_coordinates
             pmd.tools.minimize(parm, arg_list).execute()
+
+        def test_coordinates_is_None():
+            parm.coordinates = None
+            pmd.tools.minimize(parm, 'igb 8 maxcyc 10').execute()
+        self.assertRaises(exc.SimulationError, test_coordinates_is_None)
 
     @unittest.skipUnless(has_openmm, 'Cannot test minimize function without OpenMM')
     def test_minimize_openmm(self):
