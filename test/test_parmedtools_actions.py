@@ -19,6 +19,7 @@ import parmed.unit as u
 import parmed.tools as PT
 from parmed.tools import exceptions as exc
 from parmed.tools import parmlist
+from parmed.tools.simulations import sanderapi
 import re
 import saved_outputs as saved
 import sys
@@ -1795,6 +1796,31 @@ Basic MD simulation
         info = f.read()
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 23.01), 0.05)
+
+    def test_minimize_sanderapi(self):
+        """ Tests the minimize action with pysander and scipy """
+        # just want to make sure those minimizations runnable
+        parm7 = get_fn('ala_ala_ala.parm7')
+        rst7 = get_fn('ala_ala_ala.rst7')
+        parm = pmd.load_file(parm7, rst7)
+        original_coordinates = parm.coordinates
+        for igb in (1, 2, 5, 7, 8):
+            parm.coordinates = original_coordinates
+            sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+
+    @unittest.skipIf(sander is None, 'Cannot test amber minimization without pysander')
+    def test_minimize_from_action_tools(self):
+        """ Tests the minimize action with pysander and scipy """
+        # just want to make sure those minimizations runnable
+        parm7 = get_fn('ala_ala_ala.parm7')
+        rst7 = get_fn('ala_ala_ala.rst7')
+        parm = pmd.load_file(parm7, rst7)
+
+        original_coordinates = parm.coordinates
+        for igb in (0, 1, 2, 5, 6, 7, 8):
+            arg_list = 'igb {} maxcyc 10'.format(igb)
+            parm.coordinates = original_coordinates
+            pmd.tools.minimize(parm, arg_list).execute()
 
     @unittest.skipUnless(has_openmm, 'Cannot test minimize function without OpenMM')
     def test_minimize_openmm(self):
