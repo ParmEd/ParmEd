@@ -1807,6 +1807,9 @@ Basic MD simulation
         for igb in (1, 2, 5, 7, 8):
             parm.coordinates = original_coordinates
             sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+        def test_wrong_igb():
+            sanderapi.minimize(parm, igb=100, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+        self.assertRaises(exc.SimulationError, test_wrong_igb)
 
     @unittest.skipIf(sander is None, 'Cannot test amber minimization without pysander')
     def test_minimize_from_action_tools(self):
