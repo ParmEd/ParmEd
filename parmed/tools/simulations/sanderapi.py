@@ -131,4 +131,4 @@ def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
     if not results.success:
         print('Problem minimizing structure with scipy and sander:',
               file=sys.stderr)
-        print(b'\t' + results.message)
+        print('\t' + results.message.decode())
