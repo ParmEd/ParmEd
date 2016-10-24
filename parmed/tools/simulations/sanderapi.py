@@ -23,6 +23,12 @@ def energy(parm, args, output=sys.stdout):
     """
     Compute a single-point energy using sander and print the result to the
     desired output
+
+    Parameters
+    ----------
+    parm : Structure
+    args : ArgumentList
+    output : file handler, default sys.stdout
     """
     global HAS_SANDER
     if not HAS_SANDER:
