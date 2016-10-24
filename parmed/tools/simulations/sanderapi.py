@@ -103,7 +103,7 @@ def energy(parm, args, output=sys.stdout):
             output.write('     EHbond   = %20.7f' % e.hbond)
         output.write('\nTOTAL    = %20.7f\n' % e.tot)
 
-def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
+def minimize(parm, igb, saltcon, cutoff, tol, maxcyc, disp=True):
     """ Minimizes a snapshot. Use the existing System if it exists """
     if not HAS_SANDER:
         raise SimulationError('Could not import sander')
@@ -129,7 +129,7 @@ def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
         e, f = sander.energy_forces()
         return e.tot, -np.array(f)
     with sander.setup(parm, parm.coordinates, parm.box, inp):
-        options = dict(maxiter=maxcyc, disp=True, gtol=tol)
+        options = dict(maxiter=maxcyc, disp=disp, gtol=tol)
         results = optimize.minimize(energy_function, parm.coordinates,
                                     method='L-BFGS-B', jac=True,
                                     options=options)
