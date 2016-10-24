@@ -3500,7 +3500,7 @@ class energy(Action):
         import parmed as pmd
         parm = pmd.load_file('prmtop', xyz='rst7') 
         pmd.tools.energy(parm, 'igb 8').execute()
-        pmd.tools.energy(parm, 'igb 8').execute()
+
         # Using Openmm
         pmd.tools.energy(parm, 'igb 5 omm').execute()
     """
