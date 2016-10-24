@@ -1820,6 +1820,7 @@ Basic MD simulation
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
     def test_energy_HAS_SANDER_is_False(self):
+        """ Tests energy action with HAS_SANDER = False """ 
         parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         sanderapi.HAS_SANDER = False
         self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
