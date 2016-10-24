@@ -1797,6 +1797,7 @@ Basic MD simulation
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 23.01), 0.05)
 
+    @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     def test_minimize_sanderapi(self):
         """ Tests the minimize action with pysander and scipy """
         # just want to make sure those minimizations runnable
