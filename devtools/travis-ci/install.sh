@@ -20,6 +20,7 @@ else # Otherwise, CPython... go through conda
     bash miniconda.sh -b
 
     export PATH=$HOME/miniconda/bin:$PATH
+    conda update conda -y
     conda install --yes conda-build jinja2 binstar pip
     conda config --add channels omnia
     conda config --add channels ambermd
