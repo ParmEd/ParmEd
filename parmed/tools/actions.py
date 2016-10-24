@@ -3502,7 +3502,7 @@ class energy(Action):
         pmd.tools.energy(parm, 'igb 8').execute()
         pmd.tools.energy(parm, 'igb 8').execute()
         # Using Openmm
-        pmd.tools.energy(parm, 'igb 8 omm').execute()
+        pmd.tools.energy(parm, 'igb 5 omm').execute()
     """
     usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | [Ewald]] '
              '[nodisper] [omm] [applayer] [platform <platform>] [precision '
