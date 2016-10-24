@@ -20,6 +20,7 @@ import parmed.tools as PT
 from parmed.tools import exceptions as exc
 from parmed.tools import parmlist
 from parmed.tools.simulations import sanderapi
+from parmed.tools.actions import ArgumentList
 import re
 import saved_outputs as saved
 import sys
@@ -1815,6 +1816,22 @@ Basic MD simulation
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 12785.68), 0.05)
         self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
+
+    @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+    @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
+    def test_energy_HAS_SANDER_is_False(self):
+        parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
+        sanderapi.HAS_SANDER = False
+        self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
+        self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
+            saltcon=None, cutoff=None, tol=1E-2, maxcyc=10))
+        sanderapi.HAS_SANDER = True
+        sanderapi.HAS_SCIPY = False
+        self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
+            saltcon=0., cutoff=999., tol=1E-2, maxcyc=10))
+        # make sure we can compute energy if restore sander and scipy
+        sanderapi.HAS_SCIPY = True
+        sanderapi.minimize(parm, igb=1, saltcon=0., cutoff=999., tol=1E-2, maxcyc=10)
 
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     def test_minimize_sanderapi_implicit_solvent_minimization(self):
