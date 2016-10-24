@@ -34,7 +34,7 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
         conda install -y -n myenv boost==1.59.0 -c omnia
         # uninstall parmed from ambermd
-        conda uninstall -y parmed -n myenv
+        # conda uninstall -y parmed -n myenv
         conda install -y -n myenv nglview -c bioconda
     else
         # Do not install the full numpy/scipy stack
