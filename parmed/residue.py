@@ -280,7 +280,7 @@ T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN',
                                 'RT', 'RT3', 'RT5', 'RTN'])
 
 WATER_NAMES = set(['WAT', 'HOH', 'TIP3', 'TIP4',
-                     'TIP5', 'SPCE', 'SPC'])
+                   'TIP5', 'SPCE', 'SPC'])
 SOLVENT_NAMES = WATER_NAMES ^ set({'SOL'})
 EXTRA_POINT_NAMES = set(['EP', 'LP'])
 CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
