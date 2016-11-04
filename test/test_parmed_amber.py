@@ -1167,14 +1167,14 @@ class TestParameterFiles(FileIOTestCase):
         warnings.filterwarnings('ignore', category=AmberWarning)
         params = parameters.AmberParameterSet.from_leaprc(
                 os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd',
-                             'leaprc.ff14SB')
+                             'leaprc.protein.ff14SB')
         )
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['EP'].atomic_number, 0)
         self.assertTrue(params.residues)
         fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
-                          'cmd', 'leaprc.ff14SB')
+                          'cmd', 'leaprc.protein.ff14SB')
         with open(fn) as f:
             params = parameters.AmberParameterSet.from_leaprc(f)
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
