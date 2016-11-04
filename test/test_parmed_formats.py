@@ -935,15 +935,16 @@ class TestPDBStructure(FileIOTestCase):
     def test_pdb_write_standard_names_water(self):
         parm = formats.load_file(get_fn('nma.pdb'))
         resname_set = set(res.name for res in parm.residues)
-        assert 'WAT' in resname_set
+        self.assertIn('WAT', resname_set)
+        self.assertNotIn('HOH', resname_set)
         assert 'HOH' not in resname_set
         output = StringIO()
         parm.write_pdb(output, standard_resnames=True)
         output.seek(0)
         pdb = read_PDB(output)
         resname_set = set(res.name for res in pdb.residues)
-        assert 'WAT' not in resname_set
-        assert 'HOH' in resname_set
+        self.assertNotIn('WAT', resname_set)
+        self.assertIn('HOH', resname_set)
 
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
