@@ -89,6 +89,11 @@ class Action(lawsuit):
     interpreter map. There are a number of attributes that can refine the
     behavior of individual Actions in the interpreter:
 
+    Parameters
+    ----------
+    input_parm : Structure
+    arg_list : str or ArgumentList
+
     Attributes
     ----------
     stderr : file-like, optional
@@ -3487,6 +3492,17 @@ class energy(Action):
         - decompose : Print bond, angle, dihedral, and nonbonded energies
                       separately
         - applayer : Use OpenMM's class to compute the energy
+
+    Examples
+    --------
+    
+        # Using AMBER
+        import parmed as pmd
+        parm = pmd.load_file('prmtop', xyz='rst7') 
+        pmd.tools.energy(parm, 'igb 8').execute()
+
+        # Using Openmm
+        pmd.tools.energy(parm, 'igb 5 omm').execute()
     """
     usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | [Ewald]] '
              '[nodisper] [omm] [applayer] [platform <platform>] [precision '
