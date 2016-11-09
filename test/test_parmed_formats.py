@@ -932,6 +932,20 @@ class TestPDBStructure(FileIOTestCase):
                     residue.AminoAcidResidue.get(res.name).abbr, res.name
             )
 
+    def test_pdb_write_standard_names_water(self):
+        parm = formats.load_file(get_fn('nma.pdb'))
+        resname_set = set(res.name for res in parm.residues)
+        self.assertIn('WAT', resname_set)
+        self.assertNotIn('HOH', resname_set)
+        assert 'HOH' not in resname_set
+        output = StringIO()
+        parm.write_pdb(output, standard_resnames=True)
+        output.seek(0)
+        pdb = read_PDB(output)
+        resname_set = set(res.name for res in pdb.residues)
+        self.assertNotIn('WAT', resname_set)
+        self.assertIn('HOH', resname_set)
+
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
         pdbfile = read_PDB(self.pdb)
@@ -1063,6 +1077,8 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         self.assertEqual(formats.pdb._standardize_resname('RA'), ('A', False))
         self.assertEqual(formats.pdb._standardize_resname('DG'), ('DG', False))
         self.assertEqual(formats.pdb._standardize_resname('BLA'), ('BLA', True))
+        self.assertEqual(formats.pdb._standardize_resname('WAT'), ('HOH', True))
+        self.assertEqual(formats.pdb._standardize_resname('TIP3'), ('HOH', True))
 
     def test_deprecations(self):
         fn = get_fn('blah', written=True)

@@ -12,7 +12,7 @@ from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
-from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
 from parmed.modeller import StandardBiomolecularResidues
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint, Bond
@@ -73,7 +73,10 @@ def _standardize_resname(resname):
             try:
                 return DNAResidue.get(resname).abbr, False
             except KeyError:
-                return resname, True
+                if resname in WATER_NAMES:
+                    return 'HOH', True
+                else:
+                    return resname, True
 
 def _is_hetatm(resname):
     """ Sees if residue name is "standard", otherwise, we need to use HETATM to
