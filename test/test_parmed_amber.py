@@ -881,6 +881,12 @@ def _num_unique_dtypes(dct):
 class TestParameterFiles(FileIOTestCase):
     """ Tests Amber parameter and frcmod files """
 
+    def setUp(self):
+        warnings.filterwarnings('ignore', category=AmberWarning)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_find_amber_files(self):
         """ Tests the Amber file finder helper function """
@@ -945,7 +951,6 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(params.atom_types['C'].epsilon, 0.086)
         self.assertEqual(params.atom_types['CA'].rmin, 1.9061)
         self.assertEqual(params.atom_types['CA'].epsilon, 0.086)
-        warnings.filterwarnings('always', category=AmberWarning)
 
     def test_frcmod_with_tabstops(self):
         """ Test parsing an Amber frcmod file with tabs instead of spaces """
@@ -964,7 +969,6 @@ class TestParameterFiles(FileIOTestCase):
                         os.path.join(get_fn('parm'), 'parm14ipq.dat')
                 )
         )
-        warnings.filterwarnings('always', category=ParameterWarning)
 
     def _check_ff99sb(self, params):
         self.assertEqual(_num_unique_types(params.atom_types), 0)
@@ -1360,7 +1364,6 @@ class TestParameterFiles(FileIOTestCase):
         self.assertTrue(AmberOFFLibrary.id_format(fn))
         lib = AmberOFFLibrary.parse(fn)
         self.assertEqual(len(lib), 2)
-        warnings.filterwarnings('default', category=AmberWarning)
 
     def test_glycam_parsing(self):
         """ Tests reading GLYCAM parameter files (weird dihedrals) """
