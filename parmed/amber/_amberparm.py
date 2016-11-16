@@ -217,6 +217,8 @@ class AmberParm(AmberFormat, Structure):
             if not hasattr(f, 'coordinates') or f.coordinates is None:
                 raise TypeError('%s does not have coordinates' % xyz)
             self.coordinates = f.coordinates
+            if hasattr(f, 'velocities') and f.velocities is not None:
+                self.velocities = f.velocities
             if hasattr(f, 'box') and f.box is not None and box is None:
                 self.box = f.box
         else:
