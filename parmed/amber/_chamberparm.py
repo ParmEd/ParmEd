@@ -23,13 +23,14 @@ Boston, MA 02111-1307, USA.
 from __future__ import division, print_function
 
 from parmed.amber._amberparm import AmberParm
-from parmed.constants import NTYPES, NATYP, IFBOX, TINY, NATOM, SMALL
+from parmed.constants import (NTYPES, NATYP, IFBOX, TINY, NATOM, SMALL,
+                              DEG_TO_RAD, RAD_TO_DEG)
 from parmed.exceptions import AmberError, AmberWarning
 from parmed.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
                                     ImproperType, CmapType, ExtraPoint)
 from parmed.utils.six.moves import zip, range
 import copy as _copy
-from math import sqrt
+from math import sqrt, pi
 import warnings
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -363,6 +364,11 @@ class ChamberParm(AmberParm):
         del self.improper_types[:]
         for k, eq in zip(self.parm_data['CHARMM_IMPROPER_FORCE_CONSTANT'],
                          self.parm_data['CHARMM_IMPROPER_PHASE']):
+            # Previous versions of ParmEd stored improper phases as degrees,
+            # whereas it should really be stored in radians. So do a simple
+            # heuristic check to see if a conversion is necessary so we support
+            # all versions.
+            eq = eq if abs(eq) <= 2*pi else eq * RAD_TO_DEG
             self.improper_types.append(
                     ImproperType(k, eq, self.improper_types)
             )
@@ -468,7 +474,7 @@ class ChamberParm(AmberParm):
         data['CHARMM_IMPROPER_FORCE_CONSTANT'] = \
                 [type.psi_k for type in self.improper_types]
         data['CHARMM_IMPROPER_PHASE'] = \
-                [type.psi_eq for type in self.improper_types]
+                [type.psi_eq*DEG_TO_RAD for type in self.improper_types]
         data['CHARMM_IMPROPERS'] = improper_array = []
         for imp in self.impropers:
             improper_array.extend([imp.atom1.idx+1, imp.atom2.idx+1,
@@ -592,7 +598,7 @@ class ChamberParm(AmberParm):
         self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0,
                 comments=['K_psi: kcal/mole/rad**2'])
         self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0,
-                comments=['psi: degrees'])
+                comments=['psi: radians'])
         natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
         self.add_flag('SOLTY', '5E16.8', num_items=natyp)
         self.add_flag('LENNARD_JONES_ACOEF', '3E24.16', num_items=0)
