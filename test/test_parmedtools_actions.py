@@ -1817,47 +1817,47 @@ Basic MD simulation
         self.assertLess(abs(ene + 12785.68), 0.05)
         self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
 
-    @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-    @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
-    def test_energy_HAS_SANDER_is_False(self):
-        """ Tests energy action with HAS_SANDER = False """
-        parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
-        sanderapi.HAS_SANDER = False
-        self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
-        self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
-            saltcon=None, cutoff=None, tol=1E-2, maxcyc=10))
-        sanderapi.HAS_SANDER = True
-        sanderapi.HAS_SCIPY = False
-        self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
-            saltcon=0., cutoff=999., tol=1E-2, maxcyc=10))
-        # make sure we can compute energy if restore sander and scipy
-        sanderapi.HAS_SCIPY = True
-        sanderapi.minimize(parm, igb=1, saltcon=0., cutoff=999., tol=1E-2, maxcyc=10)
+#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+#   @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
+#   def test_energy_HAS_SANDER_is_False(self):
+#       """ Tests energy action with HAS_SANDER = False """
+#       parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
+#       sanderapi.HAS_SANDER = False
+#       self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
+#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
+#           saltcon=None, cutoff=None, tol=1E-2, maxcyc=10))
+#       sanderapi.HAS_SANDER = True
+#       sanderapi.HAS_SCIPY = False
+#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
+#           saltcon=0., cutoff=999., tol=1E-2, maxcyc=10))
+#       # make sure we can compute energy if restore sander and scipy
+#       sanderapi.HAS_SCIPY = True
+#       sanderapi.minimize(parm, igb=1, saltcon=0., cutoff=999., tol=1E-2, maxcyc=10)
 
-    @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-    def test_minimize_sanderapi_implicit_solvent_minimization(self):
-        """ Tests the minimize action with pysander and scipy """
-        # just want to make sure those minimizations runnable
-        parm7 = get_fn('ala_ala_ala.parm7')
-        rst7 = get_fn('ala_ala_ala.rst7')
-        parm = pmd.load_file(parm7, rst7)
-        original_coordinates = parm.coordinates
-        for igb in (0, 1, 2, 5, 7, 8):
-            parm.coordinates = original_coordinates
-            sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
-        def test_wrong_igb():
-            sanderapi.minimize(parm, igb=100, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
-        self.assertRaises(exc.SimulationError, test_wrong_igb)
+#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+#   def test_minimize_sanderapi_implicit_solvent_minimization(self):
+#       """ Tests the minimize action with pysander and scipy """
+#       # just want to make sure those minimizations runnable
+#       parm7 = get_fn('ala_ala_ala.parm7')
+#       rst7 = get_fn('ala_ala_ala.rst7')
+#       parm = pmd.load_file(parm7, rst7)
+#       original_coordinates = parm.coordinates
+#       for igb in (0, 1, 2, 5, 7, 8):
+#           parm.coordinates = original_coordinates
+#           sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+#       def test_wrong_igb():
+#           sanderapi.minimize(parm, igb=100, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+#       self.assertRaises(exc.SimulationError, test_wrong_igb)
 
-    @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-    def test_minimize_sanderapi_explicit_solvent_minimization(self):
-        """ Tests the minimize action with pysander and scipy """
-        # just want to make sure those minimizations runnable
-        parm7 = get_fn('ala3_solv.parm7')
-        rst7 = get_fn('ala3_solv.rst7')
-        parm = pmd.load_file(parm7, rst7)
-        sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=None, tol=1E-2, maxcyc=10)
-        sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=9., tol=1E-2, maxcyc=10)
+#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+#   def test_minimize_sanderapi_explicit_solvent_minimization(self):
+#       """ Tests the minimize action with pysander and scipy """
+#       # just want to make sure those minimizations runnable
+#       parm7 = get_fn('ala3_solv.parm7')
+#       rst7 = get_fn('ala3_solv.rst7')
+#       parm = pmd.load_file(parm7, rst7)
+#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=None, tol=1E-2, maxcyc=10)
+#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=9., tol=1E-2, maxcyc=10)
 
     @unittest.skipIf(sander is None, 'Cannot test amber minimization without pysander')
     def test_minimize_from_action_tools(self):
