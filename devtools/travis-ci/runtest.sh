@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 do_coverage() {
     echo "Combining coverage data"
