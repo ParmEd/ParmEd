@@ -1993,7 +1993,7 @@ class TestWriteFiles(FileIOTestCase):
         self.assertTrue(
                 diff_files(get_fn('test_fad.prmtop', written=True),
                            get_saved_fn('test_fad.prmtop.save'),
-                           absolute_error=1e-6)
+                           absolute_error=1e-4)
         )
 
     def test_save_amber_parm(self):
