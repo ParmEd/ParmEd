@@ -1803,7 +1803,7 @@ Basic MD simulation
         PT.energy(parm, 'igb 0').execute()
         parm.coordinates = None
         self.assertRaises(exc.SimulationError, lambda: PT.energy(parm).execute())
-        
+
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     def test_energy_sander_explicit_water(self):
         """ Tests energy action with sander """
@@ -1820,7 +1820,7 @@ Basic MD simulation
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
     def test_energy_HAS_SANDER_is_False(self):
-        """ Tests energy action with HAS_SANDER = False """ 
+        """ Tests energy action with HAS_SANDER = False """
         parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         sanderapi.HAS_SANDER = False
         self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
@@ -2189,14 +2189,14 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             self.assertTrue(hasattr(atom, 'xz'))
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
@@ -2205,14 +2205,14 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
