@@ -73,7 +73,7 @@ class AminoAcidResidue(BiomolecularResidue):
     Raises
     ------
     ValueError
-        If any aliases have the same abbreviation as *other* 
+        If any aliases have the same abbreviation as *other*
     """
     _all_residues_by_name = dict()
     _all_residues_by_abbr = dict()
@@ -191,7 +191,7 @@ class DNAResidue(BiomolecularResidue):
     def get(cls, key):
         """
         Gets the nucleic acid corresponding to either the residue name or
-        abbreviation. It is case-insensitive. 
+        abbreviation. It is case-insensitive.
 
         Parameters
         ----------
@@ -239,7 +239,7 @@ class RNAResidue(DNAResidue):
     def get(cls, key):
         """
         Gets the nucleic acid corresponding to either the residue name or
-        abbreviation. It is case-insensitive. 
+        abbreviation. It is case-insensitive.
 
         Parameters
         ----------
@@ -279,12 +279,10 @@ U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN', 'RU', 'RU3', 'RU5',
 T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN',
                                 'RT', 'RT3', 'RT5', 'RTN'])
 
-WATER_NAMES = set(['WAT', 'HOH', 'TIP3', 'TIP4',
-                   'TIP5', 'SPCE', 'SPC'])
-SOLVENT_NAMES = WATER_NAMES | set({'SOL'})
-EXTRA_POINT_NAMES = set(['EP', 'LP'])
-CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
-                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K',
-                    'NA+'])
-ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR', 'CL-'])
+WATER_NAMES = {'WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC'}
+SOLVENT_NAMES = WATER_NAMES | {'SOL'}
+EXTRA_POINT_NAMES = {'EP', 'LP'}
+CATION_NAMES = {'Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG2',
+                'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K', 'NA+'}
+ANION_NAMES = {'Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR', 'CL-'}
 ALLION_NAMES = CATION_NAMES | ANION_NAMES

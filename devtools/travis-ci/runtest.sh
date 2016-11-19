@@ -15,6 +15,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     eval "$(pyenv init -)"
 fi
 sh devtools/travis-ci/pyflakes_check.sh
+echo "Using ParmEd version `parmed --version`"
 cd test
 echo "Using nosetests...:"
 if [ "$PYTHON_VERSION" = "pypy" ]; then

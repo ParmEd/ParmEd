@@ -73,7 +73,7 @@ def _standardize_resname(resname):
             try:
                 return DNAResidue.get(resname).abbr, False
             except KeyError:
-                if resname in WATER_NAMES:
+                if resname.strip() in WATER_NAMES:
                     return 'HOH', True
                 else:
                     return resname, True

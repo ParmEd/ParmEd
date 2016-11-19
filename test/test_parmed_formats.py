@@ -933,6 +933,7 @@ class TestPDBStructure(FileIOTestCase):
             )
 
     def test_pdb_write_standard_names_water(self):
+        """ Test water residue name translation in PDB writing """
         parm = formats.load_file(get_fn('nma.pdb'))
         resname_set = set(res.name for res in parm.residues)
         self.assertIn('WAT', resname_set)
