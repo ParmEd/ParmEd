@@ -1116,50 +1116,54 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_parm_parsing_ljedit(self):
         """ Tests parsing an Amber parm.dat file with an LJEDIT section """
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'parm14ipq.dat')
-        )
-        self.assertEqual(_num_unique_types(params.atom_types), 74)
-        self.assertEqual(_num_unique_types(params.bond_types), 217)
-        self.assertEqual(_num_unique_types(params.angle_types), 724)
-        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 1848)
-        self.assertEqual(_num_unique_types(params.improper_periodic_types), 102)
-        self.assertEqual(_num_unique_types(params.nbfix_types), 6)
-        # Check a couple dihedral types, since this file has them disordered
-        d = params.dihedral_types[('TN', 'TG', 'C', 'N')]
-        self.assertEqual(len(d), 4)
-        self.assertEqual(d[0].phi_k, 0.04031)
-        self.assertEqual(d[0].per, 4)
-        self.assertEqual(d[0].phase, 0)
-        self.assertEqual(d[1].phi_k, 0.06853)
-        self.assertEqual(d[1].per, 3)
-        self.assertEqual(d[1].phase, 180)
-        self.assertEqual(d[2].phi_k, 0.19829)
-        self.assertEqual(d[2].per, 2)
-        self.assertEqual(d[2].phase, 180)
-        self.assertEqual(d[3].phi_k, 1.46258)
-        self.assertEqual(d[3].per, 1)
-        self.assertEqual(d[3].phase, 180)
-        # Check the nbfix types
-        self.assertEqual(params.nbfix_types[('O3', 'OW')][0],
-                         math.sqrt(0.162750*0.21))
-        self.assertEqual(params.nbfix_types[('O3', 'OW')][1],
-                         1.775931+1.8605)
-        self.assertEqual(params.nbfix_types[('OA', 'OW')][0],
-                         math.sqrt(0.162750*0.2104))
-        self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
-                         1.775931+1.66)
-        # Check inside an frcmod file
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'frcmod.2')
-        )
-        self.assertEqual(_num_unique_types(params.atom_types), 4)
-        self.assertEqual(_num_unique_types(params.bond_types), 0)
-        self.assertEqual(_num_unique_types(params.angle_types), 0)
-        self.assertEqual(_num_unique_types(params.dihedral_types), 0)
-        self.assertEqual(params.nbfix_types[('HC', 'OH')][0],
-                         math.sqrt(0.0150*0.2))
-        self.assertEqual(params.nbfix_types[('HC', 'OH')][1], 1.377+1.721)
+        warnings.filterwarnings('ignore', category=ParameterWarning)
+        try:
+            params = parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'parm14ipq.dat')
+            )
+            self.assertEqual(_num_unique_types(params.atom_types), 74)
+            self.assertEqual(_num_unique_types(params.bond_types), 217)
+            self.assertEqual(_num_unique_types(params.angle_types), 724)
+            self.assertEqual(_num_unique_dtypes(params.dihedral_types), 1848)
+            self.assertEqual(_num_unique_types(params.improper_periodic_types), 102)
+            self.assertEqual(_num_unique_types(params.nbfix_types), 6)
+            # Check a couple dihedral types, since this file has them disordered
+            d = params.dihedral_types[('TN', 'TG', 'C', 'N')]
+            self.assertEqual(len(d), 4)
+            self.assertEqual(d[0].phi_k, 0.04031)
+            self.assertEqual(d[0].per, 4)
+            self.assertEqual(d[0].phase, 0)
+            self.assertEqual(d[1].phi_k, 0.06853)
+            self.assertEqual(d[1].per, 3)
+            self.assertEqual(d[1].phase, 180)
+            self.assertEqual(d[2].phi_k, 0.19829)
+            self.assertEqual(d[2].per, 2)
+            self.assertEqual(d[2].phase, 180)
+            self.assertEqual(d[3].phi_k, 1.46258)
+            self.assertEqual(d[3].per, 1)
+            self.assertEqual(d[3].phase, 180)
+            # Check the nbfix types
+            self.assertEqual(params.nbfix_types[('O3', 'OW')][0],
+                             math.sqrt(0.162750*0.21))
+            self.assertEqual(params.nbfix_types[('O3', 'OW')][1],
+                             1.775931+1.8605)
+            self.assertEqual(params.nbfix_types[('OA', 'OW')][0],
+                             math.sqrt(0.162750*0.2104))
+            self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
+                             1.775931+1.66)
+            # Check inside an frcmod file
+            params = parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'frcmod.2')
+            )
+            self.assertEqual(_num_unique_types(params.atom_types), 4)
+            self.assertEqual(_num_unique_types(params.bond_types), 0)
+            self.assertEqual(_num_unique_types(params.angle_types), 0)
+            self.assertEqual(_num_unique_types(params.dihedral_types), 0)
+            self.assertEqual(params.nbfix_types[('HC', 'OH')][0],
+                             math.sqrt(0.0150*0.2))
+            self.assertEqual(params.nbfix_types[('HC', 'OH')][1], 1.377+1.721)
+        finally:
+            warnings.filterwarnings('always', category=ParameterWarning)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_load_leaprc(self):
@@ -1320,29 +1324,33 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_lib_with_box(self):
         """ Tests handling of OFF files with multiple residues and a box """
-        solvents = AmberOFFLibrary.parse(get_fn('solvents.lib'))
-        for res in solvents['TIP3PBOX']:
-            self.assertEqual(len(res.bonds), 3)
-            for atom in res.atoms:
-                self.assertEqual(len(atom.bonds), 2)
-        self.assertIsNot(solvents['TIP3PBOX'].box, None)
-        # Now create one
-        struct = readparm.LoadParm(get_fn('cyclohexane.parm7'),
-                                   get_fn('cyclohexane.md.rst7'))
-        self.assertIsNot(struct.box, None)
-        reslib = ResidueTemplateContainer.from_structure(struct)
-        reslib.name = 'CYCHBOX'
-        self.assertIsNot(reslib.box, None)
-        np.testing.assert_equal(struct.box, reslib.box)
-        # Now write an OFF file
-        fn = get_fn('test.lib', written=True)
-        AmberOFFLibrary.write(dict(CYCHBOX=reslib), fn)
-        # Now read it and make sure I have the appropriate bonds
-        lib2 = AmberOFFLibrary.parse(fn)
-        # All residues should have exactly the same number of bonds
-        self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
-        self.assertGreater(len(lib2['CYCHBOX'][0].bonds), 0)
-        np.testing.assert_allclose(lib2['CYCHBOX'].box, struct.box, atol=0.001)
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        try:
+            solvents = AmberOFFLibrary.parse(get_fn('solvents.lib'))
+            for res in solvents['TIP3PBOX']:
+                self.assertEqual(len(res.bonds), 3)
+                for atom in res.atoms:
+                    self.assertEqual(len(atom.bonds), 2)
+            self.assertIsNot(solvents['TIP3PBOX'].box, None)
+            # Now create one
+            struct = readparm.LoadParm(get_fn('cyclohexane.parm7'),
+                                       get_fn('cyclohexane.md.rst7'))
+            self.assertIsNot(struct.box, None)
+            reslib = ResidueTemplateContainer.from_structure(struct)
+            reslib.name = 'CYCHBOX'
+            self.assertIsNot(reslib.box, None)
+            np.testing.assert_equal(struct.box, reslib.box)
+            # Now write an OFF file
+            fn = get_fn('test.lib', written=True)
+            AmberOFFLibrary.write(dict(CYCHBOX=reslib), fn)
+            # Now read it and make sure I have the appropriate bonds
+            lib2 = AmberOFFLibrary.parse(fn)
+            # All residues should have exactly the same number of bonds
+            self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
+            self.assertGreater(len(lib2['CYCHBOX'][0].bonds), 0)
+            np.testing.assert_allclose(lib2['CYCHBOX'].box, struct.box, atol=0.001)
+        finally:
+            warnings.filterwarnings('always', category=AmberWarning)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):

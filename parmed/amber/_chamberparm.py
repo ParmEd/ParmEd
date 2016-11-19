@@ -368,7 +368,7 @@ class ChamberParm(AmberParm):
             # whereas it should really be stored in radians. So do a simple
             # heuristic check to see if a conversion is necessary so we support
             # all versions.
-            eq = eq if abs(eq) <= 2*pi else eq * RAD_TO_DEG
+            eq = eq * RAD_TO_DEG if abs(eq) <= 2*pi else eq
             self.improper_types.append(
                     ImproperType(k, eq, self.improper_types)
             )
@@ -378,6 +378,13 @@ class ChamberParm(AmberParm):
                     Improper(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
                              self.atoms[l-1], self.improper_types[m-1])
             )
+        # Make sure that if we have a comment in the CHARMM impropers, we fix it
+        # to say the units are in radians
+        for i in range(len(self.parm_comments.get('CHARMM_IMPROPER_PHASE', []))):
+            comment = self.parm_comments['CHARMM_IMPROPER_PHASE'][i]
+            if 'degrees' in comment:
+                self.parm_comments['CHARMM_IMPROPER_PHASE'][i] = \
+                        comment.replace('degrees', 'radians')
 
     #===================================================
 
