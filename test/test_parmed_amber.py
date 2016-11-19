@@ -1986,6 +1986,16 @@ class TestWriteFiles(FileIOTestCase):
             f1.close()
             f2.close()
 
+    def test_write_chamber_parm(self):
+        """ Checks for correct units in improper phase in chamber prmtop """
+        parm = readparm.ChamberParm(get_fn('test_fad.prmtop'))
+        parm.write_parm(get_fn('test_fad.prmtop', written=True))
+        self.assertTrue(
+                diff_files(get_fn('test_fad.prmtop', written=True),
+                           get_saved_fn('test_fad.prmtop.save'),
+                           absolute_error=1e-6)
+        )
+
     def test_save_amber_parm(self):
         """ Test writing AmberParm file with AmberParm.save """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
