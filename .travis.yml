@@ -20,8 +20,5 @@ matrix:
 
 install:
     - source devtools/travis-ci/install.sh
-      # install our package
     - python setup.py install
-
-script:
     - source devtools/travis-ci/runtest.sh
