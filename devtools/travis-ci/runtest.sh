@@ -39,3 +39,12 @@ if [ -z "$MINIMAL_PACKAGES" -a "$PYTHON_VERSION" != 'pypy' ]; then
     coveralls
 fi
 echo "Done!"
+
+# Workaround for annoying Travis failure on Macs
+type shell_session_update 2>&1 > /dev/null
+
+if [ $? -ne 0 ]; then
+  shell_session_update() {
+    echo "Faking shell_session_update"
+  }
+fi
