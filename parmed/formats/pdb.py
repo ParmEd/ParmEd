@@ -65,7 +65,7 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid, inscode):
 def _standardize_resname(resname):
     """ Looks up a standardized residue name for the given resname """
     try:
-        return AminoAcidResidue.get(resname).abbr, False
+        return AminoAcidResidue.get(resname, abbronly=True).abbr, False
     except KeyError:
         try:
             return RNAResidue.get(resname).abbr, False
@@ -1589,7 +1589,7 @@ def _needs_ter_card(res):
     """
     # First see if it's in the list of standard biomolecular residues. If so,
     # and it has no tail, no TER is needed
-    std_resname = _standardize_resname(res.name)
+    std_resname = _standardize_resname(res.name)[0]
     if std_resname in StandardBiomolecularResidues:
         is_std_res = True
         if StandardBiomolecularResidues[std_resname].tail is None:

@@ -101,7 +101,7 @@ class AminoAcidResidue(BiomolecularResidue):
                 self.symbol)
 
     @classmethod
-    def get(cls, key):
+    def get(cls, key, abbronly=False):
         """
         Gets the amino acid corresponding to either the residue name, 3-letter
         abbreviation or 1-letter symbol. It is case-insensitive.
@@ -110,6 +110,9 @@ class AminoAcidResidue(BiomolecularResidue):
         ----------
         key : str
             1-letter symbol, 3-letter abbreviation, or residue name
+        abbronly : bool
+            If True, only look for the 3-letter abbreviation (not the 1-letter
+            symbol)
 
         Returns
         -------
@@ -121,7 +124,7 @@ class AminoAcidResidue(BiomolecularResidue):
         KeyError if ``key`` is not a symbol, abbreviation, or case-insensitive
         name of an amino acid residue, or any of its abbreviations.
         """
-        if len(key) == 1:
+        if len(key) == 1 and not abbronly:
             return cls._all_residues_by_symbol[key.upper()]
         if len(key) == 3:
             return cls._all_residues_by_abbr[key.upper()]
