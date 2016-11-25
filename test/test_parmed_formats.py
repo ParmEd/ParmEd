@@ -1080,6 +1080,13 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         self.assertEqual(formats.pdb._standardize_resname('BLA'), ('BLA', True))
         self.assertEqual(formats.pdb._standardize_resname('WAT'), ('HOH', True))
         self.assertEqual(formats.pdb._standardize_resname('TIP3'), ('HOH', True))
+        # Make sure standard residues return themselves
+        for res in residue.AminoAcidResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
+        for res in residue.DNAResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
+        for res in residue.RNAResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
     def test_deprecations(self):
         fn = get_fn('blah', written=True)
