@@ -586,14 +586,18 @@ class ResidueTemplateContainer(list):
             # See if we need to decorate the termini names
             if rt.head is None and rt.tail is not None and term_decorate:
                 if AminoAcidResidue.has(rt.name):
-                    rt.name = 'N%s' % rt.name
+                    if len(rt.name) != 4 or rt.name[0] != 'N':
+                        rt.name = 'N%s' % rt.name
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
-                    rt.name = '%s5' % rt.name
+                    if rt.name[-1] != '5':
+                        rt.name = '%s5' % rt.name
             elif rt.tail is None and rt.head is not None and term_decorate:
                 if AminoAcidResidue.has(rt.name):
-                    rt.name = 'C%s' % rt.name
+                    if len(rt.name) != 4 or rt.name[0] != 'C':
+                        rt.name = 'C%s' % rt.name
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
-                    rt.name = '%s3' % rt.name
+                    if rt.name[-1] != '3':
+                        rt.name = '%s3' % rt.name
             inst.append(rt)
         inst.box = struct.box
         return inst
