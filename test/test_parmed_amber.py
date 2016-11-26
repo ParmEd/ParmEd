@@ -903,6 +903,7 @@ class TestParameterFiles(FileIOTestCase):
         fn = get_fn('test.frcmod', written=True)
         with open(fn, 'w') as f:
             f.write('\n\n\n\n\n\n')
+        self.assertFalse(parameters.AmberParameterSet.id_format(fn))
 
     def test_file_detection_parm(self):
         """ Tests the detection of Amber parm.dat files """

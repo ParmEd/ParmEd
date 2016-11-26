@@ -838,14 +838,14 @@ class AmberParameterSet(ParameterSet):
         # Write the LJ terms
         outfile.write('NONB\n')
         for atom, typ in iteritems(self.atom_types):
-            outfile.write('%s  %8.4f %8.4f\n' %
+            outfile.write('%s  %12.8f %12.8f\n' %
                           (atom.ljust(2), typ.rmin, typ.epsilon))
         outfile.write('\n')
         # Write the NBFIX terms
         if self.nbfix_types:
             outfile.write('LJEDIT\n')
             for (a1, a2), (eps, rmin) in iteritems(self.nbfix_types):
-                outfile.write('%s %s %8.3f %8.3f %8.3f %8.3f\n' %
+                outfile.write('%s %s %12.8f %12.8f %12.8f %12.8f\n' %
                               (a1.ljust(2), a2.ljust(2), eps, rmin/2,
                                eps, rmin/2))
 
