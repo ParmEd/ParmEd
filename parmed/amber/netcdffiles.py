@@ -326,8 +326,9 @@ class NetCDFRestart(object):
         return self._ncfile.variables['remd_dimtype'][:]
 
     def close(self):
-        self.closed = True
-        self._ncfile.close()
+        if not self.closed:
+            self.closed = True
+            self._ncfile.close()
 
     def __del__(self):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
@@ -771,8 +772,9 @@ class NetCDFTraj(object):
 
     def close(self):
         """ Closes the NetCDF file """
-        self._ncfile.close()
-        self.closed = True
+        if not self.closed:
+            self._ncfile.close()
+            self.closed = True
 
     def __del__(self):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
