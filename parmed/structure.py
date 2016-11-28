@@ -216,6 +216,8 @@ class Structure(object):
     coordinates : np.ndarray of shape (nframes, natom, 3)
         If no coordinates are set, this is set to None. The first frame will
         match the coordinates present on the atoms.
+    symmetry : :class:`Symmetry`
+        if no symmetry is set, this is set to None.
 
     Notes
     -----
@@ -297,6 +299,7 @@ class Structure(object):
         self.nrexcl = 3
         self.title = ''
         self._combining_rule = 'lorentz'
+        self.symmetry = None
 
     #===================================================
 
@@ -990,6 +993,27 @@ class Structure(object):
 
     #===================================================
 
+    def visualize(self, *args, **kwargs):
+        """Use nglview for visualization. This only works with Jupyter notebook
+        and require to install `nglview`
+
+        Examples
+        --------
+        >>> import parmed as pmd
+        >>> parm = pmd.download_PDB('1tsu')
+        >>> parm.visualize()
+
+        Parameters
+        ----------
+        args and kwargs : positional and keyword arguments given to nglview, optional
+        """
+        if self.coordinates is None:
+            raise ValueError('coordinates must not be None')
+        from nglview import show_parmed
+        return show_parmed(self, *args, **kwargs)
+
+    #===================================================
+
     def __getitem__(self, selection):
         """
         Allows extracting a single atom from the structure or a slice of atoms
@@ -1151,6 +1175,14 @@ class Structure(object):
                            ['atom1', 'atom2'])
         copy_valence_terms(struct.groups, [], self.groups, [],
                            ['atom', 'type', 'move'])
+        if self.box is not None:
+            try:
+                struct.box = self.box
+            except KeyError:
+                # will be handled in subclass
+                pass
+        struct.symmetry = self.symmetry
+        struct.space_group = self.space_group
         return struct
 
     def _get_selection_array(self, selection):
@@ -2932,6 +2964,11 @@ class Structure(object):
                                  'should not be here')
         for atom, parms in zip(self.atoms, gb_parms):
             force.addParticle([atom.charge] + list(parms))
+        try:
+            force.finalize()
+        except AttributeError:
+            # only new versions of omm require calling finalize
+            pass
         # Set cutoff method
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomGBForce.NoCutoff)

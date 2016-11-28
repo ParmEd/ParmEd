@@ -903,6 +903,7 @@ class TestParameterFiles(FileIOTestCase):
         fn = get_fn('test.frcmod', written=True)
         with open(fn, 'w') as f:
             f.write('\n\n\n\n\n\n')
+        self.assertFalse(parameters.AmberParameterSet.id_format(fn))
 
     def test_file_detection_parm(self):
         """ Tests the detection of Amber parm.dat files """
@@ -1116,50 +1117,54 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_parm_parsing_ljedit(self):
         """ Tests parsing an Amber parm.dat file with an LJEDIT section """
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'parm14ipq.dat')
-        )
-        self.assertEqual(_num_unique_types(params.atom_types), 74)
-        self.assertEqual(_num_unique_types(params.bond_types), 217)
-        self.assertEqual(_num_unique_types(params.angle_types), 724)
-        self.assertEqual(_num_unique_dtypes(params.dihedral_types), 1848)
-        self.assertEqual(_num_unique_types(params.improper_periodic_types), 102)
-        self.assertEqual(_num_unique_types(params.nbfix_types), 6)
-        # Check a couple dihedral types, since this file has them disordered
-        d = params.dihedral_types[('TN', 'TG', 'C', 'N')]
-        self.assertEqual(len(d), 4)
-        self.assertEqual(d[0].phi_k, 0.04031)
-        self.assertEqual(d[0].per, 4)
-        self.assertEqual(d[0].phase, 0)
-        self.assertEqual(d[1].phi_k, 0.06853)
-        self.assertEqual(d[1].per, 3)
-        self.assertEqual(d[1].phase, 180)
-        self.assertEqual(d[2].phi_k, 0.19829)
-        self.assertEqual(d[2].per, 2)
-        self.assertEqual(d[2].phase, 180)
-        self.assertEqual(d[3].phi_k, 1.46258)
-        self.assertEqual(d[3].per, 1)
-        self.assertEqual(d[3].phase, 180)
-        # Check the nbfix types
-        self.assertEqual(params.nbfix_types[('O3', 'OW')][0],
-                         math.sqrt(0.162750*0.21))
-        self.assertEqual(params.nbfix_types[('O3', 'OW')][1],
-                         1.775931+1.8605)
-        self.assertEqual(params.nbfix_types[('OA', 'OW')][0],
-                         math.sqrt(0.162750*0.2104))
-        self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
-                         1.775931+1.66)
-        # Check inside an frcmod file
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'frcmod.2')
-        )
-        self.assertEqual(_num_unique_types(params.atom_types), 4)
-        self.assertEqual(_num_unique_types(params.bond_types), 0)
-        self.assertEqual(_num_unique_types(params.angle_types), 0)
-        self.assertEqual(_num_unique_types(params.dihedral_types), 0)
-        self.assertEqual(params.nbfix_types[('HC', 'OH')][0],
-                         math.sqrt(0.0150*0.2))
-        self.assertEqual(params.nbfix_types[('HC', 'OH')][1], 1.377+1.721)
+        warnings.filterwarnings('ignore', category=ParameterWarning)
+        try:
+            params = parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'parm14ipq.dat')
+            )
+            self.assertEqual(_num_unique_types(params.atom_types), 74)
+            self.assertEqual(_num_unique_types(params.bond_types), 217)
+            self.assertEqual(_num_unique_types(params.angle_types), 724)
+            self.assertEqual(_num_unique_dtypes(params.dihedral_types), 1848)
+            self.assertEqual(_num_unique_types(params.improper_periodic_types), 102)
+            self.assertEqual(_num_unique_types(params.nbfix_types), 6)
+            # Check a couple dihedral types, since this file has them disordered
+            d = params.dihedral_types[('TN', 'TG', 'C', 'N')]
+            self.assertEqual(len(d), 4)
+            self.assertEqual(d[0].phi_k, 0.04031)
+            self.assertEqual(d[0].per, 4)
+            self.assertEqual(d[0].phase, 0)
+            self.assertEqual(d[1].phi_k, 0.06853)
+            self.assertEqual(d[1].per, 3)
+            self.assertEqual(d[1].phase, 180)
+            self.assertEqual(d[2].phi_k, 0.19829)
+            self.assertEqual(d[2].per, 2)
+            self.assertEqual(d[2].phase, 180)
+            self.assertEqual(d[3].phi_k, 1.46258)
+            self.assertEqual(d[3].per, 1)
+            self.assertEqual(d[3].phase, 180)
+            # Check the nbfix types
+            self.assertEqual(params.nbfix_types[('O3', 'OW')][0],
+                             math.sqrt(0.162750*0.21))
+            self.assertEqual(params.nbfix_types[('O3', 'OW')][1],
+                             1.775931+1.8605)
+            self.assertEqual(params.nbfix_types[('OA', 'OW')][0],
+                             math.sqrt(0.162750*0.2104))
+            self.assertEqual(params.nbfix_types[('OA', 'OW')][1],
+                             1.775931+1.66)
+            # Check inside an frcmod file
+            params = parameters.AmberParameterSet(
+                    os.path.join(get_fn('parm'), 'frcmod.2')
+            )
+            self.assertEqual(_num_unique_types(params.atom_types), 4)
+            self.assertEqual(_num_unique_types(params.bond_types), 0)
+            self.assertEqual(_num_unique_types(params.angle_types), 0)
+            self.assertEqual(_num_unique_types(params.dihedral_types), 0)
+            self.assertEqual(params.nbfix_types[('HC', 'OH')][0],
+                             math.sqrt(0.0150*0.2))
+            self.assertEqual(params.nbfix_types[('HC', 'OH')][1], 1.377+1.721)
+        finally:
+            warnings.filterwarnings('always', category=ParameterWarning)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_load_leaprc(self):
@@ -1167,14 +1172,14 @@ class TestParameterFiles(FileIOTestCase):
         warnings.filterwarnings('ignore', category=AmberWarning)
         params = parameters.AmberParameterSet.from_leaprc(
                 os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'cmd',
-                             'leaprc.ff14SB')
+                             'leaprc.protein.ff14SB')
         )
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
         self.assertEqual(params.atom_types['3C'].atomic_number, 6)
         self.assertEqual(params.atom_types['EP'].atomic_number, 0)
         self.assertTrue(params.residues)
         fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap',
-                          'cmd', 'leaprc.ff14SB')
+                          'cmd', 'leaprc.protein.ff14SB')
         with open(fn) as f:
             params = parameters.AmberParameterSet.from_leaprc(f)
         self.assertEqual(params.atom_types['H'].atomic_number, 1)
@@ -1273,25 +1278,6 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_private_functions(self):
         """ Test some of the private utility functions in AmberParameterSet """
-        improper_key = parameters.AmberParameterSet._periodic_improper_key
-        # Construct an improper with 4 atoms
-        a1 = topologyobjects.Atom(name='CA', type='CA')
-        a2 = topologyobjects.Atom(name='CB', type='CB')
-        a3 = topologyobjects.Atom(name='CC', type='CD')
-        a4 = topologyobjects.Atom(name='CD', type='CC')
-        bonds = [topologyobjects.Bond(a1, a3), topologyobjects.Bond(a2, a3),
-                 topologyobjects.Bond(a3, a4)]
-        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a4, a3, a2, a1), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a1, a4, a2, a3), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a2, a4, a1, a3), ('CA', 'CB', 'CD', 'CC'))
-        # Now have no connectivity, check fallback
-        a1 = topologyobjects.Atom(name='CA', type='CA')
-        a2 = topologyobjects.Atom(name='CB', type='CB')
-        a3 = topologyobjects.Atom(name='CC', type='CD')
-        a4 = topologyobjects.Atom(name='CD', type='CC')
-        self.assertEqual(improper_key(a1, a2, a3, a4), ('CA', 'CB', 'CD', 'CC'))
-        self.assertEqual(improper_key(a4, a3, a2, a1), ('CC', 'CD', 'CB', 'CA'))
         # Check on AmberParm._truncate_array
         parm = readparm.AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         parm._truncate_array('ATOM_NAME', 2)
@@ -1339,29 +1325,33 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_lib_with_box(self):
         """ Tests handling of OFF files with multiple residues and a box """
-        solvents = AmberOFFLibrary.parse(get_fn('solvents.lib'))
-        for res in solvents['TIP3PBOX']:
-            self.assertEqual(len(res.bonds), 3)
-            for atom in res.atoms:
-                self.assertEqual(len(atom.bonds), 2)
-        self.assertIsNot(solvents['TIP3PBOX'].box, None)
-        # Now create one
-        struct = readparm.LoadParm(get_fn('cyclohexane.parm7'),
-                                   get_fn('cyclohexane.md.rst7'))
-        self.assertIsNot(struct.box, None)
-        reslib = ResidueTemplateContainer.from_structure(struct)
-        reslib.name = 'CYCHBOX'
-        self.assertIsNot(reslib.box, None)
-        np.testing.assert_equal(struct.box, reslib.box)
-        # Now write an OFF file
-        fn = get_fn('test.lib', written=True)
-        AmberOFFLibrary.write(dict(CYCHBOX=reslib), fn)
-        # Now read it and make sure I have the appropriate bonds
-        lib2 = AmberOFFLibrary.parse(fn)
-        # All residues should have exactly the same number of bonds
-        self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
-        self.assertGreater(len(lib2['CYCHBOX'][0].bonds), 0)
-        np.testing.assert_allclose(lib2['CYCHBOX'].box, struct.box, atol=0.001)
+        warnings.filterwarnings('ignore', category=AmberWarning)
+        try:
+            solvents = AmberOFFLibrary.parse(get_fn('solvents.lib'))
+            for res in solvents['TIP3PBOX']:
+                self.assertEqual(len(res.bonds), 3)
+                for atom in res.atoms:
+                    self.assertEqual(len(atom.bonds), 2)
+            self.assertIsNot(solvents['TIP3PBOX'].box, None)
+            # Now create one
+            struct = readparm.LoadParm(get_fn('cyclohexane.parm7'),
+                                       get_fn('cyclohexane.md.rst7'))
+            self.assertIsNot(struct.box, None)
+            reslib = ResidueTemplateContainer.from_structure(struct)
+            reslib.name = 'CYCHBOX'
+            self.assertIsNot(reslib.box, None)
+            np.testing.assert_equal(struct.box, reslib.box)
+            # Now write an OFF file
+            fn = get_fn('test.lib', written=True)
+            AmberOFFLibrary.write(dict(CYCHBOX=reslib), fn)
+            # Now read it and make sure I have the appropriate bonds
+            lib2 = AmberOFFLibrary.parse(fn)
+            # All residues should have exactly the same number of bonds
+            self.assertEqual(len({len(x.bonds) for x in lib2['CYCHBOX']}), 1)
+            self.assertGreater(len(lib2['CYCHBOX'][0].bonds), 0)
+            np.testing.assert_allclose(lib2['CYCHBOX'].box, struct.box, atol=0.001)
+        finally:
+            warnings.filterwarnings('always', category=AmberWarning)
 
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
@@ -2005,6 +1995,16 @@ class TestWriteFiles(FileIOTestCase):
             f1.close()
             f2.close()
 
+    def test_write_chamber_parm(self):
+        """ Checks for correct units in improper phase in chamber prmtop """
+        parm = readparm.ChamberParm(get_fn('test_fad.prmtop'))
+        parm.write_parm(get_fn('test_fad.prmtop', written=True))
+        self.assertTrue(
+                diff_files(get_fn('test_fad.prmtop', written=True),
+                           get_saved_fn('test_fad.prmtop.save'),
+                           absolute_error=1e-4)
+        )
+
     def test_save_amber_parm(self):
         """ Test writing AmberParm file with AmberParm.save """
         parm = readparm.AmberParm(get_fn('trx.prmtop'))
@@ -2014,6 +2014,30 @@ class TestWriteFiles(FileIOTestCase):
         parm.save(get_fn('trx.prmtop', written=True))
         parm2 = readparm.AmberParm(get_fn('trx.prmtop', written=True))
         self.assertIn('NEW_FLAG', parm2.parm_data)
+
+    def test_write_pdb_with_LES_parm(self):
+        output = StringIO()
+        saved_pdb = get_fn('4lzt.les.pdb')
+        rst7_name = get_fn('4lzt.les.rst7')
+        parm_name = get_fn('4lzt.les.parm7')
+        parm = pmd.load_file(parm_name, rst7_name)
+        parm.write_pdb(output)
+        output.seek(0)
+        new_parm = pmd.read_PDB(output)
+        saved_parm = pmd.load_file(saved_pdb)
+
+        for new_atom, saved_atom  in zip(new_parm.atoms, saved_parm.atoms):
+            if saved_atom.other_locations:
+                self.assertTrue(new_atom.other_locations)
+
+        # make sure the labels are added, only pick two atoms since we already
+        # tested above
+        output.seek(0)
+        buffer = output.read()
+        self.assertIn('ATOM     18  HE2ALYS     1      -0.780   9.159  10.504',
+                buffer)
+        self.assertIn('ATOM     23  NZ BLYS     1      -0.618   8.282   8.901',
+                buffer)
 
     def test_amber_restart(self):
         """ Test writing an ASCII Amber restart file """

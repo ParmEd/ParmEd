@@ -12,10 +12,11 @@ from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
 from parmed.formats.registry import FileFormatType
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
-from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
 from parmed.modeller import StandardBiomolecularResidues
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint, Bond
+from parmed.symmetry import Symmetry
 from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
 from parmed.utils.six.moves import range
@@ -24,7 +25,7 @@ import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
+def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid, inscode):
     """
     Compares two atom instances, along with the residue name, number, and chain
     identifier, to determine if two atoms are actually the *same* atom, but
@@ -44,6 +45,8 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
         The chain identifier that the new atom would belong to
     segid : ``str``
         The segment identifier for the molecule
+    inscode : ``str``
+        The insertion code for the residue
 
     Returns
     -------
@@ -54,6 +57,7 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
     if old_atom.residue.number != resid: return False
     if old_atom.residue.chain != chain.strip(): return False
     if old_atom.residue.segid != segid.strip(): return False
+    if old_atom.residue.insertion_code != inscode.strip(): return False
     return True
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -61,7 +65,7 @@ def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid):
 def _standardize_resname(resname):
     """ Looks up a standardized residue name for the given resname """
     try:
-        return AminoAcidResidue.get(resname).abbr, False
+        return AminoAcidResidue.get(resname, abbronly=True).abbr, False
     except KeyError:
         try:
             return RNAResidue.get(resname).abbr, False
@@ -69,7 +73,10 @@ def _standardize_resname(resname):
             try:
                 return DNAResidue.get(resname).abbr, False
             except KeyError:
-                return resname, True
+                if resname.strip() in WATER_NAMES:
+                    return 'HOH', True
+                else:
+                    return resname, True
 
 def _is_hetatm(resname):
     """ Sees if residue name is "standard", otherwise, we need to use HETATM to
@@ -311,9 +318,12 @@ class PDBFile(object):
         atom_overflow = False
         ZEROSET = set('0')
         altloc_ids = set()
+        _symmetry_lines = []
 
         try:
             for line in fileobj:
+                if 'REMARK 290   SMTRY' in line:
+                    _symmetry_lines.append(line)
                 rec = line[:6]
                 if rec == 'ATOM  ' or rec == 'HETATM':
                     atomno += 1
@@ -439,8 +449,8 @@ class PDBFile(object):
                                 charge=chg, mass=mass, occupancy=occupancy,
                                 bfactor=bfactor, altloc=altloc, number=atnum)
                     atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
-                    if (_compare_atoms(last_atom, atom, resname,
-                                       resid, chain, segid) and altloc):
+                    if (_compare_atoms(last_atom, atom, resname, resid, chain,
+                                       segid, inscode) and altloc):
                         atom.residue = last_atom.residue
                         last_atom.other_locations[altloc] = atom
                         altloc_ids.add(atom.number)
@@ -479,7 +489,7 @@ class PDBFile(object):
                         warnings.warn('Problem parsing residue number from '
                                       'ANISOU record', PDBWarning)
                         continue # Skip the rest of this record
-                    icode = line[27].strip()
+                    icode = line[26].strip()
                     try:
                         u11 = int(line[28:35])
                         u22 = int(line[35:42])
@@ -654,6 +664,14 @@ class PDBFile(object):
             all_coordinates.append(coordinates)
         struct._coordinates = np.array(all_coordinates).reshape(
                         (-1, len(struct.atoms), 3))
+        # process symmetry lines
+        if _symmetry_lines:
+            data = []
+            for line in _symmetry_lines:
+                if line.strip().startswith('REMARK 290   SMTRY'):
+                    data.append(line.split()[4:])
+            tensor = np.asarray(data, dtype='f8')
+            struct.symmetry = Symmetry(tensor)
         return struct
 
     #===================================================
@@ -705,6 +723,13 @@ class PDBFile(object):
         standard_resnames : bool, optional, default False
             If True, common aliases for various amino and nucleic acid residues
             will be converted into the PDB-standard values.
+
+        Notes
+        -----
+        If multiple coordinate frames are present, these will be written as
+        separate models (but only the unit cell from the first model will be
+        written, as the PDB standard dictates that only one set of unit cells
+        shall be present).
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -739,6 +764,12 @@ class PDBFile(object):
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
                     struct.box[4], struct.box[5], struct.space_group, ''))
+        if struct.symmetry is not None:
+            fmt = '%d%4d%10.6f%10.6f%10.6f%15.5f\n'
+            for index, arr in enumerate(struct.symmetry.data):
+                arr_list = [1 + index % 3, 1 + index//3] + arr.tolist()
+                symm_line = "REMARK 290   SMTRY" + fmt % tuple(arr_list)
+                dest.write(symm_line)
         if coordinates is not None:
             coords = np.array(coordinates, copy=False, subok=True)
             try:
@@ -1196,7 +1227,7 @@ class CIFFile(object):
                                 altloc=altloc, number=atnum)
                 atom.xx, atom.xy, atom.xz = x, y, z
                 if (_compare_atoms(last_atom, atom, resname, resnum,
-                                   chain, '')
+                                   chain, '', inscode)
                         and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
@@ -1287,6 +1318,9 @@ class CIFFile(object):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
                                       'B-factors. Skipping', PDBWarning)
+            symmetry_obj = cont.getObj('symmetry')
+            if symmetry_obj is not None:
+                struct.space_group = symmetry_obj.getRow(0)[1]
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
@@ -1351,6 +1385,13 @@ class CIFFile(object):
         standard_resnames : bool, optional
             If True, common aliases for various amino and nucleic acid residues
             will be converted into the PDB-standard values. Default is False
+
+        Notes
+        -----
+        If multiple coordinate frames are present, these will be written as
+        separate models (but only the unit cell from the first model will be
+        written, as the PDBx standard dictates that only one set of unit cells
+        shall be present).
         """
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
@@ -1548,7 +1589,7 @@ def _needs_ter_card(res):
     """
     # First see if it's in the list of standard biomolecular residues. If so,
     # and it has no tail, no TER is needed
-    std_resname = _standardize_resname(res.name)
+    std_resname = _standardize_resname(res.name)[0]
     if std_resname in StandardBiomolecularResidues:
         is_std_res = True
         if StandardBiomolecularResidues[std_resname].tail is None:

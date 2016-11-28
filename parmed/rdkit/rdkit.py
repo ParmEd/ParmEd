@@ -32,10 +32,50 @@ class RDKit(object):
         return PDBFile.parse(fh)
 
     @staticmethod
-    def from_smiles(smiles):
+    def from_smiles(smiles, coordinates=True):
         """
         Load smiles string to :class:`Structure`
+
+        Parameters
+        ----------
+        smiles : str, smiles
+        coordinates : bool, default True
+            if True, use `rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates
+
+        Returns
+        -------
+        parm : :class:`Structure`
         """
         from rdkit import Chem
-        return RDKit.load(Chem.MolFromSmiles(smiles))
+        from rdkit.Chem import AllChem
+        mol = Chem.MolFromSmiles(smiles)
 
+        if coordinates:
+            AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True,
+                    useBasicKnowledge=True)
+
+        parm = RDKit.load(mol)
+        if not coordinates:
+            parm.coordinates = None
+            parm._coordinates = None
+        return parm
+
+    @staticmethod
+    def from_sdf(filename, structure=False):
+        """
+        Load SDF file to :class:`Structure`
+
+        Parameters
+        ----------
+        filename: str
+        structure : bool, default False
+            if True, return a :class:`Structure`
+            if False, return a list of :class:`Structure`
+        """
+        from rdkit import Chem
+        sdf_collection = Chem.SDMolSupplier(filename, removeHs=False)
+        if structure:
+            mol = next(sdf_collection)
+            return RDKit.load(mol)
+        else:
+            return [RDKit.load(mol) for mol in sdf_collection]

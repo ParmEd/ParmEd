@@ -6,7 +6,6 @@ from parmed.charmm import CharmmPsfFile
 # TODO -- move this functionality to a more centralized location
 from parmed.charmm.psf import set_molecules
 from parmed.formats.registry import FileFormatType
-from parmed.utils import canonical_improper_order
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types
 from parmed.utils.six.moves import range
@@ -75,7 +74,7 @@ class PSFFile(object):
             attribute, it will be used to print the PSF file. Otherwise, it will
             be treated like a string and a file will be opened, printed, then
             closed
-        vmd : bool 
+        vmd : bool
             If True, it will write out a PSF in the format that VMD prints it in
             (i.e., no NUMLP/NUMLPH or MOLNT sections)
 
@@ -89,6 +88,16 @@ class PSFFile(object):
             ext = 'EXT' in struct.flags
         except AttributeError:
             ext = True
+        # See if this is an XPLOR format
+        try:
+            xplor = 'XPLOR' in struct.flags
+        except AttributeError:
+            for atom in struct.atoms:
+                if isinstance(atom.type, string_types):
+                    xplor = True
+                    break
+            else:
+                xplor = False
         own_handle = False
         # Index the atoms and residues TODO delete
         if isinstance(dest, string_types):
@@ -111,6 +120,8 @@ class PSFFile(object):
             dest.write(' '.join(f for f in struct.flags if f not in ('CHEQ',)))
         else:
             dest.write('EXT') # EXT is always active if no flags present
+            if xplor:
+                dest.write(' XPLOR')
         dest.write('\n\n')
         if isinstance(struct.title, string_types):
             dest.write(intfmt % 1 + ' !NTITLE\n')
@@ -200,11 +211,7 @@ class PSFFile(object):
                 yield (imp.atom1, imp.atom2, imp.atom3, imp.atom4)
             for dih in struct.dihedrals:
                 if dih.improper:
-                    # Central atom first
-                    yield canonical_improper_order(
-                            dih.atom3, dih.atom1, dih.atom2,
-                            dih.atom4, center=1,
-                    )
+                    yield (dih.atom1, dih.atom2, dih.atom3, dih.atom4)
         for i, (a1, a2, a3, a4) in enumerate(improp_gen(struct)):
             dest.write((intfmt*4) % (a1.idx+1, a2.idx+1, a3.idx+1, a4.idx+1))
             if i % 2 == 1: # Write 2 dihedrals per line

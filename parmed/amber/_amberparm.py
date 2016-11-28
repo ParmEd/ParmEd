@@ -217,6 +217,8 @@ class AmberParm(AmberFormat, Structure):
             if not hasattr(f, 'coordinates') or f.coordinates is None:
                 raise TypeError('%s does not have coordinates' % xyz)
             self.coordinates = f.coordinates
+            if hasattr(f, 'velocities') and f.velocities is not None:
+                self.velocities = f.velocities
             if hasattr(f, 'box') and f.box is not None and box is None:
                 self.box = f.box
         else:
@@ -267,6 +269,9 @@ class AmberParm(AmberFormat, Structure):
             inst.box = _copy.copy(rawdata.box)
         inst.hasbox = inst.box is not None
         inst.hasvels = inst.velocities is not None
+        n_copy = inst.pointers.get('NCOPY', 1)
+        if n_copy >= 2:
+            inst._label_alternates()
         return inst
 
     #===================================================
@@ -377,6 +382,9 @@ class AmberParm(AmberFormat, Structure):
                 dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
+        n_copy = inst.pointers.get('NCOPY', 1)
+        if n_copy >= 2:
+            inst._label_alternates()
 
         return inst
 
@@ -396,12 +404,7 @@ class AmberParm(AmberFormat, Structure):
         if isinstance(other, Atom):
             return other
         other.pointers = {}
-        other.LJ_types = self.LJ_types.copy()
-        other.LJ_radius = _copy.copy(self.LJ_radius)
-        other.LJ_depth = _copy.copy(self.LJ_depth)
-        for atom in other.atoms:
-            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        self._copy_lj_data(other)
         other._add_standard_flags()
         other.remake_parm()
         other._set_nonbonded_tables()
@@ -415,6 +418,15 @@ class AmberParm(AmberFormat, Structure):
             other.parm_data['LENNARD_JONES_CCOEF'] = \
                     self.parm_data['LENNARD_JONES_CCOEF'][:]
         return other
+
+    def _copy_lj_data(self, other):
+        """ Copies Lennard-Jones lists and dicts from myself to a copy """
+        other.LJ_types = self.LJ_types.copy()
+        other.LJ_radius = _copy.copy(self.LJ_radius)
+        other.LJ_depth = _copy.copy(self.LJ_depth)
+        for atom in other.atoms:
+            other.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            other.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
 
     #===================================================
 
@@ -1993,6 +2005,27 @@ class AmberParm(AmberFormat, Structure):
                      'most-used values scee=%f scnb=%f' % (scee, scnb),
                      AmberWarning)
         return n13, n14
+
+    #===================================================
+
+    def _get_atom_collection_for_alternate_labels(self):
+        atom_collection = [defaultdict(list) for r in self.residues]
+
+        for adict, residue in zip(atom_collection, self.residues):
+            for atom in residue.atoms:
+                adict[atom.name].append(atom)
+        return atom_collection
+
+    def _label_alternates(self):
+        atom_collection = self._get_atom_collection_for_alternate_labels()
+        possible_labels = list('ABCDEF')
+
+        for _, adict in enumerate(atom_collection):
+            for atom_name, atom_list in iteritems(adict):
+                if len(atom_list) > 1:
+                    for i, atom in enumerate(atom_list):
+                        label = possible_labels[i%len(possible_labels)]
+                        atom.altloc = label
 
     #===================================================
 

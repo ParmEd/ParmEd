@@ -19,6 +19,8 @@ import parmed.unit as u
 import parmed.tools as PT
 from parmed.tools import exceptions as exc
 from parmed.tools import parmlist
+from parmed.tools.simulations import sanderapi
+from parmed.tools.actions import ArgumentList
 import re
 import saved_outputs as saved
 import sys
@@ -346,6 +348,15 @@ class TestNonParmActions(FileIOTestCase):
         parm = a.parm
         for x, y in zip(parm.parm_data['BOX_DIMENSIONS'], [90] + [33]*3):
             self.assertEqual(x, y)
+        has_wat = False
+        for res in parm.residues:
+            self.assertNotEqual(res.name, 'TIP3')
+            if res.name == 'WAT':
+                has_wat = True
+                names = [a.name for a in res]
+                self.assertNotIn('OH2', names)
+                self.assertIn('O', names)
+        self.assertTrue(has_wat)
 
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromber(self):
@@ -1776,8 +1787,8 @@ Basic MD simulation
         self.assertLess(abs(ene + 23.01), 0.05)
 
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-    def test_energy_sander(self):
-        """ Tests the energy action with sander """
+    def test_energy_sander_gb(self):
+        """ Tests gb energy action with sander """
         parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
         f = StringIO()
         PT.energy.output = f
@@ -1786,6 +1797,86 @@ Basic MD simulation
         info = f.read()
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 23.01), 0.05)
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'igb 100').execute())
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'saltcon -0.2').execute())
+        PT.energy(parm, 'igb 0').execute()
+        parm.coordinates = None
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm).execute())
+
+    @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+    def test_energy_sander_explicit_water(self):
+        """ Tests energy action with sander """
+        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        f = StringIO()
+        PT.energy.output = f
+        PT.energy(parm).execute()
+        f.seek(0)
+        info = f.read()
+        ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
+        self.assertLess(abs(ene + 12785.68), 0.05)
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
+
+#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+#   @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
+#   def test_energy_HAS_SANDER_is_False(self):
+#       """ Tests energy action with HAS_SANDER = False """
+#       parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
+#       sanderapi.HAS_SANDER = False
+#       self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
+#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
+#           saltcon=None, cutoff=None, tol=1E-2, maxcyc=10))
+#       sanderapi.HAS_SANDER = True
+#       sanderapi.HAS_SCIPY = False
+#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
+#           saltcon=0., cutoff=999., tol=1E-2, maxcyc=10))
+#       # make sure we can compute energy if restore sander and scipy
+#       sanderapi.HAS_SCIPY = True
+#       sanderapi.minimize(parm, igb=1, saltcon=0., cutoff=999., tol=1E-2, maxcyc=10)
+
+#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+#   def test_minimize_sanderapi_implicit_solvent_minimization(self):
+#       """ Tests the minimize action with pysander and scipy """
+#       # just want to make sure those minimizations runnable
+#       parm7 = get_fn('ala_ala_ala.parm7')
+#       rst7 = get_fn('ala_ala_ala.rst7')
+#       parm = pmd.load_file(parm7, rst7)
+#       original_coordinates = parm.coordinates
+#       for igb in (0, 1, 2, 5, 7, 8):
+#           parm.coordinates = original_coordinates
+#           sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+#       def test_wrong_igb():
+#           sanderapi.minimize(parm, igb=100, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
+#       self.assertRaises(exc.SimulationError, test_wrong_igb)
+
+#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
+#   def test_minimize_sanderapi_explicit_solvent_minimization(self):
+#       """ Tests the minimize action with pysander and scipy """
+#       # just want to make sure those minimizations runnable
+#       parm7 = get_fn('ala3_solv.parm7')
+#       rst7 = get_fn('ala3_solv.rst7')
+#       parm = pmd.load_file(parm7, rst7)
+#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=None, tol=1E-2, maxcyc=10)
+#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=9., tol=1E-2, maxcyc=10)
+
+    @unittest.skipIf(sander is None, 'Cannot test amber minimization without pysander')
+    def test_minimize_from_action_tools(self):
+        """ Tests the minimize action with pysander and scipy """
+        # just want to make sure those minimizations runnable
+        parm7 = get_fn('ala_ala_ala.parm7')
+        rst7 = get_fn('ala_ala_ala.rst7')
+        parm = pmd.load_file(parm7, rst7)
+        original_coordinates = parm.coordinates
+
+        for igb in (0, 1, 2, 5, 6, 7, 8):
+            arg_list = 'igb {} maxcyc 10'.format(igb)
+            parm.coordinates = original_coordinates
+            pmd.tools.minimize(parm, arg_list).execute()
+
+        def test_coordinates_is_None():
+            parm.coordinates = None
+            pmd.tools.minimize(parm, 'igb 8 maxcyc 10').execute()
+        self.assertRaises(exc.SimulationError, test_coordinates_is_None)
 
     @unittest.skipUnless(has_openmm, 'Cannot test minimize function without OpenMM')
     def test_minimize_openmm(self):
@@ -2098,14 +2189,14 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             self.assertTrue(hasattr(atom, 'xz'))
         PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self._empty_writes()
         PT.parmout(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
@@ -2114,14 +2205,14 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self._empty_writes()
         PT.outparm(parm, get_fn('test.parm7', written=True),
                          get_fn('test.rst7', written=True)).execute()
         self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.parm7'),
+        self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
                                    get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),

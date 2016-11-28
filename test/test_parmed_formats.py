@@ -5,15 +5,18 @@ from __future__ import division
 import utils
 
 import numpy as np
+import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
                     topologyobjects, Atom, write_PDB, write_CIF)
+from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
 from parmed.utils.six import iteritems, add_metaclass
 from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
+import sys
 import unittest
 from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
                    HAS_GROMACS, FileIOTestCase)
@@ -24,6 +27,14 @@ def reset_stringio(io):
     io.seek(0)
     io.truncate()
     return io
+
+try:
+    import rdkit
+    has_rdkit = True
+except ImportError:
+    has_rdkit = False
+
+is_linux = sys.platform.startswith('linux')
 
 class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
@@ -231,6 +242,26 @@ class TestFileLoader(FileIOTestCase):
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberParm)
 
+    @unittest.skipUnless(has_rdkit and is_linux, "Only test load_rdkit module on Linux")
+    def test_load_sdf(self):
+        """ test load sdf format via rdkit """
+        sdffile = get_fn('test.sdf')
+        # structure = False
+        parmlist = pmd.load_file(sdffile)
+        self.assertIsInstance(parmlist, list)
+        self.assertEqual(len(parmlist[0].atoms), 34)
+        self.assertEqual(len(parmlist[1].atoms), 43)
+        np.testing.assert_almost_equal(parmlist[0].coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[0].coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[1].coordinates[0], [7.0468, -1.7307, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[1].coordinates[-1], [1.5269, 2.1331, 0.0000], decimal=3)
+        # structure = True
+        parm = pmd.load_file(sdffile, structure=True)
+        self.assertIsInstance(parm, Structure)
+        self.assertEqual(len(parm.atoms), 34)
+        np.testing.assert_almost_equal(parm.coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parm.coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
+
 class TestPDBStructure(FileIOTestCase):
 
     def setUp(self):
@@ -252,6 +283,10 @@ class TestPDBStructure(FileIOTestCase):
     def tearDown(self):
         warnings.filterwarnings('always', category=exceptions.PDBWarning)
         FileIOTestCase.tearDown(self)
+
+    def test_pdb_anisou_inscode(self):
+        """ Tests that PDB files with ANISOU records on inscodes work """
+        download_PDB('1gdu')
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
@@ -897,6 +932,21 @@ class TestPDBStructure(FileIOTestCase):
                     residue.AminoAcidResidue.get(res.name).abbr, res.name
             )
 
+    def test_pdb_write_standard_names_water(self):
+        """ Test water residue name translation in PDB writing """
+        parm = formats.load_file(get_fn('nma.pdb'))
+        resname_set = set(res.name for res in parm.residues)
+        self.assertIn('WAT', resname_set)
+        self.assertNotIn('HOH', resname_set)
+        assert 'HOH' not in resname_set
+        output = StringIO()
+        parm.write_pdb(output, standard_resnames=True)
+        output.seek(0)
+        pdb = read_PDB(output)
+        resname_set = set(res.name for res in pdb.residues)
+        self.assertNotIn('WAT', resname_set)
+        self.assertIn('HOH', resname_set)
+
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
         pdbfile = read_PDB(self.pdb)
@@ -962,6 +1012,45 @@ class TestPDBStructure(FileIOTestCase):
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
+    def test_pdb_write_symmetry_data(self):
+        def assert_remark_290(parm, remark_290_lines):
+            output = StringIO()
+            parm.write_pdb(output)
+            output.seek(0)
+            buffer = output.read()
+            for line in remark_290_lines.split():
+                self.assertTrue(line in buffer)
+
+        # 4lzt
+        pdbfile = get_fn('4lzt.pdb')
+        parm = pmd.load_file(pdbfile)
+        remark_290_lines = """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
+"""
+        assert_remark_290(parm, remark_290_lines)
+
+        # 2idg
+        parm = pmd.download_PDB('2igd')
+        remark_290_lines = """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
+REMARK 290   SMTRY1   2 -1.000000  0.000000  0.000000       17.52500
+REMARK 290   SMTRY2   2  0.000000 -1.000000  0.000000        0.00000
+REMARK 290   SMTRY3   2  0.000000  0.000000  1.000000       21.18500
+REMARK 290   SMTRY1   3 -1.000000  0.000000  0.000000        0.00000
+REMARK 290   SMTRY2   3  0.000000  1.000000  0.000000       20.25000
+REMARK 290   SMTRY3   3  0.000000  0.000000 -1.000000       21.18500
+REMARK 290   SMTRY1   4  1.000000  0.000000  0.000000       17.52500
+REMARK 290   SMTRY2   4  0.000000 -1.000000  0.000000       20.25000
+REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
+"""
+        assert_remark_290(parm, remark_290_lines)
+
+        self.assertRaises(ValueError, lambda: Symmetry(np.arange(100).reshape(10, 10)))
+
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
         pdbfile = read_PDB(self.overflow2, skip_bonds=True) # Big file... skip bond check
@@ -989,6 +1078,15 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(formats.pdb._standardize_resname('RA'), ('A', False))
         self.assertEqual(formats.pdb._standardize_resname('DG'), ('DG', False))
         self.assertEqual(formats.pdb._standardize_resname('BLA'), ('BLA', True))
+        self.assertEqual(formats.pdb._standardize_resname('WAT'), ('HOH', True))
+        self.assertEqual(formats.pdb._standardize_resname('TIP3'), ('HOH', True))
+        # Make sure standard residues return themselves
+        for res in residue.AminoAcidResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
+        for res in residue.DNAResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
+        for res in residue.RNAResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
     def test_deprecations(self):
         fn = get_fn('blah', written=True)

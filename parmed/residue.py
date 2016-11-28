@@ -73,7 +73,7 @@ class AminoAcidResidue(BiomolecularResidue):
     Raises
     ------
     ValueError
-        If any aliases have the same abbreviation as *other* 
+        If any aliases have the same abbreviation as *other*
     """
     _all_residues_by_name = dict()
     _all_residues_by_abbr = dict()
@@ -101,7 +101,7 @@ class AminoAcidResidue(BiomolecularResidue):
                 self.symbol)
 
     @classmethod
-    def get(cls, key):
+    def get(cls, key, abbronly=False):
         """
         Gets the amino acid corresponding to either the residue name, 3-letter
         abbreviation or 1-letter symbol. It is case-insensitive.
@@ -110,6 +110,9 @@ class AminoAcidResidue(BiomolecularResidue):
         ----------
         key : str
             1-letter symbol, 3-letter abbreviation, or residue name
+        abbronly : bool
+            If True, only look for the 3-letter abbreviation (not the 1-letter
+            symbol)
 
         Returns
         -------
@@ -121,7 +124,7 @@ class AminoAcidResidue(BiomolecularResidue):
         KeyError if ``key`` is not a symbol, abbreviation, or case-insensitive
         name of an amino acid residue, or any of its abbreviations.
         """
-        if len(key) == 1:
+        if len(key) == 1 and not abbronly:
             return cls._all_residues_by_symbol[key.upper()]
         if len(key) == 3:
             return cls._all_residues_by_abbr[key.upper()]
@@ -191,7 +194,7 @@ class DNAResidue(BiomolecularResidue):
     def get(cls, key):
         """
         Gets the nucleic acid corresponding to either the residue name or
-        abbreviation. It is case-insensitive. 
+        abbreviation. It is case-insensitive.
 
         Parameters
         ----------
@@ -239,7 +242,7 @@ class RNAResidue(DNAResidue):
     def get(cls, key):
         """
         Gets the nucleic acid corresponding to either the residue name or
-        abbreviation. It is case-insensitive. 
+        abbreviation. It is case-insensitive.
 
         Parameters
         ----------
@@ -279,11 +282,10 @@ U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN', 'RU', 'RU3', 'RU5',
 T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN',
                                 'RT', 'RT3', 'RT5', 'RTN'])
 
-SOLVENT_NAMES = set(['WAT', 'HOH', 'TIP3', 'SOL',
-                     'TIP4', 'TIP5', 'SPCE', 'SPC'])
-EXTRA_POINT_NAMES = set(['EP', 'LP'])
-CATION_NAMES = set(['Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD',
-                    'MG2', 'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K',
-                    'NA+'])
-ANION_NAMES = set(['Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR', 'CL-'])
+WATER_NAMES = {'WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC'}
+SOLVENT_NAMES = WATER_NAMES | {'SOL'}
+EXTRA_POINT_NAMES = {'EP', 'LP'}
+CATION_NAMES = {'Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG2',
+                'CAL', 'RUB', 'LIT', 'ZN2', 'CD2', 'NA', 'K+', 'K', 'NA+'}
+ANION_NAMES = {'Cl-', 'Br-', 'F-', 'I-', 'CLA', 'CL', 'BR', 'CL-'}
 ALLION_NAMES = CATION_NAMES | ANION_NAMES

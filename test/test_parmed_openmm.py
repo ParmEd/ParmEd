@@ -560,8 +560,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 16)
 
-    def test_overload_level(self):
-        """Test correct support for the overload_level attribute of
+    def test_override_level(self):
+        """Test correct support for the override_level attribute of
            ResidueTemplates and correct writing to XML tag"""
         params = openmm.OpenMMParameterSet.from_parameterset(
                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
@@ -569,13 +569,13 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         new_residues = OrderedDict()
         new_residues['K'] = params.residues['K']
         new_residues['NA'] = params.residues['NA']
-        new_residues['K'].overload_level = 1
+        new_residues['K'].override_level = 1
         params.residues = new_residues
         ffxml = StringIO()
         params.write(ffxml)
         ffxml.seek(0)
         output_lines = ffxml.readlines()
-        control_line1 = '  <Residue name="K" overload="1">\n'
+        control_line1 = '  <Residue name="K" override="1">\n'
         control_line2 = '  <Residue name="NA">\n'
         self.assertEqual(output_lines[5], control_line1)
         self.assertEqual(output_lines[8], control_line2)

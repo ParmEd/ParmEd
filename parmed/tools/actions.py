@@ -89,6 +89,11 @@ class Action(lawsuit):
     interpreter map. There are a number of attributes that can refine the
     behavior of individual Actions in the interpreter:
 
+    Parameters
+    ----------
+    input_parm : Structure
+    arg_list : str or ArgumentList
+
     Attributes
     ----------
     stderr : file-like, optional
@@ -3487,6 +3492,17 @@ class energy(Action):
         - decompose : Print bond, angle, dihedral, and nonbonded energies
                       separately
         - applayer : Use OpenMM's class to compute the energy
+
+    Examples
+    --------
+    
+        # Using AMBER
+        import parmed as pmd
+        parm = pmd.load_file('prmtop', xyz='rst7') 
+        pmd.tools.energy(parm, 'igb 8').execute()
+
+        # Using Openmm
+        pmd.tools.energy(parm, 'igb 5 omm').execute()
     """
     usage = ('[cutoff <cut>] [[igb <IGB>] [saltcon <conc>] | [Ewald]] '
              '[nodisper] [omm] [applayer] [platform <platform>] [precision '
@@ -3717,7 +3733,8 @@ class chamber(Action):
         - -radii      Implicit solvent solvation radii. <radiusset> can be
                       amber6, bondi, mbondi, mbondi2, mbondi3
                       Same effect as the changeRadii command. Default is mbondi.
-        - nocondense  This no longer has any effect and is ignored.
+        - nosettle    This avoids changing the names of the water residue and
+                      oxygen atoms from TIP3 and OH2 to WAT and O
 
     If the PDB file has a CRYST1 record, the box information will be set from
     there. Any box info given on the command-line will override the box found in
@@ -3725,7 +3742,7 @@ class chamber(Action):
     """
     usage = ('-top <RTF> -param <PAR> [-str <STR>] -psf <PSF> [-crd <CRD>] '
              '[-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii '
-             '<radiusset>]')
+             '<radiusset>] [nosettle]')
     needs_parm = False
 
     def init(self, arg_list):
@@ -3828,6 +3845,7 @@ class chamber(Action):
             raise InputError('Illegal radius set %s -- must be one of '
                              '%s' % (self.radii, ', '.join(GB_RADII)))
         arg_list.has_key('nocondense')
+        self.nosettle = arg_list.has_key('nosettle')
 
     def __str__(self):
         retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
@@ -3852,6 +3870,8 @@ class chamber(Action):
         elif self.box is not None:
             retstr += ' Box info %s.' % (self.box)
         retstr += ' GB Radius set %s.' % self.radii
+        if self.nosettle:
+            retstr += ' Not changing water names.'
         return retstr
 
     def execute(self):
@@ -3945,6 +3965,15 @@ class chamber(Action):
         changeRadii(parm, self.radii).execute()
         self.parm_list.add_parm(parm)
         self.parm = parm
+        if not self.nosettle:
+            # Change water residue names from TIP3 to WAT and OH2 to O
+            for res, nam in zip(parm.residues, parm.parm_data['RESIDUE_LABEL']):
+                if nam != 'TIP3':
+                    continue
+                res.name = parm.parm_data['RESIDUE_LABEL'][res.idx] = 'WAT'
+                for atom in res:
+                    if atom.name == 'OH2':
+                        atom.name = parm.parm_data['ATOM_NAME'][atom.idx] = 'O'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
