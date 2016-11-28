@@ -117,7 +117,7 @@ class OpenMMParameterSet(ParameterSet):
 
         return new_params
 
-    def write(self, dest, provenance=None, write_unused=True):
+    def write(self, dest, provenance=None, write_unused=True, ljforce=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -151,6 +151,12 @@ class OpenMMParameterSet(ParameterSet):
             templates remaining and parameters including those atom types will
             not be written. A ParameterWarning is issued if any such residues are
             found in a).
+        ljforce : bool
+            If True will turn off L-J and use the LennardJonesForce to use
+            CostumNonbondedForce to compute L-J interactions. Default is False. It
+            should be set to True when converting a charmm force field file that doesn't
+            have NBFIX in the file so that the ffxml conversion is compatible with the
+            main charmm36.xml file
 
         Notes
         -----
@@ -193,8 +199,8 @@ class OpenMMParameterSet(ParameterSet):
 #           self._write_omm_rb_torsions(dest, skip_types)
             self._write_omm_cmaps(dest, skip_types)
             self._write_omm_scripts(dest, skip_types)
-            self._write_omm_nonbonded(dest, skip_types)
-            self._write_omm_LennardJonesForce(dest, skip_types)
+            self._write_omm_nonbonded(dest, skip_types, ljforce)
+            self._write_omm_LennardJonesForce(dest, skip_types, ljforce)
         finally:
             dest.write('</ForceField>\n')
             if own_handle:
@@ -440,7 +446,7 @@ class OpenMMParameterSet(ParameterSet):
             )
         dest.write(' </CmapTorsionForce>\n')
 
-    def _write_omm_nonbonded(self, dest, skip_types):
+    def _write_omm_nonbonded(self, dest, skip_types, ljforce):
         if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -484,7 +490,7 @@ class OpenMMParameterSet(ParameterSet):
                 sigma = 1.0
                 epsilon = 0.0
 
-            if self.nbfix_types:
+            if self.nbfix_types or ljforce:
                 # turn off L-J. Will use LennardJonesForce to use CostumNonbondedForce to compute L-J interactions
                 sigma = 1.0
                 epsilon = 0.0
@@ -500,8 +506,8 @@ class OpenMMParameterSet(ParameterSet):
                        (name, sigma, abs(epsilon)))
         dest.write(' </NonbondedForce>\n')
 
-    def _write_omm_LennardJonesForce(self, dest, skip_types):
-        if not self.nbfix_types: return
+    def _write_omm_LennardJonesForce(self, dest, skip_types, ljforce):
+        if not self.nbfix_types and not ljforce: return
         # Convert Conversion factors for writing in natural OpenMM units
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
