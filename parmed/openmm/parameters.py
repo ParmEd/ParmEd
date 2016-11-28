@@ -152,16 +152,17 @@ class OpenMMParameterSet(ParameterSet):
             not be written. A ParameterWarning is issued if any such residues are
             found in a).
         separate_ljforce : bool
-            If True will use a separate LennardJonesForce to create a CostumNonbondedForce to
-            compute L-J interactions. It will set sigma to 1 and epsilon to 0 in the NonbondedForce
-            so that the NonbondedForce only calculates the electrostatic contribution.
-            It should be set to True when converting a CHARMM force field file that doesn't
-            have pair-specific L-J modifications (NBFIX in CHARMM) so that the ffxml conversion
-            is compatible with the main charmm36.xml file
+            If True will use a separate LennardJonesForce to create a
+            CostumNonbondedForce to compute L-J interactions. It will set sigma
+            to 1 and epsilon to 0 in the NonbondedForce so that the
+            NonbondedForce  only calculates the electrostatic contribution. It
+            should be set to True when converting a CHARMM force field file that
+            doesn't have pair-specific  L-J modifications (NBFIX in CHARMM) so
+            that the ffxml conversion is compatible with the main charmm36.xml file.
             Note:
             ----
-            When pair-specific L-J modifications are present (NBFIX in CHARMM), this behavior is
-            always present and this flag is ignored.
+            When pair-specific L-J modifications are present (NBFIX in CHARMM), this
+            behavior is always present and this flag is ignored.
 
         Notes
         -----
