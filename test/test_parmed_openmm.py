@@ -556,7 +556,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                          OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrell'
                      ),
-                     ljforce=True
+                     separate_ljforce=True
         )
 
     def test_not_write_residues_with_same_templhash(self):
