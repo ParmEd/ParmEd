@@ -1644,30 +1644,34 @@ class AmberParm(AmberFormat, Structure):
         data['DIHEDRALS_INC_HYDROGEN'] = dihed_array = []
         dihed_list = list(self.dihedrals_inc_h)
         for dihed in dihed_list:
+            imp_sign = -1 if dihed.improper else 1
+            end_sign = -1 if dihed.ignore_end else 1
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*dihed.signs[0],
-                                    dihed.atom1.idx*3*dihed.signs[1],
+                                    dihed.atom2.idx*3*end_sign,
+                                    dihed.atom1.idx*3*imp_sign,
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*dihed.signs[0],
-                                    dihed.atom4.idx*3*dihed.signs[1],
+                                    dihed.atom3.idx*3*end_sign,
+                                    dihed.atom4.idx*3*imp_sign,
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIH] = len(dihed_list)
         self.pointers['NPHIH'] = len(dihed_list)
         data['DIHEDRALS_WITHOUT_HYDROGEN'] = dihed_array = []
         dihed_list = list(self.dihedrals_without_h)
         for dihed in dihed_list:
+            imp_sign = -1 if dihed.improper else 1
+            end_sign = -1 if dihed.ignore_end else 1
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*dihed.signs[0],
-                                    dihed.atom1.idx*3*dihed.signs[1],
+                                    dihed.atom2.idx*3*end_sign,
+                                    dihed.atom1.idx*3*imp_sign,
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*dihed.signs[0],
-                                    dihed.atom4.idx*3*dihed.signs[1],
+                                    dihed.atom3.idx*3*end_sign,
+                                    dihed.atom4.idx*3*imp_sign,
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = len(dihed_list)
         self.pointers['NPHIA'] = self.pointers['MPHIA'] = len(dihed_list)

@@ -2569,8 +2569,7 @@ class tiMerge(Action):
                             'that breaks a ring. Try redefining your softcore '
                             'region to include the ring or at least three '
                             'consecutive atoms.' %
-                            (atmi+1, atmj+1, (atmk+1) * dihed.signs[0],
-                             (atml+1) * dihed.signs[1])
+                            (atmi+1, atmj+1, abs(atmk)+1, abs(atml)+1)
                     )
 
         self.sc_mask1 = '@' + ','.join(new_sc_atm1)
@@ -3495,10 +3494,10 @@ class energy(Action):
 
     Examples
     --------
-    
+
         # Using AMBER
         import parmed as pmd
-        parm = pmd.load_file('prmtop', xyz='rst7') 
+        parm = pmd.load_file('prmtop', xyz='rst7')
         pmd.tools.energy(parm, 'igb 8').execute()
 
         # Using Openmm
